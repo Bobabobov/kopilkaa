@@ -1,10 +1,14 @@
-@'
-node_modules
+﻿node_modules
 .next
 .env
-prisma/prod.db
+.env.local
+.env.*
+prisma/*.db
 prisma/backups
-backups
+uploads/
+backups/
 *.log
 npm-debug.log*
-'@ | Out-File -Encoding utf8 .gitignore
+ssh*
+*.pem
+*.pub

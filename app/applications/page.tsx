@@ -140,7 +140,7 @@ export default function ApplicationsPage() {
       transition={{ duration: 0.4 }}
       className="mx-auto max-w-3xl card p-6"
     >
-      <h1 className="text-2xl font-semibold mb-4">Подачаfffff заявки</h1>
+      <h1 className="text-2xl font-semibold mb-4">Подача заявки</h1>
 
       <form className="grid gap-4" onSubmit={submit}>
         <div>

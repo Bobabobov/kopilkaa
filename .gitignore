@@ -1,0 +1,10 @@
+@'
+node_modules
+.next
+.env
+prisma/prod.db
+prisma/backups
+backups
+*.log
+npm-debug.log*
+'@ | Out-File -Encoding utf8 .gitignore

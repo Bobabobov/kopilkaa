@@ -27,7 +27,7 @@ export default function ProfilePage() {
       {loading && <div>Загрузка…</div>}
       {!loading && !user && (
         <div>
-          Вы не вошли. <a href="/auth" className="underline">Перейти ко входу</a>
+          Вы не вошли. <a href="/login" className="underline">Перейти ко входу</a>
         </div>
       )}
   

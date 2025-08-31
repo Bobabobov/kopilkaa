@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 
 type User = { id: string; email: string; role: "USER" | "ADMIN"; name?: string | null } | null;
 
-// Маршруты авторизации (эти страницы у тебя уже есть)
-const LOGIN    = "/login-new"    as Route;
-const REGISTER = "/register-new" as Route;
+// Маршруты авторизации
+const LOGIN    = "/login"    as Route;
+const REGISTER = "/register" as Route;
 
 export default function NavAuth() {
   const [user, setUser] = useState<User>(null);

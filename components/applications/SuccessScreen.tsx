@@ -104,7 +104,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onNewApplication}
-          className="px-10 py-4 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
+          className="px-8 py-3 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
           style={{ background: 'linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)' }}
         >
           Создать ещё заявку
@@ -114,9 +114,9 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-10 py-4 bg-white/30 font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl border border-white/20 hover:bg-white/40 text-lg"
+                  className="px-8 py-3 bg-white/20 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10"
                   style={{ 
-                    borderColor: '#abd1c6/30',
+                    borderColor: '#abd1c6/20',
                     color: '#fffffe'
                   }}
                 >

@@ -119,7 +119,7 @@ export default function AvatarUpload({
   };
 
   const displayAvatar = preview || currentAvatar;
-  const avatarLetter = userName[0]?.toUpperCase() || "?";
+  const avatarLetter = (userName && userName[0]) ? userName[0].toUpperCase() : "?";
   const frame = getAvatarFrame(avatarFrame || 'none');
   const frameKey = avatarFrame || 'none';
 

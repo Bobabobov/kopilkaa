@@ -241,12 +241,12 @@
 
 /* Темная тема */
 @media (prefers-color-scheme: dark) {
-  .stack-game .stack-game .stack-game-container {
+  .stack-game .stack-game-container {
     background: rgba(31, 41, 55, 0.95);
     border-color: rgba(75, 85, 99, 0.3);
   }
 
-  .stack-game .stack-game .stack-game-title {
+  .stack-game .stack-game-title {
     color: #f9fafb;
   }
 
@@ -305,7 +305,7 @@
 
 /* Адаптивность */
 @media (max-width: 640px) {
-  .stack-game .stack-game .stack-game-container {
+  .stack-game .stack-game-container {
     margin: 10px;
     padding: 16px;
     max-width: none;
@@ -327,7 +327,7 @@
     max-width: 200px;
   }
 
-  .stack-game .stack-game .stack-game-stats {
+  .stack-game .stack-game-stats {
     flex-direction: column;
     gap: 12px;
   }

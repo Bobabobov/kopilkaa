@@ -34,36 +34,13 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Link 
             href="/applications"
-            className="group relative px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer"
+            className="px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-105"
             style={{ 
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: '#ffffff',
-              boxShadow: '0 10px 30px rgba(102, 126, 234, 0.4), 0 4px 15px rgba(118, 75, 162, 0.3)',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #7c94f1 0%, #8a5cb8 100%)';
-              e.currentTarget.style.boxShadow = '0 15px 40px rgba(102, 126, 234, 0.6), 0 6px 20px rgba(118, 75, 162, 0.5)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-              e.currentTarget.style.boxShadow = '0 10px 30px rgba(102, 126, 234, 0.4), 0 4px 15px rgba(118, 75, 162, 0.3)';
-            }}
-            onMouseDown={(e) => {
-              e.currentTarget.style.transform = 'scale(0.95)';
-            }}
-            onMouseUp={(e) => {
-              e.currentTarget.style.transform = 'scale(1.1)';
+              backgroundColor: '#f9bc60',
+              color: '#001e1d'
             }}
           >
-            <span className="relative z-10">Создать заявку</span>
-            <div 
-              className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{
-                background: 'linear-gradient(135deg, #8a9eff 0%, #9d6dd1 100%)',
-                filter: 'blur(1px)'
-              }}
-            />
+            Создать заявку
           </Link>
           
           <Link 

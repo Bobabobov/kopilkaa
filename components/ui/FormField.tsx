@@ -105,20 +105,8 @@ export default function FormField({
       }}
     >
       {/* Лейбл */}
-      <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-        {IconComponent && <IconComponent size="sm" className="text-emerald-500" />}
+      <label className="block text-sm font-medium mb-2" style={{ color: '#abd1c6' }}>
         {label} {required && "*"}
-        {maxLength && <span className="text-gray-500">(≤ {maxLength})</span>}
-        {ValidationIconComponent && (
-          <div
-            className={`${getValidationIconColor()} transition-transform duration-200`}
-            style={{
-              animation: `scaleIn 0.2s ease-out both`
-            }}
-          >
-            <ValidationIconComponent size="sm" />
-          </div>
-        )}
       </label>
       
       {/* Поле ввода */}
@@ -129,11 +117,31 @@ export default function FormField({
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             rows={compact ? 2 : rows}
-            className={`w-full px-4 py-3 rounded-xl border-2 ${getValidationColor()} bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-300 resize-none ${compact ? 'text-sm' : ''}`}
+            className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50 resize-none ${
+              error || isRequiredEmpty 
+                ? 'border-red-400 bg-red-50/10' 
+                : value.trim() 
+                  ? 'border-[#abd1c6]/60 bg-[#abd1c6]/5' 
+                  : 'border-[#abd1c6]/30 bg-[#004643]/50'
+            }`}
+            style={{ 
+              color: '#fffffe',
+              backgroundColor: error || isRequiredEmpty ? 'rgba(239, 68, 68, 0.05)' : value.trim() ? 'rgba(171, 209, 198, 0.05)' : 'rgba(0, 70, 67, 0.5)'
+            }}
           />
         ) : (
           <input 
-            className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200 ${getValidationColor()}`}
+            className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50 ${
+              error || isRequiredEmpty 
+                ? 'border-red-400 bg-red-50/10' 
+                : value.trim() 
+                  ? 'border-[#abd1c6]/60 bg-[#abd1c6]/5' 
+                  : 'border-[#abd1c6]/30 bg-[#004643]/50'
+            }`}
+            style={{ 
+              color: '#fffffe',
+              backgroundColor: error || isRequiredEmpty ? 'rgba(239, 68, 68, 0.05)' : value.trim() ? 'rgba(171, 209, 198, 0.05)' : 'rgba(0, 70, 67, 0.5)'
+            }}
             type={type === "email" ? "text" : type}
             value={value} 
             onChange={e => onChange(e.target.value)}
@@ -142,9 +150,14 @@ export default function FormField({
         )}
         
         {/* Иконка валидации справа */}
-        {ValidationIconComponent && (
+        {value.trim() && !error && !isRequiredEmpty && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-            <ValidationIconComponent size="sm" className={getValidationIconColor()} />
+            <LucideIcons.CheckCircle size="sm" className="text-[#abd1c6]" />
+          </div>
+        )}
+        {(error || isRequiredEmpty) && (
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <LucideIcons.XCircle size="sm" className="text-red-400" />
           </div>
         )}
       </div>
@@ -165,38 +178,24 @@ export default function FormField({
       {showValidation && (
         <>
           {isRequiredEmpty && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 text-red-500 text-sm mt-1 animate-fadeIn"
-            >
+            <div className="flex items-center gap-2 text-red-400 text-sm mt-2 animate-fadeIn">
               <LucideIcons.Alert size="sm" />
               <span>Заполните это поле</span>
-            </motion.div>
+            </div>
           )}
           
           {isOverLimit && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-2 text-red-500 text-sm mt-1 animate-fadeIn"
-            >
+            <div className="flex items-center gap-2 text-red-400 text-sm mt-2 animate-fadeIn">
               <LucideIcons.XCircle size="sm" />
               <span>Превышен лимит символов</span>
-            </motion.div>
+            </div>
           )}
           
           {error && (
-            <motion.p 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mt-1 text-sm text-red-600 dark:text-red-400"
-            >
-              {error}
-            </motion.p>
+            <div className="flex items-center gap-2 text-red-400 text-sm mt-2 animate-fadeIn">
+              <LucideIcons.Alert size="sm" />
+              <span>{error}</span>
+            </div>
           )}
         </>
       )}

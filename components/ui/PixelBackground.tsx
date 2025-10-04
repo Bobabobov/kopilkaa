@@ -28,162 +28,194 @@ export default function PixelBackground() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Low Poly / Пиксельные цвета
-    const colors = [
-      '#004643', // Основной тёмно-зелёный
-      '#0f4c3a', // Тёмно-зелёный
-      '#2d5a4e', // Средне-зелёный
-      '#abd1c6', // Светло-зелёный
-      '#f9bc60', // Жёлтый
-      '#e16162', // Красный
-      '#f38ba8', // Розовый
-      '#a786df', // Фиолетовый
-      '#7dc4e4', // Голубой
-    ];
+    // Пиксельные цвета для неба и облаков
+    const skyColors = {
+      skyBlue: '#87CEEB',      // Ярко-голубое небо
+      lightBlue: '#B0E0E6',    // Светло-голубой
+      cloudWhite: '#FFFFFF',   // Белые облака
+      cloudGray: '#F0F8FF',    // Светло-серые облака
+      cloudShadow: '#E6F3FF'   // Тени облаков
+    };
 
-    // Класс для пиксельного блока
-    class PixelBlock {
+    // Класс для пиксельного облака
+    class PixelCloud {
       x: number;
       y: number;
-      size: number;
-      color: string;
+      width: number;
+      height: number;
       speedX: number;
       speedY: number;
-      rotation: number;
-      rotationSpeed: number;
-      pulse: number;
-      pulseSpeed: number;
+      segments: number[][];
+      time: number;
 
       constructor() {
         this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 40 + 20;
-        this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5;
-        this.rotation = Math.random() * Math.PI * 2;
-        this.rotationSpeed = (Math.random() - 0.5) * 0.02;
-        this.pulse = Math.random() * Math.PI * 2;
-        this.pulseSpeed = (Math.random() - 0.5) * 0.03;
+        this.y = Math.random() * canvas.height * 0.7; // Облака только в верхней части
+        this.width = Math.random() * 120 + 80;
+        this.height = Math.random() * 40 + 20;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.1;
+        this.time = Math.random() * Math.PI * 2;
+        
+        // Создаём сегменты облака для пиксельного вида
+        this.segments = this.generateCloudSegments();
+      }
+
+      generateCloudSegments(): number[][] {
+        const segments = [];
+        const segmentCount = Math.floor(this.width / 20);
+        
+        for (let i = 0; i < segmentCount; i++) {
+          const segmentX = (i / segmentCount) * this.width;
+          const segmentWidth = this.width / segmentCount;
+          const segmentHeight = this.height * (0.7 + Math.random() * 0.6);
+          const segmentY = this.height - segmentHeight;
+          
+          segments.push([segmentX, segmentY, segmentWidth, segmentHeight]);
+        }
+        
+        return segments;
       }
 
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
-        this.rotation += this.rotationSpeed;
-        this.pulse += this.pulseSpeed;
+        this.time += 0.01;
 
-        // Ограничение движения
-        if (this.x < 0) this.x = canvas.width;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.y < 0) this.y = canvas.height;
-        if (this.y > canvas.height) this.y = 0;
+        // Ограничение движения (облака циклически перемещаются)
+        if (this.x < -this.width) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = -this.width;
+        if (this.y < 0) this.y = canvas.height * 0.7;
+        if (this.y > canvas.height * 0.7) this.y = 0;
       }
 
       draw() {
-        const pulseScale = 1 + Math.sin(this.pulse) * 0.1;
-        const currentSize = this.size * pulseScale;
-
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.rotate(this.rotation);
         
-        // Рисуем пиксельный блок с градиентом
-        const gradient = ctx.createLinearGradient(-currentSize/2, -currentSize/2, currentSize/2, currentSize/2);
-        const colorVariation = Math.sin(this.pulse) * 15;
-        
-        // Создаём пиксельный эффект через цветовые вариации
-        const baseColor = this.color;
-        const lightColor = this.lightenColor(baseColor, colorVariation);
-        const darkColor = this.darkenColor(baseColor, colorVariation);
-        
-        // Проверяем валидность цветов
-        const isValidColor = (color: string) => /^#[0-9A-F]{6}$/i.test(color);
-        
-        gradient.addColorStop(0, isValidColor(lightColor) ? lightColor : baseColor);
-        gradient.addColorStop(0.5, isValidColor(baseColor) ? baseColor : '#004643');
-        gradient.addColorStop(1, isValidColor(darkColor) ? darkColor : baseColor);
-
-        ctx.fillStyle = gradient;
-        ctx.fillRect(-currentSize/2, -currentSize/2, currentSize, currentSize);
-        
-        // Добавляем пиксельную рамку
-        ctx.strokeStyle = this.lightenColor(baseColor, 30);
-        ctx.lineWidth = 1;
-        ctx.strokeRect(-currentSize/2, -currentSize/2, currentSize, currentSize);
+        // Рисуем сегменты облака
+        this.segments.forEach((segment, index) => {
+          const [segX, segY, segW, segH] = segment;
+          
+          // Основное облако
+          ctx.fillStyle = skyColors.cloudWhite;
+          ctx.fillRect(segX, segY, segW, segH);
+          
+          // Тень облака
+          ctx.fillStyle = skyColors.cloudShadow;
+          ctx.fillRect(segX + 2, segY + 2, segW, segH);
+          
+          // Пиксельная рамка
+          ctx.strokeStyle = skyColors.cloudGray;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(segX, segY, segW, segH);
+        });
         
         ctx.restore();
       }
+    }
 
-      lightenColor(color: string, amount: number): string {
-        const num = parseInt(color.replace("#", ""), 16);
-        const r = Math.min(255, Math.max(0, ((num >> 16) & 255) + amount));
-        const g = Math.min(255, Math.max(0, ((num >> 8) & 255) + amount));
-        const b = Math.min(255, Math.max(0, (num & 255) + amount));
-        const hex = ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
-        return `#${hex}`;
+    // Класс для пиксельного солнца
+    class PixelSun {
+      x: number;
+      y: number;
+      radius: number;
+      time: number;
+
+      constructor() {
+        this.x = canvas.width * 0.8;
+        this.y = canvas.height * 0.2;
+        this.radius = 25;
+        this.time = 0;
       }
 
-      darkenColor(color: string, amount: number): string {
-        const num = parseInt(color.replace("#", ""), 16);
-        const r = Math.min(255, Math.max(0, ((num >> 16) & 255) - amount));
-        const g = Math.min(255, Math.max(0, ((num >> 8) & 255) - amount));
-        const b = Math.min(255, Math.max(0, (num & 255) - amount));
-        const hex = ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
-        return `#${hex}`;
+      update() {
+        this.time += 0.02;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        
+        // Лучи солнца
+        const rayCount = 8;
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 3;
+        
+        for (let i = 0; i < rayCount; i++) {
+          const angle = (i / rayCount) * Math.PI * 2 + this.time;
+          const startRadius = this.radius + 5;
+          const endRadius = this.radius + 15;
+          
+          ctx.beginPath();
+          ctx.moveTo(
+            Math.cos(angle) * startRadius,
+            Math.sin(angle) * startRadius
+          );
+          ctx.lineTo(
+            Math.cos(angle) * endRadius,
+            Math.sin(angle) * endRadius
+          );
+          ctx.stroke();
+        }
+        
+        // Само солнце
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(-this.radius, -this.radius, this.radius * 2, this.radius * 2);
+        
+        // Рамка солнца
+        ctx.strokeStyle = '#FFA500';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-this.radius, -this.radius, this.radius * 2, this.radius * 2);
+        
+        ctx.restore();
       }
     }
 
-    // Создаём блоки
-    const blocks: PixelBlock[] = [];
-    const blockCount = Math.min(50, Math.floor((canvas.width * canvas.height) / 10000));
+    // Создаём облака и солнце
+    const clouds: PixelCloud[] = [];
+    const cloudCount = Math.min(15, Math.floor(canvas.width / 100));
     
-    for (let i = 0; i < blockCount; i++) {
-      blocks.push(new PixelBlock());
+    for (let i = 0; i < cloudCount; i++) {
+      clouds.push(new PixelCloud());
     }
+
+    const sun = new PixelSun();
 
     // Функция анимации
     const animate = () => {
       timeRef.current += 0.01;
       
-      // Очищаем canvas
-      ctx.fillStyle = '#004643';
+      // Рисуем небо с градиентом
+      const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      const timeVariation = Math.sin(timeRef.current * 0.3) * 0.1;
+      
+      skyGradient.addColorStop(0, `hsl(${200 + timeVariation * 5}, 70%, ${85 + timeVariation * 5}%)`);
+      skyGradient.addColorStop(0.6, `hsl(${210 + timeVariation * 8}, 60%, ${80 + timeVariation * 3}%)`);
+      skyGradient.addColorStop(1, `hsl(${220 + timeVariation * 10}, 50%, ${75 + timeVariation * 2}%)`);
+      
+      ctx.fillStyle = skyGradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Добавляем градиентный фон с пиксельным эффектом
-      const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      const timeVariation = Math.sin(timeRef.current * 0.5) * 0.1;
-      
-      bgGradient.addColorStop(0, `hsl(${180 + timeVariation * 10}, 70%, ${15 + timeVariation * 5}%)`);
-      bgGradient.addColorStop(0.5, `hsl(${200 + timeVariation * 15}, 60%, ${12 + timeVariation * 3}%)`);
-      bgGradient.addColorStop(1, `hsl(${220 + timeVariation * 20}, 50%, ${10 + timeVariation * 2}%)`);
-      
-      ctx.fillStyle = bgGradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Рисуем пиксельную сетку для Low Poly эффекта
-      ctx.strokeStyle = 'rgba(171, 209, 198, 0.1)';
-      ctx.lineWidth = 0.5;
-      
-      const gridSize = 50;
-      for (let x = 0; x < canvas.width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
+      // Добавляем пиксельную текстуру неба
+      ctx.fillStyle = 'rgba(135, 206, 235, 0.1)';
+      const pixelSize = 4;
+      for (let x = 0; x < canvas.width; x += pixelSize * 2) {
+        for (let y = 0; y < canvas.height * 0.7; y += pixelSize * 2) {
+          if (Math.random() > 0.95) {
+            ctx.fillRect(x, y, pixelSize, pixelSize);
+          }
+        }
       }
       
-      for (let y = 0; y < canvas.height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-      }
+      // Обновляем и рисуем солнце
+      sun.update();
+      sun.draw();
       
-      // Обновляем и рисуем блоки
-      blocks.forEach(block => {
-        block.update();
-        block.draw();
+      // Обновляем и рисуем облака
+      clouds.forEach(cloud => {
+        cloud.update();
+        cloud.draw();
       });
       
       animationRef.current = requestAnimationFrame(animate);

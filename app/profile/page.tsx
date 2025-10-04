@@ -11,7 +11,7 @@ import ProfileLikesSection from "@/components/profile/ProfileLikesSection";
 import ProfileFriendsSection from "@/components/profile/ProfileFriendsSection";
 import SettingsModal from "@/components/profile/SettingsModal";
 import UniversalBackground from "@/components/ui/UniversalBackground";
-import ThreePet from "@/components/ThreePet";
+// import ThreePet from "@/components/ThreePet"; // Temporarily disabled
 
 type User = { id: string; email: string; role: "USER" | "ADMIN"; name?: string | null; createdAt: string; avatar?: string | null; headerTheme?: string | null; avatarFrame?: string | null; hideEmail?: boolean; lastSeen?: string | null };
 
@@ -110,7 +110,7 @@ export default function ProfilePage() {
                   transition={{ delay: 0.3 }}
                   className="lg:col-span-6"
                 >
-                  <ThreePet />
+                  {/* <ThreePet /> */} {/* Temporarily disabled - requires Three.js */}
                 </motion.div>
 
                 {/* Right Sidebar - Статистика и Активность - 3 колонки */}

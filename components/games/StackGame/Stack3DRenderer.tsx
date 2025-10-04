@@ -35,57 +35,80 @@ const Stack3DRenderer: React.FC<Stack3DRendererProps> = ({
 
   // Создание 3D сцены
   const initScene = useCallback(() => {
-    if (!mountRef.current) return;
+    if (!mountRef.current) {
+      console.error('Mount ref is null');
+      return;
+    }
 
-    // Создание сцены
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a2e);
-    sceneRef.current = scene;
+    try {
+      // Очистка предыдущего содержимого
+      mountRef.current.innerHTML = '';
 
-    // Создание камеры
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      600 / 800, // Соотношение сторон canvas
-      0.1,
-      1000
-    );
-    camera.position.set(0, 5, 15);
-    camera.lookAt(0, 0, 0);
-    cameraRef.current = camera;
+      // Создание сцены
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x1a1a2e);
+      sceneRef.current = scene;
 
-    // Создание рендерера
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(600, 800);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    rendererRef.current = renderer;
+      // Создание камеры
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        600 / 800, // Соотношение сторон canvas
+        0.1,
+        1000
+      );
+      camera.position.set(0, 5, 15);
+      camera.lookAt(0, 0, 0);
+      cameraRef.current = camera;
 
-    // Освещение
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-    scene.add(ambientLight);
+      // Создание рендерера
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(600, 800);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      rendererRef.current = renderer;
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(10, 10, 5);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    scene.add(directionalLight);
+      // Освещение
+      const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+      scene.add(ambientLight);
 
-    // Добавление рендерера в DOM
-    mountRef.current.appendChild(renderer.domElement);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(10, 10, 5);
+      directionalLight.castShadow = true;
+      directionalLight.shadow.mapSize.width = 2048;
+      directionalLight.shadow.mapSize.height = 2048;
+      scene.add(directionalLight);
 
-    // Обработчик клика
-    const handleClick = (event: MouseEvent) => {
-      if (!gameOver) {
-        onCanvasClick();
+      // Добавление тестового куба для проверки
+      const testGeometry = new THREE.BoxGeometry(2, 2, 2);
+      const testMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+      const testCube = new THREE.Mesh(testGeometry, testMaterial);
+      testCube.position.set(0, 0, 0);
+      scene.add(testCube);
+
+      // Добавление рендерера в DOM
+      mountRef.current.appendChild(renderer.domElement);
+
+      // Обработчик клика
+      const handleClick = (event: MouseEvent) => {
+        if (!gameOver) {
+          onCanvasClick();
+        }
+      };
+
+      renderer.domElement.addEventListener('click', handleClick);
+
+      console.log('3D scene initialized successfully');
+
+      return () => {
+        renderer.domElement.removeEventListener('click', handleClick);
+      };
+    } catch (error) {
+      console.error('Error initializing 3D scene:', error);
+      // Fallback: показать сообщение об ошибке
+      if (mountRef.current) {
+        mountRef.current.innerHTML = '<div style="color: white; text-align: center; padding: 20px;">Ошибка загрузки 3D сцены</div>';
       }
-    };
-
-    renderer.domElement.addEventListener('click', handleClick);
-
-    return () => {
-      renderer.domElement.removeEventListener('click', handleClick);
-    };
+    }
   }, [gameOver, onCanvasClick]);
 
   // Создание 3D блока
@@ -161,6 +184,15 @@ const Stack3DRenderer: React.FC<Stack3DRendererProps> = ({
       
       // Легкое вращение
       currentBlockRef.current.rotation.y += 0.01;
+    }
+
+    // Анимация тестового куба
+    if (sceneRef.current) {
+      const testCube = sceneRef.current.children.find(child => child instanceof THREE.Mesh && child.geometry instanceof THREE.BoxGeometry);
+      if (testCube) {
+        testCube.rotation.x += 0.01;
+        testCube.rotation.y += 0.01;
+      }
     }
   }, [currentBlock]);
 

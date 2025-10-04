@@ -435,7 +435,7 @@ export default function AdminClient() {
                         <div className="min-w-0 flex-1 basis-0">
                           <a
                             href={`/admin/applications/${it.id}`}
-                            className="text-lg sm:text-xl font-bold clamp-2 break-words max-w-full text-gray-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 hover:underline transition-colors cursor-pointer group-hover:scale-105 transform duration-300"
+                            className="text-lg sm:text-xl font-bold clamp-2 break-words max-w-full text-gray-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 hover:underline transition-colors cursor-pointer"
                             title="Открыть полную заявку"
                           >
                             {it.title}

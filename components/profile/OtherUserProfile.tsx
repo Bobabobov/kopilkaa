@@ -57,7 +57,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch("/api/profile/me");
+        const response = await fetch("/api/profile/me", { cache: "no-store" });
         if (response.ok) {
           const data = await response.json();
           setIsAuthenticated(true);

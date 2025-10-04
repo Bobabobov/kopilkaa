@@ -140,10 +140,12 @@ export default function ProfilePage() {
       </div>
 
       {/* Модальное окно настроек */}
-      <SettingsModal
-        isOpen={isSettingsModalOpen}
-        onClose={() => setIsSettingsModalOpen(false)}
-      />
+      {isSettingsModalOpen && (
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

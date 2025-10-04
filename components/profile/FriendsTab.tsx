@@ -155,6 +155,23 @@ export default function FriendsTab({
     );
   }
 
+  // Проверяем, что data является массивом
+  if (!data || !Array.isArray(data)) {
+    const emptyState = getEmptyStateMessage();
+    
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center py-12"
+      >
+        <div className="text-6xl mb-4">{emptyState.icon}</div>
+        <h3 className="text-lg font-medium text-white mb-2">{emptyState.title}</h3>
+        <p className="text-gray-400 text-sm">{emptyState.description}</p>
+      </motion.div>
+    );
+  }
+
   if (data.length === 0) {
     const emptyState = getEmptyStateMessage();
     

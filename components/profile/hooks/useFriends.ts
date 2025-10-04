@@ -106,10 +106,10 @@ export function useFriends(): UseFriendsReturn {
       setLoading(true);
       
       // Получаем ID текущего пользователя
-      const meRes = await fetch("/api/profile/me");
+      const meRes = await fetch("/api/profile/me", { cache: "no-store" });
       if (meRes.ok) {
         const meData = await meRes.json();
-        setCurrentUserId(meData.id);
+        setCurrentUserId(meData.user.id); // Исправлено: meData.user.id вместо meData.id
       }
       
       // Загружаем данные параллельно
@@ -121,17 +121,17 @@ export function useFriends(): UseFriendsReturn {
       
       if (friendsRes.ok) {
         const friendsData = await friendsRes.json();
-        setFriends(friendsData || []);
+        setFriends(friendsData.friendships || []);
       }
       
       if (sentRes.ok) {
         const sentData = await sentRes.json();
-        setSentRequests(sentData || []);
+        setSentRequests(sentData.friendships || []);
       }
       
       if (receivedRes.ok) {
         const receivedData = await receivedRes.json();
-        setReceivedRequests(receivedData || []);
+        setReceivedRequests(receivedData.friendships || []);
       }
     } catch (error) {
       console.error("Error loading friends:", error);
@@ -143,17 +143,21 @@ export function useFriends(): UseFriendsReturn {
 
   // Поиск пользователей
   const searchUsers = useCallback(async (query: string) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
-    
     try {
       setSearchLoading(true);
-      const response = await fetch(`/api/users/search?q=${encodeURIComponent(query)}&limit=50`);
+      
+      // Если запрос пустой, показываем всех пользователей
+      const url = query.trim() 
+        ? `/api/users/search?q=${encodeURIComponent(query)}&limit=50`
+        : '/api/users/search?limit=50';
+      
+      console.log('Searching users with URL:', url);
+      
+      const response = await fetch(url);
       
       if (response.ok) {
         const data = await response.json();
+        console.log('Search results:', data.users?.length || 0, 'users found');
         setSearchResults(data.users || []);
       } else {
         const errorData = await response.json();
@@ -187,6 +191,8 @@ export function useFriends(): UseFriendsReturn {
     try {
       setSendingRequests(prev => new Set(prev).add(userId));
       
+      console.log('Sending friend request to userId:', userId);
+      
       const response = await fetch('/api/profile/friends', {
         method: 'POST',
         headers: {
@@ -195,12 +201,20 @@ export function useFriends(): UseFriendsReturn {
         body: JSON.stringify({ receiverId: userId }),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('Success response:', data);
         showToast("success", "Заявка отправлена");
+        console.log('Reloading friends and search results...');
         await loadFriends(); // Перезагружаем данные
+        await searchUsers(searchQuery); // Обновляем результаты поиска
+        console.log('Friends and search results reloaded');
       } else {
         const errorData = await response.json();
+        console.error('Error response:', errorData);
         showToast("error", errorData.message || "Ошибка отправки заявки");
       }
     } catch (error) {
@@ -227,6 +241,7 @@ export function useFriends(): UseFriendsReturn {
       if (response.ok) {
         showToast("success", "Заявка отменена");
         await loadFriends();
+        await searchUsers(searchQuery); // Обновляем результаты поиска
       } else {
         const errorData = await response.json();
         showToast("error", errorData.message || "Ошибка отмены заявки");
@@ -267,7 +282,7 @@ export function useFriends(): UseFriendsReturn {
         const friendsRes = await fetch("/api/profile/friends?type=friends");
         if (friendsRes.ok) {
           const friendsData = await friendsRes.json();
-          setFriends(friendsData || []);
+          setFriends(friendsData.friendships || []);
         }
       } else {
         const errorData = await response.json();
@@ -321,7 +336,7 @@ export function useFriends(): UseFriendsReturn {
         const friendsRes = await fetch("/api/profile/friends?type=friends");
         if (friendsRes.ok) {
           const friendsData = await friendsRes.json();
-          setFriends(friendsData || []);
+          setFriends(friendsData.friendships || []);
         }
       } else {
         const errorData = await response.json();
@@ -336,7 +351,9 @@ export function useFriends(): UseFriendsReturn {
   // Загружаем данные при монтировании
   useEffect(() => {
     loadFriends();
-  }, [loadFriends]);
+    // Загружаем всех пользователей для поиска при инициализации
+    searchUsers('');
+  }, []); // Убираем зависимость от loadFriends, чтобы избежать бесконечного цикла
 
   return {
     // Состояние

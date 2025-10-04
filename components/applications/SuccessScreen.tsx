@@ -55,7 +55,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
             >
               <div className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300" style={{ borderColor: '#abd1c6/30' }}>
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#abd1c6/20' }}>
-                  <LucideIcons.Clock size="lg" style={{ color: '#f9bc60' }} />
+                  <LucideIcons.Clock size="lg" className="text-[#f9bc60]" />
                 </div>
                 <h3 className="font-semibold mb-2 text-center" style={{ color: '#fffffe' }}>Модерация</h3>
                 <p className="text-sm text-center" style={{ color: '#abd1c6' }}>
@@ -65,7 +65,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
               
               <div className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300" style={{ borderColor: '#abd1c6/30' }}>
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#abd1c6/20' }}>
-                  <LucideIcons.Mail size="lg" style={{ color: '#f9bc60' }} />
+                  <LucideIcons.Mail size="lg" className="text-[#f9bc60]" />
                 </div>
                 <h3 className="font-semibold mb-2 text-center" style={{ color: '#fffffe' }}>Уведомления</h3>
                 <p className="text-sm text-center" style={{ color: '#abd1c6' }}>
@@ -75,7 +75,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
               
               <div className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300" style={{ borderColor: '#abd1c6/30' }}>
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#abd1c6/20' }}>
-                  <LucideIcons.Clock size="lg" style={{ color: '#e16162' }} />
+                  <LucideIcons.Clock size="lg" className="text-[#e16162]" />
                 </div>
                 <h3 className="font-semibold mb-2 text-center" style={{ color: '#fffffe' }}>Следующая заявка</h3>
                 <p className="text-sm text-center" style={{ color: '#abd1c6' }}>
@@ -85,7 +85,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
               
               <div className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300" style={{ borderColor: '#abd1c6/30' }}>
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#abd1c6/20' }}>
-                  <LucideIcons.Heart size="lg" style={{ color: '#e16162' }} />
+                  <LucideIcons.Heart size="lg" className="text-[#e16162]" />
                 </div>
                 <h3 className="font-semibold mb-2 text-center" style={{ color: '#fffffe' }}>Поддержка</h3>
                 <p className="text-sm text-center" style={{ color: '#abd1c6' }}>

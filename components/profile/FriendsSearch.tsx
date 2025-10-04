@@ -31,6 +31,7 @@ interface FriendsSearchProps {
   getUserStatus: (lastSeen: string | null) => UserStatus;
   sendingRequests: Set<string>;
   onSendRequest: (userId: string) => void;
+  onCancelRequest: (friendshipId: string, userId: string) => void;
 }
 
 export default function FriendsSearch({
@@ -41,7 +42,8 @@ export default function FriendsSearch({
   currentUserId,
   getUserStatus,
   sendingRequests,
-  onSendRequest
+  onSendRequest,
+  onCancelRequest
 }: FriendsSearchProps) {
   
   return (
@@ -68,7 +70,7 @@ export default function FriendsSearch({
       </div>
 
       {/* Результаты поиска */}
-      <div className="max-h-96 overflow-y-auto">
+      <div className="h-[50vh] overflow-y-auto">
         {searchLoading && searchQuery.trim() ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, index) => (
@@ -97,8 +99,15 @@ export default function FriendsSearch({
               Попробуйте изменить поисковый запрос
             </p>
           </motion.div>
-        ) : searchQuery.trim() && searchResults.length > 0 ? (
+        ) : searchResults.length > 0 ? (
           <div className="space-y-1">
+            {searchQuery.trim() && (
+              <div className="mb-4">
+                <p className="text-sm text-gray-400">
+                  {searchResults.length} {searchResults.length === 1 ? 'пользователь найден' : searchResults.length < 5 ? 'пользователя найдено' : 'пользователей найдено'}
+                </p>
+              </div>
+            )}
             {searchResults.map((user, index) => {
               const status = getUserStatus(user.lastSeen || null);
               const isSendingRequest = sendingRequests.has(user.id);
@@ -112,7 +121,8 @@ export default function FriendsSearch({
                   currentUserId={currentUserId}
                   status={status}
                   actions={{
-                    onSendRequest: isCurrentUser ? undefined : () => onSendRequest(user.id)
+                    onSendRequest: isCurrentUser ? undefined : () => onSendRequest(user.id),
+                    onCancelRequest: isCurrentUser ? undefined : user.friendshipId ? () => onCancelRequest(user.friendshipId!, user.id) : undefined
                   }}
                   isSendingRequest={isSendingRequest}
                   variant="search"
@@ -126,10 +136,17 @@ export default function FriendsSearch({
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-12"
           >
-            <div className="text-6xl mb-4">👥</div>
-            <h3 className="text-lg font-medium text-white mb-2">Поиск друзей</h3>
+            <div className="text-6xl mb-4">
+              {searchQuery.trim() ? '🔍' : '👥'}
+            </div>
+            <h3 className="text-lg font-medium text-white mb-2">
+              {searchQuery.trim() ? 'Ничего не найдено' : 'Поиск друзей'}
+            </h3>
             <p className="text-gray-400 text-sm">
-              Введите имя или email пользователя для поиска
+              {searchQuery.trim() 
+                ? 'Попробуйте изменить поисковый запрос'
+                : 'Введите имя или email пользователя для поиска или выберите из списка ниже'
+              }
             </p>
           </motion.div>
         )}

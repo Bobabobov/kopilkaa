@@ -71,12 +71,15 @@ export async function POST(request: Request) {
 
   try {
     const { receiverId } = await request.json();
+    console.log('POST /api/profile/friends - receiverId:', receiverId, 'session.uid:', session.uid);
 
     if (!receiverId) {
+      console.log('Error: receiverId is missing');
       return NextResponse.json({ message: 'ID получателя обязателен' }, { status: 400 });
     }
 
     if (receiverId === session.uid) {
+      console.log('Error: trying to add self as friend');
       return NextResponse.json({ message: 'Нельзя добавить себя в друзья' }, { status: 400 });
     }
 
@@ -87,6 +90,7 @@ export async function POST(request: Request) {
     });
 
     if (!receiver) {
+      console.log('Error: receiver not found:', receiverId);
       return NextResponse.json({ message: 'Пользователь не найден' }, { status: 404 });
     }
 
@@ -101,6 +105,7 @@ export async function POST(request: Request) {
     });
 
     if (existingFriendship) {
+      console.log('Error: friendship already exists:', existingFriendship);
       return NextResponse.json({ message: 'Заявка уже существует' }, { status: 400 });
     }
 
@@ -121,6 +126,7 @@ export async function POST(request: Request) {
       }
     });
 
+    console.log('Successfully created friendship:', friendship.id);
     return NextResponse.json({ friendship });
   } catch (error) {
     console.error('Create friendship error:', error);

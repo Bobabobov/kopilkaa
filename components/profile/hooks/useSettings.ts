@@ -100,7 +100,7 @@ export function useSettings(): UseSettingsReturn {
       
       if (response.ok) {
         const data = await response.json();
-        setUser(data);
+        setUser(data.user); // Исправлено: data.user вместо data
       } else {
         console.error("Failed to load user data");
       }
@@ -112,7 +112,7 @@ export function useSettings(): UseSettingsReturn {
   }, []);
 
   // Изменение имени
-  const handleNameChange = async (newName: string) => {
+  const handleNameChange = useCallback(async (newName: string) => {
     try {
       setSaving(true);
       const response = await fetch("/api/profile/me", {
@@ -125,7 +125,7 @@ export function useSettings(): UseSettingsReturn {
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data);
+        setUser(data.user); // Исправлено: data.user вместо data
         showLocalNotification('success', 'Успешно!', 'Имя обновлено');
       } else {
         const errorData = await response.json();
@@ -137,10 +137,10 @@ export function useSettings(): UseSettingsReturn {
     } finally {
       setSaving(false);
     }
-  };
+  }, [showLocalNotification]);
 
   // Изменение email
-  const handleEmailChange = async (newEmail: string) => {
+  const handleEmailChange = useCallback(async (newEmail: string) => {
     try {
       setSaving(true);
       const response = await fetch("/api/profile/me", {
@@ -153,7 +153,7 @@ export function useSettings(): UseSettingsReturn {
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data);
+        setUser(data.user); // Исправлено: data.user вместо data
         showLocalNotification('success', 'Успешно!', 'Email обновлен');
       } else {
         const errorData = await response.json();
@@ -165,10 +165,10 @@ export function useSettings(): UseSettingsReturn {
     } finally {
       setSaving(false);
     }
-  };
+  }, [showLocalNotification]);
 
   // Изменение видимости email
-  const handleEmailVisibilityChange = async (hideEmail: boolean) => {
+  const handleEmailVisibilityChange = useCallback(async (hideEmail: boolean) => {
     try {
       setSaving(true);
       const response = await fetch("/api/profile/me", {
@@ -181,7 +181,7 @@ export function useSettings(): UseSettingsReturn {
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data);
+        setUser(data.user); // Исправлено: data.user вместо data
         showLocalNotification('success', 'Успешно!', `Email ${hideEmail ? 'скрыт' : 'показывается'}`);
       } else {
         const errorData = await response.json();
@@ -193,21 +193,21 @@ export function useSettings(): UseSettingsReturn {
     } finally {
       setSaving(false);
     }
-  };
+  }, [showLocalNotification]);
 
   // Изменение аватарки
-  const handleAvatarChange = (avatarUrl: string | null) => {
+  const handleAvatarChange = useCallback((avatarUrl: string | null) => {
     if (user) {
       setUser({ ...user, avatar: avatarUrl });
     }
-  };
+  }, [user]);
 
   // Изменение рамки аватарки
-  const handleFrameChange = (frame: string) => {
+  const handleFrameChange = useCallback((frame: string) => {
     if (user) {
       setUser({ ...user, avatarFrame: frame });
     }
-  };
+  }, [user]);
 
   // Изменение пароля
   const handlePasswordChange = async (oldPassword: string, newPassword: string): Promise<boolean> => {
@@ -326,7 +326,7 @@ export function useSettings(): UseSettingsReturn {
   // Загружаем пользователя при монтировании
   useEffect(() => {
     loadUser();
-  }, [loadUser]);
+  }, []); // Убираем зависимость от loadUser, чтобы избежать бесконечного цикла
 
   return {
     // Состояние

@@ -40,10 +40,10 @@ export function StatsCards({ stats }: StatsCardsProps) {
         >
           {/* Простая иконка */}
           <div className="w-8 h-8 mx-auto mb-3 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f9bc60' }}>
-            {stat.icon === "FileText" && <LucideIcons.FileText size="sm" style={{ color: '#001e1d' }} />}
-            {stat.icon === "Clock" && <LucideIcons.Clock size="sm" style={{ color: '#001e1d' }} />}
-            {stat.icon === "CheckCircle" && <LucideIcons.CheckCircle size="sm" style={{ color: '#001e1d' }} />}
-            {stat.icon === "XCircle" && <LucideIcons.XCircle size="sm" style={{ color: '#001e1d' }} />}
+            {stat.icon === "FileText" && <LucideIcons.FileText size="sm" className="text-[#001e1d]" />}
+            {stat.icon === "Clock" && <LucideIcons.Clock size="sm" className="text-[#001e1d]" />}
+            {stat.icon === "CheckCircle" && <LucideIcons.CheckCircle size="sm" className="text-[#001e1d]" />}
+            {stat.icon === "XCircle" && <LucideIcons.XCircle size="sm" className="text-[#001e1d]" />}
           </div>
           
           {/* Число */}

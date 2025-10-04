@@ -88,7 +88,7 @@ const GamePreview: React.FC<GamePreviewProps> = ({
 
   if (isAvailable) {
     return (
-      <Link href={href} className="block">
+      <Link href={href as any} className="block">
         {content}
       </Link>
     );

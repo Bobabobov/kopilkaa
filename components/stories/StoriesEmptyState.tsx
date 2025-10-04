@@ -15,7 +15,7 @@ export function StoriesEmptyState({ hasQuery }: StoriesEmptyStateProps) {
                 {hasQuery ? (
                   <>
                     <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <LucideIcons.Search size="xl" style={{ color: '#abd1c6' }} />
+                      <LucideIcons.Search size="xl" className="text-[#abd1c6]" />
                     </div>
                     
                     <h3 className="text-2xl font-bold mb-4" style={{ color: '#fffffe' }}>
@@ -39,7 +39,7 @@ export function StoriesEmptyState({ hasQuery }: StoriesEmptyStateProps) {
                 ) : (
                   <>
                     <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <LucideIcons.BookOpen size="xl" style={{ color: '#f9bc60' }} />
+                      <LucideIcons.BookOpen size="xl" className="text-[#f9bc60]" />
                     </div>
                     
                     <h3 className="text-2xl font-bold mb-4" style={{ color: '#fffffe' }}>

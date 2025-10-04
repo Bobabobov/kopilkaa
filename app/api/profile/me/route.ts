@@ -7,12 +7,7 @@ export async function GET() {
     const session = await getSession();
     if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
     
-    // Обновляем lastSeen при каждом запросе
-    await prisma.user.update({
-      where: { id: session.uid },
-      data: { lastSeen: new Date() }
-    });
-    
+    // Получаем пользователя без обновления lastSeen при каждом запросе
     const user = await prisma.user.findUnique({
       where: { id: session.uid },
       select: { 
@@ -28,6 +23,27 @@ export async function GET() {
         lastSeen: true
       },
     });
+    
+    // Обновляем lastSeen только если прошло больше 5 минут с последнего обновления
+    if (user && user.lastSeen) {
+      const lastSeenTime = new Date(user.lastSeen);
+      const now = new Date();
+      const diffInMinutes = (now.getTime() - lastSeenTime.getTime()) / (1000 * 60);
+      
+      if (diffInMinutes > 5) {
+        // Обновляем lastSeen в фоне, не ждем результата
+        prisma.user.update({
+          where: { id: session.uid },
+          data: { lastSeen: new Date() }
+        }).catch(console.error);
+      }
+    } else if (user) {
+      // Если lastSeen null, обновляем
+      prisma.user.update({
+        where: { id: session.uid },
+        data: { lastSeen: new Date() }
+      }).catch(console.error);
+    }
     
     return Response.json({ user }, {
       headers: {

@@ -131,7 +131,7 @@ export default function ApplicationsModal({ isOpen, onClose }: ApplicationsModal
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl backdrop-blur-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 30, 29, 0.2)' }}>
-                  <LucideIcons.FileText size="md" style={{ color: '#001e1d' }} />
+                  <LucideIcons.FileText size="md" className="text-[#001e1d]" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold" style={{ color: '#001e1d' }}>Мои заявки</h2>

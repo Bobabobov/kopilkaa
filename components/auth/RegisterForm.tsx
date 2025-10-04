@@ -69,7 +69,7 @@ export default function RegisterForm({ onSubmit, busy, errors }: RegisterFormPro
           {/* Имя */}
           <FormField
             label="Имя"
-            type="text"
+            type="input"
             value={formData.name}
             onChange={(value) => handleInputChange('name', value)}
             placeholder="Как к вам обращаться"

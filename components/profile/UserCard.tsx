@@ -97,11 +97,35 @@ export default function UserCard({
         );
 
       case 'search':
+        // Проверяем статус дружбы
+        if (user.friendshipStatus === 'PENDING' && user.isRequester) {
+          return (
+            <button
+              onClick={actions?.onCancelRequest}
+              disabled={isSendingRequest}
+              className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-[#abd1c6] to-[#94c4b8] hover:from-[#94c4b8] hover:to-[#7db8aa] text-[#001e1d] rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none font-semibold"
+            >
+              {isSendingRequest ? 'Отмена...' : 'Отменить заявку'}
+            </button>
+          );
+        }
+        
+        if (user.friendshipStatus === 'ACCEPTED') {
+          return (
+            <button
+              disabled
+              className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-[#abd1c6] to-[#94c4b8] text-[#001e1d] rounded-xl cursor-not-allowed shadow-lg font-semibold"
+            >
+              В друзьях
+            </button>
+          );
+        }
+        
         return (
           <button
             onClick={actions?.onSendRequest}
             disabled={isSendingRequest}
-            className="px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-[#f9bc60] to-[#e8a545] hover:from-[#e8a545] hover:to-[#d4952a] text-[#001e1d] rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none font-semibold"
           >
             {isSendingRequest ? 'Отправка...' : 'Добавить'}
           </button>
@@ -118,7 +142,7 @@ export default function UserCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 * index }}
-      className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all duration-200 group"
+      className="flex items-center gap-4 p-4 rounded-2xl bg-[#004643]/40 hover:bg-[#004643]/60 backdrop-blur-sm border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 transition-all duration-300 group"
     >
       {/* Аватарка */}
       <Link 

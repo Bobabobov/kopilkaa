@@ -91,7 +91,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center p-4"
         onClick={onClose}
       >
         <motion.div
@@ -99,26 +99,29 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-200 dark:border-gray-700"
+          className="rounded-3xl shadow-2xl max-w-4xl w-full h-[90vh] overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] border border-[#abd1c6]/30 mx-4"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Заголовок модалки */}
-          <div className="bg-gradient-to-r from-gray-600 to-gray-700 p-4 text-white">
-            <div className="flex items-center justify-between">
+          <div className="relative p-6 bg-gradient-to-r from-[#f9bc60] via-[#f9bc60] to-[#e8a545]">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#f9bc60]/95 via-[#f9bc60]/95 to-[#e8a545]/95 backdrop-blur-sm"></div>
+            <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center">
+                <div className="w-12 h-12 rounded-2xl bg-[#001e1d]/20 backdrop-blur-sm flex items-center justify-center border border-[#001e1d]/30">
                   <LucideIcons.Settings size="lg" className="text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">Настройки профиля</h2>
-                  <p className="text-gray-200">Управление вашим аккаунтом</p>
+                  <h2 className="text-2xl font-bold text-[#001e1d]">Настройки профиля</h2>
+                  <p className="text-[#001e1d]/80 text-sm">Управление вашим аккаунтом</p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-xl flex items-center justify-center hover:bg-white/30 transition-colors"
+                className="p-3 rounded-2xl bg-[#001e1d]/10 hover:bg-[#001e1d]/20 backdrop-blur-sm border border-[#001e1d]/20 transition-all duration-200 group"
               >
-                <span className="text-xl">✕</span>
+                <svg className="w-5 h-5 text-[#001e1d] group-hover:rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
           </div>
@@ -151,7 +154,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </AnimatePresence>
 
           {/* Контент */}
-          <div className="p-6 max-h-[calc(90vh-200px)] overflow-y-auto">
+          <div className="p-6 h-[calc(90vh-200px)] overflow-y-auto bg-gradient-to-b from-[#004643]/30 to-[#001e1d]/40">
             {loading ? (
               <SettingsLoading />
             ) : !user ? (

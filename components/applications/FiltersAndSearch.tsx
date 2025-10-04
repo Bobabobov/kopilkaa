@@ -33,7 +33,7 @@ export function FiltersAndSearch({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
         {/* Search */}
         <div className="relative sm:col-span-2 lg:col-span-1">
-          <LucideIcons.Search size="sm" className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2" style={{ color: '#abd1c6' }} />
+          <LucideIcons.Search size="sm" className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-[#abd1c6]" />
           <input
             type="text"
             placeholder="Поиск по заявкам..."
@@ -45,7 +45,6 @@ export function FiltersAndSearch({
               border: '1px solid rgba(171, 209, 198, 0.3)',
               color: '#fffffe'
             }}
-            placeholder="Поиск по заявкам..."
           />
         </div>
 

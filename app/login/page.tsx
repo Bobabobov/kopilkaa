@@ -68,99 +68,151 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-[calc(100dvh-120px)] flex items-center justify-center p-4 pt-24 relative">
+    <div className="min-h-[calc(100dvh-120px)] flex items-center justify-center p-4 pt-24 relative" style={{ backgroundColor: '#004643' }}>
       {/* Декоративные элементы */}
-      <div className="absolute top-20 left-20 w-16 h-16 bg-gradient-to-br from-green-400/15 to-blue-400/15 rounded-full blur-xl"></div>
-      <div className="absolute bottom-20 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/15 to-pink-400/15 rounded-full blur-xl"></div>
+      <div className="absolute top-20 left-20 w-20 h-20 bg-gradient-to-br from-[#f9bc60]/20 to-[#e8a545]/20 rounded-full blur-xl animate-pulse"></div>
+      <div className="absolute bottom-20 right-20 w-32 h-32 bg-gradient-to-br from-[#abd1c6]/15 to-[#94c4b8]/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-br from-[#e16162]/10 to-[#d63384]/10 rounded-full blur-lg animate-pulse" style={{ animationDelay: '2s' }}></div>
       
-      <div className="card w-full max-w-md relative z-10">
-        <h1 className="text-2xl font-semibold mb-1">Вход</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Войдите в свой аккаунт</p>
-
-        <form onSubmit={submit} className="space-y-5" noValidate>
-          <div>
-            <label className="label">Email *</label>
-            <div className="relative">
-              <input 
-                className={`input ${validationErrors.email ? 'border-red-300 dark:border-red-600' : email.trim() ? 'border-green-300 dark:border-green-600' : ''}`}
-                type="text" 
-                value={email} 
-                onChange={e => {
-                  setEmail(e.target.value);
-                  if (validationErrors.email) {
-                    setValidationErrors(prev => ({...prev, email: ''}));
-                  }
-                }} 
-              />
-              {email.trim() && !validationErrors.email && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <LucideIcons.CheckCircle size="sm" className="text-green-500" />
-                </div>
-              )}
-              {validationErrors.email && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <LucideIcons.XCircle size="sm" className="text-red-500" />
-                </div>
-              )}
+      <div className="w-full max-w-md relative z-10">
+        <div className="bg-gradient-to-br from-[#004643]/95 to-[#001e1d]/95 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-[#abd1c6]/20">
+          {/* Заголовок */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#f9bc60] to-[#e8a545] flex items-center justify-center shadow-lg">
+              <LucideIcons.User size="lg" className="text-[#001e1d]" />
             </div>
-            {validationErrors.email && (
-              <div className="flex items-center gap-2 text-red-500 text-sm mt-1 animate-fadeIn">
-                <LucideIcons.Alert size="sm" />
-                <span>{validationErrors.email}</span>
-              </div>
-            )}
+            <h1 className="text-3xl font-bold mb-2" style={{ color: '#fffffe' }}>Вход</h1>
+            <p className="text-sm" style={{ color: '#abd1c6' }}>Войдите в свой аккаунт</p>
+          </div>
+
+          <form onSubmit={submit} className="space-y-6" noValidate>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#abd1c6' }}>Email *</label>
+              <div className="relative">
+                <input 
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50 ${
+                    validationErrors.email 
+                      ? 'border-red-400 bg-red-50/10' 
+                      : email.trim() 
+                        ? 'border-[#abd1c6]/60 bg-[#abd1c6]/5' 
+                        : 'border-[#abd1c6]/30 bg-[#004643]/50'
+                  }`}
+                  style={{ 
+                    color: '#fffffe',
+                    backgroundColor: validationErrors.email ? 'rgba(239, 68, 68, 0.05)' : email.trim() ? 'rgba(171, 209, 198, 0.05)' : 'rgba(0, 70, 67, 0.5)'
+                  }}
+                  type="text" 
+                  value={email} 
+                  onChange={e => {
+                    setEmail(e.target.value);
+                    if (validationErrors.email) {
+                      setValidationErrors(prev => ({...prev, email: ''}));
+                    }
+                  }} 
+                />
+                {email.trim() && !validationErrors.email && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <LucideIcons.CheckCircle size="sm" className="text-[#abd1c6]" />
+                  </div>
+                )}
+                {validationErrors.email && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <LucideIcons.XCircle size="sm" className="text-red-400" />
+                  </div>
+                )}
+            </div>
+              {validationErrors.email && (
+                <div className="flex items-center gap-2 text-red-400 text-sm mt-2 animate-fadeIn">
+                  <LucideIcons.Alert size="sm" />
+                  <span>{validationErrors.email}</span>
+                </div>
+              )}
           </div>
           
-          <div>
-            <label className="label">Пароль *</label>
-            <div className="relative">
-              <input 
-                className={`input ${validationErrors.password ? 'border-red-300 dark:border-red-600' : password.trim() ? 'border-green-300 dark:border-green-600' : ''}`}
-                type="password" 
-                value={password} 
-                onChange={e => {
-                  setPassword(e.target.value);
-                  if (validationErrors.password) {
-                    setValidationErrors(prev => ({...prev, password: ''}));
-                  }
-                }} 
-              />
-              {password.trim() && !validationErrors.password && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <LucideIcons.CheckCircle size="sm" className="text-green-500" />
-                </div>
-              )}
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#abd1c6' }}>Пароль *</label>
+              <div className="relative">
+                <input 
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50 ${
+                    validationErrors.password 
+                      ? 'border-red-400 bg-red-50/10' 
+                      : password.trim() 
+                        ? 'border-[#abd1c6]/60 bg-[#abd1c6]/5' 
+                        : 'border-[#abd1c6]/30 bg-[#004643]/50'
+                  }`}
+                  style={{ 
+                    color: '#fffffe',
+                    backgroundColor: validationErrors.password ? 'rgba(239, 68, 68, 0.05)' : password.trim() ? 'rgba(171, 209, 198, 0.05)' : 'rgba(0, 70, 67, 0.5)'
+                  }}
+                  type="password" 
+                  value={password} 
+                  onChange={e => {
+                    setPassword(e.target.value);
+                    if (validationErrors.password) {
+                      setValidationErrors(prev => ({...prev, password: ''}));
+                    }
+                  }} 
+                />
+                {password.trim() && !validationErrors.password && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <LucideIcons.CheckCircle size="sm" className="text-[#abd1c6]" />
+                  </div>
+                )}
+                {validationErrors.password && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <LucideIcons.XCircle size="sm" className="text-red-400" />
+                  </div>
+                )}
+              </div>
               {validationErrors.password && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <LucideIcons.XCircle size="sm" className="text-red-500" />
+                <div className="flex items-center gap-2 text-red-400 text-sm mt-2 animate-fadeIn">
+                  <LucideIcons.Alert size="sm" />
+                  <span>{validationErrors.password}</span>
                 </div>
               )}
             </div>
-            {validationErrors.password && (
-              <div className="flex items-center gap-2 text-red-500 text-sm mt-1 animate-fadeIn">
+
+            {err && (
+              <div className="bg-red-500/10 border border-red-400/30 text-red-400 text-sm p-4 rounded-xl flex items-center gap-2">
                 <LucideIcons.Alert size="sm" />
-                <span>{validationErrors.password}</span>
+                <span>{err}</span>
               </div>
             )}
-          </div>
 
-          {err && (
-            <div className="text-red-500 text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-xl">
-              {err}
-            </div>
-          )}
-
-          <button 
-            type="submit" 
-            disabled={busy}
-            className="w-full btn-primary py-3 px-4"
-          >
-            {busy ? "Вход..." : "Войти"}
-          </button>
+            <button 
+              type="submit" 
+              disabled={busy}
+              className="w-full py-3 px-6 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+              style={{
+                background: busy 
+                  ? 'linear-gradient(135deg, #abd1c6, #94c4b8)' 
+                  : 'linear-gradient(135deg, #f9bc60, #e8a545)',
+                color: '#001e1d'
+              }}
+            >
+              {busy ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-[#001e1d]/30 border-t-[#001e1d] rounded-full animate-spin"></div>
+                  Вход...
+                </div>
+              ) : (
+                "Войти"
+              )}
+            </button>
         </form>
 
-        <div className="mt-6 text-center text-sm">
-          Нет аккаунта? <Link href="/register" className="text-green-600 dark:text-green-400 hover:underline font-medium">Зарегистрироваться</Link>
+          <div className="mt-8 text-center">
+            <p className="text-sm" style={{ color: '#abd1c6' }}>
+              Нет аккаунта?{' '}
+              <Link 
+                href="/register" 
+                className="font-semibold transition-all duration-300 hover:underline hover:scale-105 inline-block" 
+                style={{ color: '#f9bc60' }}
+              >
+                Зарегистрироваться
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

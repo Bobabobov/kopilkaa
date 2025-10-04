@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { ApplicationStatus } from "./types";
 import StatsCards from "./components/StatsCards";
 import ControlPanel from "./components/ControlPanel";
@@ -11,7 +10,6 @@ import ApplicationsGrid from "./components/ApplicationsGrid";
 import StatusModal from "./components/StatusModal";
 import ImageLightbox from "./components/ImageLightbox";
 import Pagination from "./components/Pagination";
-import PageTimeStats from "./components/PageTimeStats";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import { useAdminApplications } from "./hooks/useAdminApplications";
@@ -183,7 +181,7 @@ export default function AdminClient() {
 
       <div className="relative z-10">
         {/* Заголовок */}
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 pt-24 pb-8">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-4xl font-bold mb-2" style={{ color: '#fffffe' }}>
@@ -194,18 +192,6 @@ export default function AdminClient() {
               </p>
             </div>
             
-            <div className="flex items-center gap-4">
-              <Link
-                href="/admin"
-                className="px-4 py-2 bg-white/90 backdrop-blur-xl hover:bg-gray-50 rounded-xl transition-all duration-300 border shadow-lg hover:shadow-xl"
-                style={{ 
-                  borderColor: '#abd1c6/30',
-                  color: '#2d5a4e'
-                }}
-              >
-                🏠 Главная
-              </Link>
-            </div>
       </div>
 
           {/* Статистика */}
@@ -261,8 +247,6 @@ export default function AdminClient() {
             </div>
         )}
 
-          {/* Статистика времени на странице */}
-          <PageTimeStats />
         </div>
       </div>
 

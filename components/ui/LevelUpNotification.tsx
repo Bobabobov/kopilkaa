@@ -174,3 +174,4 @@ export default function LevelUpNotification({ isOpen, onClose, level }: LevelUpN
 
 
 
+

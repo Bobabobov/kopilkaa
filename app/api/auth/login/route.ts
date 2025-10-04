@@ -16,13 +16,13 @@ export async function POST(req: Request) {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       console.log("User not found:", email);
-      return Response.json({ error: "Неверные email или пароль" }, { status: 401 });
+      return Response.json({ error: "Такого пользователя не существует" }, { status: 404 });
     }
     
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) {
       console.log("Invalid password for user:", email);
-      return Response.json({ error: "Неверные email или пароль" }, { status: 401 });
+      return Response.json({ error: "Неверный пароль" }, { status: 401 });
     }
 
     console.log("Login successful for user:", user.id);

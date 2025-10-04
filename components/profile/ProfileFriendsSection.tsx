@@ -42,7 +42,7 @@ export default function ProfileFriendsSection() {
     const fetchFriends = async () => {
       try {
         // Получаем ID текущего пользователя
-        const meRes = await fetch("/api/profile/me");
+        const meRes = await fetch("/api/profile/me", { cache: "no-store" });
         if (meRes.ok) {
           const meData = await meRes.json();
           setCurrentUserId(meData.user.id);

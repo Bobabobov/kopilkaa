@@ -257,6 +257,7 @@ export default function FriendsModal({ isOpen, onClose, initialTab = 'friends' }
                 getUserStatus={getUserStatus}
                 sendingRequests={sendingRequests}
                 onSendRequest={handleSendRequest}
+                onCancelRequest={handleCancelRequest}
               />
             )}
           </div>

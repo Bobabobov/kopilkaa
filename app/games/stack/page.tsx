@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import dynamic from 'next/dynamic';
+import StackLeaderboard from '@/components/games/StackGame/StackLeaderboard';
 
 // Динамический импорт Stack Game (без SSR для избежания проблем с canvas)
 const StackGame = dynamic(() => import('@/components/games/StackGame/StackGame'), {
@@ -37,8 +38,16 @@ export default function StackGamePage() {
 
       {/* Игра на всю страницу */}
       <div className="pt-20 min-h-screen flex items-center justify-center">
-        <div className="w-full max-w-6xl px-4">
-          <StackGame />
+        <div className="w-full max-w-7xl px-4 flex flex-col lg:flex-row gap-8">
+          {/* Левая колонка - игра */}
+          <div className="flex-1">
+            <StackGame />
+          </div>
+          
+          {/* Правая колонка - таблица рекордов */}
+          <div className="flex-shrink-0 w-full lg:w-auto">
+            <StackLeaderboard />
+          </div>
         </div>
       </div>
     </div>

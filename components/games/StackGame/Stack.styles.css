@@ -52,16 +52,9 @@
 
 .stack-game .stack-game-content {
   display: flex;
-  gap: 24px;
-  align-items: flex-start;
-}
-
-.stack-game .stack-game-main {
-  display: flex;
   flex-direction: column;
   gap: 20px;
   align-items: center;
-  flex: 1;
 }
 
 .stack-game .stack-canvas-wrapper {
@@ -337,15 +330,6 @@
   .stack-game .stack-game-stats {
     flex-direction: column;
     gap: 12px;
-  }
-
-  .stack-game .stack-game-content {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .stack-game .stack-game-main {
-    align-items: center;
   }
 
   .stack-game .stack-game-leaderboard {

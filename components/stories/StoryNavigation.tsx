@@ -6,7 +6,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function StoryNavigation() {
   return (
-    <div className="p-4">
+    <div className="pt-24 p-4">
       <Link
         href="/stories"
         className="inline-flex items-center transition-colors"

@@ -68,7 +68,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-[calc(100dvh-120px)] flex items-center justify-center p-4 relative">
+    <div className="min-h-[calc(100dvh-120px)] flex items-center justify-center p-4 pt-24 relative">
       {/* Декоративные элементы */}
       <div className="absolute top-20 left-20 w-16 h-16 bg-gradient-to-br from-green-400/15 to-blue-400/15 rounded-full blur-xl"></div>
       <div className="absolute bottom-20 right-20 w-24 h-24 bg-gradient-to-br from-purple-400/15 to-pink-400/15 rounded-full blur-xl"></div>

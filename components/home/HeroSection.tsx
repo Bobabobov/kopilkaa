@@ -16,7 +16,7 @@ interface HeroSectionProps {
 
 export default function HeroSection({ stats, loading }: HeroSectionProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16">
+    <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
       <div className="text-center max-w-4xl mx-auto">
         {/* Основной заголовок */}
         <h1 className="text-5xl md:text-7xl font-bold mb-6" style={{ color: '#fffffe' }}>

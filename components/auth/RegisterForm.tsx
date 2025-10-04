@@ -38,7 +38,7 @@ export default function RegisterForm({ onSubmit, busy, errors }: RegisterFormPro
   };
 
   return (
-    <div className="min-h-[calc(100dvh-120px)] flex items-center justify-center p-4 relative">
+    <div className="min-h-[calc(100dvh-120px)] flex items-center justify-center p-4 pt-24 relative">
       {/* Декоративные элементы */}
       <div className="absolute top-10 right-20 w-20 h-20 bg-gradient-to-br from-blue-400/15 to-purple-400/15 rounded-full blur-xl"></div>
       <div className="absolute bottom-32 left-16 w-28 h-28 bg-gradient-to-br from-green-400/15 to-yellow-400/15 rounded-full blur-xl"></div>

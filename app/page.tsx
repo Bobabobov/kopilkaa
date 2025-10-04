@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import HeroSection from "@/components/home/HeroSection";
-import UniversalBackground from "@/components/ui/UniversalBackground";
+import PixelBackground from "@/components/ui/PixelBackground";
 
 type Stats = {
   collected: number;
@@ -38,7 +38,7 @@ export default function HomePage() {
   if (!mounted) {
     return (
       <div className="min-h-screen">
-        <UniversalBackground />
+        <PixelBackground />
         <div className="relative z-10">
           <HeroSection stats={{ collected: 0, requests: 0, approved: 0, people: 0 }} loading={true} />
         </div>
@@ -48,7 +48,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <UniversalBackground />
+      <PixelBackground />
       <div className="relative z-10">
         <HeroSection stats={stats} loading={loading} />
       </div>

@@ -65,45 +65,47 @@ export function StoryCard({ story, index }: StoryCardProps) {
             </p>
             
             {/* Метаданные */}
-            <div className="flex items-center justify-between text-xs" style={{ color: '#2d5a4e' }}>
-              <div className="flex items-center gap-4">
-                {story.user?.id ? (
-                  <Link 
-                    href={`/profile/${story.user.id}`}
-                    className="flex items-center gap-1 hover:opacity-80 transition-opacity duration-200 group/author"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="relative">
+            <div className="bg-gradient-to-r from-yellow-50/50 to-yellow-100/30 rounded-xl p-3 border border-yellow-200/30">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-4">
+                  {story.user?.id ? (
+                    <Link 
+                      href={`/profile/${story.user.id}`}
+                      className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 group/author bg-white/70 rounded-lg px-2 py-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="relative">
+                        <img
+                          src={story.user.avatar || '/default-avatar.png'}
+                          alt={authorName}
+                          className="w-5 h-5 rounded-full object-cover border border-white/20 group-hover/author:border-yellow-400/50 transition-colors duration-200"
+                        />
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400/20 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-200"></div>
+                      </div>
+                      <span className="group-hover/author:text-yellow-600 transition-colors duration-200 font-medium">
+                        {authorName}
+                      </span>
+                    </Link>
+                  ) : (
+                    <div className="flex items-center gap-2 bg-white/70 rounded-lg px-2 py-1">
                       <img
-                        src={story.user.avatar || '/default-avatar.png'}
+                        src={story.user?.avatar || '/default-avatar.png'}
                         alt={authorName}
-                        className="w-4 h-4 rounded-full object-cover border border-white/20 group-hover/author:border-yellow-400/50 transition-colors duration-200"
+                        className="w-5 h-5 rounded-full object-cover border border-white/20"
                       />
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400/20 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-200"></div>
+                      <span className="font-medium">{authorName}</span>
                     </div>
-                    <span className="group-hover/author:text-yellow-400 transition-colors duration-200">
-                      {authorName}
-                    </span>
-                  </Link>
-                ) : (
-                  <span className="flex items-center gap-1">
-                    <img
-                      src={story.user?.avatar || '/default-avatar.png'}
-                      alt={authorName}
-                      className="w-4 h-4 rounded-full object-cover border border-white/20"
-                    />
-                    {authorName}
-                  </span>
-                )}
-                <span className="flex items-center gap-1">
-                  <LucideIcons.Clock size="sm" />
-                  {Math.ceil(story.summary.length / 200)} мин
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-1" style={{ color: '#e16162' }}>
-                <LucideIcons.Heart size="sm" />
-                {story._count?.likes || 0}
+                  )}
+                  <div className="flex items-center gap-1 bg-white/50 rounded-lg px-2 py-1">
+                    <LucideIcons.Clock size="sm" />
+                    {Math.ceil(story.summary.length / 200)} мин
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-1 bg-white/50 rounded-lg px-2 py-1" style={{ color: '#e16162' }}>
+                  <LucideIcons.Heart size="sm" />
+                  {story._count?.likes || 0}
+                </div>
               </div>
             </div>
             

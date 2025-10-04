@@ -67,10 +67,34 @@ export function StoryCard({ story, index }: StoryCardProps) {
             {/* Метаданные */}
             <div className="flex items-center justify-between text-xs" style={{ color: '#2d5a4e' }}>
               <div className="flex items-center gap-4">
-                <span className="flex items-center gap-1">
-                  <LucideIcons.User size="sm" />
-                  {authorName}
-                </span>
+                {story.user?.id ? (
+                  <Link 
+                    href={`/profile/${story.user.id}`}
+                    className="flex items-center gap-1 hover:opacity-80 transition-opacity duration-200 group/author"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="relative">
+                      <img
+                        src={story.user.avatar || '/default-avatar.png'}
+                        alt={authorName}
+                        className="w-4 h-4 rounded-full object-cover border border-white/20 group-hover/author:border-yellow-400/50 transition-colors duration-200"
+                      />
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400/20 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-200"></div>
+                    </div>
+                    <span className="group-hover/author:text-yellow-400 transition-colors duration-200">
+                      {authorName}
+                    </span>
+                  </Link>
+                ) : (
+                  <span className="flex items-center gap-1">
+                    <img
+                      src={story.user?.avatar || '/default-avatar.png'}
+                      alt={authorName}
+                      className="w-4 h-4 rounded-full object-cover border border-white/20"
+                    />
+                    {authorName}
+                  </span>
+                )}
                 <span className="flex items-center gap-1">
                   <LucideIcons.Clock size="sm" />
                   {Math.ceil(story.summary.length / 200)} мин

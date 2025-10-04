@@ -78,12 +78,17 @@ const Stack3DRenderer: React.FC<Stack3DRendererProps> = ({
       directionalLight.shadow.mapSize.height = 2048;
       scene.add(directionalLight);
 
-      // Добавление тестового куба для проверки
-      const testGeometry = new THREE.BoxGeometry(2, 2, 2);
-      const testMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
-      const testCube = new THREE.Mesh(testGeometry, testMaterial);
-      testCube.position.set(0, 0, 0);
-      scene.add(testCube);
+      // Добавляем базовую плоскость для блоков
+      const planeGeometry = new THREE.PlaneGeometry(600, 800);
+      const planeMaterial = new THREE.MeshLambertMaterial({ 
+        color: 0x2a2a3e, 
+        transparent: true, 
+        opacity: 0.3 
+      });
+      const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+      plane.rotation.x = -Math.PI / 2;
+      plane.position.z = -50;
+      scene.add(plane);
 
       // Добавление рендерера в DOM
       mountRef.current.appendChild(renderer.domElement);
@@ -113,7 +118,12 @@ const Stack3DRenderer: React.FC<Stack3DRendererProps> = ({
 
   // Создание 3D блока
   const createBlockMesh = useCallback((block: Block, isCurrent: boolean = false): THREE.Mesh => {
-    const geometry = new THREE.BoxGeometry(block.width, block.height, 30);
+    // Конвертируем 2D координаты в 3D
+    const width = block.width;
+    const height = block.height;
+    const depth = 30;
+    
+    const geometry = new THREE.BoxGeometry(width, height, depth);
     
     // Материал с градиентом цвета
     const color = new THREE.Color(block.color);
@@ -124,7 +134,13 @@ const Stack3DRenderer: React.FC<Stack3DRendererProps> = ({
     });
 
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(block.x, block.y, 0);
+    
+    // Конвертируем 2D координаты в 3D (центрируем относительно canvas)
+    const x = block.x - 300; // Центрируем по X (canvas width / 2)
+    const y = 400 - block.y - height / 2; // Инвертируем Y и центрируем (canvas height / 2)
+    const z = isCurrent ? 15 : 0; // Текущий блок немного выше
+    
+    mesh.position.set(x, y, z);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
 
@@ -178,21 +194,15 @@ const Stack3DRenderer: React.FC<Stack3DRendererProps> = ({
   // Анимация текущего блока
   const animateCurrentBlock = useCallback(() => {
     if (currentBlockRef.current && currentBlock) {
-      // Легкое покачивание
-      currentBlockRef.current.position.x = currentBlock.x + Math.sin(Date.now() * 0.005) * 2;
-      currentBlockRef.current.position.y = currentBlock.y;
+      // Конвертируем 2D координаты в 3D
+      const x = currentBlock.x - 300 + Math.sin(Date.now() * 0.005) * 2; // Легкое покачивание
+      const y = 400 - currentBlock.y - currentBlock.height / 2;
+      const z = 15; // Текущий блок выше
+      
+      currentBlockRef.current.position.set(x, y, z);
       
       // Легкое вращение
       currentBlockRef.current.rotation.y += 0.01;
-    }
-
-    // Анимация тестового куба
-    if (sceneRef.current) {
-      const testCube = sceneRef.current.children.find(child => child instanceof THREE.Mesh && child.geometry instanceof THREE.BoxGeometry);
-      if (testCube) {
-        testCube.rotation.x += 0.01;
-        testCube.rotation.y += 0.01;
-      }
     }
   }, [currentBlock]);
 

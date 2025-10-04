@@ -4,6 +4,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { useStackGame } from './useStackGame';
 import StackControls from './StackControls';
+import Stack3DRenderer from './Stack3DRenderer';
 import './Stack.styles.css';
 
 // Основной контейнер игры Stack
@@ -30,11 +31,11 @@ const StackGame: React.FC = () => {
 
       <div className="stack-game-content">
         <div className="stack-canvas-wrapper">
-          <canvas
-            ref={gameState.canvasRef}
-            className="stack-canvas"
-            width={600}
-            height={800}
+          <Stack3DRenderer
+            stack={gameState.stack}
+            currentBlock={gameState.currentBlock}
+            gameOver={gameState.gameOver}
+            onCanvasClick={gameState.placeBlock}
           />
           {gameState.gameOver && (
             <div className="game-overlay">

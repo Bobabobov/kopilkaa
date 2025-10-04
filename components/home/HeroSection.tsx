@@ -34,34 +34,55 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Link 
             href="/applications"
-            className="group relative px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer"
+            className="group relative px-8 py-4 text-lg font-bold transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer"
             style={{ 
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: '#ffffff',
-              boxShadow: '0 10px 30px rgba(102, 126, 234, 0.4), 0 4px 15px rgba(118, 75, 162, 0.3)',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+              background: 'linear-gradient(45deg, #00ffff 0%, #ff00ff 50%, #ffff00 100%)',
+              color: '#000000',
+              boxShadow: '0 0 20px #00ffff, 0 0 40px #ff00ff, inset 0 0 20px rgba(255, 255, 255, 0.3)',
+              textShadow: '0 0 10px #ffffff',
+              borderRadius: '8px',
+              border: '2px solid #ffffff',
+              fontFamily: 'monospace',
+              letterSpacing: '1px',
+              textTransform: 'uppercase',
+              filter: 'brightness(1.2) contrast(1.1)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #7c94f1 0%, #8a5cb8 100%)';
-              e.currentTarget.style.boxShadow = '0 15px 40px rgba(102, 126, 234, 0.6), 0 6px 20px rgba(118, 75, 162, 0.5)';
+              e.currentTarget.style.background = 'linear-gradient(45deg, #00ffff 0%, #ff00ff 30%, #ffff00 60%, #ff00ff 100%)';
+              e.currentTarget.style.boxShadow = '0 0 30px #00ffff, 0 0 60px #ff00ff, 0 0 90px #ffff00, inset 0 0 30px rgba(255, 255, 255, 0.5)';
+              e.currentTarget.style.filter = 'brightness(1.4) contrast(1.2) saturate(1.3)';
+              e.currentTarget.style.textShadow = '0 0 15px #ffffff, 0 0 25px #00ffff';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-              e.currentTarget.style.boxShadow = '0 10px 30px rgba(102, 126, 234, 0.4), 0 4px 15px rgba(118, 75, 162, 0.3)';
+              e.currentTarget.style.background = 'linear-gradient(45deg, #00ffff 0%, #ff00ff 50%, #ffff00 100%)';
+              e.currentTarget.style.boxShadow = '0 0 20px #00ffff, 0 0 40px #ff00ff, inset 0 0 20px rgba(255, 255, 255, 0.3)';
+              e.currentTarget.style.filter = 'brightness(1.2) contrast(1.1)';
+              e.currentTarget.style.textShadow = '0 0 10px #ffffff';
             }}
             onMouseDown={(e) => {
               e.currentTarget.style.transform = 'scale(0.95)';
+              e.currentTarget.style.filter = 'brightness(1.0) contrast(1.0)';
             }}
             onMouseUp={(e) => {
               e.currentTarget.style.transform = 'scale(1.1)';
+              e.currentTarget.style.filter = 'brightness(1.4) contrast(1.2) saturate(1.3)';
             }}
           >
-            <span className="relative z-10">Создать заявку</span>
+            <span className="relative z-10" style={{ 
+              background: 'linear-gradient(45deg, #00ffff, #ff00ff, #ffff00)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              Создать заявку
+            </span>
             <div 
-              className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
               style={{
-                background: 'linear-gradient(135deg, #8a9eff 0%, #9d6dd1 100%)',
-                filter: 'blur(1px)'
+                background: 'linear-gradient(45deg, #00ffff 0%, #ff00ff 25%, #ffff00 50%, #ff00ff 75%, #00ffff 100%)',
+                borderRadius: '6px',
+                filter: 'blur(2px)',
+                animation: 'rainbow-pulse 2s ease-in-out infinite alternate'
               }}
             />
           </Link>

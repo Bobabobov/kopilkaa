@@ -260,13 +260,8 @@ export default function ApplicationsPage() {
   if (submitted) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        {/* Decorative Background Elements */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute left-0 top-1/4 w-64 h-64 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute right-0 top-1/3 w-80 h-80 bg-gradient-to-br from-emerald-500/10 to-lime-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute left-1/2 top-1/2 w-32 h-32 bg-gradient-to-br from-lime-500/10 to-green-500/10 rounded-full blur-2xl"></div>
-        </div>
-
+        <UniversalBackground />
+        
         <div className="container-p mx-auto pt-32 pb-8 relative z-10">
           <SuccessScreen onNewApplication={() => setSubmitted(false)} />
         </div>

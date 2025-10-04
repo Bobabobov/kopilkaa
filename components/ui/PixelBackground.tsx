@@ -4,8 +4,6 @@ import { useEffect, useRef } from 'react';
 
 export default function PixelBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
-  const timeRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -23,211 +21,159 @@ export default function PixelBackground() {
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      drawStaticBackground();
     };
 
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // Пиксельные цвета для неба и облаков
-    const skyColors = {
-      skyBlue: '#87CEEB',      // Ярко-голубое небо
-      lightBlue: '#B0E0E6',    // Светло-голубой
-      cloudWhite: '#FFFFFF',   // Белые облака
-      cloudGray: '#F0F8FF',    // Светло-серые облака
-      cloudShadow: '#E6F3FF'   // Тени облаков
+    // Пиксельные цвета в стиле сайта
+    const colors = {
+      base: '#004643',      // Основной тёмно-зелёный
+      dark: '#002e2b',      // Очень тёмный
+      medium: '#0f4c3a',    // Средний зелёный
+      light: '#2d5a4e',     // Светло-зелёный
+      accent: '#abd1c6',    // Акцентный
+      highlight: '#f9bc60', // Жёлтый акцент
+      shadow: '#001a18'     // Тень
     };
 
-    // Класс для пиксельного облака
-    class PixelCloud {
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-      speedX: number;
-      speedY: number;
-      segments: number[][];
-      time: number;
-
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height * 0.7; // Облака только в верхней части
-        this.width = Math.random() * 120 + 80;
-        this.height = Math.random() * 40 + 20;
-        this.speedX = (Math.random() - 0.5) * 0.3;
-        this.speedY = (Math.random() - 0.5) * 0.1;
-        this.time = Math.random() * Math.PI * 2;
-        
-        // Создаём сегменты облака для пиксельного вида
-        this.segments = this.generateCloudSegments();
-      }
-
-      generateCloudSegments(): number[][] {
-        const segments = [];
-        const segmentCount = Math.floor(this.width / 20);
-        
-        for (let i = 0; i < segmentCount; i++) {
-          const segmentX = (i / segmentCount) * this.width;
-          const segmentWidth = this.width / segmentCount;
-          const segmentHeight = this.height * (0.7 + Math.random() * 0.6);
-          const segmentY = this.height - segmentHeight;
-          
-          segments.push([segmentX, segmentY, segmentWidth, segmentHeight]);
-        }
-        
-        return segments;
-      }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        this.time += 0.01;
-
-        // Ограничение движения (облака циклически перемещаются)
-        if (this.x < -this.width) this.x = canvas.width;
-        if (this.x > canvas.width) this.x = -this.width;
-        if (this.y < 0) this.y = canvas.height * 0.7;
-        if (this.y > canvas.height * 0.7) this.y = 0;
-      }
-
-      draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        
-        // Рисуем сегменты облака
-        this.segments.forEach((segment, index) => {
-          const [segX, segY, segW, segH] = segment;
-          
-          // Основное облако
-          ctx.fillStyle = skyColors.cloudWhite;
-          ctx.fillRect(segX, segY, segW, segH);
-          
-          // Тень облака
-          ctx.fillStyle = skyColors.cloudShadow;
-          ctx.fillRect(segX + 2, segY + 2, segW, segH);
-          
-          // Пиксельная рамка
-          ctx.strokeStyle = skyColors.cloudGray;
-          ctx.lineWidth = 1;
-          ctx.strokeRect(segX, segY, segW, segH);
-        });
-        
-        ctx.restore();
-      }
-    }
-
-    // Класс для пиксельного солнца
-    class PixelSun {
-      x: number;
-      y: number;
-      radius: number;
-      time: number;
-
-      constructor() {
-        this.x = canvas.width * 0.8;
-        this.y = canvas.height * 0.2;
-        this.radius = 25;
-        this.time = 0;
-      }
-
-      update() {
-        this.time += 0.02;
-      }
-
-      draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        
-        // Лучи солнца
-        const rayCount = 8;
-        ctx.strokeStyle = '#FFD700';
-        ctx.lineWidth = 3;
-        
-        for (let i = 0; i < rayCount; i++) {
-          const angle = (i / rayCount) * Math.PI * 2 + this.time;
-          const startRadius = this.radius + 5;
-          const endRadius = this.radius + 15;
-          
-          ctx.beginPath();
-          ctx.moveTo(
-            Math.cos(angle) * startRadius,
-            Math.sin(angle) * startRadius
-          );
-          ctx.lineTo(
-            Math.cos(angle) * endRadius,
-            Math.sin(angle) * endRadius
-          );
-          ctx.stroke();
-        }
-        
-        // Само солнце
-        ctx.fillStyle = '#FFD700';
-        ctx.fillRect(-this.radius, -this.radius, this.radius * 2, this.radius * 2);
-        
-        // Рамка солнца
-        ctx.strokeStyle = '#FFA500';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(-this.radius, -this.radius, this.radius * 2, this.radius * 2);
-        
-        ctx.restore();
-      }
-    }
-
-    // Создаём облака и солнце
-    const clouds: PixelCloud[] = [];
-    const cloudCount = Math.min(15, Math.floor(canvas.width / 100));
-    
-    for (let i = 0; i < cloudCount; i++) {
-      clouds.push(new PixelCloud());
-    }
-
-    const sun = new PixelSun();
-
-    // Функция анимации
-    const animate = () => {
-      timeRef.current += 0.01;
+    // Функция рисования 3D пиксельного куба
+    const drawPixelCube = (x: number, y: number, size: number, color: string) => {
+      const depth = size * 0.6; // Глубина куба
       
-      // Рисуем небо с градиентом
-      const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      const timeVariation = Math.sin(timeRef.current * 0.3) * 0.1;
+      // Основная грань (передняя)
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, size, size);
       
-      skyGradient.addColorStop(0, `hsl(${200 + timeVariation * 5}, 70%, ${85 + timeVariation * 5}%)`);
-      skyGradient.addColorStop(0.6, `hsl(${210 + timeVariation * 8}, 60%, ${80 + timeVariation * 3}%)`);
-      skyGradient.addColorStop(1, `hsl(${220 + timeVariation * 10}, 50%, ${75 + timeVariation * 2}%)`);
+      // Верхняя грань (светлее)
+      const topColor = lightenColor(color, 30);
+      ctx.fillStyle = topColor;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + depth, y - depth);
+      ctx.lineTo(x + size + depth, y - depth);
+      ctx.lineTo(x + size, y);
+      ctx.closePath();
+      ctx.fill();
       
-      ctx.fillStyle = skyGradient;
+      // Правая грань (темнее)
+      const rightColor = darkenColor(color, 25);
+      ctx.fillStyle = rightColor;
+      ctx.beginPath();
+      ctx.moveTo(x + size, y);
+      ctx.lineTo(x + size + depth, y - depth);
+      ctx.lineTo(x + size + depth, y + size - depth);
+      ctx.lineTo(x + size, y + size);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Пиксельные контуры
+      ctx.strokeStyle = darkenColor(color, 40);
+      ctx.lineWidth = 1;
+      
+      // Передняя грань
+      ctx.strokeRect(x, y, size, size);
+      
+      // Верхняя грань
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + depth, y - depth);
+      ctx.lineTo(x + size + depth, y - depth);
+      ctx.lineTo(x + size, y);
+      ctx.stroke();
+      
+      // Правая грань
+      ctx.beginPath();
+      ctx.moveTo(x + size, y);
+      ctx.lineTo(x + size + depth, y - depth);
+      ctx.lineTo(x + size + depth, y + size - depth);
+      ctx.lineTo(x + size, y + size);
+      ctx.stroke();
+    };
+
+    // Функция осветления цвета
+    const lightenColor = (color: string, amount: number): string => {
+      const num = parseInt(color.replace("#", ""), 16);
+      const r = Math.min(255, ((num >> 16) & 255) + amount);
+      const g = Math.min(255, ((num >> 8) & 255) + amount);
+      const b = Math.min(255, (num & 255) + amount);
+      return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+    };
+
+    // Функция затемнения цвета
+    const darkenColor = (color: string, amount: number): string => {
+      const num = parseInt(color.replace("#", ""), 16);
+      const r = Math.max(0, ((num >> 16) & 255) - amount);
+      const g = Math.max(0, ((num >> 8) & 255) - amount);
+      const b = Math.max(0, (num & 255) - amount);
+      return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+    };
+
+    // Функция рисования статичного фона
+    const drawStaticBackground = () => {
+      // Очищаем canvas
+      ctx.fillStyle = colors.base;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Добавляем пиксельную текстуру неба
-      ctx.fillStyle = 'rgba(135, 206, 235, 0.1)';
-      const pixelSize = 4;
-      for (let x = 0; x < canvas.width; x += pixelSize * 2) {
-        for (let y = 0; y < canvas.height * 0.7; y += pixelSize * 2) {
+      // Добавляем градиентный фон
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, colors.dark);
+      gradient.addColorStop(0.5, colors.base);
+      gradient.addColorStop(1, colors.medium);
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Рисуем пиксельные кубы разных размеров
+      const cubeSize = 32;
+      const spacing = 40;
+      
+      // Создаём сетку кубов
+      for (let x = 0; x < canvas.width + cubeSize; x += spacing) {
+        for (let y = 0; y < canvas.height + cubeSize; y += spacing) {
+          // Случайный выбор цвета
+          const colorOptions = [colors.medium, colors.light, colors.accent, colors.highlight];
+          const color = colorOptions[Math.floor(Math.random() * colorOptions.length)];
+          
+          // Случайный размер (но кратный 8 для пиксельного вида)
+          const size = Math.floor((Math.random() * 3 + 1)) * 8;
+          
+          // Случайное смещение для естественности
+          const offsetX = (Math.random() - 0.5) * 20;
+          const offsetY = (Math.random() - 0.5) * 20;
+          
+          drawPixelCube(x + offsetX, y + offsetY, size, color);
+        }
+      }
+      
+      // Добавляем несколько крупных кубов для акцентов
+      const largeCubes = [
+        { x: canvas.width * 0.1, y: canvas.height * 0.2, size: 48, color: colors.highlight },
+        { x: canvas.width * 0.8, y: canvas.height * 0.3, size: 40, color: colors.accent },
+        { x: canvas.width * 0.2, y: canvas.height * 0.7, size: 56, color: colors.light },
+        { x: canvas.width * 0.7, y: canvas.height * 0.8, size: 44, color: colors.medium }
+      ];
+      
+      largeCubes.forEach(cube => {
+        drawPixelCube(cube.x, cube.y, cube.size, cube.color);
+      });
+      
+      // Добавляем пиксельную текстуру
+      ctx.fillStyle = 'rgba(171, 209, 198, 0.1)';
+      const pixelSize = 2;
+      for (let x = 0; x < canvas.width; x += pixelSize * 3) {
+        for (let y = 0; y < canvas.height; y += pixelSize * 3) {
           if (Math.random() > 0.95) {
             ctx.fillRect(x, y, pixelSize, pixelSize);
           }
         }
       }
-      
-      // Обновляем и рисуем солнце
-      sun.update();
-      sun.draw();
-      
-      // Обновляем и рисуем облака
-      clouds.forEach(cloud => {
-        cloud.update();
-        cloud.draw();
-      });
-      
-      animationRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    // Инициализация
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
     };
   }, []);
 

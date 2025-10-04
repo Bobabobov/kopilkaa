@@ -23,11 +23,7 @@ export default function StoryMetadata({ story, liked, likesCount, onLike }: Stor
   const readTime = Math.ceil((story.story?.length || 0) / 200);
 
   return (
-    <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 dark:text-gray-400 mb-8">
-      <span className="flex items-center gap-2">
-        <LucideIcons.User size="sm" />
-        {authorName}
-      </span>
+    <div className="flex flex-wrap items-center gap-6 text-sm mb-8" style={{ color: '#abd1c6' }}>
       <span className="flex items-center gap-2">
         <LucideIcons.Clock size="sm" />
         {readTime} мин чтения
@@ -39,14 +35,6 @@ export default function StoryMetadata({ story, liked, likesCount, onLike }: Stor
         likesCount={likesCount} 
         onLike={onLike} 
       />
-      
-      <span>
-        {story.createdAt ? new Date(story.createdAt).toLocaleDateString('ru-RU', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }) : 'Дата неизвестна'}
-      </span>
     </div>
   );
 }

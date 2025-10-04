@@ -3,7 +3,15 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import UniversalBackground from "@/components/ui/UniversalBackground";
+import PixelBackground from "@/components/ui/PixelBackground";
+import { 
+  StoryHeader, 
+  StoryContent, 
+  StoryImages, 
+  StoryActions, 
+  StoryMetadata,
+  StoryNavigation 
+} from "@/components/stories";
 
 interface Story {
   id: string;
@@ -105,7 +113,7 @@ export default function StoryPage() {
   if (loading) {
     return (
       <div className="min-h-screen">
-        <UniversalBackground />
+        <PixelBackground />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-2 border-t-transparent mx-auto mb-4" style={{ borderColor: '#f9bc60' }}></div>
@@ -119,7 +127,7 @@ export default function StoryPage() {
   if (error) {
     return (
       <div className="min-h-screen">
-        <UniversalBackground />
+        <PixelBackground />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="text-6xl mb-4">⚠️</div>
@@ -141,7 +149,7 @@ export default function StoryPage() {
   if (!story) {
     return (
       <div className="min-h-screen">
-        <UniversalBackground />
+        <PixelBackground />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="text-6xl mb-4">📖</div>
@@ -162,83 +170,43 @@ export default function StoryPage() {
 
   return (
     <div className="min-h-screen">
-      <UniversalBackground />
+      <PixelBackground />
       <div className="relative z-10">
-        {/* Простая навигация */}
-        <div className="p-4">
-          <Link 
-            href="/stories"
-            className="flex items-center gap-2 transition-colors"
-            style={{ color: '#f9bc60' }}
-          >
-            ← Вернуться к историям
-          </Link>
-        </div>
+        {/* Навигация */}
+        <StoryNavigation />
         
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
-            {/* Простой заголовок */}
-            <h1 className="text-3xl font-bold mb-6" style={{ color: '#fffffe' }}>
-              {story.title}
-            </h1>
+            {/* Заголовок истории */}
+            <StoryHeader 
+              title={story.title}
+              author={story.user?.name || story.user?.email || 'Неизвестный автор'}
+              createdAt={story.createdAt}
+            />
             
-            {/* Простые метаданные */}
-            <div className="flex items-center gap-6 text-sm mb-8" style={{ color: '#abd1c6' }}>
-              <span>Автор: {story.user?.name || story.user?.email}</span>
-              <span>Дата: {story.createdAt ? new Date(story.createdAt).toLocaleDateString('ru-RU') : 'Неизвестно'}</span>
-              <span>Лайков: {likesCount}</span>
-              <button 
-                onClick={handleLike}
-                className="px-4 py-2 rounded-lg transition-colors"
-                style={{
-                  backgroundColor: liked ? '#f9bc60' : '#abd1c6/20',
-                  color: liked ? '#001e1d' : '#abd1c6'
-                }}
-              >
-                {liked ? '❤️' : '🤍'} {likesCount}
-              </button>
-            </div>
+            {/* Метаданные */}
+            <StoryMetadata 
+              story={story}
+              liked={liked}
+              likesCount={likesCount}
+              onLike={handleLike}
+            />
             
-            {/* Простой контент */}
-            <div className="rounded-lg p-6 mb-8" style={{ backgroundColor: '#fffffe/80' }}>
-              <div className="leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere max-w-none" style={{ color: '#001e1d' }}>
-                {story.story || story.summary || 'Текст истории недоступен.'}
-              </div>
-            </div>
+            {/* Контент */}
+            <StoryContent 
+              content={story.story || story.summary || 'Текст истории недоступен.'}
+            />
             
-            {/* Простые изображения */}
+            {/* Изображения */}
             {story.images && story.images.length > 0 && (
-              <div className="space-y-4 mb-8">
-                <h3 className="text-xl font-semibold" style={{ color: '#fffffe' }}>Изображения:</h3>
-                {story.images.map((image, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={image.url}
-                      alt={`${story.title} - изображение ${index + 1}`}
-                      className="w-full h-auto rounded-lg"
-                    />
-                  </div>
-                ))}
-              </div>
+              <StoryImages 
+                images={story.images}
+                title={story.title}
+              />
             )}
             
-            {/* Простые действия */}
-            <div className="flex gap-4 justify-center">
-              <Link
-                href="/stories"
-                className="px-6 py-3 rounded-lg transition-colors border-2"
-                style={{ borderColor: '#abd1c6', color: '#abd1c6' }}
-              >
-                Все истории
-              </Link>
-              <Link
-                href="/applications"
-                className="px-6 py-3 rounded-lg transition-colors"
-                style={{ backgroundColor: '#f9bc60', color: '#001e1d' }}
-              >
-                Подать заявку
-              </Link>
-            </div>
+            {/* Действия */}
+            <StoryActions />
           </div>
         </div>
       </div>

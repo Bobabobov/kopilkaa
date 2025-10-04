@@ -6,10 +6,11 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function StoryNavigation() {
   return (
-    <div className="mb-8">
+    <div className="p-4">
       <Link
         href="/stories"
-        className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+        className="inline-flex items-center transition-colors"
+        style={{ color: '#f9bc60' }}
       >
         <LucideIcons.ArrowLeft size="sm" className="mr-2" />
         Вернуться к историям

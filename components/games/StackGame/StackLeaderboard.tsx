@@ -2,6 +2,7 @@
 // Шаблон для будущего функционала рейтинга игроков
 
 import React from 'react';
+import './Stack.styles.css';
 
 interface LeaderboardEntry {
   id: number;
@@ -24,7 +25,7 @@ const mockLeaderboard: LeaderboardEntry[] = [
 
 const StackLeaderboard: React.FC = () => {
   return (
-    <div className="stack-game-leaderboard">
+    <div className="stack-game stack-game-leaderboard">
       <div className="leaderboard-header">
         <h3 className="leaderboard-title">🏆 Таблица рекордов</h3>
         <div className="leaderboard-subtitle">Лучшие результаты</div>

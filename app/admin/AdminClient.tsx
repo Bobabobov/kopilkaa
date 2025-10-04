@@ -269,7 +269,8 @@ export default function AdminClient() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 mb-6 shadow-lg shadow-emerald-500/30"
+            className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 shadow-lg"
+            style={{ background: 'linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)' }}
           >
             <span className="text-4xl">⚡</span>
           </motion.div>
@@ -278,7 +279,8 @@ export default function AdminClient() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4"
+            style={{ color: '#fffffe' }}
           >
             Админ-панель
           </motion.h1>
@@ -287,7 +289,8 @@ export default function AdminClient() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed px-4"
+            className="text-base sm:text-lg max-w-2xl mx-auto leading-relaxed px-4"
+            style={{ color: '#abd1c6' }}
           >
             Управление заявками и модерация контента
           </motion.p>
@@ -337,13 +340,14 @@ export default function AdminClient() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="card p-12 text-center"
+              className="bg-white/90 rounded-2xl p-12 text-center shadow-lg border"
+              style={{ borderColor: '#abd1c6/30' }}
             >
               <div className="text-6xl mb-4">⏳</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-xl font-semibold mb-2" style={{ color: '#001e1d' }}>
                 {q ? 'Ищем заявки...' : 'Загружаем заявки...'}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p style={{ color: '#2d5a4e' }}>
                 {q ? `Поиск по запросу: "${q}"` : 'Пожалуйста, подождите'}
               </p>
             </motion.div>
@@ -353,13 +357,14 @@ export default function AdminClient() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="card p-6 text-center"
+              className="bg-white/90 rounded-2xl p-6 text-center shadow-lg border"
+              style={{ borderColor: '#abd1c6/30' }}
             >
               <div className="text-6xl mb-4">❌</div>
-              <h3 className="text-xl font-semibold text-red-600 dark:text-red-400 mb-2">
+              <h3 className="text-xl font-semibold mb-2" style={{ color: '#e16162' }}>
                 Ошибка загрузки
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">{err}</p>
+              <p style={{ color: '#2d5a4e' }}>{err}</p>
             </motion.div>
           )}
 
@@ -367,13 +372,14 @@ export default function AdminClient() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="card p-12 text-center"
+              className="bg-white/90 rounded-2xl p-12 text-center shadow-lg border"
+              style={{ borderColor: '#abd1c6/30' }}
             >
               <div className="text-8xl mb-6">📝</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h3 className="text-2xl font-bold mb-4" style={{ color: '#001e1d' }}>
                 Заявки не найдены
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p style={{ color: '#2d5a4e' }}>
                 {q || status !== "ALL"
                   ? "Попробуйте изменить поисковый запрос или фильтры"
                   : "Пока нет заявок для модерации"}

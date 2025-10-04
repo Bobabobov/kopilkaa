@@ -38,7 +38,7 @@ export function StoryCard({ story, index }: StoryCardProps) {
       className="group"
     >
       <Link href={`/stories/${story.id}`}>
-        <div className="bg-white/90 backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 hover:-translate-y-1 h-full"
+        <div className="bg-white/90 backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 hover:-translate-y-1 h-full max-w-full overflow-hidden"
              style={{ borderColor: '#abd1c6/30' }}>
           {/* Изображение */}
           <div className="relative mb-4 rounded-xl overflow-hidden">
@@ -53,14 +53,14 @@ export function StoryCard({ story, index }: StoryCardProps) {
           </div>
           
           {/* Контент */}
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             {/* Заголовок */}
-            <h3 className="text-xl font-bold transition-colors line-clamp-2" style={{ color: '#001e1d' }}>
+            <h3 className="text-xl font-bold transition-colors line-clamp-2 break-words overflow-hidden" style={{ color: '#001e1d' }}>
               {story.title}
             </h3>
             
             {/* Описание */}
-            <p className="text-sm leading-relaxed line-clamp-3" style={{ color: '#2d5a4e' }}>
+            <p className="text-sm leading-relaxed line-clamp-3 break-words overflow-hidden" style={{ color: '#2d5a4e' }}>
               {story.summary}
             </p>
             

@@ -87,6 +87,5 @@ export default function StackGamePage() {
         </div>
       </div>
     </div>
-    </div>
   );
 }

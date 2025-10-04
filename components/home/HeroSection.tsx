@@ -34,38 +34,75 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Link 
             href="/applications"
-            className="px-8 py-4 text-lg font-bold transition-all duration-200 transform hover:scale-105 active:scale-95 cursor-pointer"
+            className="pixel-button"
             style={{ 
-              background: '#4a90e2',
-              color: '#ffffff',
-              border: '2px solid #2c5aa0',
+              display: 'inline-block',
+              padding: '16px 32px',
+              background: '#68b7e9',
+              color: '#151729',
+              border: 'none',
               borderRadius: '0px',
-              fontFamily: 'monospace',
-              letterSpacing: '1px',
+              fontFamily: '"Courier New", "Monaco", monospace',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              letterSpacing: '2px',
               textTransform: 'uppercase',
-              boxShadow: '4px 4px 0px #2c5aa0',
-              imageRendering: 'pixelated'
+              textDecoration: 'none',
+              textAlign: 'center',
+              cursor: 'pointer',
+              position: 'relative',
+              imageRendering: 'pixelated',
+              WebkitImageRendering: 'pixelated',
+              msInterpolationMode: 'nearest-neighbor',
+              filter: 'none',
+              transition: 'none'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#5ba0f2';
-              e.currentTarget.style.boxShadow = '6px 6px 0px #2c5aa0';
-              e.currentTarget.style.transform = 'translate(-2px, -2px) scale(1.05)';
+              e.currentTarget.style.background = '#7bc7f0';
+              e.currentTarget.style.transform = 'translate(-2px, -2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#4a90e2';
-              e.currentTarget.style.boxShadow = '4px 4px 0px #2c5aa0';
-              e.currentTarget.style.transform = 'translate(0px, 0px) scale(1)';
+              e.currentTarget.style.background = '#68b7e9';
+              e.currentTarget.style.transform = 'translate(0px, 0px)';
             }}
             onMouseDown={(e) => {
-              e.currentTarget.style.transform = 'translate(2px, 2px) scale(0.95)';
-              e.currentTarget.style.boxShadow = '2px 2px 0px #2c5aa0';
+              e.currentTarget.style.background = '#5ba7d9';
+              e.currentTarget.style.transform = 'translate(2px, 2px)';
             }}
             onMouseUp={(e) => {
-              e.currentTarget.style.transform = 'translate(-2px, -2px) scale(1.05)';
-              e.currentTarget.style.boxShadow = '6px 6px 0px #2c5aa0';
+              e.currentTarget.style.background = '#7bc7f0';
+              e.currentTarget.style.transform = 'translate(-2px, -2px)';
             }}
           >
-            Создать заявку
+            <span style={{
+              position: 'relative',
+              zIndex: 1,
+              textShadow: '1px 1px 0px #ffffff, -1px -1px 0px #4f7e8b'
+            }}>
+              Создать заявку
+            </span>
+            {/* Пиксельная тень */}
+            <div style={{
+              position: 'absolute',
+              top: '0px',
+              left: '0px',
+              right: '0px',
+              bottom: '0px',
+              background: '#4f7e8b',
+              zIndex: '-1',
+              transform: 'translate(4px, 4px)'
+            }} />
+            {/* Пиксельная рамка */}
+            <div style={{
+              position: 'absolute',
+              top: '0px',
+              left: '0px',
+              right: '0px',
+              bottom: '0px',
+              border: '2px solid #ffffff',
+              zIndex: '0',
+              boxSizing: 'border-box'
+            }} />
           </Link>
           
           <Link 

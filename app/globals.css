@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Pixel-perfect styling */
+.pixel-button {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  -webkit-image-rendering: pixelated;
+  -webkit-image-rendering: -webkit-crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
+.pixel-button * {
+  image-rendering: pixelated;
+  -webkit-image-rendering: pixelated;
+}
+
 @layer base {
   html {
     overflow-x: hidden;

@@ -1,8 +1,18 @@
 // app/applications/page.tsx
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { msToHuman } from "@/lib/time";
+import { LucideIcons } from "@/components/ui/LucideIcons";
+import { usePageTimeTracking } from "@/lib/usePageTimeTracking";
+import ProgressBar from "@/components/applications/ProgressBar";
+import FormField from "@/components/applications/FormField";
+import PhotoUpload from "@/components/applications/PhotoUpload";
+import SuccessScreen from "@/components/applications/SuccessScreen";
+import PageHeader from "@/components/applications/PageHeader";
+import SubmitSection from "@/components/applications/SubmitSection";
+import UniversalBackground from "@/components/ui/UniversalBackground";
 
 type LocalImage = { file: File; url: string };
 
@@ -11,6 +21,8 @@ const LIMITS = {
   summaryMax: 140,
   storyMin: 200,
   storyMax: 3000,
+  amountMin: 1,
+  amountMax: 1000000,
   paymentMin: 10,
   paymentMax: 200,
   maxPhotos: 5,
@@ -19,9 +31,20 @@ const LIMITS = {
 const DRAFT_KEY = "application_draft_v1";
 
 export default function ApplicationsPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<{ id: string; email: string } | null>(null);
+  
+  // Отслеживание времени на странице
+  usePageTimeTracking({ 
+    page: "/applications", 
+    enabled: true,
+    sendInterval: 30000 // отправляем каждые 30 секунд
+  });
+  const [loadingAuth, setLoadingAuth] = useState(true);
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [story, setStory] = useState("");
+  const [amount, setAmount] = useState("");
   const [payment, setPayment] = useState("");
   const [photos, setPhotos] = useState<LocalImage[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -29,9 +52,24 @@ export default function ApplicationsPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [left, setLeft] = useState<number | null>(null); // для лимита 24ч
+  const [submitted, setSubmitted] = useState(false); // для экрана успеха
+  const [draftSaved, setDraftSaved] = useState(false); // для уведомления о сохранении
+  const [showClearModal, setShowClearModal] = useState(false); // для модального окна очистки
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  // Загрузка черновика
+  // Функция для очистки черновика
+  const clearDraft = () => {
+    localStorage.removeItem(DRAFT_KEY);
+    setPhotos([]);
+    setTitle("");
+    setSummary("");
+    setStory("");
+    setAmount("");
+    setPayment("");
+    setShowClearModal(false);
+  };
+
+  // Загрузка черновика (сразу при загрузке страницы)
   useEffect(() => {
     try {
       const raw = localStorage.getItem(DRAFT_KEY);
@@ -40,17 +78,57 @@ export default function ApplicationsPage() {
         setTitle(d.title || "");
         setSummary(d.summary || "");
         setStory(d.story || "");
+        setAmount(d.amount || "");
         setPayment(d.payment || "");
-        // фото в черновик не кладём (безопасность/размер)
+        
+        // Фотографии не восстанавливаем из localStorage (проблемы с File объектами)
+        // Пользователю нужно будет загрузить их заново
+        if (d.photos && d.photos.length > 0) {
+          // Показываем уведомление о том, что фотографии нужно загрузить заново
+          setMsg("Черновик восстановлен, но фотографии нужно загрузить заново");
+        }
       }
-    } catch {}
+    } catch (error) {
+      console.error('Ошибка загрузки черновика:', error);
+    }
   }, []);
 
-  // Сохранение черновика (без фото)
+  // Проверка авторизации
   useEffect(() => {
-    const data = { title, summary, story, payment };
+    fetch("/api/profile/me", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!d.user) {
+          router.push("/register");
+          return;
+        }
+        setUser(d.user);
+      })
+      .catch(() => router.push("/register"))
+      .finally(() => setLoadingAuth(false));
+  }, [router]);
+
+  // Сохранение черновика (без фото - только текст)
+  useEffect(() => {
+    // Не сохраняем, если все поля пустые
+    if (!title && !summary && !story && !amount && !payment) {
+      return;
+    }
+    
+    const data = { 
+      title, 
+      summary, 
+      story, 
+      amount, 
+      payment
+    };
     localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-  }, [title, summary, story, payment]);
+    
+    // Показываем уведомление о сохранении
+    setDraftSaved(true);
+    const timer = setTimeout(() => setDraftSaved(false), 2000);
+    return () => clearTimeout(timer);
+  }, [title, summary, story, amount, payment]);
 
   const onPickFiles = (files: FileList | null) => {
     if (!files) return;
@@ -83,6 +161,7 @@ export default function ApplicationsPage() {
     title.length > 0 && title.length <= LIMITS.titleMax &&
     summary.length > 0 && summary.length <= LIMITS.summaryMax &&
     story.length >= LIMITS.storyMin && story.length <= LIMITS.storyMax &&
+    amount.length > 0 && parseInt(amount) >= LIMITS.amountMin && parseInt(amount) <= LIMITS.amountMax &&
     payment.length >= LIMITS.paymentMin && payment.length <= LIMITS.paymentMax &&
     photos.length <= LIMITS.maxPhotos;
 
@@ -91,7 +170,21 @@ export default function ApplicationsPage() {
     setUploading(true);
     try {
       const fd = new FormData();
-      photos.forEach((p) => fd.append("files", p.file));
+      
+      photos.forEach((item) => {
+        let file: File;
+        
+        if (item instanceof File) {
+          file = item;
+        } else if (item && item.file instanceof File) {
+          file = item.file;
+        } else {
+          return;
+        }
+        
+        fd.append("files", file);
+      });
+      
       const r = await fetch("/api/uploads", { method: "POST", body: fd });
       const d = await r.json();
       if (!r.ok) throw new Error(d?.error || "Ошибка загрузки");
@@ -104,6 +197,13 @@ export default function ApplicationsPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMsg(null); setErr(null);
+    
+    // Дополнительная проверка авторизации при отправке
+    if (!user) {
+      router.push("/register");
+      return;
+    }
+    
     if (!valid) { setErr("Проверьте поля — есть ошибки/лимиты"); return; }
 
     try {
@@ -112,9 +212,14 @@ export default function ApplicationsPage() {
       const r = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, summary, story, payment, images: urls }),
+        body: JSON.stringify({ title, summary, story, amount, payment, images: urls }),
       });
       const d = await r.json();
+      if (r.status === 401) {
+        // Если сессия истекла во время заполнения формы
+        router.push("/register");
+        return;
+      }
       if (r.status === 429 && d?.leftMs) {
         setLeft(d.leftMs);
         throw new Error("Лимит: 1 заявка в 24 часа");
@@ -122,121 +227,299 @@ export default function ApplicationsPage() {
       if (!r.ok) throw new Error(d?.error || "Ошибка отправки");
 
       // Успех
-      setMsg("Заявка отправлена! Мы уведомим после модерации.");
-      localStorage.removeItem(DRAFT_KEY);
-      setPhotos([]);
-      setTitle(""); setSummary(""); setStory(""); setPayment("");
+      setSubmitted(true);
+      clearDraft(); // Очищаем черновик только при успешной отправке
     } catch (e: any) {
       setErr(e.message || "Ошибка");
+      // При ошибке НЕ очищаем черновик - данные остаются
     } finally {
       setSubmitting(false);
     }
   };
 
+  // Показываем загрузку пока проверяем авторизацию
+  if (loadingAuth) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mx-auto max-w-3xl card p-6 text-center"
+      >
+        <div>Проверка авторизации...</div>
+      </motion.div>
+    );
+  }
+
+  // Если пользователь не авторизован, ничего не показываем (уже перенаправили)
+  if (!user) {
+    return null;
+  }
+
+  // Экран успешной отправки
+  if (submitted) {
+    return (
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute left-0 top-1/4 w-64 h-64 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute right-0 top-1/3 w-80 h-80 bg-gradient-to-br from-emerald-500/10 to-lime-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute left-1/2 top-1/2 w-32 h-32 bg-gradient-to-br from-lime-500/10 to-green-500/10 rounded-full blur-2xl"></div>
+        </div>
+
+        <div className="container-p mx-auto pt-32 pb-8 relative z-10">
+          <SuccessScreen onNewApplication={() => setSubmitted(false)} />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="mx-auto max-w-3xl card p-6"
-    >
-      <h1 className="text-2xl font-semibold mb-4">Подача заявки</h1>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Универсальный фон */}
+      <UniversalBackground />
 
-      <form className="grid gap-4" onSubmit={submit}>
-        <div>
-          <label className="label">Заголовок <span className="opacity-60">(≤ {LIMITS.titleMax})</span></label>
-          <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={LIMITS.titleMax} />
-          <div className="help mt-1">{title.length} / {LIMITS.titleMax}</div>
-        </div>
+      <PageHeader />
 
-        <div>
-          <label className="label">Кратко <span className="opacity-60">(≤ {LIMITS.summaryMax})</span></label>
-          <input className="input" value={summary} onChange={(e) => setSummary(e.target.value)} maxLength={LIMITS.summaryMax} />
-          <div className="help mt-1">{summary.length} / {LIMITS.summaryMax}</div>
-        </div>
+      {/* Main Content */}
+      <div className="container-p mx-auto max-w-7xl relative z-10 px-4">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          {/* Left Sidebar with Tips */}
+          <div className="xl:col-span-1">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="sticky top-8 space-y-6"
+            >
+              {/* Tips Section */}
+              <div className="backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 dark:border-slate-700/30">
+                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  <span className="text-emerald-500">💡</span>
+                  Советы
+                </h3>
+                <div className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-start gap-3">
+                    <span className="text-green-500 mt-0.5 flex-shrink-0">✓</span>
+                    <span>Будьте конкретными в описании ситуации</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-green-500 mt-0.5 flex-shrink-0">✓</span>
+                    <span>Приложите фотографии для подтверждения</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-green-500 mt-0.5 flex-shrink-0">✓</span>
+                    <span>Укажите точную сумму, которая нужна</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-green-500 mt-0.5 flex-shrink-0">✓</span>
+                    <span>Опишите, как планируете использовать средства</span>
+                  </div>
+                </div>
+              </div>
 
-        <div>
-          <label className="label">История <span className="opacity-60">({LIMITS.storyMin}–{LIMITS.storyMax})</span></label>
-          <textarea
-            className="input min-h-[160px]"
-            value={story}
-            onChange={(e) => setStory(e.target.value)}
-            minLength={LIMITS.storyMin}
-            maxLength={LIMITS.storyMax}
-          />
-          <div className="help mt-1">{story.length} / {LIMITS.storyMax}</div>
-        </div>
-
-        <div>
-          <label className="label">Реквизиты <span className="opacity-60">({LIMITS.paymentMin}–{LIMITS.paymentMax})</span></label>
-          <textarea
-            className="input"
-            value={payment}
-            onChange={(e) => setPayment(e.target.value)}
-            minLength={LIMITS.paymentMin}
-            maxLength={LIMITS.paymentMax}
-          />
-          <div className="help mt-1">{payment.length} / {LIMITS.paymentMax}</div>
-        </div>
-
-        <div
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={onDrop}
-          className="rounded-2xl border border-dashed border-black/20 dark:border-white/20 p-4"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="label">Фотографии (до {LIMITS.maxPhotos})</div>
-            <button type="button" className="btn-ghost border border-black/10 dark:border-white/10 rounded-xl px-3 py-2"
-              onClick={() => inputRef.current?.click()}>
-              Выбрать файлы
-            </button>
-            <input
-              ref={inputRef}
-              type="file"
-              className="hidden"
-              accept="image/*"
-              multiple
-              onChange={(e) => onPickFiles(e.target.files)}
-            />
+            </motion.div>
           </div>
 
-          <div className="help mb-3">Перетащите файлы сюда или нажмите «Выбрать файлы». Каждый ≤ 5 МБ.</div>
+          {/* Main Form */}
+          <div className="xl:col-span-3">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="space-y-8"
+            >
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {photos.map((p, i) => (
-              <div key={i} className="relative rounded-xl overflow-hidden border border-black/10 dark:border-white/10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.url} alt={`photo-${i+1}`} className="w-full h-32 object-cover" />
-                <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-xs flex justify-between">
-                  <button type="button" className="px-2 py-1" onClick={() => move(i, -1)}>◀</button>
-                  <span className="px-2 py-1">{i + 1}</span>
-                  <button type="button" className="px-2 py-1" onClick={() => move(i, +1)}>▶</button>
+
+          {/* Уведомление о сохранении черновика */}
+          {draftSaved && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center gap-2 text-green-700 dark:text-green-400"
+            >
+              <LucideIcons.CheckCircle size="sm" />
+              <span className="text-sm font-medium">Черновик сохранен</span>
+            </motion.div>
+          )}
+
+          {/* Кнопка очистки черновика */}
+          {(title || summary || story || amount || payment) && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mb-4"
+            >
+              <button
+                type="button"
+                onClick={() => setShowClearModal(true)}
+                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+              >
+                <LucideIcons.Trash size="sm" />
+                Очистить черновик
+              </button>
+            </motion.div>
+          )}
+
+          <form className="grid gap-6" onSubmit={submit}>
+            <ProgressBar
+              title={title}
+              summary={summary}
+              story={story}
+              amount={amount}
+              payment={payment}
+              photos={photos}
+            />
+            
+            <FormField
+              type="input"
+              label="Заголовок"
+              icon="Home"
+              value={title}
+              onChange={setTitle}
+              placeholder="Краткое описание вашей ситуации..."
+              hint="Будьте конкретными и понятными"
+              maxLength={LIMITS.titleMax}
+              delay={0.1}
+            />
+
+            <FormField
+              type="input"
+              label="Краткое описание"
+              icon="MessageCircle"
+              value={summary}
+              onChange={setSummary}
+              placeholder="Основная суть вашей просьбы..."
+              hint="Это будет видно в списке заявок"
+              maxLength={LIMITS.summaryMax}
+              delay={0.2}
+            />
+
+            <FormField
+              type="textarea"
+              label="Подробная история"
+              icon="FileText"
+              value={story}
+              onChange={setStory}
+              placeholder="Расскажите подробно о вашей ситуации, что привело к необходимости помощи, как планируете использовать средства..."
+              hint="Чем подробнее, тем больше шансов на помощь"
+              minLength={LIMITS.storyMin}
+              maxLength={LIMITS.storyMax}
+              delay={0.3}
+            />
+
+            <FormField
+              type="input"
+              label="Сумма запроса"
+              icon="DollarSign"
+              value={amount}
+              onChange={setAmount}
+              placeholder="Укажите сумму в рублях..."
+              hint="Минимум 1 рубль, максимум 1 000 000 рублей"
+              minLength={LIMITS.amountMin}
+              maxLength={7}
+              delay={0.4}
+            />
+
+            <FormField
+              type="textarea"
+              label="Реквизиты для получения помощи"
+              icon="CreditCard"
+              value={payment}
+              onChange={setPayment}
+              placeholder="Банковские реквизиты, номер карты или другие способы получения средств"
+              hint="Будьте осторожны с личными данными"
+              minLength={LIMITS.paymentMin}
+              maxLength={LIMITS.paymentMax}
+              compact={true}
+              delay={0.5}
+            />
+
+            <PhotoUpload
+              photos={photos}
+              onPhotosChange={setPhotos}
+              maxPhotos={LIMITS.maxPhotos}
+              delay={0.5}
+            />
+
+            <SubmitSection
+              submitting={submitting}
+              uploading={uploading}
+              left={left}
+              msg={msg}
+              err={err}
+              onSubmit={submit}
+            />
+          </form>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Модальное окно очистки черновика */}
+      {showClearModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setShowClearModal(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="relative bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full shadow-2xl border border-gray-200 dark:border-gray-700"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center">
+              {/* Иконка предупреждения */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-lg"
+              >
+                <div className="text-white">
+                  <LucideIcons.XCircle size="lg" />
                 </div>
+              </motion.div>
+
+              {/* Заголовок */}
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Очистить черновик?
+              </h3>
+
+              {/* Описание */}
+              <p className="text-gray-600 dark:text-gray-400 mb-2">
+                Вы уверены, что хотите очистить все заполненные данные?
+              </p>
+              <p className="text-red-600 dark:text-red-400 font-medium mb-8">
+                ⚠️ Это действие нельзя отменить!
+              </p>
+
+              {/* Кнопки */}
+              <div className="flex gap-4 justify-center">
                 <button
-                  type="button"
-                  onClick={() => removeAt(i)}
-                  className="absolute top-1 right-1 bg-black/60 text-white text-xs rounded px-2 py-1"
+                  className="px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl transition-all duration-300 hover:scale-105 font-medium"
+                  onClick={() => setShowClearModal(false)}
                 >
-                  Удалить
+                  Отмена
+                </button>
+                <button
+                  className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all duration-300 hover:scale-105 font-medium shadow-lg hover:shadow-xl"
+                  onClick={clearDraft}
+                >
+                  Очистить
                 </button>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button className="btn-primary" disabled={!valid || uploading || submitting}>
-            {submitting ? "Отправка..." : uploading ? "Загрузка фото..." : "Отправить заявку"}
-          </button>
-          <div className="help">
-            Лимит: 1 заявка в 24 часа.
-            {left !== null && <span> Повторная подача через ~ {msToHuman(left)}</span>}
-          </div>
-        </div>
-
-        {msg && <div className="text-green-700 dark:text-green-400 text-sm">{msg}</div>}
-        {err && <div className="error">{err}</div>}
-      </form>
-    </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </div>
   );
 }

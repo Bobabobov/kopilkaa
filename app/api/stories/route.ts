@@ -13,6 +13,8 @@ export async function GET(req: Request) {
       { title:   { contains: q } },
       { summary: { contains: q } },
       { story:   { contains: q } },
+      { user: { name: { contains: q } } },
+      { user: { email: { contains: q } } },
     ];
   }
 
@@ -26,6 +28,8 @@ export async function GET(req: Request) {
       select: {
         id: true, title: true, summary: true, createdAt: true,
         images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
+        user: { select: { id: true, name: true, email: true, avatar: true, avatarFrame: true, headerTheme: true, hideEmail: true } },
+        _count: { select: { likes: true } },
       },
     }),
     prisma.application.count({ where }),

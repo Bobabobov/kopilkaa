@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET() {
-  const s = getSession();
+  const s = await getSession();
   if (!s || s.role !== "ADMIN") return new Response("Forbidden", { status: 403 });
 
   const encoder = new TextEncoder();

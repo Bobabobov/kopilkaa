@@ -14,15 +14,45 @@ enum ApplicationStatus {
   REJECTED
 }
 
+enum AchievementRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+  EXCLUSIVE
+}
+
+enum AchievementType {
+  STREAK
+  APPLICATIONS
+  GAMES
+  SOCIAL
+  SPECIAL
+}
+
 model User {
   id           String          @id @default(cuid())
   email        String          @unique
   passwordHash String
   name         String?
+  avatar       String?
+  headerTheme  String?         @default("default")
+  avatarFrame  String?         @default("none")
+  customFrameData String?      // JSON данные пользовательских рамок
+  hideEmail    Boolean         @default(true)  // Скрывать email в профиле по умолчанию
   role         String          @default("USER")
   createdAt    DateTime        @default(now())
+  lastSeen     DateTime        @default(now())
+  lastCommentAt DateTime?      // Время последнего комментария для кулдауна
 
   applications Application[]
+  gameRecords  GameRecord[]
+  userTree     UserTree?
+  userAchievements UserAchievement[]
+  friendshipsSent     Friendship[] @relation("FriendshipRequester")
+  friendshipsReceived Friendship[] @relation("FriendshipReceiver")
+  pageVisits   PageVisit[]
+  storyLikes   StoryLike[]
 }
 
 model Application {
@@ -33,12 +63,14 @@ model Application {
   title        String
   summary      String
   story        String
+  amount       Int              @default(0)
   payment      String
   status       ApplicationStatus  @default(PENDING)
   adminComment String?
   createdAt    DateTime           @default(now())
 
   images       ApplicationImage[]
+  likes        StoryLike[]
 
   @@index([userId])
   @@index([status])
@@ -55,4 +87,142 @@ model ApplicationImage {
 
   @@index([applicationId])
   @@index([sort])
+}
+
+// Модель для игровых записей
+model GameRecord {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameType      String    // Тип игры: leaf-flight, etc.
+  attempts      Int       @default(0)    // Количество попыток
+  maxAttempts   Int       @default(3)    // Максимальное количество попыток
+  bestScore     Int?      // Лучший результат
+  cooldownEnd   DateTime? // Конец кулдауна
+  lastPlayed    DateTime? // Последняя игра
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@unique([userId, gameType])
+  @@index([userId])
+  @@index([gameType])
+  @@index([cooldownEnd])
+}
+
+// Модель для дерева мотивации
+model UserTree {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level         Int       @default(0)
+  streak        Int       @default(0)
+  maxStreak     Int       @default(0)
+  totalWatered  Int       @default(0)
+  lastWatered   DateTime?
+  treeType      String?   // oak, sakura, etc.
+  potType       String?   // clay, ceramic, etc.
+  background    String?   // garden, forest, etc.
+  decorations   String?   // JSON array of decorations
+  isCustomized  Boolean   @default(false)
+  customizedAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([userId])
+}
+
+// Модель для достижений
+model Achievement {
+  id          String            @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  rarity      AchievementRarity @default(COMMON)
+  type        AchievementType   @default(SPECIAL)
+  isExclusive Boolean           @default(false)
+  maxCount    Int               @default(1) // Максимальное количество раз, которое можно получить
+  isActive    Boolean           @default(true)
+  validFrom   DateTime?         // Дата начала действия
+  validTo     DateTime?         // Дата окончания действия
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  userAchievements UserAchievement[]
+  
+  @@index([rarity])
+  @@index([type])
+  @@index([isActive])
+  @@index([validFrom])
+  @@index([validTo])
+}
+
+// Модель для связи пользователей с достижениями
+model UserAchievement {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement  Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt   DateTime    @default(now())
+  grantedBy    String?     // ID администратора, который выдал достижение
+  grantedByName String?    // Имя администратора для отображения
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+  @@index([unlockedAt])
+}
+
+// Модель для дружбы между пользователями
+model Friendship {
+  id          String            @id @default(cuid())
+  requesterId String
+  requester   User              @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiverId  String
+  receiver    User              @relation("FriendshipReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  status      FriendshipStatus  @default(PENDING)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  @@unique([requesterId, receiverId])
+  @@index([requesterId])
+  @@index([receiverId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+// Модель для отслеживания времени на страницах
+model PageVisit {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  page      String   // путь страницы, например "/applications"
+  timeSpent Int      // время в миллисекундах
+  visitDate DateTime @default(now())
+  
+  @@index([userId])
+  @@index([page])
+  @@index([visitDate])
+}
+
+// Модель для лайков историй
+model StoryLike {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  
+  @@unique([userId, applicationId])
+  @@index([userId])
+  @@index([applicationId])
+  @@index([createdAt])
 }

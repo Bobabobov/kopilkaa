@@ -1,127 +1,105 @@
 "use client";
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
+import RegisterForm from "@/components/auth/RegisterForm";
+import SuccessScreen from "@/components/auth/SuccessScreen";
+
+interface FormData {
+  email: string;
+  name: string;
+  password: string;
+  password2: string;
+  acceptTerms: boolean;
+}
 
 export default function RegisterPage() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [password2, setPassword2] = useState("");
-  const [err, setErr] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [busy, setBusy] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setErr(null);
-    
-    if (password.length < 8) {
-      setErr("Пароль минимум 8 символов");
-      return;
+  const validateForm = (formData: FormData) => {
+    const newErrors: {[key: string]: string} = {};
+
+    if (!formData.email) {
+      newErrors.email = "Email обязателен";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Введите корректный email адрес";
     }
-    
-    if (password !== password2) {
-      setErr("Пароли не совпадают");
+
+    if (!formData.name || formData.name.trim().length === 0) {
+      newErrors.name = "Имя обязательно";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Имя должно содержать минимум 2 символа";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Пароль обязателен";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Пароль должен содержать минимум 8 символов";
+    }
+
+    if (!formData.password2) {
+      newErrors.password2 = "Подтвердите пароль";
+    } else if (formData.password !== formData.password2) {
+      newErrors.password2 = "Пароли не совпадают";
+    }
+
+    if (!formData.acceptTerms) {
+      newErrors.acceptTerms = "Необходимо согласиться с правилами и условиями";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (formData: FormData) => {
+    if (!validateForm(formData)) {
       return;
     }
     
     setBusy(true);
+    setSuccess(false);
 
     try {
-      const r = await fetch("/api/auth/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name })
+        body: JSON.stringify({ 
+          email: formData.email.trim().toLowerCase(), 
+          password: formData.password,
+          name: formData.name.trim()
+        })
       });
-      const data = await r.json();
       
-      if (!r.ok) {
-        setErr(data?.message || "Не удалось создать аккаунт");
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setErrors({ general: data?.message || "Не удалось создать аккаунт" });
         return;
       }
       
-      // Успешная регистрация - перенаправляем на профиль
-      if (data.ok) {
+      // Успешная регистрация
+      setSuccess(true);
+      setTimeout(() => {
         window.location.href = "/profile";
-      }
-    } catch (e: any) {
-      setErr(e.message);
+      }, 2000);
+      
+    } catch (error: any) {
+      setErrors({ general: "Ошибка соединения. Попробуйте еще раз." });
     } finally {
       setBusy(false);
     }
+  };
+
+  if (success) {
+    return <SuccessScreen />;
   }
 
   return (
-    <div className="min-h-[calc(100dvh-120px)] flex items-center justify-center p-4">
-      <div className="w-full max-w-md rounded-2xl shadow-lg p-6 bg-white/70 dark:bg-neutral-900/70 backdrop-blur">
-        <h1 className="text-2xl font-semibold mb-1">Создать аккаунт</h1>
-        <p className="text-sm text-neutral-500 mb-4">Быстро и бесплатно</p>
-
-        <form onSubmit={submit} className="space-y-4">
-          <div>
-            <label className="block text-sm mb-1">Email</label>
-            <input 
-              className="w-full rounded-xl border px-3 py-2" 
-              type="email" 
-              required 
-              value={email} 
-              onChange={e => setEmail(e.target.value)} 
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm mb-1">Имя (необязательно)</label>
-            <input 
-              className="w-full rounded-xl border px-3 py-2" 
-              type="text" 
-              value={name} 
-              onChange={e => setName(e.target.value)} 
-              placeholder="Как к вам обращаться" 
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm mb-1">Пароль</label>
-            <input 
-              className="w-full rounded-xl border px-3 py-2" 
-              type="password" 
-              required 
-              value={password} 
-              onChange={e => setPassword(e.target.value)} 
-            />
-            <div className="text-xs text-neutral-500 mt-1">Минимум 8 символов</div>
-          </div>
-          
-          <div>
-            <label className="block text-sm mb-1">Повторите пароль</label>
-            <input 
-              className="w-full rounded-xl border px-3 py-2" 
-              type="password" 
-              required 
-              value={password2} 
-              onChange={e => setPassword2(e.target.value)} 
-            />
-          </div>
-
-          {err && (
-            <div className="text-red-500 text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-xl">
-              {err}
-            </div>
-          )}
-
-          <button 
-            type="submit" 
-            disabled={busy}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2 px-4 disabled:opacity-50"
-          >
-            {busy ? "Регистрация..." : "Зарегистрироваться"}
-          </button>
-        </form>
-
-        <div className="mt-4 text-center text-sm">
-          Уже есть аккаунт? <Link href="/login" className="text-blue-600 hover:underline">Войти</Link>
-        </div>
-      </div>
-    </div>
+    <RegisterForm 
+      onSubmit={handleSubmit}
+      busy={busy}
+      errors={errors}
+    />
   );
 }
 

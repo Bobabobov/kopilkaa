@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export async function GET(req: Request) {
-  const session = getSession();
+  const session = await getSession();
   if (!session) return Response.json({ error: "Требуется вход" }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
@@ -22,6 +22,7 @@ export async function GET(req: Request) {
         title: true,
         summary: true,
         story: true,
+        amount: true,
         payment: true,
         status: true,
         adminComment: true,

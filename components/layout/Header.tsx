@@ -1,56 +1,106 @@
 // components/layout/Header.tsx
 "use client";
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import ThemeToggle from "@/components/ui/ThemeToggle";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import NavAuth from "@/app/_parts/NavAuth";
-import type { Route } from "next"; // ✅ важно: тип для typed routes
-
-const links: { href: Route; label: string }[] = [
-  { href: "/", label: "Главная" },
-  { href: "/stories", label: "Истории" }, // публичные истории
-  { href: "/applications", label: "Заявка" },
-  { href: "/profile", label: "Профиль" },
-  // Админку показывает NavAuth, если роль ADMIN
-];
+import HeaderLogo from "./HeaderLogo";
+import HeaderNavigation from "./HeaderNavigation";
+import HeaderMobileButton from "./HeaderMobileButton";
 
 export default function Header() {
-  const pathname = usePathname();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // корректная подсветка активного пункта (учитывает вложенные маршруты)
-  const isActive = (href: Route) =>
-    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+  // Проверяем авторизацию
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/profile/me");
+        const isAuth = response.ok;
+        setIsAuthenticated(isAuth);
+      } catch (error) {
+        setIsAuthenticated(false);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Закрываем мобильное меню при изменении размера экрана
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) { // lg breakpoint
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur bg-white/70 dark:bg-black/20 border-b border-black/5 dark:border-white/10">
-      <div className="container-p mx-auto flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <Image src="/logo.svg" alt="Копилка" width={28} height={28} className="rounded" />
-          <span>Копилка</span>
-        </Link>
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg" style={{ backgroundColor: '#004643', borderColor: '#abd1c6' }}>
+        <div className="container-p mx-auto flex h-20 items-center justify-between gap-4">
+          {/* Логотип слева */}
+          <HeaderLogo />
 
-        <nav className="hidden md:flex items-center gap-1">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href} // ✅ теперь тип Route — ок
-              className={cn(
-                "px-3 py-2 rounded-xl text-sm transition hover:bg-black/5 dark:hover:bg-white/10",
-                isActive(l.href) && "bg-black/5 dark:bg-white/10 font-medium"
-              )}
-            >
-              {l.label}
-            </Link>
-          ))}
-        </nav>
+          {/* Промежуточная навигация для планшетов - показываем основные ссылки */}
+          <div className="hidden lg:flex xl:hidden">
+            <HeaderNavigation />
+          </div>
 
-        <div className="flex items-center gap-2">
-          <NavAuth />
-          <ThemeToggle />
+          {/* Полная навигация для больших экранов */}
+          <div className="hidden xl:flex flex-1 justify-center">
+            <HeaderNavigation />
+          </div>
+
+          {/* Правая часть - показываем на средних и больших экранах */}
+          <div className="hidden sm:flex items-center gap-3 w-[180px] justify-end flex-shrink-0">
+            <NavAuth />
+          </div>
+
+          {/* Кнопка мобильного меню */}
+          <HeaderMobileButton 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            isOpen={mobileMenuOpen}
+          />
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Мобильное меню */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden border-t backdrop-blur-sm fixed top-20 left-0 right-0 z-40 shadow-lg"
+            style={{ backgroundColor: '#004643', borderColor: '#abd1c6' }}
+          >
+            <div className="container-p py-4 space-y-2">
+              {/* Навигационные ссылки */}
+              <div className="space-y-1">
+                <HeaderNavigation 
+                  className="flex-col space-y-1" 
+                  onLinkClick={() => setMobileMenuOpen(false)}
+                />
+              </div>
+
+              {/* Авторизация для мобильных */}
+              <div className="pt-2 border-t border-white/20 dark:border-white/10">
+                <div className="px-4">
+                  <NavAuth />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

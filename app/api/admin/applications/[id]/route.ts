@@ -5,9 +5,30 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { publish } from "@/lib/sse";
 import { sendStatusEmail } from "@/lib/email";
+// import { checkAndGrantAchievements } from "@/lib/achievements"; // Удалено - система достижений отключена
+
+export async function GET(req: Request, { params }: { params: { id: string } }) {
+  const s = await getSession();
+  if (!s || s.role !== "ADMIN") return Response.json({ error: "Forbidden" }, { status: 403 });
+
+  try {
+    const item = await prisma.application.findUnique({
+      where: { id: params.id },
+      include: {
+        user: { select: { email: true, id: true } },
+        images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
+      },
+    });
+
+    if (!item) return Response.json({ error: "Not found" }, { status: 404 });
+    return Response.json({ item });
+  } catch (error) {
+    return Response.json({ error: "Server error" }, { status: 500 });
+  }
+}
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-  const s = getSession();
+  const s = await getSession();
   if (!s || s.role !== "ADMIN") return Response.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json().catch(() => ({}));
@@ -35,6 +56,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       }).catch((e) => console.error("mail error:", e));
     }
 
+    // Система достижений отключена
+
     // 🛰️ SSE для админки
     publish("application:update", {
       id: item.id,
@@ -44,6 +67,26 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     publish("stats:dirty", {});
 
     return Response.json({ ok: true, item });
+  } catch {
+    return Response.json({ error: "Not found" }, { status: 404 });
+  }
+}
+
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+  const s = await getSession();
+  if (!s || s.role !== "ADMIN") return Response.json({ error: "Forbidden" }, { status: 403 });
+
+  try {
+    // Удаляем заявку (изображения удалятся автоматически из-за onDelete: Cascade)
+    await prisma.application.delete({
+      where: { id: params.id },
+    });
+
+    // 🛰️ SSE для админки
+    publish("application:delete", { id: params.id });
+    publish("stats:dirty", {});
+
+    return Response.json({ ok: true });
   } catch {
     return Response.json({ error: "Not found" }, { status: 404 });
   }

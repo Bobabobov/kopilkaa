@@ -82,7 +82,7 @@ export default function GamesPage() {
                 href="/games/stack"
                 difficulty="Средне"
                 category="Аркада"
-                isAvailable={true}
+                isAvailable={false}
               />
               
               <GamePreview

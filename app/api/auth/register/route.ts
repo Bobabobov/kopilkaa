@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { setSession } from "@/lib/auth";
+// import { checkAndGrantAchievements } from "@/lib/achievements"; // Удалено - система достижений отключена
 
 export const runtime = "nodejs";
 
@@ -30,7 +31,9 @@ export async function POST(req: Request) {
     });
 
     // Сразу логиним (httpOnly-cookie через твой lib/auth.ts)
-    setSession({ uid: user.id, role: user.role as "USER" | "ADMIN" });
+    await setSession({ uid: user.id, role: user.role as "USER" | "ADMIN" });
+
+    // Система достижений отключена
 
     return NextResponse.json({ ok: true, user: { id: user.id, email: user.email } }, { status: 201 });
   } catch (err: any) {

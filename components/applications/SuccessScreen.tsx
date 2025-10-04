@@ -52,7 +52,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
               transition={{ duration: 0.5, delay: 0.5 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
             >
-              <div className="bg-white/20 backdrop-blur-xl rounded-xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
+              <div className="bg-white/20 rounded-xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
                 <LucideIcons.Clock size="lg" className="mx-auto mb-3" style={{ color: '#abd1c6' }} />
                 <h3 className="font-semibold mb-2" style={{ color: '#fffffe' }}>Модерация</h3>
                 <p className="text-sm" style={{ color: '#abd1c6' }}>
@@ -60,7 +60,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
                 </p>
               </div>
               
-              <div className="bg-white/20 backdrop-blur-xl rounded-xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
+              <div className="bg-white/20 rounded-xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
                 <LucideIcons.Mail size="lg" className="mx-auto mb-3" style={{ color: '#abd1c6' }} />
                 <h3 className="font-semibold mb-2" style={{ color: '#fffffe' }}>Уведомления</h3>
                 <p className="text-sm" style={{ color: '#abd1c6' }}>
@@ -68,7 +68,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
                 </p>
               </div>
               
-              <div className="bg-white/20 backdrop-blur-xl rounded-xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
+              <div className="bg-white/20 rounded-xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
                 <LucideIcons.Clock size="lg" className="text-orange-400 mx-auto mb-3" />
                 <h3 className="font-semibold mb-2" style={{ color: '#fffffe' }}>Следующая заявка</h3>
                 <p className="text-sm" style={{ color: '#abd1c6' }}>
@@ -76,7 +76,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
                 </p>
               </div>
               
-              <div className="bg-white/20 backdrop-blur-xl rounded-xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
+              <div className="bg-white/20 rounded-xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
                 <LucideIcons.Heart size="lg" className="text-red-400 mx-auto mb-3" />
                 <h3 className="font-semibold mb-2" style={{ color: '#fffffe' }}>Поддержка</h3>
                 <p className="text-sm" style={{ color: '#abd1c6' }}>
@@ -95,7 +95,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onNewApplication}
-          className="px-8 py-3 bg-white/20 backdrop-blur-xl text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10"
+          className="px-8 py-3 bg-white/20 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10"
           style={{ borderColor: '#abd1c6/20' }}
         >
           Создать ещё заявку
@@ -105,7 +105,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-3 bg-white/20 backdrop-blur-xl font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10"
+                  className="px-8 py-3 bg-white/20 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10"
                   style={{ 
                     borderColor: '#abd1c6/20',
                     color: '#fffffe'

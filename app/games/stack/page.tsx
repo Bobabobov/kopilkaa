@@ -39,7 +39,10 @@ export default function StackGamePage() {
       {/* Игра на всю страницу */}
       <div className="pt-20 min-h-screen flex items-center justify-center">
         <div className="w-full max-w-7xl px-4 flex flex-col lg:flex-row gap-8">
-          {/* Левая колонка - игра */}
+          {/* Левая колонка - пустая */}
+          <div className="hidden lg:block flex-1"></div>
+          
+          {/* Центральная колонка - игра */}
           <div className="flex-1">
             <StackGame />
           </div>

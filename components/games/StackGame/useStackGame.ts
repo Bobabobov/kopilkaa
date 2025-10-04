@@ -311,6 +311,7 @@ export const useStackGame = () => {
     currentBlock,
     startGame,
     pauseGame,
-    restartGame
+    restartGame,
+    placeBlock
   };
 };

@@ -42,6 +42,11 @@ export default function ProfilePage() {
     return () => window.removeEventListener('open-settings-modal', handleOpenSettingsModal);
   }, []);
 
+  // Закрываем модальное окно при загрузке страницы (если оно было открыто)
+  useEffect(() => {
+    setIsSettingsModalOpen(false);
+  }, []);
+
 
   useEffect(() => {
     fetch("/api/profile/me", { cache: "no-store" })

@@ -163,7 +163,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   <div className="flex-shrink-0">
                     <AvatarUpload
                       currentAvatar={user.avatar}
-                      userName={user.name || user.email}
+                      userName={user.name || user.email || 'Пользователь'}
                       avatarFrame={user.avatarFrame}
                       onAvatarChange={handleAvatarChange}
                       onFrameChange={() => {/* Открыть модалку рамок */}}

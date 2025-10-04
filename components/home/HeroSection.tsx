@@ -34,57 +34,78 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Link 
             href="/applications"
-            className="px-8 py-4 text-lg font-bold rounded-xl transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer"
             style={{ 
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: '#ffffff',
+              display: 'inline-block',
+              padding: '8px 16px',
+              background: '#68b7e9',
+              color: '#151729',
               border: 'none',
-              borderRadius: '16px',
-              fontFamily: 'monospace',
+              borderRadius: '0px',
+              fontFamily: '"Courier New", "Monaco", "Consolas", monospace',
+              fontSize: '12px',
+              fontWeight: 'bold',
               letterSpacing: '1px',
               textTransform: 'uppercase',
               textDecoration: 'none',
-              textAlign: 'center',
-              boxShadow: '0 8px 25px rgba(102, 126, 234, 0.4), 0 4px 15px rgba(118, 75, 162, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+              cursor: 'pointer',
               position: 'relative',
-              overflow: 'hidden'
+              imageRendering: 'pixelated',
+              WebkitImageRendering: 'pixelated',
+              msInterpolationMode: 'nearest-neighbor',
+              fontSmooth: 'never',
+              WebkitFontSmoothing: 'none',
+              MozOsxFontSmoothing: 'unset',
+              textRendering: 'optimizeSpeed'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #7c94f1 0%, #8a5cb8 100%)';
-              e.currentTarget.style.boxShadow = '0 12px 35px rgba(102, 126, 234, 0.6), 0 6px 20px rgba(118, 75, 162, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)';
-              e.currentTarget.style.filter = 'brightness(1.1) saturate(1.1)';
+              e.currentTarget.style.background = '#7bc7f0';
+              e.currentTarget.style.transform = 'translate(-1px, -1px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-              e.currentTarget.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.4), 0 4px 15px rgba(118, 75, 162, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
-              e.currentTarget.style.filter = 'brightness(1) saturate(1)';
+              e.currentTarget.style.background = '#68b7e9';
+              e.currentTarget.style.transform = 'translate(0px, 0px)';
             }}
             onMouseDown={(e) => {
-              e.currentTarget.style.transform = 'scale(0.95)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4), 0 2px 10px rgba(118, 75, 162, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.background = '#5ba7d9';
+              e.currentTarget.style.transform = 'translate(1px, 1px)';
             }}
             onMouseUp={(e) => {
-              e.currentTarget.style.transform = 'scale(1.1)';
-              e.currentTarget.style.boxShadow = '0 12px 35px rgba(102, 126, 234, 0.6), 0 6px 20px rgba(118, 75, 162, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)';
+              e.currentTarget.style.background = '#7bc7f0';
+              e.currentTarget.style.transform = 'translate(-1px, -1px)';
             }}
           >
             <span style={{
               position: 'relative',
-              zIndex: 2
+              zIndex: 2,
+              textShadow: '1px 1px 0px #ffffff, -1px -1px 0px #4f7e8b',
+              imageRendering: 'pixelated',
+              WebkitImageRendering: 'pixelated'
             }}>
               Создать заявку
             </span>
-            {/* Объёмный блик */}
+            {/* Пиксельная тень */}
             <div style={{
               position: 'absolute',
               top: '0px',
               left: '0px',
               right: '0px',
-              height: '50%',
-              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%)',
-              borderRadius: '16px 16px 0 0',
-              pointerEvents: 'none'
+              bottom: '0px',
+              background: '#4f7e8b',
+              zIndex: '-1',
+              transform: 'translate(2px, 2px)',
+              imageRendering: 'pixelated'
+            }} />
+            {/* Пиксельная рамка */}
+            <div style={{
+              position: 'absolute',
+              top: '0px',
+              left: '0px',
+              right: '0px',
+              bottom: '0px',
+              border: '1px solid #ffffff',
+              zIndex: '1',
+              boxSizing: 'border-box',
+              imageRendering: 'pixelated'
             }} />
           </Link>
           

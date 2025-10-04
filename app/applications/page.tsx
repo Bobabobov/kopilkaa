@@ -472,7 +472,8 @@ export default function ApplicationsPage() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full shadow-2xl border border-gray-200 dark:border-gray-700"
+            className="relative bg-white/90 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl"
+            style={{ borderColor: '#abd1c6/30' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center">
@@ -489,28 +490,33 @@ export default function ApplicationsPage() {
               </motion.div>
 
               {/* Заголовок */}
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Очистить черновик?
+              <h3 className="text-2xl font-bold mb-4" style={{ color: '#001e1d' }}>
+                🗑️ Очистить черновик?
               </h3>
 
               {/* Описание */}
-              <p className="text-gray-600 dark:text-gray-400 mb-2">
+              <p className="mb-2" style={{ color: '#2d5a4e' }}>
                 Вы уверены, что хотите очистить все заполненные данные?
               </p>
-              <p className="text-red-600 dark:text-red-400 font-medium mb-8">
+              <p className="text-red-500 font-medium mb-8">
                 ⚠️ Это действие нельзя отменить!
               </p>
 
               {/* Кнопки */}
               <div className="flex gap-4 justify-center">
                 <button
-                  className="px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl transition-all duration-300 hover:scale-105 font-medium"
+                  className="px-6 py-3 bg-white/90 backdrop-blur-xl rounded-xl transition-all duration-300 hover:scale-105 font-medium shadow-lg hover:shadow-xl"
+                  style={{ 
+                    borderColor: '#abd1c6/30',
+                    color: '#2d5a4e'
+                  }}
                   onClick={() => setShowClearModal(false)}
                 >
                   Отмена
                 </button>
                 <button
-                  className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all duration-300 hover:scale-105 font-medium shadow-lg hover:shadow-xl"
+                  className="px-6 py-3 text-white rounded-xl transition-all duration-300 hover:scale-105 font-medium shadow-lg hover:shadow-xl"
+                  style={{ background: 'linear-gradient(135deg, #e16162 0%, #d63384 100%)' }}
                   onClick={clearDraft}
                 >
                   Очистить

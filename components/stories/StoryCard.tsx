@@ -65,46 +65,46 @@ export function StoryCard({ story, index }: StoryCardProps) {
             </p>
             
             {/* Метаданные */}
-            <div className="bg-gradient-to-r from-yellow-50/50 to-yellow-100/30 rounded-xl p-3 border border-yellow-200/30">
+            <div className="bg-gradient-to-r from-yellow-100/80 to-yellow-200/60 rounded-xl p-4 border-2 border-yellow-300/50 shadow-lg">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-4">
                   {story.user?.id ? (
                     <Link 
                       href={`/profile/${story.user.id}`}
-                      className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 group/author bg-white/70 rounded-lg px-2 py-1"
+                      className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 group/author bg-white rounded-lg px-3 py-2 shadow-md border border-yellow-200/50"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="relative">
                         <img
                           src={story.user.avatar || '/default-avatar.png'}
                           alt={authorName}
-                          className="w-5 h-5 rounded-full object-cover border border-white/20 group-hover/author:border-yellow-400/50 transition-colors duration-200"
+                          className="w-5 h-5 rounded-full object-cover border-2 border-yellow-300/50 group-hover/author:border-yellow-500 transition-colors duration-200"
                         />
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400/20 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-200"></div>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400/30 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-200"></div>
                       </div>
-                      <span className="group-hover/author:text-yellow-600 transition-colors duration-200 font-medium">
+                      <span className="group-hover/author:text-yellow-700 transition-colors duration-200 font-semibold">
                         {authorName}
                       </span>
                     </Link>
                   ) : (
-                    <div className="flex items-center gap-2 bg-white/70 rounded-lg px-2 py-1">
+                    <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-md border border-yellow-200/50">
                       <img
                         src={story.user?.avatar || '/default-avatar.png'}
                         alt={authorName}
-                        className="w-5 h-5 rounded-full object-cover border border-white/20"
+                        className="w-5 h-5 rounded-full object-cover border-2 border-yellow-300/50"
                       />
-                      <span className="font-medium">{authorName}</span>
+                      <span className="font-semibold">{authorName}</span>
                     </div>
                   )}
-                  <div className="flex items-center gap-1 bg-white/50 rounded-lg px-2 py-1">
-                    <LucideIcons.Clock size="sm" />
-                    {Math.ceil(story.summary.length / 200)} мин
+                  <div className="flex items-center gap-1 bg-white rounded-lg px-3 py-2 shadow-md border border-yellow-200/50">
+                    <LucideIcons.Clock size="sm" className="text-yellow-600" />
+                    <span className="font-medium">{Math.ceil(story.summary.length / 200)} мин</span>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-1 bg-white/50 rounded-lg px-2 py-1" style={{ color: '#e16162' }}>
+                <div className="flex items-center gap-1 bg-white rounded-lg px-3 py-2 shadow-md border border-yellow-200/50" style={{ color: '#e16162' }}>
                   <LucideIcons.Heart size="sm" />
-                  {story._count?.likes || 0}
+                  <span className="font-medium">{story._count?.likes || 0}</span>
                 </div>
               </div>
             </div>

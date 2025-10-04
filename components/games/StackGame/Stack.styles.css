@@ -52,9 +52,16 @@
 
 .stack-game .stack-game-content {
   display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.stack-game .stack-game-main {
+  display: flex;
   flex-direction: column;
   gap: 20px;
   align-items: center;
+  flex: 1;
 }
 
 .stack-game .stack-canvas-wrapper {
@@ -330,5 +337,184 @@
   .stack-game .stack-game-stats {
     flex-direction: column;
     gap: 12px;
+  }
+
+  .stack-game .stack-game-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .stack-game .stack-game-main {
+    align-items: center;
+  }
+
+  .stack-game .stack-game-leaderboard {
+    min-width: auto;
+    max-width: none;
+    width: 100%;
+  }
+}
+
+/* Таблица рекордов */
+.stack-game .stack-game-leaderboard {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 280px;
+  max-width: 320px;
+}
+
+.stack-game .leaderboard-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.stack-game .leaderboard-title {
+  margin: 0 0 4px 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.stack-game .leaderboard-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.stack-game .leaderboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stack-game .leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.stack-game .leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.stack-game .leaderboard-item:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-1px);
+}
+
+.stack-game .leaderboard-item.top-three {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 255, 255, 0.8));
+  border-color: rgba(255, 215, 0, 0.2);
+}
+
+.stack-game .rank {
+  font-size: 1.25rem;
+  font-weight: 700;
+  min-width: 32px;
+  text-align: center;
+}
+
+.stack-game .player-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stack-game .player-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.875rem;
+}
+
+.stack-game .player-date {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.stack-game .player-score {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #4f46e5;
+  min-width: 32px;
+  text-align: right;
+}
+
+.stack-game .leaderboard-footer {
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.stack-game .current-user-info {
+  text-align: center;
+}
+
+.stack-game .current-rank,
+.stack-game .current-best {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 4px 0;
+}
+
+.stack-game .current-rank {
+  font-weight: 600;
+  color: #4f46e5;
+}
+
+/* Темная тема для таблицы рекордов */
+@media (prefers-color-scheme: dark) {
+  .stack-game .stack-game-leaderboard {
+    background: rgba(31, 41, 55, 0.95);
+    border-color: rgba(75, 85, 99, 0.3);
+  }
+
+  .stack-game .leaderboard-title {
+    color: #f9fafb;
+  }
+
+  .stack-game .leaderboard-subtitle {
+    color: #9ca3af;
+  }
+
+  .stack-game .leaderboard-item {
+    background: rgba(55, 65, 81, 0.5);
+    border-color: rgba(75, 85, 99, 0.2);
+  }
+
+  .stack-game .leaderboard-item:hover {
+    background: rgba(55, 65, 81, 0.8);
+  }
+
+  .stack-game .player-name {
+    color: #f9fafb;
+  }
+
+  .stack-game .player-date {
+    color: #9ca3af;
+  }
+
+  .stack-game .leaderboard-footer {
+    border-color: rgba(75, 85, 99, 0.3);
+  }
+
+  .stack-game .current-rank {
+    color: #60a5fa;
+  }
+
+  .stack-game .current-best {
+    color: #9ca3af;
   }
 }

@@ -4,6 +4,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { useStackGame } from './useStackGame';
 import StackControls from './StackControls';
+import StackLeaderboard from './StackLeaderboard';
 import './Stack.styles.css';
 
 // Основной контейнер игры Stack
@@ -29,32 +30,36 @@ const StackGame: React.FC = () => {
       </div>
 
       <div className="stack-game-content">
-        <div className="stack-canvas-wrapper">
-          <canvas
-            ref={gameState.canvasRef}
-            className="stack-canvas"
-            width={600}
-            height={800}
-          />
-          {gameState.gameOver && (
-            <div className="game-overlay">
-              <div className="game-over-message">
-                <h3>Игра окончена!</h3>
-                <p>Ваш счёт: {gameState.score}</p>
-                <p>Лучший результат: {gameState.bestScore}</p>
+        <div className="stack-game-main">
+          <div className="stack-canvas-wrapper">
+            <canvas
+              ref={gameState.canvasRef}
+              className="stack-canvas"
+              width={600}
+              height={800}
+            />
+            {gameState.gameOver && (
+              <div className="game-overlay">
+                <div className="game-over-message">
+                  <h3>Игра окончена!</h3>
+                  <p>Ваш счёт: {gameState.score}</p>
+                  <p>Лучший результат: {gameState.bestScore}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
+          <StackControls
+            gameState={gameState}
+            onStart={gameState.startGame}
+            onRestart={gameState.restartGame}
+            onPause={gameState.pauseGame}
+            isPlaying={gameState.isPlaying}
+            isPaused={gameState.isPaused}
+          />
         </div>
 
-        <StackControls
-          gameState={gameState}
-          onStart={gameState.startGame}
-          onRestart={gameState.restartGame}
-          onPause={gameState.pauseGame}
-          isPlaying={gameState.isPlaying}
-          isPaused={gameState.isPaused}
-        />
+        <StackLeaderboard />
       </div>
 
       <div className="stack-game-instructions">

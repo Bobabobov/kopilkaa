@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function PixelBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const animationRef = useRef<number>();
+  const timeRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -32,32 +32,32 @@ export default function PixelBackground() {
       overlay: 'rgba(0, 26, 24, 0.85)' // Полупрозрачный оверлей
     };
 
-    // Массив для хранения кубов
+    // Массив для хранения кубов с анимационными свойствами
     const cubes: Array<{
       x: number;
       y: number;
+      baseX: number;
+      baseY: number;
       size: number;
       color: string;
       originalColor: string;
-      hovered: boolean;
+      pulsePhase: number;
+      pulseSpeed: number;
+      floatPhase: number;
+      floatSpeed: number;
+      rotationPhase: number;
+      rotationSpeed: number;
     }> = [];
 
     // Функция рисования 3D пиксельного куба
     const drawPixelCube = (cube: typeof cubes[0]) => {
-      const { x, y, size, color, hovered } = cube;
+      const { x, y, size, color } = cube;
       const depth = size * 0.6; // Глубина куба
       
-      // Эффект hover - увеличение и свечение
-      const scale = hovered ? 1.2 : 1;
-      const glowIntensity = hovered ? 0.3 : 0;
-      const scaledSize = size * scale;
-      const scaledDepth = depth * scale;
-      
-      // Свечение при hover
-      if (hovered) {
-        ctx.shadowColor = color;
-        ctx.shadowBlur = 20;
-      }
+      // Пульсация размера
+      const pulseScale = 1 + Math.sin(cube.pulsePhase) * 0.1;
+      const scaledSize = size * pulseScale;
+      const scaledDepth = depth * pulseScale;
       
       // Основная грань (передняя)
       ctx.fillStyle = color;
@@ -107,9 +107,6 @@ export default function PixelBackground() {
       ctx.lineTo(x + scaledSize + scaledDepth, y + scaledSize - scaledDepth);
       ctx.lineTo(x + scaledSize, y + scaledSize);
       ctx.stroke();
-      
-      // Сбрасываем тень
-      ctx.shadowBlur = 0;
     };
 
     // Функция осветления цвета
@@ -134,7 +131,7 @@ export default function PixelBackground() {
     const initializeCubes = () => {
       cubes.length = 0;
       const cubeSize = 32;
-      const spacing = 50;
+      const spacing = 60;
       
       // Создаём сетку кубов
       for (let x = 0; x < canvas.width + cubeSize; x += spacing) {
@@ -147,16 +144,23 @@ export default function PixelBackground() {
           const size = Math.floor((Math.random() * 3 + 1)) * 8;
           
           // Случайное смещение для естественности
-          const offsetX = (Math.random() - 0.5) * 20;
-          const offsetY = (Math.random() - 0.5) * 20;
+          const offsetX = (Math.random() - 0.5) * 30;
+          const offsetY = (Math.random() - 0.5) * 30;
           
           cubes.push({
             x: x + offsetX,
             y: y + offsetY,
+            baseX: x + offsetX,
+            baseY: y + offsetY,
             size,
             color,
             originalColor: color,
-            hovered: false
+            pulsePhase: Math.random() * Math.PI * 2,
+            pulseSpeed: (Math.random() - 0.5) * 0.02,
+            floatPhase: Math.random() * Math.PI * 2,
+            floatSpeed: (Math.random() - 0.5) * 0.01,
+            rotationPhase: Math.random() * Math.PI * 2,
+            rotationSpeed: (Math.random() - 0.5) * 0.005
           });
         }
       }
@@ -173,29 +177,36 @@ export default function PixelBackground() {
         cubes.push({
           x: cube.x,
           y: cube.y,
+          baseX: cube.x,
+          baseY: cube.y,
           size: cube.size,
           color: cube.color,
           originalColor: cube.color,
-          hovered: false
+          pulsePhase: Math.random() * Math.PI * 2,
+          pulseSpeed: (Math.random() - 0.5) * 0.02,
+          floatPhase: Math.random() * Math.PI * 2,
+          floatSpeed: (Math.random() - 0.5) * 0.01,
+          rotationPhase: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.005
         });
       });
     };
 
-    // Функция проверки hover
-    const checkHover = () => {
+    // Обновление анимации кубов
+    const updateCubes = () => {
       cubes.forEach(cube => {
-        const distance = Math.sqrt(
-          Math.pow(mousePos.x - (cube.x + cube.size/2), 2) + 
-          Math.pow(mousePos.y - (cube.y + cube.size/2), 2)
-        );
-        const wasHovered = cube.hovered;
-        cube.hovered = distance < 60; // Радиус hover
+        // Обновляем фазы
+        cube.pulsePhase += cube.pulseSpeed;
+        cube.floatPhase += cube.floatSpeed;
+        cube.rotationPhase += cube.rotationSpeed;
         
-        if (cube.hovered) {
-          cube.color = lightenColor(cube.originalColor, 40);
-        } else {
-          cube.color = cube.originalColor;
-        }
+        // Плавающее движение
+        cube.x = cube.baseX + Math.sin(cube.floatPhase) * 5;
+        cube.y = cube.baseY + Math.cos(cube.floatPhase * 0.7) * 3;
+        
+        // Пульсация цвета
+        const colorVariation = Math.sin(cube.pulsePhase) * 15;
+        cube.color = lightenColor(cube.originalColor, colorVariation);
       });
     };
 
@@ -205,11 +216,13 @@ export default function PixelBackground() {
       ctx.fillStyle = colors.base;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Добавляем градиентный фон
+      // Добавляем градиентный фон с пульсацией
       const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      gradient.addColorStop(0, colors.dark);
-      gradient.addColorStop(0.5, colors.base);
-      gradient.addColorStop(1, colors.medium);
+      const timeVariation = Math.sin(timeRef.current * 0.3) * 0.05;
+      
+      gradient.addColorStop(0, lightenColor(colors.dark, timeVariation * 10));
+      gradient.addColorStop(0.5, lightenColor(colors.base, timeVariation * 5));
+      gradient.addColorStop(1, lightenColor(colors.medium, timeVariation * 3));
       
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -223,8 +236,9 @@ export default function PixelBackground() {
       ctx.fillStyle = colors.overlay;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Добавляем пиксельную текстуру
-      ctx.fillStyle = 'rgba(171, 209, 198, 0.05)';
+      // Добавляем пиксельную текстуру с пульсацией
+      const textureIntensity = 0.05 + Math.sin(timeRef.current * 0.5) * 0.02;
+      ctx.fillStyle = `rgba(171, 209, 198, ${textureIntensity})`;
       const pixelSize = 2;
       for (let x = 0; x < canvas.width; x += pixelSize * 4) {
         for (let y = 0; y < canvas.height; y += pixelSize * 4) {
@@ -237,7 +251,8 @@ export default function PixelBackground() {
 
     // Анимационный цикл
     const animate = () => {
-      checkHover();
+      timeRef.current += 0.01;
+      updateCubes();
       drawBackground();
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -248,30 +263,19 @@ export default function PixelBackground() {
       initializeCubes();
     };
 
-    // Обработчики событий
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      setMousePos({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
-    };
-
     // Инициализация
     resizeCanvas();
     animate();
     
     window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('mousemove', handleMouseMove);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
-      window.removeEventListener('mousemove', handleMouseMove);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [mousePos]);
+  }, []);
 
   return (
     <canvas

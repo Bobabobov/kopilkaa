@@ -4,9 +4,9 @@
 .stack-game .stack-game-container {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
-  padding: 24px;
-  margin: 20px auto;
-  max-width: 500px;
+  padding: 32px;
+  margin: 0 auto;
+  max-width: 800px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -18,10 +18,10 @@
 }
 
 .stack-game .stack-game-title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: bold;
   color: #1f2937;
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
 }
 
 .stack-game .stack-game-stats {
@@ -45,7 +45,7 @@
 }
 
 .stack-game .stat-value {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #4f46e5;
 }

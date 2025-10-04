@@ -62,64 +62,31 @@ export default function StackGamePage() {
       {/* Универсальный фон */}
       <UniversalBackground />
       
-      <div className="container mx-auto px-4 pt-32 pb-8 relative z-10">
-        {/* Заголовок страницы */}
-        <div className="text-center mb-8">
+      {/* Фиксированная шапка */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-gray-700/50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link 
             href="/games"
-            className="inline-flex items-center text-green-400 hover:text-green-300 mb-4 transition-colors"
+            className="inline-flex items-center text-green-400 hover:text-green-300 transition-colors"
           >
             ← Вернуться к играм
           </Link>
           
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-xl font-bold text-white">
             🎯 Stack Game
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Классическая игра на точность и реакцию. Постройте как можно более высокую башню из блоков!
-          </p>
-        </div>
-
-        {/* Компонент игры */}
-        <div className="max-w-4xl mx-auto">
-          <StackGame />
-        </div>
-
-        {/* Дополнительная информация */}
-        <div className="max-w-4xl mx-auto mt-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700/20 text-center">
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Точность
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
-                Кликайте в нужный момент, чтобы блоки точно попадали на стопку
-              </p>
-            </div>
-            
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700/20 text-center">
-              <div className="text-4xl mb-4">⚡</div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Скорость
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
-                С каждым блоком игра становится быстрее и сложнее
-              </p>
-            </div>
-            
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700/20 text-center">
-              <div className="text-4xl mb-4">🏆</div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Рекорды
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
-                Соревнуйтесь сами с собой и улучшайте свой лучший результат
-              </p>
-            </div>
-          </div>
+          
+          <div className="w-24"></div> {/* Для центрирования заголовка */}
         </div>
       </div>
+
+      {/* Игра на всю страницу */}
+      <div className="pt-20 min-h-screen flex items-center justify-center">
+        <div className="w-full max-w-6xl px-4">
+          <StackGame />
+        </div>
+      </div>
+    </div>
     </div>
   );
 }

@@ -33,8 +33,8 @@ const StackGame: React.FC = () => {
           <canvas
             ref={gameState.canvasRef}
             className="stack-canvas"
-            width={400}
-            height={600}
+            width={600}
+            height={800}
           />
           {gameState.gameOver && (
             <div className="game-overlay">

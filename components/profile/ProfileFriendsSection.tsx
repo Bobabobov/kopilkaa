@@ -2,7 +2,13 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import FriendsModal from "./FriendsModal";
+import dynamic from "next/dynamic";
+
+// Lazy load heavy modal
+const FriendsModal = dynamic(() => import("./FriendsModal"), {
+  ssr: false,
+  loading: () => <div className="hidden" />
+});
 
 interface User {
   id: string;

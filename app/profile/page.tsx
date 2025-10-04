@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import UserInfoCard from "@/components/profile/UserInfoCard";
 import ProfileStatsList from "@/components/profile/ProfileStatsList";
@@ -9,9 +10,14 @@ import ProfileActivity from "@/components/profile/ProfileActivity";
 import ProfileLoading from "@/components/profile/ProfileLoading";
 import ProfileLikesSection from "@/components/profile/ProfileLikesSection";
 import ProfileFriendsSection from "@/components/profile/ProfileFriendsSection";
-import SettingsModal from "@/components/profile/SettingsModal";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 // import ThreePet from "@/components/ThreePet"; // Temporarily disabled
+
+// Lazy load heavy modals
+const SettingsModal = dynamic(() => import("@/components/profile/SettingsModal"), {
+  ssr: false,
+  loading: () => <div className="hidden" />
+});
 
 type User = { id: string; email: string; role: "USER" | "ADMIN"; name?: string | null; createdAt: string; avatar?: string | null; headerTheme?: string | null; avatarFrame?: string | null; hideEmail?: boolean; lastSeen?: string | null };
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface StoriesEmptyStateProps {
@@ -9,12 +8,7 @@ interface StoriesEmptyStateProps {
 
 export function StoriesEmptyState({ hasQuery }: StoriesEmptyStateProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="text-center py-16 px-4"
-    >
+    <div className="text-center py-16 px-4 animate-fade-in-up">
             <div className="container mx-auto">
               <div className="bg-white/20 backdrop-blur-xl rounded-2xl p-12 shadow-lg border border-white/10 max-w-2xl mx-auto"
                    style={{ borderColor: '#abd1c6/20' }}>
@@ -76,6 +70,6 @@ export function StoriesEmptyState({ hasQuery }: StoriesEmptyStateProps) {
                 )}
               </div>
             </div>
-    </motion.div>
+    </div>
   );
 }

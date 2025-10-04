@@ -56,12 +56,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
         </div>
 
         {/* Статистика платформы */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-2xl mx-auto"
-        >
+        <div className="max-w-2xl mx-auto animate-fade-in-up">
           <h2 className="text-3xl font-bold mb-8" style={{ color: '#fffffe' }}>
             Статистика платформы
           </h2>
@@ -105,7 +100,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

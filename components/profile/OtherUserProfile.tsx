@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import OtherUserHeader from "@/components/profile/OtherUserHeader";
 import OtherUserCard from "@/components/profile/OtherUserCard";
 import OtherUserLoadingStates from "@/components/profile/OtherUserLoadingStates";
@@ -10,7 +11,12 @@ import OtherUserStats from "@/components/profile/OtherUserStats";
 import OtherUserActivity from "@/components/profile/OtherUserActivity";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import UniversalBackground from "@/components/ui/UniversalBackground";
-import FriendsModal from "@/components/profile/FriendsModal";
+
+// Lazy load heavy modal
+const FriendsModal = dynamic(() => import("@/components/profile/FriendsModal"), {
+  ssr: false,
+  loading: () => <div className="hidden" />
+});
 
 type User = { 
   id: string; 

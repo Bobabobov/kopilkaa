@@ -35,7 +35,11 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
           </div>
           
           <input 
-            className="w-full pl-10 pr-10 py-3 bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-300 text-gray-900 placeholder-gray-500 text-sm shadow-lg group-hover:shadow-yellow-500/10 focus:shadow-yellow-500/20" 
+            className="w-full pl-10 pr-10 py-3 backdrop-blur-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-300 text-white placeholder-gray-300 text-sm shadow-lg group-hover:shadow-yellow-500/10 focus:shadow-yellow-500/20" 
+            style={{
+              backgroundColor: 'rgba(0, 30, 29, 0.8)',
+              borderColor: 'rgba(171, 209, 198, 0.3)'
+            }}
             placeholder="Поиск историй..." 
             value={query} 
             onChange={(e) => onQueryChange(e.target.value)} 

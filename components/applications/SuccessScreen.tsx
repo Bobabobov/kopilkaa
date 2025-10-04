@@ -53,34 +53,34 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
               transition={{ duration: 0.5, delay: 0.5 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
             >
-              <div className="bg-white/90 rounded-2xl p-6 shadow-lg border" style={{ borderColor: '#abd1c6/30' }}>
+              <div className="bg-white/20 rounded-2xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
                 <LucideIcons.Clock size="lg" className="mx-auto mb-3" style={{ color: '#f9bc60' }} />
-                <h3 className="font-semibold mb-2" style={{ color: '#001e1d' }}>Модерация</h3>
-                <p className="text-sm" style={{ color: '#2d5a4e' }}>
+                <h3 className="font-semibold mb-2" style={{ color: '#fffffe' }}>Модерация</h3>
+                <p className="text-sm" style={{ color: '#abd1c6' }}>
                   Ваша заявка проверяется модераторами
                 </p>
               </div>
               
-              <div className="bg-white/90 rounded-2xl p-6 shadow-lg border" style={{ borderColor: '#abd1c6/30' }}>
+              <div className="bg-white/20 rounded-2xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
                 <LucideIcons.Mail size="lg" className="mx-auto mb-3" style={{ color: '#f9bc60' }} />
-                <h3 className="font-semibold mb-2" style={{ color: '#001e1d' }}>Уведомления</h3>
-                <p className="text-sm" style={{ color: '#2d5a4e' }}>
+                <h3 className="font-semibold mb-2" style={{ color: '#fffffe' }}>Уведомления</h3>
+                <p className="text-sm" style={{ color: '#abd1c6' }}>
                   Мы сообщим о результате на email
                 </p>
               </div>
               
-              <div className="bg-white/90 rounded-2xl p-6 shadow-lg border" style={{ borderColor: '#abd1c6/30' }}>
+              <div className="bg-white/20 rounded-2xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
                 <LucideIcons.Clock size="lg" className="mx-auto mb-3" style={{ color: '#e16162' }} />
-                <h3 className="font-semibold mb-2" style={{ color: '#001e1d' }}>Следующая заявка</h3>
-                <p className="text-sm" style={{ color: '#2d5a4e' }}>
+                <h3 className="font-semibold mb-2" style={{ color: '#fffffe' }}>Следующая заявка</h3>
+                <p className="text-sm" style={{ color: '#abd1c6' }}>
                   Следующую заявку можно подать только через 24 часа
                 </p>
               </div>
               
-              <div className="bg-white/90 rounded-2xl p-6 shadow-lg border" style={{ borderColor: '#abd1c6/30' }}>
+              <div className="bg-white/20 rounded-2xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
                 <LucideIcons.Heart size="lg" className="mx-auto mb-3" style={{ color: '#e16162' }} />
-                <h3 className="font-semibold mb-2" style={{ color: '#001e1d' }}>Поддержка</h3>
-                <p className="text-sm" style={{ color: '#2d5a4e' }}>
+                <h3 className="font-semibold mb-2" style={{ color: '#fffffe' }}>Поддержка</h3>
+                <p className="text-sm" style={{ color: '#abd1c6' }}>
                   Если нужна помощь, обращайтесь в поддержку
                 </p>
               </div>
@@ -106,10 +106,10 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-3 bg-white/90 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border"
+                  className="px-8 py-3 bg-white/20 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10"
                   style={{ 
-                    borderColor: '#abd1c6/30',
-                    color: '#2d5a4e'
+                    borderColor: '#abd1c6/20',
+                    color: '#fffffe'
                   }}
                 >
                   Мой профиль

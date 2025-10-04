@@ -38,10 +38,10 @@ export function StoryCard({ story, index }: StoryCardProps) {
       className="group"
     >
       <Link href={`/stories/${story.id}`}>
-        <div className="bg-white/90 backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 hover:-translate-y-1 h-full max-w-full overflow-hidden"
+        <div className="bg-white/90 backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 hover:-translate-y-1 h-full max-w-full overflow-hidden flex flex-col"
              style={{ borderColor: '#abd1c6/30' }}>
           {/* Изображение */}
-          <div className="relative mb-4 rounded-xl overflow-hidden">
+          <div className="relative mb-4 rounded-xl overflow-hidden flex-shrink-0">
             <img 
               src={mainImage} 
               alt={story.title}
@@ -53,19 +53,19 @@ export function StoryCard({ story, index }: StoryCardProps) {
           </div>
           
           {/* Контент */}
-          <div className="space-y-4 min-w-0">
+          <div className="flex flex-col flex-1 min-w-0">
             {/* Заголовок */}
-            <h3 className="text-xl font-bold transition-colors line-clamp-2 break-words overflow-hidden" style={{ color: '#001e1d' }}>
+            <h3 className="text-xl font-bold transition-colors line-clamp-2 break-words overflow-hidden mb-3" style={{ color: '#001e1d' }}>
               {story.title}
             </h3>
             
             {/* Описание */}
-            <p className="text-sm leading-relaxed line-clamp-3 break-words overflow-hidden" style={{ color: '#2d5a4e' }}>
+            <p className="text-sm leading-relaxed line-clamp-3 break-words overflow-hidden flex-1 mb-4" style={{ color: '#2d5a4e' }}>
               {story.summary}
             </p>
             
             {/* Метаданные */}
-            <div className="bg-gradient-to-r from-emerald-200/70 to-green-300/50 rounded-xl p-4 border-2 border-emerald-400/60 shadow-lg">
+            <div className="bg-gradient-to-r from-emerald-200/70 to-green-300/50 rounded-xl p-4 border-2 border-emerald-400/60 shadow-lg flex-shrink-0">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-4">
                   {story.user?.id ? (
@@ -110,7 +110,7 @@ export function StoryCard({ story, index }: StoryCardProps) {
             </div>
             
             {/* Дата */}
-            <div className="pt-2 border-t" style={{ borderColor: '#abd1c6/50' }}>
+            <div className="pt-2 border-t mt-4 flex-shrink-0" style={{ borderColor: '#abd1c6/50' }}>
               <span className="text-xs" style={{ color: '#2d5a4e' }}>
                 {story.createdAt ? new Date(story.createdAt).toLocaleDateString('ru-RU', {
                   year: 'numeric',

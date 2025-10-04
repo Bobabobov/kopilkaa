@@ -90,16 +90,19 @@ export default function PixelBackground() {
         
         // Рисуем пиксельный блок с градиентом
         const gradient = ctx.createLinearGradient(-currentSize/2, -currentSize/2, currentSize/2, currentSize/2);
-        const colorVariation = Math.sin(this.pulse) * 20;
+        const colorVariation = Math.sin(this.pulse) * 15;
         
         // Создаём пиксельный эффект через цветовые вариации
         const baseColor = this.color;
         const lightColor = this.lightenColor(baseColor, colorVariation);
         const darkColor = this.darkenColor(baseColor, colorVariation);
         
-        gradient.addColorStop(0, lightColor);
-        gradient.addColorStop(0.5, baseColor);
-        gradient.addColorStop(1, darkColor);
+        // Проверяем валидность цветов
+        const isValidColor = (color: string) => /^#[0-9A-F]{6}$/i.test(color);
+        
+        gradient.addColorStop(0, isValidColor(lightColor) ? lightColor : baseColor);
+        gradient.addColorStop(0.5, isValidColor(baseColor) ? baseColor : '#004643');
+        gradient.addColorStop(1, isValidColor(darkColor) ? darkColor : baseColor);
 
         ctx.fillStyle = gradient;
         ctx.fillRect(-currentSize/2, -currentSize/2, currentSize, currentSize);
@@ -114,18 +117,20 @@ export default function PixelBackground() {
 
       lightenColor(color: string, amount: number): string {
         const num = parseInt(color.replace("#", ""), 16);
-        const r = Math.min(255, ((num >> 16) & 255) + amount);
-        const g = Math.min(255, ((num >> 8) & 255) + amount);
-        const b = Math.min(255, (num & 255) + amount);
-        return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+        const r = Math.min(255, Math.max(0, ((num >> 16) & 255) + amount));
+        const g = Math.min(255, Math.max(0, ((num >> 8) & 255) + amount));
+        const b = Math.min(255, Math.max(0, (num & 255) + amount));
+        const hex = ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+        return `#${hex}`;
       }
 
       darkenColor(color: string, amount: number): string {
         const num = parseInt(color.replace("#", ""), 16);
-        const r = Math.max(0, ((num >> 16) & 255) - amount);
-        const g = Math.max(0, ((num >> 8) & 255) - amount);
-        const b = Math.max(0, (num & 255) - amount);
-        return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+        const r = Math.min(255, Math.max(0, ((num >> 16) & 255) - amount));
+        const g = Math.min(255, Math.max(0, ((num >> 8) & 255) - amount));
+        const b = Math.min(255, Math.max(0, (num & 255) - amount));
+        const hex = ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+        return `#${hex}`;
       }
     }
 

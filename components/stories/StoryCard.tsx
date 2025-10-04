@@ -82,7 +82,7 @@ export function StoryCard({ story, index }: StoryCardProps) {
                         />
                         <div className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald-400/30 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-200"></div>
                       </div>
-                      <span className="group-hover/author:text-emerald-700 transition-colors duration-200 font-semibold">
+                      <span className="group-hover/author:text-emerald-700 transition-colors duration-200 font-semibold text-gray-800">
                         {authorName}
                       </span>
                     </Link>
@@ -93,12 +93,12 @@ export function StoryCard({ story, index }: StoryCardProps) {
                         alt={authorName}
                         className="w-5 h-5 rounded-full object-cover border-2 border-emerald-300/50"
                       />
-                      <span className="font-semibold">{authorName}</span>
+                      <span className="font-semibold text-gray-800">{authorName}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1 bg-white rounded-lg px-3 py-2 shadow-md border border-emerald-200/50">
                     <LucideIcons.Clock size="sm" className="text-emerald-600" />
-                    <span className="font-medium">{Math.ceil(story.summary.length / 200)} мин</span>
+                    <span className="font-medium text-gray-700">{Math.ceil(story.summary.length / 200)} мин</span>
                   </div>
                 </div>
                 

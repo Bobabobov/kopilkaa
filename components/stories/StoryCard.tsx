@@ -38,8 +38,8 @@ export function StoryCard({ story, index }: StoryCardProps) {
       className="group"
     >
       <Link href={`/stories/${story.id}`}>
-        <div className="backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border hover:-translate-y-1 h-full"
-             style={{ backgroundColor: '#fffffe/80', borderColor: '#abd1c6/20' }}>
+        <div className="bg-white/90 backdrop-blur-xl rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 hover:-translate-y-1 h-full"
+             style={{ borderColor: '#abd1c6/30' }}>
           {/* Изображение */}
           <div className="relative mb-4 rounded-xl overflow-hidden">
             <img 
@@ -47,7 +47,9 @@ export function StoryCard({ story, index }: StoryCardProps) {
               alt={story.title}
               className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+            {/* Акцентная полоса */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 to-yellow-600"></div>
           </div>
           
           {/* Контент */}
@@ -58,12 +60,12 @@ export function StoryCard({ story, index }: StoryCardProps) {
             </h3>
             
             {/* Описание */}
-            <p className="text-sm leading-relaxed line-clamp-3" style={{ color: '#abd1c6' }}>
+            <p className="text-sm leading-relaxed line-clamp-3" style={{ color: '#2d5a4e' }}>
               {story.summary}
             </p>
             
             {/* Метаданные */}
-            <div className="flex items-center justify-between text-xs" style={{ color: '#abd1c6' }}>
+            <div className="flex items-center justify-between text-xs" style={{ color: '#2d5a4e' }}>
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1">
                   <LucideIcons.User size="sm" />
@@ -75,7 +77,7 @@ export function StoryCard({ story, index }: StoryCardProps) {
                 </span>
               </div>
               
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1" style={{ color: '#e16162' }}>
                 <LucideIcons.Heart size="sm" />
                 {story._count?.likes || 0}
               </div>
@@ -83,7 +85,7 @@ export function StoryCard({ story, index }: StoryCardProps) {
             
             {/* Дата */}
             <div className="pt-2 border-t" style={{ borderColor: '#abd1c6/50' }}>
-              <span className="text-xs" style={{ color: '#abd1c6' }}>
+              <span className="text-xs" style={{ color: '#2d5a4e' }}>
                 {story.createdAt ? new Date(story.createdAt).toLocaleDateString('ru-RU', {
                   year: 'numeric',
                   month: 'long',

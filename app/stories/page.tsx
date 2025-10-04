@@ -8,7 +8,7 @@ import {
   StoriesEmptyState, 
   StoriesPagination
 } from "@/components/stories";
-import UniversalBackground from "@/components/ui/UniversalBackground";
+import PixelBackground from "@/components/ui/PixelBackground";
 
 interface Story {
   id: string;
@@ -72,8 +72,8 @@ export default function StoriesPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Универсальный фон */}
-      <UniversalBackground />
+      {/* Пиксельный фон */}
+      <PixelBackground />
 
       {/* Header */}
       <StoriesHeader 
@@ -90,7 +90,7 @@ export default function StoriesPage() {
         ) : (
           <>
             {/* Stories Grid */}
-            <div className="px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto px-4 py-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {stories.map((story, index) => (
                   <StoryCard key={story.id} story={story} index={index} />
@@ -99,11 +99,13 @@ export default function StoriesPage() {
             </div>
 
             {/* Pagination */}
-            <StoriesPagination 
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            <div className="container mx-auto px-4 pb-8">
+              <StoriesPagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
           </>
         )}
       </div>

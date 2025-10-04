@@ -181,6 +181,8 @@ export default function StoryPage() {
             <StoryHeader 
               title={story.title}
               author={story.user?.name || story.user?.email || 'Неизвестный автор'}
+              authorId={story.user?.id}
+              authorAvatar={story.user?.avatar}
               createdAt={story.createdAt}
             />
             

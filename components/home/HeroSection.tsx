@@ -34,57 +34,38 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Link 
             href="/applications"
-            className="group relative px-8 py-4 text-lg font-bold transition-all duration-300 transform hover:scale-110 active:scale-95 cursor-pointer"
+            className="px-8 py-4 text-lg font-bold transition-all duration-200 transform hover:scale-105 active:scale-95 cursor-pointer"
             style={{ 
-              background: 'linear-gradient(45deg, #00ffff 0%, #ff00ff 50%, #ffff00 100%)',
-              color: '#000000',
-              boxShadow: '0 0 20px #00ffff, 0 0 40px #ff00ff, inset 0 0 20px rgba(255, 255, 255, 0.3)',
-              textShadow: '0 0 10px #ffffff',
-              borderRadius: '8px',
-              border: '2px solid #ffffff',
+              background: '#4a90e2',
+              color: '#ffffff',
+              border: '2px solid #2c5aa0',
+              borderRadius: '0px',
               fontFamily: 'monospace',
               letterSpacing: '1px',
               textTransform: 'uppercase',
-              filter: 'brightness(1.2) contrast(1.1)'
+              boxShadow: '4px 4px 0px #2c5aa0',
+              imageRendering: 'pixelated'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(45deg, #00ffff 0%, #ff00ff 30%, #ffff00 60%, #ff00ff 100%)';
-              e.currentTarget.style.boxShadow = '0 0 30px #00ffff, 0 0 60px #ff00ff, 0 0 90px #ffff00, inset 0 0 30px rgba(255, 255, 255, 0.5)';
-              e.currentTarget.style.filter = 'brightness(1.4) contrast(1.2) saturate(1.3)';
-              e.currentTarget.style.textShadow = '0 0 15px #ffffff, 0 0 25px #00ffff';
+              e.currentTarget.style.background = '#5ba0f2';
+              e.currentTarget.style.boxShadow = '6px 6px 0px #2c5aa0';
+              e.currentTarget.style.transform = 'translate(-2px, -2px) scale(1.05)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(45deg, #00ffff 0%, #ff00ff 50%, #ffff00 100%)';
-              e.currentTarget.style.boxShadow = '0 0 20px #00ffff, 0 0 40px #ff00ff, inset 0 0 20px rgba(255, 255, 255, 0.3)';
-              e.currentTarget.style.filter = 'brightness(1.2) contrast(1.1)';
-              e.currentTarget.style.textShadow = '0 0 10px #ffffff';
+              e.currentTarget.style.background = '#4a90e2';
+              e.currentTarget.style.boxShadow = '4px 4px 0px #2c5aa0';
+              e.currentTarget.style.transform = 'translate(0px, 0px) scale(1)';
             }}
             onMouseDown={(e) => {
-              e.currentTarget.style.transform = 'scale(0.95)';
-              e.currentTarget.style.filter = 'brightness(1.0) contrast(1.0)';
+              e.currentTarget.style.transform = 'translate(2px, 2px) scale(0.95)';
+              e.currentTarget.style.boxShadow = '2px 2px 0px #2c5aa0';
             }}
             onMouseUp={(e) => {
-              e.currentTarget.style.transform = 'scale(1.1)';
-              e.currentTarget.style.filter = 'brightness(1.4) contrast(1.2) saturate(1.3)';
+              e.currentTarget.style.transform = 'translate(-2px, -2px) scale(1.05)';
+              e.currentTarget.style.boxShadow = '6px 6px 0px #2c5aa0';
             }}
           >
-            <span className="relative z-10" style={{ 
-              background: 'linear-gradient(45deg, #00ffff, #ff00ff, #ffff00)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
-              Создать заявку
-            </span>
-            <div 
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{
-                background: 'linear-gradient(45deg, #00ffff 0%, #ff00ff 25%, #ffff00 50%, #ff00ff 75%, #00ffff 100%)',
-                borderRadius: '6px',
-                filter: 'blur(2px)',
-                animation: 'rainbow-pulse 2s ease-in-out infinite alternate'
-              }}
-            />
+            Создать заявку
           </Link>
           
           <Link 

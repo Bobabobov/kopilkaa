@@ -23,7 +23,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
         className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
         style={{ backgroundColor: '#abd1c6/20' }}
       >
-        <LucideIcons.CheckCircle size="xl" className="text-[#f9bc60]" />
+        <LucideIcons.CheckCircle size="xl" className="text-[#abd1c6]" />
       </motion.div>
       
       <motion.h2
@@ -43,8 +43,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
         className="text-lg mb-8 max-w-2xl mx-auto"
         style={{ color: '#abd1c6' }}
       >
-        Спасибо за вашу заявку! Мы получили её и передали на модерацию. 
-        <span style={{ color: '#f9bc60' }}>Вы получите уведомление о результате в течение 24 часов.</span>
+        Спасибо за вашу заявку! Мы получили её и передали на модерацию. Вы получите уведомление о результате в течение 24 часов.
       </motion.p>
 
             <motion.div
@@ -54,7 +53,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
             >
               <div className="bg-white/20 backdrop-blur-xl rounded-xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
-                <LucideIcons.Clock size="lg" className="mx-auto mb-3" style={{ color: '#f9bc60' }} />
+                <LucideIcons.Clock size="lg" className="mx-auto mb-3" style={{ color: '#abd1c6' }} />
                 <h3 className="font-semibold mb-2" style={{ color: '#fffffe' }}>Модерация</h3>
                 <p className="text-sm" style={{ color: '#abd1c6' }}>
                   Ваша заявка проверяется модераторами
@@ -62,7 +61,7 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
               </div>
               
               <div className="bg-white/20 backdrop-blur-xl rounded-xl p-6 shadow-lg border border-white/10" style={{ borderColor: '#abd1c6/20' }}>
-                <LucideIcons.Mail size="lg" className="mx-auto mb-3" style={{ color: '#f9bc60' }} />
+                <LucideIcons.Mail size="lg" className="mx-auto mb-3" style={{ color: '#abd1c6' }} />
                 <h3 className="font-semibold mb-2" style={{ color: '#fffffe' }}>Уведомления</h3>
                 <p className="text-sm" style={{ color: '#abd1c6' }}>
                   Мы сообщим о результате на email
@@ -96,8 +95,8 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onNewApplication}
-          className="px-8 py-3 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-          style={{ background: 'linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)' }}
+          className="px-8 py-3 bg-white/20 backdrop-blur-xl text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10"
+          style={{ borderColor: '#abd1c6/20' }}
         >
           Создать ещё заявку
         </motion.button>

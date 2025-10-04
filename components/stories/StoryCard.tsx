@@ -55,12 +55,12 @@ export function StoryCard({ story, index }: StoryCardProps) {
           {/* Контент */}
           <div className="flex flex-col flex-1 min-w-0">
             {/* Заголовок */}
-            <h3 className="text-xl font-bold transition-colors break-words mb-3" style={{ color: '#001e1d' }}>
+            <h3 className="text-xl font-bold transition-colors line-clamp-2 break-words overflow-hidden mb-3" style={{ color: '#001e1d' }}>
               {story.title}
             </h3>
             
             {/* Описание */}
-            <p className="text-sm leading-relaxed break-words flex-1 mb-4" style={{ color: '#2d5a4e' }}>
+            <p className="text-sm leading-relaxed line-clamp-3 break-words overflow-hidden flex-1 mb-4" style={{ color: '#2d5a4e' }}>
               {story.summary}
             </p>
             

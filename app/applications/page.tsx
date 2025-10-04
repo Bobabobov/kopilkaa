@@ -7,7 +7,7 @@ import { msToHuman } from "@/lib/time";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { usePageTimeTracking } from "@/lib/usePageTimeTracking";
 import ProgressBar from "@/components/applications/ProgressBar";
-import FormField from "@/components/applications/FormField";
+import FormField from "@/components/ui/FormField";
 import PhotoUpload from "@/components/applications/PhotoUpload";
 import SuccessScreen from "@/components/applications/SuccessScreen";
 import PageHeader from "@/components/applications/PageHeader";
@@ -378,6 +378,7 @@ export default function ApplicationsPage() {
               hint="Будьте конкретными и понятными"
               maxLength={LIMITS.titleMax}
               delay={0.1}
+              required={true}
             />
 
             <FormField
@@ -390,6 +391,7 @@ export default function ApplicationsPage() {
               hint="Это будет видно в списке заявок"
               maxLength={LIMITS.summaryMax}
               delay={0.2}
+              required={true}
             />
 
             <FormField
@@ -403,6 +405,7 @@ export default function ApplicationsPage() {
               minLength={LIMITS.storyMin}
               maxLength={LIMITS.storyMax}
               delay={0.3}
+              required={true}
             />
 
             <FormField
@@ -416,6 +419,7 @@ export default function ApplicationsPage() {
               minLength={LIMITS.amountMin}
               maxLength={7}
               delay={0.4}
+              required={true}
             />
 
             <FormField
@@ -430,6 +434,7 @@ export default function ApplicationsPage() {
               maxLength={LIMITS.paymentMax}
               compact={true}
               delay={0.5}
+              required={true}
             />
 
             <PhotoUpload

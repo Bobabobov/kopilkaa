@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import FormField from "./FormField";
+import FormField from "@/components/ui/FormField";
 import PasswordField from "./PasswordField";
 
 interface FormData {

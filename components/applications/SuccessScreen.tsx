@@ -30,19 +30,21 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="text-3xl font-bold text-gray-900 dark:text-white mb-4"
+        className="text-3xl font-bold mb-4"
+        style={{ color: '#fffffe' }}
       >
-        Заявка отправлена!
+        ✅ Заявка отправлена!
       </motion.h2>
       
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto"
+        className="text-lg mb-8 max-w-2xl mx-auto"
+        style={{ color: '#abd1c6' }}
       >
         Спасибо за вашу заявку! Мы получили её и передали на модерацию. 
-        Вы получите уведомление о результате в течение 24 часов.
+        <span style={{ color: '#f9bc60' }}>Вы получите уведомление о результате в течение 24 часов.</span>
       </motion.p>
 
       <motion.div
@@ -51,34 +53,34 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
         transition={{ duration: 0.5, delay: 0.5 }}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
       >
-        <div className="backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/30">
-          <LucideIcons.Clock size="lg" className="mx-auto mb-3 text-[#f9bc60]" />
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Модерация</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="bg-white/90 backdrop-blur-xl rounded-xl p-6 shadow-lg" style={{ borderColor: '#abd1c6/30' }}>
+          <LucideIcons.Clock size="lg" className="mx-auto mb-3" style={{ color: '#f9bc60' }} />
+          <h3 className="font-semibold mb-2" style={{ color: '#001e1d' }}>Модерация</h3>
+          <p className="text-sm" style={{ color: '#2d5a4e' }}>
             Ваша заявка проверяется модераторами
           </p>
         </div>
         
-        <div className="backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/30">
-          <LucideIcons.Mail size="lg" className="mx-auto mb-3 text-[#f9bc60]" />
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Уведомления</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="bg-white/90 backdrop-blur-xl rounded-xl p-6 shadow-lg" style={{ borderColor: '#abd1c6/30' }}>
+          <LucideIcons.Mail size="lg" className="mx-auto mb-3" style={{ color: '#f9bc60' }} />
+          <h3 className="font-semibold mb-2" style={{ color: '#001e1d' }}>Уведомления</h3>
+          <p className="text-sm" style={{ color: '#2d5a4e' }}>
             Мы сообщим о результате на email
           </p>
         </div>
         
-        <div className="backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/30">
+        <div className="bg-white/90 backdrop-blur-xl rounded-xl p-6 shadow-lg" style={{ borderColor: '#abd1c6/30' }}>
           <LucideIcons.Clock size="lg" className="text-orange-500 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Следующая заявка</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <h3 className="font-semibold mb-2" style={{ color: '#001e1d' }}>Следующая заявка</h3>
+          <p className="text-sm" style={{ color: '#2d5a4e' }}>
             Следующую заявку можно подать только через 24 часа
           </p>
         </div>
         
-        <div className="backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 dark:border-slate-700/30">
+        <div className="bg-white/90 backdrop-blur-xl rounded-xl p-6 shadow-lg" style={{ borderColor: '#abd1c6/30' }}>
           <LucideIcons.Heart size="lg" className="text-red-500 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Поддержка</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <h3 className="font-semibold mb-2" style={{ color: '#001e1d' }}>Поддержка</h3>
+          <p className="text-sm" style={{ color: '#2d5a4e' }}>
             Если нужна помощь, обращайтесь в поддержку
           </p>
         </div>
@@ -94,7 +96,8 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onNewApplication}
-          className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+          className="px-8 py-3 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+          style={{ background: 'linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)' }}
         >
           Создать ещё заявку
         </motion.button>
@@ -103,7 +106,11 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 backdrop-blur-sm text-gray-900 dark:text-white font-semibold rounded-xl border border-slate-200/50 dark:border-slate-700/30 hover:bg-white/20 dark:hover:bg-slate-800/20 transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="px-8 py-3 bg-white/90 backdrop-blur-xl font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+            style={{ 
+              borderColor: '#abd1c6/30',
+              color: '#2d5a4e'
+            }}
           >
             Мой профиль
           </motion.button>

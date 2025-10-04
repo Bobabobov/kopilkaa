@@ -12,7 +12,7 @@ import PhotoUpload from "@/components/applications/PhotoUpload";
 import SuccessScreen from "@/components/applications/SuccessScreen";
 import PageHeader from "@/components/applications/PageHeader";
 import SubmitSection from "@/components/applications/SubmitSection";
-import UniversalBackground from "@/components/ui/UniversalBackground";
+import PixelBackground from "@/components/ui/PixelBackground";
 
 type LocalImage = { file: File; url: string };
 
@@ -276,8 +276,8 @@ export default function ApplicationsPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Универсальный фон */}
-      <UniversalBackground />
+      {/* Пиксельный фон */}
+      <PixelBackground />
 
       <PageHeader />
 

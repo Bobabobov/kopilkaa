@@ -425,7 +425,7 @@ export default function AdminClient() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-3xl p-4 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 border border-gray-100 dark:border-gray-700"
+                    className="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-3xl p-4 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-green-500/5 to-lime-500/5 group-hover:from-emerald-500/10 group-hover:via-green-500/10 group-hover:to-lime-500/10 transition-all duration-500"></div>
 

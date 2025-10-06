@@ -11,7 +11,14 @@ export type ApplicationItem = {
   status: ApplicationStatus;
   adminComment: string | null;
   createdAt: string;
-  user: { email: string; id: string; name: string | null; avatar: string | null; avatarFrame: string | null; hideEmail: boolean };
+  user: {
+    email: string;
+    id: string;
+    name: string | null;
+    avatar: string | null;
+    avatarFrame: string | null;
+    hideEmail: boolean;
+  };
   images: { url: string; sort: number }[];
 };
 
@@ -34,7 +41,3 @@ export type LightboxState = {
   images: string[];
   currentIndex: number;
 };
-
-
-
-

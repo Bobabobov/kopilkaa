@@ -30,7 +30,9 @@ export default function MobileStats({ stats, loading }: MobileStatsProps) {
           <div className="text-3xl lg:text-4xl font-bold text-[#6B9071] dark:text-[#AEC3B0] mb-2">
             ₽ {loading ? "0" : stats.collected.toLocaleString()}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Собрано</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            Собрано
+          </div>
         </div>
 
         <div className="text-center">
@@ -44,14 +46,18 @@ export default function MobileStats({ stats, loading }: MobileStatsProps) {
           <div className="text-3xl lg:text-4xl font-bold text-[#6B9071] dark:text-[#AEC3B0] mb-2">
             {loading ? "0" : stats.approved}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Одобрено</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            Одобрено
+          </div>
         </div>
 
         <div className="text-center">
           <div className="text-3xl lg:text-4xl font-bold text-[#6B9071] dark:text-[#AEC3B0] mb-2">
             {loading ? "0" : stats.people}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Поддержано</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            Поддержано
+          </div>
         </div>
       </div>
 
@@ -61,17 +67,3 @@ export default function MobileStats({ stats, loading }: MobileStatsProps) {
     </motion.div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

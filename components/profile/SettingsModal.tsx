@@ -13,7 +13,10 @@ import EmailVisibilityToggle from "./settings/EmailVisibilityToggle";
 import PasswordChangeForm from "./PasswordChangeForm";
 import DataManagementSection from "./DataManagementSection";
 import SettingsSection, { ReadOnlyField } from "./SettingsSection";
-import { SettingsLoading, SettingsUnauthorized } from "./settings/LoadingStates";
+import {
+  SettingsLoading,
+  SettingsUnauthorized,
+} from "./settings/LoadingStates";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 
@@ -24,23 +27,23 @@ interface SettingsModalProps {
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { ToastComponent } = useBeautifulToast();
-  
+
   const {
     // Состояние
     user,
     loading,
     saving,
-    
+
     // Пароль
     isChangingPassword,
     setIsChangingPassword,
     passwordData,
     setPasswordData,
     passwordError,
-    
+
     // Локальные уведомления
     localNotification,
-    
+
     // Действия
     handleNameChange,
     handleEmailChange,
@@ -58,7 +61,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     if (!isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
       }
     };
@@ -66,21 +69,21 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     // Сохраняем текущую прокрутку
     const originalOverflow = document.body.style.overflow;
     const originalPosition = document.body.style.position;
-    
+
     // Блокируем прокрутку плавно
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    
-    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      
+      document.removeEventListener("keydown", handleKeyDown);
+
       // Восстанавливаем прокрутку плавно
       document.body.style.overflow = originalOverflow;
       document.body.style.position = originalPosition;
-      document.body.style.width = '';
+      document.body.style.width = "";
     };
   }, [isOpen, onClose]);
 
@@ -111,16 +114,30 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   <LucideIcons.Settings size="lg" className="text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-[#001e1d]">Настройки профиля</h2>
-                  <p className="text-[#001e1d]/80 text-sm">Управление вашим аккаунтом</p>
+                  <h2 className="text-2xl font-bold text-[#001e1d]">
+                    Настройки профиля
+                  </h2>
+                  <p className="text-[#001e1d]/80 text-sm">
+                    Управление вашим аккаунтом
+                  </p>
                 </div>
               </div>
               <button
                 onClick={onClose}
                 className="p-3 rounded-2xl bg-[#001e1d]/10 hover:bg-[#001e1d]/20 backdrop-blur-sm border border-[#001e1d]/20 transition-all duration-200 group"
               >
-                <svg className="w-5 h-5 text-[#001e1d] group-hover:rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5 text-[#001e1d] group-hover:rotate-90 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -135,18 +152,32 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className="mx-6 mb-4 p-4 rounded-xl shadow-lg"
-                style={{ background: 'linear-gradient(to right, #abd1c6/20, #f9bc60/20)', borderColor: '#abd1c6' }}
+                style={{
+                  background:
+                    "linear-gradient(to right, #abd1c6/20, #f9bc60/20)",
+                  borderColor: "#abd1c6",
+                }}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#f9bc60' }}>
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: "#f9bc60" }}
+                  >
                     <span className="text-white text-sm">
-                      {localNotification.type === 'success' ? '✓' : 
-                       localNotification.type === 'error' ? '✗' : 'ℹ'}
+                      {localNotification.type === "success"
+                        ? "✓"
+                        : localNotification.type === "error"
+                          ? "✗"
+                          : "ℹ"}
                     </span>
                   </div>
                   <div>
-                    <div className="font-semibold" style={{ color: '#001e1d' }}>{localNotification.title}</div>
-                    <div className="text-sm" style={{ color: '#abd1c6' }}>{localNotification.message}</div>
+                    <div className="font-semibold" style={{ color: "#001e1d" }}>
+                      {localNotification.title}
+                    </div>
+                    <div className="text-sm" style={{ color: "#abd1c6" }}>
+                      {localNotification.message}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -166,15 +197,21 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   <div className="flex-shrink-0">
                     <AvatarUpload
                       currentAvatar={user.avatar}
-                      userName={user.name || user.email || 'Пользователь'}
+                      userName={user.name || user.email || "Пользователь"}
                       avatarFrame={user.avatarFrame}
                       onAvatarChange={handleAvatarChange}
-                      onFrameChange={() => {/* Открыть модалку рамок */}}
+                      onFrameChange={() => {
+                        /* Открыть модалку рамок */
+                      }}
                     />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Аватарка</h3>
-                    <p className="text-gray-600 dark:text-gray-400">Загрузите изображение для вашего профиля</p>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      Аватарка
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Загрузите изображение для вашего профиля
+                    </p>
                   </div>
                 </div>
 
@@ -212,7 +249,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 {/* Последний вход */}
                 <ReadOnlyField
                   label="Последний вход"
-                  value={new Date(user.lastSeen || user.createdAt).toLocaleString("ru-RU")}
+                  value={new Date(
+                    user.lastSeen || user.createdAt,
+                  ).toLocaleString("ru-RU")}
                 />
 
                 {/* Пароль */}

@@ -59,7 +59,7 @@ export async function GET(req: Request) {
     });
 
     // Получаем информацию о пользователях
-    const userIds = userStats.map(stat => stat.userId);
+    const userIds = userStats.map((stat) => stat.userId);
     const users = await prisma.user.findMany({
       where: {
         id: {
@@ -74,11 +74,16 @@ export async function GET(req: Request) {
       },
     });
 
-    const userStatsWithInfo = userStats.map(stat => {
-      const user = users.find(u => u.id === stat.userId);
+    const userStatsWithInfo = userStats.map((stat) => {
+      const user = users.find((u) => u.id === stat.userId);
       return {
         ...stat,
-        user: user || { id: stat.userId, name: null, email: "Неизвестный", avatar: null },
+        user: user || {
+          id: stat.userId,
+          name: null,
+          email: "Неизвестный",
+          avatar: null,
+        },
       };
     });
 
@@ -94,26 +99,32 @@ export async function GET(req: Request) {
         visitDate: true,
         timeSpent: true,
       },
-      orderBy: { visitDate: 'desc' }
+      orderBy: { visitDate: "desc" },
     });
 
     // Группируем по дням
-    const dailyStats = dailyVisits.reduce((acc, visit) => {
-      const date = visit.visitDate.toISOString().split('T')[0];
-      if (!acc[date]) {
-        acc[date] = { visits: 0, totalTime: 0, times: [] };
-      }
-      acc[date].visits++;
-      acc[date].totalTime += visit.timeSpent;
-      acc[date].times.push(visit.timeSpent);
-      return acc;
-    }, {} as Record<string, { visits: number; totalTime: number; times: number[] }>);
+    const dailyStats = dailyVisits.reduce(
+      (acc, visit) => {
+        const date = visit.visitDate.toISOString().split("T")[0];
+        if (!acc[date]) {
+          acc[date] = { visits: 0, totalTime: 0, times: [] };
+        }
+        acc[date].visits++;
+        acc[date].totalTime += visit.timeSpent;
+        acc[date].times.push(visit.timeSpent);
+        return acc;
+      },
+      {} as Record<
+        string,
+        { visits: number; totalTime: number; times: number[] }
+      >,
+    );
 
     const dailyStatsArray = Object.entries(dailyStats).map(([date, data]) => ({
       date,
       visits: data.visits,
       totalTime: data.totalTime,
-      avgTime: data.times.reduce((a, b) => a + b, 0) / data.times.length
+      avgTime: data.times.reduce((a, b) => a + b, 0) / data.times.length,
     }));
 
     return Response.json({
@@ -127,6 +138,9 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("Ошибка получения статистики времени:", error);
-    return Response.json({ error: "Внутренняя ошибка сервера" }, { status: 500 });
+    return Response.json(
+      { error: "Внутренняя ошибка сервера" },
+      { status: 500 },
+    );
   }
 }

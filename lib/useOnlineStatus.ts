@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export function useOnlineStatus() {
   const [isOnline, setIsOnline] = useState(true);
@@ -7,9 +7,9 @@ export function useOnlineStatus() {
     // Обновляем статус при загрузке страницы
     const updateStatus = async () => {
       try {
-        await fetch('/api/profile/me', { cache: 'no-store' });
+        await fetch("/api/profile/me", { cache: "no-store" });
       } catch (error) {
-        console.error('Error updating online status:', error);
+        console.error("Error updating online status:", error);
       }
     };
 
@@ -24,11 +24,11 @@ export function useOnlineStatus() {
       updateStatus();
     };
 
-    window.addEventListener('focus', handleFocus);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
 

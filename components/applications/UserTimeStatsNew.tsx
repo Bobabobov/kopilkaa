@@ -23,21 +23,24 @@ interface UserTimeStatsProps {
   applicationId?: string;
 }
 
-export default function UserTimeStatsNew({ userId, applicationId }: UserTimeStatsProps) {
+export default function UserTimeStatsNew({
+  userId,
+  applicationId,
+}: UserTimeStatsProps) {
   const [data, setData] = useState<UserTimeStatsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const url = `/api/page-visits/user-stats?userId=${userId}&page=/applications${applicationId ? `&applicationId=${applicationId}` : ''}`;
+        const url = `/api/page-visits/user-stats?userId=${userId}&page=/applications${applicationId ? `&applicationId=${applicationId}` : ""}`;
         const response = await fetch(url);
         if (response.ok) {
           const stats = await response.json();
           setData(stats);
         }
       } catch (error) {
-        console.error('Ошибка загрузки статистики пользователя:', error);
+        console.error("Ошибка загрузки статистики пользователя:", error);
       } finally {
         setLoading(false);
       }
@@ -51,7 +54,7 @@ export default function UserTimeStatsNew({ userId, applicationId }: UserTimeStat
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    
+
     if (hours > 0) {
       return `${hours}ч ${minutes}м`;
     } else if (minutes > 0) {
@@ -85,7 +88,9 @@ export default function UserTimeStatsNew({ userId, applicationId }: UserTimeStat
         <div className="text-center text-blue-600 dark:text-blue-400">
           <div className="text-2xl mb-2">⏱️</div>
           <div className="font-medium">Время написания заявки</div>
-          <div className="text-sm mt-1">Нет данных о времени, проведенном на странице заявок</div>
+          <div className="text-sm mt-1">
+            Нет данных о времени, проведенном на странице заявок
+          </div>
           {data && (
             <div className="text-xs mt-2 text-blue-500 dark:text-blue-300">
               {data.period}
@@ -107,11 +112,15 @@ export default function UserTimeStatsNew({ userId, applicationId }: UserTimeStat
         <div className="font-bold text-emerald-700 dark:text-emerald-300 text-lg mb-2">
           Время написания заявки
         </div>
-        
+
         <div className="text-sm text-emerald-600 dark:text-emerald-400 mb-4">
-          Автор: {data.user.name || (!data.user.hideEmail ? data.user.email.split('@')[0] : 'Пользователь')}
+          Автор:{" "}
+          {data.user.name ||
+            (!data.user.hideEmail
+              ? data.user.email.split("@")[0]
+              : "Пользователь")}
         </div>
-        
+
         <div className="text-center">
           <div className="text-4xl font-bold text-emerald-700 dark:text-emerald-300 mb-2">
             {formatTime(data.totalTime)}
@@ -120,7 +129,7 @@ export default function UserTimeStatsNew({ userId, applicationId }: UserTimeStat
             времени на написание заявок
           </div>
         </div>
-        
+
         <div className="text-xs text-emerald-600/70 dark:text-emerald-400/70 mt-3">
           {data.period}
         </div>

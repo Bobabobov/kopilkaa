@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 // Lazy load heavy modal
 const FriendsModal = dynamic(() => import("./FriendsModal"), {
   ssr: false,
-  loading: () => <div className="hidden" />
+  loading: () => <div className="hidden" />,
 });
 
 interface User {
@@ -35,7 +35,9 @@ export default function ProfileFriendsSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [initialTab, setInitialTab] = useState<'friends' | 'sent' | 'received' | 'search'>('friends');
+  const [initialTab, setInitialTab] = useState<
+    "friends" | "sent" | "received" | "search"
+  >("friends");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function ProfileFriendsSection() {
 
         const [friendsRes, receivedRes] = await Promise.all([
           fetch("/api/profile/friends?type=friends"),
-          fetch("/api/profile/friends?type=received")
+          fetch("/api/profile/friends?type=received"),
         ]);
 
         if (friendsRes.ok) {
@@ -63,8 +65,8 @@ export default function ProfileFriendsSection() {
           setReceivedRequests(receivedData.friendships || []);
         }
       } catch (err) {
-        console.error('Error fetching friends:', err);
-        setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
+        console.error("Error fetching friends:", err);
+        setError(err instanceof Error ? err.message : "Неизвестная ошибка");
       } finally {
         setLoading(false);
       }
@@ -74,15 +76,21 @@ export default function ProfileFriendsSection() {
 
     // Обработчик для открытия модального окна друзей
     const handleOpenFriendsModal = (event: CustomEvent) => {
-      const tab = event.detail?.tab || 'friends';
+      const tab = event.detail?.tab || "friends";
       setInitialTab(tab);
       setIsModalOpen(true);
     };
 
-    window.addEventListener('open-friends-modal', handleOpenFriendsModal as EventListener);
-    
+    window.addEventListener(
+      "open-friends-modal",
+      handleOpenFriendsModal as EventListener,
+    );
+
     return () => {
-      window.removeEventListener('open-friends-modal', handleOpenFriendsModal as EventListener);
+      window.removeEventListener(
+        "open-friends-modal",
+        handleOpenFriendsModal as EventListener,
+      );
     };
   }, []);
 
@@ -108,7 +116,12 @@ export default function ProfileFriendsSection() {
                 Мои друзья
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {totalFriends} {totalFriends === 1 ? 'друг' : totalFriends < 5 ? 'друга' : 'друзей'}
+                {totalFriends}{" "}
+                {totalFriends === 1
+                  ? "друг"
+                  : totalFriends < 5
+                    ? "друга"
+                    : "друзей"}
                 {pendingRequests > 0 && (
                   <span className="text-emerald-600 dark:text-emerald-400 ml-2">
                     • {pendingRequests} заявок
@@ -117,11 +130,11 @@ export default function ProfileFriendsSection() {
               </p>
             </div>
           </div>
-          
+
           {(totalFriends > 0 || pendingRequests > 0) && (
             <button
               onClick={() => {
-                setInitialTab('friends');
+                setInitialTab("friends");
                 setIsModalOpen(true);
               }}
               className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors font-medium"
@@ -135,12 +148,16 @@ export default function ProfileFriendsSection() {
         {loading ? (
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto mb-2"></div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Загрузка...</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Загрузка...
+            </p>
           </div>
         ) : error ? (
           <div className="text-center py-8">
             <div className="text-red-500 text-2xl mb-2">⚠️</div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Ошибка загрузки</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Ошибка загрузки
+            </p>
           </div>
         ) : totalFriends === 0 && pendingRequests === 0 ? (
           <div className="text-center py-8">
@@ -150,7 +167,7 @@ export default function ProfileFriendsSection() {
             </p>
             <button
               onClick={() => {
-                setInitialTab('search');
+                setInitialTab("search");
                 setIsModalOpen(true);
               }}
               className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors text-sm"
@@ -169,7 +186,13 @@ export default function ProfileFriendsSection() {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {pendingRequests} {pendingRequests === 1 ? 'заявка' : pendingRequests < 5 ? 'заявки' : 'заявок'} в друзья
+                      {pendingRequests}{" "}
+                      {pendingRequests === 1
+                        ? "заявка"
+                        : pendingRequests < 5
+                          ? "заявки"
+                          : "заявок"}{" "}
+                      в друзья
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
                       Требуют вашего внимания
@@ -177,7 +200,7 @@ export default function ProfileFriendsSection() {
                   </div>
                   <button
                     onClick={() => {
-                      setInitialTab('received');
+                      setInitialTab("received");
                       setIsModalOpen(true);
                     }}
                     className="text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
@@ -190,11 +213,19 @@ export default function ProfileFriendsSection() {
 
             {/* Показать друзей */}
             {friends.slice(0, 3).map((friendship, index) => {
-              const friend = friendship.requesterId === currentUserId ? friendship.receiver : friendship.requester;
-              if (!friend || !friendship.id || !friendship.id.trim()) return null;
+              const friend =
+                friendship.requesterId === currentUserId
+                  ? friendship.receiver
+                  : friendship.requester;
+              if (!friend || !friendship.id || !friendship.id.trim())
+                return null;
               return (
                 <motion.div
-                  key={friendship.id && friendship.id.trim() ? friendship.id : `profile-friend-${index}`}
+                  key={
+                    friendship.id && friendship.id.trim()
+                      ? friendship.id
+                      : `profile-friend-${index}`
+                  }
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * index }}
@@ -211,7 +242,8 @@ export default function ProfileFriendsSection() {
                         />
                       ) : (
                         <span>
-                          {(friend.name || friend.email.split('@')[0])[0].toUpperCase()}
+                          {(friend.name ||
+                            friend.email.split("@")[0])[0].toUpperCase()}
                         </span>
                       )}
                     </div>
@@ -219,18 +251,21 @@ export default function ProfileFriendsSection() {
                     {/* Информация */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Link 
+                        <Link
                           href={`/profile/${friend.id}`}
                           className="text-sm font-semibold text-gray-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors truncate"
                         >
-                          {friend.name || friend.email.split('@')[0]}
+                          {friend.name || friend.email.split("@")[0]}
                         </Link>
                         <span className="text-emerald-500 text-xs">👥</span>
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Друг с {new Date(friendship.createdAt).toLocaleDateString('ru-RU')}
+                          Друг с{" "}
+                          {new Date(friendship.createdAt).toLocaleDateString(
+                            "ru-RU",
+                          )}
                         </span>
                         <Link
                           href={`/profile/${friend.id}`}
@@ -244,12 +279,12 @@ export default function ProfileFriendsSection() {
                 </motion.div>
               );
             })}
-            
+
             {totalFriends > 3 && (
               <div className="text-center pt-2">
                 <button
                   onClick={() => {
-                    setInitialTab('friends');
+                    setInitialTab("friends");
                     setIsModalOpen(true);
                   }}
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -263,8 +298,8 @@ export default function ProfileFriendsSection() {
       </motion.div>
 
       {/* Модальное окно */}
-      <FriendsModal 
-        isOpen={isModalOpen} 
+      <FriendsModal
+        isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         initialTab={initialTab}
       />

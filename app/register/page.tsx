@@ -12,12 +12,12 @@ interface FormData {
 }
 
 export default function RegisterPage() {
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const validateForm = (formData: FormData) => {
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: { [key: string]: string } = {};
 
     if (!formData.email) {
       newErrors.email = "Email обязателен";
@@ -55,7 +55,7 @@ export default function RegisterPage() {
     if (!validateForm(formData)) {
       return;
     }
-    
+
     setBusy(true);
     setSuccess(false);
 
@@ -63,26 +63,25 @@ export default function RegisterPage() {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email: formData.email.trim().toLowerCase(), 
+        body: JSON.stringify({
+          email: formData.email.trim().toLowerCase(),
           password: formData.password,
-          name: formData.name.trim()
-        })
+          name: formData.name.trim(),
+        }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         setErrors({ general: data?.message || "Не удалось создать аккаунт" });
         return;
       }
-      
+
       // Успешная регистрация
       setSuccess(true);
       setTimeout(() => {
         window.location.href = "/profile";
       }, 2000);
-      
     } catch (error: any) {
       setErrors({ general: "Ошибка соединения. Попробуйте еще раз." });
     } finally {
@@ -94,11 +93,5 @@ export default function RegisterPage() {
     return <SuccessScreen />;
   }
 
-  return (
-    <RegisterForm 
-      onSubmit={handleSubmit}
-      busy={busy}
-      errors={errors}
-    />
-  );
+  return <RegisterForm onSubmit={handleSubmit} busy={busy} errors={errors} />;
 }

@@ -25,10 +25,17 @@ interface UserInfoCardProps {
   onThemeChange?: (theme: string | null) => void;
 }
 
-export default function UserInfoCard({ user, onThemeChange }: UserInfoCardProps) {
+export default function UserInfoCard({
+  user,
+  onThemeChange,
+}: UserInfoCardProps) {
   const [currentAvatar, setCurrentAvatar] = useState(user.avatar);
-  const [currentAvatarFrame, setCurrentAvatarFrame] = useState(user.avatarFrame);
-  const [currentHeaderTheme, setCurrentHeaderTheme] = useState(user.headerTheme);
+  const [currentAvatarFrame, setCurrentAvatarFrame] = useState(
+    user.avatarFrame,
+  );
+  const [currentHeaderTheme, setCurrentHeaderTheme] = useState(
+    user.headerTheme,
+  );
   const [showFrameCustomization, setShowFrameCustomization] = useState(false);
   const [showHeaderCustomization, setShowHeaderCustomization] = useState(false);
   const [isApplicationsModalOpen, setIsApplicationsModalOpen] = useState(false);
@@ -39,8 +46,15 @@ export default function UserInfoCard({ user, onThemeChange }: UserInfoCardProps)
       setIsApplicationsModalOpen(true);
     };
 
-    window.addEventListener('open-applications-modal', handleOpenApplicationsModal);
-    return () => window.removeEventListener('open-applications-modal', handleOpenApplicationsModal);
+    window.addEventListener(
+      "open-applications-modal",
+      handleOpenApplicationsModal,
+    );
+    return () =>
+      window.removeEventListener(
+        "open-applications-modal",
+        handleOpenApplicationsModal,
+      );
   }, []);
 
   return (
@@ -60,13 +74,15 @@ export default function UserInfoCard({ user, onThemeChange }: UserInfoCardProps)
         <div className="relative z-10">
           {/* Avatar */}
           <div className="text-center mb-8">
-                        <AvatarUpload
-                          currentAvatar={currentAvatar}
-                          userName={user.name || (!user.hideEmail ? user.email : 'Пользователь')}
-                          avatarFrame={currentAvatarFrame}
-                          onAvatarChange={setCurrentAvatar}
-                          onFrameChange={() => setShowFrameCustomization(true)}
-                        />
+            <AvatarUpload
+              currentAvatar={currentAvatar}
+              userName={
+                user.name || (!user.hideEmail ? user.email : "Пользователь")
+              }
+              avatarFrame={currentAvatarFrame}
+              onAvatarChange={setCurrentAvatar}
+              onFrameChange={() => setShowFrameCustomization(true)}
+            />
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 mt-4">
               {user.name || "Пользователь"}
             </h2>
@@ -86,9 +102,11 @@ export default function UserInfoCard({ user, onThemeChange }: UserInfoCardProps)
           <div className="space-y-4 mb-8">
             <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-2xl p-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-400 text-sm">Дата регистрации:</span>
+                <span className="text-gray-600 dark:text-gray-400 text-sm">
+                  Дата регистрации:
+                </span>
                 <span className="text-gray-900 dark:text-white font-semibold text-sm">
-                  {new Date(user.createdAt).toLocaleDateString('ru-RU')}
+                  {new Date(user.createdAt).toLocaleDateString("ru-RU")}
                 </span>
               </div>
             </div>
@@ -97,50 +115,70 @@ export default function UserInfoCard({ user, onThemeChange }: UserInfoCardProps)
           {/* Quick Actions */}
           <div className="space-y-3">
             {/* Мои заявки - Синий градиент */}
-            <button 
+            <button
               onClick={() => {
-                window.dispatchEvent(new CustomEvent('open-applications-modal'));
+                window.dispatchEvent(
+                  new CustomEvent("open-applications-modal"),
+                );
               }}
               className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-blue-400/20"
             >
-              <SiteIcons.Document size="md" className="text-white group-hover:scale-110 transition-transform" />
+              <SiteIcons.Document
+                size="md"
+                className="text-white group-hover:scale-110 transition-transform"
+              />
               <span>Мои заявки</span>
             </button>
-            
+
             {/* Игры - Фиолетовый градиент */}
-            <a 
+            <a
               href="/games"
               className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-purple-400/20"
             >
-              <SiteIcons.Heart size="md" className="text-white group-hover:scale-110 transition-transform" />
+              <SiteIcons.Heart
+                size="md"
+                className="text-white group-hover:scale-110 transition-transform"
+              />
               <span>Игры</span>
             </a>
 
             {/* Кастомизация заголовка - Фиолетовый градиент */}
-            <button 
+            <button
               onClick={() => setShowHeaderCustomization(true)}
               className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-purple-400/20"
             >
-              <svg className="w-5 h-5 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+              <svg
+                className="w-5 h-5 text-white group-hover:scale-110 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"
+                />
               </svg>
               <span>Тема заголовка</span>
             </button>
 
             {/* Настройки - Серый градиент */}
-            <button 
+            <button
               onClick={() => {
-                window.dispatchEvent(new CustomEvent('open-settings-modal'));
+                window.dispatchEvent(new CustomEvent("open-settings-modal"));
               }}
               className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-gray-500/20"
             >
-              <SiteIcons.Settings size="md" className="text-white group-hover:scale-110 transition-transform" />
+              <SiteIcons.Settings
+                size="md"
+                className="text-white group-hover:scale-110 transition-transform"
+              />
               <span>Настройки</span>
             </button>
           </div>
         </div>
       </div>
-
 
       {/* Модальное окно выбора рамки аватарки */}
       <AvatarFrameCustomization

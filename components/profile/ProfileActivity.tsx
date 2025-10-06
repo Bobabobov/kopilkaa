@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 interface ActivityItem {
   id: string;
-  type: 'application' | 'login';
+  type: "application" | "login";
   title: string;
   description: string;
   icon: string;
@@ -21,23 +21,23 @@ export default function ProfileActivity() {
     // Пока что используем моковые данные, позже заменим на реальный API
     const mockActivities: ActivityItem[] = [
       {
-        id: '1',
-        type: 'application',
-        title: 'Создана заявка',
-        description: 'Заявка на помощь',
-        icon: '📝',
-        timestamp: '2 дня назад',
-        color: 'green'
+        id: "1",
+        type: "application",
+        title: "Создана заявка",
+        description: "Заявка на помощь",
+        icon: "📝",
+        timestamp: "2 дня назад",
+        color: "green",
       },
       {
-        id: '2',
-        type: 'login',
-        title: 'Вход в систему',
-        description: 'Последний вход',
-        icon: '🔑',
-        timestamp: '3 дня назад',
-        color: 'gray'
-      }
+        id: "2",
+        type: "login",
+        title: "Вход в систему",
+        description: "Последний вход",
+        icon: "🔑",
+        timestamp: "3 дня назад",
+        color: "gray",
+      },
     ];
 
     setTimeout(() => {
@@ -48,11 +48,16 @@ export default function ProfileActivity() {
 
   const getColorClasses = (color: string) => {
     switch (color) {
-      case 'blue': return 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400';
-      case 'yellow': return 'bg-lime-100 dark:bg-lime-900/20 text-lime-600 dark:text-lime-400';
-      case 'green': return 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400';
-      case 'gray': return 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
-      default: return 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
+      case "blue":
+        return "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400";
+      case "yellow":
+        return "bg-lime-100 dark:bg-lime-900/20 text-lime-600 dark:text-lime-400";
+      case "green":
+        return "bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400";
+      case "gray":
+        return "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400";
+      default:
+        return "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400";
     }
   };
 
@@ -120,7 +125,9 @@ export default function ProfileActivity() {
                     <h4 className="font-semibold text-gray-900 dark:text-white text-sm truncate">
                       {activity.title}
                     </h4>
-                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getColorClasses(activity.color)}`}>
+                    <span
+                      className={`px-2 py-1 rounded-lg text-xs font-medium ${getColorClasses(activity.color)}`}
+                    >
                       {activity.timestamp}
                     </span>
                   </div>

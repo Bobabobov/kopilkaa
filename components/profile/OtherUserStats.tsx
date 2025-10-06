@@ -54,7 +54,9 @@ export default function OtherUserStats({ userId }: OtherUserStatsProps) {
             <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center text-white text-lg">
               📊
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Статистика</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Статистика
+            </h3>
           </div>
           <div className="text-center py-4">
             <div className="animate-spin w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto"></div>
@@ -77,10 +79,14 @@ export default function OtherUserStats({ userId }: OtherUserStatsProps) {
             <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center text-white text-lg">
               📊
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Статистика</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Статистика
+            </h3>
           </div>
           <div className="text-center py-4">
-            <p className="text-gray-600 dark:text-gray-400 text-sm">Не удалось загрузить статистику</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              Не удалось загрузить статистику
+            </p>
           </div>
         </div>
       </div>
@@ -104,7 +110,9 @@ export default function OtherUserStats({ userId }: OtherUserStatsProps) {
           <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center text-white text-lg">
             📊
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Статистика</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Статистика
+          </h3>
         </div>
 
         <div className="space-y-4">
@@ -113,20 +121,23 @@ export default function OtherUserStats({ userId }: OtherUserStatsProps) {
               <div className="w-10 h-10 bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                 📝
               </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Заявки</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Заявки
+              </span>
             </div>
             <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
               {stats.applicationsCount}
             </span>
           </div>
 
-
           <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-emerald-50 dark:from-blue-900/20 dark:to-emerald-900/20 rounded-2xl hover:from-blue-100 hover:to-emerald-100 dark:hover:from-blue-900/30 dark:hover:to-emerald-900/30 transition-all duration-300">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-emerald-100 dark:from-blue-900/30 dark:to-emerald-900/30 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                 📅
               </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">На платформе</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                На платформе
+              </span>
             </div>
             <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
               {stats.daysSinceRegistration} дн.

@@ -48,7 +48,9 @@ body {
 }
 
 #container .game-over * {
-  transition: opacity 0.5s ease, transform 0.5s ease; /* Плавные переходы для элементов */
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease; /* Плавные переходы для элементов */
   opacity: 0; /* Элементы скрыты по умолчанию */
   transform: translatey(-50px); /* Начальное положение */
   color: #333344; /* Цвет текста завершения игры */
@@ -73,7 +75,9 @@ body {
 }
 
 #container .game-ready #start-button {
-  transition: opacity 0.5s ease, transform 0.5s ease; /* Плавные переходы для кнопки */
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease; /* Плавные переходы для кнопки */
   opacity: 0; /* Скрыта по умолчанию */
   transform: translatey(-50px); /* Начальное положение кнопки */
   border: 3px solid #333344; /* Стиль границы кнопки */
@@ -89,7 +93,9 @@ body {
   top: 16vh;
   left: 0;
   text-align: center; /* Центрирование текста инструкций */
-  transition: opacity 0.5s ease, transform 0.5s ease; /* Плавные переходы */
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease; /* Плавные переходы */
   opacity: 0; /* Инструкции скрыты по умолчанию */
 }
 
@@ -206,26 +212,26 @@ body {
     right: 80px;
     gap: 6px;
   }
-  
+
   #container #author-credit .author-label,
   #container #author-credit .author-link {
     font-size: 12px;
   }
-  
+
   #container #source-credit {
     bottom: 15px;
     left: 15px;
   }
-  
+
   #container #source-credit .source-link {
     padding: 6px 10px;
     gap: 4px;
   }
-  
+
   #container #source-credit .source-icon {
     font-size: 12px;
   }
-  
+
   #container #source-credit .source-text {
     font-size: 10px;
   }

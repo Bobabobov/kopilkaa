@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     const { page, timeSpent } = await req.json();
 
-    if (!page || typeof timeSpent !== 'number' || timeSpent < 0) {
+    if (!page || typeof timeSpent !== "number" || timeSpent < 0) {
       return Response.json({ error: "Некорректные данные" }, { status: 400 });
     }
 
@@ -27,6 +27,9 @@ export async function POST(req: Request) {
     return Response.json({ success: true, visit });
   } catch (error) {
     console.error("Ошибка записи времени посещения:", error);
-    return Response.json({ error: "Внутренняя ошибка сервера" }, { status: 500 });
+    return Response.json(
+      { error: "Внутренняя ошибка сервера" },
+      { status: 500 },
+    );
   }
 }

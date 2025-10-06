@@ -14,14 +14,21 @@ function bad(message: string, status = 400) {
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
-    const email = String(body?.email ?? "").trim().toLowerCase();
+    const email = String(body?.email ?? "")
+      .trim()
+      .toLowerCase();
     const password = String(body?.password ?? "");
     const name = String(body?.name ?? body?.username ?? "").trim();
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return bad("Некорректный email");
-    if (password.length < 8 || password.length > 72) return bad("Пароль должен быть 8–72 символа");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))
+      return bad("Некорректный email");
+    if (password.length < 8 || password.length > 72)
+      return bad("Пароль должен быть 8–72 символа");
 
-    const exists = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+    const exists = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
     if (exists) return bad("Этот email уже зарегистрирован", 409);
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -35,9 +42,13 @@ export async function POST(req: Request) {
 
     // Система достижений отключена
 
-    return NextResponse.json({ ok: true, user: { id: user.id, email: user.email } }, { status: 201 });
+    return NextResponse.json(
+      { ok: true, user: { id: user.id, email: user.email } },
+      { status: 201 },
+    );
   } catch (err: any) {
-    if (err?.code === "P2002") return bad("Этот email уже зарегистрирован", 409);
+    if (err?.code === "P2002")
+      return bad("Этот email уже зарегистрирован", 409);
     console.error("register error:", err);
     return NextResponse.json({ message: "Ошибка сервера" }, { status: 500 });
   }

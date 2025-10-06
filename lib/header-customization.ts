@@ -5,10 +5,11 @@ export const headerThemes = {
     name: "По умолчанию",
     description: "Классический градиентный фон",
     background: "gradient",
-    gradient: "from-white/90 via-white/80 to-white/90 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/90",
+    gradient:
+      "from-white/90 via-white/80 to-white/90 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/90",
     textColor: "text-gray-900 dark:text-white",
     accentColor: "text-emerald-600 dark:text-emerald-400",
-    decoration: "none"
+    decoration: "none",
   },
   nature: {
     name: "Природа",
@@ -17,34 +18,34 @@ export const headerThemes = {
     image: "/header-themes/nature.jpg",
     textColor: "text-white",
     accentColor: "text-green-300",
-    decoration: "nature"
+    decoration: "nature",
   },
   ocean: {
     name: "Океан",
     description: "Морской пейзаж",
-    background: "image", 
+    background: "image",
     image: "/header-themes/ocean.jpg",
     textColor: "text-white",
     accentColor: "text-blue-300",
-    decoration: "ocean"
+    decoration: "ocean",
   },
   space: {
     name: "Космос",
     description: "Звездное небо",
     background: "image",
-    image: "/header-themes/space.jpg", 
+    image: "/header-themes/space.jpg",
     textColor: "text-white",
     accentColor: "text-purple-300",
-    decoration: "space"
+    decoration: "space",
   },
   city: {
     name: "Город",
     description: "Городской пейзаж",
     background: "image",
     image: "/header-themes/city.jpg",
-    textColor: "text-white", 
+    textColor: "text-white",
     accentColor: "text-yellow-300",
-    decoration: "city"
+    decoration: "city",
   },
   abstract: {
     name: "Абстракция",
@@ -52,68 +53,73 @@ export const headerThemes = {
     background: "image",
     image: "/header-themes/abstract.jpg",
     textColor: "text-white",
-    accentColor: "text-pink-300", 
-    decoration: "abstract"
-  }
+    accentColor: "text-pink-300",
+    decoration: "abstract",
+  },
 };
 
 export const headerDecorations = {
   none: {
     name: "Без украшений",
-    elements: []
+    elements: [],
   },
   nature: {
     name: "Природные",
     elements: [
       { type: "leaf", position: "top-left", size: "small" },
-      { type: "flower", position: "top-right", size: "medium" }
-    ]
+      { type: "flower", position: "top-right", size: "medium" },
+    ],
   },
   ocean: {
     name: "Морские",
     elements: [
       { type: "wave", position: "bottom-left", size: "large" },
-      { type: "shell", position: "top-right", size: "small" }
-    ]
+      { type: "shell", position: "top-right", size: "small" },
+    ],
   },
   space: {
-    name: "Космические", 
+    name: "Космические",
     elements: [
       { type: "star", position: "scattered", size: "small" },
-      { type: "planet", position: "top-right", size: "medium" }
-    ]
+      { type: "planet", position: "top-right", size: "medium" },
+    ],
   },
   city: {
     name: "Городские",
     elements: [
       { type: "building", position: "bottom-left", size: "large" },
-      { type: "light", position: "top-right", size: "small" }
-    ]
+      { type: "light", position: "top-right", size: "small" },
+    ],
   },
   abstract: {
     name: "Абстрактные",
     elements: [
       { type: "circle", position: "center", size: "large" },
-      { type: "triangle", position: "top-left", size: "medium" }
-    ]
-  }
+      { type: "triangle", position: "top-left", size: "medium" },
+    ],
+  },
 };
 
 // Получить конфигурацию темы
 export function getHeaderTheme(themeKey: string) {
-  return headerThemes[themeKey as keyof typeof headerThemes] || headerThemes.default;
+  return (
+    headerThemes[themeKey as keyof typeof headerThemes] || headerThemes.default
+  );
 }
 
 // Получить конфигурацию украшений
 export function getHeaderDecoration(decorationKey: string) {
-  return headerDecorations[decorationKey as keyof typeof headerDecorations] || headerDecorations.none;
+  return (
+    headerDecorations[decorationKey as keyof typeof headerDecorations] ||
+    headerDecorations.none
+  );
 }
 
 // Получить все доступные темы
 export function getAllHeaderThemes() {
   return Object.entries(headerThemes).map(([key, theme]) => ({
     key,
-    ...theme
+    ...theme,
   }));
 }
 
@@ -124,7 +130,7 @@ export const avatarFrames = {
     description: "Обычная аватарка",
     className: "",
     borderColor: "",
-    type: "css" as const
+    type: "css" as const,
   },
   // Новые рамки для квадратных аватарок
   // ПРОСТЫЕ РАМКИ (4 штуки)
@@ -134,7 +140,7 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/simple-gold.svg"
+    imageUrl: "/avatar-frames/simple-gold.svg",
   },
   simpleSilver: {
     name: "Простая серебряная",
@@ -142,7 +148,7 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/simple-silver.svg"
+    imageUrl: "/avatar-frames/simple-silver.svg",
   },
   simpleEmerald: {
     name: "Простая изумрудная",
@@ -150,7 +156,7 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/simple-emerald.svg"
+    imageUrl: "/avatar-frames/simple-emerald.svg",
   },
   simpleOcean: {
     name: "Простая морская",
@@ -158,9 +164,9 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/simple-ocean.svg"
+    imageUrl: "/avatar-frames/simple-ocean.svg",
   },
-  
+
   // СЛОЖНЫЕ РАМКИ (4 штуки)
   complexFire: {
     name: "Огненная",
@@ -168,7 +174,7 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/complex-fire.svg"
+    imageUrl: "/avatar-frames/complex-fire.svg",
   },
   complexIce: {
     name: "Ледяная",
@@ -176,7 +182,7 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/complex-ice.svg"
+    imageUrl: "/avatar-frames/complex-ice.svg",
   },
   complexNeon: {
     name: "Неоновая",
@@ -184,7 +190,7 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/complex-neon.svg"
+    imageUrl: "/avatar-frames/complex-neon.svg",
   },
   complexMagic: {
     name: "Магическая",
@@ -192,9 +198,9 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/complex-magic.svg"
+    imageUrl: "/avatar-frames/complex-magic.svg",
   },
-  
+
   // МЕГА СЛОЖНЫЕ РАМКИ (4 штуки)
   megaUniverse: {
     name: "Вселенная",
@@ -202,7 +208,7 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/mega-universe.svg"
+    imageUrl: "/avatar-frames/mega-universe.svg",
   },
   megaQuantum: {
     name: "Квантовая",
@@ -210,7 +216,7 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/mega-quantum.svg"
+    imageUrl: "/avatar-frames/mega-quantum.svg",
   },
   megaHologram: {
     name: "Голограмма",
@@ -218,29 +224,30 @@ export const avatarFrames = {
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/mega-hologram.svg"
+    imageUrl: "/avatar-frames/mega-hologram.svg",
   },
   megaCrystal: {
     name: "Кристалл",
-    description: "Кристаллическая рамка с вращающимися гранями и радужными переливами",
+    description:
+      "Кристаллическая рамка с вращающимися гранями и радужными переливами",
     className: "",
     borderColor: "",
     type: "image" as const,
-    imageUrl: "/avatar-frames/mega-crystal.svg"
-  }
+    imageUrl: "/avatar-frames/mega-crystal.svg",
+  },
 };
 
 // Получить конфигурацию рамки
 export function getAvatarFrame(frameKey: string) {
-  return avatarFrames[frameKey as keyof typeof avatarFrames] || avatarFrames.none;
+  return (
+    avatarFrames[frameKey as keyof typeof avatarFrames] || avatarFrames.none
+  );
 }
 
 // Получить все доступные рамки
 export function getAllAvatarFrames() {
   return Object.entries(avatarFrames).map(([key, frame]) => ({
     key,
-    ...frame
+    ...frame,
   }));
 }
-
-

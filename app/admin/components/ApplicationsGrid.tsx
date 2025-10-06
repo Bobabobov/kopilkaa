@@ -11,8 +11,16 @@ interface ApplicationsGridProps {
   visibleEmails: Set<string>;
   onToggleEmail: (id: string) => void;
   onEdit: (id: string, status: ApplicationStatus, comment: string) => void;
-  onQuickApprove: (id: string, status: ApplicationStatus, comment: string) => void;
-  onQuickReject: (id: string, status: ApplicationStatus, comment: string) => void;
+  onQuickApprove: (
+    id: string,
+    status: ApplicationStatus,
+    comment: string,
+  ) => void;
+  onQuickReject: (
+    id: string,
+    status: ApplicationStatus,
+    comment: string,
+  ) => void;
   onDelete: (id: string, title: string) => void;
 }
 

@@ -7,9 +7,13 @@ import { publish } from "@/lib/sse";
 import { sendStatusEmail } from "@/lib/email";
 // import { checkAndGrantAchievements } from "@/lib/achievements"; // Удалено - система достижений отключена
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
   const s = await getSession();
-  if (!s || s.role !== "ADMIN") return Response.json({ error: "Forbidden" }, { status: 403 });
+  if (!s || s.role !== "ADMIN")
+    return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {
     const item = await prisma.application.findUnique({
@@ -27,13 +31,22 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
   const s = await getSession();
-  if (!s || s.role !== "ADMIN") return Response.json({ error: "Forbidden" }, { status: 403 });
+  if (!s || s.role !== "ADMIN")
+    return Response.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json().catch(() => ({}));
-  const status = body?.status as "PENDING" | "APPROVED" | "REJECTED" | undefined;
-  const adminComment = typeof body?.adminComment === "string" ? body.adminComment : undefined;
+  const status = body?.status as
+    | "PENDING"
+    | "APPROVED"
+    | "REJECTED"
+    | undefined;
+  const adminComment =
+    typeof body?.adminComment === "string" ? body.adminComment : undefined;
   if (!status || !["PENDING", "APPROVED", "REJECTED"].includes(status))
     return Response.json({ error: "Invalid status" }, { status: 400 });
 
@@ -42,7 +55,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       where: { id: params.id },
       data: { status, adminComment: adminComment ?? null },
       include: {
-        user:   { select: { email: true, id: true } },
+        user: { select: { email: true, id: true } },
         images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
       },
     });
@@ -72,9 +85,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
   const s = await getSession();
-  if (!s || s.role !== "ADMIN") return Response.json({ error: "Forbidden" }, { status: 403 });
+  if (!s || s.role !== "ADMIN")
+    return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {
     // Удаляем заявку (изображения удалятся автоматически из-за onDelete: Cascade)

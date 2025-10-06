@@ -13,16 +13,19 @@ import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 
 // Lazy load heavy modal
-const FriendsModal = dynamic(() => import("@/components/profile/FriendsModal"), {
-  ssr: false,
-  loading: () => <div className="hidden" />
-});
+const FriendsModal = dynamic(
+  () => import("@/components/profile/FriendsModal"),
+  {
+    ssr: false,
+    loading: () => <div className="hidden" />,
+  },
+);
 
-type User = { 
-  id: string; 
-  email: string; 
-  role: "USER" | "ADMIN"; 
-  name?: string | null; 
+type User = {
+  id: string;
+  email: string;
+  role: "USER" | "ADMIN";
+  name?: string | null;
   createdAt: string;
   avatar?: string | null;
   headerTheme?: string | null;
@@ -50,7 +53,9 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isFriendsModalOpen, setIsFriendsModalOpen] = useState(false);
-  const [friendsModalTab, setFriendsModalTab] = useState<'friends' | 'sent' | 'received' | 'search'>('friends');
+  const [friendsModalTab, setFriendsModalTab] = useState<
+    "friends" | "sent" | "received" | "search"
+  >("friends");
   const { showToast, ToastComponent } = useBeautifulToast();
 
   // Проверка авторизации
@@ -82,8 +87,15 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
       }
     };
 
-    window.addEventListener('open-friends-modal', handleOpenFriendsModal as EventListener);
-    return () => window.removeEventListener('open-friends-modal', handleOpenFriendsModal as EventListener);
+    window.addEventListener(
+      "open-friends-modal",
+      handleOpenFriendsModal as EventListener,
+    );
+    return () =>
+      window.removeEventListener(
+        "open-friends-modal",
+        handleOpenFriendsModal as EventListener,
+      );
   }, []);
 
   // Загрузка данных пользователя
@@ -93,7 +105,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     const loadUserData = async () => {
       try {
         setLoading(true);
-        
+
         // Загружаем данные пользователя
         const userResponse = await fetch(`/api/users/${userId}`);
         if (userResponse.ok) {
@@ -104,13 +116,13 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
           return;
         }
 
-
         // Загружаем статус дружбы
         const friendshipResponse = await fetch(`/api/profile/friends?type=all`);
         if (friendshipResponse.ok) {
           const friendshipData = await friendshipResponse.json();
-          const userFriendship = friendshipData.friendships.find((f: Friendship) => 
-            f.requesterId === userId || f.receiverId === userId
+          const userFriendship = friendshipData.friendships.find(
+            (f: Friendship) =>
+              f.requesterId === userId || f.receiverId === userId,
           );
           setFriendship(userFriendship || null);
         }
@@ -128,81 +140,117 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   useEffect(() => {
     if (currentUserId && userId && currentUserId === userId) {
       // Перенаправляем на собственный профиль
-      router.push('/profile');
+      router.push("/profile");
     }
   }, [currentUserId, userId, router]);
 
   const sendFriendRequest = async () => {
     if (!user) return;
-    
+
     if (!isAuthenticated) {
-      showToast("warning", "Требуется авторизация", "Необходимо войти в аккаунт для добавления в друзья");
+      showToast(
+        "warning",
+        "Требуется авторизация",
+        "Необходимо войти в аккаунт для добавления в друзья",
+      );
       return;
     }
-    
+
     try {
       console.log("Sending friend request to:", user.id);
       const response = await fetch("/api/profile/friends", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ receiverId: user.id })
+        body: JSON.stringify({ receiverId: user.id }),
       });
 
       console.log("Friend request response:", response.status);
       const data = await response.json();
       console.log("Friend request data:", data);
-      
+
       if (response.ok) {
         setFriendship(data.friendship);
-        showToast("success", "Заявка отправлена!", "Заявка в друзья успешно отправлена");
+        showToast(
+          "success",
+          "Заявка отправлена!",
+          "Заявка в друзья успешно отправлена",
+        );
       } else {
-        showToast("error", "Ошибка отправки", data.message || "Не удалось отправить заявку в друзья");
+        showToast(
+          "error",
+          "Ошибка отправки",
+          data.message || "Не удалось отправить заявку в друзья",
+        );
       }
     } catch (error) {
       console.error("Friend request error:", error);
-      showToast("error", "Ошибка отправки", "Не удалось отправить заявку в друзья");
+      showToast(
+        "error",
+        "Ошибка отправки",
+        "Не удалось отправить заявку в друзья",
+      );
     }
   };
 
   const acceptFriendRequest = async () => {
     if (!friendship) return;
-    
+
     try {
       const response = await fetch(`/api/profile/friends/${friendship.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "ACCEPTED" })
+        body: JSON.stringify({ status: "ACCEPTED" }),
       });
 
       if (response.ok) {
         setFriendship({ ...friendship, status: "ACCEPTED" });
-        showToast("success", "Заявка принята!", "Пользователь добавлен в друзья");
+        showToast(
+          "success",
+          "Заявка принята!",
+          "Пользователь добавлен в друзья",
+        );
       } else {
-        showToast("error", "Ошибка принятия", "Не удалось принять заявку в друзья");
+        showToast(
+          "error",
+          "Ошибка принятия",
+          "Не удалось принять заявку в друзья",
+        );
       }
     } catch (error) {
-      showToast("error", "Ошибка принятия", "Не удалось принять заявку в друзья");
+      showToast(
+        "error",
+        "Ошибка принятия",
+        "Не удалось принять заявку в друзья",
+      );
     }
   };
 
   const declineFriendRequest = async () => {
     if (!friendship) return;
-    
+
     try {
       const response = await fetch(`/api/profile/friends/${friendship.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "DECLINED" })
+        body: JSON.stringify({ status: "DECLINED" }),
       });
 
       if (response.ok) {
         setFriendship({ ...friendship, status: "DECLINED" });
         showToast("info", "Заявка отклонена", "Заявка в друзья отклонена");
       } else {
-        showToast("error", "Ошибка отклонения", "Не удалось отклонить заявку в друзья");
+        showToast(
+          "error",
+          "Ошибка отклонения",
+          "Не удалось отклонить заявку в друзья",
+        );
       }
     } catch (error) {
-      showToast("error", "Ошибка отклонения", "Не удалось отклонить заявку в друзья");
+      showToast(
+        "error",
+        "Ошибка отклонения",
+        "Не удалось отклонить заявку в друзья",
+      );
     }
   };
 
@@ -239,7 +287,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* User Info Card - 3 колонки */}
-            <OtherUserCard 
+            <OtherUserCard
               user={user}
               friendship={friendship}
               currentUserId={currentUserId}
@@ -261,7 +309,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
           </div>
         </div>
       </div>
-      
+
       {/* Красивые уведомления */}
       <ToastComponent />
 

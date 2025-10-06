@@ -5,10 +5,16 @@ import { motion } from "framer-motion";
 
 interface SecuritySectionProps {
   lastSeen: string;
-  onPasswordChange: (oldPassword: string, newPassword: string) => Promise<boolean>;
+  onPasswordChange: (
+    oldPassword: string,
+    newPassword: string,
+  ) => Promise<boolean>;
 }
 
-export default function SecuritySection({ lastSeen, onPasswordChange }: SecuritySectionProps) {
+export default function SecuritySection({
+  lastSeen,
+  onPasswordChange,
+}: SecuritySectionProps) {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -77,8 +83,10 @@ export default function SecuritySection({ lastSeen, onPasswordChange }: Security
       className="lg:col-span-1"
     >
       <div className="relative overflow-hidden bg-gradient-to-br from-white/90 via-white/80 to-white/90 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/20 dark:border-gray-700/20">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Безопасность</h2>
-        
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+          Безопасность
+        </h2>
+
         <div className="space-y-6">
           {/* Последний вход */}
           <div>
@@ -86,7 +94,7 @@ export default function SecuritySection({ lastSeen, onPasswordChange }: Security
               Последний вход
             </label>
             <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl text-gray-600 dark:text-gray-400">
-              {new Date(lastSeen).toLocaleString('ru-RU')}
+              {new Date(lastSeen).toLocaleString("ru-RU")}
             </div>
           </div>
 
@@ -95,7 +103,7 @@ export default function SecuritySection({ lastSeen, onPasswordChange }: Security
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Пароль
             </label>
-            
+
             {!isChangingPassword ? (
               <div className="flex items-center gap-2">
                 <div className="flex-1 px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl text-gray-600 dark:text-gray-400">
@@ -122,7 +130,7 @@ export default function SecuritySection({ lastSeen, onPasswordChange }: Security
                     placeholder="Введите текущий пароль"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Новый пароль
@@ -135,7 +143,7 @@ export default function SecuritySection({ lastSeen, onPasswordChange }: Security
                     placeholder="Введите новый пароль"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Подтвердите пароль
@@ -154,7 +162,9 @@ export default function SecuritySection({ lastSeen, onPasswordChange }: Security
                 )}
 
                 {passwordSuccess && (
-                  <div className="text-green-500 text-sm">✓ Пароль успешно изменен</div>
+                  <div className="text-green-500 text-sm">
+                    ✓ Пароль успешно изменен
+                  </div>
                 )}
 
                 <div className="flex gap-2">

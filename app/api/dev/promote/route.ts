@@ -10,7 +10,8 @@ export async function POST(req: Request) {
     }
 
     const { email, role } = await req.json();
-    if (!email) return Response.json({ error: "email required" }, { status: 400 });
+    if (!email)
+      return Response.json({ error: "email required" }, { status: 400 });
 
     const targetRole = role === "USER" ? "USER" : "ADMIN"; // по умолчанию ADMIN
     const user = await prisma.user.update({

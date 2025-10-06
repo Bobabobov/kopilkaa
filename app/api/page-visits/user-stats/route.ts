@@ -15,7 +15,10 @@ export async function GET(req: Request) {
     const page = searchParams.get("page") || "/applications";
 
     if (!userId) {
-      return Response.json({ error: "Не указан ID пользователя" }, { status: 400 });
+      return Response.json(
+        { error: "Не указан ID пользователя" },
+        { status: 400 },
+      );
     }
 
     // Получаем информацию о заявке, чтобы узнать дату создания
@@ -23,7 +26,7 @@ export async function GET(req: Request) {
     if (applicationId) {
       const application = await prisma.application.findUnique({
         where: { id: applicationId },
-        select: { createdAt: true, title: true }
+        select: { createdAt: true, title: true },
       });
       if (application) {
         applicationDate = application.createdAt;
@@ -31,7 +34,7 @@ export async function GET(req: Request) {
     }
 
     // Если есть дата заявки, ищем время только в этот день
-    let whereClause: any = {
+    const whereClause: any = {
       userId,
       page,
     };
@@ -42,7 +45,7 @@ export async function GET(req: Request) {
       // Ищем время в день создания заявки (с 00:00 до 23:59)
       const startOfDay = new Date(applicationDate);
       startOfDay.setHours(0, 0, 0, 0);
-      
+
       const endOfDay = new Date(applicationDate);
       endOfDay.setHours(23, 59, 59, 999);
 
@@ -78,11 +81,14 @@ export async function GET(req: Request) {
     // Получаем информацию о пользователе
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, name: true, hideEmail: true }
+      select: { email: true, name: true, hideEmail: true },
     });
 
     if (!user) {
-      return Response.json({ error: "Пользователь не найден" }, { status: 404 });
+      return Response.json(
+        { error: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     // Если ищем в день создания заявки, но данных нет - возвращаем 0
@@ -100,7 +106,7 @@ export async function GET(req: Request) {
       user: {
         email: user.email,
         name: user.name,
-        hideEmail: user.hideEmail
+        hideEmail: user.hideEmail,
       },
       page,
       period,
@@ -110,6 +116,9 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("Ошибка получения статистики пользователя:", error);
-    return Response.json({ error: "Внутренняя ошибка сервера" }, { status: 500 });
+    return Response.json(
+      { error: "Внутренняя ошибка сервера" },
+      { status: 500 },
+    );
   }
 }

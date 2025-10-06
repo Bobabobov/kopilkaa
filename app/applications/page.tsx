@@ -33,12 +33,12 @@ const DRAFT_KEY = "application_draft_v1";
 export default function ApplicationsPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ id: string; email: string } | null>(null);
-  
+
   // Отслеживание времени на странице
-  usePageTimeTracking({ 
-    page: "/applications", 
+  usePageTimeTracking({
+    page: "/applications",
     enabled: true,
-    sendInterval: 30000 // отправляем каждые 30 секунд
+    sendInterval: 30000, // отправляем каждые 30 секунд
   });
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [title, setTitle] = useState("");
@@ -80,7 +80,7 @@ export default function ApplicationsPage() {
         setStory(d.story || "");
         setAmount(d.amount || "");
         setPayment(d.payment || "");
-        
+
         // Фотографии не восстанавливаем из localStorage (проблемы с File объектами)
         // Пользователю нужно будет загрузить их заново
         if (d.photos && d.photos.length > 0) {
@@ -89,7 +89,7 @@ export default function ApplicationsPage() {
         }
       }
     } catch (error) {
-      console.error('Ошибка загрузки черновика:', error);
+      console.error("Ошибка загрузки черновика:", error);
     }
   }, []);
 
@@ -114,16 +114,16 @@ export default function ApplicationsPage() {
     if (!title && !summary && !story && !amount && !payment) {
       return;
     }
-    
-    const data = { 
-      title, 
-      summary, 
-      story, 
-      amount, 
-      payment
+
+    const data = {
+      title,
+      summary,
+      story,
+      amount,
+      payment,
     };
     localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
-    
+
     // Показываем уведомление о сохранении
     setDraftSaved(true);
     const timer = setTimeout(() => setDraftSaved(false), 2000);
@@ -144,7 +144,8 @@ export default function ApplicationsPage() {
     onPickFiles(e.dataTransfer.files);
   };
 
-  const removeAt = (i: number) => setPhotos((p) => p.filter((_, idx) => idx !== i));
+  const removeAt = (i: number) =>
+    setPhotos((p) => p.filter((_, idx) => idx !== i));
   const move = (i: number, dir: -1 | 1) => {
     setPhotos((p) => {
       const arr = [...p];
@@ -158,11 +159,17 @@ export default function ApplicationsPage() {
   };
 
   const valid =
-    title.length > 0 && title.length <= LIMITS.titleMax &&
-    summary.length > 0 && summary.length <= LIMITS.summaryMax &&
-    story.length >= LIMITS.storyMin && story.length <= LIMITS.storyMax &&
-    amount.length > 0 && parseInt(amount) >= LIMITS.amountMin && parseInt(amount) <= LIMITS.amountMax &&
-    payment.length >= LIMITS.paymentMin && payment.length <= LIMITS.paymentMax &&
+    title.length > 0 &&
+    title.length <= LIMITS.titleMax &&
+    summary.length > 0 &&
+    summary.length <= LIMITS.summaryMax &&
+    story.length >= LIMITS.storyMin &&
+    story.length <= LIMITS.storyMax &&
+    amount.length > 0 &&
+    parseInt(amount) >= LIMITS.amountMin &&
+    parseInt(amount) <= LIMITS.amountMax &&
+    payment.length >= LIMITS.paymentMin &&
+    payment.length <= LIMITS.paymentMax &&
     photos.length <= LIMITS.maxPhotos;
 
   const uploadAll = async (): Promise<string[]> => {
@@ -170,10 +177,10 @@ export default function ApplicationsPage() {
     setUploading(true);
     try {
       const fd = new FormData();
-      
+
       photos.forEach((item) => {
         let file: File;
-        
+
         if (item instanceof File) {
           file = item;
         } else if (item && item.file instanceof File) {
@@ -181,10 +188,10 @@ export default function ApplicationsPage() {
         } else {
           return;
         }
-        
+
         fd.append("files", file);
       });
-      
+
       const r = await fetch("/api/uploads", { method: "POST", body: fd });
       const d = await r.json();
       if (!r.ok) throw new Error(d?.error || "Ошибка загрузки");
@@ -196,15 +203,19 @@ export default function ApplicationsPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMsg(null); setErr(null);
-    
+    setMsg(null);
+    setErr(null);
+
     // Дополнительная проверка авторизации при отправке
     if (!user) {
       router.push("/register");
       return;
     }
-    
-    if (!valid) { setErr("Проверьте поля — есть ошибки/лимиты"); return; }
+
+    if (!valid) {
+      setErr("Проверьте поля — есть ошибки/лимиты");
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -212,7 +223,14 @@ export default function ApplicationsPage() {
       const r = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, summary, story, amount, payment, images: urls }),
+        body: JSON.stringify({
+          title,
+          summary,
+          story,
+          amount,
+          payment,
+          images: urls,
+        }),
       });
       const d = await r.json();
       if (r.status === 401) {
@@ -261,7 +279,7 @@ export default function ApplicationsPage() {
     return (
       <div className="min-h-screen relative overflow-hidden">
         <UniversalBackground />
-        
+
         <div className="container-p mx-auto pt-32 pb-8 relative z-10">
           <SuccessScreen onNewApplication={() => setSubmitted(false)} />
         </div>
@@ -295,24 +313,31 @@ export default function ApplicationsPage() {
                 </h3>
                 <div className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-start gap-3">
-                    <span className="text-green-500 mt-0.5 flex-shrink-0">✓</span>
+                    <span className="text-green-500 mt-0.5 flex-shrink-0">
+                      ✓
+                    </span>
                     <span>Будьте конкретными в описании ситуации</span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-green-500 mt-0.5 flex-shrink-0">✓</span>
+                    <span className="text-green-500 mt-0.5 flex-shrink-0">
+                      ✓
+                    </span>
                     <span>Приложите фотографии для подтверждения</span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-green-500 mt-0.5 flex-shrink-0">✓</span>
+                    <span className="text-green-500 mt-0.5 flex-shrink-0">
+                      ✓
+                    </span>
                     <span>Укажите точную сумму, которая нужна</span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-green-500 mt-0.5 flex-shrink-0">✓</span>
+                    <span className="text-green-500 mt-0.5 flex-shrink-0">
+                      ✓
+                    </span>
                     <span>Опишите, как планируете использовать средства</span>
                   </div>
                 </div>
               </div>
-
             </motion.div>
           </div>
 
@@ -324,135 +349,133 @@ export default function ApplicationsPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="space-y-8"
             >
+              {/* Уведомление о сохранении черновика */}
+              {draftSaved && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center gap-2 text-green-700 dark:text-green-400"
+                >
+                  <LucideIcons.CheckCircle size="sm" />
+                  <span className="text-sm font-medium">Черновик сохранен</span>
+                </motion.div>
+              )}
 
+              {/* Кнопка очистки черновика */}
+              {(title || summary || story || amount || payment) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="mb-4"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setShowClearModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  >
+                    <LucideIcons.Trash size="sm" />
+                    Очистить черновик
+                  </button>
+                </motion.div>
+              )}
 
-          {/* Уведомление о сохранении черновика */}
-          {draftSaved && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center gap-2 text-green-700 dark:text-green-400"
-            >
-              <LucideIcons.CheckCircle size="sm" />
-              <span className="text-sm font-medium">Черновик сохранен</span>
-            </motion.div>
-          )}
+              <form className="grid gap-6" onSubmit={submit}>
+                <ProgressBar
+                  title={title}
+                  summary={summary}
+                  story={story}
+                  amount={amount}
+                  payment={payment}
+                  photos={photos}
+                />
 
-          {/* Кнопка очистки черновика */}
-          {(title || summary || story || amount || payment) && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mb-4"
-            >
-              <button
-                type="button"
-                onClick={() => setShowClearModal(true)}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-              >
-                <LucideIcons.Trash size="sm" />
-                Очистить черновик
-              </button>
-            </motion.div>
-          )}
+                <FormField
+                  type="input"
+                  label="Заголовок"
+                  icon="Home"
+                  value={title}
+                  onChange={setTitle}
+                  placeholder="Краткое описание вашей ситуации..."
+                  hint="Будьте конкретными и понятными"
+                  maxLength={LIMITS.titleMax}
+                  delay={0.1}
+                  required={true}
+                />
 
-          <form className="grid gap-6" onSubmit={submit}>
-            <ProgressBar
-              title={title}
-              summary={summary}
-              story={story}
-              amount={amount}
-              payment={payment}
-              photos={photos}
-            />
-            
-            <FormField
-              type="input"
-              label="Заголовок"
-              icon="Home"
-              value={title}
-              onChange={setTitle}
-              placeholder="Краткое описание вашей ситуации..."
-              hint="Будьте конкретными и понятными"
-              maxLength={LIMITS.titleMax}
-              delay={0.1}
-              required={true}
-            />
+                <FormField
+                  type="input"
+                  label="Краткое описание"
+                  icon="MessageCircle"
+                  value={summary}
+                  onChange={setSummary}
+                  placeholder="Основная суть вашей просьбы..."
+                  hint="Это будет видно в списке заявок"
+                  maxLength={LIMITS.summaryMax}
+                  delay={0.2}
+                  required={true}
+                />
 
-            <FormField
-              type="input"
-              label="Краткое описание"
-              icon="MessageCircle"
-              value={summary}
-              onChange={setSummary}
-              placeholder="Основная суть вашей просьбы..."
-              hint="Это будет видно в списке заявок"
-              maxLength={LIMITS.summaryMax}
-              delay={0.2}
-              required={true}
-            />
+                <FormField
+                  type="textarea"
+                  label="Подробная история"
+                  icon="FileText"
+                  value={story}
+                  onChange={setStory}
+                  placeholder="Расскажите подробно о вашей ситуации, что привело к необходимости помощи, как планируете использовать средства..."
+                  hint="Чем подробнее, тем больше шансов на помощь"
+                  minLength={LIMITS.storyMin}
+                  maxLength={LIMITS.storyMax}
+                  delay={0.3}
+                  required={true}
+                />
 
-            <FormField
-              type="textarea"
-              label="Подробная история"
-              icon="FileText"
-              value={story}
-              onChange={setStory}
-              placeholder="Расскажите подробно о вашей ситуации, что привело к необходимости помощи, как планируете использовать средства..."
-              hint="Чем подробнее, тем больше шансов на помощь"
-              minLength={LIMITS.storyMin}
-              maxLength={LIMITS.storyMax}
-              delay={0.3}
-              required={true}
-            />
+                <FormField
+                  type="input"
+                  label="Сумма запроса"
+                  icon="DollarSign"
+                  value={amount}
+                  onChange={setAmount}
+                  placeholder="Укажите сумму в рублях..."
+                  hint="Минимум 1 рубль, максимум 1 000 000 рублей"
+                  minLength={LIMITS.amountMin}
+                  maxLength={7}
+                  delay={0.4}
+                  required={true}
+                />
 
-            <FormField
-              type="input"
-              label="Сумма запроса"
-              icon="DollarSign"
-              value={amount}
-              onChange={setAmount}
-              placeholder="Укажите сумму в рублях..."
-              hint="Минимум 1 рубль, максимум 1 000 000 рублей"
-              minLength={LIMITS.amountMin}
-              maxLength={7}
-              delay={0.4}
-              required={true}
-            />
+                <FormField
+                  type="textarea"
+                  label="Реквизиты для получения помощи"
+                  icon="CreditCard"
+                  value={payment}
+                  onChange={setPayment}
+                  placeholder="Банковские реквизиты, номер карты или другие способы получения средств"
+                  hint="Будьте осторожны с личными данными"
+                  minLength={LIMITS.paymentMin}
+                  maxLength={LIMITS.paymentMax}
+                  compact={true}
+                  delay={0.5}
+                  required={true}
+                />
 
-            <FormField
-              type="textarea"
-              label="Реквизиты для получения помощи"
-              icon="CreditCard"
-              value={payment}
-              onChange={setPayment}
-              placeholder="Банковские реквизиты, номер карты или другие способы получения средств"
-              hint="Будьте осторожны с личными данными"
-              minLength={LIMITS.paymentMin}
-              maxLength={LIMITS.paymentMax}
-              compact={true}
-              delay={0.5}
-              required={true}
-            />
+                <PhotoUpload
+                  photos={photos}
+                  onPhotosChange={setPhotos}
+                  maxPhotos={LIMITS.maxPhotos}
+                  delay={0.5}
+                />
 
-            <PhotoUpload
-              photos={photos}
-              onPhotosChange={setPhotos}
-              maxPhotos={LIMITS.maxPhotos}
-              delay={0.5}
-            />
-
-            <SubmitSection
-              submitting={submitting}
-              uploading={uploading}
-              left={left}
-              msg={msg}
-              err={err}
-              onSubmit={submit}
-            />
-          </form>
+                <SubmitSection
+                  submitting={submitting}
+                  uploading={uploading}
+                  left={left}
+                  msg={msg}
+                  err={err}
+                  onSubmit={submit}
+                />
+              </form>
             </motion.div>
           </div>
         </div>
@@ -473,7 +496,7 @@ export default function ApplicationsPage() {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="relative bg-white/90 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl"
-            style={{ borderColor: '#abd1c6/30' }}
+            style={{ borderColor: "#abd1c6/30" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center">
@@ -490,12 +513,15 @@ export default function ApplicationsPage() {
               </motion.div>
 
               {/* Заголовок */}
-              <h3 className="text-2xl font-bold mb-4" style={{ color: '#001e1d' }}>
+              <h3
+                className="text-2xl font-bold mb-4"
+                style={{ color: "#001e1d" }}
+              >
                 🗑️ Очистить черновик?
               </h3>
 
               {/* Описание */}
-              <p className="mb-2" style={{ color: '#2d5a4e' }}>
+              <p className="mb-2" style={{ color: "#2d5a4e" }}>
                 Вы уверены, что хотите очистить все заполненные данные?
               </p>
               <p className="text-red-500 font-medium mb-8">
@@ -506,9 +532,9 @@ export default function ApplicationsPage() {
               <div className="flex gap-4 justify-center">
                 <button
                   className="px-6 py-3 bg-white/90 backdrop-blur-xl rounded-xl transition-all duration-300 hover:scale-105 font-medium shadow-lg hover:shadow-xl"
-                  style={{ 
-                    borderColor: '#abd1c6/30',
-                    color: '#2d5a4e'
+                  style={{
+                    borderColor: "#abd1c6/30",
+                    color: "#2d5a4e",
                   }}
                   onClick={() => setShowClearModal(false)}
                 >
@@ -516,7 +542,10 @@ export default function ApplicationsPage() {
                 </button>
                 <button
                   className="px-6 py-3 text-white rounded-xl transition-all duration-300 hover:scale-105 font-medium shadow-lg hover:shadow-xl"
-                  style={{ background: 'linear-gradient(135deg, #e16162 0%, #d63384 100%)' }}
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #e16162 0%, #d63384 100%)",
+                  }}
                   onClick={clearDraft}
                 >
                   Очистить

@@ -12,13 +12,23 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
     <div className="pt-24 pb-8">
       {/* Заголовок */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4" style={{ color: '#fffffe' }}>
+        <h1
+          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4"
+          style={{ color: "#fffffe" }}
+        >
           📖 Истории Помощи
         </h1>
-        
-        <p className="text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto px-4" style={{ color: '#abd1c6' }}>
-          Читайте вдохновляющие истории людей, которые получили помощь через нашу платформу.
-          <span className="font-medium" style={{ color: '#f9bc60' }}> Каждая история — это надежда</span>
+
+        <p
+          className="text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto px-4"
+          style={{ color: "#abd1c6" }}
+        >
+          Читайте вдохновляющие истории людей, которые получили помощь через
+          нашу платформу.
+          <span className="font-medium" style={{ color: "#f9bc60" }}>
+            {" "}
+            Каждая история — это надежда
+          </span>
         </p>
       </div>
 
@@ -26,25 +36,25 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
       <div className="container mx-auto px-4">
         <div className="relative group max-w-md mx-auto">
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-            <LucideIcons.Search 
-              size="sm" 
+            <LucideIcons.Search
+              size="sm"
               className={`transition-colors duration-300 ${
-                query ? 'text-yellow-500' : 'text-gray-400'
-              }`} 
+                query ? "text-yellow-500" : "text-gray-400"
+              }`}
             />
           </div>
-          
-          <input 
-            className="w-full pl-10 pr-10 py-3 backdrop-blur-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-300 text-white placeholder-gray-300 text-sm shadow-lg group-hover:shadow-yellow-500/10 focus:shadow-yellow-500/20" 
+
+          <input
+            className="w-full pl-10 pr-10 py-3 backdrop-blur-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-300 text-white placeholder-gray-300 text-sm shadow-lg group-hover:shadow-yellow-500/10 focus:shadow-yellow-500/20"
             style={{
-              backgroundColor: 'rgba(0, 30, 29, 0.8)',
-              borderColor: 'rgba(171, 209, 198, 0.3)'
+              backgroundColor: "rgba(0, 30, 29, 0.8)",
+              borderColor: "rgba(171, 209, 198, 0.3)",
             }}
-            placeholder="Поиск историй..." 
-            value={query} 
-            onChange={(e) => onQueryChange(e.target.value)} 
+            placeholder="Поиск историй..."
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
           />
-          
+
           {query && (
             <button
               onClick={() => onQueryChange("")}

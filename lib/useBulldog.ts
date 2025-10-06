@@ -7,7 +7,7 @@ export interface BulldogState {
   clickCount: number;
   isHappy: boolean;
   currentImage: string;
-  mood: 'normal' | 'happy' | 'excited' | 'sleepy' | 'playful';
+  mood: "normal" | "happy" | "excited" | "sleepy" | "playful";
   level: number;
   experience: number;
   lastClickTime: number;
@@ -23,30 +23,27 @@ export interface BulldogStats {
 }
 
 const MOODS = {
-  normal: '/buldog/buldog1.png',
-  happy: '/buldog/buldog2.png',
-  excited: '/buldog/buldog3.png',
-  sleepy: '/buldog/buldog4.png', // Сонный бульдог - начальное состояние
-  playful: '/buldog/buldog5.png',
-  surprised: '/buldog/buldog6.png'
+  normal: "/buldog/buldog1.png",
+  happy: "/buldog/buldog2.png",
+  excited: "/buldog/buldog3.png",
+  sleepy: "/buldog/buldog4.png", // Сонный бульдог - начальное состояние
+  playful: "/buldog/buldog5.png",
+  surprised: "/buldog/buldog6.png",
 };
 
 // Случайные эмоции для кликов
-const RANDOM_EMOTIONS = [
-  'happy', 'excited', 'playful', 'surprised'
-];
-
+const RANDOM_EMOTIONS = ["happy", "excited", "playful", "surprised"];
 
 export function useBulldog() {
   const [state, setState] = useState<BulldogState>({
     clickCount: 0,
     isHappy: false,
     currentImage: MOODS.sleepy, // Начальное состояние - сонный бульдог
-    mood: 'sleepy',
+    mood: "sleepy",
     level: 1,
     experience: 0,
     lastClickTime: 0,
-    streak: 0
+    streak: 0,
   });
 
   // Таймер для сброса серии
@@ -55,16 +52,16 @@ export function useBulldog() {
   const [stats, setStats] = useState<BulldogStats>({
     totalClicks: 0,
     sessionsPlayed: 1,
-    favoriteMood: 'normal',
+    favoriteMood: "normal",
     longestStreak: 0,
-    totalPlayTime: 0
+    totalPlayTime: 0,
   });
 
   // Загрузка данных из localStorage
   useEffect(() => {
-    const savedState = localStorage.getItem('bulldog-state');
-    const savedStats = localStorage.getItem('bulldog-stats');
-    
+    const savedState = localStorage.getItem("bulldog-state");
+    const savedStats = localStorage.getItem("bulldog-stats");
+
     if (savedState) {
       setState(JSON.parse(savedState));
     }
@@ -75,11 +72,11 @@ export function useBulldog() {
 
   // Сохранение данных в localStorage
   useEffect(() => {
-    localStorage.setItem('bulldog-state', JSON.stringify(state));
+    localStorage.setItem("bulldog-state", JSON.stringify(state));
   }, [state]);
 
   useEffect(() => {
-    localStorage.setItem('bulldog-stats', JSON.stringify(stats));
+    localStorage.setItem("bulldog-stats", JSON.stringify(stats));
   }, [stats]);
 
   // Очистка таймера при размонтировании
@@ -91,30 +88,32 @@ export function useBulldog() {
     };
   }, [streakTimer]);
 
-
   // Определение настроения
-  const getMood = useCallback((clickCount: number, streak: number): BulldogState['mood'] => {
-    if (clickCount === 0 || streak === 0) return 'sleepy'; // Начальное состояние или сброшенная серия
-    if (streak >= 10) return 'excited';
-    if (streak >= 5) return 'playful';
-    if (clickCount >= 50) return 'happy';
-    if (clickCount >= 20) return 'normal';
-    return 'sleepy';
-  }, []);
+  const getMood = useCallback(
+    (clickCount: number, streak: number): BulldogState["mood"] => {
+      if (clickCount === 0 || streak === 0) return "sleepy"; // Начальное состояние или сброшенная серия
+      if (streak >= 10) return "excited";
+      if (streak >= 5) return "playful";
+      if (clickCount >= 50) return "happy";
+      if (clickCount >= 20) return "normal";
+      return "sleepy";
+    },
+    [],
+  );
 
   // Сброс серии кликов
   const resetStreak = useCallback(() => {
-    setState(prev => {
+    setState((prev) => {
       // Если серия уже 0, не меняем изображение
       if (prev.streak === 0) {
         return prev;
       }
-      
-      return { 
-        ...prev, 
+
+      return {
+        ...prev,
         streak: 0,
-        mood: 'sleepy',
-        currentImage: MOODS.sleepy
+        mood: "sleepy",
+        currentImage: MOODS.sleepy,
       };
     });
   }, []);
@@ -139,70 +138,82 @@ export function useBulldog() {
   const handleClick = useCallback(() => {
     const now = Date.now();
     const timeSinceLastClick = now - state.lastClickTime;
-    
+
     // Определяем серию кликов (если прошло меньше 2 секунд)
     const newStreak = timeSinceLastClick < 2000 ? state.streak + 1 : 1;
     const newClickCount = state.clickCount + 1;
-    
+
     // Выбираем случайную эмоцию для клика
-    const randomEmotion = RANDOM_EMOTIONS[Math.floor(Math.random() * RANDOM_EMOTIONS.length)];
+    const randomEmotion =
+      RANDOM_EMOTIONS[Math.floor(Math.random() * RANDOM_EMOTIONS.length)];
     const newMood = getMood(newClickCount, newStreak);
-    
-    setState(prev => ({
+
+    setState((prev) => ({
       ...prev,
       clickCount: newClickCount,
       isHappy: true,
       currentImage: MOODS[randomEmotion as keyof typeof MOODS], // Случайная эмоция при клике
-      mood: randomEmotion as 'normal' | 'happy' | 'excited' | 'sleepy' | 'playful', // Временно показываем случайную эмоцию
+      mood: randomEmotion as
+        | "normal"
+        | "happy"
+        | "excited"
+        | "sleepy"
+        | "playful", // Временно показываем случайную эмоцию
       experience: prev.experience + 1,
       lastClickTime: now,
-      streak: newStreak
+      streak: newStreak,
     }));
 
-    setStats(prev => ({
+    setStats((prev) => ({
       ...prev,
       totalClicks: prev.totalClicks + 1,
       longestStreak: Math.max(prev.longestStreak, newStreak),
-      favoriteMood: newMood
+      favoriteMood: newMood,
     }));
-
 
     // Запускаем таймер сброса серии
     startStreakTimer();
 
     // Сброс состояния счастья через 2 секунды
     setTimeout(() => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        isHappy: false
+        isHappy: false,
       }));
     }, 2000);
-  }, [state.clickCount, state.streak, state.lastClickTime, getMood, startStreakTimer]);
+  }, [
+    state.clickCount,
+    state.streak,
+    state.lastClickTime,
+    getMood,
+    startStreakTimer,
+  ]);
 
   // Получение сообщения
   const getMessage = useCallback(() => {
     const { clickCount, streak, mood } = state;
-    
+
     if (streak >= 10) {
       return { text: "Неудержимый! 🔥", type: "excited" };
     }
-    
+
     if (streak >= 5) {
       return { text: "Горячая серия! ⚡", type: "streak" };
     }
-    
+
     const messages = {
       sleepy: ["Сонный бульдог... 😴", "Время для отдыха 🛌", "Zzz... 💤"],
       normal: ["Хорошо! 🐕", "Мне нравится! 😊", "Не плохо! 👍"],
       happy: ["Отлично! 🎉", "Я счастлив! 😄", "Ура! 🎊"],
       playful: ["Давай играть! 🎾", "Еще! Еще! 🎈", "Весело! 🎪"],
       excited: ["ВОООО! 🚀", "Я в восторге! 🌟", "Невероятно! ⚡"],
-      surprised: ["Ого! 😲", "Неожиданно! 😮", "Вау! 🤯"]
+      surprised: ["Ого! 😲", "Неожиданно! 😮", "Вау! 🤯"],
     };
-    
+
     const moodMessages = messages[mood];
-    const randomMessage = moodMessages[Math.floor(Math.random() * moodMessages.length)];
-    
+    const randomMessage =
+      moodMessages[Math.floor(Math.random() * moodMessages.length)];
+
     return { text: randomMessage, type: mood };
   }, [state]);
 
@@ -217,11 +228,11 @@ export function useBulldog() {
     const nextLevelExp = getLevel() * 10;
     const currentExp = state.experience - currentLevelExp;
     const expNeeded = nextLevelExp - currentLevelExp;
-    
+
     return {
       current: currentExp,
       needed: expNeeded,
-      percentage: (currentExp / expNeeded) * 100
+      percentage: (currentExp / expNeeded) * 100,
     };
   }, [state.experience, getLevel]);
 
@@ -232,6 +243,6 @@ export function useBulldog() {
     resetStreak,
     getMessage,
     getLevel,
-    getLevelProgress
+    getLevelProgress,
   };
 }

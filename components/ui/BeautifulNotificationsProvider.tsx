@@ -9,13 +9,27 @@ import { useBeautifulToast } from "./BeautifulToast";
 
 interface BeautifulNotificationsContextType {
   // Alert функции
-  showAlert: (type: "error" | "warning" | "info" | "success", title: string, message?: string, duration?: number, showCloseButton?: boolean) => void;
+  showAlert: (
+    type: "error" | "warning" | "info" | "success",
+    title: string,
+    message?: string,
+    duration?: number,
+    showCloseButton?: boolean,
+  ) => void;
   hideAlert: () => void;
-  
+
   // Modal функции
-  showModal: (title: string, content: ReactNode, options?: { size?: "sm" | "md" | "lg" | "xl"; showCloseButton?: boolean; closeOnBackdropClick?: boolean }) => void;
+  showModal: (
+    title: string,
+    content: ReactNode,
+    options?: {
+      size?: "sm" | "md" | "lg" | "xl";
+      showCloseButton?: boolean;
+      closeOnBackdropClick?: boolean;
+    },
+  ) => void;
   hideModal: () => void;
-  
+
   // Dialog функции
   showDialog: (options: {
     type: "alert" | "confirm" | "prompt";
@@ -30,20 +44,34 @@ interface BeautifulNotificationsContextType {
     placeholder?: string;
   }) => void;
   hideDialog: () => void;
-  
+
   // Toast функции
-  showToast: (type: "success" | "error" | "info" | "warning", title: string, message?: string, duration?: number) => void;
+  showToast: (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message?: string,
+    duration?: number,
+  ) => void;
   hideToast: () => void;
-  
+
   // Замена стандартных окон браузера
   alert: (message: string, title?: string) => void;
   confirm: (message: string, title?: string) => Promise<boolean>;
-  prompt: (message: string, defaultValue?: string, title?: string) => Promise<string | null>;
+  prompt: (
+    message: string,
+    defaultValue?: string,
+    title?: string,
+  ) => Promise<string | null>;
 }
 
-const BeautifulNotificationsContext = createContext<BeautifulNotificationsContextType | null>(null);
+const BeautifulNotificationsContext =
+  createContext<BeautifulNotificationsContextType | null>(null);
 
-export function BeautifulNotificationsProvider({ children }: { children: ReactNode }) {
+export function BeautifulNotificationsProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const { showAlert, hideAlert, AlertComponent } = useBeautifulAlert();
   const { showModal, hideModal, ModalComponent } = useBeautifulModal();
   const { showDialog, hideDialog, DialogComponent } = useBeautifulDialog();
@@ -55,7 +83,10 @@ export function BeautifulNotificationsProvider({ children }: { children: ReactNo
   };
 
   // Замена стандартного confirm
-  const confirm = (message: string, title: string = "Подтверждение"): Promise<boolean> => {
+  const confirm = (
+    message: string,
+    title: string = "Подтверждение",
+  ): Promise<boolean> => {
     return new Promise((resolve) => {
       showDialog({
         type: "confirm",
@@ -64,13 +95,17 @@ export function BeautifulNotificationsProvider({ children }: { children: ReactNo
         onConfirm: () => resolve(true),
         onCancel: () => resolve(false),
         confirmText: "Да",
-        cancelText: "Нет"
+        cancelText: "Нет",
       });
     });
   };
 
   // Замена стандартного prompt
-  const prompt = (message: string, defaultValue: string = "", title: string = "Ввод"): Promise<string | null> => {
+  const prompt = (
+    message: string,
+    defaultValue: string = "",
+    title: string = "Ввод",
+  ): Promise<string | null> => {
     return new Promise((resolve) => {
       let currentValue = defaultValue;
       showDialog({
@@ -85,7 +120,7 @@ export function BeautifulNotificationsProvider({ children }: { children: ReactNo
         onCancel: () => resolve(null),
         confirmText: "OK",
         cancelText: "Отмена",
-        placeholder: "Введите значение"
+        placeholder: "Введите значение",
       });
     });
   };
@@ -118,7 +153,9 @@ export function BeautifulNotificationsProvider({ children }: { children: ReactNo
 export function useBeautifulNotifications() {
   const context = useContext(BeautifulNotificationsContext);
   if (!context) {
-    throw new Error("useBeautifulNotifications must be used within BeautifulNotificationsProvider");
+    throw new Error(
+      "useBeautifulNotifications must be used within BeautifulNotificationsProvider",
+    );
   }
   return context;
 }
@@ -128,7 +165,11 @@ declare global {
   interface Window {
     beautifulAlert: (message: string, title?: string) => void;
     beautifulConfirm: (message: string, title?: string) => Promise<boolean>;
-    beautifulPrompt: (message: string, defaultValue?: string, title?: string) => Promise<string | null>;
+    beautifulPrompt: (
+      message: string,
+      defaultValue?: string,
+      title?: string,
+    ) => Promise<string | null>;
   }
 }
 
@@ -136,20 +177,27 @@ declare global {
 export function initBeautifulNotifications() {
   if (typeof window !== "undefined") {
     // Получаем контекст из провайдера
-    const provider = document.querySelector('[data-beautiful-notifications]');
+    const provider = document.querySelector("[data-beautiful-notifications]");
     if (provider) {
       // Здесь можно добавить логику для получения функций из контекста
       // Пока что оставляем заглушки
       window.beautifulAlert = (message: string, title?: string) => {
         console.log("Beautiful Alert:", title, message);
       };
-      
-      window.beautifulConfirm = (message: string, title?: string): Promise<boolean> => {
+
+      window.beautifulConfirm = (
+        message: string,
+        title?: string,
+      ): Promise<boolean> => {
         console.log("Beautiful Confirm:", title, message);
         return Promise.resolve(true);
       };
-      
-      window.beautifulPrompt = (message: string, defaultValue?: string, title?: string): Promise<string | null> => {
+
+      window.beautifulPrompt = (
+        message: string,
+        defaultValue?: string,
+        title?: string,
+      ): Promise<string | null> => {
         console.log("Beautiful Prompt:", title, message, defaultValue);
         return Promise.resolve(defaultValue || null);
       };

@@ -63,7 +63,10 @@ export default function StatsSection({ userId }: StatsSectionProps) {
             <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded mb-6 w-1/3"></div>
             <div className="grid grid-cols-2 gap-4">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-20 bg-gray-300 dark:bg-gray-600 rounded-xl"></div>
+                <div
+                  key={i}
+                  className="h-20 bg-gray-300 dark:bg-gray-600 rounded-xl"
+                ></div>
               ))}
             </div>
           </div>
@@ -82,29 +85,33 @@ export default function StatsSection({ userId }: StatsSectionProps) {
       value: stats.applications.total,
       subtitle: `${stats.applications.approved} одобрено`,
       icon: "📝",
-      color: "from-blue-500 to-blue-600"
+      color: "from-blue-500 to-blue-600",
     },
     {
       title: "Дерево",
       value: stats.tree ? `Ур. ${stats.tree.level}` : "Не настроено",
-      subtitle: stats.tree ? `${stats.tree.currentStreak} дней подряд` : "Система отключена",
+      subtitle: stats.tree
+        ? `${stats.tree.currentStreak} дней подряд`
+        : "Система отключена",
       icon: "🌳",
-      color: "from-emerald-500 to-emerald-600"
+      color: "from-emerald-500 to-emerald-600",
     },
     {
       title: "Достижения",
       value: stats.achievements ? stats.achievements.total : 0,
-      subtitle: stats.achievements ? `${stats.achievements.rare} редких` : "Система отключена",
+      subtitle: stats.achievements
+        ? `${stats.achievements.rare} редких`
+        : "Система отключена",
       icon: "🏆",
-      color: "from-yellow-500 to-yellow-600"
+      color: "from-yellow-500 to-yellow-600",
     },
     {
       title: "В системе",
       value: `${stats.user.daysSinceRegistration}д`,
       subtitle: "Дней с регистрации",
       icon: "📅",
-      color: "from-purple-500 to-purple-600"
-    }
+      color: "from-purple-500 to-purple-600",
+    },
   ];
 
   return (
@@ -115,8 +122,10 @@ export default function StatsSection({ userId }: StatsSectionProps) {
       className="lg:col-span-2"
     >
       <div className="relative overflow-hidden bg-gradient-to-br from-white/90 via-white/80 to-white/90 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 dark:border-gray-700/20">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Статистика и активность</h2>
-        
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+          Статистика и активность
+        </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {statCards.map((card, index) => (
             <motion.div

@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const session = await getSession();
   if (!session) {
@@ -18,19 +18,22 @@ export async function POST(
 
     // Проверяем, что история существует
     const story = await prisma.application.findUnique({
-      where: { id: storyId, status: "APPROVED" }
+      where: { id: storyId, status: "APPROVED" },
     });
 
     if (!story) {
-      return NextResponse.json({ message: "История не найдена" }, { status: 404 });
+      return NextResponse.json(
+        { message: "История не найдена" },
+        { status: 404 },
+      );
     }
 
     // Проверяем, не лайкнул ли уже пользователь
     const existingLike = await prisma.storyLike.findFirst({
       where: {
         applicationId: storyId,
-        userId: userId
-      }
+        userId: userId,
+      },
     });
 
     if (existingLike) {
@@ -41,8 +44,8 @@ export async function POST(
     await prisma.storyLike.create({
       data: {
         applicationId: storyId,
-        userId: userId
-      }
+        userId: userId,
+      },
     });
 
     return NextResponse.json({ message: "Лайк добавлен" });
@@ -54,7 +57,7 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const session = await getSession();
   if (!session) {
@@ -69,8 +72,8 @@ export async function DELETE(
     const deletedLike = await prisma.storyLike.deleteMany({
       where: {
         applicationId: storyId,
-        userId: userId
-      }
+        userId: userId,
+      },
     });
 
     if (deletedLike.count === 0) {

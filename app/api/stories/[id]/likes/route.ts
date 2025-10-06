@@ -2,9 +2,12 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
-export async function GET(_: Request, { params: { id } }: { params: { id: string } }) {
+export async function GET(
+  _: Request,
+  { params: { id } }: { params: { id: string } },
+) {
   const session = await getSession();
-  
+
   try {
     // Проверяем, существует ли история
     const story = await prisma.application.findFirst({
@@ -57,7 +60,7 @@ export async function GET(_: Request, { params: { id } }: { params: { id: string
     return Response.json({
       count: likeCount,
       userLiked,
-      likes: likes.map(like => ({
+      likes: likes.map((like) => ({
         id: like.id,
         user: like.user,
         createdAt: like.createdAt,

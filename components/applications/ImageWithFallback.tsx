@@ -36,12 +36,17 @@ export function ImageWithFallback({ src, alt, index }: ImageWithFallbackProps) {
           />
         </div>
       )}
-      
+
       {imageError ? (
         <div className="w-full h-20 flex items-center justify-center bg-slate-100 dark:bg-slate-700">
           <div className="text-center">
-            <LucideIcons.Image size="md" className="text-slate-400 mx-auto mb-1" />
-            <span className="text-xs text-slate-500 dark:text-slate-400">Фото {index + 1}</span>
+            <LucideIcons.Image
+              size="md"
+              className="text-slate-400 mx-auto mb-1"
+            />
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Фото {index + 1}
+            </span>
           </div>
         </div>
       ) : (
@@ -60,25 +65,3 @@ export function ImageWithFallback({ src, alt, index }: ImageWithFallbackProps) {
     </motion.div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

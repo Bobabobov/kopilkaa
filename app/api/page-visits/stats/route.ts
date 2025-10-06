@@ -38,6 +38,9 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("Ошибка получения статистики времени:", error);
-    return Response.json({ error: "Внутренняя ошибка сервера" }, { status: 500 });
+    return Response.json(
+      { error: "Внутренняя ошибка сервера" },
+      { status: 500 },
+    );
   }
 }

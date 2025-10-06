@@ -12,7 +12,7 @@ interface User {
   createdAt: string;
   lastSeen?: string | null;
   hideEmail?: boolean;
-  friendshipStatus?: 'PENDING' | 'ACCEPTED' | 'DECLINED';
+  friendshipStatus?: "PENDING" | "ACCEPTED" | "DECLINED";
   friendshipId?: string;
   isRequester?: boolean;
 }
@@ -36,7 +36,7 @@ interface UserCardProps {
     onRemoveFriend?: () => void;
   };
   isSendingRequest?: boolean;
-  variant?: 'friends' | 'sent' | 'received' | 'search';
+  variant?: "friends" | "sent" | "received" | "search";
 }
 
 export default function UserCard({
@@ -47,9 +47,10 @@ export default function UserCard({
   showStatus = true,
   actions,
   isSendingRequest = false,
-  variant = 'friends'
+  variant = "friends",
 }: UserCardProps) {
-  const displayName = user.name || (!user.hideEmail ? user.email.split('@')[0] : 'Пользователь');
+  const displayName =
+    user.name || (!user.hideEmail ? user.email.split("@")[0] : "Пользователь");
   const isCurrentUser = user.id === currentUserId;
 
   // Определяем какие кнопки показывать в зависимости от варианта
@@ -57,7 +58,7 @@ export default function UserCard({
     if (isCurrentUser) return null;
 
     switch (variant) {
-      case 'friends':
+      case "friends":
         return (
           <button
             onClick={actions?.onRemoveFriend}
@@ -67,18 +68,18 @@ export default function UserCard({
           </button>
         );
 
-      case 'sent':
+      case "sent":
         return (
           <button
             onClick={actions?.onCancelRequest}
             disabled={isSendingRequest}
             className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-900/20 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSendingRequest ? 'Отмена...' : 'Отменить'}
+            {isSendingRequest ? "Отмена..." : "Отменить"}
           </button>
         );
 
-      case 'received':
+      case "received":
         return (
           <div className="flex gap-2">
             <button
@@ -96,21 +97,21 @@ export default function UserCard({
           </div>
         );
 
-      case 'search':
+      case "search":
         // Проверяем статус дружбы
-        if (user.friendshipStatus === 'PENDING' && user.isRequester) {
+        if (user.friendshipStatus === "PENDING" && user.isRequester) {
           return (
             <button
               onClick={actions?.onCancelRequest}
               disabled={isSendingRequest}
               className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-[#abd1c6] to-[#94c4b8] hover:from-[#94c4b8] hover:to-[#7db8aa] text-[#001e1d] rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none font-semibold"
             >
-              {isSendingRequest ? 'Отмена...' : 'Отменить заявку'}
+              {isSendingRequest ? "Отмена..." : "Отменить заявку"}
             </button>
           );
         }
-        
-        if (user.friendshipStatus === 'ACCEPTED') {
+
+        if (user.friendshipStatus === "ACCEPTED") {
           return (
             <button
               disabled
@@ -120,14 +121,14 @@ export default function UserCard({
             </button>
           );
         }
-        
+
         return (
           <button
             onClick={actions?.onSendRequest}
             disabled={isSendingRequest}
             className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-[#f9bc60] to-[#e8a545] hover:from-[#e8a545] hover:to-[#d4952a] text-[#001e1d] rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none font-semibold"
           >
-            {isSendingRequest ? 'Отправка...' : 'Добавить'}
+            {isSendingRequest ? "Отправка..." : "Добавить"}
           </button>
         );
 
@@ -145,7 +146,7 @@ export default function UserCard({
       className="flex items-center gap-4 p-4 rounded-2xl bg-[#004643]/40 hover:bg-[#004643]/60 backdrop-blur-sm border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 transition-all duration-300 group"
     >
       {/* Аватарка */}
-      <Link 
+      <Link
         href={`/profile/${user.id}`}
         className="relative flex-shrink-0"
         target="_blank"
@@ -162,21 +163,27 @@ export default function UserCard({
             displayName[0].toUpperCase()
           )}
         </div>
-        
+
         {/* Статус онлайн */}
         {showStatus && status && (
-          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 ${
-            status.status === "online" 
-              ? "bg-green-400 animate-pulse" 
-              : "bg-gray-400"
-          }`} title={status.status === "online" ? "Онлайн" : `Последний вход: ${status.text}`}>
-          </div>
+          <div
+            className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 ${
+              status.status === "online"
+                ? "bg-green-400 animate-pulse"
+                : "bg-gray-400"
+            }`}
+            title={
+              status.status === "online"
+                ? "Онлайн"
+                : `Последний вход: ${status.text}`
+            }
+          ></div>
         )}
       </Link>
 
       {/* Информация о пользователе */}
       <div className="flex-1 min-w-0">
-        <Link 
+        <Link
           href={`/profile/${user.id}`}
           target="_blank"
           rel="noopener noreferrer"
@@ -186,7 +193,7 @@ export default function UserCard({
             {displayName}
           </h3>
           <p className="text-sm text-gray-400 truncate">
-            {!user.hideEmail ? user.email : 'Email скрыт'}
+            {!user.hideEmail ? user.email : "Email скрыт"}
           </p>
           {showStatus && status && (
             <p className="text-xs text-gray-500">
@@ -197,9 +204,7 @@ export default function UserCard({
       </div>
 
       {/* Кнопки действий */}
-      <div className="flex-shrink-0">
-        {getActionButtons()}
-      </div>
+      <div className="flex-shrink-0">{getActionButtons()}</div>
     </motion.div>
   );
 }

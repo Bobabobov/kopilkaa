@@ -18,11 +18,16 @@ export function ReadingProgress({ target }: ReadingProgressProps) {
       const windowHeight = window.innerHeight;
       const elementHeight = rect.height;
       const elementTop = rect.top;
-      
+
       // Вычисляем прогресс на основе того, сколько элемента видно
-      const visibleHeight = Math.min(windowHeight, elementTop + elementHeight) - Math.max(0, elementTop);
-      const progressPercent = Math.max(0, Math.min(100, (visibleHeight / elementHeight) * 100));
-      
+      const visibleHeight =
+        Math.min(windowHeight, elementTop + elementHeight) -
+        Math.max(0, elementTop);
+      const progressPercent = Math.max(
+        0,
+        Math.min(100, (visibleHeight / elementHeight) * 100),
+      );
+
       setProgress(progressPercent);
     };
 
@@ -30,15 +35,15 @@ export function ReadingProgress({ target }: ReadingProgressProps) {
       requestAnimationFrame(updateProgress);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     updateProgress(); // Инициализация
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [target]);
 
   return (
     <div className="fixed top-0 left-0 right-0 z-40 h-1 bg-gray-200 dark:bg-gray-700">
-      <div 
+      <div
         className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-150 ease-out"
         style={{ width: `${progress}%` }}
       />

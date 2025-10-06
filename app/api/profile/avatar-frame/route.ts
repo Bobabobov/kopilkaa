@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 export async function PATCH(request: NextRequest) {
   try {
     const session = await getSession();
-    
+
     if (!session?.uid) {
       return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
     }
@@ -14,7 +14,10 @@ export async function PATCH(request: NextRequest) {
     const { avatarFrame } = await request.json();
 
     if (!avatarFrame) {
-      return NextResponse.json({ error: "Рамка аватарки не указана" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Рамка аватарки не указана" },
+        { status: 400 },
+      );
     }
 
     // Обновляем рамку аватарки пользователя
@@ -29,20 +32,19 @@ export async function PATCH(request: NextRequest) {
         avatarFrame: true,
         headerTheme: true,
         role: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: "Рамка аватарки обновлена",
-      user: updatedUser
+      user: updatedUser,
     });
-
   } catch (error) {
     console.error("Error updating avatar frame:", error);
     return NextResponse.json(
       { error: "Ошибка при обновлении рамки аватарки" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

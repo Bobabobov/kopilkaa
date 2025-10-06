@@ -16,7 +16,7 @@ interface UseAdminApplicationsReturn {
   page: number;
   pages: number;
   stats: Stats | null;
-  
+
   // Фильтры
   q: string;
   setQ: (query: string) => void;
@@ -30,7 +30,7 @@ interface UseAdminApplicationsReturn {
   setSortBy: (sort: "date" | "amount" | "status") => void;
   sortOrder: "asc" | "desc";
   setSortOrder: (order: "asc" | "desc") => void;
-  
+
   // Действия
   load: (pageNum?: number) => Promise<void>;
   setPage: (pageNum: number) => void;
@@ -39,10 +39,14 @@ interface UseAdminApplicationsReturn {
   visibleEmails: Set<string>;
 }
 
-export function useAdminApplications({ initialPage = 1 }: UseAdminApplicationsProps = {}): UseAdminApplicationsReturn {
+export function useAdminApplications({
+  initialPage = 1,
+}: UseAdminApplicationsProps = {}): UseAdminApplicationsReturn {
   // Фильтры/поиск
   const [q, setQ] = useState("");
-  const [status, setStatus] = useState<"ALL" | "PENDING" | "APPROVED" | "REJECTED">("ALL");
+  const [status, setStatus] = useState<
+    "ALL" | "PENDING" | "APPROVED" | "REJECTED"
+  >("ALL");
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "amount" | "status">("date");
@@ -58,38 +62,41 @@ export function useAdminApplications({ initialPage = 1 }: UseAdminApplicationsPr
   const [visibleEmails, setVisibleEmails] = useState<Set<string>>(new Set());
 
   // Загрузка данных
-  const load = useCallback(async (p = 1) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const params = new URLSearchParams({
-        page: p.toString(),
-        limit: "20",
-        ...(q && { q }),
-        ...(status !== "ALL" && { status }),
-        ...(minAmount && { minAmount }),
-        ...(maxAmount && { maxAmount }),
-        ...(sortBy && { sortBy }),
-        ...(sortOrder && { sortOrder }),
-      });
+  const load = useCallback(
+    async (p = 1) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const response = await fetch(`/api/admin/applications?${params}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const params = new URLSearchParams({
+          page: p.toString(),
+          limit: "20",
+          ...(q && { q }),
+          ...(status !== "ALL" && { status }),
+          ...(minAmount && { minAmount }),
+          ...(maxAmount && { maxAmount }),
+          ...(sortBy && { sortBy }),
+          ...(sortOrder && { sortOrder }),
+        });
+
+        const response = await fetch(`/api/admin/applications?${params}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setItems(data.items || []);
+        setPages(data.pages || 1);
+        setPage(p);
+      } catch (err) {
+        console.error("Failed to load applications:", err);
+        setError("Ошибка загрузки заявок");
+      } finally {
+        setLoading(false);
       }
-      
-      const data = await response.json();
-      setItems(data.items || []);
-      setPages(data.pages || 1);
-      setPage(p);
-    } catch (err) {
-      console.error("Failed to load applications:", err);
-      setError("Ошибка загрузки заявок");
-    } finally {
-      setLoading(false);
-    }
-  }, [q, status, minAmount, maxAmount, sortBy, sortOrder]);
+    },
+    [q, status, minAmount, maxAmount, sortBy, sortOrder],
+  );
 
   // Загрузка статистики
   const refreshStats = useCallback(async () => {
@@ -106,7 +113,7 @@ export function useAdminApplications({ initialPage = 1 }: UseAdminApplicationsPr
 
   // Переключение видимости email
   const toggleEmail = useCallback((id: string) => {
-    setVisibleEmails(prev => {
+    setVisibleEmails((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
         newSet.delete(id);
@@ -135,7 +142,7 @@ export function useAdminApplications({ initialPage = 1 }: UseAdminApplicationsPr
     page,
     pages,
     stats,
-    
+
     // Фильтры
     q,
     setQ,
@@ -149,7 +156,7 @@ export function useAdminApplications({ initialPage = 1 }: UseAdminApplicationsPr
     setSortBy,
     sortOrder,
     setSortOrder,
-    
+
     // Действия
     load,
     setPage,

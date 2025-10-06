@@ -8,7 +8,9 @@ interface SuccessScreenProps {
   onNewApplication: () => void;
 }
 
-export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) {
+export default function SuccessScreen({
+  onNewApplication,
+}: SuccessScreenProps) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -19,80 +21,133 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.2, type: "spring", stiffness: 200 }}
+        transition={{
+          duration: 0.5,
+          delay: 0.2,
+          type: "spring",
+          stiffness: 200,
+        }}
         className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
-        style={{ background: 'linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)' }}
+        style={{
+          background: "linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)",
+        }}
       >
         <LucideIcons.CheckCircle size="xl" className="text-white" />
       </motion.div>
-      
+
       <motion.h2
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
         className="text-4xl md:text-5xl font-bold mb-6"
-        style={{ color: '#fffffe' }}
+        style={{ color: "#fffffe" }}
       >
         Заявка отправлена!
       </motion.h2>
-      
+
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
         className="text-lg mb-8 max-w-2xl mx-auto"
-        style={{ color: '#abd1c6' }}
+        style={{ color: "#abd1c6" }}
       >
-        Спасибо за вашу заявку! Мы получили её и передали на модерацию. 
-        <span style={{ color: '#f9bc60' }}>Вы получите уведомление о результате в течение 24 часов.</span>
+        Спасибо за вашу заявку! Мы получили её и передали на модерацию.
+        <span style={{ color: "#f9bc60" }}>
+          Вы получите уведомление о результате в течение 24 часов.
+        </span>
       </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-            >
-              <div className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300" style={{ borderColor: '#abd1c6/30' }}>
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#abd1c6/20' }}>
-                  <LucideIcons.Clock size="lg" className="text-[#f9bc60]" />
-                </div>
-                <h3 className="font-semibold mb-2 text-center" style={{ color: '#fffffe' }}>Модерация</h3>
-                <p className="text-sm text-center" style={{ color: '#abd1c6' }}>
-                  Ваша заявка проверяется модераторами
-                </p>
-              </div>
-              
-              <div className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300" style={{ borderColor: '#abd1c6/30' }}>
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#abd1c6/20' }}>
-                  <LucideIcons.Mail size="lg" className="text-[#f9bc60]" />
-                </div>
-                <h3 className="font-semibold mb-2 text-center" style={{ color: '#fffffe' }}>Уведомления</h3>
-                <p className="text-sm text-center" style={{ color: '#abd1c6' }}>
-                  Мы сообщим о результате на email
-                </p>
-              </div>
-              
-              <div className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300" style={{ borderColor: '#abd1c6/30' }}>
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#abd1c6/20' }}>
-                  <LucideIcons.Clock size="lg" className="text-[#e16162]" />
-                </div>
-                <h3 className="font-semibold mb-2 text-center" style={{ color: '#fffffe' }}>Следующая заявка</h3>
-                <p className="text-sm text-center" style={{ color: '#abd1c6' }}>
-                  Следующую заявку можно подать только через 24 часа
-                </p>
-              </div>
-              
-              <div className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300" style={{ borderColor: '#abd1c6/30' }}>
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#abd1c6/20' }}>
-                  <LucideIcons.Heart size="lg" className="text-[#e16162]" />
-                </div>
-                <h3 className="font-semibold mb-2 text-center" style={{ color: '#fffffe' }}>Поддержка</h3>
-                <p className="text-sm text-center" style={{ color: '#abd1c6' }}>
-                  Если нужна помощь, обращайтесь в поддержку
-                </p>
-              </div>
-            </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+      >
+        <div
+          className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300"
+          style={{ borderColor: "#abd1c6/30" }}
+        >
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            style={{ backgroundColor: "#abd1c6/20" }}
+          >
+            <LucideIcons.Clock size="lg" className="text-[#f9bc60]" />
+          </div>
+          <h3
+            className="font-semibold mb-2 text-center"
+            style={{ color: "#fffffe" }}
+          >
+            Модерация
+          </h3>
+          <p className="text-sm text-center" style={{ color: "#abd1c6" }}>
+            Ваша заявка проверяется модераторами
+          </p>
+        </div>
+
+        <div
+          className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300"
+          style={{ borderColor: "#abd1c6/30" }}
+        >
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            style={{ backgroundColor: "#abd1c6/20" }}
+          >
+            <LucideIcons.Mail size="lg" className="text-[#f9bc60]" />
+          </div>
+          <h3
+            className="font-semibold mb-2 text-center"
+            style={{ color: "#fffffe" }}
+          >
+            Уведомления
+          </h3>
+          <p className="text-sm text-center" style={{ color: "#abd1c6" }}>
+            Мы сообщим о результате на email
+          </p>
+        </div>
+
+        <div
+          className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300"
+          style={{ borderColor: "#abd1c6/30" }}
+        >
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            style={{ backgroundColor: "#abd1c6/20" }}
+          >
+            <LucideIcons.Clock size="lg" className="text-[#e16162]" />
+          </div>
+          <h3
+            className="font-semibold mb-2 text-center"
+            style={{ color: "#fffffe" }}
+          >
+            Следующая заявка
+          </h3>
+          <p className="text-sm text-center" style={{ color: "#abd1c6" }}>
+            Следующую заявку можно подать только через 24 часа
+          </p>
+        </div>
+
+        <div
+          className="bg-white/30 rounded-2xl p-6 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300"
+          style={{ borderColor: "#abd1c6/30" }}
+        >
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            style={{ backgroundColor: "#abd1c6/20" }}
+          >
+            <LucideIcons.Heart size="lg" className="text-[#e16162]" />
+          </div>
+          <h3
+            className="font-semibold mb-2 text-center"
+            style={{ color: "#fffffe" }}
+          >
+            Поддержка
+          </h3>
+          <p className="text-sm text-center" style={{ color: "#abd1c6" }}>
+            Если нужна помощь, обращайтесь в поддержку
+          </p>
+        </div>
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -103,24 +158,25 @@ export default function SuccessScreen({ onNewApplication }: SuccessScreenProps) 
         <motion.button
           onClick={onNewApplication}
           className="px-8 py-3 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-          style={{ background: 'linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)' }}
+          style={{
+            background: "linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)",
+          }}
         >
           Создать ещё заявку
         </motion.button>
-        
-              <Link href="/profile">
-                <motion.button
-                  className="px-8 py-3 bg-white/20 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10"
-                  style={{ 
-                    borderColor: '#abd1c6/20',
-                    color: '#fffffe'
-                  }}
-                >
-                  Мой профиль
-                </motion.button>
-              </Link>
+
+        <Link href="/profile">
+          <motion.button
+            className="px-8 py-3 bg-white/20 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-white/10"
+            style={{
+              borderColor: "#abd1c6/20",
+              color: "#fffffe",
+            }}
+          >
+            Мой профиль
+          </motion.button>
+        </Link>
       </motion.div>
     </motion.div>
   );
 }
-

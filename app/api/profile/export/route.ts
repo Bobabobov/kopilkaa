@@ -4,10 +4,11 @@ import { prisma } from "@/lib/db";
 export async function GET() {
   try {
     const session = await getSession();
-    if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
-    
+    if (!session)
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+
     const userId = session.uid;
-    
+
     // Получаем все данные пользователя
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -32,10 +33,10 @@ export async function GET() {
             images: {
               select: {
                 url: true,
-                sort: true
-              }
-            }
-          }
+                sort: true,
+              },
+            },
+          },
         },
         gameRecords: {
           select: {
@@ -43,8 +44,8 @@ export async function GET() {
             attempts: true,
             bestScore: true,
             lastPlayed: true,
-            createdAt: true
-          }
+            createdAt: true,
+          },
         },
         userTree: {
           select: {
@@ -59,8 +60,8 @@ export async function GET() {
             decorations: true,
             isCustomized: true,
             customizedAt: true,
-            createdAt: true
-          }
+            createdAt: true,
+          },
         },
         userAchievements: {
           select: {
@@ -73,10 +74,10 @@ export async function GET() {
                 description: true,
                 icon: true,
                 rarity: true,
-                type: true
-              }
-            }
-          }
+                type: true,
+              },
+            },
+          },
         },
         friendshipsSent: {
           select: {
@@ -86,10 +87,10 @@ export async function GET() {
               select: {
                 id: true,
                 name: true,
-                email: true
-              }
-            }
-          }
+                email: true,
+              },
+            },
+          },
         },
         friendshipsReceived: {
           select: {
@@ -99,18 +100,18 @@ export async function GET() {
               select: {
                 id: true,
                 name: true,
-                email: true
-              }
-            }
-          }
-        }
-      }
+                email: true,
+              },
+            },
+          },
+        },
+      },
     });
-    
+
     if (!user) {
       return Response.json({ error: "User not found" }, { status: 404 });
     }
-    
+
     // Формируем данные для экспорта
     const exportData = {
       user: {
@@ -119,7 +120,7 @@ export async function GET() {
         name: user.name,
         role: user.role,
         createdAt: user.createdAt,
-        lastSeen: user.lastSeen
+        lastSeen: user.lastSeen,
       },
       applications: user.applications,
       gameRecords: user.gameRecords,
@@ -127,45 +128,21 @@ export async function GET() {
       achievements: user.userAchievements,
       friendships: {
         sent: user.friendshipsSent,
-        received: user.friendshipsReceived
+        received: user.friendshipsReceived,
       },
       exportedAt: new Date().toISOString(),
-      exportedBy: "Kopilka App"
+      exportedBy: "Kopilka App",
     };
-    
+
     // Возвращаем JSON файл
     return new Response(JSON.stringify(exportData, null, 2), {
       headers: {
-        'Content-Type': 'application/json',
-        'Content-Disposition': `attachment; filename="kopilka-export-${new Date().toISOString().split('T')[0]}.json"`
-      }
+        "Content-Type": "application/json",
+        "Content-Disposition": `attachment; filename="kopilka-export-${new Date().toISOString().split("T")[0]}.json"`,
+      },
     });
   } catch (error) {
     console.error("Error exporting data:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -16,47 +16,47 @@ export interface BeautifulModalProps {
 
 const sizeConfig = {
   sm: "max-w-sm",
-  md: "max-w-md", 
+  md: "max-w-md",
   lg: "max-w-lg",
   xl: "max-w-xl",
 };
 
-export default function BeautifulModal({ 
-  show, 
-  onClose, 
-  title, 
+export default function BeautifulModal({
+  show,
+  onClose,
+  title,
   children,
   size = "md",
   showCloseButton = true,
-  closeOnBackdropClick = true
+  closeOnBackdropClick = true,
 }: BeautifulModalProps) {
   const sizeClass = sizeConfig[size];
 
   useEffect(() => {
     if (show) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
-    
+
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [show]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
       }
     };
 
     if (show) {
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [show, onClose]);
 
@@ -75,18 +75,18 @@ export default function BeautifulModal({
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 400, 
+            transition={{
+              type: "spring",
+              stiffness: 400,
               damping: 25,
-              duration: 0.4 
+              duration: 0.4,
             }}
             className={`relative w-full ${sizeClass} max-h-[90vh] overflow-hidden`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Фоновое свечение */}
             <div className="absolute inset-0 bg-gradient-to-r from-pastel-mint-500 to-pastel-aqua-500 rounded-2xl blur-sm opacity-20 scale-105"></div>
-            
+
             {/* Основная плашка */}
             <div className="relative bg-white/95 dark:bg-gray-800/95 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 backdrop-blur-sm">
               {/* Заголовок */}
@@ -99,13 +99,23 @@ export default function BeautifulModal({
                     onClick={onClose}
                     className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                   >
-                    <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 )}
               </div>
-              
+
               {/* Содержимое */}
               <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
                 {children}
@@ -140,20 +150,20 @@ export function useBeautifulModal() {
       size?: "sm" | "md" | "lg" | "xl";
       showCloseButton?: boolean;
       closeOnBackdropClick?: boolean;
-    }
+    },
   ) => {
-    setModal({ 
-      show: true, 
-      title, 
-      content, 
+    setModal({
+      show: true,
+      title,
+      content,
       size: options?.size,
       showCloseButton: options?.showCloseButton,
-      closeOnBackdropClick: options?.closeOnBackdropClick
+      closeOnBackdropClick: options?.closeOnBackdropClick,
     });
   };
 
   const hideModal = () => {
-    setModal(prev => ({ ...prev, show: false }));
+    setModal((prev) => ({ ...prev, show: false }));
   };
 
   const ModalComponent = () => (

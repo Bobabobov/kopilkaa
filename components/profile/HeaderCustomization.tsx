@@ -23,13 +23,15 @@ interface HeaderCustomizationProps {
   onClose: () => void;
 }
 
-export default function HeaderCustomization({ 
-  user, 
-  onThemeChange, 
-  isOpen, 
-  onClose 
+export default function HeaderCustomization({
+  user,
+  onThemeChange,
+  isOpen,
+  onClose,
 }: HeaderCustomizationProps) {
-  const [selectedTheme, setSelectedTheme] = useState(user.headerTheme || 'default');
+  const [selectedTheme, setSelectedTheme] = useState(
+    user.headerTheme || "default",
+  );
   const [saving, setSaving] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
 
@@ -43,23 +45,31 @@ export default function HeaderCustomization({
 
     setSaving(true);
     try {
-      const response = await fetch('/api/profile/header-theme', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ headerTheme: selectedTheme })
+      const response = await fetch("/api/profile/header-theme", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ headerTheme: selectedTheme }),
       });
 
       if (response.ok) {
         onThemeChange(selectedTheme);
-        showToast('success', 'Тема обновлена!', 'Заголовок профиля успешно изменен');
+        showToast(
+          "success",
+          "Тема обновлена!",
+          "Заголовок профиля успешно изменен",
+        );
         onClose();
       } else {
         const data = await response.json();
-        showToast('error', 'Ошибка сохранения', data.error || 'Не удалось сохранить тему');
+        showToast(
+          "error",
+          "Ошибка сохранения",
+          data.error || "Не удалось сохранить тему",
+        );
       }
     } catch (error) {
-      console.error('Error saving header theme:', error);
-      showToast('error', 'Ошибка сохранения', 'Не удалось сохранить тему');
+      console.error("Error saving header theme:", error);
+      showToast("error", "Ошибка сохранения", "Не удалось сохранить тему");
     } finally {
       setSaving(false);
     }
@@ -86,8 +96,18 @@ export default function HeaderCustomization({
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -102,7 +122,7 @@ export default function HeaderCustomization({
               {themes.map((theme, index) => {
                 const isSelected = selectedTheme === theme.key;
                 const themeConfig = getHeaderTheme(theme.key);
-                
+
                 return (
                   <motion.div
                     key={theme.key || `theme-${index}`}
@@ -110,35 +130,47 @@ export default function HeaderCustomization({
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedTheme(theme.key)}
                     className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${
-                      isSelected 
-                        ? 'border-emerald-500 shadow-lg shadow-emerald-500/20' 
-                        : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300'
+                      isSelected
+                        ? "border-emerald-500 shadow-lg shadow-emerald-500/20"
+                        : "border-gray-200 dark:border-gray-700 hover:border-emerald-300"
                     }`}
                   >
                     {/* Preview */}
-                    <div 
+                    <div
                       className={`h-32 w-full ${
-                        themeConfig.background === 'gradient' 
+                        themeConfig.background === "gradient"
                           ? `bg-gradient-to-r ${(themeConfig as any).gradient}`
-                          : 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900'
+                          : "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900"
                       }`}
-                      style={themeConfig.background === 'image' ? {
-                        backgroundImage: `url(${(themeConfig as any).image})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center center',
-                        backgroundRepeat: 'no-repeat'
-                      } : {}}
+                      style={
+                        themeConfig.background === "image"
+                          ? {
+                              backgroundImage: `url(${(themeConfig as any).image})`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center center",
+                              backgroundRepeat: "no-repeat",
+                            }
+                          : {}
+                      }
                     >
                       {/* Overlay for better text visibility */}
                       <div className="absolute inset-0 bg-black/15"></div>
-                      
+
                       {/* Sample content */}
                       <div className="absolute inset-0 p-4 flex flex-col justify-center">
-                        <h3 className={`text-lg font-bold ${themeConfig.textColor} mb-1`}>
+                        <h3
+                          className={`text-lg font-bold ${themeConfig.textColor} mb-1`}
+                        >
                           Мой профиль
                         </h3>
-                        <p className={`text-sm ${themeConfig.textColor} opacity-90`}>
-                          Добро пожаловать, <span className={themeConfig.accentColor}>Пользователь</span>!
+                        <p
+                          className={`text-sm ${themeConfig.textColor} opacity-90`}
+                        >
+                          Добро пожаловать,{" "}
+                          <span className={themeConfig.accentColor}>
+                            Пользователь
+                          </span>
+                          !
                         </p>
                       </div>
                     </div>
@@ -156,8 +188,16 @@ export default function HeaderCustomization({
                     {/* Selection indicator */}
                     {isSelected && (
                       <div className="absolute top-2 right-2 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        <svg
+                          className="w-4 h-4 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       </div>
                     )}
@@ -180,7 +220,7 @@ export default function HeaderCustomization({
               disabled={saving}
               className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors"
             >
-              {saving ? 'Сохранение...' : 'Сохранить'}
+              {saving ? "Сохранение..." : "Сохранить"}
             </button>
           </div>
         </motion.div>
@@ -190,4 +230,3 @@ export default function HeaderCustomization({
     </>
   );
 }
-

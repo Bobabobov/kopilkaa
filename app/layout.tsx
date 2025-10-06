@@ -10,7 +10,8 @@ const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
 export const metadata: Metadata = {
   title: "Копилка — платформа взаимной помощи",
-  description: "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
+  description:
+    "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
 };
 
 export default function RootLayout({
@@ -24,9 +25,7 @@ export default function RootLayout({
         <BeautifulNotificationsProvider>
           <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="flex-1 container-p mx-auto py-6">
-              {children}
-            </main>
+            <main className="flex-1 container-p mx-auto py-6">{children}</main>
             <Footer />
             <ScrollToTop />
           </div>

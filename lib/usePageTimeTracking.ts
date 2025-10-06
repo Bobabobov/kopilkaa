@@ -1,5 +1,5 @@
 // lib/usePageTimeTracking.ts
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 interface UsePageTimeTrackingOptions {
   page: string;
@@ -7,10 +7,10 @@ interface UsePageTimeTrackingOptions {
   sendInterval?: number; // интервал отправки данных в миллисекундах
 }
 
-export function usePageTimeTracking({ 
-  page, 
-  enabled = true, 
-  sendInterval = 30000 // отправляем каждые 30 секунд
+export function usePageTimeTracking({
+  page,
+  enabled = true,
+  sendInterval = 30000, // отправляем каждые 30 секунд
 }: UsePageTimeTrackingOptions) {
   const startTimeRef = useRef<number | null>(null);
   const accumulatedTimeRef = useRef<number>(0);
@@ -20,10 +20,10 @@ export function usePageTimeTracking({
   // Функция для отправки времени на сервер
   const sendTimeToServer = async (timeSpent: number) => {
     try {
-      await fetch('/api/page-visits', {
-        method: 'POST',
+      await fetch("/api/page-visits", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           page,
@@ -31,24 +31,24 @@ export function usePageTimeTracking({
         }),
       });
     } catch (error) {
-      console.error('Ошибка отправки времени посещения:', error);
+      console.error("Ошибка отправки времени посещения:", error);
     }
   };
 
   // Функция для начала отслеживания
   const startTracking = () => {
     if (!enabled || isActiveRef.current) return;
-    
+
     startTimeRef.current = Date.now();
     isActiveRef.current = true;
-    
+
     // Отправляем данные через заданный интервал
     intervalRef.current = setInterval(() => {
       if (startTimeRef.current && isActiveRef.current) {
         const currentTime = Date.now();
         const timeSpent = currentTime - startTimeRef.current;
         accumulatedTimeRef.current += timeSpent;
-        
+
         sendTimeToServer(timeSpent);
         // НЕ сбрасываем таймер - продолжаем отслеживать
       }
@@ -58,14 +58,14 @@ export function usePageTimeTracking({
   // Функция для остановки отслеживания
   const stopTracking = () => {
     if (!isActiveRef.current) return;
-    
+
     isActiveRef.current = false;
-    
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    
+
     // Отправляем оставшееся время
     if (startTimeRef.current) {
       const finalTime = Date.now() - startTimeRef.current;
@@ -95,13 +95,13 @@ export function usePageTimeTracking({
     startTracking();
 
     // Слушаем изменения видимости страницы
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
       stopTracking();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [enabled, page, sendInterval]);
 

@@ -26,12 +26,15 @@ export async function POST(req: NextRequest) {
 
     // Администратор может загружать файлы большего размера
     const maxSize = session.role === "ADMIN" ? ADMIN_MAX_SIZE : MAX_SIZE;
-    
+
     // Проверяем размер каждого файла
     for (const file of files) {
       if (file.size > maxSize) {
         const maxSizeMB = Math.round(maxSize / (1024 * 1024));
-        return NextResponse.json({ error: `Файл ${file.name} больше ${maxSizeMB} МБ` }, { status: 400 });
+        return NextResponse.json(
+          { error: `Файл ${file.name} больше ${maxSizeMB} МБ` },
+          { status: 400 },
+        );
       }
     }
 
@@ -39,7 +42,10 @@ export async function POST(req: NextRequest) {
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     for (const file of files) {
       if (!allowedTypes.includes(file.type)) {
-        return NextResponse.json({ error: `Неподдерживаемый тип файла: ${file.type}` }, { status: 400 });
+        return NextResponse.json(
+          { error: `Неподдерживаемый тип файла: ${file.type}` },
+          { status: 400 },
+        );
       }
     }
 
@@ -54,9 +60,9 @@ export async function POST(req: NextRequest) {
       const id = randomUUID().replace(/-/g, "");
       const filename = `${id}${ext}`;
       const filepath = join(UPLOAD_DIR, filename);
-      
+
       await writeFile(filepath, uint8Array);
-      
+
       const url = `/api/uploads/${filename}`;
       uploadedFiles.push({ url, filename });
     }
@@ -64,6 +70,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ files: uploadedFiles });
   } catch (error) {
     console.error("Error uploading files:", error);
-    return NextResponse.json({ error: "Ошибка загрузки файлов" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Ошибка загрузки файлов" },
+      { status: 500 },
+    );
   }
 }

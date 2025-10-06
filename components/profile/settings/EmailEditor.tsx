@@ -8,10 +8,10 @@ interface EmailEditorProps {
   disabled: boolean;
 }
 
-export default function EmailEditor({ 
-  currentEmail, 
-  onSave, 
-  disabled 
+export default function EmailEditor({
+  currentEmail,
+  onSave,
+  disabled,
 }: EmailEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(currentEmail);
@@ -29,7 +29,11 @@ export default function EmailEditor({
   };
 
   const handleSave = () => {
-    if (value.trim() && value.trim() !== currentEmail && validateEmail(value.trim())) {
+    if (
+      value.trim() &&
+      value.trim() !== currentEmail &&
+      validateEmail(value.trim())
+    ) {
       onSave(value.trim());
     }
     setIsEditing(false);
@@ -44,7 +48,7 @@ export default function EmailEditor({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setValue(newValue);
-    setIsValid(validateEmail(newValue) || newValue === '');
+    setIsValid(validateEmail(newValue) || newValue === "");
   };
 
   if (isEditing) {
@@ -56,7 +60,9 @@ export default function EmailEditor({
             value={value}
             onChange={handleChange}
             className={`flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-800 dark:text-white ${
-              !isValid ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              !isValid
+                ? "border-red-500"
+                : "border-gray-300 dark:border-gray-600"
             }`}
             placeholder="Введите ваш email"
             disabled={disabled}
@@ -64,7 +70,12 @@ export default function EmailEditor({
           />
           <button
             onClick={handleSave}
-            disabled={disabled || !value.trim() || !isValid || value.trim() === currentEmail}
+            disabled={
+              disabled ||
+              !value.trim() ||
+              !isValid ||
+              value.trim() === currentEmail
+            }
             className="px-4 py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-semibold rounded-xl transition-colors"
           >
             ✓
@@ -99,16 +110,3 @@ export default function EmailEditor({
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

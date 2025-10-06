@@ -2,10 +2,10 @@
 
 export default function UniversalBackground() {
   return (
-    <div 
+    <div
       className="fixed inset-0 -z-10"
       style={{
-        backgroundColor: '#004643'
+        backgroundColor: "#004643",
       }}
     />
   );

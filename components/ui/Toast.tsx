@@ -12,7 +12,12 @@ interface ToastProps {
   duration?: number;
 }
 
-export default function Toast({ message, type, onClose, duration = 3000 }: ToastProps) {
+export default function Toast({
+  message,
+  type,
+  onClose,
+  duration = 3000,
+}: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(onClose, duration);
     return () => clearTimeout(timer);
@@ -58,8 +63,18 @@ export default function Toast({ message, type, onClose, duration = 3000 }: Toast
           onClick={onClose}
           className="ml-2 text-white/80 hover:text-white transition-colors"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -69,21 +84,23 @@ export default function Toast({ message, type, onClose, duration = 3000 }: Toast
 
 // Хук для управления уведомлениями
 export function useToast() {
-  const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: ToastType }>>([]);
+  const [toasts, setToasts] = useState<
+    Array<{ id: string; message: string; type: ToastType }>
+  >([]);
 
   const showToast = (message: string, type: ToastType = "info") => {
     const id = Math.random().toString(36).substr(2, 9);
-    setToasts(prev => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id, message, type }]);
   };
 
   const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
   const ToastContainer = () => (
     <div className="fixed top-4 right-4 z-[9999] space-y-2 pointer-events-none">
       <AnimatePresence>
-        {toasts.map(toast => (
+        {toasts.map((toast) => (
           <div key={toast.id} className="pointer-events-auto">
             <Toast
               message={toast.message}

@@ -30,15 +30,27 @@ type Status = "PENDING" | "APPROVED" | "REJECTED";
 
 export function statusSubject(status: Status) {
   switch (status) {
-    case "PENDING": return "Ваша заявка принята в обработку";
-    case "APPROVED": return "Ваша заявка одобрена";
-    case "REJECTED": return "Ваша заявка отклонена";
+    case "PENDING":
+      return "Ваша заявка принята в обработку";
+    case "APPROVED":
+      return "Ваша заявка одобрена";
+    case "REJECTED":
+      return "Ваша заявка отклонена";
   }
 }
 
-export function statusHtml(opts: { title: string; status: Status; comment?: string | null }) {
+export function statusHtml(opts: {
+  title: string;
+  status: Status;
+  comment?: string | null;
+}) {
   const { title, status, comment } = opts;
-  const statusText = status === "PENDING" ? "В обработке" : status === "APPROVED" ? "Одобрено" : "Отказано";
+  const statusText =
+    status === "PENDING"
+      ? "В обработке"
+      : status === "APPROVED"
+        ? "Одобрено"
+        : "Отказано";
   return `
   <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5;color:#111">
     <h2 style="margin:0 0 12px">Статус вашей заявки обновлён</h2>
@@ -53,11 +65,14 @@ export function statusHtml(opts: { title: string; status: Status; comment?: stri
 
 export async function sendStatusEmail(
   to: string,
-  data: { title: string; status: Status; comment?: string | null }
+  data: { title: string; status: Status; comment?: string | null },
 ) {
   if (!MAIL_ENABLED || !mailer) {
     if (process.env.NODE_ENV !== "production") {
-      console.log("[mail] skipped", { to, subject: statusSubject(data.status) });
+      console.log("[mail] skipped", {
+        to,
+        subject: statusSubject(data.status),
+      });
     }
     return;
   }
@@ -71,7 +86,17 @@ export async function sendStatusEmail(
 }
 
 function escapeHtml(s: string) {
-  return s.replace(/[&<>"']/g, (ch) =>
-    ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" } as Record<string,string>)[ch]
+  return s.replace(
+    /[&<>"']/g,
+    (ch) =>
+      (
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }) as Record<string, string>
+      )[ch],
   );
 }

@@ -4,11 +4,15 @@ import { prisma } from "@/lib/db";
 
 export async function GET(req: Request) {
   const session = await getSession();
-  if (!session) return Response.json({ error: "Требуется вход" }, { status: 401 });
+  if (!session)
+    return Response.json({ error: "Требуется вход" }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
   const page = Math.max(1, Number(searchParams.get("page") || 1));
-  const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit") || 10)));
+  const limit = Math.min(
+    50,
+    Math.max(1, Number(searchParams.get("limit") || 10)),
+  );
   const skip = (page - 1) * limit;
 
   const [items, total] = await Promise.all([
@@ -34,7 +38,10 @@ export async function GET(req: Request) {
   ]);
 
   return Response.json({
-    page, limit, total, pages: Math.ceil(total / limit),
+    page,
+    limit,
+    total,
+    pages: Math.ceil(total / limit),
     items,
   });
 }

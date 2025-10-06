@@ -17,7 +17,7 @@ export function StoryGallery({ images, onImageClick }: StoryGalleryProps) {
           <LucideIcons.Image size="md" />
           Фотографии
         </h3>
-        
+
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {images.map((img, i) => (
             <div
@@ -25,8 +25,8 @@ export function StoryGallery({ images, onImageClick }: StoryGalleryProps) {
               className="relative group cursor-pointer overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700"
               onClick={() => onImageClick(i)}
             >
-              <img 
-                src={img.url} 
+              <img
+                src={img.url}
                 alt={`Фото ${i + 1}`}
                 className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-200"
               />

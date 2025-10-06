@@ -31,7 +31,7 @@ export default function ControlPanel({
   onMaxAmountChange,
   onSortByChange,
   onSortOrderChange,
-  onReset
+  onReset,
 }: ControlPanelProps) {
   return (
     <motion.div
@@ -44,7 +44,7 @@ export default function ControlPanel({
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-indigo-500/5"></div>
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/10 to-blue-400/10 rounded-full blur-2xl"></div>
       <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-400/10 to-pink-400/10 rounded-full blur-xl"></div>
-      
+
       <div className="relative">
         {/* Заголовок */}
         <div className="flex items-center justify-between mb-8">
@@ -66,7 +66,7 @@ export default function ControlPanel({
             </div>
             Панель управления
           </h3>
-          
+
           <button
             onClick={onReset}
             className="group px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-medium rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
@@ -128,7 +128,9 @@ export default function ControlPanel({
             <select
               className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white"
               value={status}
-              onChange={(e) => onStatusChange(e.target.value as "ALL" | ApplicationStatus)}
+              onChange={(e) =>
+                onStatusChange(e.target.value as "ALL" | ApplicationStatus)
+              }
             >
               <option value="ALL">Все статусы</option>
               <option value="PENDING">В обработке</option>
@@ -143,7 +145,9 @@ export default function ControlPanel({
               Сумма от
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">₽</span>
+              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">
+                ₽
+              </span>
               <input
                 type="number"
                 className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
@@ -160,7 +164,9 @@ export default function ControlPanel({
               Сумма до
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">₽</span>
+              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">
+                ₽
+              </span>
               <input
                 type="number"
                 className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
@@ -181,7 +187,9 @@ export default function ControlPanel({
             <select
               className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white"
               value={sortBy}
-              onChange={(e) => onSortByChange(e.target.value as "date" | "amount" | "status")}
+              onChange={(e) =>
+                onSortByChange(e.target.value as "date" | "amount" | "status")
+              }
             >
               <option value="date">По дате</option>
               <option value="amount">По сумме</option>
@@ -196,7 +204,9 @@ export default function ControlPanel({
             <select
               className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white"
               value={sortOrder}
-              onChange={(e) => onSortOrderChange(e.target.value as "asc" | "desc")}
+              onChange={(e) =>
+                onSortOrderChange(e.target.value as "asc" | "desc")
+              }
             >
               <option value="desc">По убыванию</option>
               <option value="asc">По возрастанию</option>
@@ -207,21 +217,3 @@ export default function ControlPanel({
     </motion.div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

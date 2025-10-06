@@ -20,11 +20,11 @@ interface ProfileInfoSectionProps {
   saving: boolean;
 }
 
-export default function ProfileInfoSection({ 
-  user, 
-  onNameChange, 
-  onEmailChange, 
-  saving 
+export default function ProfileInfoSection({
+  user,
+  onNameChange,
+  onEmailChange,
+  saving,
 }: ProfileInfoSectionProps) {
   return (
     <motion.div
@@ -34,8 +34,10 @@ export default function ProfileInfoSection({
       className="lg:col-span-2"
     >
       <div className="relative overflow-hidden bg-gradient-to-br from-white/90 via-white/80 to-white/90 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/20 dark:border-gray-700/20">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Личная информация</h2>
-        
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+          Личная информация
+        </h2>
+
         <div className="space-y-6">
           {/* Name */}
           <div>
@@ -67,11 +69,13 @@ export default function ProfileInfoSection({
               Роль
             </label>
             <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
-                user.role === "ADMIN" 
-                  ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" 
-                  : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
-              }`}>
+              <span
+                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                  user.role === "ADMIN"
+                    ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                    : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
+                }`}
+              >
                 {user.role === "ADMIN" ? "Администратор" : "Пользователь"}
               </span>
             </div>
@@ -83,7 +87,7 @@ export default function ProfileInfoSection({
               Дата регистрации
             </label>
             <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl text-gray-600 dark:text-gray-400">
-              {new Date(user.createdAt).toLocaleDateString('ru-RU')}
+              {new Date(user.createdAt).toLocaleDateString("ru-RU")}
             </div>
           </div>
         </div>

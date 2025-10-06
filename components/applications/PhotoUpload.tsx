@@ -10,10 +10,18 @@ interface PhotoUploadProps {
   delay?: number;
 }
 
-export default function PhotoUpload({ photos, onPhotosChange, maxPhotos, delay = 0.5 }: PhotoUploadProps) {
+export default function PhotoUpload({
+  photos,
+  onPhotosChange,
+  maxPhotos,
+  delay = 0.5,
+}: PhotoUploadProps) {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const mappedFiles = files.map(f => ({ file: f, url: URL.createObjectURL(f) }));
+    const mappedFiles = files.map((f) => ({
+      file: f,
+      url: URL.createObjectURL(f),
+    }));
     const newPhotos = [...photos, ...mappedFiles].slice(0, maxPhotos);
     onPhotosChange(newPhotos);
   };
@@ -26,7 +34,10 @@ export default function PhotoUpload({ photos, onPhotosChange, maxPhotos, delay =
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
-    const mappedFiles = files.map(f => ({ file: f, url: URL.createObjectURL(f) }));
+    const mappedFiles = files.map((f) => ({
+      file: f,
+      url: URL.createObjectURL(f),
+    }));
     const newPhotos = [...photos, ...mappedFiles].slice(0, maxPhotos);
     onPhotosChange(newPhotos);
   };
@@ -40,7 +51,6 @@ export default function PhotoUpload({ photos, onPhotosChange, maxPhotos, delay =
       onDrop={onDrop}
       className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 p-6 bg-transparent hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors duration-300 relative"
     >
-      
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <LucideIcons.Image size="sm" className="text-emerald-500" />
@@ -85,7 +95,7 @@ export default function PhotoUpload({ photos, onPhotosChange, maxPhotos, delay =
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
               </div>
-              
+
               <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <motion.button
                   whileHover={{ scale: 1.1 }}
@@ -110,4 +120,3 @@ export default function PhotoUpload({ photos, onPhotosChange, maxPhotos, delay =
     </motion.div>
   );
 }
-

@@ -9,7 +9,11 @@ interface StoriesPaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export function StoriesPagination({ currentPage, totalPages, onPageChange }: StoriesPaginationProps) {
+export function StoriesPagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: StoriesPaginationProps) {
   if (totalPages <= 1) return null;
 
   const getVisiblePages = () => {
@@ -17,12 +21,16 @@ export function StoriesPagination({ currentPage, totalPages, onPageChange }: Sto
     const range = [];
     const rangeWithDots = [];
 
-    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
       range.push(i);
     }
 
     if (currentPage - delta > 2) {
-      rangeWithDots.push(1, '...');
+      rangeWithDots.push(1, "...");
     } else {
       rangeWithDots.push(1);
     }
@@ -30,7 +38,7 @@ export function StoriesPagination({ currentPage, totalPages, onPageChange }: Sto
     rangeWithDots.push(...range);
 
     if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push('...', totalPages);
+      rangeWithDots.push("...", totalPages);
     } else {
       rangeWithDots.push(totalPages);
     }
@@ -50,7 +58,7 @@ export function StoriesPagination({ currentPage, totalPages, onPageChange }: Sto
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-xl border border-white/20 rounded-xl text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
-        style={{ borderColor: '#abd1c6/30' }}
+        style={{ borderColor: "#abd1c6/30" }}
       >
         <LucideIcons.ChevronLeft size="sm" />
         <span className="hidden sm:inline">Предыдущая</span>
@@ -60,22 +68,29 @@ export function StoriesPagination({ currentPage, totalPages, onPageChange }: Sto
       <div className="flex items-center gap-1">
         {getVisiblePages().map((page, index) => (
           <div key={index}>
-            {page === '...' ? (
-              <span className="px-3 py-2" style={{ color: '#2d5a4e' }}>...</span>
+            {page === "..." ? (
+              <span className="px-3 py-2" style={{ color: "#2d5a4e" }}>
+                ...
+              </span>
             ) : (
               <button
                 onClick={() => onPageChange(page as number)}
                 className={`px-3 py-2 rounded-xl font-medium transition-all duration-300 ${
                   currentPage === page
-                    ? 'text-white shadow-lg'
-                    : 'bg-white/90 backdrop-blur-xl border border-white/20 text-gray-700 hover:bg-gray-50 shadow-lg hover:shadow-xl'
+                    ? "text-white shadow-lg"
+                    : "bg-white/90 backdrop-blur-xl border border-white/20 text-gray-700 hover:bg-gray-50 shadow-lg hover:shadow-xl"
                 }`}
-                style={currentPage === page ? {
-                  background: 'linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)',
-                  borderColor: '#f9bc60'
-                } : {
-                  borderColor: '#abd1c6/30'
-                }}
+                style={
+                  currentPage === page
+                    ? {
+                        background:
+                          "linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)",
+                        borderColor: "#f9bc60",
+                      }
+                    : {
+                        borderColor: "#abd1c6/30",
+                      }
+                }
               >
                 {page}
               </button>
@@ -89,7 +104,7 @@ export function StoriesPagination({ currentPage, totalPages, onPageChange }: Sto
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-xl border border-white/20 rounded-xl text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
-        style={{ borderColor: '#abd1c6/30' }}
+        style={{ borderColor: "#abd1c6/30" }}
       >
         <span className="hidden sm:inline">Следующая</span>
         <LucideIcons.ChevronRight size="sm" />
@@ -97,11 +112,3 @@ export function StoriesPagination({ currentPage, totalPages, onPageChange }: Sto
     </motion.div>
   );
 }
-
-
-
-
-
-
-
-

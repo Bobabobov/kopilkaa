@@ -14,12 +14,26 @@ import UniversalBackground from "@/components/ui/UniversalBackground";
 // import ThreePet from "@/components/ThreePet"; // Temporarily disabled
 
 // Lazy load heavy modals
-const SettingsModal = dynamic(() => import("@/components/profile/SettingsModal"), {
-  ssr: false,
-  loading: () => <div className="hidden" />
-});
+const SettingsModal = dynamic(
+  () => import("@/components/profile/SettingsModal"),
+  {
+    ssr: false,
+    loading: () => <div className="hidden" />,
+  },
+);
 
-type User = { id: string; email: string; role: "USER" | "ADMIN"; name?: string | null; createdAt: string; avatar?: string | null; headerTheme?: string | null; avatarFrame?: string | null; hideEmail?: boolean; lastSeen?: string | null };
+type User = {
+  id: string;
+  email: string;
+  role: "USER" | "ADMIN";
+  name?: string | null;
+  createdAt: string;
+  avatar?: string | null;
+  headerTheme?: string | null;
+  avatarFrame?: string | null;
+  hideEmail?: boolean;
+  lastSeen?: string | null;
+};
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -38,8 +52,12 @@ export default function ProfilePage() {
       setIsSettingsModalOpen(true);
     };
 
-    window.addEventListener('open-settings-modal', handleOpenSettingsModal);
-    return () => window.removeEventListener('open-settings-modal', handleOpenSettingsModal);
+    window.addEventListener("open-settings-modal", handleOpenSettingsModal);
+    return () =>
+      window.removeEventListener(
+        "open-settings-modal",
+        handleOpenSettingsModal,
+      );
   }, []);
 
   // Закрываем модальное окно при загрузке страницы (если оно было открыто)
@@ -76,10 +94,14 @@ export default function ProfilePage() {
           className="text-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-white/20 dark:border-gray-700/20"
         >
           <div className="text-8xl mb-6">🔒</div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Доступ ограничен</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg">Войдите в аккаунт, чтобы просмотреть свой профиль</p>
-          <a 
-            href="/login" 
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            Доступ ограничен
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg">
+            Войдите в аккаунт, чтобы просмотреть свой профиль
+          </p>
+          <a
+            href="/login"
             className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             Войти в аккаунт
@@ -94,11 +116,10 @@ export default function ProfilePage() {
       {/* Универсальный фон */}
       <UniversalBackground />
 
-           {/* Header */}
-           <div className="mt-20">
-             <ProfileHeader user={user} />
-           </div>
-
+      {/* Header */}
+      <div className="mt-20">
+        <ProfileHeader user={user} />
+      </div>
 
       {/* Main Content */}
       <div className="w-full px-6 pt-32 pb-8 relative z-10">
@@ -106,34 +127,32 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* User Info Card - 3 колонки */}
             <div className="lg:col-span-3 space-y-6">
-              <UserInfoCard 
-                user={user} 
-                onThemeChange={handleThemeChange}
-              />
+              <UserInfoCard user={user} onThemeChange={handleThemeChange} />
               <ProfileFriendsSection />
             </div>
 
-                {/* Центральный блок - 3D Бульдог - 6 колонок */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="lg:col-span-6"
-                >
-                  {/* <ThreePet /> */} {/* Temporarily disabled - requires Three.js */}
-                </motion.div>
+            {/* Центральный блок - 3D Бульдог - 6 колонок */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="lg:col-span-6"
+            >
+              {/* <ThreePet /> */}{" "}
+              {/* Temporarily disabled - requires Three.js */}
+            </motion.div>
 
-                {/* Right Sidebar - Статистика и Активность - 3 колонки */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="lg:col-span-3 space-y-6"
-                >
-                  <ProfileStatsList />
-                  <ProfileActivity />
-                  <ProfileLikesSection />
-                </motion.div>
+            {/* Right Sidebar - Статистика и Активность - 3 колонки */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="lg:col-span-3 space-y-6"
+            >
+              <ProfileStatsList />
+              <ProfileActivity />
+              <ProfileLikesSection />
+            </motion.div>
           </div>
         </div>
       </div>

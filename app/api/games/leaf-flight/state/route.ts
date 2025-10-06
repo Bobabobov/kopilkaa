@@ -1,21 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getSession();
-    
+
     if (!session) {
-      return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+      return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
     }
 
     // Получаем или создаем запись игры для пользователя
     let gameRecord = await prisma.gameRecord.findFirst({
       where: {
         userId: session.uid,
-        gameType: 'leaf-flight'
-      }
+        gameType: "leaf-flight",
+      },
     });
 
     if (!gameRecord) {
@@ -24,11 +24,11 @@ export async function GET(request: NextRequest) {
       gameRecord = await prisma.gameRecord.create({
         data: {
           userId: session.uid,
-          gameType: 'leaf-flight',
+          gameType: "leaf-flight",
           attempts: 0,
           maxAttempts: maxAttempts,
-          cooldownEnd: null
-        }
+          cooldownEnd: null,
+        },
       });
     }
 
@@ -36,10 +36,10 @@ export async function GET(request: NextRequest) {
       attempts: gameRecord.attempts,
       maxAttempts: gameRecord.maxAttempts,
       cooldownEnd: gameRecord.cooldownEnd,
-      bestScore: gameRecord.bestScore || 0
+      bestScore: gameRecord.bestScore || 0,
     });
   } catch (error) {
-    console.error('Ошибка загрузки состояния игры:', error);
-    return NextResponse.json({ error: 'Ошибка сервера' }, { status: 500 });
+    console.error("Ошибка загрузки состояния игры:", error);
+    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

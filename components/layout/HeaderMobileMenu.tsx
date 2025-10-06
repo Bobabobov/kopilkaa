@@ -11,13 +11,14 @@ export default function HeaderMobileMenu() {
   // Закрываем мобильное меню при изменении размера экрана
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) { // lg breakpoint
+      if (window.innerWidth >= 1024) {
+        // lg breakpoint
         setMobileMenuOpen(false);
       }
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
@@ -26,13 +27,28 @@ export default function HeaderMobileMenu() {
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         className="lg:hidden p-3 rounded-xl transition-all duration-200 drop-shadow-md"
-        style={{ color: '#fffffe' }}
+        style={{ color: "#fffffe" }}
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           {mobileMenuOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           )}
         </svg>
       </button>
@@ -46,13 +62,13 @@ export default function HeaderMobileMenu() {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
             className="lg:hidden border-t backdrop-blur-sm"
-            style={{ backgroundColor: '#004643', borderColor: '#abd1c6' }}
+            style={{ backgroundColor: "#004643", borderColor: "#abd1c6" }}
           >
             <div className="container-p py-4 space-y-2">
               {/* Навигационные ссылки */}
               <div className="space-y-1">
-                <HeaderNavigation 
-                  className="flex-col space-y-1" 
+                <HeaderNavigation
+                  className="flex-col space-y-1"
                   onLinkClick={() => setMobileMenuOpen(false)}
                 />
               </div>

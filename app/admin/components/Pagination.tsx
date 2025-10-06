@@ -10,7 +10,7 @@ interface PaginationProps {
 export default function Pagination({
   currentPage,
   totalPages,
-  onPageChange
+  onPageChange,
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
@@ -27,8 +27,18 @@ export default function Pagination({
           disabled={currentPage <= 1}
           onClick={() => onPageChange(currentPage - 1)}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
           Назад
         </button>
@@ -51,7 +61,7 @@ export default function Pagination({
               </button>
             );
           })}
-          
+
           {totalPages > 5 && (
             <>
               <span className="text-gray-400">...</span>
@@ -75,8 +85,18 @@ export default function Pagination({
           onClick={() => onPageChange(currentPage + 1)}
         >
           Вперёд
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </button>
       </div>

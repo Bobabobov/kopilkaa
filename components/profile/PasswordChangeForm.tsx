@@ -22,9 +22,8 @@ export default function PasswordChangeForm({
   onPasswordDataChange,
   onSubmit,
   onCancel,
-  onStartChange
+  onStartChange,
 }: PasswordChangeFormProps) {
-  
   if (!isChangingPassword) {
     return (
       <div className="flex items-center space-x-3">
@@ -50,12 +49,17 @@ export default function PasswordChangeForm({
         <input
           type="password"
           value={passwordData.oldPassword}
-          onChange={(e) => onPasswordDataChange({...passwordData, oldPassword: e.target.value})}
+          onChange={(e) =>
+            onPasswordDataChange({
+              ...passwordData,
+              oldPassword: e.target.value,
+            })
+          }
           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
           placeholder="Введите текущий пароль"
         />
       </div>
-      
+
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Новый пароль
@@ -63,12 +67,17 @@ export default function PasswordChangeForm({
         <input
           type="password"
           value={passwordData.newPassword}
-          onChange={(e) => onPasswordDataChange({...passwordData, newPassword: e.target.value})}
+          onChange={(e) =>
+            onPasswordDataChange({
+              ...passwordData,
+              newPassword: e.target.value,
+            })
+          }
           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
           placeholder="Введите новый пароль"
         />
       </div>
-      
+
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Подтвердите пароль
@@ -76,7 +85,12 @@ export default function PasswordChangeForm({
         <input
           type="password"
           value={passwordData.confirmPassword}
-          onChange={(e) => onPasswordDataChange({...passwordData, confirmPassword: e.target.value})}
+          onChange={(e) =>
+            onPasswordDataChange({
+              ...passwordData,
+              confirmPassword: e.target.value,
+            })
+          }
           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
           placeholder="Подтвердите новый пароль"
         />

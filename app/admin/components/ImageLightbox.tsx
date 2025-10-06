@@ -14,17 +14,19 @@ export default function ImageLightbox({
   images,
   currentIndex,
   onClose,
-  onIndexChange
+  onIndexChange,
 }: ImageLightboxProps) {
   useEffect(() => {
     if (!isOpen) return;
-    
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft") onIndexChange((currentIndex - 1 + images.length) % images.length);
-      if (e.key === "ArrowRight") onIndexChange((currentIndex + 1) % images.length);
+      if (e.key === "ArrowLeft")
+        onIndexChange((currentIndex - 1 + images.length) % images.length);
+      if (e.key === "ArrowRight")
+        onIndexChange((currentIndex + 1) % images.length);
     };
-    
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, currentIndex, images.length, onClose, onIndexChange]);
@@ -47,17 +49,19 @@ export default function ImageLightbox({
         >
           ×
         </button>
-        
+
         {images.length > 1 && (
           <button
             aria-label="Prev"
             className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white"
-            onClick={() => onIndexChange((currentIndex - 1 + images.length) % images.length)}
+            onClick={() =>
+              onIndexChange((currentIndex - 1 + images.length) % images.length)
+            }
           >
             ‹
           </button>
         )}
-        
+
         {images.length > 1 && (
           <button
             aria-label="Next"
@@ -67,14 +71,14 @@ export default function ImageLightbox({
             ›
           </button>
         )}
-        
+
         <img
           src={images[currentIndex]}
           alt=""
           className="w-full h-full object-contain select-none"
           draggable={false}
         />
-        
+
         {images.length > 1 && (
           <div className="absolute bottom-2 left-0 right-0 text-center text-white/80 text-sm">
             {currentIndex + 1} / {images.length}
@@ -84,32 +88,3 @@ export default function ImageLightbox({
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -16,13 +16,13 @@ interface NotificationProps {
   };
 }
 
-export function Notification({ 
-  isOpen, 
-  onClose, 
-  title, 
-  message, 
+export function Notification({
+  isOpen,
+  onClose,
+  title,
+  message,
   type = "info",
-  action 
+  action,
 }: NotificationProps) {
   useEffect(() => {
     if (isOpen) {
@@ -94,7 +94,7 @@ export function Notification({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={onClose}
           />
-          
+
           {/* Modal */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -107,7 +107,10 @@ export function Notification({
               onClick={onClose}
               className="absolute top-4 right-4 p-1 rounded-lg hover:bg-white/10 transition-colors"
             >
-              <LucideIcons.Close size="sm" className="text-gray-500 dark:text-gray-400" />
+              <LucideIcons.Close
+                size="sm"
+                className="text-gray-500 dark:text-gray-400"
+              />
             </button>
 
             {/* Content */}

@@ -15,7 +15,10 @@ interface ApplicationsModalProps {
   onClose: () => void;
 }
 
-export default function ApplicationsModal({ isOpen, onClose }: ApplicationsModalProps) {
+export default function ApplicationsModal({
+  isOpen,
+  onClose,
+}: ApplicationsModalProps) {
   const { showToast, ToastComponent } = useBeautifulToast();
   const {
     items,
@@ -38,14 +41,14 @@ export default function ApplicationsModal({ isOpen, onClose }: ApplicationsModal
   // Локальные уведомления
   const [localNotification, setLocalNotification] = useState<{
     show: boolean;
-    type: 'success' | 'error' | 'info';
+    type: "success" | "error" | "info";
     title: string;
     message: string;
   }>({
     show: false,
-    type: 'info',
-    title: '',
-    message: ''
+    type: "info",
+    title: "",
+    message: "",
   });
 
   // Горячие клавиши и блокировка прокрутки
@@ -57,48 +60,57 @@ export default function ApplicationsModal({ isOpen, onClose }: ApplicationsModal
     const originalPosition = document.body.style.position;
     const originalTop = document.body.style.top;
     const originalWidth = document.body.style.width;
-    
+
     // Сохраняем текущую позицию прокрутки
     const scrollY = window.scrollY;
-    
+
     // Блокируем прокрутку
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
     document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
+    document.body.style.width = "100%";
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         onClose();
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    
+    document.addEventListener("keydown", handleKeyDown);
+
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      
+      document.removeEventListener("keydown", handleKeyDown);
+
       // Восстанавливаем прокрутку
       document.body.style.overflow = originalOverflow;
       document.body.style.position = originalPosition;
       document.body.style.top = originalTop;
       document.body.style.width = originalWidth;
-      
+
       // Плавно восстанавливаем позицию прокрутки
       requestAnimationFrame(() => {
         window.scrollTo({
           top: scrollY,
-          behavior: 'instant'
+          behavior: "instant",
         });
       });
     };
   }, [isOpen, onClose]);
 
   // Функция для показа локального уведомления
-  const showLocalNotification = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  const showLocalNotification = (
+    type: "success" | "error" | "info",
+    title: string,
+    message: string,
+  ) => {
     setLocalNotification({ show: true, type, title, message });
     setTimeout(() => {
-      setLocalNotification({ show: false, type: 'info', title: '', message: '' });
+      setLocalNotification({
+        show: false,
+        type: "info",
+        title: "",
+        message: "",
+      });
     }, 3000);
   };
 
@@ -120,32 +132,47 @@ export default function ApplicationsModal({ isOpen, onClose }: ApplicationsModal
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
           className="rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden backdrop-blur-xl"
-          style={{ 
-            backgroundColor: '#004643',
-            border: '1px solid #abd1c6'
+          style={{
+            backgroundColor: "#004643",
+            border: "1px solid #abd1c6",
           }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Заголовок модалки */}
-          <div className="p-4" style={{ backgroundColor: '#f9bc60' }}>
+          <div className="p-4" style={{ backgroundColor: "#f9bc60" }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl backdrop-blur-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 30, 29, 0.2)' }}>
+                <div
+                  className="w-12 h-12 rounded-2xl backdrop-blur-xl flex items-center justify-center"
+                  style={{ backgroundColor: "rgba(0, 30, 29, 0.2)" }}
+                >
                   <LucideIcons.FileText size="md" className="text-[#001e1d]" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold" style={{ color: '#001e1d' }}>Мои заявки</h2>
-                  <p style={{ color: '#001e1d', opacity: 0.8 }}>
-                    {stats.total} {stats.total === 1 ? 'заявка' : stats.total < 5 ? 'заявки' : 'заявок'}
+                  <h2
+                    className="text-2xl font-bold"
+                    style={{ color: "#001e1d" }}
+                  >
+                    Мои заявки
+                  </h2>
+                  <p style={{ color: "#001e1d", opacity: 0.8 }}>
+                    {stats.total}{" "}
+                    {stats.total === 1
+                      ? "заявка"
+                      : stats.total < 5
+                        ? "заявки"
+                        : "заявок"}
                   </p>
                 </div>
               </div>
               <button
                 onClick={onClose}
                 className="w-10 h-10 rounded-xl backdrop-blur-xl flex items-center justify-center transition-colors hover:opacity-80"
-                style={{ backgroundColor: 'rgba(0, 30, 29, 0.2)' }}
+                style={{ backgroundColor: "rgba(0, 30, 29, 0.2)" }}
               >
-                <span className="text-xl" style={{ color: '#001e1d' }}>✕</span>
+                <span className="text-xl" style={{ color: "#001e1d" }}>
+                  ✕
+                </span>
               </button>
             </div>
           </div>
@@ -159,19 +186,27 @@ export default function ApplicationsModal({ isOpen, onClose }: ApplicationsModal
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className="mx-6 mb-4 p-3 rounded-lg text-sm font-medium shadow-lg"
-                style={{ 
-                  background: 'linear-gradient(135deg, #f9bc60, #fac570)',
-                  color: '#001e1d'
+                style={{
+                  background: "linear-gradient(135deg, #f9bc60, #fac570)",
+                  color: "#001e1d",
                 }}
               >
                 <div className="flex items-center gap-2">
                   <span className="text-lg">
-                    {localNotification.type === 'success' ? '✅' :
-                     localNotification.type === 'error' ? '❌' : 'ℹ️'}
+                    {localNotification.type === "success"
+                      ? "✅"
+                      : localNotification.type === "error"
+                        ? "❌"
+                        : "ℹ️"}
                   </span>
                   <div>
                     <div className="font-bold">{localNotification.title}</div>
-                    <div className="text-sm" style={{ color: '#001e1d', opacity: 0.8 }}>{localNotification.message}</div>
+                    <div
+                      className="text-sm"
+                      style={{ color: "#001e1d", opacity: 0.8 }}
+                    >
+                      {localNotification.message}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -182,14 +217,24 @@ export default function ApplicationsModal({ isOpen, onClose }: ApplicationsModal
           <div className="p-6 max-h-[calc(90vh-150px)] overflow-y-auto">
             {loading ? (
               <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#f9bc60' }}></div>
-                <p style={{ color: '#abd1c6' }}>Загрузка заявок...</p>
+                <div
+                  className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+                  style={{ borderColor: "#f9bc60" }}
+                ></div>
+                <p style={{ color: "#abd1c6" }}>Загрузка заявок...</p>
               </div>
             ) : err ? (
               <div className="text-center py-12">
-                <div className="text-4xl mb-4" style={{ color: '#f9bc60' }}>⚠️</div>
-                <h3 className="text-xl font-bold mb-2" style={{ color: '#fffffe' }}>Ошибка загрузки</h3>
-                <p style={{ color: '#abd1c6' }}>{err}</p>
+                <div className="text-4xl mb-4" style={{ color: "#f9bc60" }}>
+                  ⚠️
+                </div>
+                <h3
+                  className="text-xl font-bold mb-2"
+                  style={{ color: "#fffffe" }}
+                >
+                  Ошибка загрузки
+                </h3>
+                <p style={{ color: "#abd1c6" }}>{err}</p>
               </div>
             ) : (
               <>
@@ -217,11 +262,7 @@ export default function ApplicationsModal({ isOpen, onClose }: ApplicationsModal
                     ))
                   )}
                 </div>
-                <Pagination
-                  page={page}
-                  pages={pages}
-                  onPageChange={load}
-                />
+                <Pagination page={page} pages={pages} onPageChange={load} />
               </>
             )}
           </div>

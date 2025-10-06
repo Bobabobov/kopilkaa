@@ -24,18 +24,24 @@ interface ApplicationCardProps {
   onToggleExpanded: (id: string) => void;
 }
 
-export function ApplicationCard({ item, index, isExpanded, onToggleExpanded }: ApplicationCardProps) {
-  const storyShort = item.story.length > 260 ? item.story.slice(0, 260) + "…" : item.story;
+export function ApplicationCard({
+  item,
+  index,
+  isExpanded,
+  onToggleExpanded,
+}: ApplicationCardProps) {
+  const storyShort =
+    item.story.length > 260 ? item.story.slice(0, 260) + "…" : item.story;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      whileHover={{ 
-        scale: 1.01, 
+      whileHover={{
+        scale: 1.01,
         y: -2,
-        boxShadow: "0 10px 25px rgba(0,0,0,0.1)"
+        boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
       }}
       className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-700/50 shadow-md hover:shadow-lg transition-all duration-300"
     >
@@ -49,7 +55,9 @@ export function ApplicationCard({ item, index, isExpanded, onToggleExpanded }: A
             {item.summary}
           </p>
         </div>
-        <div className={`px-2 py-1 rounded-full text-xs font-medium shrink-0 ${statusColor(item.status)}`}>
+        <div
+          className={`px-2 py-1 rounded-full text-xs font-medium shrink-0 ${statusColor(item.status)}`}
+        >
           {statusRu[item.status]}
         </div>
       </div>
@@ -78,8 +86,15 @@ export function ApplicationCard({ item, index, isExpanded, onToggleExpanded }: A
       <div className="flex items-center justify-between pt-2 sm:pt-3 border-t border-slate-200 dark:border-slate-700">
         <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
           <LucideIcons.Calendar size="xs" />
-          <span className="hidden sm:inline">{new Date(item.createdAt).toLocaleDateString('ru-RU')}</span>
-          <span className="sm:hidden">{new Date(item.createdAt).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })}</span>
+          <span className="hidden sm:inline">
+            {new Date(item.createdAt).toLocaleDateString("ru-RU")}
+          </span>
+          <span className="sm:hidden">
+            {new Date(item.createdAt).toLocaleDateString("ru-RU", {
+              day: "2-digit",
+              month: "2-digit",
+            })}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           {item.images.length > 0 && (
@@ -93,13 +108,16 @@ export function ApplicationCard({ item, index, isExpanded, onToggleExpanded }: A
 
       {/* Admin Comment */}
       {item.adminComment && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           className="mt-2 sm:mt-3 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg"
         >
           <div className="flex items-start gap-2">
-            <LucideIcons.MessageCircle size="xs" className="text-emerald-500 mt-0.5 flex-shrink-0" />
+            <LucideIcons.MessageCircle
+              size="xs"
+              className="text-emerald-500 mt-0.5 flex-shrink-0"
+            />
             <div className="min-w-0 flex-1">
               <div className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">
                 Комментарий модератора:

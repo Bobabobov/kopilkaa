@@ -10,7 +10,11 @@ interface LevelUpNotificationProps {
   level: number;
 }
 
-export default function LevelUpNotification({ isOpen, onClose, level }: LevelUpNotificationProps) {
+export default function LevelUpNotification({
+  isOpen,
+  onClose,
+  level,
+}: LevelUpNotificationProps) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -41,7 +45,7 @@ export default function LevelUpNotification({ isOpen, onClose, level }: LevelUpN
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={handleClose}
           />
-          
+
           {/* Notification */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -62,8 +66,18 @@ export default function LevelUpNotification({ isOpen, onClose, level }: LevelUpN
               onClick={handleClose}
               className="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all duration-200 z-10"
             >
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
 
@@ -95,7 +109,8 @@ export default function LevelUpNotification({ isOpen, onClose, level }: LevelUpN
                 transition={{ delay: 0.4 }}
                 className="text-white/90 text-lg mb-6"
               >
-                Ваше дерево выросло до уровня <span className="font-bold text-yellow-300">{level}</span>!
+                Ваше дерево выросло до уровня{" "}
+                <span className="font-bold text-yellow-300">{level}</span>!
               </motion.p>
 
               {/* Level badge */}
@@ -106,7 +121,9 @@ export default function LevelUpNotification({ isOpen, onClose, level }: LevelUpN
                 className="inline-flex items-center gap-2 bg-white/20 px-6 py-3 rounded-2xl mb-6"
               >
                 <span className="text-2xl">🏆</span>
-                <span className="text-white font-semibold text-lg">Уровень {level}</span>
+                <span className="text-white font-semibold text-lg">
+                  Уровень {level}
+                </span>
               </motion.div>
 
               {/* Button */}
@@ -126,23 +143,23 @@ export default function LevelUpNotification({ isOpen, onClose, level }: LevelUpN
               {[...Array(12)].map((_, i) => (
                 <motion.div
                   key={i}
-                  initial={{ 
-                    opacity: 0, 
-                    x: Math.random() * 400 - 200, 
+                  initial={{
+                    opacity: 0,
+                    x: Math.random() * 400 - 200,
                     y: Math.random() * 400 - 200,
-                    rotate: 0
+                    rotate: 0,
                   }}
-                  animate={{ 
-                    opacity: [0, 1, 0], 
-                    x: Math.random() * 400 - 200, 
+                  animate={{
+                    opacity: [0, 1, 0],
+                    x: Math.random() * 400 - 200,
                     y: Math.random() * 400 - 200,
-                    rotate: 360
+                    rotate: 360,
                   }}
-                  transition={{ 
-                    delay: 0.3 + i * 0.1, 
+                  transition={{
+                    delay: 0.3 + i * 0.1,
                     duration: 2,
                     repeat: Infinity,
-                    repeatDelay: 3
+                    repeatDelay: 3,
                   }}
                   className="absolute w-2 h-2 bg-yellow-300 rounded-full"
                 />
@@ -154,28 +171,3 @@ export default function LevelUpNotification({ isOpen, onClose, level }: LevelUpN
     </AnimatePresence>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

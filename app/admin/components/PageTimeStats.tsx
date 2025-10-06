@@ -26,7 +26,9 @@ export default function PageTimeStats({ className = "" }: PageTimeStatsProps) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/page-visits/stats?page=/applications&days=${days}`);
+      const response = await fetch(
+        `/api/page-visits/stats?page=/applications&days=${days}`,
+      );
       if (!response.ok) {
         throw new Error("Ошибка загрузки статистики");
       }
@@ -47,7 +49,7 @@ export default function PageTimeStats({ className = "" }: PageTimeStatsProps) {
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
-    
+
     if (hours > 0) {
       return `${hours}ч ${minutes % 60}м`;
     } else if (minutes > 0) {
@@ -56,7 +58,6 @@ export default function PageTimeStats({ className = "" }: PageTimeStatsProps) {
       return `${seconds}с`;
     }
   };
-
 
   if (loading) {
     return (
@@ -67,7 +68,9 @@ export default function PageTimeStats({ className = "" }: PageTimeStatsProps) {
       >
         <div className="text-center py-8">
           <div className="text-4xl mb-4">⏳</div>
-          <p className="text-gray-600 dark:text-gray-400">Загружаем статистику времени...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Загружаем статистику времени...
+          </p>
         </div>
       </motion.div>
     );
@@ -112,7 +115,7 @@ export default function PageTimeStats({ className = "" }: PageTimeStatsProps) {
             Анализ активности пользователей за последние {data.period}
           </p>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Период:
@@ -137,7 +140,9 @@ export default function PageTimeStats({ className = "" }: PageTimeStatsProps) {
               <span className="text-2xl">⏱️</span>
             </div>
             <div>
-              <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Общее время</p>
+              <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                Общее время
+              </p>
               <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">
                 {formatTime(data.totalTime)}
               </p>
@@ -151,7 +156,9 @@ export default function PageTimeStats({ className = "" }: PageTimeStatsProps) {
               <span className="text-2xl">👥</span>
             </div>
             <div>
-              <p className="text-sm text-green-600 dark:text-green-400 font-medium">Всего посещений</p>
+              <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                Всего посещений
+              </p>
               <p className="text-2xl font-bold text-green-800 dark:text-green-200">
                 {data.totalVisits}
               </p>
@@ -165,7 +172,9 @@ export default function PageTimeStats({ className = "" }: PageTimeStatsProps) {
               <span className="text-2xl">📈</span>
             </div>
             <div>
-              <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Среднее время</p>
+              <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+                Среднее время
+              </p>
               <p className="text-2xl font-bold text-purple-800 dark:text-purple-200">
                 {formatTime(data.averageTime)}
               </p>
@@ -173,7 +182,6 @@ export default function PageTimeStats({ className = "" }: PageTimeStatsProps) {
           </div>
         </div>
       </div>
-
     </motion.div>
   );
 }

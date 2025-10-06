@@ -23,8 +23,8 @@ export default function ProfileStatsList() {
 
   useEffect(() => {
     fetch("/api/profile/stats")
-      .then(r => r.json())
-      .then(data => {
+      .then((r) => r.json())
+      .then((data) => {
         if (data && !data.error) {
           setStats(data);
         }
@@ -64,9 +64,7 @@ export default function ProfileStatsList() {
       {!stats ? (
         <div className="text-center py-4">
           <SiteIcons.Stats size="lg" className="text-gray-400 mx-auto mb-2" />
-          <p className="text-gray-600 dark:text-gray-400 text-xs">
-            Нет данных
-          </p>
+          <p className="text-gray-600 dark:text-gray-400 text-xs">Нет данных</p>
         </div>
       ) : (
         <div className="space-y-1.5">
@@ -77,7 +75,10 @@ export default function ProfileStatsList() {
             transition={{ delay: 0.1 }}
             className="flex items-center gap-2 p-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
           >
-            <SiteIcons.Document size="md" className="text-emerald-500 flex-shrink-0" />
+            <SiteIcons.Document
+              size="md"
+              className="text-emerald-500 flex-shrink-0"
+            />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <h4 className="font-medium text-gray-900 dark:text-white text-xs">
@@ -93,7 +94,6 @@ export default function ProfileStatsList() {
             </div>
           </motion.div>
 
-
           {/* Дней в системе */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -101,7 +101,10 @@ export default function ProfileStatsList() {
             transition={{ delay: 0.15 }}
             className="flex items-center gap-2 p-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
           >
-            <SiteIcons.Calendar size="md" className="text-orange-500 flex-shrink-0" />
+            <SiteIcons.Calendar
+              size="md"
+              className="text-orange-500 flex-shrink-0"
+            />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <h4 className="font-medium text-gray-900 dark:text-white text-xs">

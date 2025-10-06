@@ -17,7 +17,9 @@ export default function ExpandableText({
   const visible = open || !isLong ? safe : safe.slice(0, threshold) + "…";
 
   return (
-    <div className={`whitespace-pre-line break-words text-anywhere ${className}`}>
+    <div
+      className={`whitespace-pre-line break-words text-anywhere ${className}`}
+    >
       {visible}
       {isLong && (
         <span

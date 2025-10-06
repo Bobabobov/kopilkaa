@@ -10,7 +10,7 @@ export default function StoryNavigation() {
       <Link
         href="/stories"
         className="inline-flex items-center transition-colors"
-        style={{ color: '#f9bc60' }}
+        style={{ color: "#f9bc60" }}
       >
         <LucideIcons.ArrowLeft size="sm" className="mr-2" />
         Вернуться к историям

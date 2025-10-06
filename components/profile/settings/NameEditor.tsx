@@ -8,10 +8,10 @@ interface NameEditorProps {
   disabled: boolean;
 }
 
-export default function NameEditor({ 
-  currentName, 
-  onSave, 
-  disabled 
+export default function NameEditor({
+  currentName,
+  onSave,
+  disabled,
 }: NameEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(currentName);
@@ -78,27 +78,3 @@ export default function NameEditor({
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -24,18 +24,19 @@ interface AvatarFrameCustomizationProps {
   onClose: () => void;
 }
 
-export default function AvatarFrameCustomization({ 
-  user, 
-  onFrameChange, 
-  isOpen, 
-  onClose 
+export default function AvatarFrameCustomization({
+  user,
+  onFrameChange,
+  isOpen,
+  onClose,
 }: AvatarFrameCustomizationProps) {
-  const [selectedFrame, setSelectedFrame] = useState(user.avatarFrame || 'none');
+  const [selectedFrame, setSelectedFrame] = useState(
+    user.avatarFrame || "none",
+  );
   const [saving, setSaving] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
 
   const frames = getAllAvatarFrames();
-
 
   const handleSave = async () => {
     if (selectedFrame === user.avatarFrame) {
@@ -45,23 +46,31 @@ export default function AvatarFrameCustomization({
 
     setSaving(true);
     try {
-      const response = await fetch('/api/profile/avatar-frame', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ avatarFrame: selectedFrame })
+      const response = await fetch("/api/profile/avatar-frame", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatarFrame: selectedFrame }),
       });
 
       if (response.ok) {
         onFrameChange(selectedFrame);
-        showToast('success', 'Рамка обновлена!', 'Рамка аватарки успешно изменена');
+        showToast(
+          "success",
+          "Рамка обновлена!",
+          "Рамка аватарки успешно изменена",
+        );
         onClose();
       } else {
         const data = await response.json();
-        showToast('error', 'Ошибка сохранения', data.error || 'Не удалось сохранить рамку');
+        showToast(
+          "error",
+          "Ошибка сохранения",
+          data.error || "Не удалось сохранить рамку",
+        );
       }
     } catch (error) {
-      console.error('Error saving avatar frame:', error);
-      showToast('error', 'Ошибка сохранения', 'Не удалось сохранить рамку');
+      console.error("Error saving avatar frame:", error);
+      showToast("error", "Ошибка сохранения", "Не удалось сохранить рамку");
     } finally {
       setSaving(false);
     }
@@ -88,8 +97,18 @@ export default function AvatarFrameCustomization({
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -104,7 +123,7 @@ export default function AvatarFrameCustomization({
               {frames.map((frame, index) => {
                 const isSelected = selectedFrame === frame.key;
                 const frameConfig = getAvatarFrame(frame.key);
-                
+
                 return (
                   <motion.div
                     key={frame.key || `frame-${index}`}
@@ -112,50 +131,62 @@ export default function AvatarFrameCustomization({
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedFrame(frame.key)}
                     className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${
-                      isSelected 
-                        ? 'border-emerald-500 shadow-lg shadow-emerald-500/20' 
-                        : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300'
+                      isSelected
+                        ? "border-emerald-500 shadow-lg shadow-emerald-500/20"
+                        : "border-gray-200 dark:border-gray-700 hover:border-emerald-300"
                     }`}
                   >
                     {/* Preview */}
                     <div className="p-6 flex justify-center">
-                      {frameConfig.type === 'image' ? (
+                      {frameConfig.type === "image" ? (
                         // Рамка-картинка
                         <div className="w-16 h-16 rounded-lg overflow-hidden relative">
                           {/* Рамка как фон */}
-                          <div 
+                          <div
                             className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat rounded-lg"
-                            style={{ backgroundImage: `url(${frameConfig.imageUrl})` }}
+                            style={{
+                              backgroundImage: `url(${frameConfig.imageUrl})`,
+                            }}
                           />
                           {/* Аватар поверх рамки */}
                           <div className="absolute inset-2 rounded-md overflow-hidden">
                             {user.avatar ? (
-                              <img 
-                                src={user.avatar} 
-                                alt="Аватар" 
+                              <img
+                                src={user.avatar}
+                                alt="Аватар"
                                 className="w-full h-full object-cover"
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600 text-white font-bold text-xl">
-                                {user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}
+                                {user.name
+                                  ? user.name[0].toUpperCase()
+                                  : user.email[0].toUpperCase()}
                               </div>
                             )}
                           </div>
                         </div>
                       ) : (
                         // CSS рамка
-                        <div className={`w-16 h-16 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg ${frameConfig.className} ${
-                          user.avatar ? 'bg-gray-100 dark:bg-gray-700' : 'bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600'
-                        }`}>
+                        <div
+                          className={`w-16 h-16 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg ${frameConfig.className} ${
+                            user.avatar
+                              ? "bg-gray-100 dark:bg-gray-700"
+                              : "bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600"
+                          }`}
+                        >
                           {user.avatar ? (
-                            <img 
-                              src={user.avatar} 
-                              alt="Аватар" 
-                              className={`w-full h-full object-cover rounded-lg ${frame.key === 'rainbow' ? 'rounded-lg' : ''}`}
+                            <img
+                              src={user.avatar}
+                              alt="Аватар"
+                              className={`w-full h-full object-cover rounded-lg ${frame.key === "rainbow" ? "rounded-lg" : ""}`}
                             />
                           ) : (
-                            <div className={`w-full h-full flex items-center justify-center rounded-lg ${frame.key === 'rainbow' ? 'rounded-lg' : ''}`}>
-                              {user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}
+                            <div
+                              className={`w-full h-full flex items-center justify-center rounded-lg ${frame.key === "rainbow" ? "rounded-lg" : ""}`}
+                            >
+                              {user.name
+                                ? user.name[0].toUpperCase()
+                                : user.email[0].toUpperCase()}
                             </div>
                           )}
                         </div>
@@ -175,8 +206,16 @@ export default function AvatarFrameCustomization({
                     {/* Selection indicator */}
                     {isSelected && (
                       <div className="absolute top-2 right-2 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        <svg
+                          className="w-4 h-4 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       </div>
                     )}
@@ -199,7 +238,7 @@ export default function AvatarFrameCustomization({
               disabled={saving}
               className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors"
             >
-              {saving ? 'Сохранение...' : 'Сохранить'}
+              {saving ? "Сохранение..." : "Сохранить"}
             </button>
           </div>
         </motion.div>

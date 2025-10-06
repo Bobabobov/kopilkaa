@@ -4,18 +4,24 @@
 import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
 
 export default function DemoNotificationsPage() {
-  const { 
-    showAlert, 
-    showModal, 
-    showDialog, 
+  const {
+    showAlert,
+    showModal,
+    showDialog,
     showToast,
     alert,
     confirm,
-    prompt 
+    prompt,
   } = useBeautifulNotifications();
 
   const handleAlert = () => {
-    showAlert("error", "Ошибка", "Произошла ошибка при выполнении операции", 0, true);
+    showAlert(
+      "error",
+      "Ошибка",
+      "Произошла ошибка при выполнении операции",
+      0,
+      true,
+    );
   };
 
   const handleToast = () => {
@@ -25,24 +31,23 @@ export default function DemoNotificationsPage() {
   const handleModal = () => {
     showModal(
       "Демо модального окна",
-      (
-        <div className="space-y-4">
-          <p className="text-gray-600 dark:text-gray-300">
-            Это пример красивого модального окна с анимациями и современным дизайном.
-          </p>
-          <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-            <h4 className="font-semibold mb-2">Особенности:</h4>
-            <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>Плавные анимации появления и исчезновения</li>
-              <li>Размытие фона (backdrop blur)</li>
-              <li>Градиентное свечение</li>
-              <li>Адаптивный дизайн</li>
-              <li>Поддержка темной темы</li>
-            </ul>
-          </div>
+      <div className="space-y-4">
+        <p className="text-gray-600 dark:text-gray-300">
+          Это пример красивого модального окна с анимациями и современным
+          дизайном.
+        </p>
+        <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+          <h4 className="font-semibold mb-2">Особенности:</h4>
+          <ul className="list-disc list-inside space-y-1 text-sm">
+            <li>Плавные анимации появления и исчезновения</li>
+            <li>Размытие фона (backdrop blur)</li>
+            <li>Градиентное свечение</li>
+            <li>Адаптивный дизайн</li>
+            <li>Поддержка темной темы</li>
+          </ul>
         </div>
-      ),
-      { size: "lg" }
+      </div>,
+      { size: "lg" },
     );
   };
 
@@ -50,7 +55,8 @@ export default function DemoNotificationsPage() {
     showDialog({
       type: "confirm",
       title: "Подтверждение действия",
-      message: "Вы уверены, что хотите выполнить это действие? Это действие нельзя будет отменить.",
+      message:
+        "Вы уверены, что хотите выполнить это действие? Это действие нельзя будет отменить.",
       onConfirm: () => {
         showToast("success", "Подтверждено", "Действие выполнено", 2000);
       },
@@ -58,14 +64,19 @@ export default function DemoNotificationsPage() {
         showToast("info", "Отменено", "Действие отменено", 2000);
       },
       confirmText: "Да, выполнить",
-      cancelText: "Отмена"
+      cancelText: "Отмена",
     });
   };
 
   const handlePrompt = async () => {
     const result = await prompt("Введите ваше имя:", "Иван", "Ввод имени");
     if (result !== null) {
-      showToast("success", "Привет!", `Приятно познакомиться, ${result}!`, 3000);
+      showToast(
+        "success",
+        "Привет!",
+        `Приятно познакомиться, ${result}!`,
+        3000,
+      );
     } else {
       showToast("info", "Отменено", "Ввод отменен", 2000);
     }
@@ -78,10 +89,12 @@ export default function DemoNotificationsPage() {
   const handleStandardConfirm = async () => {
     const result = await confirm("Вы хотите продолжить?", "Подтверждение");
     showToast(
-      result ? "success" : "info", 
-      result ? "Продолжаем!" : "Отменено", 
-      result ? "Пользователь подтвердил действие" : "Пользователь отменил действие",
-      2000
+      result ? "success" : "info",
+      result ? "Продолжаем!" : "Отменено",
+      result
+        ? "Пользователь подтвердил действие"
+        : "Пользователь отменил действие",
+      2000,
     );
   };
 
@@ -91,9 +104,9 @@ export default function DemoNotificationsPage() {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
           Демо красивых уведомлений
         </h1>
-        
+
         <p className="text-gray-600 dark:text-gray-300 mb-8">
-          Здесь вы можете протестировать различные типы красивых уведомлений, 
+          Здесь вы можете протестировать различные типы красивых уведомлений,
           которые заменяют стандартные окна браузера.
         </p>
 
@@ -103,31 +116,42 @@ export default function DemoNotificationsPage() {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Alert уведомления
             </h2>
-            
+
             <div className="space-y-3">
-              <button
-                onClick={handleAlert}
-                className="w-full btn-primary"
-              >
+              <button onClick={handleAlert} className="w-full btn-primary">
                 Показать Alert (Ошибка)
               </button>
-              
+
               <button
-                onClick={() => showAlert("warning", "Предупреждение", "Это предупреждение о важной информации")}
+                onClick={() =>
+                  showAlert(
+                    "warning",
+                    "Предупреждение",
+                    "Это предупреждение о важной информации",
+                  )
+                }
                 className="w-full btn-primary"
               >
                 Показать Alert (Предупреждение)
               </button>
-              
+
               <button
-                onClick={() => showAlert("info", "Информация", "Это информационное сообщение")}
+                onClick={() =>
+                  showAlert(
+                    "info",
+                    "Информация",
+                    "Это информационное сообщение",
+                  )
+                }
                 className="w-full btn-primary"
               >
                 Показать Alert (Информация)
               </button>
-              
+
               <button
-                onClick={() => showAlert("success", "Успех", "Операция выполнена успешно!")}
+                onClick={() =>
+                  showAlert("success", "Успех", "Операция выполнена успешно!")
+                }
                 className="w-full btn-primary"
               >
                 Показать Alert (Успех)
@@ -140,31 +164,44 @@ export default function DemoNotificationsPage() {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Toast уведомления
             </h2>
-            
+
             <div className="space-y-3">
-              <button
-                onClick={handleToast}
-                className="w-full btn-primary"
-              >
+              <button onClick={handleToast} className="w-full btn-primary">
                 Показать Toast (Успех)
               </button>
-              
+
               <button
-                onClick={() => showToast("error", "Ошибка", "Что-то пошло не так", 3000)}
+                onClick={() =>
+                  showToast("error", "Ошибка", "Что-то пошло не так", 3000)
+                }
                 className="w-full btn-primary"
               >
                 Показать Toast (Ошибка)
               </button>
-              
+
               <button
-                onClick={() => showToast("warning", "Внимание", "Проверьте введенные данные", 3000)}
+                onClick={() =>
+                  showToast(
+                    "warning",
+                    "Внимание",
+                    "Проверьте введенные данные",
+                    3000,
+                  )
+                }
                 className="w-full btn-primary"
               >
                 Показать Toast (Предупреждение)
               </button>
-              
+
               <button
-                onClick={() => showToast("info", "Информация", "Новая информация доступна", 3000)}
+                onClick={() =>
+                  showToast(
+                    "info",
+                    "Информация",
+                    "Новая информация доступна",
+                    3000,
+                  )
+                }
                 className="w-full btn-primary"
               >
                 Показать Toast (Информация)
@@ -177,38 +214,48 @@ export default function DemoNotificationsPage() {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Модальные окна
             </h2>
-            
+
             <div className="space-y-3">
-              <button
-                onClick={handleModal}
-                className="w-full btn-primary"
-              >
+              <button onClick={handleModal} className="w-full btn-primary">
                 Показать модальное окно
               </button>
-              
+
               <button
-                onClick={() => showModal(
-                  "Маленькое окно",
-                  <p className="text-gray-600 dark:text-gray-300">Это маленькое модальное окно.</p>,
-                  { size: "sm" }
-                )}
+                onClick={() =>
+                  showModal(
+                    "Маленькое окно",
+                    <p className="text-gray-600 dark:text-gray-300">
+                      Это маленькое модальное окно.
+                    </p>,
+                    { size: "sm" },
+                  )
+                }
                 className="w-full btn-primary"
               >
                 Маленькое модальное окно
               </button>
-              
+
               <button
-                onClick={() => showModal(
-                  "Большое окно",
-                  <div className="space-y-4">
-                    <p className="text-gray-600 dark:text-gray-300">Это большое модальное окно с дополнительным контентом.</p>
-                    <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
-                      <h4 className="font-semibold mb-2">Дополнительная информация</h4>
-                      <p className="text-sm">Здесь может быть любой контент: формы, изображения, таблицы и т.д.</p>
-                    </div>
-                  </div>,
-                  { size: "xl" }
-                )}
+                onClick={() =>
+                  showModal(
+                    "Большое окно",
+                    <div className="space-y-4">
+                      <p className="text-gray-600 dark:text-gray-300">
+                        Это большое модальное окно с дополнительным контентом.
+                      </p>
+                      <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                        <h4 className="font-semibold mb-2">
+                          Дополнительная информация
+                        </h4>
+                        <p className="text-sm">
+                          Здесь может быть любой контент: формы, изображения,
+                          таблицы и т.д.
+                        </p>
+                      </div>
+                    </div>,
+                    { size: "xl" },
+                  )
+                }
                 className="w-full btn-primary"
               >
                 Большое модальное окно
@@ -221,29 +268,25 @@ export default function DemoNotificationsPage() {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Диалоги
             </h2>
-            
+
             <div className="space-y-3">
-              <button
-                onClick={handleDialog}
-                className="w-full btn-primary"
-              >
+              <button onClick={handleDialog} className="w-full btn-primary">
                 Показать диалог подтверждения
               </button>
-              
-              <button
-                onClick={handlePrompt}
-                className="w-full btn-primary"
-              >
+
+              <button onClick={handlePrompt} className="w-full btn-primary">
                 Показать диалог ввода
               </button>
-              
+
               <button
-                onClick={() => showDialog({
-                  type: "alert",
-                  title: "Простое уведомление",
-                  message: "Это простое уведомление в стиле диалога.",
-                  confirmText: "Понятно"
-                })}
+                onClick={() =>
+                  showDialog({
+                    type: "alert",
+                    title: "Простое уведомление",
+                    message: "Это простое уведомление в стиле диалога.",
+                    confirmText: "Понятно",
+                  })
+                }
                 className="w-full btn-primary"
               >
                 Простое уведомление
@@ -256,26 +299,17 @@ export default function DemoNotificationsPage() {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Замена стандартных окон браузера
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <button
-                onClick={handleStandardAlert}
-                className="btn-primary"
-              >
+              <button onClick={handleStandardAlert} className="btn-primary">
                 Заменить alert()
               </button>
-              
-              <button
-                onClick={handleStandardConfirm}
-                className="btn-primary"
-              >
+
+              <button onClick={handleStandardConfirm} className="btn-primary">
                 Заменить confirm()
               </button>
-              
-              <button
-                onClick={handlePrompt}
-                className="btn-primary"
-              >
+
+              <button onClick={handlePrompt} className="btn-primary">
                 Заменить prompt()
               </button>
             </div>
@@ -285,14 +319,3 @@ export default function DemoNotificationsPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-

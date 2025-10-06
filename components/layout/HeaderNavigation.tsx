@@ -17,15 +17,23 @@ interface HeaderNavigationProps {
   onLinkClick?: () => void;
 }
 
-export default function HeaderNavigation({ className, onLinkClick }: HeaderNavigationProps) {
+export default function HeaderNavigation({
+  className,
+  onLinkClick,
+}: HeaderNavigationProps) {
   const pathname = usePathname();
 
   // корректная подсветка активного пункта (учитывает вложенные маршруты)
   const isActive = (href: Route) =>
-    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <nav className={cn("flex items-center gap-2", className)} suppressHydrationWarning>
+    <nav
+      className={cn("flex items-center gap-2", className)}
+      suppressHydrationWarning
+    >
       {links.map((l) => (
         <Link
           key={l.href}
@@ -33,13 +41,11 @@ export default function HeaderNavigation({ className, onLinkClick }: HeaderNavig
           onClick={onLinkClick}
           className={cn(
             "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 drop-shadow-md",
-            isActive(l.href) 
-              ? "shadow-lg" 
-              : "hover:shadow-md"
+            isActive(l.href) ? "shadow-lg" : "hover:shadow-md",
           )}
           style={{
-            backgroundColor: isActive(l.href) ? '#f9bc60' : 'transparent',
-            color: isActive(l.href) ? '#001e1d' : '#fffffe'
+            backgroundColor: isActive(l.href) ? "#f9bc60" : "transparent",
+            color: isActive(l.href) ? "#001e1d" : "#fffffe",
           }}
           suppressHydrationWarning
         >

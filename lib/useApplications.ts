@@ -9,18 +9,22 @@ export function useApplications() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [filter, setFilter] = useState<"ALL" | "PENDING" | "APPROVED" | "REJECTED">("ALL");
+  const [filter, setFilter] = useState<
+    "ALL" | "PENDING" | "APPROVED" | "REJECTED"
+  >("ALL");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest");
 
   const load = async (p = 1) => {
-    setLoading(true); 
+    setLoading(true);
     setErr(null);
     try {
-      const r = await fetch(`/api/applications/mine?page=${p}&limit=10`, { cache: "no-store" });
+      const r = await fetch(`/api/applications/mine?page=${p}&limit=10`, {
+        cache: "no-store",
+      });
       const d = await r.json();
       if (!r.ok) throw new Error(d?.error || "Ошибка загрузки");
-      
+
       setItems(d.items);
       setPage(d.page);
       setPages(d.pages);
@@ -31,22 +35,23 @@ export function useApplications() {
     }
   };
 
-  useEffect(() => { 
-    load(1); 
+  useEffect(() => {
+    load(1);
   }, []);
 
   // Статистика заявок
   const stats = {
     total: items.length,
-    pending: items.filter(item => item.status === "PENDING").length,
-    approved: items.filter(item => item.status === "APPROVED").length,
-    rejected: items.filter(item => item.status === "REJECTED").length,
+    pending: items.filter((item) => item.status === "PENDING").length,
+    approved: items.filter((item) => item.status === "APPROVED").length,
+    rejected: items.filter((item) => item.status === "REJECTED").length,
   };
 
   // Фильтрация и поиск
-  const filteredItems = items.filter(item => {
+  const filteredItems = items.filter((item) => {
     const matchesFilter = filter === "ALL" || item.status === filter;
-    const matchesSearch = search === "" || 
+    const matchesSearch =
+      search === "" ||
       item.title.toLowerCase().includes(search.toLowerCase()) ||
       item.summary.toLowerCase().includes(search.toLowerCase()) ||
       item.story.toLowerCase().includes(search.toLowerCase());
@@ -54,7 +59,7 @@ export function useApplications() {
   });
 
   const toggleExpanded = (id: string) => {
-    setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   return {
@@ -66,7 +71,7 @@ export function useApplications() {
     loading,
     err,
     expanded,
-    
+
     // Filters
     filter,
     setFilter,
@@ -74,31 +79,9 @@ export function useApplications() {
     setSearch,
     sortBy,
     setSortBy,
-    
+
     // Actions
     load,
     toggleExpanded,
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

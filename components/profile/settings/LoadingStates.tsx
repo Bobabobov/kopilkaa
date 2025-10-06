@@ -26,10 +26,14 @@ export function SettingsUnauthorized() {
         className="text-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-white/20 dark:border-gray-700/20"
       >
         <div className="text-8xl mb-6">🔒</div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Доступ ограничен</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg">Войдите в аккаунт, чтобы изменить настройки</p>
-        <a 
-          href="/login" 
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          Доступ ограничен
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg">
+          Войдите в аккаунт, чтобы изменить настройки
+        </p>
+        <a
+          href="/login"
           className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
         >
           Войти в аккаунт
@@ -38,27 +42,3 @@ export function SettingsUnauthorized() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

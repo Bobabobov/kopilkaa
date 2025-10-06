@@ -32,18 +32,22 @@ export default function Header() {
   // Закрываем мобильное меню при изменении размера экрана
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) { // lg breakpoint
+      if (window.innerWidth >= 1024) {
+        // lg breakpoint
         setMobileMenuOpen(false);
       }
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg" style={{ backgroundColor: '#004643', borderColor: '#abd1c6' }}>
+      <header
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg"
+        style={{ backgroundColor: "#004643", borderColor: "#abd1c6" }}
+      >
         <div className="container-p mx-auto flex h-20 items-center justify-between gap-4">
           {/* Логотип слева */}
           <HeaderLogo />
@@ -64,7 +68,7 @@ export default function Header() {
           </div>
 
           {/* Кнопка мобильного меню */}
-          <HeaderMobileButton 
+          <HeaderMobileButton
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             isOpen={mobileMenuOpen}
           />
@@ -80,13 +84,13 @@ export default function Header() {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
             className="lg:hidden border-t backdrop-blur-sm fixed top-20 left-0 right-0 z-40 shadow-lg"
-            style={{ backgroundColor: '#004643', borderColor: '#abd1c6' }}
+            style={{ backgroundColor: "#004643", borderColor: "#abd1c6" }}
           >
             <div className="container-p py-4 space-y-2">
               {/* Навигационные ссылки */}
               <div className="space-y-1">
-                <HeaderNavigation 
-                  className="flex-col space-y-1" 
+                <HeaderNavigation
+                  className="flex-col space-y-1"
                   onLinkClick={() => setMobileMenuOpen(false)}
                 />
               </div>

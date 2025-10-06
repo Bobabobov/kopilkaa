@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  StoriesHeader, 
-  StoryCard, 
-  StoriesLoading, 
-  StoriesEmptyState, 
-  StoriesPagination
+import {
+  StoriesHeader,
+  StoryCard,
+  StoriesLoading,
+  StoriesEmptyState,
+  StoriesPagination,
 } from "@/components/stories";
 import PixelBackground from "@/components/ui/PixelBackground";
 
@@ -44,7 +44,7 @@ export default function StoriesPage() {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: "12",
-        ...(query && { q: query })
+        ...(query && { q: query }),
       });
 
       const response = await fetch(`/api/stories?${params}`);
@@ -76,10 +76,7 @@ export default function StoriesPage() {
       <PixelBackground />
 
       {/* Header */}
-      <StoriesHeader 
-        query={query} 
-        onQueryChange={setQuery} 
-      />
+      <StoriesHeader query={query} onQueryChange={setQuery} />
 
       {/* Content */}
       <div className="relative z-10">
@@ -100,7 +97,7 @@ export default function StoriesPage() {
 
             {/* Pagination */}
             <div className="container mx-auto px-4 pb-8">
-              <StoriesPagination 
+              <StoriesPagination
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}

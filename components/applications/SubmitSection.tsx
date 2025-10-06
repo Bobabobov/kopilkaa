@@ -13,13 +13,13 @@ interface SubmitSectionProps {
   onSubmit: (e: React.FormEvent) => void;
 }
 
-export default function SubmitSection({ 
-  submitting, 
-  uploading, 
-  left, 
-  msg, 
-  err, 
-  onSubmit 
+export default function SubmitSection({
+  submitting,
+  uploading,
+  left,
+  msg,
+  err,
+  onSubmit,
 }: SubmitSectionProps) {
   return (
     <motion.div
@@ -71,17 +71,18 @@ export default function SubmitSection({
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm ${
-            left > 0 
-              ? "text-lime-700 dark:text-lime-300" 
-              : "text-green-700 dark:text-green-300"
-          }`}>
+          <div
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm ${
+              left > 0
+                ? "text-lime-700 dark:text-lime-300"
+                : "text-green-700 dark:text-green-300"
+            }`}
+          >
             <LucideIcons.Clock size="sm" />
             <span>
-              {left > 0 
-                ? `Лимит: 1 заявка в 24 часа (осталось ${msToHuman(left)})` 
-                : "Можете отправить заявку"
-              }
+              {left > 0
+                ? `Лимит: 1 заявка в 24 часа (осталось ${msToHuman(left)})`
+                : "Можете отправить заявку"}
             </span>
           </div>
         </motion.div>
@@ -115,4 +116,3 @@ export default function SubmitSection({
     </motion.div>
   );
 }
-

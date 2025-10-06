@@ -12,7 +12,7 @@ interface User {
   createdAt: string;
   lastSeen?: string | null;
   hideEmail?: boolean;
-  friendshipStatus?: 'PENDING' | 'ACCEPTED' | 'DECLINED';
+  friendshipStatus?: "PENDING" | "ACCEPTED" | "DECLINED";
   friendshipId?: string;
   isRequester?: boolean;
 }
@@ -33,7 +33,7 @@ interface UserStatus {
 }
 
 interface FriendsTabProps {
-  type: 'friends' | 'sent' | 'received';
+  type: "friends" | "sent" | "received";
   data: Friendship[];
   loading: boolean;
   currentUserId: string | null;
@@ -55,34 +55,33 @@ export default function FriendsTab({
   currentUserId,
   getUserStatus,
   sendingRequests,
-  actions
+  actions,
 }: FriendsTabProps) {
-  
   const getEmptyStateMessage = () => {
     switch (type) {
-      case 'friends':
+      case "friends":
         return {
-          icon: '👥',
-          title: 'Пока нет друзей',
-          description: 'Добавьте друзей, чтобы начать общение'
+          icon: "👥",
+          title: "Пока нет друзей",
+          description: "Добавьте друзей, чтобы начать общение",
         };
-      case 'sent':
+      case "sent":
         return {
-          icon: '📤',
-          title: 'Нет отправленных заявок',
-          description: 'Вы еще не отправляли заявки в друзья'
+          icon: "📤",
+          title: "Нет отправленных заявок",
+          description: "Вы еще не отправляли заявки в друзья",
         };
-      case 'received':
+      case "received":
         return {
-          icon: '📥',
-          title: 'Нет входящих заявок',
-          description: 'У вас пока нет новых заявок в друзья'
+          icon: "📥",
+          title: "Нет входящих заявок",
+          description: "У вас пока нет новых заявок в друзья",
         };
       default:
         return {
-          icon: '📋',
-          title: 'Пусто',
-          description: 'Здесь пока ничего нет'
+          icon: "📋",
+          title: "Пусто",
+          description: "Здесь пока ничего нет",
         };
     }
   };
@@ -92,28 +91,32 @@ export default function FriendsTab({
     let userActions: any = {};
 
     switch (type) {
-      case 'friends':
+      case "friends":
         // Для друзей показываем того, кто не является текущим пользователем
-        user = friendship.requesterId === currentUserId ? friendship.receiver : friendship.requester;
+        user =
+          friendship.requesterId === currentUserId
+            ? friendship.receiver
+            : friendship.requester;
         userActions = {
-          onRemoveFriend: () => actions.onRemoveFriend?.(friendship.id)
+          onRemoveFriend: () => actions.onRemoveFriend?.(friendship.id),
         };
         break;
-        
-      case 'sent':
+
+      case "sent":
         // Для отправленных заявок показываем получателя
         user = friendship.receiver;
         userActions = {
-          onCancelRequest: () => actions.onCancelRequest?.(friendship.id, friendship.receiverId)
+          onCancelRequest: () =>
+            actions.onCancelRequest?.(friendship.id, friendship.receiverId),
         };
         break;
-        
-      case 'received':
+
+      case "received":
         // Для полученных заявок показываем отправителя
         user = friendship.requester;
         userActions = {
           onAcceptRequest: () => actions.onAcceptRequest?.(friendship.id),
-          onDeclineRequest: () => actions.onDeclineRequest?.(friendship.id)
+          onDeclineRequest: () => actions.onDeclineRequest?.(friendship.id),
         };
         break;
     }
@@ -158,7 +161,7 @@ export default function FriendsTab({
   // Проверяем, что data является массивом
   if (!data || !Array.isArray(data)) {
     const emptyState = getEmptyStateMessage();
-    
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -166,7 +169,9 @@ export default function FriendsTab({
         className="text-center py-12"
       >
         <div className="text-6xl mb-4">{emptyState.icon}</div>
-        <h3 className="text-lg font-medium text-white mb-2">{emptyState.title}</h3>
+        <h3 className="text-lg font-medium text-white mb-2">
+          {emptyState.title}
+        </h3>
         <p className="text-gray-400 text-sm">{emptyState.description}</p>
       </motion.div>
     );
@@ -174,7 +179,7 @@ export default function FriendsTab({
 
   if (data.length === 0) {
     const emptyState = getEmptyStateMessage();
-    
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -182,7 +187,9 @@ export default function FriendsTab({
         className="text-center py-12"
       >
         <div className="text-6xl mb-4">{emptyState.icon}</div>
-        <h3 className="text-lg font-medium text-white mb-2">{emptyState.title}</h3>
+        <h3 className="text-lg font-medium text-white mb-2">
+          {emptyState.title}
+        </h3>
         <p className="text-gray-400 text-sm">{emptyState.description}</p>
       </motion.div>
     );

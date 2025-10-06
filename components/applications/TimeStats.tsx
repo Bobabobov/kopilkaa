@@ -17,17 +17,19 @@ export default function TimeStats() {
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const response = await fetch('/api/page-visits/stats?page=/applications&days=30');
+        const response = await fetch(
+          "/api/page-visits/stats?page=/applications&days=30",
+        );
         if (response.ok) {
           const stats = await response.json();
           setData({
             totalTime: stats.totalTime || 0,
             totalVisits: stats.totalVisits || 0,
-            averageTime: stats.averageTime || 0
+            averageTime: stats.averageTime || 0,
           });
         }
       } catch (error) {
-        console.error('Ошибка загрузки статистики:', error);
+        console.error("Ошибка загрузки статистики:", error);
       } finally {
         setLoading(false);
       }
@@ -40,7 +42,7 @@ export default function TimeStats() {
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
-    
+
     if (hours > 0) {
       return `${hours}ч ${minutes % 60}м`;
     } else if (minutes > 0) {
@@ -74,7 +76,9 @@ export default function TimeStats() {
         <div className="text-center text-blue-600 dark:text-blue-400">
           <div className="text-2xl mb-2">📊</div>
           <div className="font-medium">Статистика времени</div>
-          <div className="text-sm mt-1">Пока нет данных о времени, проведенном на этой странице</div>
+          <div className="text-sm mt-1">
+            Пока нет данных о времени, проведенном на этой странице
+          </div>
         </div>
       </motion.div>
     );
@@ -91,30 +95,36 @@ export default function TimeStats() {
         <div className="font-bold text-emerald-700 dark:text-emerald-300 text-lg mb-2">
           Статистика времени на странице
         </div>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
           <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3">
-            <div className="text-emerald-600 dark:text-emerald-400 font-medium">Общее время</div>
+            <div className="text-emerald-600 dark:text-emerald-400 font-medium">
+              Общее время
+            </div>
             <div className="text-lg font-bold text-emerald-700 dark:text-emerald-300">
               {formatTime(data.totalTime)}
             </div>
           </div>
-          
+
           <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3">
-            <div className="text-emerald-600 dark:text-emerald-400 font-medium">Посещений</div>
+            <div className="text-emerald-600 dark:text-emerald-400 font-medium">
+              Посещений
+            </div>
             <div className="text-lg font-bold text-emerald-700 dark:text-emerald-300">
               {data.totalVisits}
             </div>
           </div>
-          
+
           <div className="bg-white/50 dark:bg-black/20 rounded-lg p-3">
-            <div className="text-emerald-600 dark:text-emerald-400 font-medium">Среднее время</div>
+            <div className="text-emerald-600 dark:text-emerald-400 font-medium">
+              Среднее время
+            </div>
             <div className="text-lg font-bold text-emerald-700 dark:text-emerald-300">
               {formatTime(data.averageTime)}
             </div>
           </div>
         </div>
-        
+
         <div className="text-xs text-emerald-600/70 dark:text-emerald-400/70 mt-3">
           За последние 30 дней
         </div>

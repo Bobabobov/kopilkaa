@@ -8,7 +8,7 @@ export default function TopDonors() {
     { name: "Михаил П.", amount: "8,200", position: 2, isTop: false },
     { name: "Елена С.", amount: "6,700", position: 3, isTop: false },
     { name: "Дмитрий Л.", amount: "5,100", position: 4, isTop: false },
-    { name: "Ольга М.", amount: "4,800", position: 5, isTop: false }
+    { name: "Ольга М.", amount: "4,800", position: 5, isTop: false },
   ];
 
   const getRankIcon = (position: number) => {
@@ -20,7 +20,9 @@ export default function TopDonors() {
       case 3:
         return <LucideIcons.Medal size="md" className="text-amber-600" />;
       default:
-        return <span className="text-sm font-bold text-current">{position}</span>;
+        return (
+          <span className="text-sm font-bold text-current">{position}</span>
+        );
     }
   };
 
@@ -63,20 +65,29 @@ export default function TopDonors() {
         transition={{ duration: 0.6, delay: 0.5 }}
         className="text-center mb-10 relative"
       >
-        
-        <div className="relative group" data-sal="slide-left" data-sal-delay="200">
+        <div
+          className="relative group"
+          data-sal="slide-left"
+          data-sal-delay="200"
+        >
           <div className="absolute -inset-1 bg-gradient-to-r from-[#6B9071] to-[#375534] rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition duration-500"></div>
           <div className="relative bg-gradient-to-r from-[#E3EED4]/80 to-[#AEC3B0]/80 dark:from-[#0F2A1D]/80 dark:to-[#375534]/80 backdrop-blur-md rounded-2xl p-6 border border-white/20 dark:border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105">
             <div className="flex items-center justify-center gap-3 mb-3">
-            <LucideIcons.Star size="lg" className="text-yellow-500 animate-pulse" />
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#0F2A1D] to-[#375534] bg-clip-text text-transparent">
-              Топ-донатеры
-            </h2>
-            <LucideIcons.Star size="lg" className="text-yellow-500 animate-pulse" />
-          </div>
-          <p className="text-sm text-gray-800 dark:text-gray-200 font-medium">
-            🏆 Наши самые щедрые помощники 🏆
-          </p>
+              <LucideIcons.Star
+                size="lg"
+                className="text-yellow-500 animate-pulse"
+              />
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-[#0F2A1D] to-[#375534] bg-clip-text text-transparent">
+                Топ-донатеры
+              </h2>
+              <LucideIcons.Star
+                size="lg"
+                className="text-yellow-500 animate-pulse"
+              />
+            </div>
+            <p className="text-sm text-gray-800 dark:text-gray-200 font-medium">
+              🏆 Наши самые щедрые помощники 🏆
+            </p>
           </div>
         </div>
       </motion.div>
@@ -90,12 +101,12 @@ export default function TopDonors() {
             transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
             data-sal="slide-up"
             data-sal-delay={300 + index * 100}
-            whileHover={{ 
-              scale: 1.03, 
+            whileHover={{
+              scale: 1.03,
               y: -4,
-              boxShadow: donor.isTop 
-                ? "0 20px 40px rgba(245, 158, 11, 0.3)" 
-                : "0 15px 30px rgba(0,0,0,0.15)"
+              boxShadow: donor.isTop
+                ? "0 20px 40px rgba(245, 158, 11, 0.3)"
+                : "0 15px 30px rgba(0,0,0,0.15)",
             }}
             whileTap={{ scale: 0.97 }}
             className={`group relative overflow-hidden rounded-2xl transition-all duration-500 cursor-pointer ${
@@ -104,7 +115,6 @@ export default function TopDonors() {
                 : "bg-gradient-to-r from-white/80 via-gray-50/80 to-white/80 dark:from-slate-800/80 dark:via-slate-700/80 dark:to-slate-800/80 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-xl hover:shadow-2xl hover:border-white/30 dark:hover:border-white/20"
             }`}
           >
-            
             <div className="relative p-5 flex items-center gap-4">
               <div className="flex-shrink-0 relative">
                 <motion.div
@@ -120,14 +130,16 @@ export default function TopDonors() {
                   )}
                 </motion.div>
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <div className={`font-bold text-lg ${
-                    donor.isTop 
-                      ? "text-gray-900 dark:text-white" 
-                      : "text-slate-900 dark:text-white"
-                  }`}>
+                  <div
+                    className={`font-bold text-lg ${
+                      donor.isTop
+                        ? "text-gray-900 dark:text-white"
+                        : "text-slate-900 dark:text-white"
+                    }`}
+                  >
                     {donor.name}
                   </div>
                   {donor.isTop && (
@@ -139,20 +151,28 @@ export default function TopDonors() {
                     </motion.div>
                   )}
                 </div>
-                <div className={`text-base font-bold ${
-                  donor.isTop 
-                    ? "text-gray-800 dark:text-gray-200" 
-                    : "text-slate-600 dark:text-slate-400"
-                }`}>
+                <div
+                  className={`text-base font-bold ${
+                    donor.isTop
+                      ? "text-gray-800 dark:text-gray-200"
+                      : "text-slate-600 dark:text-slate-400"
+                  }`}
+                >
                   ₽{donor.amount}
                 </div>
                 {donor.position <= 3 && (
-                  <div className={`text-xs font-medium mt-1 ${
-                    donor.isTop 
-                      ? "text-gray-700 dark:text-gray-300" 
-                      : "text-slate-500 dark:text-slate-500"
-                  }`}>
-                    {donor.position === 1 ? "🥇 Лидер" : donor.position === 2 ? "🥈 Серебро" : "🥉 Бронза"}
+                  <div
+                    className={`text-xs font-medium mt-1 ${
+                      donor.isTop
+                        ? "text-gray-700 dark:text-gray-300"
+                        : "text-slate-500 dark:text-slate-500"
+                    }`}
+                  >
+                    {donor.position === 1
+                      ? "🥇 Лидер"
+                      : donor.position === 2
+                        ? "🥈 Серебро"
+                        : "🥉 Бронза"}
                   </div>
                 )}
               </div>
@@ -180,38 +200,36 @@ export default function TopDonors() {
         transition={{ duration: 0.6, delay: 1.2 }}
         className="text-center mt-10"
       >
-        <div className="relative group" data-sal="slide-up" data-sal-delay="800">
+        <div
+          className="relative group"
+          data-sal="slide-up"
+          data-sal-delay="800"
+        >
           <div className="absolute -inset-1 bg-gradient-to-r from-[#AEC3B0] to-[#6B9071] rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition duration-500"></div>
           <div className="relative p-6 rounded-2xl bg-gradient-to-r from-[#E3EED4]/80 via-[#AEC3B0]/80 to-[#E3EED4]/80 dark:from-[#0F2A1D]/80 dark:via-[#375534]/80 dark:to-[#0F2A1D]/80 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105">
-          
-          <div className="relative flex items-center justify-center gap-3 mb-3">
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <LucideIcons.Heart size="md" className="text-red-500" />
-            </motion.div>
-            <span className="text-base font-bold bg-gradient-to-r from-[#0F2A1D] to-[#375534] bg-clip-text text-transparent">
-              Спасибо всем за поддержку!
-            </span>
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-            >
-              <LucideIcons.Heart size="md" className="text-red-500" />
-            </motion.div>
-          </div>
-          <p className="text-sm text-gray-800 dark:text-gray-200 font-medium">
-            💝 Каждая копейка помогает изменить чью-то жизнь 💝
-          </p>
+            <div className="relative flex items-center justify-center gap-3 mb-3">
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <LucideIcons.Heart size="md" className="text-red-500" />
+              </motion.div>
+              <span className="text-base font-bold bg-gradient-to-r from-[#0F2A1D] to-[#375534] bg-clip-text text-transparent">
+                Спасибо всем за поддержку!
+              </span>
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+              >
+                <LucideIcons.Heart size="md" className="text-red-500" />
+              </motion.div>
+            </div>
+            <p className="text-sm text-gray-800 dark:text-gray-200 font-medium">
+              💝 Каждая копейка помогает изменить чью-то жизнь 💝
+            </p>
           </div>
         </div>
       </motion.div>
     </motion.div>
   );
 }
-
-
-
-
-

@@ -7,7 +7,8 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const s = await getSession();
-  if (!s || s.role !== "ADMIN") return new Response("Forbidden", { status: 403 });
+  if (!s || s.role !== "ADMIN")
+    return new Response("Forbidden", { status: 403 });
 
   const encoder = new TextEncoder();
   let un: (() => void) | null = null;
@@ -20,7 +21,10 @@ export async function GET() {
       write(`event: hello\ndata: "connected"\n\n`);
 
       un = subscribe(write);
-      pingTimer = setInterval(() => write(`event: ping\ndata: "${Date.now()}"\n\n`), 25000);
+      pingTimer = setInterval(
+        () => write(`event: ping\ndata: "${Date.now()}"\n\n`),
+        25000,
+      );
     },
     cancel() {
       if (pingTimer) clearInterval(pingTimer);

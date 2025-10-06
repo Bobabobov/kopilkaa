@@ -21,11 +21,11 @@ export interface BeautifulDialogProps {
   placeholder?: string;
 }
 
-export default function BeautifulDialog({ 
-  show, 
-  onClose, 
-  type, 
-  title, 
+export default function BeautifulDialog({
+  show,
+  onClose,
+  type,
+  title,
   message,
   onConfirm,
   onCancel,
@@ -33,35 +33,35 @@ export default function BeautifulDialog({
   cancelText = "Отмена",
   promptValue = "",
   onPromptChange,
-  placeholder = "Введите значение"
+  placeholder = "Введите значение",
 }: BeautifulDialogProps) {
   const [inputValue, setInputValue] = useState(promptValue);
 
   useEffect(() => {
     if (show) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
-    
+
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [show]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         handleCancel();
       }
     };
 
     if (show) {
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [show]);
 
@@ -82,20 +82,50 @@ export default function BeautifulDialog({
     switch (type) {
       case "alert":
         return (
-          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          <svg
+            className="w-8 h-8 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
           </svg>
         );
       case "confirm":
         return (
-          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            className="w-8 h-8 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
         );
       case "prompt":
         return (
-          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          <svg
+            className="w-8 h-8 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
           </svg>
         );
     }
@@ -126,22 +156,26 @@ export default function BeautifulDialog({
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 400, 
+            transition={{
+              type: "spring",
+              stiffness: 400,
               damping: 25,
-              duration: 0.4 
+              duration: 0.4,
             }}
             className="relative w-full max-w-md"
           >
             {/* Фоновое свечение */}
-            <div className={`absolute inset-0 bg-gradient-to-r ${getGradient()} rounded-2xl blur-sm opacity-20 scale-105`}></div>
-            
+            <div
+              className={`absolute inset-0 bg-gradient-to-r ${getGradient()} rounded-2xl blur-sm opacity-20 scale-105`}
+            ></div>
+
             {/* Основная плашка */}
             <div className="relative bg-white/95 dark:bg-gray-800/95 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 backdrop-blur-sm p-6">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <div className={`w-12 h-12 bg-gradient-to-r ${getGradient()} rounded-full flex items-center justify-center shadow-lg`}>
+                  <div
+                    className={`w-12 h-12 bg-gradient-to-r ${getGradient()} rounded-full flex items-center justify-center shadow-lg`}
+                  >
                     {getIcon()}
                   </div>
                 </div>
@@ -152,7 +186,7 @@ export default function BeautifulDialog({
                   <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                     {message}
                   </p>
-                  
+
                   {/* Поле ввода для prompt */}
                   {type === "prompt" && (
                     <div className="mb-4">
@@ -166,7 +200,7 @@ export default function BeautifulDialog({
                       />
                     </div>
                   )}
-                  
+
                   {/* Кнопки */}
                   <div className="flex gap-3 justify-end">
                     {(type === "confirm" || type === "prompt") && (
@@ -231,7 +265,7 @@ export function useBeautifulDialog() {
   };
 
   const hideDialog = () => {
-    setDialog(prev => ({ ...prev, show: false }));
+    setDialog((prev) => ({ ...prev, show: false }));
   };
 
   const DialogComponent = () => (

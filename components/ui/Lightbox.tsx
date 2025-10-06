@@ -30,7 +30,10 @@ export default function Lightbox({ images, startIndex = 0, onClose }: Props) {
       className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <div className="relative max-w-5xl w-full h-[80vh]" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="relative max-w-5xl w-full h-[80vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Close */}
         <button
           aria-label="Close"

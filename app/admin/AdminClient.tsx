@@ -23,7 +23,7 @@ export default function AdminClient() {
     page,
     pages,
     stats,
-    
+
     // Фильтры
     q,
     setQ,
@@ -37,7 +37,7 @@ export default function AdminClient() {
     setSortBy,
     sortOrder,
     setSortOrder,
-    
+
     // Действия
     load,
     setPage,
@@ -77,7 +77,11 @@ export default function AdminClient() {
   const { showToast } = useBeautifulToast();
 
   // Быстрое обновление статуса
-  const quickUpdate = async (id: string, newStatus: ApplicationStatus, comment: string) => {
+  const quickUpdate = async (
+    id: string,
+    newStatus: ApplicationStatus,
+    comment: string,
+  ) => {
     try {
       const response = await fetch(`/api/admin/applications/${id}`, {
         method: "PATCH",
@@ -107,13 +111,13 @@ export default function AdminClient() {
   const updateStatus = async () => {
     try {
       const response = await fetch(`/api/admin/applications/${modal.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           status: modal.status,
           adminComment: modal.comment,
-      }),
-    });
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -136,9 +140,12 @@ export default function AdminClient() {
   // Удаление заявки
   const deleteApplication = async () => {
     try {
-      const response = await fetch(`/api/admin/applications/${deleteModal.id}`, {
-      method: "DELETE",
-    });
+      const response = await fetch(
+        `/api/admin/applications/${deleteModal.id}`,
+        {
+          method: "DELETE",
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -147,7 +154,7 @@ export default function AdminClient() {
       // showToast("Заявка удалена!", "success" as any);
 
       // Закрываем модалку
-    setDeleteModal({ id: "", title: "" });
+      setDeleteModal({ id: "", title: "" });
 
       // Обновляем данные
       await load(page);
@@ -159,15 +166,27 @@ export default function AdminClient() {
   };
 
   // Обработчики для ApplicationCard
-  const handleEdit = (id: string, status: ApplicationStatus, comment: string) => {
+  const handleEdit = (
+    id: string,
+    status: ApplicationStatus,
+    comment: string,
+  ) => {
     setModal({ id, status, comment });
   };
 
-  const handleQuickApprove = (id: string, status: ApplicationStatus, comment: string) => {
+  const handleQuickApprove = (
+    id: string,
+    status: ApplicationStatus,
+    comment: string,
+  ) => {
     quickUpdate(id, status, comment);
   };
 
-  const handleQuickReject = (id: string, status: ApplicationStatus, comment: string) => {
+  const handleQuickReject = (
+    id: string,
+    status: ApplicationStatus,
+    comment: string,
+  ) => {
     quickUpdate(id, status, comment);
   };
 
@@ -184,15 +203,17 @@ export default function AdminClient() {
         <div className="container mx-auto px-4 pt-24 pb-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-bold mb-2" style={{ color: '#fffffe' }}>
+              <h1
+                className="text-4xl font-bold mb-2"
+                style={{ color: "#fffffe" }}
+              >
                 🔧 Админ Панель
               </h1>
-              <p className="text-lg" style={{ color: '#abd1c6' }}>
+              <p className="text-lg" style={{ color: "#abd1c6" }}>
                 Управление заявками и статистика платформы
               </p>
             </div>
-            
-      </div>
+          </div>
 
           {/* Статистика */}
           {stats && <StatsCards stats={stats} />}
@@ -234,10 +255,10 @@ export default function AdminClient() {
               onQuickReject={handleQuickReject}
               onDelete={handleDelete}
             />
-                        </div>
+          </div>
 
-        {/* Пагинация */}
-        {pages > 1 && (
+          {/* Пагинация */}
+          {pages > 1 && (
             <div className="mt-8">
               <Pagination
                 currentPage={page}
@@ -245,8 +266,7 @@ export default function AdminClient() {
                 onPageChange={setPage}
               />
             </div>
-        )}
-
+          )}
         </div>
       </div>
 
@@ -254,8 +274,10 @@ export default function AdminClient() {
       <StatusModal
         modal={modal}
         onClose={() => setModal({ id: "", status: "PENDING", comment: "" })}
-        onStatusChange={(status) => setModal(prev => ({ ...prev, status }))}
-        onCommentChange={(comment) => setModal(prev => ({ ...prev, comment }))}
+        onStatusChange={(status) => setModal((prev) => ({ ...prev, status }))}
+        onCommentChange={(comment) =>
+          setModal((prev) => ({ ...prev, comment }))
+        }
         onSave={updateStatus}
       />
 
@@ -278,9 +300,9 @@ export default function AdminClient() {
                 <button
                   onClick={() => setDeleteModal({ id: "", title: "" })}
                   className="px-6 py-3 bg-white/90 backdrop-blur-xl hover:bg-gray-50 rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
-                  style={{ 
-                    borderColor: '#abd1c6/30',
-                    color: '#2d5a4e'
+                  style={{
+                    borderColor: "#abd1c6/30",
+                    color: "#2d5a4e",
                   }}
                 >
                   Отмена
@@ -288,7 +310,10 @@ export default function AdminClient() {
                 <button
                   onClick={deleteApplication}
                   className="px-6 py-3 text-white rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
-                  style={{ background: 'linear-gradient(135deg, #e16162 0%, #d63384 100%)' }}
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #e16162 0%, #d63384 100%)",
+                  }}
                 >
                   Удалить
                 </button>
@@ -297,14 +322,18 @@ export default function AdminClient() {
           </div>
         </div>
       )}
-      
+
       {/* Лайтбокс изображений */}
       <ImageLightbox
         isOpen={lightbox.isOpen}
-        onClose={() => setLightbox({ isOpen: false, images: [], currentIndex: 0 })}
+        onClose={() =>
+          setLightbox({ isOpen: false, images: [], currentIndex: 0 })
+        }
         images={lightbox.images}
         currentIndex={lightbox.currentIndex}
-        onIndexChange={(index) => setLightbox(prev => ({ ...prev, currentIndex: index }))}
+        onIndexChange={(index) =>
+          setLightbox((prev) => ({ ...prev, currentIndex: index }))
+        }
       />
     </div>
   );

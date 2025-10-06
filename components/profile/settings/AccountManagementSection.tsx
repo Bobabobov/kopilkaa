@@ -8,9 +8,9 @@ interface AccountManagementSectionProps {
   onDeleteAccount: () => Promise<void>;
 }
 
-export default function AccountManagementSection({ 
-  onExportData, 
-  onDeleteAccount 
+export default function AccountManagementSection({
+  onExportData,
+  onDeleteAccount,
 }: AccountManagementSectionProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -51,14 +51,18 @@ export default function AccountManagementSection({
       className="lg:col-span-1"
     >
       <div className="relative overflow-hidden bg-gradient-to-br from-white/90 via-white/80 to-white/90 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/20 dark:border-gray-700/20">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Управление аккаунтом</h2>
-        
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+          Управление аккаунтом
+        </h2>
+
         <div className="space-y-4">
           {/* Экспорт данных */}
           <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Экспорт данных</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                  Экспорт данных
+                </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Скачайте все ваши данные в формате JSON
                 </p>
@@ -77,7 +81,9 @@ export default function AccountManagementSection({
           <div className="border border-red-200 dark:border-red-700 rounded-xl p-4 bg-red-50 dark:bg-red-900/20">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-red-900 dark:text-red-300 mb-1">Удаление аккаунта</h3>
+                <h3 className="font-semibold text-red-900 dark:text-red-300 mb-1">
+                  Удаление аккаунта
+                </h3>
                 <p className="text-sm text-red-600 dark:text-red-400">
                   Это действие необратимо. Все данные будут удалены навсегда.
                 </p>

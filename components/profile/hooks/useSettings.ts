@@ -4,11 +4,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 
-type User = { 
-  id: string; 
-  email: string; 
-  role: "USER" | "ADMIN"; 
-  name?: string | null; 
+type User = {
+  id: string;
+  email: string;
+  role: "USER" | "ADMIN";
+  name?: string | null;
   createdAt: string;
   avatar?: string | null;
   avatarFrame?: string | null;
@@ -21,7 +21,7 @@ interface UseSettingsReturn {
   user: User | null;
   loading: boolean;
   saving: boolean;
-  
+
   // Пароль
   isChangingPassword: boolean;
   setIsChangingPassword: (changing: boolean) => void;
@@ -33,15 +33,15 @@ interface UseSettingsReturn {
   setPasswordData: (data: any) => void;
   passwordError: string;
   setPasswordError: (error: string) => void;
-  
+
   // Локальные уведомления
   localNotification: {
     show: boolean;
-    type: 'success' | 'error' | 'info';
+    type: "success" | "error" | "info";
     title: string;
     message: string;
   };
-  
+
   // Действия
   loadUser: () => Promise<void>;
   handleNameChange: (newName: string) => Promise<void>;
@@ -49,12 +49,19 @@ interface UseSettingsReturn {
   handleEmailVisibilityChange: (hideEmail: boolean) => Promise<void>;
   handleAvatarChange: (avatarUrl: string | null) => void;
   handleFrameChange: (frame: string) => void;
-  handlePasswordChange: (oldPassword: string, newPassword: string) => Promise<boolean>;
+  handlePasswordChange: (
+    oldPassword: string,
+    newPassword: string,
+  ) => Promise<boolean>;
   handlePasswordSubmit: () => Promise<void>;
   cancelPasswordChange: () => void;
   handleExportData: () => Promise<void>;
   handleDeleteAccount: () => Promise<void>;
-  showLocalNotification: (type: 'success' | 'error' | 'info', title: string, message: string) => void;
+  showLocalNotification: (
+    type: "success" | "error" | "info",
+    title: string,
+    message: string,
+  ) => void;
 }
 
 export function useSettings(): UseSettingsReturn {
@@ -65,39 +72,42 @@ export function useSettings(): UseSettingsReturn {
   const [passwordData, setPasswordData] = useState({
     oldPassword: "",
     newPassword: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const [passwordError, setPasswordError] = useState("");
-  
+
   // Локальные уведомления
   const [localNotification, setLocalNotification] = useState<{
     show: boolean;
-    type: 'success' | 'error' | 'info';
+    type: "success" | "error" | "info";
     title: string;
     message: string;
   }>({
     show: false,
-    type: 'info',
-    title: '',
-    message: ''
+    type: "info",
+    title: "",
+    message: "",
   });
-  
+
   const { showToast } = useBeautifulToast();
 
   // Показ локальных уведомлений
-  const showLocalNotification = useCallback((type: 'success' | 'error' | 'info', title: string, message: string) => {
-    setLocalNotification({ show: true, type, title, message });
-    setTimeout(() => {
-      setLocalNotification(prev => ({ ...prev, show: false }));
-    }, 4000);
-  }, []);
+  const showLocalNotification = useCallback(
+    (type: "success" | "error" | "info", title: string, message: string) => {
+      setLocalNotification({ show: true, type, title, message });
+      setTimeout(() => {
+        setLocalNotification((prev) => ({ ...prev, show: false }));
+      }, 4000);
+    },
+    [],
+  );
 
   // Загрузка пользователя
   const loadUser = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch("/api/profile/me", { cache: "no-store" });
-      
+
       if (response.ok) {
         const data = await response.json();
         setUser(data.user); // Исправлено: data.user вместо data
@@ -112,105 +122,151 @@ export function useSettings(): UseSettingsReturn {
   }, []);
 
   // Изменение имени
-  const handleNameChange = useCallback(async (newName: string) => {
-    try {
-      setSaving(true);
-      const response = await fetch("/api/profile/me", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: newName }),
-      });
+  const handleNameChange = useCallback(
+    async (newName: string) => {
+      try {
+        setSaving(true);
+        const response = await fetch("/api/profile/me", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name: newName }),
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user); // Исправлено: data.user вместо data
-        showLocalNotification('success', 'Успешно!', 'Имя обновлено');
-      } else {
-        const errorData = await response.json();
-        showLocalNotification('error', 'Ошибка', errorData.message || 'Не удалось обновить имя');
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user); // Исправлено: data.user вместо data
+          showLocalNotification("success", "Успешно!", "Имя обновлено");
+        } else {
+          const errorData = await response.json();
+          showLocalNotification(
+            "error",
+            "Ошибка",
+            errorData.message || "Не удалось обновить имя",
+          );
+        }
+      } catch (error) {
+        console.error("Error updating name:", error);
+        showLocalNotification(
+          "error",
+          "Ошибка",
+          "Произошла ошибка при обновлении имени",
+        );
+      } finally {
+        setSaving(false);
       }
-    } catch (error) {
-      console.error("Error updating name:", error);
-      showLocalNotification('error', 'Ошибка', 'Произошла ошибка при обновлении имени');
-    } finally {
-      setSaving(false);
-    }
-  }, [showLocalNotification]);
+    },
+    [showLocalNotification],
+  );
 
   // Изменение email
-  const handleEmailChange = useCallback(async (newEmail: string) => {
-    try {
-      setSaving(true);
-      const response = await fetch("/api/profile/me", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: newEmail }),
-      });
+  const handleEmailChange = useCallback(
+    async (newEmail: string) => {
+      try {
+        setSaving(true);
+        const response = await fetch("/api/profile/me", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: newEmail }),
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user); // Исправлено: data.user вместо data
-        showLocalNotification('success', 'Успешно!', 'Email обновлен');
-      } else {
-        const errorData = await response.json();
-        showLocalNotification('error', 'Ошибка', errorData.message || 'Не удалось обновить email');
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user); // Исправлено: data.user вместо data
+          showLocalNotification("success", "Успешно!", "Email обновлен");
+        } else {
+          const errorData = await response.json();
+          showLocalNotification(
+            "error",
+            "Ошибка",
+            errorData.message || "Не удалось обновить email",
+          );
+        }
+      } catch (error) {
+        console.error("Error updating email:", error);
+        showLocalNotification(
+          "error",
+          "Ошибка",
+          "Произошла ошибка при обновлении email",
+        );
+      } finally {
+        setSaving(false);
       }
-    } catch (error) {
-      console.error("Error updating email:", error);
-      showLocalNotification('error', 'Ошибка', 'Произошла ошибка при обновлении email');
-    } finally {
-      setSaving(false);
-    }
-  }, [showLocalNotification]);
+    },
+    [showLocalNotification],
+  );
 
   // Изменение видимости email
-  const handleEmailVisibilityChange = useCallback(async (hideEmail: boolean) => {
-    try {
-      setSaving(true);
-      const response = await fetch("/api/profile/me", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ hideEmail }),
-      });
+  const handleEmailVisibilityChange = useCallback(
+    async (hideEmail: boolean) => {
+      try {
+        setSaving(true);
+        const response = await fetch("/api/profile/me", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ hideEmail }),
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user); // Исправлено: data.user вместо data
-        showLocalNotification('success', 'Успешно!', `Email ${hideEmail ? 'скрыт' : 'показывается'}`);
-      } else {
-        const errorData = await response.json();
-        showLocalNotification('error', 'Ошибка', errorData.message || 'Не удалось изменить видимость email');
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user); // Исправлено: data.user вместо data
+          showLocalNotification(
+            "success",
+            "Успешно!",
+            `Email ${hideEmail ? "скрыт" : "показывается"}`,
+          );
+        } else {
+          const errorData = await response.json();
+          showLocalNotification(
+            "error",
+            "Ошибка",
+            errorData.message || "Не удалось изменить видимость email",
+          );
+        }
+      } catch (error) {
+        console.error("Error updating email visibility:", error);
+        showLocalNotification(
+          "error",
+          "Ошибка",
+          "Произошла ошибка при изменении видимости email",
+        );
+      } finally {
+        setSaving(false);
       }
-    } catch (error) {
-      console.error("Error updating email visibility:", error);
-      showLocalNotification('error', 'Ошибка', 'Произошла ошибка при изменении видимости email');
-    } finally {
-      setSaving(false);
-    }
-  }, [showLocalNotification]);
+    },
+    [showLocalNotification],
+  );
 
   // Изменение аватарки
-  const handleAvatarChange = useCallback((avatarUrl: string | null) => {
-    if (user) {
-      setUser({ ...user, avatar: avatarUrl });
-    }
-  }, [user]);
+  const handleAvatarChange = useCallback(
+    (avatarUrl: string | null) => {
+      if (user) {
+        setUser({ ...user, avatar: avatarUrl });
+      }
+    },
+    [user],
+  );
 
   // Изменение рамки аватарки
-  const handleFrameChange = useCallback((frame: string) => {
-    if (user) {
-      setUser({ ...user, avatarFrame: frame });
-    }
-  }, [user]);
+  const handleFrameChange = useCallback(
+    (frame: string) => {
+      if (user) {
+        setUser({ ...user, avatarFrame: frame });
+      }
+    },
+    [user],
+  );
 
   // Изменение пароля
-  const handlePasswordChange = async (oldPassword: string, newPassword: string): Promise<boolean> => {
+  const handlePasswordChange = async (
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<boolean> => {
     try {
       const response = await fetch("/api/profile/password", {
         method: "PATCH",
@@ -222,7 +278,7 @@ export function useSettings(): UseSettingsReturn {
 
       if (response.ok) {
         const data = await response.json();
-        showLocalNotification('success', 'Успешно!', 'Пароль изменен');
+        showLocalNotification("success", "Успешно!", "Пароль изменен");
         return true;
       } else {
         const errorData = await response.json();
@@ -239,29 +295,36 @@ export function useSettings(): UseSettingsReturn {
   // Отправка формы пароля
   const handlePasswordSubmit = async () => {
     setPasswordError("");
-    
-    if (!passwordData.oldPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+
+    if (
+      !passwordData.oldPassword ||
+      !passwordData.newPassword ||
+      !passwordData.confirmPassword
+    ) {
       setPasswordError("Все поля обязательны для заполнения");
       return;
     }
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setPasswordError("Пароли не совпадают");
       return;
     }
-    
+
     if (passwordData.newPassword.length < 6) {
       setPasswordError("Пароль должен содержать минимум 6 символов");
       return;
     }
-    
-    const success = await handlePasswordChange(passwordData.oldPassword, passwordData.newPassword);
-    
+
+    const success = await handlePasswordChange(
+      passwordData.oldPassword,
+      passwordData.newPassword,
+    );
+
     if (success) {
       setPasswordData({
         oldPassword: "",
         newPassword: "",
-        confirmPassword: ""
+        confirmPassword: "",
       });
       setIsChangingPassword(false);
     }
@@ -272,7 +335,7 @@ export function useSettings(): UseSettingsReturn {
     setPasswordData({
       oldPassword: "",
       newPassword: "",
-      confirmPassword: ""
+      confirmPassword: "",
     });
     setPasswordError("");
     setIsChangingPassword(false);
@@ -285,21 +348,29 @@ export function useSettings(): UseSettingsReturn {
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
+        const a = document.createElement("a");
+        a.style.display = "none";
         a.href = url;
-        a.download = `profile-data-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `profile-data-${new Date().toISOString().split("T")[0]}.json`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        showLocalNotification('success', 'Успешно!', 'Данные экспортированы');
+        showLocalNotification("success", "Успешно!", "Данные экспортированы");
       } else {
-        showLocalNotification('error', 'Ошибка', 'Не удалось экспортировать данные');
+        showLocalNotification(
+          "error",
+          "Ошибка",
+          "Не удалось экспортировать данные",
+        );
       }
     } catch (error) {
       console.error("Error exporting data:", error);
-      showLocalNotification('error', 'Ошибка', 'Произошла ошибка при экспорте данных');
+      showLocalNotification(
+        "error",
+        "Ошибка",
+        "Произошла ошибка при экспорте данных",
+      );
     }
   };
 
@@ -309,17 +380,29 @@ export function useSettings(): UseSettingsReturn {
       const response = await fetch("/api/profile/delete", {
         method: "DELETE",
       });
-      
+
       if (response.ok) {
-        showLocalNotification('success', 'Аккаунт удален', 'Ваш аккаунт был успешно удален');
+        showLocalNotification(
+          "success",
+          "Аккаунт удален",
+          "Ваш аккаунт был успешно удален",
+        );
         // Перенаправление будет обработано в компоненте
       } else {
         const errorData = await response.json();
-        showLocalNotification('error', 'Ошибка', errorData.message || 'Не удалось удалить аккаунт');
+        showLocalNotification(
+          "error",
+          "Ошибка",
+          errorData.message || "Не удалось удалить аккаунт",
+        );
       }
     } catch (error) {
       console.error("Error deleting account:", error);
-      showLocalNotification('error', 'Ошибка', 'Произошла ошибка при удалении аккаунта');
+      showLocalNotification(
+        "error",
+        "Ошибка",
+        "Произошла ошибка при удалении аккаунта",
+      );
     }
   };
 
@@ -333,7 +416,7 @@ export function useSettings(): UseSettingsReturn {
     user,
     loading,
     saving,
-    
+
     // Пароль
     isChangingPassword,
     setIsChangingPassword,
@@ -341,10 +424,10 @@ export function useSettings(): UseSettingsReturn {
     setPasswordData,
     passwordError,
     setPasswordError,
-    
+
     // Локальные уведомления
     localNotification,
-    
+
     // Действия
     loadUser,
     handleNameChange,

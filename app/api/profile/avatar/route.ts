@@ -31,13 +31,19 @@ export async function POST(req: NextRequest) {
     const maxSize = session.role === "ADMIN" ? ADMIN_MAX_SIZE : MAX_SIZE;
     if (file.size > maxSize) {
       const maxSizeMB = Math.round(maxSize / (1024 * 1024));
-      return NextResponse.json({ error: `Файл больше ${maxSizeMB} МБ` }, { status: 400 });
+      return NextResponse.json(
+        { error: `Файл больше ${maxSizeMB} МБ` },
+        { status: 400 },
+      );
     }
 
     // Проверяем тип файла
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ error: "Неподдерживаемый тип файла" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Неподдерживаемый тип файла" },
+        { status: 400 },
+      );
     }
 
     await mkdir(UPLOAD_DIR, { recursive: true });
@@ -47,7 +53,7 @@ export async function POST(req: NextRequest) {
     const id = randomUUID().replace(/-/g, "");
     const filename = `avatar_${session.uid}_${id}${ext}`;
     const filepath = join(UPLOAD_DIR, filename);
-    
+
     await writeFile(filepath, buf);
 
     const avatarUrl = `/api/uploads/${filename}`;
@@ -55,21 +61,23 @@ export async function POST(req: NextRequest) {
     // Обновляем аватарку в базе данных
     await prisma.user.update({
       where: { id: session.uid },
-      data: { avatar: avatarUrl }
+      data: { avatar: avatarUrl },
     });
 
-    return NextResponse.json({ 
-      ok: true, 
+    return NextResponse.json({
+      ok: true,
       avatar: avatarUrl,
-      message: "Аватарка успешно загружена"
+      message: "Аватарка успешно загружена",
     });
-
   } catch (error) {
     console.error("Error uploading avatar:", error);
-    return NextResponse.json({ 
-      error: "Ошибка загрузки аватарки", 
-      details: error instanceof Error ? error.message : "Unknown error"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Ошибка загрузки аватарки",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -84,16 +92,18 @@ export async function DELETE() {
     // Удаляем аватарку из базы данных
     await prisma.user.update({
       where: { id: session.uid },
-      data: { avatar: null }
+      data: { avatar: null },
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       ok: true,
-      message: "Аватарка удалена"
+      message: "Аватарка удалена",
     });
-
   } catch (error) {
     console.error("Error deleting avatar:", error);
-    return NextResponse.json({ error: "Ошибка удаления аватарки" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Ошибка удаления аватарки" },
+      { status: 500 },
+    );
   }
 }

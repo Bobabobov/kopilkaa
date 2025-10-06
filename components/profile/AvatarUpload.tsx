@@ -14,12 +14,12 @@ interface AvatarUploadProps {
   onFrameChange?: (frame: string) => void;
 }
 
-export default function AvatarUpload({ 
-  currentAvatar, 
-  userName, 
+export default function AvatarUpload({
+  currentAvatar,
+  userName,
   avatarFrame,
-  onAvatarChange, 
-  onFrameChange
+  onAvatarChange,
+  onFrameChange,
 }: AvatarUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
@@ -33,7 +33,11 @@ export default function AvatarUpload({
     // Проверяем тип файла
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      showToast("error", "Неподдерживаемый формат", "Выберите JPG, PNG, GIF или WebP файл");
+      showToast(
+        "error",
+        "Неподдерживаемый формат",
+        "Выберите JPG, PNG, GIF или WebP файл",
+      );
       return;
     }
 
@@ -56,12 +60,12 @@ export default function AvatarUpload({
 
   const uploadAvatar = async (file: File) => {
     setUploading(true);
-    
+
     try {
       console.log("Uploading avatar:", {
         name: file.name,
         size: file.size,
-        type: file.type
+        type: file.type,
       });
 
       const formData = new FormData();
@@ -80,10 +84,18 @@ export default function AvatarUpload({
       if (response.ok) {
         onAvatarChange(data.avatar);
         setPreview(null);
-        showToast("success", "Аватарка загружена!", "Ваша аватарка успешно обновлена");
+        showToast(
+          "success",
+          "Аватарка загружена!",
+          "Ваша аватарка успешно обновлена",
+        );
       } else {
         console.error("Upload failed:", data);
-        showToast("error", "Ошибка загрузки", data.error || "Не удалось загрузить аватарку");
+        showToast(
+          "error",
+          "Ошибка загрузки",
+          data.error || "Не удалось загрузить аватарку",
+        );
       }
     } catch (error) {
       console.error("Error uploading avatar:", error);
@@ -95,7 +107,7 @@ export default function AvatarUpload({
 
   const removeAvatar = async () => {
     setUploading(true);
-    
+
     try {
       const response = await fetch("/api/profile/avatar", {
         method: "DELETE",
@@ -108,7 +120,11 @@ export default function AvatarUpload({
         setPreview(null);
         showToast("success", "Аватарка удалена", "Аватарка успешно удалена");
       } else {
-        showToast("error", "Ошибка удаления", data.error || "Не удалось удалить аватарку");
+        showToast(
+          "error",
+          "Ошибка удаления",
+          data.error || "Не удалось удалить аватарку",
+        );
       }
     } catch (error) {
       console.error("Error deleting avatar:", error);
@@ -119,23 +135,24 @@ export default function AvatarUpload({
   };
 
   const displayAvatar = preview || currentAvatar;
-  const avatarLetter = (userName && userName[0]) ? userName[0].toUpperCase() : "?";
-  const frame = getAvatarFrame(avatarFrame || 'none');
-  const frameKey = avatarFrame || 'none';
+  const avatarLetter =
+    userName && userName[0] ? userName[0].toUpperCase() : "?";
+  const frame = getAvatarFrame(avatarFrame || "none");
+  const frameKey = avatarFrame || "none";
 
   return (
     <>
       <div className="relative inline-block group">
         {/* Аватарка */}
         <div className="relative">
-          {frame.type === 'image' ? (
+          {frame.type === "image" ? (
             // Рамка-картинка
             <div className="w-24 h-24 rounded-lg mx-auto mb-4 overflow-hidden relative">
               {/* Рамка как фон */}
-              <div 
+              <div
                 className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat rounded-lg"
-                style={{ 
-                  backgroundImage: `url(${(frame as any).imageUrl || '/default-avatar.png'})` 
+                style={{
+                  backgroundImage: `url(${(frame as any).imageUrl || "/default-avatar.png"})`,
                 }}
               />
               {/* Аватар поверх рамки */}
@@ -146,7 +163,7 @@ export default function AvatarUpload({
                     alt="Аватарка"
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.style.display = "none";
                     }}
                   />
                 ) : (
@@ -158,26 +175,32 @@ export default function AvatarUpload({
             </div>
           ) : (
             // CSS рамка
-            <div className={`w-24 h-24 rounded-lg flex items-center justify-center text-white font-bold text-2xl shadow-2xl mx-auto mb-4 overflow-hidden ${frame.className} ${
-              displayAvatar ? 'bg-gray-100 dark:bg-gray-700' : 'bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600'
-            }`}>
+            <div
+              className={`w-24 h-24 rounded-lg flex items-center justify-center text-white font-bold text-2xl shadow-2xl mx-auto mb-4 overflow-hidden ${frame.className} ${
+                displayAvatar
+                  ? "bg-gray-100 dark:bg-gray-700"
+                  : "bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600"
+              }`}
+            >
               {displayAvatar ? (
                 <img
                   src={displayAvatar}
                   alt="Аватарка"
-                  className={`w-full h-full object-cover rounded-lg ${frameKey === 'rainbow' ? 'rounded-lg' : ''}`}
+                  className={`w-full h-full object-cover rounded-lg ${frameKey === "rainbow" ? "rounded-lg" : ""}`}
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.style.display = "none";
                   }}
                 />
               ) : (
-                <div className={`w-full h-full flex items-center justify-center rounded-lg ${frameKey === 'rainbow' ? 'rounded-lg' : ''}`}>
+                <div
+                  className={`w-full h-full flex items-center justify-center rounded-lg ${frameKey === "rainbow" ? "rounded-lg" : ""}`}
+                >
                   <span className="relative z-10">{avatarLetter}</span>
                 </div>
               )}
             </div>
           )}
-          
+
           {/* Индикатор загрузки */}
           {uploading && (
             <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
@@ -203,19 +226,19 @@ export default function AvatarUpload({
           >
             {uploading ? "Загрузка..." : "Изменить"}
           </motion.button>
-          
+
           {onFrameChange && (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => onFrameChange('')}
+              onClick={() => onFrameChange("")}
               disabled={uploading}
               className="px-3 py-1 bg-purple-500 hover:bg-purple-600 disabled:bg-gray-400 text-white text-xs rounded-lg transition-colors"
             >
               Рамка
             </motion.button>
           )}
-          
+
           {currentAvatar && (
             <motion.button
               whileHover={{ scale: 1.05 }}

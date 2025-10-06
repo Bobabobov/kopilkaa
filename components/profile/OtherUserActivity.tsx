@@ -39,17 +39,23 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case "application_created": return "📝";
-      case "profile_updated": return "👤";
-      default: return "📌";
+      case "application_created":
+        return "📝";
+      case "profile_updated":
+        return "👤";
+      default:
+        return "📌";
     }
   };
 
   const getActivityColor = (type: string) => {
     switch (type) {
-      case "application_created": return "text-emerald-600 dark:text-emerald-400";
-      case "profile_updated": return "text-green-600 dark:text-green-400";
-      default: return "text-gray-600 dark:text-gray-400";
+      case "application_created":
+        return "text-emerald-600 dark:text-emerald-400";
+      case "profile_updated":
+        return "text-green-600 dark:text-green-400";
+      default:
+        return "text-gray-600 dark:text-gray-400";
     }
   };
 
@@ -66,7 +72,9 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
             <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-lg">
               ⚡
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Активность</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Активность
+            </h3>
           </div>
           <div className="text-center py-4">
             <div className="animate-spin w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full mx-auto"></div>
@@ -93,7 +101,9 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
           <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-lg">
             ⚡
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Активность</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Активность
+          </h3>
         </div>
 
         {activities.length === 0 ? (
@@ -101,7 +111,9 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
             <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">⚡</span>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">Пока нет активности</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              Пока нет активности
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -117,11 +129,13 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
                   {getActivityIcon(activity.type)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className={`text-sm font-semibold ${getActivityColor(activity.type)} mb-1`}>
+                  <div
+                    className={`text-sm font-semibold ${getActivityColor(activity.type)} mb-1`}
+                  >
                     {activity.description}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-500">
-                    {new Date(activity.createdAt).toLocaleString('ru-RU')}
+                    {new Date(activity.createdAt).toLocaleString("ru-RU")}
                   </div>
                 </div>
               </motion.div>
@@ -132,8 +146,3 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
     </motion.div>
   );
 }
-
-
-
-
-

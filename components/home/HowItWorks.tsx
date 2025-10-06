@@ -30,19 +30,27 @@ export default function HowItWorks() {
           <div className="space-y-3 text-left">
             <div className="flex items-center gap-2">
               <LucideIcons.Document size="sm" className="text-[#6B9071]" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">Заполните форму заявки</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Заполните форму заявки
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <LucideIcons.Help size="sm" className="text-[#6B9071]" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">Опишите вашу ситуацию</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Опишите вашу ситуацию
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <LucideIcons.Money size="sm" className="text-[#6B9071]" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">Укажите нужную сумму</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Укажите нужную сумму
+              </span>
             </div>
           </div>
           <div className="mt-4 p-3 rounded-lg bg-[#E3EED4] dark:bg-[#0F2A1D] border border-[#AEC3B0] dark:border-[#6B9071]">
-            <span className="text-sm font-medium text-gray-900 dark:text-white">Время: 5-10 минут</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white">
+              Время: 5-10 минут
+            </span>
           </div>
         </div>
 
@@ -61,19 +69,27 @@ export default function HowItWorks() {
           <div className="space-y-3 text-left">
             <div className="flex items-center gap-2">
               <LucideIcons.Document size="sm" className="text-[#6B9071]" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">Проверка документов</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Проверка документов
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <LucideIcons.Stats size="sm" className="text-[#6B9071]" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">Оценка ситуации</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Оценка ситуации
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <LucideIcons.Star size="sm" className="text-[#6B9071]" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">Принятие решения</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Принятие решения
+              </span>
             </div>
           </div>
           <div className="mt-4 p-3 rounded-lg bg-[#E3EED4] dark:bg-[#0F2A1D] border border-[#AEC3B0] dark:border-[#6B9071]">
-            <span className="text-sm font-medium text-gray-900 dark:text-white">Время: 3-5 дней</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white">
+              Время: 3-5 дней
+            </span>
           </div>
         </div>
 
@@ -92,27 +108,30 @@ export default function HowItWorks() {
           <div className="space-y-3 text-left">
             <div className="flex items-center gap-2">
               <LucideIcons.Money size="sm" className="text-[#AEC3B0]" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">Перевод средств</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Перевод средств
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <LucideIcons.Help size="sm" className="text-[#AEC3B0]" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">Уведомление о решении</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Уведомление о решении
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <LucideIcons.Friends size="sm" className="text-[#AEC3B0]" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">Поддержка проекта</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Поддержка проекта
+              </span>
             </div>
           </div>
           <div className="mt-4 p-3 rounded-lg bg-[#E3EED4] dark:bg-[#0F2A1D] border border-[#AEC3B0] dark:border-[#6B9071]">
-            <span className="text-sm font-medium text-gray-900 dark:text-white">Мгновенно</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white">
+              Мгновенно
+            </span>
           </div>
         </div>
       </div>
     </motion.div>
   );
 }
-
-
-
-
-

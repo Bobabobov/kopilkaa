@@ -15,7 +15,7 @@ export default function StatusModal({
   onClose,
   onStatusChange,
   onCommentChange,
-  onSave
+  onSave,
 }: StatusModalProps) {
   if (!modal.id) return null;
 
@@ -34,11 +34,23 @@ export default function StatusModal({
       >
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Сменить статус заявки</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Сменить статус заявки
+          </h2>
         </div>
 
         <div className="space-y-6">
@@ -49,7 +61,9 @@ export default function StatusModal({
             <select
               className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white"
               value={modal.status}
-              onChange={(e) => onStatusChange(e.target.value as ApplicationStatus)}
+              onChange={(e) =>
+                onStatusChange(e.target.value as ApplicationStatus)
+              }
             >
               <option value="PENDING">⏳ В обработке</option>
               <option value="APPROVED">✅ Одобрено</option>
@@ -88,32 +102,3 @@ export default function StatusModal({
     </motion.div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

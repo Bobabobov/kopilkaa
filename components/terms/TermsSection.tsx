@@ -8,21 +8,38 @@ interface TermsSectionProps {
   delay?: number;
 }
 
-export default function TermsSection({ number, title, children, delay = 0 }: TermsSectionProps) {
+export default function TermsSection({
+  number,
+  title,
+  children,
+  delay = 0,
+}: TermsSectionProps) {
   const getAnimationClass = () => {
     switch (delay) {
-      case 0.3: return "animate-fade-in-up-delay-3";
-      case 0.4: return "animate-fade-in-up-delay-4";
-      case 0.5: return "animate-fade-in-up-delay-5";
-      case 0.6: return "animate-fade-in-up-delay-1";
-      case 0.7: return "animate-fade-in-up-delay-2";
-      case 0.8: return "animate-fade-in-up-delay-3";
-      case 0.9: return "animate-fade-in-up-delay-4";
-      case 1.0: return "animate-fade-in-up-delay-5";
-      case 1.1: return "animate-fade-in-up-delay-1";
-      case 1.2: return "animate-fade-in-up-delay-2";
-      case 1.3: return "animate-fade-in-up-delay-3";
-      default: return "animate-fade-in-up";
+      case 0.3:
+        return "animate-fade-in-up-delay-3";
+      case 0.4:
+        return "animate-fade-in-up-delay-4";
+      case 0.5:
+        return "animate-fade-in-up-delay-5";
+      case 0.6:
+        return "animate-fade-in-up-delay-1";
+      case 0.7:
+        return "animate-fade-in-up-delay-2";
+      case 0.8:
+        return "animate-fade-in-up-delay-3";
+      case 0.9:
+        return "animate-fade-in-up-delay-4";
+      case 1.0:
+        return "animate-fade-in-up-delay-5";
+      case 1.1:
+        return "animate-fade-in-up-delay-1";
+      case 1.2:
+        return "animate-fade-in-up-delay-2";
+      case 1.3:
+        return "animate-fade-in-up-delay-3";
+      default:
+        return "animate-fade-in-up";
     }
   };
 

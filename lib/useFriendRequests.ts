@@ -31,7 +31,7 @@ export function useFriendRequests() {
         if (isMounted) {
           setLoading(true);
         }
-        
+
         const response = await fetch("/api/profile/friends?type=received");
         if (isMounted) {
           if (response.ok) {
@@ -52,14 +52,14 @@ export function useFriendRequests() {
     };
 
     checkAuthAndLoad();
-    
+
     // Обновляем каждые 30 секунд только если авторизован
     intervalRef.current = setInterval(() => {
       if (isAuthenticated) {
         checkAuthAndLoad();
       }
     }, 30000);
-    
+
     return () => {
       isMounted = false;
       if (intervalRef.current) {
@@ -70,7 +70,3 @@ export function useFriendRequests() {
 
   return { pendingCount, loading };
 }
-
-
-
-

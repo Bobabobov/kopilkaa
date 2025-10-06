@@ -52,3 +52,7 @@ async function deleteTestUsers() {
 
 // Запускаем скрипт
 deleteTestUsers();
+
+
+
+

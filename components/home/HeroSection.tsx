@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { useBulldog } from "@/lib/useBulldog";
 
 type Stats = {
   collected: number;
@@ -15,6 +17,8 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ stats, loading }: HeroSectionProps) {
+  const { state, handleClick, message } = useBulldog();
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
       <div className="text-center max-w-4xl mx-auto">
@@ -26,10 +30,9 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
         </h1>
         
         {/* Описание */}
-        <p className="text-xl md:text-2xl mb-12 leading-relaxed" style={{ color: '#abd1c6' }}>
+        <p className="text-xl md:text-2xl mb-8 leading-relaxed" style={{ color: '#abd1c6' }}>
           Безопасная платформа для сбора помощи. Создавайте заявки, делитесь историями и находите поддержку сообщества.
         </p>
-        
         {/* Кнопки */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Link 

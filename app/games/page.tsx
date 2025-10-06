@@ -76,13 +76,13 @@ export default function GamesPage() {
           <div className="max-w-4xl mx-auto mb-12">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <GamePreview
-                title="Stack Game"
-                description="Классическая игра на точность и реакцию. Постройте как можно более высокую башню из блоков, кликая в нужный момент!"
-                icon="🎯"
-                href="/games/stack"
+                title="Tower Blocks"
+                description="3D игра на точность и реакцию! Стройте башню из движущихся блоков, кликая в нужный момент. Чем точнее - тем выше!"
+                icon="🏗️"
+                href="/tower-blocks"
                 difficulty="Средне"
                 category="Аркада"
-                isAvailable={false}
+                isAvailable={true}
               />
               
               <GamePreview
@@ -96,11 +96,11 @@ export default function GamesPage() {
               />
               
               <GamePreview
-                title="Snake Game"
-                description="Классическая змейка с современной графикой. Собирайте еду, избегайте столкновений и становитесь длиннее!"
-                icon="🐍"
-                href="/games/snake"
-                difficulty="Легко"
+                title="Stack Game"
+                description="Классическая игра на точность и реакцию. Постройте как можно более высокую башню из блоков, кликая в нужный момент!"
+                icon="📚"
+                href="/games/stack"
+                difficulty="Средне"
                 category="Аркада"
                 isAvailable={false}
               />
@@ -171,18 +171,6 @@ export default function GamesPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -47,7 +47,6 @@ export default function ProfilePage() {
     setIsSettingsModalOpen(false);
   }, []);
 
-
   useEffect(() => {
     fetch("/api/profile/me", { cache: "no-store" })
       .then(async (r) => {

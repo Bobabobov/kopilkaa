@@ -190,7 +190,3 @@ export default function RegisterForm({ onSubmit, busy, errors }: RegisterFormPro
     </div>
   );
 }
-
-
-
-

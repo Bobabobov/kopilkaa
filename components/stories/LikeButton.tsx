@@ -22,7 +22,6 @@ export default function LikeButton({
     e.preventDefault();
     e.stopPropagation();
 
-    console.log("❤️ LikeButton clicked!", { liked, likesCount });
     setIsAnimating(true);
     onLike();
 

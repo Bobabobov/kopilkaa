@@ -158,13 +158,11 @@ export function useFriends(): UseFriendsReturn {
         ? `/api/users/search?q=${encodeURIComponent(query)}&limit=50`
         : "/api/users/search?limit=50";
 
-      console.log("Searching users with URL:", url);
 
       const response = await fetch(url);
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Search results:", data.users?.length || 0, "users found");
         setSearchResults(data.users || []);
       } else {
         const errorData = await response.json();
@@ -198,7 +196,6 @@ export function useFriends(): UseFriendsReturn {
     try {
       setSendingRequests((prev) => new Set(prev).add(userId));
 
-      console.log("Sending friend request to userId:", userId);
 
       const response = await fetch("/api/profile/friends", {
         method: "POST",
@@ -208,17 +205,12 @@ export function useFriends(): UseFriendsReturn {
         body: JSON.stringify({ receiverId: userId }),
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Success response:", data);
         showToast("success", "Заявка отправлена");
-        console.log("Reloading friends and search results...");
         await loadFriends(); // Перезагружаем данные
         await searchUsers(searchQuery); // Обновляем результаты поиска
-        console.log("Friends and search results reloaded");
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);

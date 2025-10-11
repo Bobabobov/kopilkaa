@@ -55,6 +55,8 @@ import {
   Send,
   BookOpen,
   ZoomIn,
+  Edit3,
+  Coins,
 } from "lucide-react";
 
 interface IconProps {
@@ -144,6 +146,10 @@ export const LucideIcons = {
     <X className={`${sizeClasses[size]} ${className}`} />
   ),
 
+  X: ({ className = "", size = "md" }: IconProps) => (
+    <X className={`${sizeClasses[size]} ${className}`} />
+  ),
+
   // Дополнительные иконки
   Check: ({ className = "", size = "md" }: IconProps) => (
     <Check className={`${sizeClasses[size]} ${className}`} />
@@ -223,7 +229,19 @@ export const LucideIcons = {
     <Edit className={`${sizeClasses[size]} ${className}`} />
   ),
 
+  Edit3: ({ className = "", size = "md" }: IconProps) => (
+    <Edit3 className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Coin: ({ className = "", size = "md" }: IconProps) => (
+    <Coins className={`${sizeClasses[size]} ${className}`} />
+  ),
+
   Trash: ({ className = "", size = "md" }: IconProps) => (
+    <Trash2 className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Trash2: ({ className = "", size = "md" }: IconProps) => (
     <Trash2 className={`${sizeClasses[size]} ${className}`} />
   ),
 

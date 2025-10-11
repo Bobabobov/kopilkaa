@@ -1,16 +1,42 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
+
+  // Проверяем авторизацию при загрузке
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/profile/me", { cache: "no-store" });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.user) {
+            // Пользователь уже авторизован, перенаправляем в профиль
+            router.push("/profile");
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Error checking auth:", error);
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   // Функция валидации
   const validateForm = () => {
@@ -67,6 +93,18 @@ export default function LoginPage() {
     } finally {
       setBusy(false);
     }
+  }
+
+  // Показываем загрузку пока проверяем авторизацию
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Проверка авторизации...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

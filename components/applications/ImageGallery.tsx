@@ -12,8 +12,6 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
 
-  console.log("ImageGallery props:", { images, title });
-  console.log("Current image in lightbox:", images[currentIndex]);
 
   useEffect(() => {
     setMounted(true);
@@ -228,7 +226,6 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
                   style={{ zIndex: 20 }}
                 >
                   {images.map((img, index) => {
-                    console.log(`Thumbnail ${index}:`, img);
                     return (
                       <button
                         key={index}

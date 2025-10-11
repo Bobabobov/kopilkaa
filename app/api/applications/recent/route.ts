@@ -9,11 +9,10 @@ export async function GET(req: Request) {
       Math.max(1, Number(searchParams.get("limit") || 3)),
     );
 
-    // Получаем последние заявки (всех статусов, но только с публичной информацией)
+    // Получаем последние одобренные заявки
     const applications = await prisma.application.findMany({
       where: {
-        // Показываем только заявки, которые не содержат личную информацию
-        // или показываем все, но скрываем чувствительные данные
+        status: "APPROVED", // Показываем только одобренные заявки
       },
       orderBy: { createdAt: "desc" },
       take: limit,
@@ -22,43 +21,31 @@ export async function GET(req: Request) {
         title: true,
         summary: true,
         amount: true,
-        payment: true,
         status: true,
         createdAt: true,
+        images: {
+          select: {
+            url: true,
+            sort: true,
+          },
+          orderBy: {
+            sort: "asc",
+          },
+        },
         user: {
           select: {
             id: true,
             name: true,
+            email: true,
             avatar: true,
-            avatarFrame: true,
-            // Не показываем email для безопасности
           },
         },
       },
     });
 
-    // Форматируем данные для отображения
-    const formattedApplications = applications.map((app) => ({
-      id: app.id,
-      title: app.title,
-      summary: app.summary,
-      amount: app.amount,
-      payment: app.payment,
-      status: app.status,
-      createdAt: app.createdAt,
-      userName: app.user.name || "Анонимный пользователь",
-      userId: app.user.id,
-      userAvatar: app.user.avatar,
-      userAvatarFrame: app.user.avatarFrame,
-      // Создаем инициал из имени или используем первую букву названия
-      initial: app.user.name
-        ? app.user.name.charAt(0).toUpperCase()
-        : app.title.charAt(0).toUpperCase(),
-    }));
-
     return Response.json({
       success: true,
-      applications: formattedApplications,
+      applications: applications,
     });
   } catch (error) {
     console.error("Ошибка при получении последних заявок:", error);

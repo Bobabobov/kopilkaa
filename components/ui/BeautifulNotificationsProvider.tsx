@@ -182,14 +182,12 @@ export function initBeautifulNotifications() {
       // Здесь можно добавить логику для получения функций из контекста
       // Пока что оставляем заглушки
       window.beautifulAlert = (message: string, title?: string) => {
-        console.log("Beautiful Alert:", title, message);
       };
 
       window.beautifulConfirm = (
         message: string,
         title?: string,
       ): Promise<boolean> => {
-        console.log("Beautiful Confirm:", title, message);
         return Promise.resolve(true);
       };
 
@@ -198,7 +196,6 @@ export function initBeautifulNotifications() {
         defaultValue?: string,
         title?: string,
       ): Promise<string | null> => {
-        console.log("Beautiful Prompt:", title, message, defaultValue);
         return Promise.resolve(defaultValue || null);
       };
     }

@@ -20,12 +20,9 @@ export default function OtherUserStats({ userId }: OtherUserStatsProps) {
     const loadStats = async () => {
       try {
         setLoading(true);
-        console.log("Loading stats for user:", userId);
         const response = await fetch(`/api/users/${userId}/stats`);
-        console.log("Stats response:", response.status);
         if (response.ok) {
           const data = await response.json();
-          console.log("Stats data:", data);
           setStats(data.stats);
         } else {
           const errorData = await response.json();

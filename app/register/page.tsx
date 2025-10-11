@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import RegisterForm from "@/components/auth/RegisterForm";
 import SuccessScreen from "@/components/auth/SuccessScreen";
 
@@ -12,9 +13,34 @@ interface FormData {
 }
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  // Проверяем авторизацию при загрузке
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/profile/me", { cache: "no-store" });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.user) {
+            // Пользователь уже авторизован, перенаправляем в профиль
+            router.push("/profile");
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Error checking auth:", error);
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   const validateForm = (formData: FormData) => {
     const newErrors: { [key: string]: string } = {};
@@ -88,6 +114,18 @@ export default function RegisterPage() {
       setBusy(false);
     }
   };
+
+  // Показываем загрузку пока проверяем авторизацию
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Проверка авторизации...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (success) {
     return <SuccessScreen />;

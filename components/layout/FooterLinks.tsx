@@ -48,6 +48,19 @@ export default function FooterLinks() {
             Помощь и поддержка
           </span>
         </Link>
+        <Link
+          href="/advertising"
+          className="block text-sm transition-all duration-300 hover:translate-x-2 group"
+          style={{ color: "#abd1c6" }}
+        >
+          <span className="flex items-center gap-2">
+            <div
+              className="w-1 h-1 rounded-full transition-all duration-300 group-hover:w-2 group-hover:h-2"
+              style={{ backgroundColor: "#f9bc60" }}
+            ></div>
+            📢 Реклама на сайте
+          </span>
+        </Link>
       </div>
     </div>
   );

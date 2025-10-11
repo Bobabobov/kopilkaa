@@ -4,6 +4,11 @@ const nextConfig = {
     typedRoutes: true,
   },
   
+  // Принудительно используем порт 3000
+  server: {
+    port: 3000,
+  },
+  
   // Заголовки безопасности
   async headers() {
     return [

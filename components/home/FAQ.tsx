@@ -1,252 +1,172 @@
 "use client";
-import { motion } from "framer-motion";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
-type FAQItem = {
-  id: string;
+interface FAQItem {
   question: string;
   answer: string;
-  icon: string;
-  colorClass: string;
-  bgColorClass: string;
-  borderColorClass: string;
-  textColorClass: string;
-  iconBgClass: string;
-};
+  icon: keyof typeof LucideIcons;
+}
+
+const faqs: FAQItem[] = [
+  {
+    question: "Как создать заявку на помощь?",
+    answer: "Зарегистрируйтесь на платформе, перейдите в раздел 'Создать заявку', заполните все необходимые поля: опишите вашу ситуацию, укажите нужную сумму и приложите подтверждающие документы/фото. После модерации ваша заявка будет опубликована.",
+    icon: "FileText",
+  },
+  {
+    question: "Сколько времени занимает модерация?",
+    answer: "Обычно модерация заявки занимает до 24 часов. Мы тщательно проверяем каждую заявку, чтобы убедиться в её достоверности и защитить наше сообщество от мошенничества.",
+    icon: "Clock",
+  },
+  {
+    question: "Безопасно ли указывать свои реквизиты?",
+    answer: "Да, ваши данные защищены. Мы используем современные технологии шифрования. Однако рекомендуем указывать только необходимую информацию для получения помощи и не делиться конфиденциальными данными.",
+    icon: "Shield",
+  },
+  {
+    question: "Могу ли я помочь анонимно?",
+    answer: "Да, вы можете оказывать помощь анонимно. При переводе средств вы сами решаете, раскрывать ли свою личность. Система защищает конфиденциальность всех участников.",
+    icon: "User",
+  },
+  {
+    question: "Что делать, если моя заявка отклонена?",
+    answer: "Если ваша заявка отклонена, вы получите уведомление с указанием причины. Вы можете исправить недочёты и подать заявку повторно через 24 часа. Обратитесь в поддержку, если у вас остались вопросы.",
+    icon: "HelpCircle",
+  },
+  {
+    question: "Берёте ли вы комиссию?",
+    answer: "Нет, наша платформа полностью бесплатна. Мы не берём комиссию с переводов. 100% средств идут напрямую тем, кто нуждается в помощи.",
+    icon: "DollarSign",
+  },
+  {
+    question: "Как я могу быть уверен, что помогаю реальным людям?",
+    answer: "Каждая заявка проходит тщательную модерацию. Мы проверяем документы, фотографии и достоверность информации. Также вы можете видеть историю пользователя на платформе.",
+    icon: "CheckCircle",
+  },
+];
 
 export default function FAQ() {
-  const [openItem, setOpenItem] = useState<string | null>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const renderIcon = (iconName: string) => {
-    const iconProps = { size: "lg" as const, className: "text-white" };
-
-    switch (iconName) {
-      case "document":
-        return <LucideIcons.Document {...iconProps} />;
-      case "list":
-        return <LucideIcons.List {...iconProps} />;
-      case "clock":
-        return <LucideIcons.Clock {...iconProps} />;
-      case "money":
-        return <LucideIcons.Money {...iconProps} />;
-      case "file":
-        return <LucideIcons.File {...iconProps} />;
-      case "x-circle":
-        return <LucideIcons.XCircle {...iconProps} />;
-      case "shield":
-        return <LucideIcons.Shield {...iconProps} />;
-      case "message-circle":
-        return <LucideIcons.MessageCircle {...iconProps} />;
-      default:
-        return <LucideIcons.Help {...iconProps} />;
-    }
-  };
-
-  const faqItems: FAQItem[] = [
-    {
-      id: "how-to-apply",
-      question: "Как подать заявку на помощь?",
-      answer:
-        "Подача заявки очень проста! Сначала зарегистрируйтесь на платформе, затем заполните подробную форму заявки. В форме нужно описать вашу ситуацию, указать нужную сумму и приложить необходимые документы. После подачи заявка попадает на рассмотрение к нашей команде экспертов.",
-      icon: "document",
-      colorClass: "slate",
-      bgColorClass:
-        "from-[#E3EED4] to-[#AEC3B0] dark:from-[#0F2A1D] dark:to-[#375534]",
-      borderColorClass: "border-[#AEC3B0] dark:border-[#6B9071]",
-      textColorClass: "text-gray-900 dark:text-white",
-      iconBgClass: "bg-[#6B9071]",
-    },
-    {
-      id: "what-applications",
-      question: "Какие заявки рассматривает копилка?",
-      answer:
-        "Мы рассматриваем самые разные заявки: образование и обучение, бизнес-проекты и стартапы, творческие инициативы, медицинские нужды, помощь в сложных жизненных ситуациях. Главное - чтобы заявка была обоснованной и соответствовала нашим принципам помощи. Каждая заявка рассматривается индивидуально.",
-      icon: "list",
-      colorClass: "emerald",
-      bgColorClass:
-        "from-[#AEC3B0] to-[#6B9071] dark:from-[#375534] dark:to-[#6B9071]",
-      borderColorClass: "border-[#6B9071] dark:border-[#AEC3B0]",
-      textColorClass: "text-gray-900 dark:text-white",
-      iconBgClass: "bg-[#6B9071]",
-    },
-    {
-      id: "review-time",
-      question: "Сколько времени занимает рассмотрение?",
-      answer:
-        "Обычно рассмотрение заявки занимает 3-5 рабочих дней. В сложных случаях, когда требуется дополнительная проверка документов или консультация с экспертами, процесс может занять до 10 дней. Мы обязательно уведомим вас о решении по email и в личном кабинете.",
-      icon: "clock",
-      colorClass: "teal",
-      bgColorClass:
-        "from-[#6B9071] to-[#375534] dark:from-[#6B9071] dark:to-[#375534]",
-      borderColorClass: "border-[#375534] dark:border-[#6B9071]",
-      textColorClass: "text-gray-900 dark:text-white",
-      iconBgClass: "bg-[#375534]",
-    },
-    {
-      id: "return-money",
-      question: "Нужно ли возвращать полученные средства?",
-      answer:
-        "Нет, возврат средств не требуется! Это безвозмездная помощь. Мы просим только поделиться результатами использования средств - это поможет вдохновить других людей и показать, как ваша идея воплотилась в жизнь. Это необязательно, но очень ценно для сообщества.",
-      icon: "money",
-      colorClass: "green",
-      bgColorClass:
-        "from-[#E3EED4] to-[#AEC3B0] dark:from-[#0F2A1D] dark:to-[#375534]",
-      borderColorClass: "border-[#AEC3B0] dark:border-[#6B9071]",
-      textColorClass: "text-gray-900 dark:text-white",
-      iconBgClass: "bg-[#6B9071]",
-    },
-    {
-      id: "documents",
-      question: "Какие документы нужны для заявки?",
-      answer:
-        "Список документов зависит от типа заявки. Обычно нужны: паспорт, документы, подтверждающие вашу ситуацию (справки, договоры, медицинские заключения), план использования средств. Для бизнес-проектов - бизнес-план и финансовые расчеты. Мы поможем определить, какие именно документы нужны для вашего случая.",
-      icon: "file",
-      colorClass: "emerald",
-      bgColorClass:
-        "from-[#AEC3B0] to-[#6B9071] dark:from-[#375534] dark:to-[#6B9071]",
-      borderColorClass: "border-[#6B9071] dark:border-[#AEC3B0]",
-      textColorClass: "text-gray-900 dark:text-white",
-      iconBgClass: "bg-[#6B9071]",
-    },
-    {
-      id: "rejection",
-      question: "Почему заявка может быть отклонена?",
-      answer:
-        "Заявка может быть отклонена по нескольким причинам: недостаточное обоснование необходимости помощи, отсутствие необходимых документов, несоответствие заявки нашим принципам, подозрение в мошенничестве. В случае отклонения мы обязательно объясним причину и дадим рекомендации по улучшению заявки.",
-      icon: "x-circle",
-      colorClass: "red",
-      bgColorClass:
-        "from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20",
-      borderColorClass: "border-red-200 dark:border-red-700/50",
-      textColorClass: "text-red-700 dark:text-red-300",
-      iconBgClass: "bg-red-600",
-    },
-    {
-      id: "privacy",
-      question: "Безопасны ли мои личные данные?",
-      answer:
-        "Да, мы серьезно относимся к защите ваших данных. Вся информация шифруется и хранится в соответствии с требованиями безопасности. Мы не передаем ваши личные данные третьим лицам без вашего согласия. Документы доступны только нашей команде экспертов для рассмотрения заявки.",
-      icon: "shield",
-      colorClass: "lime",
-      bgColorClass:
-        "from-lime-50 to-lime-100 dark:from-lime-900/20 dark:to-lime-800/20",
-      borderColorClass: "border-lime-200 dark:border-lime-700/50",
-      textColorClass: "text-lime-700 dark:text-lime-300",
-      iconBgClass: "bg-lime-600",
-    },
-    {
-      id: "contact",
-      question: "Как связаться с поддержкой?",
-      answer:
-        "Вы можете связаться с нами через форму обратной связи в личном кабинете, написать на email поддержки или использовать чат на сайте. Мы отвечаем в течение 24 часов в рабочие дни. Также вы можете оставить отзыв о работе платформы - ваше мнение очень важно для нас.",
-      icon: "message-circle",
-      colorClass: "green",
-      bgColorClass:
-        "from-[#E3EED4] to-[#AEC3B0] dark:from-[#0F2A1D] dark:to-[#375534]",
-      borderColorClass: "border-[#AEC3B0] dark:border-[#6B9071]",
-      textColorClass: "text-gray-900 dark:text-white",
-      iconBgClass: "bg-[#6B9071]",
-    },
-  ];
-
-  const toggleItem = (id: string) => {
-    setOpenItem(openItem === id ? null : id);
+  const toggleFAQ = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1.3 }}
-      className="max-w-6xl mx-auto mt-16 px-4"
-    >
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-          Частые вопросы
-        </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Ответы на самые популярные вопросы о работе платформы "Копилка"
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 items-start max-w-4xl mx-auto">
-        {faqItems.map((item, index) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1.4 + index * 0.1 }}
-            className={`p-6 rounded-2xl bg-gradient-to-br ${item.bgColorClass} border transition-all duration-300 cursor-pointer ${
-              openItem === item.id
-                ? `shadow-xl border-2 ${item.borderColorClass.replace("border-", "border-2 ")}`
-                : `${item.borderColorClass} hover:shadow-lg`
-            }`}
-            onClick={() => toggleItem(item.id)}
-          >
-            <div className="flex items-start gap-4">
-              <div
-                className={`w-12 h-12 rounded-full ${item.iconBgClass} flex items-center justify-center flex-shrink-0`}
-              >
-                {renderIcon(item.icon)}
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center justify-between">
-                  {item.question}
-                  <motion.span
-                    className={`text-xl ml-2 transition-colors duration-200 ${
-                      openItem === item.id
-                        ? "text-gray-600 dark:text-gray-300"
-                        : "text-gray-400"
-                    }`}
-                    animate={{
-                      rotate: openItem === item.id ? 180 : 0,
-                    }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                  >
-                    {openItem === item.id ? "−" : "+"}
-                  </motion.span>
-                </h3>
-
-                <div
-                  className={`transition-all duration-300 ease-in-out ${
-                    openItem === item.id
-                      ? "max-h-96 opacity-100 mt-4"
-                      : "max-h-0 opacity-0 mt-0 overflow-hidden"
-                  }`}
-                >
-                  <div className="space-y-4">
-                    <p
-                      className={`text-base ${item.textColorClass} leading-relaxed font-medium`}
-                    >
-                      {item.answer}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="text-center mt-12">
-        <div className="p-8 rounded-2xl bg-gradient-to-br from-[#E3EED4] to-[#AEC3B0] dark:from-[#0F2A1D] dark:to-[#375534] border border-[#AEC3B0] dark:border-[#6B9071]">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            Не нашли ответ на свой вопрос?
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Наша команда поддержки всегда готова помочь вам
+    <section className="py-20 px-4" id="faq">
+      <div className="max-w-4xl mx-auto">
+        {/* Заголовок секции */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: "#fffffe" }}>
+            Часто задаваемые вопросы
+          </h2>
+          <p className="text-xl" style={{ color: "#abd1c6" }}>
+            Ответы на популярные вопросы о работе платформы
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="btn-primary py-3 px-6 hover:scale-105 transition-all duration-300">
-              Связаться с поддержкой
-            </button>
-            <button className="btn-ghost border border-gray-300 dark:border-gray-600 py-3 px-6 hover:scale-105 transition-all duration-300">
-              Посмотреть все вопросы
-            </button>
-          </div>
+        </motion.div>
+
+        {/* FAQ Items */}
+        <div className="space-y-4">
+          {faqs.map((faq, index) => {
+            const Icon = LucideIcons[faq.icon];
+            const isOpen = openIndex === index;
+
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.05 }}
+              >
+                <button
+                  onClick={() => toggleFAQ(index)}
+                  className="w-full text-left bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Иконка */}
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: "#f9bc6020" }}
+                    >
+                      {Icon && (
+                        <div style={{ color: "#f9bc60" }}>
+                          <Icon size="md" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Контент */}
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between gap-4">
+                        <h3 className="text-lg md:text-xl font-bold" style={{ color: "#fffffe" }}>
+                          {faq.question}
+                        </h3>
+                        <motion.div
+                          animate={{ rotate: isOpen ? 180 : 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="flex-shrink-0"
+                        >
+                          <LucideIcons.ChevronDown size="md" style={{ color: "#abd1c6" }} />
+                        </motion.div>
+                      </div>
+
+                      {/* Ответ */}
+                      <AnimatePresence>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="overflow-hidden"
+                          >
+                            <p className="mt-4 text-base leading-relaxed" style={{ color: "#abd1c6" }}>
+                              {faq.answer}
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </button>
+              </motion.div>
+            );
+          })}
         </div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="text-center mt-12"
+        >
+          <p className="text-lg mb-4" style={{ color: "#abd1c6" }}>
+            Не нашли ответ на свой вопрос?
+          </p>
+          <a
+            href="/support"
+            className="inline-flex items-center gap-2 px-6 py-3 text-base font-semibold rounded-lg border-2 transition-all duration-300 hover:scale-105"
+            style={{
+              borderColor: "#abd1c6",
+              color: "#abd1c6",
+            }}
+          >
+            <LucideIcons.MessageCircle size="sm" />
+            Связаться с поддержкой
+          </a>
+        </motion.div>
       </div>
-    </motion.div>
+    </section>
   );
 }

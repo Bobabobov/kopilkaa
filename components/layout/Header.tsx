@@ -11,6 +11,7 @@ export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [topBannerHeight, setTopBannerHeight] = useState(0);
 
   // Проверяем авторизацию
   useEffect(() => {
@@ -29,11 +30,45 @@ export default function Header() {
     checkAuth();
   }, []);
 
+  // Определяем высоту TopBanner при загрузке
+  useEffect(() => {
+    const topBanner = document.querySelector('[data-top-banner]') as HTMLElement;
+    if (topBanner) {
+      setTopBannerHeight(topBanner.offsetHeight);
+    }
+    
+    // Отслеживаем скролл, чтобы Header двигался синхронно с баннером
+    const handleScroll = () => {
+      if (!topBanner) return;
+      
+      const scrollY = window.scrollY;
+      const bannerHeight = topBanner.offsetHeight;
+      
+      // Рассчитываем на сколько скрыт баннер
+      const hideProgress = Math.min(scrollY / bannerHeight, 1);
+      
+      // Header двигается вверх по мере скрытия баннера
+      const header = document.querySelector('header') as HTMLElement;
+      if (header) {
+        const newTop = bannerHeight * (1 - hideProgress);
+        header.style.top = `${newTop}px`;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Вызываем сразу для начального состояния
+    handleScroll();
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   // Закрываем мобильное меню при изменении размера экрана
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
-        // lg breakpoint
         setMobileMenuOpen(false);
       }
     };
@@ -44,15 +79,26 @@ export default function Header() {
 
   return (
     <>
-      <header
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg"
-        style={{ backgroundColor: "#004643", borderColor: "#abd1c6" }}
-      >
-        <div className="container-p mx-auto flex h-20 items-center justify-between gap-4">
+              {/* Spacer для Header + TopBanner */}
+              <div 
+                style={{ 
+                  height: `${64 + topBannerHeight}px`
+                }} 
+              />
+
+              <header
+                className="fixed left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg"
+                style={{ 
+                  backgroundColor: "#004643", 
+                  borderColor: "#abd1c6",
+                  top: `${topBannerHeight}px`
+                }}
+              >
+        <div className="container-p mx-auto flex h-16 items-center justify-between gap-4">
           {/* Логотип слева */}
           <HeaderLogo />
 
-          {/* Промежуточная навигация для планшетов - показываем основные ссылки */}
+          {/* Промежуточная навигация для планшетов */}
           <div className="hidden lg:flex xl:hidden">
             <HeaderNavigation />
           </div>
@@ -83,8 +129,11 @@ export default function Header() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden border-t backdrop-blur-sm fixed top-20 left-0 right-0 z-40 shadow-lg"
-            style={{ backgroundColor: "#004643", borderColor: "#abd1c6" }}
+            className="lg:hidden border-t backdrop-blur-sm shadow-lg"
+            style={{ 
+              backgroundColor: "#004643", 
+              borderColor: "#abd1c6"
+            }}
           >
             <div className="container-p py-4 space-y-2">
               {/* Навигационные ссылки */}
@@ -96,7 +145,7 @@ export default function Header() {
               </div>
 
               {/* Авторизация для мобильных */}
-              <div className="pt-2 border-t border-white/20 dark:border-white/10">
+              <div className="pt-2 border-t border-white/20">
                 <div className="px-4">
                   <NavAuth />
                 </div>

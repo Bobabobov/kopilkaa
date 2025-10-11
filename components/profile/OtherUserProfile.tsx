@@ -157,16 +157,13 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     }
 
     try {
-      console.log("Sending friend request to:", user.id);
       const response = await fetch("/api/profile/friends", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ receiverId: user.id }),
       });
 
-      console.log("Friend request response:", response.status);
       const data = await response.json();
-      console.log("Friend request data:", data);
 
       if (response.ok) {
         setFriendship(data.friendship);

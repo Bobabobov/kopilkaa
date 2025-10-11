@@ -43,3 +43,6 @@ async function deleteTestApplications() {
 
 // Запускаем скрипт
 deleteTestApplications();
+
+
+

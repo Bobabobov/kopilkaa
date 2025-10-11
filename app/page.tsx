@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import HeroSection from "@/components/home/HeroSection";
+import HowItWorks from "@/components/home/HowItWorks";
+import RecentApplications from "@/components/home/RecentApplications";
+import FAQ from "@/components/home/FAQ";
 import PixelBackground from "@/components/ui/PixelBackground";
 
 type Stats = {
@@ -59,6 +62,9 @@ export default function HomePage() {
       <PixelBackground />
       <div className="relative z-10">
         <HeroSection stats={stats} loading={loading} />
+        <HowItWorks />
+        <RecentApplications />
+        <FAQ />
       </div>
     </div>
   );

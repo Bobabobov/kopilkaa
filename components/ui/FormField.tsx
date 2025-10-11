@@ -56,7 +56,7 @@ export default function FormField({
 
   const isValid = maxLength
     ? charCount >= minLength && charCount <= maxLength
-    : true;
+    : charCount >= minLength;
   const isNearLimit = maxLength ? charCount > maxLength * 0.8 : false;
   const isOverLimit = maxLength ? charCount > maxLength : false;
 
@@ -187,6 +187,33 @@ export default function FormField({
               {charCount} / {maxLength}
             </span>
           )}
+        </div>
+      )}
+
+      {/* Статус поля */}
+      {showValidation && value.trim() && !error && !isRequiredEmpty && (
+        <div className="flex items-center gap-2 text-sm mt-1">
+          {isOverLimit ? (
+            <div className="flex items-center gap-2 text-red-400">
+              <LucideIcons.XCircle size="sm" />
+              <span>Слишком много символов</span>
+            </div>
+          ) : isNearLimit ? (
+            <div className="flex items-center gap-2 text-lime-400">
+              <LucideIcons.Alert size="sm" />
+              <span>Приближается лимит</span>
+            </div>
+          ) : isValid && charCount >= minLength && !isNearLimit ? (
+            <div className="flex items-center gap-2 text-green-400">
+              <LucideIcons.CheckCircle size="sm" />
+              <span>Поле заполнено корректно</span>
+            </div>
+          ) : charCount > 0 && charCount < minLength ? (
+            <div className="flex items-center gap-2 text-yellow-400">
+              <LucideIcons.Alert size="sm" />
+              <span>Минимум {minLength} символов</span>
+            </div>
+          ) : null}
         </div>
       )}
 

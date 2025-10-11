@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface Story {
@@ -27,9 +28,14 @@ interface StoryCardProps {
 }
 
 export function StoryCard({ story, index }: StoryCardProps) {
+  const router = useRouter();
   const authorName =
     story.user?.name || story.user?.email?.split("@")[0] || "Неизвестный автор";
   const mainImage = story.images?.[0]?.url || "/stories-preview.jpg";
+
+  const handleCardClick = () => {
+    router.push(`/stories/${story.id}`);
+  };
 
   return (
     <motion.div
@@ -42,16 +48,16 @@ export function StoryCard({ story, index }: StoryCardProps) {
       }}
       className="group"
     >
-      <Link href={`/stories/${story.id}`}>
-        <div
-          className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 border border-[#abd1c6]/40 hover:-translate-y-2 hover:scale-[1.02] h-full max-w-full overflow-hidden flex flex-col group-hover:border-[#f9bc60]/60"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 50%, rgba(249,188,96,0.1) 100%)",
-            boxShadow:
-              "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-          }}
-        >
+      <div
+        onClick={handleCardClick}
+        className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 border border-[#abd1c6]/40 hover:-translate-y-2 hover:scale-[1.02] h-full max-w-full overflow-hidden flex flex-col group-hover:border-[#f9bc60]/60 cursor-pointer"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 50%, rgba(249,188,96,0.1) 100%)",
+          boxShadow:
+            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+        }}
+      >
           {/* Изображение */}
           <div className="relative mb-4 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg">
             <img
@@ -167,7 +173,6 @@ export function StoryCard({ story, index }: StoryCardProps) {
             </div>
           </div>
         </div>
-      </Link>
     </motion.div>
   );
 }

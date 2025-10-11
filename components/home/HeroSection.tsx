@@ -1,8 +1,11 @@
 "use client";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import Image from "next/image";
 import { useBulldog } from "@/lib/useBulldog";
+import { useEffect } from "react";
+import AdSection from "./AdSection";
+import TopDonors from "./TopDonors";
 
 type Stats = {
   collected: number;
@@ -16,11 +19,44 @@ interface HeroSectionProps {
   loading: boolean;
 }
 
+// Компонент для анимированного числа
+function AnimatedNumber({ value, prefix = "", suffix = "" }: { value: number; prefix?: string; suffix?: string }) {
+  const motionValue = useMotionValue(0);
+  const rounded = useTransform(motionValue, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    const controls = animate(motionValue, value, {
+      duration: 2,
+      ease: "easeOut",
+    });
+
+    return controls.stop;
+  }, [motionValue, value]);
+
+  return (
+    <motion.span>
+      {prefix}
+      <motion.span>{rounded}</motion.span>
+      {suffix}
+    </motion.span>
+  );
+}
+
 export default function HeroSection({ stats, loading }: HeroSectionProps) {
   const { state, handleClick, getMessage } = useBulldog();
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
+    <div className="min-h-screen flex items-center justify-center px-4 py-16 relative">
+      {/* Блок рекламы слева вверху */}
+      <div className="fixed left-4 z-20 hidden xl:block max-w-sm" style={{ top: '360px' }}>
+        <AdSection />
+      </div>
+      
+      {/* Блок топ донатеров справа вверху */}
+      <div className="fixed right-4 z-20 hidden xl:block max-w-sm" style={{ top: '360px' }}>
+        <TopDonors />
+      </div>
+      
       <div className="text-center max-w-4xl mx-auto">
         {/* Основной заголовок */}
         <h1
@@ -72,55 +108,85 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           </h2>
 
           {/* Основная сумма */}
-          <div className="mb-8">
+          <motion.div
+            className="mb-8"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
             <div
               className="text-4xl md:text-5xl font-bold mb-2"
               style={{ color: "#f9bc60" }}
             >
-              ₽ {loading ? "0" : stats.collected.toLocaleString()}
+              {loading ? (
+                "₽ 0"
+              ) : (
+                <>
+                  ₽ <AnimatedNumber value={stats.collected} />
+                </>
+              )}
             </div>
             <p className="text-lg" style={{ color: "#abd1c6" }}>
               Собрано для помощи
             </p>
-          </div>
+          </motion.div>
 
           {/* Компактная статистика */}
           <div className="grid grid-cols-3 gap-6 max-w-md mx-auto">
-            <div className="text-center">
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
               <div
                 className="text-2xl font-bold mb-1"
                 style={{ color: "#fffffe" }}
               >
-                {loading ? "0" : stats.requests}
+                {loading ? "0" : <AnimatedNumber value={stats.requests} />}
               </div>
               <div className="text-sm" style={{ color: "#abd1c6" }}>
                 Заявок
               </div>
-            </div>
+            </motion.div>
 
-            <div className="text-center">
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               <div
                 className="text-2xl font-bold mb-1"
                 style={{ color: "#fffffe" }}
               >
-                {loading ? "0" : stats.approved}
+                {loading ? "0" : <AnimatedNumber value={stats.approved} />}
               </div>
               <div className="text-sm" style={{ color: "#abd1c6" }}>
                 Одобрено
               </div>
-            </div>
+            </motion.div>
 
-            <div className="text-center">
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
               <div
                 className="text-2xl font-bold mb-1"
                 style={{ color: "#fffffe" }}
               >
-                {loading ? "0" : stats.people}
+                {loading ? "0" : <AnimatedNumber value={stats.people} />}
               </div>
               <div className="text-sm" style={{ color: "#abd1c6" }}>
                 Помогли
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

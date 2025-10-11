@@ -62,24 +62,16 @@ export default function AvatarUpload({
     setUploading(true);
 
     try {
-      console.log("Uploading avatar:", {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      });
 
       const formData = new FormData();
       formData.append("avatar", file);
 
-      console.log("Sending request to /api/profile/avatar");
       const response = await fetch("/api/profile/avatar", {
         method: "POST",
         body: formData,
       });
 
-      console.log("Response status:", response.status);
       const data = await response.json();
-      console.log("Response data:", data);
 
       if (response.ok) {
         onAvatarChange(data.avatar);

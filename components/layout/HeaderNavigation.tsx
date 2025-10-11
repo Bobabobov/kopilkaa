@@ -10,6 +10,7 @@ const links: { href: Route; label: string }[] = [
   { href: "/stories", label: "Истории" },
   { href: "/applications", label: "Заявка" },
   { href: "/games", label: "Игры" },
+  { href: "/advertising", label: "📢 Реклама" },
 ];
 
 interface HeaderNavigationProps {

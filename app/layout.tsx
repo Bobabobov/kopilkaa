@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import TopBanner from "@/components/layout/TopBanner";
 import ScrollToTop from "@/components/ui/ScrollToTop";
 import { BeautifulNotificationsProvider } from "@/components/ui/BeautifulNotificationsProvider";
 
@@ -24,8 +25,9 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <BeautifulNotificationsProvider>
           <div className="min-h-screen flex flex-col">
+            <TopBanner />
             <Header />
-            <main className="flex-1 container-p mx-auto py-6">{children}</main>
+            <main className="flex-1 container-p mx-auto">{children}</main>
             <Footer />
             <ScrollToTop />
           </div>

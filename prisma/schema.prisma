@@ -226,3 +226,40 @@ model StoryLike {
   @@index([applicationId])
   @@index([createdAt])
 }
+
+model Advertisement {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  imageUrl  String?
+  linkUrl   String?
+  expiresAt DateTime?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([isActive])
+  @@index([expiresAt])
+  @@index([createdAt])
+}
+
+// Модель для заявок на размещение рекламы
+model AdRequest {
+  id            String   @id @default(cuid())
+  companyName   String   // Название компании/проекта
+  email         String   // Контактный email
+  website       String?  // Ссылка на сайт/соцсеть
+  format        String   // Формат размещения (banner, post, telegram)
+  duration      Int      // Срок в днях
+  bannerUrl     String?  // URL загруженного баннера
+  comment       String?  // Комментарий от рекламодателя
+  status        String   @default("new") // new, processing, approved, rejected
+  adminComment  String?  // Комментарий администратора
+  processedBy   String?  // ID администратора, обработавшего заявку
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
+}

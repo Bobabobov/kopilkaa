@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { ApplicationStatus } from "./types";
 import StatsCards from "./components/StatsCards";
 import ControlPanel from "./components/ControlPanel";
@@ -213,6 +214,28 @@ export default function AdminClient() {
                 Управление заявками и статистика платформы
               </p>
             </div>
+            
+              {/* Навигация */}
+              <div className="flex gap-2">
+                <Link
+                  href="/admin"
+                  className="px-4 py-2 bg-[#f9bc60] text-[#001e1d] font-semibold rounded-lg hover:bg-[#f9bc60]/90 transition-colors"
+                >
+                  Заявки
+                </Link>
+                <Link
+                  href="/admin/ads"
+                  className="px-4 py-2 bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
+                >
+                  Реклама
+                </Link>
+                <Link
+                  href="/admin/ad-requests"
+                  className="px-4 py-2 bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
+                >
+                  Заявки на рекламу
+                </Link>
+              </div>
           </div>
 
           {/* Статистика */}

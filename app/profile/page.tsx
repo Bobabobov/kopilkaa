@@ -138,8 +138,29 @@ export default function ProfilePage() {
               transition={{ delay: 0.3 }}
               className="lg:col-span-6"
             >
-              {/* <ThreePet /> */}{" "}
-              {/* Temporarily disabled - requires Three.js */}
+              <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+                {/* Заголовок */}
+                <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 p-6 border-b border-white/10">
+                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                    <span className="text-3xl">🎮</span>
+                    Мини-игра с Бульдогом
+                  </h2>
+                  <p className="text-white/70 mt-2">Кастомизируй своего персонажа!</p>
+                </div>
+
+                {/* Область для игры */}
+                <div className="p-8">
+                  <div 
+                    className="w-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl border border-white/20 overflow-hidden flex items-center justify-center"
+                    style={{ height: '600px' }}
+                  >
+                    <div className="text-center">
+                      <div className="text-6xl mb-4">🎮</div>
+                      <p className="text-white/70 text-lg">Здесь будет мини-игра</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
 
             {/* Right Sidebar - Статистика и Активность - 3 колонки */}

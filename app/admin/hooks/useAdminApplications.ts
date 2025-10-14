@@ -12,9 +12,10 @@ interface UseAdminApplicationsReturn {
   // Состояние
   items: ApplicationItem[];
   loading: boolean;
+  loadingMore: boolean;
   error: string | null;
-  page: number;
-  pages: number;
+  currentPage: number;
+  hasMore: boolean;
   stats: Stats | null;
 
   // Фильтры
@@ -32,8 +33,7 @@ interface UseAdminApplicationsReturn {
   setSortOrder: (order: "asc" | "desc") => void;
 
   // Действия
-  load: (pageNum?: number) => Promise<void>;
-  setPage: (pageNum: number) => void;
+  loadMore: () => Promise<void>;
   refreshStats: () => void;
   toggleEmail: (id: string) => void;
   visibleEmails: Set<string>;
@@ -53,50 +53,65 @@ export function useAdminApplications({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // Список
-  const [page, setPage] = useState(initialPage);
-  const [pages, setPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [items, setItems] = useState<ApplicationItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [visibleEmails, setVisibleEmails] = useState<Set<string>>(new Set());
 
   // Загрузка данных
-  const load = useCallback(
-    async (p = 1) => {
-      try {
+  const loadMore = useCallback(async () => {
+    try {
+      if (currentPage === 1) {
         setLoading(true);
-        setError(null);
-
-        const params = new URLSearchParams({
-          page: p.toString(),
-          limit: "20",
-          ...(q && { q }),
-          ...(status !== "ALL" && { status }),
-          ...(minAmount && { minAmount }),
-          ...(maxAmount && { maxAmount }),
-          ...(sortBy && { sortBy }),
-          ...(sortOrder && { sortOrder }),
-        });
-
-        const response = await fetch(`/api/admin/applications?${params}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setItems(data.items || []);
-        setPages(data.pages || 1);
-        setPage(p);
-      } catch (err) {
-        console.error("Failed to load applications:", err);
-        setError("Ошибка загрузки заявок");
-      } finally {
-        setLoading(false);
+      } else {
+        setLoadingMore(true);
       }
-    },
-    [q, status, minAmount, maxAmount, sortBy, sortOrder],
-  );
+      setError(null);
+
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: "20",
+        ...(q && { q }),
+        ...(status !== "ALL" && { status }),
+        ...(minAmount && { minAmount }),
+        ...(maxAmount && { maxAmount }),
+        ...(sortBy && { sortBy }),
+        ...(sortOrder && { sortOrder }),
+      });
+
+      const response = await fetch(`/api/admin/applications?${params}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const newItems = data.items || [];
+      
+      if (currentPage === 1) {
+        // При первой загрузке или новом поиске - заменяем данные
+        setItems(newItems);
+      } else {
+        // При подгрузке - добавляем к существующим
+        setItems(prev => [...prev, ...newItems]);
+      }
+      
+      // Проверяем, есть ли ещё страницы
+      setHasMore(currentPage < (data.pages || 1));
+      
+      // Переходим на следующую страницу для следующей загрузки
+      setCurrentPage(prev => prev + 1);
+    } catch (err) {
+      console.error("Failed to load applications:", err);
+      setError("Ошибка загрузки заявок");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [currentPage, q, status, minAmount, maxAmount, sortBy, sortOrder]);
 
   // Загрузка статистики
   const refreshStats = useCallback(async () => {
@@ -104,7 +119,16 @@ export function useAdminApplications({
       const response = await fetch("/api/admin/stats");
       if (response.ok) {
         const data = await response.json();
-        setStats(data);
+        if (data.success && data.data?.applications) {
+          // Преобразуем структуру данных в ожидаемый формат
+          setStats({
+            pending: data.data.applications.pending,
+            approved: data.data.applications.approved,
+            rejected: data.data.applications.rejected,
+            total: data.data.applications.total,
+            totalAmount: data.data.applications.totalAmount,
+          });
+        }
       }
     } catch (err) {
       console.error("Failed to load stats:", err);
@@ -124,10 +148,12 @@ export function useAdminApplications({
     });
   }, []);
 
-  // Загрузка при изменении фильтров
+  // Загрузка при изменении фильтров (сброс на первую страницу)
   useEffect(() => {
-    load(1);
-  }, [load]);
+    setCurrentPage(1);
+    setHasMore(true);
+    loadMore();
+  }, [q, status, minAmount, maxAmount, sortBy, sortOrder]);
 
   // Загрузка статистики при монтировании
   useEffect(() => {
@@ -138,9 +164,10 @@ export function useAdminApplications({
     // Состояние
     items,
     loading,
+    loadingMore,
     error,
-    page,
-    pages,
+    currentPage,
+    hasMore,
     stats,
 
     // Фильтры
@@ -158,8 +185,7 @@ export function useAdminApplications({
     setSortOrder,
 
     // Действия
-    load,
-    setPage,
+    loadMore,
     refreshStats,
     toggleEmail,
     visibleEmails,

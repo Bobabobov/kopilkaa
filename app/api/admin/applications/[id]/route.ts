@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { publish } from "@/lib/sse";
 import { sendStatusEmail } from "@/lib/email";
-// import { checkAndGrantAchievements } from "@/lib/achievements"; // Удалено - система достижений отключена
+import { AchievementService } from "@/lib/achievements/service";
 
 export async function GET(
   req: Request,
@@ -69,7 +69,15 @@ export async function PATCH(
       }).catch((e) => console.error("mail error:", e));
     }
 
-    // Система достижений отключена
+    // Проверяем и выдаём достижения при одобрении заявки
+    if (status === "APPROVED" && item.user?.id) {
+      try {
+        await AchievementService.checkAndGrantAutomaticAchievements(item.user.id);
+      } catch (error) {
+        console.error("Error checking achievements:", error);
+        // Не прерываем обновление статуса из-за ошибки достижений
+      }
+    }
 
     // 🛰️ SSE для админки
     publish("application:update", {

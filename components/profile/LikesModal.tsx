@@ -1,7 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { LucideIcons } from "@/components/ui/LucideIcons";
+import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
 
 interface LikeData {
   id: string;
@@ -31,6 +34,10 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
   const [likes, setLikes] = useState<LikeData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  
+  // Автоскрытие скроллбаров
+  useAutoHideScrollbar();
 
   // Локальные уведомления
   const [localNotification, setLocalNotification] = useState<{
@@ -44,6 +51,11 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
     title: "",
     message: "",
   });
+
+  // Монтирование для Portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -71,20 +83,8 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
   useEffect(() => {
     if (!isOpen) return;
 
-    // Блокируем прокрутку фона более надежно
-    const originalOverflow = document.body.style.overflow;
-    const originalPosition = document.body.style.position;
-    const originalTop = document.body.style.top;
-    const originalWidth = document.body.style.width;
-
-    // Сохраняем текущую позицию прокрутки
-    const scrollY = window.scrollY;
-
-    // Блокируем прокрутку
+    // Блокируем прокрутку фона
     document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -96,20 +96,7 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-
-      // Восстанавливаем прокрутку
-      document.body.style.overflow = originalOverflow;
-      document.body.style.position = originalPosition;
-      document.body.style.top = originalTop;
-      document.body.style.width = originalWidth;
-
-      // Плавно восстанавливаем позицию прокрутки
-      requestAnimationFrame(() => {
-        window.scrollTo({
-          top: scrollY,
-          behavior: "instant",
-        });
-      });
+      document.body.style.overflow = "";
     };
   }, [isOpen, onClose]);
 
@@ -150,56 +137,39 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
     };
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       <motion.div
         key="likes-modal"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-[999] flex items-center justify-center p-4"
         onClick={onClose}
       >
         <motion.div
           key="likes-modal-content"
-          initial={{ opacity: 0, scale: 0.94, y: 32 }}
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.94, y: 32 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="relative overflow-hidden backdrop-blur-xl rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-xl"
-          style={{
-            backgroundColor: "#004643",
-            border: "1px solid #abd1c6",
-          }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="rounded-3xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] border border-[#abd1c6]/30 mx-4 flex flex-col custom-scrollbar"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Заголовок модалки */}
-          <div className="p-4" style={{ backgroundColor: "#f9bc60" }}>
+          {/* Заголовок */}
+          <div className="p-6 border-b border-[#abd1c6]/20 flex-shrink-0">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-12 h-12 rounded-2xl backdrop-blur-xl flex items-center justify-center"
-                  style={{ backgroundColor: "rgba(0, 30, 29, 0.2)" }}
-                >
-                  <svg
-                    className="w-6 h-6"
-                    style={{ color: "#001e1d" }}
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#f9bc60] rounded-2xl flex items-center justify-center">
+                  <LucideIcons.Heart size="lg" className="text-[#001e1d]" />
                 </div>
                 <div>
-                  <h2
-                    className="text-2xl font-bold"
-                    style={{ color: "#001e1d" }}
-                  >
+                  <h2 className="text-2xl font-bold text-[#fffffe]">
                     Лайки ваших историй
                   </h2>
-                  <p style={{ color: "#001e1d", opacity: 0.8 }}>
+                  <p className="text-[#abd1c6]">
                     {likes.length}{" "}
                     {likes.length === 1
                       ? "лайк"
@@ -211,12 +181,9 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
               </div>
               <button
                 onClick={onClose}
-                className="w-10 h-10 rounded-xl backdrop-blur-xl flex items-center justify-center transition-colors hover:opacity-80"
-                style={{ backgroundColor: "rgba(0, 30, 29, 0.2)" }}
+                className="w-10 h-10 bg-[#abd1c6]/20 hover:bg-[#abd1c6]/30 rounded-xl flex items-center justify-center transition-colors"
               >
-                <span className="text-xl" style={{ color: "#001e1d" }}>
-                  ✕
-                </span>
+                <LucideIcons.X size="sm" className="text-[#fffffe]" />
               </button>
             </div>
           </div>
@@ -225,22 +192,14 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
           <AnimatePresence>
             {localNotification.show && (
               <motion.div
-                key="local-notification"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="mx-6 mb-4 p-3 rounded-lg text-sm font-medium shadow-lg"
-                style={{
-                  background: "linear-gradient(135deg, #f9bc60, #fac570)",
-                  color: "#001e1d",
-                }}
+                className="mx-6 mt-4 p-3 bg-[#f9bc60] text-[#001e1d] rounded-lg text-sm font-medium shadow-lg"
               >
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: "rgba(0, 30, 29, 0.2)" }}
-                  >
-                    <span className="text-lg" style={{ color: "#001e1d" }}>
+                  <div className="w-8 h-8 bg-[#001e1d]/20 rounded-lg flex items-center justify-center">
+                    <span className="text-lg">
                       {localNotification.type === "success"
                         ? "✅"
                         : localNotification.type === "error"
@@ -250,10 +209,7 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
                   </div>
                   <div>
                     <div className="font-bold">{localNotification.title}</div>
-                    <div
-                      className="text-sm"
-                      style={{ color: "#001e1d", opacity: 0.8 }}
-                    >
+                    <div className="text-sm opacity-80">
                       {localNotification.message}
                     </div>
                   </div>
@@ -263,58 +219,34 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
           </AnimatePresence>
 
           {/* Контент */}
-          <div className="p-4 max-h-[60vh] overflow-y-auto">
+          <div className="overflow-y-auto p-6">
             {loading ? (
               <div className="text-center py-12">
-                <div
-                  className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
-                  style={{ borderColor: "#f9bc60" }}
-                ></div>
-                <p style={{ color: "#abd1c6" }}>Загрузка лайков...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#f9bc60] mx-auto mb-4"></div>
+                <p className="text-[#abd1c6]">Загрузка лайков...</p>
               </div>
             ) : error ? (
               <div className="text-center py-12">
-                <div className="text-4xl mb-4" style={{ color: "#f9bc60" }}>
-                  ⚠️
-                </div>
-                <h3
-                  className="text-xl font-bold mb-2"
-                  style={{ color: "#fffffe" }}
-                >
+                <div className="text-4xl mb-4 text-[#f9bc60]">⚠️</div>
+                <h3 className="text-xl font-bold mb-2 text-[#fffffe]">
                   Ошибка загрузки
                 </h3>
-                <p style={{ color: "#abd1c6" }}>{error}</p>
+                <p className="text-[#abd1c6]">{error}</p>
               </div>
             ) : likes.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-6xl mb-6">💔</div>
-                <h3
-                  className="text-xl font-bold mb-3"
-                  style={{ color: "#fffffe" }}
-                >
+                <h3 className="text-xl font-bold mb-3 text-[#fffffe]">
                   Пока нет лайков
                 </h3>
-                <p style={{ color: "#abd1c6" }} className="mb-6">
+                <p className="text-[#abd1c6] mb-6">
                   Когда кто-то лайкнет ваши истории, они появятся здесь
                 </p>
                 <Link
                   href="/applications"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                  style={{ backgroundColor: "#f9bc60", color: "#001e1d" }}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#f9bc60] text-[#001e1d] rounded-xl transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
+                  <LucideIcons.Plus size="sm" />
                   Подать заявку
                 </Link>
               </div>
@@ -337,18 +269,11 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
                         duration: 0.5,
                         ease: [0.16, 1, 0.3, 1],
                       }}
-                      className="backdrop-blur-sm rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                      style={{
-                        backgroundColor: "rgba(171, 209, 198, 0.1)",
-                        border: "1px solid rgba(171, 209, 198, 0.2)",
-                      }}
+                      className="bg-[#abd1c6]/10 border border-[#abd1c6]/20 rounded-xl p-4 hover:bg-[#abd1c6]/15 transition-all duration-300"
                     >
                       <div className="flex items-start gap-4">
                         {/* Аватар */}
-                        <div
-                          className="relative w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-lg"
-                          style={{ backgroundColor: "#f9bc60" }}
-                        >
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-lg bg-[#f9bc60]">
                           {like.user.avatar ? (
                             <img
                               src={like.user.avatar}
@@ -388,41 +313,28 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
                             <div className="flex-1 min-w-0">
                               <Link
                                 href={`/profile/${like.user.id}`}
-                                className="text-base font-semibold transition-colors truncate block"
-                                style={{ color: "#fffffe" }}
+                                className="text-base font-semibold text-[#fffffe] transition-colors truncate block hover:text-[#f9bc60]"
                               >
                                 {like.user.name ||
                                   like.user.email.split("@")[0]}
                               </Link>
                               <div className="flex items-center gap-2 mt-1">
-                                <svg
-                                  className="w-4 h-4 text-red-500"
-                                  fill="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                                </svg>
-                                <span
-                                  className="text-sm"
-                                  style={{ color: "#abd1c6" }}
-                                >
+                                <LucideIcons.Heart size="sm" className="text-red-500" />
+                                <span className="text-sm text-[#abd1c6]">
                                   Лайкнул вашу историю
                                 </span>
                                 <span
                                   className={`text-xs px-2 py-1 rounded-full font-medium ${
                                     userStatus.status === "online"
-                                      ? "text-[#001e1d]"
-                                      : "text-[#abd1c6]"
+                                      ? "bg-[#f9bc60] text-[#001e1d]"
+                                      : "bg-[#abd1c6]/20 text-[#abd1c6]"
                                   }`}
                                 >
                                   {userStatus.text}
                                 </span>
                               </div>
                             </div>
-                            <div
-                              className="text-sm ml-4"
-                              style={{ color: "#abd1c6" }}
-                            >
+                            <div className="text-sm ml-4 text-[#abd1c6]">
                               <span>
                                 {new Date(like.createdAt).toLocaleDateString(
                                   "ru-RU",
@@ -436,43 +348,16 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
                             href={`/stories/${like.application.id}`}
                             className="block"
                           >
-                            <div
-                              className="rounded-xl p-3 hover:shadow-lg transition-all"
-                              style={{
-                                backgroundColor: "rgba(249, 188, 96, 0.1)",
-                                border: "1px solid rgba(249, 188, 96, 0.2)",
-                              }}
-                            >
-                              <h4
-                                className="font-semibold mb-2 line-clamp-1"
-                                style={{ color: "#fffffe" }}
-                              >
+                            <div className="bg-[#f9bc60]/10 border border-[#f9bc60]/20 rounded-xl p-3 hover:bg-[#f9bc60]/15 transition-all">
+                              <h4 className="font-semibold mb-2 line-clamp-1 text-[#fffffe]">
                                 {like.application.title}
                               </h4>
-                              <p
-                                className="text-sm line-clamp-2 mb-2"
-                                style={{ color: "#abd1c6" }}
-                              >
+                              <p className="text-sm line-clamp-2 mb-2 text-[#abd1c6]">
                                 {like.application.summary}
                               </p>
-                              <div
-                                className="flex items-center gap-1 text-sm font-medium"
-                                style={{ color: "#f9bc60" }}
-                              >
+                              <div className="flex items-center gap-1 text-sm font-medium text-[#f9bc60]">
                                 <span>Читать историю</span>
-                                <svg
-                                  className="w-3 h-3"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 5l7 7-7 7"
-                                  />
-                                </svg>
+                                <LucideIcons.ArrowRight size="sm" />
                               </div>
                             </div>
                           </Link>
@@ -488,4 +373,6 @@ export default function LikesModal({ isOpen, onClose }: LikesModalProps) {
       </motion.div>
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }

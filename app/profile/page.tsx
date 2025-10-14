@@ -10,8 +10,9 @@ import ProfileActivity from "@/components/profile/ProfileActivity";
 import ProfileLoading from "@/components/profile/ProfileLoading";
 import ProfileLikesSection from "@/components/profile/ProfileLikesSection";
 import ProfileFriendsSection from "@/components/profile/ProfileFriendsSection";
+import ProfileAchievements from "@/components/profile/ProfileAchievements";
 import UniversalBackground from "@/components/ui/UniversalBackground";
-// import ThreePet from "@/components/ThreePet"; // Temporarily disabled
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 // Lazy load heavy modals
 const SettingsModal = dynamic(
@@ -87,23 +88,27 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <UniversalBackground />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-white/20 dark:border-gray-700/20"
+          className="relative z-10 text-center bg-[#004643]/80 backdrop-blur-xl rounded-3xl p-12 max-w-md border border-[#abd1c6]/20"
         >
-          <div className="text-8xl mb-6">🔒</div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Доступ ограничен
+          <div className="w-20 h-20 bg-[#f9bc60]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <LucideIcons.User className="text-[#f9bc60]" size="xl" />
+          </div>
+          <h1 className="text-3xl font-bold text-[#fffffe] mb-4">
+            Требуется авторизация
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg">
+          <p className="text-[#abd1c6] mb-8 text-lg">
             Войдите в аккаунт, чтобы просмотреть свой профиль
           </p>
           <a
             href="/login"
-            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] font-bold rounded-full transition-all duration-300"
           >
+            <LucideIcons.ArrowRight size="sm" />
             Войти в аккаунт
           </a>
         </motion.div>
@@ -122,55 +127,66 @@ export default function ProfilePage() {
       </div>
 
       {/* Main Content */}
-      <div className="w-full px-6 pt-32 pb-8 relative z-10">
+      <div className="w-full px-4 md:px-6 pt-32 pb-12 relative z-10">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* User Info Card - 3 колонки */}
+            
+            {/* Left Sidebar - User Info - 3 колонки */}
             <div className="lg:col-span-3 space-y-6">
               <UserInfoCard user={user} onThemeChange={handleThemeChange} />
               <ProfileFriendsSection />
             </div>
 
-            {/* Центральный блок - 3D Бульдог - 6 колонок */}
+            {/* Center - Main Content - 6 колонок */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="lg:col-span-6"
+              transition={{ delay: 0.2 }}
+              className="lg:col-span-6 space-y-6"
             >
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+              {/* Бульдог игра */}
+              <div className="bg-[#004643]/30 backdrop-blur-sm rounded-3xl border border-[#abd1c6]/20 overflow-hidden">
                 {/* Заголовок */}
-                <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 p-6 border-b border-white/10">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <span className="text-3xl">🎮</span>
-                    Мини-игра с Бульдогом
-                  </h2>
-                  <p className="text-white/70 mt-2">Кастомизируй своего персонажа!</p>
+                <div className="bg-[#004643]/50 p-6 border-b border-[#abd1c6]/10">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-[#f9bc60]/20 rounded-xl flex items-center justify-center">
+                      <LucideIcons.Rocket className="text-[#f9bc60]" size="lg" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-[#fffffe]">
+                        Мини-игра
+                      </h2>
+                      <p className="text-[#abd1c6] text-sm">Кастомизируй своего персонажа</p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Область для игры */}
-                <div className="p-8">
+                <div className="p-6">
                   <div 
-                    className="w-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl border border-white/20 overflow-hidden flex items-center justify-center"
-                    style={{ height: '600px' }}
+                    className="w-full bg-[#001e1d]/40 rounded-2xl border border-[#abd1c6]/10 overflow-hidden flex items-center justify-center"
+                    style={{ height: '500px' }}
                   >
                     <div className="text-center">
-                      <div className="text-6xl mb-4">🎮</div>
-                      <p className="text-white/70 text-lg">Здесь будет мини-игра</p>
+                      <div className="w-20 h-20 bg-[#f9bc60]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <LucideIcons.Rocket className="text-[#f9bc60]" size="xl" />
+                      </div>
+                      <p className="text-[#abd1c6] text-lg">Игра в разработке</p>
                     </div>
                   </div>
                 </div>
               </div>
             </motion.div>
 
-            {/* Right Sidebar - Статистика и Активность - 3 колонки */}
+            {/* Right Sidebar - Stats & Activity - 3 колонки */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.3 }}
               className="lg:col-span-3 space-y-6"
             >
               <ProfileStatsList />
+              <ProfileAchievements />
               <ProfileActivity />
               <ProfileLikesSection />
             </motion.div>

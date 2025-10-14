@@ -1,7 +1,7 @@
 // app/api/applications/route.ts
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-// import { checkAndGrantAchievements } from "@/lib/achievements"; // Удалено - система достижений отключена
+import { AchievementService } from "@/lib/achievements/service";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -110,7 +110,13 @@ export async function POST(req: Request) {
       });
     }
 
-    // Система достижений отключена
+    // Проверяем и выдаём достижения
+    try {
+      await AchievementService.checkAndGrantAutomaticAchievements(session.uid);
+    } catch (error) {
+      console.error("Error checking achievements:", error);
+      // Не прерываем создание заявки из-за ошибки достижений
+    }
 
     return Response.json({ ok: true, id: app.id });
   } catch (error) {

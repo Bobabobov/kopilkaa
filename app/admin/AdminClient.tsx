@@ -1,7 +1,7 @@
 // app/admin/AdminClient.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ApplicationStatus } from "./types";
@@ -10,7 +10,6 @@ import ControlPanel from "./components/ControlPanel";
 import ApplicationsGrid from "./components/ApplicationsGrid";
 import StatusModal from "./components/StatusModal";
 import ImageLightbox from "./components/ImageLightbox";
-import Pagination from "./components/Pagination";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import { useAdminApplications } from "./hooks/useAdminApplications";
@@ -20,9 +19,9 @@ export default function AdminClient() {
     // Состояние
     items,
     loading,
+    loadingMore,
     error,
-    page,
-    pages,
+    hasMore,
     stats,
 
     // Фильтры
@@ -40,12 +39,14 @@ export default function AdminClient() {
     setSortOrder,
 
     // Действия
-    load,
-    setPage,
+    loadMore,
     refreshStats,
     toggleEmail,
     visibleEmails,
   } = useAdminApplications();
+
+  // Intersection Observer для бесконечной прокрутки
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   // Модалка статуса
   const [modal, setModal] = useState<{
@@ -77,6 +78,29 @@ export default function AdminClient() {
 
   const { showToast } = useBeautifulToast();
 
+  // Intersection Observer для бесконечной прокрутки
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore && hasMore && !loading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1, rootMargin: "100px" }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [loadingMore, hasMore, loading, loadMore]);
+
   // Быстрое обновление статуса
   const quickUpdate = async (
     id: string,
@@ -100,7 +124,6 @@ export default function AdminClient() {
       // );
 
       // Обновляем данные
-      await load(page);
       await refreshStats();
     } catch (err) {
       console.error("Failed to update application:", err);
@@ -130,7 +153,6 @@ export default function AdminClient() {
       setModal({ id: "", status: "PENDING", comment: "" });
 
       // Обновляем данные
-      await load(page);
       await refreshStats();
     } catch (err) {
       console.error("Failed to update application:", err);
@@ -158,7 +180,6 @@ export default function AdminClient() {
       setDeleteModal({ id: "", title: "" });
 
       // Обновляем данные
-      await load(page);
       await refreshStats();
     } catch (err) {
       console.error("Failed to delete application:", err);
@@ -224,6 +245,12 @@ export default function AdminClient() {
                   Заявки
                 </Link>
                 <Link
+                  href="/admin/achievements"
+                  className="px-4 py-2 bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
+                >
+                  Достижения
+                </Link>
+                <Link
                   href="/admin/ads"
                   className="px-4 py-2 bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
                 >
@@ -278,18 +305,35 @@ export default function AdminClient() {
               onQuickReject={handleQuickReject}
               onDelete={handleDelete}
             />
-          </div>
 
-          {/* Пагинация */}
-          {pages > 1 && (
-            <div className="mt-8">
-              <Pagination
-                currentPage={page}
-                totalPages={pages}
-                onPageChange={setPage}
-              />
-            </div>
-          )}
+            {/* Индикатор загрузки следующих заявок */}
+            {loadingMore && (
+              <div className="flex justify-center items-center py-12">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 border-4 border-[#abd1c6] border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-[#abd1c6] font-medium">
+                    Загружаем ещё заявки...
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Невидимый элемент для отслеживания скролла */}
+            {hasMore && !loadingMore && (
+              <div ref={observerTarget} className="h-20" />
+            )}
+
+            {/* Сообщение о конце списка */}
+            {!hasMore && items.length > 0 && (
+              <div className="text-center py-12">
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 transition-all duration-300 hover:scale-110 hover:bg-white/10 hover:border-[#abd1c6]/50 hover:shadow-lg hover:shadow-[#abd1c6]/20 cursor-default">
+                  <p className="text-[#abd1c6] font-medium transition-all duration-300 hover:text-[#f9bc60]">
+                    А всё, ноу заявок!
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

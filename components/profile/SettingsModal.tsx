@@ -1,7 +1,8 @@
 // components/profile/SettingsModal.tsx
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSettings } from "./hooks/useSettings";
 import SettingsHeader from "./settings/SettingsHeader";
@@ -19,6 +20,7 @@ import {
 } from "./settings/LoadingStates";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
+import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -26,7 +28,11 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
+  const [mounted, setMounted] = useState(false);
   const { ToastComponent } = useBeautifulToast();
+  
+  // Автоскрытие скроллбаров
+  useAutoHideScrollbar();
 
   const {
     // Состояние
@@ -56,6 +62,11 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     handleDeleteAccount,
   } = useSettings();
 
+  // Монтирование для Portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Управление клавишами
   useEffect(() => {
     if (!isOpen) return;
@@ -68,33 +79,30 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
     // Сохраняем текущую прокрутку
     const originalOverflow = document.body.style.overflow;
-    const originalPosition = document.body.style.position;
 
-    // Блокируем прокрутку плавно
+    // Блокируем прокрутку
     document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.width = "100%";
 
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
 
-      // Восстанавливаем прокрутку плавно
+      // Восстанавливаем прокрутку
       document.body.style.overflow = originalOverflow;
-      document.body.style.position = originalPosition;
-      document.body.style.width = "";
     };
   }, [isOpen, onClose]);
 
-  return (
+  if (!isOpen || !mounted) return null;
+
+  const modalContent = (
     <AnimatePresence>
       <motion.div
         key="settings-modal"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-[999] flex items-center justify-center p-4"
         onClick={onClose}
       >
         <motion.div
@@ -102,7 +110,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="rounded-3xl shadow-2xl max-w-4xl w-full h-[90vh] overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] border border-[#abd1c6]/30 mx-4"
+          className="rounded-3xl shadow-2xl max-w-4xl w-full h-[90vh] overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] border border-[#abd1c6]/30 mx-4 custom-scrollbar"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Заголовок модалки */}
@@ -282,4 +290,6 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       <ToastComponent />
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }

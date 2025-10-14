@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import LikesModal from "./LikesModal";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface LikeData {
   id: string;
@@ -27,6 +28,7 @@ export default function ProfileLikesSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [lastReadLikeId, setLastReadLikeId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchLikes = async () => {
@@ -36,7 +38,13 @@ export default function ProfileLikesSection() {
           throw new Error("Ошибка загрузки лайков");
         }
         const data = await response.json();
-        setLikes(data.likes || []);
+        const newLikes = data.likes || [];
+        setLikes(newLikes);
+        
+        // Загружаем последний прочитанный лайк из localStorage
+        const savedLastRead = localStorage.getItem('lastReadLikeId');
+        setLastReadLikeId(savedLastRead);
+        
       } catch (err) {
         console.error("Error fetching likes:", err);
         setError(err instanceof Error ? err.message : "Неизвестная ошибка");
@@ -48,25 +56,72 @@ export default function ProfileLikesSection() {
     fetchLikes();
   }, []);
 
+  // Определяем количество новых лайков
+  const getNewLikesCount = () => {
+    if (!lastReadLikeId || likes.length === 0) return likes.length;
+    
+    // Находим индекс последнего прочитанного лайка
+    const lastReadIndex = likes.findIndex(like => like.id === lastReadLikeId);
+    
+    // Если не найден или это первый лайк, считаем все как новые
+    if (lastReadIndex === -1) return likes.length;
+    
+    // Возвращаем количество лайков после последнего прочитанного
+    return lastReadIndex;
+  };
+
+  const newLikesCount = getNewLikesCount();
+
+  // Отмечаем лайки как прочитанные при открытии модального окна
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+    // Сохраняем ID последнего лайка как прочитанный
+    if (likes.length > 0) {
+      const latestLikeId = likes[0].id;
+      setLastReadLikeId(latestLikeId);
+      localStorage.setItem('lastReadLikeId', latestLikeId);
+    }
+  };
+
   return (
     <>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700/20"
+        className="bg-[#004643]/30 backdrop-blur-sm rounded-3xl p-6 border border-[#abd1c6]/20"
       >
         {/* Заголовок секции */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-red-500 flex items-center justify-center shadow-lg">
-              <span className="text-white text-lg">❤️</span>
+            <div className="relative">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                newLikesCount > 0 
+                  ? "bg-red-500/20 animate-pulse shadow-lg shadow-red-500/30" 
+                  : "bg-[#f9bc60]/20"
+              }`}>
+                <LucideIcons.Heart 
+                  className={`transition-all duration-300 ${
+                    newLikesCount > 0 
+                      ? "text-red-500 drop-shadow-lg heart-notification" 
+                      : "text-[#f9bc60]"
+                  }`} 
+                  size="sm" 
+                />
+              </div>
+              
+              {/* Уведомление о количестве новых лайков */}
+              {newLikesCount > 0 && (
+                <div className="absolute -top-2 -right-2 min-w-[20px] h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1 animate-bounce shadow-lg border-2 border-white">
+                  {newLikesCount}
+                </div>
+              )}
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+              <h3 className="text-xl font-bold text-[#fffffe]">
                 Лайки ваших историй
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-[#abd1c6]">
                 {likes.length}{" "}
                 {likes.length === 1
                   ? "лайк"
@@ -79,10 +134,11 @@ export default function ProfileLikesSection() {
 
           {likes.length > 0 && (
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 transition-colors font-medium"
+              onClick={handleOpenModal}
+              className="text-sm text-[#f9bc60] hover:text-[#e8a545] transition-colors font-medium flex items-center gap-1"
             >
-              Все лайки →
+              Все лайки
+              <LucideIcons.ArrowRight size="sm" />
             </button>
           )}
         </div>
@@ -90,34 +146,41 @@ export default function ProfileLikesSection() {
         {/* Контент */}
         {loading ? (
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="w-12 h-12 bg-[#abd1c6]/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <LucideIcons.Loader2 className="text-[#abd1c6] animate-spin" size="lg" />
+            </div>
+            <p className="text-sm text-[#abd1c6]">
               Загрузка...
             </p>
           </div>
         ) : error ? (
           <div className="text-center py-8">
-            <div className="text-red-500 text-2xl mb-2">⚠️</div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <LucideIcons.Alert className="text-red-500" size="lg" />
+            </div>
+            <p className="text-sm text-[#abd1c6]">
               Ошибка загрузки
             </p>
           </div>
         ) : likes.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-gray-400 text-3xl mb-3">💔</div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <div className="w-16 h-16 bg-[#abd1c6]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <LucideIcons.Heart className="text-[#abd1c6]" size="xl" />
+            </div>
+            <p className="text-sm text-[#abd1c6] mb-4">
               Пока нет лайков
             </p>
             <Link
               href="/applications"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] rounded-xl transition-colors text-sm font-semibold"
             >
+              <LucideIcons.Plus size="sm" />
               Подать заявку
             </Link>
           </div>
         ) : (
-          <div className="space-y-4">
-            {likes.slice(0, 3).map((like, index) => {
+          <div className="space-y-3">
+            {likes.slice(0, 1).map((like, index) => {
               if (!like.id || !like.id.trim()) return null;
               return (
                 <motion.div
@@ -129,11 +192,11 @@ export default function ProfileLikesSection() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * index }}
-                  className="bg-gradient-to-r from-pink-50 to-red-50 dark:from-pink-900/10 dark:to-red-900/10 rounded-xl p-4 border border-pink-200 dark:border-pink-700/30 hover:shadow-md transition-shadow"
+                  className="bg-[#001e1d]/40 rounded-2xl p-4 border border-[#abd1c6]/10 hover:border-[#f9bc60]/30 transition-all"
                 >
                   <div className="flex items-start gap-3">
                     {/* Аватар */}
-                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#004643] flex items-center justify-center text-[#abd1c6] font-bold text-sm border border-[#abd1c6]/20 flex-shrink-0">
                       {like.user.avatar ? (
                         <img
                           src={like.user.avatar}
@@ -148,63 +211,33 @@ export default function ProfileLikesSection() {
                       )}
                     </div>
 
-                    {/* Информация */}
+                    {/* Контент */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Link
-                          href={`/profile/${like.user.id}`}
-                          className="text-sm font-semibold text-gray-900 dark:text-white hover:text-pink-600 dark:hover:text-pink-400 transition-colors truncate"
-                        >
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <h4 className="font-semibold text-[#fffffe] text-sm truncate">
                           {like.user.name || like.user.email.split("@")[0]}
-                        </Link>
-                        <span className="text-pink-500 text-xs">❤️</span>
-                      </div>
-
-                      <Link
-                        href={`/stories/${like.application.id}`}
-                        className="block group"
-                      >
-                        <h4 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors truncate mb-1">
-                          {like.application.title}
                         </h4>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                          {like.application.summary}
-                        </p>
-                      </Link>
-
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-[#abd1c6] text-xs flex-shrink-0">
                           {new Date(like.createdAt).toLocaleDateString("ru-RU")}
                         </span>
-                        <Link
-                          href={`/stories/${like.application.id}`}
-                          className="text-xs text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 transition-colors"
-                        >
-                          Читать →
-                        </Link>
                       </div>
+                      <p className="text-[#abd1c6] text-xs line-clamp-2">
+                        Лайкнул историю: "{like.application.title}"
+                      </p>
                     </div>
                   </div>
                 </motion.div>
               );
             })}
-
-            {likes.length > 3 && (
-              <div className="text-center pt-2">
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  И еще {likes.length - 3} лайков...
-                </button>
-              </div>
-            )}
           </div>
         )}
       </motion.div>
 
-      {/* Модальное окно */}
-      <LikesModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      {/* Модальное окно с лайками */}
+      <LikesModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </>
   );
 }

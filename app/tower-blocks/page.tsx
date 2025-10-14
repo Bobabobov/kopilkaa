@@ -7,14 +7,27 @@ export default function TowerBlocksGame() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
+    // Скрываем шапку и баннер для этой страницы
+    const banner = document.querySelector('[data-top-banner]');
+    const header = document.querySelector('header');
+    
+    if (banner) banner.style.display = 'none';
+    if (header) header.style.display = 'none';
+    
     // Устанавливаем источник iframe после монтирования компонента
     if (iframeRef.current) {
       iframeRef.current.src = "/tower-blocks/index.html";
     }
+
+    // Восстанавливаем шапку и баннер при выходе со страницы
+    return () => {
+      if (banner) banner.style.display = '';
+      if (header) header.style.display = '';
+    };
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full z-50 bg-black">
+    <div className="fixed inset-0 w-full h-full bg-black z-50">
       {/* Кнопка назад */}
       <div className="absolute top-4 left-4 z-10">
         <Link

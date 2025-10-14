@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
-import { SiteIcons } from "@/components/ui/Icon";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface UserStats {
   applications: {
@@ -35,12 +34,12 @@ export default function ProfileStatsList() {
 
   if (loading) {
     return (
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-4 shadow-lg border border-white/20 dark:border-gray-700/20 h-fit">
-        <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-          <div className="space-y-2">
-            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
-            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
+      <div className="bg-[#004643]/30 backdrop-blur-sm rounded-3xl p-6 border border-[#abd1c6]/20">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-[#abd1c6]/20 rounded w-32"></div>
+          <div className="space-y-3">
+            <div className="h-16 bg-[#abd1c6]/10 rounded-xl"></div>
+            <div className="h-16 bg-[#abd1c6]/10 rounded-xl"></div>
           </div>
         </div>
       </div>
@@ -51,74 +50,74 @@ export default function ProfileStatsList() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 }}
-      className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-4 shadow-lg border border-white/20 dark:border-gray-700/20 h-fit"
+      transition={{ delay: 0.4 }}
+      className="bg-[#004643]/30 backdrop-blur-sm rounded-3xl p-6 border border-[#abd1c6]/20"
     >
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <SiteIcons.Stats size="md" className="text-green-500" />
-          Моя статистика
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 bg-[#f9bc60]/20 rounded-xl flex items-center justify-center">
+          <LucideIcons.Stats className="text-[#f9bc60]" size="sm" />
+        </div>
+        <h3 className="text-xl font-bold text-[#fffffe]">
+          Статистика
         </h3>
       </div>
 
       {!stats ? (
-        <div className="text-center py-4">
-          <SiteIcons.Stats size="lg" className="text-gray-400 mx-auto mb-2" />
-          <p className="text-gray-600 dark:text-gray-400 text-xs">Нет данных</p>
+        <div className="text-center py-8">
+          <div className="w-16 h-16 bg-[#abd1c6]/10 rounded-full flex items-center justify-center mx-auto mb-3">
+            <LucideIcons.Stats className="text-[#abd1c6]" size="lg" />
+          </div>
+          <p className="text-[#abd1c6] text-sm">Нет данных</p>
         </div>
       ) : (
-        <div className="space-y-1.5">
+        <div className="space-y-3">
           {/* Заявки */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="flex items-center gap-2 p-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-          >
-            <SiteIcons.Document
-              size="md"
-              className="text-emerald-500 flex-shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h4 className="font-medium text-gray-900 dark:text-white text-xs">
-                  Мои заявки
-                </h4>
-                <span className="px-1 py-0.5 rounded text-xs font-medium bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
-                  {stats.applications.total}
-                </span>
+          <div className="bg-[#001e1d]/40 rounded-2xl p-4 border border-[#abd1c6]/10">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-[#f9bc60]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <LucideIcons.FileText className="text-[#f9bc60]" size="md" />
               </div>
-              <p className="text-gray-600 dark:text-gray-400 text-xs">
-                Одобрено: {stats.applications.approved}
-              </p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h4 className="font-semibold text-[#fffffe] text-sm">
+                    Мои заявки
+                  </h4>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#f9bc60] text-[#001e1d]">
+                    {stats.applications.total}
+                  </span>
+                </div>
+                <p className="text-[#abd1c6] text-xs">
+                  Одобрено: {stats.applications.approved}
+                </p>
+              </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Дней в системе */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15 }}
-            className="flex items-center gap-2 p-2 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-          >
-            <SiteIcons.Calendar
-              size="md"
-              className="text-orange-500 flex-shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h4 className="font-medium text-gray-900 dark:text-white text-xs">
-                  В системе
-                </h4>
-                <span className="px-1 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400">
-                  {stats.user.daysSinceRegistration}д
-                </span>
+          <div className="bg-[#001e1d]/40 rounded-2xl p-4 border border-[#abd1c6]/10">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-[#f9bc60]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <LucideIcons.Calendar className="text-[#f9bc60]" size="md" />
               </div>
-              <p className="text-gray-600 dark:text-gray-400 text-xs">
-                Дней с регистрации
-              </p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h4 className="font-semibold text-[#fffffe] text-sm">
+                    С нами
+                  </h4>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#f9bc60] text-[#001e1d]">
+                    {stats.user.daysSinceRegistration}
+                  </span>
+                </div>
+                <p className="text-[#abd1c6] text-xs">
+                  {stats.user.daysSinceRegistration === 1
+                    ? "день"
+                    : stats.user.daysSinceRegistration < 5
+                    ? "дня"
+                    : "дней"}
+                </p>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
     </motion.div>

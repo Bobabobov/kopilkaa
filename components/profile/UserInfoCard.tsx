@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { SiteIcons } from "@/components/ui/Icon";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 import AvatarUpload from "./AvatarUpload";
 import AvatarFrameCustomization from "./AvatarFrameCustomization";
 import HeaderCustomization from "./HeaderCustomization";
@@ -62,121 +62,110 @@ export default function UserInfoCard({
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.1 }}
-      className="lg:col-span-1"
     >
-      <div className="relative overflow-hidden bg-gradient-to-br from-white/90 via-white/80 to-white/90 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-800/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 dark:border-gray-700/20">
-        {/* Decorative background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-10 -right-10 w-24 h-24 bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-full blur-2xl"></div>
-          <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-gradient-to-br from-lime-500/10 to-emerald-500/10 rounded-full blur-xl"></div>
+      <div className="relative overflow-hidden bg-[#004643]/30 backdrop-blur-sm rounded-3xl p-8 border border-[#abd1c6]/20">
+        {/* Avatar Section */}
+        <div className="text-center mb-8">
+          <AvatarUpload
+            currentAvatar={currentAvatar}
+            userName={
+              user.name || (!user.hideEmail ? user.email : "Пользователь")
+            }
+            avatarFrame={currentAvatarFrame}
+            onAvatarChange={setCurrentAvatar}
+            onFrameChange={() => setShowFrameCustomization(true)}
+          />
+          <h2 className="text-2xl font-bold text-[#fffffe] mb-2 mt-6">
+            {user.name || "Пользователь"}
+          </h2>
+          {!user.hideEmail && (
+            <p className="text-sm text-[#abd1c6]">
+              {user.email}
+            </p>
+          )}
+          {user.hideEmail && (
+            <p className="text-sm text-[#abd1c6]/60 italic">
+              Email скрыт
+            </p>
+          )}
         </div>
 
-        <div className="relative z-10">
-          {/* Avatar */}
-          <div className="text-center mb-8">
-            <AvatarUpload
-              currentAvatar={currentAvatar}
-              userName={
-                user.name || (!user.hideEmail ? user.email : "Пользователь")
-              }
-              avatarFrame={currentAvatarFrame}
-              onAvatarChange={setCurrentAvatar}
-              onFrameChange={() => setShowFrameCustomization(true)}
-            />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 mt-4">
-              {user.name || "Пользователь"}
-            </h2>
-            {!user.hideEmail && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {user.email}
-              </p>
-            )}
-            {user.hideEmail && (
-              <p className="text-sm text-gray-400 dark:text-gray-500 italic">
-                Email скрыт
-              </p>
-            )}
-          </div>
-
-          {/* Stats */}
-          <div className="space-y-4 mb-8">
-            <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-2xl p-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-400 text-sm">
-                  Дата регистрации:
-                </span>
-                <span className="text-gray-900 dark:text-white font-semibold text-sm">
-                  {new Date(user.createdAt).toLocaleDateString("ru-RU")}
-                </span>
+        {/* Member Since */}
+        <div className="bg-[#001e1d]/40 rounded-2xl p-4 mb-8 border border-[#abd1c6]/10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#f9bc60]/20 rounded-xl flex items-center justify-center">
+                <LucideIcons.Calendar className="text-[#f9bc60]" size="sm" />
+              </div>
+              <div>
+                <p className="text-[#abd1c6] text-xs">Регистрация</p>
+                <p className="text-[#fffffe] font-semibold text-sm">
+                  {new Date(user.createdAt).toLocaleDateString("ru-RU", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Quick Actions */}
-          <div className="space-y-3">
-            {/* Мои заявки - Синий градиент */}
-            <button
-              onClick={() => {
-                window.dispatchEvent(
-                  new CustomEvent("open-applications-modal"),
-                );
-              }}
-              className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-blue-400/20"
-            >
-              <SiteIcons.Document
-                size="md"
-                className="text-white group-hover:scale-110 transition-transform"
-              />
-              <span>Мои заявки</span>
-            </button>
+        {/* Quick Actions */}
+        <div className="space-y-3">
+          {/* Мои заявки */}
+          <button
+            onClick={() => {
+              window.dispatchEvent(
+                new CustomEvent("open-applications-modal"),
+              );
+            }}
+            className="group w-full flex items-center gap-3 px-5 py-4 bg-[#001e1d]/40 hover:bg-[#001e1d]/60 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 rounded-2xl transition-all duration-300"
+          >
+            <div className="w-10 h-10 bg-[#f9bc60]/20 group-hover:bg-[#f9bc60]/30 rounded-xl flex items-center justify-center transition-colors">
+              <LucideIcons.FileText className="text-[#f9bc60]" size="sm" />
+            </div>
+            <span className="text-[#fffffe] font-semibold">Мои заявки</span>
+            <LucideIcons.ArrowRight className="text-[#abd1c6] group-hover:text-[#f9bc60] ml-auto transition-colors" size="sm" />
+          </button>
 
-            {/* Игры - Фиолетовый градиент */}
-            <a
-              href="/games"
-              className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-purple-400/20"
-            >
-              <SiteIcons.Heart
-                size="md"
-                className="text-white group-hover:scale-110 transition-transform"
-              />
-              <span>Игры</span>
-            </a>
+          {/* Игры */}
+          <a
+            href="/games"
+            className="group w-full flex items-center gap-3 px-5 py-4 bg-[#001e1d]/40 hover:bg-[#001e1d]/60 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 rounded-2xl transition-all duration-300"
+          >
+            <div className="w-10 h-10 bg-[#f9bc60]/20 group-hover:bg-[#f9bc60]/30 rounded-xl flex items-center justify-center transition-colors">
+              <LucideIcons.Rocket className="text-[#f9bc60]" size="sm" />
+            </div>
+            <span className="text-[#fffffe] font-semibold">Игры</span>
+            <LucideIcons.ArrowRight className="text-[#abd1c6] group-hover:text-[#f9bc60] ml-auto transition-colors" size="sm" />
+          </a>
 
-            {/* Кастомизация заголовка - Фиолетовый градиент */}
-            <button
-              onClick={() => setShowHeaderCustomization(true)}
-              className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-purple-400/20"
-            >
-              <svg
-                className="w-5 h-5 text-white group-hover:scale-110 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"
-                />
-              </svg>
-              <span>Тема заголовка</span>
-            </button>
+          {/* Тема заголовка */}
+          <button
+            onClick={() => setShowHeaderCustomization(true)}
+            className="group w-full flex items-center gap-3 px-5 py-4 bg-[#001e1d]/40 hover:bg-[#001e1d]/60 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 rounded-2xl transition-all duration-300"
+          >
+            <div className="w-10 h-10 bg-[#f9bc60]/20 group-hover:bg-[#f9bc60]/30 rounded-xl flex items-center justify-center transition-colors">
+              <LucideIcons.Palette className="text-[#f9bc60]" size="sm" />
+            </div>
+            <span className="text-[#fffffe] font-semibold">Тема заголовка</span>
+            <LucideIcons.ArrowRight className="text-[#abd1c6] group-hover:text-[#f9bc60] ml-auto transition-colors" size="sm" />
+          </button>
 
-            {/* Настройки - Серый градиент */}
-            <button
-              onClick={() => {
-                window.dispatchEvent(new CustomEvent("open-settings-modal"));
-              }}
-              className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-gray-500/20"
-            >
-              <SiteIcons.Settings
-                size="md"
-                className="text-white group-hover:scale-110 transition-transform"
-              />
-              <span>Настройки</span>
-            </button>
-          </div>
+          {/* Настройки */}
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent("open-settings-modal"));
+            }}
+            className="group w-full flex items-center gap-3 px-5 py-4 bg-[#001e1d]/40 hover:bg-[#001e1d]/60 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 rounded-2xl transition-all duration-300"
+          >
+            <div className="w-10 h-10 bg-[#f9bc60]/20 group-hover:bg-[#f9bc60]/30 rounded-xl flex items-center justify-center transition-colors">
+              <LucideIcons.Settings className="text-[#f9bc60]" size="sm" />
+            </div>
+            <span className="text-[#fffffe] font-semibold">Настройки</span>
+            <LucideIcons.ArrowRight className="text-[#abd1c6] group-hover:text-[#f9bc60] ml-auto transition-colors" size="sm" />
+          </button>
         </div>
       </div>
 

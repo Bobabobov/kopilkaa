@@ -14,7 +14,6 @@ import PageHeader from "@/components/applications/PageHeader";
 import SubmitSection from "@/components/applications/SubmitSection";
 import ApplicationPreview from "@/components/applications/ApplicationPreview";
 import UniversalBackground from "@/components/ui/UniversalBackground";
-import Header from "@/components/layout/Header";
 
 type LocalImage = { file: File; url: string };
 
@@ -267,10 +266,6 @@ export default function ApplicationsPage() {
       <div className="min-h-screen relative overflow-hidden">
         <UniversalBackground />
         
-        {/* Шапка сайта */}
-        <div className="relative z-20">
-          <Header />
-        </div>
         
         <div className="container-p mx-auto pt-32 pb-8 relative z-10">
           <SuccessScreen onNewApplication={() => setSubmitted(false)} />
@@ -284,10 +279,6 @@ export default function ApplicationsPage() {
       {/* Фон */}
       <UniversalBackground />
 
-      {/* Шапка сайта */}
-      <div className="relative z-20">
-        <Header />
-      </div>
 
       <PageHeader />
 

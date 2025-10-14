@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { setSession } from "@/lib/auth";
 import bcrypt from "bcryptjs";
+import { AchievementService } from "@/lib/achievements/service";
 
 export async function POST(req: Request) {
   try {
@@ -33,6 +34,17 @@ export async function POST(req: Request) {
 
     console.log("Login successful for user:", user.id);
     await setSession({ uid: user.id, role: user.role as any });
+
+    // Проверяем и выдаём достижения при входе (в фоне)
+    AchievementService.checkAndGrantAutomaticAchievements(user.id)
+      .then((granted) => {
+        if (granted.length > 0) {
+          console.log(`User ${user.id} received ${granted.length} achievements on login`);
+        }
+      })
+      .catch((error) => {
+        console.error("Error checking achievements on login:", error);
+      });
 
     return Response.json({
       ok: true,

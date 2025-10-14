@@ -1,5 +1,6 @@
 export { StoriesHeader } from "./StoriesHeader";
 export { StoryCard } from "./StoryCard";
+export { AdCard } from "./AdCard";
 export { StoriesLoading } from "./StoriesLoading";
 export { StoriesEmptyState } from "./StoriesEmptyState";
 export { StoriesPagination } from "./StoriesPagination";

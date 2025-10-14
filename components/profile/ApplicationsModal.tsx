@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useApplications } from "@/lib/useApplications";
@@ -9,6 +10,7 @@ import { ApplicationCard } from "@/components/applications/ApplicationCard";
 import { Pagination } from "@/components/applications/Pagination";
 import { EmptyState } from "@/components/applications/EmptyState";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
+import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
 
 interface ApplicationsModalProps {
   isOpen: boolean;
@@ -19,7 +21,11 @@ export default function ApplicationsModal({
   isOpen,
   onClose,
 }: ApplicationsModalProps) {
+  const [mounted, setMounted] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
+  
+  // Автоскрытие скроллбаров
+  useAutoHideScrollbar();
   const {
     items,
     stats,
@@ -50,6 +56,11 @@ export default function ApplicationsModal({
     title: "",
     message: "",
   });
+
+  // Монтирование для Portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Горячие клавиши и блокировка прокрутки
   useEffect(() => {
@@ -114,16 +125,16 @@ export default function ApplicationsModal({
     }, 3000);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       <motion.div
         key="applications-modal"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
         onClick={onClose}
       >
         <motion.div
@@ -131,7 +142,7 @@ export default function ApplicationsModal({
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden backdrop-blur-xl"
+          className="rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden backdrop-blur-xl custom-scrollbar"
           style={{
             backgroundColor: "#004643",
             border: "1px solid #abd1c6",
@@ -271,4 +282,6 @@ export default function ApplicationsModal({
       <ToastComponent key="toast-component" />
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }

@@ -28,6 +28,8 @@ enum AchievementType {
   GAMES
   SOCIAL
   SPECIAL
+  COMMUNITY
+  CREATIVITY
 }
 
 model User {

@@ -2,11 +2,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFriends } from "./hooks/useFriends";
 import FriendsTab from "./FriendsTab";
 import FriendsSearch from "./FriendsSearch";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
+import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
 
 interface FriendsModalProps {
   isOpen: boolean;
@@ -19,10 +21,14 @@ export default function FriendsModal({
   onClose,
   initialTab = "friends",
 }: FriendsModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "friends" | "sent" | "received" | "search"
   >(initialTab || "friends");
   const { ToastComponent } = useBeautifulToast();
+  
+  // Автоскрытие скроллбаров
+  useAutoHideScrollbar();
 
   const {
     // Состояние
@@ -49,6 +55,11 @@ export default function FriendsModal({
     getUserStatus,
     sendingRequests,
   } = useFriends();
+
+  // Монтирование для Portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Управление клавишами
   useEffect(() => {
@@ -124,7 +135,7 @@ export default function FriendsModal({
     await removeFriend(friendshipId);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const tabs = [
     {
@@ -148,14 +159,14 @@ export default function FriendsModal({
     { id: "search" as const, label: "Поиск", icon: "🔍" },
   ];
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       <motion.div
         key="friends-modal"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
         onClick={onClose}
       >
         <motion.div
@@ -163,10 +174,10 @@ export default function FriendsModal({
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="rounded-2xl shadow-xl max-w-2xl w-full max-h-[75vh] overflow-hidden backdrop-blur-xl"
+          className="rounded-2xl shadow-xl max-w-2xl w-full max-h-[75vh] overflow-hidden backdrop-blur-xl flex flex-col"
           style={{
             backgroundColor: "#004643",
-            border: "1px solid #abd1c6",
+            border: "1px solid #abd1c6"
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -267,7 +278,7 @@ export default function FriendsModal({
           </div>
 
           {/* Контент */}
-          <div className="p-4 max-h-96 overflow-y-auto">
+          <div className="flex-1 p-4 overflow-y-auto custom-scrollbar">
             {activeTab === "friends" && (
               <FriendsTab
                 type="friends"
@@ -332,4 +343,6 @@ export default function FriendsModal({
       <ToastComponent />
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }

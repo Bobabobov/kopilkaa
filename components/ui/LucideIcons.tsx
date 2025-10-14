@@ -21,6 +21,7 @@ import {
   Clock,
   ArrowRight,
   ArrowLeft,
+  ArrowDown,
   Plus,
   Minus,
   Edit,
@@ -57,6 +58,15 @@ import {
   ZoomIn,
   Edit3,
   Coins,
+  Megaphone,
+  Palette,
+  Rocket,
+  Loader2,
+  Target,
+  LayoutGrid,
+  Smartphone,
+  Zap,
+  Building2,
 } from "lucide-react";
 
 interface IconProps {
@@ -197,7 +207,7 @@ export const LucideIcons = {
 
   // Целевая аудитория
   Target: ({ className = "", size = "md" }: IconProps) => (
-    <Star className={`${sizeClasses[size]} ${className}`} />
+    <Target className={`${sizeClasses[size]} ${className}`} />
   ),
 
   // Тренд/рост
@@ -371,5 +381,45 @@ export const LucideIcons = {
 
   HelpCircle: ({ className = "", size = "md" }: IconProps) => (
     <HelpCircle className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  ArrowDown: ({ className = "", size = "md" }: IconProps) => (
+    <ArrowDown className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Megaphone: ({ className = "", size = "md" }: IconProps) => (
+    <Megaphone className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Palette: ({ className = "", size = "md" }: IconProps) => (
+    <Palette className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Rocket: ({ className = "", size = "md" }: IconProps) => (
+    <Rocket className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Loader2: ({ className = "", size = "md" }: IconProps) => (
+    <Loader2 className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  LayoutGrid: ({ className = "", size = "md" }: IconProps) => (
+    <LayoutGrid className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Smartphone: ({ className = "", size = "md" }: IconProps) => (
+    <Smartphone className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Zap: ({ className = "", size = "md" }: IconProps) => (
+    <Zap className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Building2: ({ className = "", size = "md" }: IconProps) => (
+    <Building2 className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Upload: ({ className = "", size = "md" }: IconProps) => (
+    <Upload className={`${sizeClasses[size]} ${className}`} />
   ),
 };

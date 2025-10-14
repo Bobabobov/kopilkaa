@@ -22,7 +22,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
     {
       icon: "💰",
       title: "Общая сумма",
-      value: `₽${stats.totalAmount.toLocaleString()}`,
+      value: `₽${stats.totalAmount?.toLocaleString() || '0'}`,
       description: "Запрошено всего",
       gradient:
         "from-emerald-500/10 to-green-500/10 group-hover:from-emerald-500/20 group-hover:to-green-500/20",

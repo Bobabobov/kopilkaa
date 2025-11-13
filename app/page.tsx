@@ -1,10 +1,29 @@
 "use client";
 import { useState, useEffect } from "react";
-import HeroSection from "@/components/home/HeroSection";
-import HowItWorks from "@/components/home/HowItWorks";
-import RecentApplications from "@/components/home/RecentApplications";
-import FAQ from "@/components/home/FAQ";
+import dynamic from "next/dynamic";
+import { cachedFetch, getCachedStats, cacheStats } from "@/lib/cache";
 import PixelBackground from "@/components/ui/PixelBackground";
+
+// Lazy load heavy components
+const HeroSection = dynamic(() => import("@/components/home/HeroSection"), {
+  ssr: false,
+  loading: () => <div className="h-screen bg-gradient-to-br from-[#004643] to-[#001e1d]" />
+});
+
+const HowItWorks = dynamic(() => import("@/components/home/HowItWorks"), {
+  ssr: false,
+  loading: () => <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+});
+
+const RecentApplications = dynamic(() => import("@/components/home/RecentApplications"), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-[#004643]/30 animate-pulse rounded-3xl" />
+});
+
+const FAQ = dynamic(() => import("@/components/home/FAQ"), {
+  ssr: false,
+  loading: () => <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+});
 
 type Stats = {
   collected: number;
@@ -25,17 +44,27 @@ export default function HomePage() {
 
   useEffect(() => {
     setMounted(true);
-    // Загружаем статистику
-    fetch("/api/stats")
-      .then((r) => r.json())
+    
+    // Проверяем кэш
+    const cachedStats = getCachedStats<Stats>();
+    if (cachedStats) {
+      setStats(cachedStats);
+      setLoading(false);
+      return;
+    }
+
+    // Загружаем статистику с кэшированием
+    cachedFetch<{ stats: Stats }>("/api/stats", {}, 2 * 60 * 1000)
       .then((data) => {
         if (data && data.stats) {
-          setStats({
+          const newStats = {
             collected: data.stats.applications.total || 0,
             requests: data.stats.applications.pending || 0,
             approved: data.stats.applications.approved || 0,
             people: data.stats.users.total || 0,
-          });
+          };
+          setStats(newStats);
+          cacheStats(newStats);
         }
       })
       .catch(() => {})

@@ -4,6 +4,7 @@ import {
   FileText,
   Shield,
   Heart,
+  ThumbsUp,
   Users,
   DollarSign,
   BarChart3,
@@ -47,6 +48,7 @@ import {
   RefreshCw,
   Save,
   AlertCircle,
+  AlertTriangle,
   Info,
   Check,
   XCircle,
@@ -67,11 +69,25 @@ import {
   Smartphone,
   Zap,
   Building2,
+  Lock,
+  Trophy,
+  Bell,
+  UserPlus,
+  UserCheck,
+  Crown,
+  Award,
+  Medal,
+  Activity,
+  CheckCircle2,
+  TrendingDown,
+  PieChart,
+  Lightbulb,
+  Gamepad2,
 } from "lucide-react";
 
 interface IconProps {
   className?: string;
-  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 }
 
 const sizeClasses = {
@@ -80,6 +96,7 @@ const sizeClasses = {
   md: "w-6 h-6",
   lg: "w-8 h-8",
   xl: "w-12 h-12",
+  "2xl": "w-16 h-16",
 };
 
 export const LucideIcons = {
@@ -114,6 +131,10 @@ export const LucideIcons = {
 
   Heart: ({ className = "", size = "md" }: IconProps) => (
     <Heart className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  ThumbsUp: ({ className = "", size = "md" }: IconProps) => (
+    <ThumbsUp className={`${sizeClasses[size]} ${className}`} />
   ),
 
   TrendingUp: ({ className = "", size = "md" }: IconProps) => (
@@ -182,17 +203,22 @@ export const LucideIcons = {
 
   // Награда/трофей
   Award: ({ className = "", size = "md" }: IconProps) => (
-    <Star className={`${sizeClasses[size]} ${className}`} />
+    <Award className={`${sizeClasses[size]} ${className}`} />
   ),
 
   // Трофей
   Trophy: ({ className = "", size = "md" }: IconProps) => (
-    <Star className={`${sizeClasses[size]} ${className}`} />
+    <Trophy className={`${sizeClasses[size]} ${className}`} />
   ),
 
   // Медаль
   Medal: ({ className = "", size = "md" }: IconProps) => (
-    <Star className={`${sizeClasses[size]} ${className}`} />
+    <Medal className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  // Корона
+  Crown: ({ className = "", size = "md" }: IconProps) => (
+    <Crown className={`${sizeClasses[size]} ${className}`} />
   ),
 
   // Бизнес/портфель
@@ -217,6 +243,10 @@ export const LucideIcons = {
 
   CheckCircle: ({ className = "", size = "md" }: IconProps) => (
     <CheckCircle className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  CheckCircle2: ({ className = "", size = "md" }: IconProps) => (
+    <CheckCircle2 className={`${sizeClasses[size]} ${className}`} />
   ),
 
   Clock: ({ className = "", size = "md" }: IconProps) => (
@@ -387,10 +417,6 @@ export const LucideIcons = {
     <ArrowDown className={`${sizeClasses[size]} ${className}`} />
   ),
 
-  Megaphone: ({ className = "", size = "md" }: IconProps) => (
-    <Megaphone className={`${sizeClasses[size]} ${className}`} />
-  ),
-
   Palette: ({ className = "", size = "md" }: IconProps) => (
     <Palette className={`${sizeClasses[size]} ${className}`} />
   ),
@@ -419,7 +445,60 @@ export const LucideIcons = {
     <Building2 className={`${sizeClasses[size]} ${className}`} />
   ),
 
-  Upload: ({ className = "", size = "md" }: IconProps) => (
-    <Upload className={`${sizeClasses[size]} ${className}`} />
+  Lock: ({ className = "", size = "md" }: IconProps) => (
+    <Lock className={`${sizeClasses[size]} ${className}`} />
   ),
+
+  Bell: ({ className = "", size = "md" }: IconProps) => (
+    <Bell className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  UserPlus: ({ className = "", size = "md" }: IconProps) => (
+    <UserPlus className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  UserCheck: ({ className = "", size = "md" }: IconProps) => (
+    <UserCheck className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  AlertTriangle: ({ className = "", size = "md" }: IconProps) => (
+    <AlertTriangle className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Activity: ({ className = "", size = "md" }: IconProps) => (
+    <Activity className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  CheckCircle2: ({ className = "", size = "md" }: IconProps) => (
+    <CheckCircle2 className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  TrendingDown: ({ className = "", size = "md" }: IconProps) => (
+    <TrendingDown className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  BarChart3: ({ className = "", size = "md" }: IconProps) => (
+    <BarChart3 className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  PieChart: ({ className = "", size = "md" }: IconProps) => (
+    <PieChart className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Lightbulb: ({ className = "", size = "md" }: IconProps) => (
+    <Lightbulb className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Gamepad2: ({ className = "", size = "md" }: IconProps) => (
+    <Gamepad2 className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  TrendingDown: ({ className = "", size = "md" }: IconProps) => (
+    <TrendingDown className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  PieChart: ({ className = "", size = "md" }: IconProps) => (
+    <PieChart className={`${sizeClasses[size]} ${className}`} />
+  ),
+
 };

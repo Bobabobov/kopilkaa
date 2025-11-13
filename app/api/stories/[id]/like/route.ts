@@ -48,7 +48,13 @@ export async function POST(
       },
     });
 
-    return NextResponse.json({ message: "Лайк добавлен" });
+    return NextResponse.json({ message: "Лайк добавлен" }, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
   } catch (error) {
     console.error("Error adding like:", error);
     return NextResponse.json({ message: "Ошибка сервера" }, { status: 500 });
@@ -80,7 +86,13 @@ export async function DELETE(
       return NextResponse.json({ message: "Лайк не найден" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Лайк удален" });
+    return NextResponse.json({ message: "Лайк удален" }, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache', 
+        'Expires': '0',
+      },
+    });
   } catch (error) {
     console.error("Error removing like:", error);
     return NextResponse.json({ message: "Ошибка сервера" }, { status: 500 });

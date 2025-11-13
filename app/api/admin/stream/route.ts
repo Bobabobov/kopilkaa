@@ -17,13 +17,15 @@ export async function GET() {
   const stream = new ReadableStream({
     start(controller) {
       const write = (str: string) => controller.enqueue(encoder.encode(str));
-      write(`retry: 3000\n\n`); // рекомендованная задержка реконнекта
+      
+      write(`retry: 3000\n\n`);
       write(`event: hello\ndata: "connected"\n\n`);
 
       un = subscribe(write);
+      
       pingTimer = setInterval(
         () => write(`event: ping\ndata: "${Date.now()}"\n\n`),
-        25000,
+        30000,
       );
     },
     cancel() {

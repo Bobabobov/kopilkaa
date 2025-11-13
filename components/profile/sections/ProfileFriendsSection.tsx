@@ -1,0 +1,416 @@
+"use client";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { motion, AnimatePresence } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
+import { useRouter } from "next/navigation";
+
+// Lazy load heavy modal
+const FriendsModal = dynamic(() => import("../modals/FriendsModal"), {
+  ssr: false,
+  loading: () => <div className="hidden" />,
+});
+
+interface User {
+  id: string;
+  name?: string | null;
+  email: string;
+  avatar?: string | null;
+  createdAt: string;
+  lastSeen?: string | null;
+}
+
+interface Friendship {
+  id: string;
+  status: "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED";
+  requesterId: string;
+  receiverId: string;
+  requester: User;
+  receiver: User;
+  createdAt: string;
+}
+
+export default function ProfileFriendsSection() {
+  const router = useRouter();
+  const [friends, setFriends] = useState<Friendship[]>([]);
+  const [receivedRequests, setReceivedRequests] = useState<Friendship[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [initialTab, setInitialTab] = useState<
+    "friends" | "sent" | "received" | "search"
+  >("friends");
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [lastReadRequestId, setLastReadRequestId] = useState<string | null>(null);
+
+  // Функция для определения онлайн статуса
+  const getOnlineStatus = (lastSeen?: string | null) => {
+    if (!lastSeen) return false;
+    const lastSeenDate = new Date(lastSeen);
+    const now = new Date();
+    const diffMinutes = (now.getTime() - lastSeenDate.getTime()) / (1000 * 60);
+    return diffMinutes < 5; // Считаем онлайн если был активен менее 5 минут назад
+  };
+
+  // Функция для форматирования времени последнего визита
+  const getLastSeenText = (lastSeen?: string | null) => {
+    if (!lastSeen) return "Давно не был в сети";
+    
+    const lastSeenDate = new Date(lastSeen);
+    const now = new Date();
+    const diffMinutes = (now.getTime() - lastSeenDate.getTime()) / (1000 * 60);
+    
+    if (diffMinutes < 5) return "В сети";
+    if (diffMinutes < 60) return `${Math.floor(diffMinutes)} мин назад`;
+    if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)} ч назад`;
+    return `${Math.floor(diffMinutes / 1440)} дн назад`;
+  };
+
+  // Отмечаем заявки как прочитанные при открытии модального окна
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+    // Сохраняем ID последней заявки как прочитанную
+    if (receivedRequests.length > 0) {
+      const latestRequestId = receivedRequests[0].id;
+      setLastReadRequestId(latestRequestId);
+      localStorage.setItem('lastReadFriendRequestId', latestRequestId);
+    }
+  };
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        // Получаем ID текущего пользователя
+        const meRes = await fetch("/api/profile/me", { cache: "no-store" });
+        if (meRes.ok) {
+          const meData = await meRes.json();
+          setCurrentUserId(meData.user.id);
+        }
+
+        const [friendsRes, receivedRes] = await Promise.all([
+          fetch("/api/profile/friends?type=friends"),
+          fetch("/api/profile/friends?type=received"),
+        ]);
+
+        if (friendsRes.ok) {
+          const friendsData = await friendsRes.json();
+          setFriends(friendsData.friendships || []);
+        }
+
+        if (receivedRes.ok) {
+          const receivedData = await receivedRes.json();
+          const newRequests = receivedData.friendships || [];
+          setReceivedRequests(newRequests);
+          
+          // Загружаем последнюю прочитанную заявку из localStorage
+          const savedLastRead = localStorage.getItem('lastReadFriendRequestId');
+          setLastReadRequestId(savedLastRead);
+        }
+      } catch (err) {
+        console.error("Error fetching friends:", err);
+        setError(err instanceof Error ? err.message : "Неизвестная ошибка");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFriends();
+
+    // Обработчик для открытия модального окна друзей
+    const handleOpenFriendsModal = (event: CustomEvent) => {
+      const tab = event.detail?.tab || "friends";
+      setInitialTab(tab);
+      handleOpenModal();
+    };
+
+    window.addEventListener(
+      "open-friends-modal",
+      handleOpenFriendsModal as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "open-friends-modal",
+        handleOpenFriendsModal as EventListener,
+      );
+    };
+  }, []);
+
+  // Определяем количество новых заявок в друзья
+  const getNewRequestsCount = () => {
+    if (!lastReadRequestId || receivedRequests.length === 0) return receivedRequests.length;
+    
+    // Находим индекс последней прочитанной заявки
+    const lastReadIndex = receivedRequests.findIndex(request => request.id === lastReadRequestId);
+    
+    // Если не найдена или это первая заявка, считаем все как новые
+    if (lastReadIndex === -1) return receivedRequests.length;
+    
+    // Возвращаем количество заявок после последней прочитанной
+    return lastReadIndex;
+  };
+
+  const newRequestsCount = getNewRequestsCount();
+
+  const totalFriends = friends.length;
+  const pendingRequests = receivedRequests.length;
+
+  return (
+    <>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="bg-gradient-to-br from-[#004643]/40 via-[#004643]/30 to-[#004643]/40 backdrop-blur-xl rounded-2xl border border-[#abd1c6]/20 overflow-hidden shadow-lg"
+      >
+        {/* Простой заголовок */}
+        <div className="p-6 border-b border-[#abd1c6]/10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <motion.div 
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                className="w-10 h-10 bg-[#f9bc60]/20 rounded-xl flex items-center justify-center"
+              >
+                <LucideIcons.Users className="text-[#f9bc60]" size="sm" />
+              </motion.div>
+              <div>
+                <h3 className="text-lg font-semibold text-[#fffffe]">Мои друзья</h3>
+                <p className="text-sm text-[#abd1c6]">
+                  {totalFriends > 0 ? `${totalFriends} друзей` : 'Список друзей'}
+                  {pendingRequests > 0 && ` · ${pendingRequests} заявок`}
+                </p>
+              </div>
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setInitialTab("friends");
+                handleOpenModal();
+              }}
+              className="px-4 py-2 bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 text-[#f9bc60] rounded-lg transition-colors text-sm font-medium"
+            >
+              Все друзья
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Контент */}
+        <div className="p-6">
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <motion.div 
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-center py-8"
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  <LucideIcons.Loader2 className="text-[#abd1c6] mx-auto mb-2" size="lg" />
+                </motion.div>
+                <p className="text-sm text-[#abd1c6]">Загрузка...</p>
+              </motion.div>
+            ) : error ? (
+              <motion.div 
+                key="error"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="text-center py-8"
+              >
+                <LucideIcons.AlertTriangle className="text-red-400 mx-auto mb-2" size="lg" />
+                <p className="text-sm text-[#abd1c6] mb-2">Ошибка загрузки</p>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => window.location.reload()}
+                  className="text-xs text-[#f9bc60] hover:text-[#e8a545] transition-colors"
+                >
+                  Попробовать еще раз
+                </motion.button>
+              </motion.div>
+            ) : totalFriends === 0 && pendingRequests === 0 ? (
+              <motion.div 
+                key="empty"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="text-center py-8"
+              >
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                >
+                  <LucideIcons.UserPlus className="text-[#abd1c6] mx-auto mb-3" size="2xl" />
+                </motion.div>
+                <p className="text-base text-[#fffffe] mb-2 font-medium">Пока нет друзей</p>
+                <p className="text-sm text-[#abd1c6] mb-4">Найдите интересных людей и заводите новые знакомства</p>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setInitialTab("search");
+                    handleOpenModal();
+                  }}
+                  className="px-6 py-2 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] rounded-xl transition-colors text-sm font-medium"
+                >
+                  Найти друзей
+                </motion.button>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="space-y-4"
+              >
+                {/* Простые карточки друзей */}
+                {friends.slice(0, 4).map((friendship, index) => {
+                  const friend = currentUserId === friendship.requesterId 
+                    ? friendship.receiver 
+                    : friendship.requester;
+                  
+                  const isOnline = getOnlineStatus(friend.lastSeen);
+                  
+                  return (
+                    <motion.div
+                      key={friendship.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                      whileHover={{ scale: 1.02 }}
+                      onClick={() => router.push(`/profile/${friend.id}`)}
+                      className="flex items-center gap-4 p-4 rounded-xl bg-[#001e1d]/20 hover:bg-[#001e1d]/30 cursor-pointer transition-colors"
+                    >
+                      {/* Простой аватар */}
+                      <div className="relative">
+                        <div className="w-14 h-14 rounded-full overflow-hidden bg-[#004643] flex items-center justify-center">
+                          {friend.avatar ? (
+                            <img
+                              src={friend.avatar}
+                              alt={friend.name || "Аватар"}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-[#f9bc60] font-bold text-xl">
+                              {(friend.name || friend.email.split("@")[0])[0].toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Простой онлайн индикатор */}
+                        {isOnline && (
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#10B981] rounded-full border-2 border-[#001e1d]" />
+                        )}
+                      </div>
+
+                      {/* Простая информация */}
+                      <div className="flex-1">
+                        <p className="text-[#fffffe] font-medium text-base">
+                          {friend.name || friend.email.split("@")[0]}
+                        </p>
+                        <p className="text-[#abd1c6] text-sm">
+                          {isOnline ? 'В сети' : 'Не в сети'}
+                        </p>
+                      </div>
+
+                      <LucideIcons.ChevronRight className="text-[#abd1c6]" size="sm" />
+                    </motion.div>
+                  );
+                })}
+
+                {/* Простые дополнительные элементы */}
+                {totalFriends > 4 && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => {
+                      setInitialTab("friends");
+                      handleOpenModal();
+                    }}
+                    className="flex items-center justify-between p-4 rounded-xl bg-[#001e1d]/10 hover:bg-[#001e1d]/20 cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <LucideIcons.Users className="text-[#abd1c6]" size="sm" />
+                      <span className="text-[#fffffe] font-medium">
+                        Еще {totalFriends - 4} друзей
+                      </span>
+                    </div>
+                    <LucideIcons.ChevronRight className="text-[#abd1c6]" size="sm" />
+                  </motion.div>
+                )}
+
+                {/* Простые заявки в друзья */}
+                {pendingRequests > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => {
+                      setInitialTab("received");
+                      handleOpenModal();
+                    }}
+                    className="flex items-center justify-between p-4 rounded-xl bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <LucideIcons.UserCheck className="text-[#f9bc60]" size="sm" />
+                        {newRequestsCount > 0 && (
+                          <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-[#fffffe] font-medium">{pendingRequests} заявок в друзья</p>
+                        {newRequestsCount > 0 && (
+                          <p className="text-[#f9bc60] text-xs">{newRequestsCount} новых</p>
+                        )}
+                      </div>
+                    </div>
+                    <LucideIcons.ChevronRight className="text-[#f9bc60]" size="sm" />
+                  </motion.div>
+                )}
+
+                {/* Простая кнопка поиска друзей */}
+                {totalFriends > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => {
+                      setInitialTab("search");
+                      handleOpenModal();
+                    }}
+                    className="flex items-center justify-center p-4 rounded-xl border border-dashed border-[#abd1c6]/30 hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/5 cursor-pointer transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <LucideIcons.UserPlus className="text-[#10B981]" size="sm" />
+                      <span className="text-[#fffffe] font-medium">Найти друзей</span>
+                    </div>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+
+      {/* Модальное окно друзей */}
+      <FriendsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        initialTab={initialTab}
+      />
+    </>
+  );
+}

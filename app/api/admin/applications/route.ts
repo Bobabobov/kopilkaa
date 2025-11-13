@@ -2,6 +2,9 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(req: Request) {
   const s = await getSession();
   if (!s || s.role !== "ADMIN")
@@ -84,5 +87,11 @@ export async function GET(req: Request) {
     total,
     pages: Math.ceil(total / limit),
     items,
+  }, {
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    },
   });
 }

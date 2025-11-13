@@ -45,9 +45,20 @@ export default function ApplicationCard({
   return (
     <motion.div
       key={it.id}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ 
+        duration: 0.6, 
+        delay: index * 0.1,
+        type: "spring",
+        stiffness: 100,
+        damping: 15
+      }}
+      whileHover={{ 
+        y: -5, 
+        scale: 1.02,
+        transition: { duration: 0.2 }
+      }}
       className="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-3xl p-4 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-green-500/5 to-lime-500/5 group-hover:from-emerald-500/10 group-hover:via-green-500/10 group-hover:to-lime-500/10 transition-all duration-500"></div>

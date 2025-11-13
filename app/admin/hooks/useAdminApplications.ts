@@ -1,7 +1,7 @@
 // app/admin/hooks/useAdminApplications.ts
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ApplicationItem, Stats, ApplicationStatus } from "../types";
 
 interface UseAdminApplicationsProps {
@@ -35,6 +35,7 @@ interface UseAdminApplicationsReturn {
   // Действия
   loadMore: () => Promise<void>;
   refreshStats: () => void;
+  refreshApplications: () => Promise<void>;
   toggleEmail: (id: string) => void;
   visibleEmails: Set<string>;
 }
@@ -148,6 +149,62 @@ export function useAdminApplications({
     });
   }, []);
 
+  // Debounced обновление для избежания множественных запросов
+  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Обновление списка заявок (перезагрузка первой страницы)
+  const refreshApplications = useCallback(async () => {
+    // Отменяем предыдущее обновление, если оно еще не выполнилось
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+    
+    refreshTimeoutRef.current = setTimeout(async () => {
+      try {
+        setError(null);
+        
+        // Не показываем loading если это быстрое обновление через SSE
+        const isQuickRefresh = items.length > 0;
+        if (!isQuickRefresh) {
+          setLoading(true);
+        }
+        
+        setCurrentPage(1);
+
+        const params = new URLSearchParams({
+          page: "1",
+          limit: "20",
+          ...(q && { q }),
+          ...(status !== "ALL" && { status }),
+          ...(minAmount && { minAmount }),
+          ...(maxAmount && { maxAmount }),
+          ...(sortBy && { sortBy }),
+          ...(sortOrder && { sortOrder }),
+        });
+
+        const response = await fetch(`/api/admin/applications?${params}`, {
+          cache: 'no-store'
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const newItems = data.items || [];
+        
+        setItems(newItems);
+        setHasMore(1 < (data.pages || 1));
+        setCurrentPage(2);
+      } catch (err) {
+        console.error("Failed to refresh applications:", err);
+        setError("Ошибка обновления заявок");
+      } finally {
+        setLoading(false);
+      }
+    }, 50);
+  }, [q, status, minAmount, maxAmount, sortBy, sortOrder, items.length]);
+
   // Загрузка при изменении фильтров (сброс на первую страницу)
   useEffect(() => {
     setCurrentPage(1);
@@ -159,6 +216,56 @@ export function useAdminApplications({
   useEffect(() => {
     refreshStats();
   }, [refreshStats]);
+
+  // SSE подключение для real-time обновлений
+  const eventSourceRef = useRef<EventSource | null>(null);
+  
+  useEffect(() => {
+    // Подключаемся к SSE
+    const connectSSE = () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+
+      const eventSource = new EventSource('/api/admin/stream');
+      eventSourceRef.current = eventSource;
+
+      eventSource.addEventListener('application:update', (event) => {
+        refreshApplications();
+      });
+
+      eventSource.addEventListener('application:created', (event) => {
+        refreshApplications();
+      });
+
+      eventSource.addEventListener('application:delete', (event) => {
+        refreshApplications();
+      });
+
+      eventSource.addEventListener('stats:dirty', () => {
+        refreshStats();
+      });
+
+      eventSource.onerror = (error) => {
+        eventSource.close();
+        setTimeout(connectSSE, 3000);
+      };
+    };
+
+    connectSSE();
+
+    // Очистка при размонтировании
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+        refreshTimeoutRef.current = null;
+      }
+    };
+  }, [refreshApplications, refreshStats]);
 
   return {
     // Состояние
@@ -187,6 +294,7 @@ export function useAdminApplications({
     // Действия
     loadMore,
     refreshStats,
+    refreshApplications,
     toggleEmail,
     visibleEmails,
   };

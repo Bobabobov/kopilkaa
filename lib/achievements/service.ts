@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export class AchievementService {
   // Получить все активные достижения
-  static async getAllAchievements(): Promise<Achievement[]> {
+  static async getAllAchievements() {
     return await prisma.achievement.findMany({
       where: {
         isActive: true,
@@ -19,7 +19,7 @@ export class AchievementService {
   }
 
   // Получить достижения пользователя
-  static async getUserAchievements(userId: string): Promise<UserAchievement[]> {
+  static async getUserAchievements(userId: string) {
     return await prisma.userAchievement.findMany({
       where: { userId },
       include: {

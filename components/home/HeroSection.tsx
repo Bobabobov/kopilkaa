@@ -63,9 +63,9 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           className="text-5xl md:text-7xl font-bold mb-6"
           style={{ color: "#fffffe" }}
         >
-          Помогаем людям
+          Расскажи историю
           <br />
-          <span style={{ color: "#f9bc60" }}>найти поддержку</span>
+          <span style={{ color: "#f9bc60" }}>получи деньги</span>
         </h1>
 
         {/* Описание */}
@@ -73,9 +73,72 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           className="text-xl md:text-2xl mb-8 leading-relaxed"
           style={{ color: "#abd1c6" }}
         >
-          Безопасная платформа для сбора помощи. Создавайте заявки, делитесь
-          историями и находите поддержку сообщества.
+          Экспериментальная платформа житейских историй. Рассказывай, играй, участвуй в стримах. Без гарантий, без обещаний — только честность.
         </p>
+
+        {/* Кнопка доната */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="text-center mb-12"
+        >
+          <Link href="/support">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              animate={{ 
+                boxShadow: [
+                  "0 0 20px rgba(249, 188, 96, 0.3)",
+                  "0 0 30px rgba(249, 188, 96, 0.6)", 
+                  "0 0 20px rgba(249, 188, 96, 0.3)"
+                ] 
+              }}
+              transition={{ 
+                boxShadow: { 
+                  duration: 2, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                } 
+              }}
+              className="px-12 py-4 text-xl font-bold rounded-2xl border-2 transition-all duration-300"
+              style={{
+                background: "linear-gradient(135deg, rgba(249, 188, 96, 0.1) 0%, rgba(249, 188, 96, 0.2) 100%)",
+                borderColor: "#f9bc60",
+                color: "#f9bc60",
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <motion.span
+                animate={{ 
+                  textShadow: [
+                    "0 0 10px rgba(249, 188, 96, 0.5)",
+                    "0 0 20px rgba(249, 188, 96, 0.8)",
+                    "0 0 10px rgba(249, 188, 96, 0.5)"
+                  ]
+                }}
+                transition={{ 
+                  duration: 2.5, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+              >
+                💫 Стань частью истории
+              </motion.span>
+            </motion.button>
+          </Link>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-4 text-base" 
+            style={{ color: "#abd1c6" }}
+          >
+            Поддержи эксперимент и попади в рейтинг легенд
+          </motion.p>
+        </motion.div>
+
         {/* Кнопки */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Link
@@ -86,7 +149,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
               color: "#001e1d",
             }}
           >
-            Создать заявку
+            Рассказать историю
           </Link>
 
           <Link
@@ -97,14 +160,14 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
               color: "#abd1c6",
             }}
           >
-            Читать истории
+            Смотреть истории
           </Link>
         </div>
 
         {/* Статистика платформы */}
         <div className="max-w-2xl mx-auto animate-fade-in-up">
           <h2 className="text-3xl font-bold mb-8" style={{ color: "#fffffe" }}>
-            Статистика платформы
+            Статистика эксперимента
           </h2>
 
           {/* Основная сумма */}
@@ -128,7 +191,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
               )}
             </div>
             <p className="text-lg" style={{ color: "#abd1c6" }}>
-              Собрано для помощи
+              Роздано авторам историй
             </p>
           </motion.div>
 
@@ -148,7 +211,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
                 {loading ? "0" : <AnimatedNumber value={stats.requests} />}
               </div>
               <div className="text-sm" style={{ color: "#abd1c6" }}>
-                Заявок
+                Историй
               </div>
             </motion.div>
 
@@ -166,7 +229,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
                 {loading ? "0" : <AnimatedNumber value={stats.approved} />}
               </div>
               <div className="text-sm" style={{ color: "#abd1c6" }}>
-                Одобрено
+                Выплачено
               </div>
             </motion.div>
 
@@ -184,11 +247,12 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
                 {loading ? "0" : <AnimatedNumber value={stats.people} />}
               </div>
               <div className="text-sm" style={{ color: "#abd1c6" }}>
-                Помогли
+                Участников
               </div>
             </motion.div>
           </div>
         </div>
+
       </div>
     </div>
   );

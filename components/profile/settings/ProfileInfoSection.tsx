@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import NameEditor from "./NameEditor";
-import EmailEditor from "./EmailEditor";
+import { NameEditor, EmailEditor } from "./ProfileEditors";
 
 interface User {
   id: string;

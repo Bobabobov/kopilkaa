@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { AchievementService } from "@/lib/achievements/service";
+import { publish } from "@/lib/sse";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -86,31 +87,36 @@ export async function POST(req: Request) {
       }
     }
 
-    // Создаём заявку
-    const app = await prisma.application.create({
-      data: {
-        userId: session.uid,
-        title,
-        summary,
-        story,
-        amount: parseInt(amount),
-        payment,
-      },
-      select: { id: true },
+    // Используем транзакцию для атомарности
+    const result = await prisma.$transaction(async (tx) => {
+      // Создаём заявку
+      const app = await tx.application.create({
+        data: {
+          userId: session.uid,
+          title,
+          summary,
+          story,
+          amount: parseInt(amount),
+          payment,
+        },
+        select: { id: true },
+      });
+
+      // Привязываем изображения по порядку
+      if (images.length) {
+        await tx.applicationImage.createMany({
+          data: images.map((url: string, i: number) => ({
+            applicationId: app.id,
+            url,
+            sort: i,
+          })),
+        });
+      }
+
+      return app;
     });
 
-    // Привязываем изображения по порядку
-    if (images.length) {
-      await prisma.applicationImage.createMany({
-        data: images.map((url: string, i: number) => ({
-          applicationId: app.id,
-          url,
-          sort: i,
-        })),
-      });
-    }
-
-    // Проверяем и выдаём достижения
+    // Проверяем и выдаём достижения (после создания заявки)
     try {
       await AchievementService.checkAndGrantAutomaticAchievements(session.uid);
     } catch (error) {
@@ -118,7 +124,21 @@ export async function POST(req: Request) {
       // Не прерываем создание заявки из-за ошибки достижений
     }
 
-    return Response.json({ ok: true, id: app.id });
+    // SSE уведомления для админки
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    publish("application:created", {
+      id: result.id,
+      userId: session.uid,
+      title,
+      summary,
+      amount: parseInt(amount),
+      status: "PENDING"
+    });
+    
+    publish("stats:dirty", {});
+
+    return Response.json({ ok: true, id: result.id });
   } catch (error) {
     console.error("Error creating application:", error);
     return Response.json(

@@ -8,7 +8,8 @@ const pass = process.env.SMTP_PASS || "";
 const from = process.env.MAIL_FROM || "no-reply@example.com";
 
 // Можно принудительно выключить письма переменной MAIL_ON=0
-const MAIL_ON = process.env.MAIL_ON !== "0";
+// Временно отключено для избежания ошибок
+const MAIL_ON = false; // process.env.MAIL_ON !== "0";
 
 // Почта включается только если (вкл) и заданы все ключи
 const MAIL_ENABLED = MAIL_ON && Boolean(host && user && pass);

@@ -74,3 +74,18 @@ config/secrets.*
 # Build artifacts
 *.tsbuildinfo
 .eslintcache
+
+# Backup files
+*.backup
+*.bak
+backups/
+
+# Test files
+test-*
+debug-*
+
+# Archives
+*.zip
+*.rar
+*.7z
+*.tar.gz

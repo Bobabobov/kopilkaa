@@ -66,28 +66,28 @@ export default function StatsCards({ stats }: StatsCardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 mb-8 lg:mb-12">
       {cards.map((card, index) => (
         <motion.div
           key={card.title}
           initial={{ opacity: 0, y: 30, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, delay: card.delay }}
-          className="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+          className="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-2xl lg:rounded-3xl p-4 lg:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
         >
           <div
             className={`absolute inset-0 bg-gradient-to-br ${card.gradient} transition-all duration-500`}
           ></div>
           <div className="relative">
             <div
-              className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${card.iconGradient} rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300`}
+              className={`inline-flex items-center justify-center w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-r ${card.iconGradient} rounded-xl lg:rounded-2xl mb-3 lg:mb-4 group-hover:scale-110 transition-transform duration-300`}
             >
-              <span className="text-3xl">{card.icon}</span>
+              <span className="text-2xl lg:text-3xl">{card.icon}</span>
             </div>
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
+            <div className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
               {card.title}
             </div>
-            <div className={`text-4xl font-bold ${card.valueColor} mb-2`}>
+            <div className={`text-2xl lg:text-4xl font-bold ${card.valueColor} mb-2`}>
               {card.value}
             </div>
             <div className="text-xs text-gray-400 dark:text-gray-500">

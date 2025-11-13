@@ -30,7 +30,7 @@ export async function PUT(
       data: {
         status,
         adminComment: adminComment || null,
-        processedBy: session.id,
+        processedBy: session.uid,
       },
     });
 

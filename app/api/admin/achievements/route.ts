@@ -35,7 +35,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching achievements for admin:', error);
-    console.error('Error stack:', error.stack);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
       { error: 'Ошибка получения достижений' },
       { status: 500 }

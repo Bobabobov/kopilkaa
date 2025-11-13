@@ -2,10 +2,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import NavAuth from "@/app/_parts/NavAuth";
+import NavAuth from "@/app/components/NavAuth";
 import HeaderLogo from "./HeaderLogo";
 import HeaderNavigation from "./HeaderNavigation";
 import HeaderMobileButton from "./HeaderMobileButton";
+import NotificationBell from "./NotificationBell";
+import DonateButton from "./DonateButton";
 
 export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -109,7 +111,9 @@ export default function Header() {
           </div>
 
           {/* Правая часть - показываем на средних и больших экранах */}
-          <div className="hidden sm:flex items-center gap-3 w-[180px] justify-end flex-shrink-0">
+          <div className="hidden sm:flex items-center gap-2 w-[280px] justify-end flex-shrink-0">
+            <DonateButton />
+            {isAuthenticated && !authLoading && <NotificationBell />}
             <NavAuth />
           </div>
 
@@ -144,9 +148,15 @@ export default function Header() {
                 />
               </div>
 
-              {/* Авторизация для мобильных */}
+              {/* Уведомления и авторизация для мобильных */}
               <div className="pt-2 border-t border-white/20">
-                <div className="px-4">
+                <div className="px-4 space-y-3">
+                  <DonateButton isMobile={true} />
+                  {isAuthenticated && !authLoading && (
+                    <div className="flex justify-center">
+                      <NotificationBell />
+                    </div>
+                  )}
                   <NavAuth />
                 </div>
               </div>

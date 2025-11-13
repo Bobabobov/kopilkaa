@@ -81,6 +81,7 @@ export default function AvatarUpload({
           "Аватарка загружена!",
           "Ваша аватарка успешно обновлена",
         );
+        
       } else {
         console.error("Upload failed:", data);
         showToast(
@@ -111,6 +112,7 @@ export default function AvatarUpload({
         onAvatarChange(null);
         setPreview(null);
         showToast("success", "Аватарка удалена", "Аватарка успешно удалена");
+        
       } else {
         showToast(
           "error",

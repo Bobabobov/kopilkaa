@@ -3,17 +3,39 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { msToHuman } from "@/lib/time";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { usePageTimeTracking } from "@/lib/usePageTimeTracking";
 import ProgressBar from "@/components/applications/ProgressBar";
 import FormField from "@/components/ui/FormField";
-import PhotoUpload from "@/components/applications/PhotoUpload";
-import SuccessScreen from "@/components/applications/SuccessScreen";
-import PageHeader from "@/components/applications/PageHeader";
-import SubmitSection from "@/components/applications/SubmitSection";
-import ApplicationPreview from "@/components/applications/ApplicationPreview";
 import UniversalBackground from "@/components/ui/UniversalBackground";
+
+// Lazy load heavy components
+const PhotoUpload = dynamic(() => import("@/components/applications/PhotoUpload"), {
+  ssr: false,
+  loading: () => <div className="h-32 bg-[#004643]/30 animate-pulse rounded-2xl" />
+});
+
+const SuccessScreen = dynamic(() => import("@/components/applications/SuccessScreen"), {
+  ssr: false,
+  loading: () => <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+});
+
+const PageHeader = dynamic(() => import("@/components/applications/PageHeader"), {
+  ssr: false,
+  loading: () => <div className="h-24 bg-[#004643]/30 animate-pulse rounded-2xl" />
+});
+
+const SubmitSection = dynamic(() => import("@/components/applications/SubmitSection"), {
+  ssr: false,
+  loading: () => <div className="h-16 bg-[#004643]/30 animate-pulse rounded-2xl" />
+});
+
+const ApplicationPreview = dynamic(() => import("@/components/applications/ApplicationPreview"), {
+  ssr: false,
+  loading: () => <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+});
 
 type LocalImage = { file: File; url: string };
 

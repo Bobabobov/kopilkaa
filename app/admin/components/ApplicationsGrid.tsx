@@ -61,37 +61,88 @@ export default function ApplicationsGrid({
 
   if (error) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-700">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-700"
+      >
         <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-red-500 text-6xl mb-4"
+          >
+            ⚠️
+          </motion.div>
+          <motion.h3 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-xl font-bold text-gray-900 dark:text-white mb-2"
+          >
             Ошибка загрузки
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
-          <button
+          </motion.h3>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-gray-600 dark:text-gray-400 mb-6"
+          >
+            {error}
+          </motion.p>
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => window.location.reload()}
             className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
           >
             Попробовать снова
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   if (applications.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-700">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-700"
+      >
         <div className="text-center">
-          <div className="text-gray-400 text-6xl mb-4">📋</div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          <motion.div 
+            initial={{ scale: 0, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-gray-400 text-6xl mb-4"
+          >
+            📋
+          </motion.div>
+          <motion.h3 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-xl font-bold text-gray-900 dark:text-white mb-2"
+          >
             Заявки не найдены
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
+          </motion.h3>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-gray-600 dark:text-gray-400"
+          >
             Попробуйте изменить фильтры поиска
-          </p>
+          </motion.p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 

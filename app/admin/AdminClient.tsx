@@ -10,6 +10,7 @@ import ControlPanel from "./components/ControlPanel";
 import ApplicationsGrid from "./components/ApplicationsGrid";
 import StatusModal from "./components/StatusModal";
 import ImageLightbox from "./components/ImageLightbox";
+import AdminLoading from "./components/AdminLoading";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import { useAdminApplications } from "./hooks/useAdminApplications";
@@ -41,6 +42,7 @@ export default function AdminClient() {
     // Действия
     loadMore,
     refreshStats,
+    refreshApplications,
     toggleEmail,
     visibleEmails,
   } = useAdminApplications();
@@ -118,16 +120,19 @@ export default function AdminClient() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // showToast(
-      //   `Заявка ${newStatus === "APPROVED" ? "одобрена" : "отклонена"}!`,
-      //   "success" as any
-      // );
+      showToast(
+        "success",
+        `Заявка ${newStatus === "APPROVED" ? "одобрена" : "отклонена"}!`
+      );
 
       // Обновляем данные
-      await refreshStats();
+      await Promise.all([
+        refreshStats(),
+        refreshApplications()
+      ]);
     } catch (err) {
       console.error("Failed to update application:", err);
-      // showToast("Ошибка обновления заявки", "error" as any);
+      showToast("error", "Ошибка обновления заявки");
     }
   };
 
@@ -147,16 +152,19 @@ export default function AdminClient() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // showToast("Статус заявки обновлен!", "success" as any);
+      showToast("success", "Статус заявки обновлен!");
 
       // Закрываем модалку
       setModal({ id: "", status: "PENDING", comment: "" });
 
       // Обновляем данные
-      await refreshStats();
+      await Promise.all([
+        refreshStats(),
+        refreshApplications()
+      ]);
     } catch (err) {
       console.error("Failed to update application:", err);
-      // showToast("Ошибка обновления заявки", "error" as any);
+      showToast("error", "Ошибка обновления заявки");
     }
   };
 
@@ -174,16 +182,19 @@ export default function AdminClient() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // showToast("Заявка удалена!", "success" as any);
+      showToast("success", "Заявка удалена!");
 
       // Закрываем модалку
       setDeleteModal({ id: "", title: "" });
 
       // Обновляем данные
-      await refreshStats();
+      await Promise.all([
+        refreshStats(),
+        refreshApplications()
+      ]);
     } catch (err) {
       console.error("Failed to delete application:", err);
-      // showToast("Ошибка удаления заявки", "error" as any);
+      showToast("error", "Ошибка удаления заявки");
     }
   };
 
@@ -216,6 +227,11 @@ export default function AdminClient() {
     setDeleteModal({ id, title });
   };
 
+  // Показываем загрузку при первой загрузке
+  if (loading && items.length === 0) {
+    return <AdminLoading />;
+  }
+
   return (
     <div className="min-h-screen">
       <UniversalBackground />
@@ -223,42 +239,42 @@ export default function AdminClient() {
       <div className="relative z-10">
         {/* Заголовок */}
         <div className="container mx-auto px-4 pt-24 pb-8">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
             <div>
               <h1
-                className="text-4xl font-bold mb-2"
+                className="text-3xl lg:text-4xl font-bold mb-2"
                 style={{ color: "#fffffe" }}
               >
                 🔧 Админ Панель
               </h1>
-              <p className="text-lg" style={{ color: "#abd1c6" }}>
+              <p className="text-base lg:text-lg" style={{ color: "#abd1c6" }}>
                 Управление заявками и статистика платформы
               </p>
             </div>
             
               {/* Навигация */}
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Link
                   href="/admin"
-                  className="px-4 py-2 bg-[#f9bc60] text-[#001e1d] font-semibold rounded-lg hover:bg-[#f9bc60]/90 transition-colors"
+                  className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base bg-[#f9bc60] text-[#001e1d] font-semibold rounded-lg hover:bg-[#f9bc60]/90 transition-colors"
                 >
                   Заявки
                 </Link>
                 <Link
                   href="/admin/achievements"
-                  className="px-4 py-2 bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
+                  className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
                 >
                   Достижения
                 </Link>
                 <Link
                   href="/admin/ads"
-                  className="px-4 py-2 bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
+                  className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
                 >
                   Реклама
                 </Link>
                 <Link
                   href="/admin/ad-requests"
-                  className="px-4 py-2 bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
+                  className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
                 >
                   Заявки на рекламу
                 </Link>

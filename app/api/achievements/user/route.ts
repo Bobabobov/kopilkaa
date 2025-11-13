@@ -20,7 +20,7 @@ export async function GET() {
       success: true,
       data: {
         achievements: userAchievements,
-        progress,
+        progress, // Все достижения с информацией о статусе
         stats,
       },
     });

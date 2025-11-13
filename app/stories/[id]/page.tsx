@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import PixelBackground from "@/components/ui/PixelBackground";
 import {
@@ -35,13 +35,18 @@ interface Story {
 
 export default function StoryPage() {
   const params = useParams();
+  const router = useRouter();
   const [story, setStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
+    // Проверяем авторизацию
+    checkAuth();
+    
     if (params.id) {
       const id = params.id as string;
 
@@ -61,12 +66,23 @@ export default function StoryPage() {
     }
   }, [params.id]);
 
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("/api/profile/me");
+      setIsAuthenticated(response.ok);
+    } catch (error) {
+      setIsAuthenticated(false);
+    }
+  };
+
   const loadStory = async (id: string) => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/stories/${id}`);
+      const response = await fetch(`/api/stories/${id}`, {
+        cache: 'no-store'
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -87,6 +103,13 @@ export default function StoryPage() {
   const handleLike = async () => {
     if (!story) return;
 
+    // Проверяем авторизацию
+    if (!isAuthenticated) {
+      alert("Войдите в систему, чтобы ставить лайки");
+      router.push("/login");
+      return;
+    }
+
     try {
       const method = liked ? "DELETE" : "POST";
       const response = await fetch(`/api/stories/${story.id}/like`, {
@@ -98,13 +121,22 @@ export default function StoryPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        if (response.status === 401) {
+          alert("Войдите в систему, чтобы ставить лайки");
+          router.push("/login");
+          return;
+        }
         console.error("Ошибка лайка:", errorData.message);
         return;
       }
 
-      // Обновляем состояние локально
-      setLiked(!liked);
+      // Сначала обновляем локально для мгновенной реакции
+      const newLikedState = !liked;
+      setLiked(newLikedState);
       setLikesCount((prev) => (liked ? prev - 1 : prev + 1));
+      
+      // Затем перезагружаем данные с сервера для синхронизации
+      await loadStory(story.id);
     } catch (error) {
       console.error("Error updating like:", error);
     }
@@ -211,6 +243,7 @@ export default function StoryPage() {
               liked={liked}
               likesCount={likesCount}
               onLike={handleLike}
+              isAuthenticated={isAuthenticated}
             />
 
             {/* Контент */}

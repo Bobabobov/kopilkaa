@@ -59,6 +59,7 @@ export default function AvatarFrameCustomization({
           "Рамка обновлена!",
           "Рамка аватарки успешно изменена",
         );
+        
         onClose();
       } else {
         const data = await response.json();

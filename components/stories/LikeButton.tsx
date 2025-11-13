@@ -9,12 +9,14 @@ interface LikeButtonProps {
   liked: boolean;
   likesCount: number;
   onLike: () => void;
+  isAuthenticated?: boolean | null;
 }
 
 export default function LikeButton({
   liked,
   likesCount,
   onLike,
+  isAuthenticated,
 }: LikeButtonProps) {
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -33,7 +35,13 @@ export default function LikeButton({
     <div className="relative">
       <button
         onClick={handleClick}
-        className={`relative z-10 flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-300 cursor-pointer ${
+        disabled={isAuthenticated === false}
+        title={isAuthenticated === false ? "Войдите в систему, чтобы ставить лайки" : undefined}
+        className={`relative z-10 flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-300 ${
+          isAuthenticated === false 
+            ? "cursor-not-allowed opacity-60" 
+            : "cursor-pointer"
+        } ${
           liked
             ? "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg shadow-red-500/25"
             : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 border border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-700"

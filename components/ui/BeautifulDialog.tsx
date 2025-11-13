@@ -131,14 +131,14 @@ export default function BeautifulDialog({
     }
   };
 
-  const getGradient = () => {
+const getGradient = () => {
     switch (type) {
       case "alert":
         return "from-red-500 to-rose-500";
       case "confirm":
-        return "from-blue-500 to-indigo-500";
+      return "from-[#f9bc60] to-[#abd1c6]";
       case "prompt":
-        return "from-purple-500 to-pink-500";
+      return "from-[#abd1c6] to-[#f9bc60]";
     }
   };
 
@@ -150,7 +150,7 @@ export default function BeautifulDialog({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -170,7 +170,7 @@ export default function BeautifulDialog({
             ></div>
 
             {/* Основная плашка */}
-            <div className="relative bg-white/95 dark:bg-gray-800/95 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 backdrop-blur-sm p-6">
+            <div className="relative bg-[#001e1d]/95 rounded-2xl shadow-2xl border border-[#abd1c6]/20 backdrop-blur-sm p-6">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
                   <div
@@ -180,10 +180,10 @@ export default function BeautifulDialog({
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-semibold text-[#fffffe] mb-2">
                     {title}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                  <p className="text-sm text-[#abd1c6] leading-relaxed mb-4">
                     {message}
                   </p>
 
@@ -195,7 +195,7 @@ export default function BeautifulDialog({
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         placeholder={placeholder}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-[#abd1c6]/20 rounded-lg bg-[#001e1d]/40 text-[#fffffe] placeholder-[#abd1c6]/60 focus:outline-none focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent"
                         autoFocus
                       />
                     </div>
@@ -206,14 +206,14 @@ export default function BeautifulDialog({
                     {(type === "confirm" || type === "prompt") && (
                       <button
                         onClick={handleCancel}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200"
+                    className="px-4 py-2 text-sm font-medium text-[#abd1c6] bg-[#001e1d]/40 hover:bg-[#001e1d]/55 border border-[#abd1c6]/20 rounded-lg transition-colors duration-200"
                       >
                         {cancelText}
                       </button>
                     )}
                     <button
                       onClick={handleConfirm}
-                      className={`px-4 py-2 text-sm font-medium text-white bg-gradient-to-r ${getGradient()} hover:opacity-90 rounded-lg transition-opacity duration-200 shadow-lg`}
+                  className="px-4 py-2 text-sm font-semibold text-[#001e1d] bg-[#f9bc60] hover:bg-[#e8a545] rounded-lg transition-colors duration-200 shadow-lg"
                     >
                       {confirmText}
                     </button>

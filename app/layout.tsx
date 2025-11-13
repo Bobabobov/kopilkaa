@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import TopBanner from "@/components/layout/TopBanner";
 import ScrollToTop from "@/components/ui/ScrollToTop";
 import { BeautifulNotificationsProvider } from "@/components/ui/BeautifulNotificationsProvider";
+import ProfilePreloadInitializer from "@/components/performance/ProfilePreloadInitializer";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="ru" suppressHydrationWarning className="dark">
       <body className={inter.className} suppressHydrationWarning>
         <BeautifulNotificationsProvider>
+          <ProfilePreloadInitializer />
           <div className="min-h-screen flex flex-col">
             <TopBanner />
             <Header />

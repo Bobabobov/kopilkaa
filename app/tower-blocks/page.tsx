@@ -11,8 +11,8 @@ export default function TowerBlocksGame() {
     const banner = document.querySelector('[data-top-banner]');
     const header = document.querySelector('header');
     
-    if (banner) banner.style.display = 'none';
-    if (header) header.style.display = 'none';
+    if (banner) (banner as HTMLElement).style.display = 'none';
+    if (header) (header as HTMLElement).style.display = 'none';
     
     // Устанавливаем источник iframe после монтирования компонента
     if (iframeRef.current) {
@@ -21,8 +21,8 @@ export default function TowerBlocksGame() {
 
     // Восстанавливаем шапку и баннер при выходе со страницы
     return () => {
-      if (banner) banner.style.display = '';
-      if (header) header.style.display = '';
+      if (banner) (banner as HTMLElement).style.display = '';
+      if (header) (header as HTMLElement).style.display = '';
     };
   }, []);
 

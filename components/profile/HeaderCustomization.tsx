@@ -89,6 +89,7 @@ export default function HeaderCustomization({
           "Тема обновлена!",
           "Заголовок профиля успешно изменен",
         );
+        
         onClose();
       } else {
         const data = await response.json();

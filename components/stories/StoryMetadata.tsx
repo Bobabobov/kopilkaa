@@ -16,6 +16,7 @@ interface StoryMetadataProps {
   liked: boolean;
   likesCount: number;
   onLike: () => void;
+  isAuthenticated?: boolean | null;
 }
 
 export default function StoryMetadata({
@@ -23,6 +24,7 @@ export default function StoryMetadata({
   liked,
   likesCount,
   onLike,
+  isAuthenticated,
 }: StoryMetadataProps) {
   const authorName =
     story.user?.name || story.user?.email?.split("@")[0] || "Неизвестный автор";
@@ -39,7 +41,7 @@ export default function StoryMetadata({
       </span>
 
       {/* Красивая анимированная кнопка лайка */}
-      <LikeButton liked={liked} likesCount={likesCount} onLike={onLike} />
+      <LikeButton liked={liked} likesCount={likesCount} onLike={onLike} isAuthenticated={isAuthenticated} />
     </div>
   );
 }

@@ -13,7 +13,7 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await getSession();
-    if (!session?.user?.id) {
+    if (!session?.uid) {
       return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
     }
 

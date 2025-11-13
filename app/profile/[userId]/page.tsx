@@ -1,6 +1,6 @@
 // app/profile/[userId]/page.tsx
 "use client";
-import OtherUserProfile from "@/components/profile/OtherUserProfile";
+import OtherUserProfile from "@/components/profile/other-user/OtherUserProfile";
 
 interface ProfilePageProps {
   params: { userId: string };

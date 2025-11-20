@@ -1,6 +1,7 @@
 // app/admin/components/ApplicationsGrid.tsx
 "use client";
 
+import { motion } from "framer-motion";
 import { ApplicationItem, ApplicationStatus } from "../types";
 import ApplicationCard from "./ApplicationCard";
 

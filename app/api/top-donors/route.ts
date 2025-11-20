@@ -4,39 +4,37 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // Получаем пользователей с одобренными заявками и суммируем их суммы с обработкой ошибок
-    const usersWithAmounts = await prisma.user.findMany({
-      where: {
-        applications: {
-          some: {
-            status: "APPROVED",
+    // Берём только реальные донаты из таблицы Donation (type = SUPPORT)
+    const usersWithDonations = await prisma.user
+      .findMany({
+        where: {
+          donations: {
+            some: {
+              type: "SUPPORT",
+            },
           },
         },
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        avatar: true,
-        vkLink: true,
-        telegramLink: true,
-        youtubeLink: true,
-        applications: {
-          where: {
-            status: "APPROVED",
-          },
-          select: {
-            amount: true,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          avatar: true,
+          vkLink: true,
+          telegramLink: true,
+          youtubeLink: true,
+          donations: {
+            where: { type: "SUPPORT" },
+            select: { amount: true },
           },
         },
-      },
-    }).catch(() => []);
+      })
+      .catch(() => []);
 
-    // Вычисляем общую сумму для каждого пользователя
-    const donors = usersWithAmounts
+    // Считаем сумму донатов по каждому пользователю
+    const donors = usersWithDonations
       .map((user) => {
-        const totalAmount = user.applications.reduce(
-          (sum, app) => sum + app.amount,
+        const totalAmount = user.donations.reduce(
+          (sum, d) => sum + d.amount,
           0,
         );
         return {
@@ -50,9 +48,9 @@ export async function GET() {
           totalAmount,
         };
       })
-      .filter((donor) => donor.totalAmount > 0) // Только с положительной суммой
-      .sort((a, b) => b.totalAmount - a.totalAmount) // Сортируем по убыванию
-      .slice(0, 3); // Берем топ-3
+      .filter((donor) => donor.totalAmount > 0)
+      .sort((a, b) => b.totalAmount - a.totalAmount)
+      .slice(0, 3);
 
     return NextResponse.json({
       success: true,
@@ -65,7 +63,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching top donors:", error);
-    // Возвращаем пустой массив вместо ошибки
     return NextResponse.json({
       success: true,
       donors: [],

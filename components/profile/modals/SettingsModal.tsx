@@ -65,6 +65,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     handleEmailChange,
     handleEmailVisibilityChange,
     handleSocialLinkChange,
+    handlePhoneChange,
   } = useSettings();
 
   // Монтирование для Portal
@@ -242,6 +243,36 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   onToggle={handleEmailVisibilityChange}
                   disabled={saving}
                 />
+
+                {/* Телефон */}
+                <SettingsSection title="Телефон">
+                  <div className="space-y-2">
+                    <label className="text-xs text-[#abd1c6]">
+                      Укажите номер телефона, чтобы входить по коду из SMS (сейчас — тестовый режим, код показывается на экране).
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="tel"
+                        defaultValue={user.phone || ""}
+                        placeholder="+7 900 000-00-00"
+                        className="flex-1 px-4 py-3 border border-[#abd1c6]/30 rounded-xl bg-[#001e1d]/20 text-[#fffffe] focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent"
+                        onBlur={(e) => {
+                          const value = e.target.value.trim();
+                          if (value && value !== (user.phone || "")) {
+                            handlePhoneChange(value);
+                          }
+                        }}
+                        disabled={saving}
+                      />
+                      {user.phoneVerified && (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#10B981]/50 bg-[#004643] text-[11px] font-semibold text-[#a7f3d0] shadow-sm">
+                          <LucideIcons.CheckCircle size="xs" className="text-[#6EE7B7]" />
+                          <span>Подтверждён</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </SettingsSection>
 
               {/* Социальные сети */}
               <SettingsSection title="Социальные сети">

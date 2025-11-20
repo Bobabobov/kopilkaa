@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { cachedFetch, getCachedStats, cacheStats } from "@/lib/cache";
+import { cacheStats, getCachedStats } from "@/lib/cache";
 import PixelBackground from "@/components/ui/PixelBackground";
 
 // Lazy load heavy components
@@ -26,10 +26,10 @@ const FAQ = dynamic(() => import("@/components/home/FAQ"), {
 });
 
 type Stats = {
-  collected: number;
-  requests: number;
-  approved: number;
-  people: number;
+  collected: number; // всего в копилке
+  requests: number;  // всего историй (заявок)
+  approved: number;  // одобренных историй
+  people: number;    // участников
 };
 
 export default function HomePage() {
@@ -44,33 +44,51 @@ export default function HomePage() {
 
   useEffect(() => {
     setMounted(true);
-    
-    // Проверяем кэш
-    const cachedStats = getCachedStats<Stats>();
-    if (cachedStats) {
-      setStats(cachedStats);
-      setLoading(false);
-      return;
-    }
 
-    // Загружаем статистику с кэшированием
-    cachedFetch<{ stats: Stats }>("/api/stats", {}, 2 * 60 * 1000)
-      .then((data) => {
-        if (data && data.stats) {
-          const newStats = {
-            collected: data.stats.applications.total || 0,
-            requests: data.stats.applications.pending || 0,
-            approved: data.stats.applications.approved || 0,
-            people: data.stats.users.total || 0,
-          };
-          setStats(newStats);
-          cacheStats(newStats);
+    const load = async () => {
+      try {
+        setLoading(true);
+
+        // сначала пробуем взять из нашего простого кэша,
+        // чтобы не мигала статистика при быстрых переходах
+        const cachedStats = getCachedStats<Stats>();
+        if (cachedStats) {
+          setStats(cachedStats);
         }
-      })
-      .catch(() => {
-        // При ошибке используем значения по умолчанию (уже установлены)
-      })
-      .finally(() => setLoading(false));
+
+        const response = await fetch("/api/stats", { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
+
+        const data = await response.json();
+
+        if (data && data.stats) {
+          const collected =
+            data.stats.donations?.balance ??
+            data.stats.applications?.total ??
+            0;
+
+          const newStats: Stats = {
+            collected,
+            // всего историй = все заявки (любой статус)
+            requests: data.stats.applications?.total || 0,
+            // выплачено = количество одобренных заявок
+            approved: data.stats.applications?.approved || 0,
+            people: data.stats.users?.total || 0,
+          };
+
+          setStats(newStats);
+          cacheStats(newStats, 5_000); // кэшируем всего на 5 секунд
+        }
+      } catch {
+        // оставляем предыдущие значения
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
   }, []);
 
   // Предотвращаем hydration ошибки

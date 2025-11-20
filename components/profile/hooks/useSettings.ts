@@ -13,6 +13,8 @@ type User = {
   avatar?: string | null;
   avatarFrame?: string | null;
   hideEmail?: boolean;
+  phone?: string | null;
+  phoneVerified?: boolean;
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;
@@ -50,6 +52,8 @@ interface UseSettingsReturn {
   handleNameChange: (newName: string) => Promise<void>;
   handleEmailChange: (newEmail: string) => Promise<void>;
   handleEmailVisibilityChange: (hideEmail: boolean) => Promise<void>;
+  // Телефон
+  handlePhoneChange: (phone: string) => Promise<void>;
   handleSocialLinkChange: (
     field: "vkLink" | "telegramLink" | "youtubeLink",
     link: string,
@@ -247,6 +251,50 @@ export function useSettings(): UseSettingsReturn {
       }
     },
     [showLocalNotification],
+  );
+
+  // Изменение / привязка телефона
+  const handlePhoneChange = useCallback(
+    async (phone: string) => {
+      try {
+        setSaving(true);
+        const response = await fetch("/api/profile/phone", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ phone }),
+        });
+
+        const data = await response.json().catch(() => null);
+
+        if (response.ok && data?.success) {
+          // Перезагружаем пользователя, чтобы обновить phone / phoneVerified
+          await loadUser();
+          showLocalNotification(
+            "success",
+            "Телефон обновлён",
+            "Код подтверждения отправлен (в тестовом режиме он показан на экране).",
+          );
+        } else {
+          showLocalNotification(
+            "error",
+            "Ошибка",
+            data?.error || "Не удалось обновить телефон",
+          );
+        }
+      } catch (error) {
+        console.error("Error updating phone:", error);
+        showLocalNotification(
+          "error",
+          "Ошибка",
+          "Произошла ошибка при обновлении телефона",
+        );
+      } finally {
+        setSaving(false);
+      }
+    },
+    [loadUser, showLocalNotification],
   );
 
   const handleSocialLinkChange = useCallback(
@@ -488,6 +536,7 @@ export function useSettings(): UseSettingsReturn {
     handleNameChange,
     handleEmailChange,
     handleEmailVisibilityChange,
+    handlePhoneChange,
     handleSocialLinkChange,
     handleAvatarChange,
     handleFrameChange,

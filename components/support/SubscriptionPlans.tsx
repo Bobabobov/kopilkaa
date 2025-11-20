@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
@@ -16,6 +17,43 @@ export default function SubscriptionPlans({
   onAmountChange,
   showSocialPrompt,
 }: SubscriptionPlansProps) {
+  const [loading, setLoading] = useState(false);
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
+  const [resultError, setResultError] = useState<string | null>(null);
+
+  const handleSubscribe = async () => {
+    const amountNumber = parseInt(customAmount || "0", 10);
+    if (!amountNumber || amountNumber <= 0) return;
+
+    try {
+      setLoading(true);
+      setResultMessage(null);
+      setResultError(null);
+
+      const response = await fetch("/api/donations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: amountNumber,
+          type: "SUPPORT",
+          comment: "monthly_support_test",
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error || "Не удалось сохранить поддержку");
+      }
+
+      setResultMessage("Тестовая ежемесячная поддержка сохранена. Копилка и топ‑донатеры обновятся.");
+    } catch (error) {
+      console.error("Subscription test error:", error);
+      setResultError("Не получилось сохранить поддержку. Попробуйте ещё раз.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="py-12 px-4">
       <div className="max-w-4xl mx-auto">
@@ -98,7 +136,9 @@ export default function SubscriptionPlans({
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            disabled={!customAmount || parseInt(customAmount) <= 0}
+            disabled={
+              loading || !customAmount || parseInt(customAmount || "0", 10) <= 0
+            }
             className="w-full py-4 rounded-2xl font-bold text-xl shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             style={{
               background: customAmount && parseInt(customAmount) > 0 
@@ -107,12 +147,27 @@ export default function SubscriptionPlans({
               color: customAmount && parseInt(customAmount) > 0 ? "#001e1d" : "#abd1c6",
               border: customAmount && parseInt(customAmount) > 0 ? "none" : "2px solid #abd1c6",
             }}
+            onClick={handleSubscribe}
           >
             <LucideIcons.Heart className="w-6 h-6 inline mr-2" />
-            {customAmount && parseInt(customAmount) > 0
-              ? `Подписаться на ₽${parseInt(customAmount).toLocaleString()}/мес`
-              : "Введите сумму подписки"}
+            {loading
+              ? "Сохраняем поддержку..."
+              : customAmount && parseInt(customAmount) > 0
+                ? `Подписаться на ₽${parseInt(customAmount).toLocaleString()}/мес (тест)`
+                : "Введите сумму подписки"}
           </motion.button>
+
+          {(resultMessage || resultError) && (
+            <div
+              className={`mt-4 rounded-2xl border px-4 py-3 text-sm ${
+                resultError
+                  ? "border-red-500/50 bg-red-500/10 text-red-200"
+                  : "border-emerald-500/50 bg-emerald-500/10 text-emerald-200"
+              }`}
+            >
+              {resultError || resultMessage}
+            </div>
+          )}
 
           {showSocialPrompt && (
             <motion.div

@@ -190,7 +190,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
               )}
             </div>
             <p className="text-lg" style={{ color: "#abd1c6" }}>
-              Роздано авторам историй
+              Всего в копилке
             </p>
           </motion.div>
 

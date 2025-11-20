@@ -23,6 +23,28 @@ export async function GET(request: NextRequest) {
       },
     }).catch(() => 0);
 
+    // Получаем статистику по донатам/копилке
+    const donations = await prisma.donation.findMany({
+      select: {
+        type: true,
+        amount: true,
+      },
+    }).catch(() => []);
+
+    const totalSupport = donations
+      .filter((d) => d.type === "SUPPORT")
+      .reduce((sum, d) => sum + d.amount, 0);
+
+    const totalPayout = donations
+      .filter((d) => d.type === "PAYOUT")
+      .reduce((sum, d) => sum + d.amount, 0);
+
+    const totalAdjust = donations
+      .filter((d) => d.type === "ADJUST")
+      .reduce((sum, d) => sum + d.amount, 0);
+
+    const balance = totalSupport - totalPayout + totalAdjust;
+
     // Формируем статистику
     const stats = {
       applications: {
@@ -43,6 +65,12 @@ export async function GET(request: NextRequest) {
       users: {
         total: totalUsers,
         new: newUsers,
+      },
+      donations: {
+        totalIn: totalSupport,
+        totalOut: totalPayout,
+        adjust: totalAdjust,
+        balance,
       },
     };
 

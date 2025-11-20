@@ -7,13 +7,13 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    // Берём реальных пользователей, у которых есть одобренные заявки
+    // Берём только пользователей, у которых есть реальные донаты (SUPPORT)
     const users = await prisma.user
       .findMany({
         where: {
-          applications: {
+          donations: {
             some: {
-              status: "APPROVED",
+              type: "SUPPORT",
             },
           },
         },
@@ -26,13 +26,9 @@ export async function GET() {
           vkLink: true,
           telegramLink: true,
           youtubeLink: true,
-          applications: {
-            where: {
-              status: "APPROVED",
-            },
-            select: {
-              amount: true,
-            },
+          donations: {
+            where: { type: "SUPPORT" },
+            select: { amount: true },
           },
         },
       })
@@ -40,11 +36,11 @@ export async function GET() {
 
     const heroesRaw = users
       .map((user) => {
-        const totalDonated = user.applications.reduce(
-          (sum, app) => sum + app.amount,
+        const totalDonated = user.donations.reduce(
+          (sum, d) => sum + d.amount,
           0,
         );
-        const donationCount = user.applications.length;
+        const donationCount = user.donations.length;
 
         return {
           id: user.id,

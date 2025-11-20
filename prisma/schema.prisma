@@ -39,6 +39,10 @@ model User {
   passwordHash String
   name         String?
   avatar       String?
+  phone        String?         @unique
+  phoneVerified Boolean        @default(false)
+  telegramId   String?         @unique
+  telegramUsername String?
   vkLink       String?
   telegramLink String?
   youtubeLink  String?
@@ -61,6 +65,8 @@ model User {
   storyLikes   StoryLike[]
   reportsSent  UserReport[] @relation("ReportReporter")
   reportsReceived UserReport[] @relation("ReportReported")
+  donations    Donation[]
+  phoneLoginCodes PhoneLoginCode[]
   isBanned     Boolean      @default(false)
   bannedUntil  DateTime?
   bannedReason String?
@@ -209,6 +215,40 @@ enum FriendshipStatus {
   ACCEPTED
   DECLINED
   BLOCKED
+}
+
+enum DonationType {
+  SUPPORT   // входящий донат/подписка
+  PAYOUT    // вывод авторам (уменьшает копилку)
+  ADJUST    // ручная корректировка баланса
+}
+
+model Donation {
+  id        String       @id @default(cuid())
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type      DonationType @default(SUPPORT)
+  amount    Int          // сумма в рублях (пока), >0
+  comment   String?
+  createdAt DateTime     @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model PhoneLoginCode {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([code])
+  @@index([expiresAt])
 }
 
 // Модель для отслеживания времени на страницах

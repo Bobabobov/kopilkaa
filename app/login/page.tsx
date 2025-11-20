@@ -10,6 +10,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [phoneCode, setPhoneCode] = useState("");
+  const [phoneStep, setPhoneStep] = useState<"enter" | "code">("enter");
+  const [phoneBusy, setPhoneBusy] = useState(false);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
@@ -100,6 +105,65 @@ export default function LoginPage() {
       setErr(e.message);
     } finally {
       setBusy(false);
+    }
+  }
+
+  // Вход по телефону (тестовый режим)
+  async function handlePhoneLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setPhoneError(null);
+
+    if (!phone.trim()) {
+      setPhoneError("Введите номер телефона");
+      return;
+    }
+
+    setPhoneBusy(true);
+
+    try {
+      if (phoneStep === "enter") {
+        const r = await fetch("/api/auth/phone/request-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone }),
+        });
+        const data = await r.json();
+
+        if (!r.ok || !data?.success) {
+          setPhoneError(data?.error || "Не удалось отправить код");
+          return;
+        }
+
+        // В тестовом режиме показываем код прямо пользователю
+        setPhoneError(
+          `Код отправлен. В тестовом режиме он: ${data.code}. Введите его ниже.`,
+        );
+        setPhoneStep("code");
+      } else {
+        if (!phoneCode.trim()) {
+          setPhoneError("Введите код");
+          return;
+        }
+
+        const r = await fetch("/api/auth/phone/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, code: phoneCode }),
+        });
+        const data = await r.json();
+
+        if (!r.ok || !data?.success) {
+          setPhoneError(data?.error || "Неверный код");
+          return;
+        }
+
+        window.location.href = "/profile";
+      }
+    } catch (error: any) {
+      console.error("Phone login error:", error);
+      setPhoneError(error.message || "Ошибка входа по телефону");
+    } finally {
+      setPhoneBusy(false);
     }
   }
 
@@ -273,6 +337,19 @@ export default function LoginPage() {
               </div>
             )}
 
+            {/* Пока просто макет кнопки Telegram-входа */}
+            <button
+              type="button"
+              className="w-full py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-300 border border-[#24A1DE]/60 text-[#24A1DE] mb-2 hover:bg-[#24A1DE]/10"
+              onClick={() =>
+                alert(
+                  "Вход через Telegram будет работать после подключения бота и домена. Бэкенд уже готов — останется только включить виджет.",
+                )
+              }
+            >
+              Войти через Telegram (скоро)
+            </button>
+
             <button
               type="submit"
               disabled={busy}
@@ -294,6 +371,75 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          {/* Вход по телефону (тестовый режим) */}
+          <div className="mt-10 pt-6 border-t border-[#abd1c6]/20">
+            <h2
+              className="text-lg font-semibold mb-4 text-center"
+              style={{ color: "#fffffe" }}
+            >
+              Или войдите по телефону (тестовый режим)
+            </h2>
+            <form onSubmit={handlePhoneLogin} className="space-y-4" noValidate>
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "#abd1c6" }}
+                >
+                  Телефон
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-[#abd1c6]/30 bg-[#004643]/50 text-[#fffffe] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50"
+                  placeholder="+7 900 000-00-00"
+                />
+              </div>
+
+              {phoneStep === "code" && (
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "#abd1c6" }}
+                  >
+                    Код из SMS (из ответа сервера)
+                  </label>
+                  <input
+                    type="text"
+                    value={phoneCode}
+                    onChange={(e) => setPhoneCode(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-[#abd1c6]/30 bg-[#004643]/50 text-[#fffffe] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50"
+                    placeholder="123456"
+                  />
+                </div>
+              )}
+
+              {phoneError && (
+                <div className="bg-emerald-500/10 border border-emerald-400/40 text-emerald-100 text-sm p-3 rounded-xl">
+                  {phoneError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={phoneBusy}
+                className="w-full py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl mt-2"
+                style={{
+                  background: phoneBusy
+                    ? "linear-gradient(135deg, #abd1c6, #94c4b8)"
+                    : "linear-gradient(135deg, #f9bc60, #e8a545)",
+                  color: "#001e1d",
+                }}
+              >
+                {phoneBusy
+                  ? "Обрабатываем..."
+                  : phoneStep === "enter"
+                    ? "Получить код"
+                    : "Войти по коду"}
+              </button>
+            </form>
+          </div>
 
           <div className="mt-8 text-center">
             <p className="text-sm" style={{ color: "#abd1c6" }}>

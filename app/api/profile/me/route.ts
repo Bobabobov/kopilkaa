@@ -116,6 +116,8 @@ export async function GET() {
         createdAt: true,
         name: true,
         avatar: true,
+        phone: true,
+        phoneVerified: true,
         vkLink: true,
         telegramLink: true,
         youtubeLink: true,

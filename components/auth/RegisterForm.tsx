@@ -8,6 +8,7 @@ import PasswordField from "./PasswordField";
 interface FormData {
   email: string;
   username: string;
+  phone: string;
   name: string;
   password: string;
   password2: string;
@@ -28,6 +29,7 @@ export default function RegisterForm({
   const [formData, setFormData] = useState<FormData>({
     email: "",
     username: "",
+    phone: "",
     name: "",
     password: "",
     password2: "",
@@ -117,6 +119,17 @@ export default function RegisterForm({
               placeholder="naprimer_user"
               error={errors.username}
               hint="3–20 символов: буквы любого языка, цифры, точка, дефис или подчёркивание"
+            />
+
+            {/* Телефон */}
+            <FormField
+              label="Телефон"
+              type="input"
+              value={formData.phone}
+              onChange={(value) => handleInputChange("phone", value)}
+              placeholder="+7 900 000-00-00"
+              error={errors.phone}
+              hint="Укажите номер, к которому у вас есть доступ — он понадобится для входа по коду."
             />
 
             {/* Имя */}

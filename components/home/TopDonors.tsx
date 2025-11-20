@@ -1,128 +1,223 @@
 "use client";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
+import { VKIcon } from "@/components/ui/icons/VKIcon";
+import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
+
+interface Donor {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string | null;
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
+  amount: string;
+  position: number;
+  isTop: boolean;
+}
 
 export default function TopDonors() {
-  const donors = [
-    { name: "Анна К.", amount: "12,500", position: 1, isTop: true },
-    { name: "Михаил П.", amount: "8,200", position: 2, isTop: false },
-    { name: "Елена С.", amount: "6,700", position: 3, isTop: false },
-  ];
+  const [donors, setDonors] = useState<Donor[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDonors = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/top-donors", { cache: "no-store" });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setDonors(data.donors || []);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching top donors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDonors();
+  }, []);
 
   const getRankIcon = (position: number) => {
     switch (position) {
       case 1:
-        return <LucideIcons.Star size="sm" className="text-yellow-400" />;
+        return <LucideIcons.Crown size="sm" className="text-[#001e1d]" />;
       case 2:
-        return <LucideIcons.Award size="sm" className="text-gray-300" />;
+        return <LucideIcons.Award size="sm" className="text-[#001e1d]" />;
       case 3:
-        return <LucideIcons.Medal size="sm" className="text-amber-600" />;
+        return <LucideIcons.Medal size="sm" className="text-[#001e1d]" />;
       default:
         return (
-          <span className="text-xs font-bold text-current">{position}</span>
+          <span className="text-xs font-bold text-[#001e1d]">{position}</span>
         );
     }
   };
 
-  const getRankBg = (position: number) => {
+  const getAvatarBg = (position: number) => {
     switch (position) {
       case 1:
-        return "bg-gradient-to-br from-yellow-400 via-yellow-500 to-amber-500 shadow-lg shadow-yellow-400/50";
+        return "bg-[#f9bc60]";
       case 2:
-        return "bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 shadow-md shadow-gray-400/30";
+        return "bg-[#abd1c6]";
       case 3:
-        return "bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 shadow-md shadow-amber-500/30";
+        return "bg-[#e16162]";
       default:
-        return "bg-gradient-to-br from-green-100 via-green-200 to-emerald-200 shadow-sm";
+        return "bg-[#94a1b2]";
     }
   };
 
   return (
-    <div className="xl:order-4 order-4">
-      <div
-        className="group relative"
-        data-sal="slide-left"
-        data-sal-delay="200"
-      >
-        <div className="absolute -inset-1 bg-gradient-to-br from-[#6B9071] via-[#AEC3B0] to-[#375534] rounded-xl blur-lg opacity-30 group-hover:opacity-50 transition duration-500"></div>
-               <div className="relative w-80 bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-md rounded-xl p-6 border border-[#abd1c6]/30 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105">
-          <div className="relative space-y-4 text-center">
-            {/* Иконка */}
-            <div className="w-12 h-12 mx-auto bg-gradient-to-br from-[#f9bc60] to-[#f9bc60] rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <LucideIcons.Star size="md" className="text-[#001e1d]" />
+    <section className="w-full">
+      <div className="rounded-3xl border border-[#abd1c6]/30 bg-gradient-to-br from-[#004643] via-[#002523] to-[#001e1d] px-6 py-6 sm:px-7 sm:py-7 shadow-2xl shadow-black/40">
+        {/* Заголовок */}
+        <div className="flex items-center justify-between gap-3 mb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#f9bc60] flex items-center justify-center text-base text-[#001e1d] shadow-md shadow-[#f9bc60]/40">
+              ★
             </div>
-
-            {/* Заголовок */}
-            <h3 className="text-lg font-bold text-[#fffffe]">
-              Топ-донатеры
-            </h3>
-
-            {/* Описание */}
-            <p className="text-sm text-[#abd1c6] leading-relaxed">
-              Наши самые щедрые помощники
-            </p>
-
-            {/* Список донатеров */}
-            <div className="space-y-2">
-              {donors.map((donor, index) => (
-                <div
-                  key={donor.name}
-                  className={`group/item relative overflow-hidden rounded-lg transition-all duration-300 cursor-pointer ${
-                    donor.isTop
-                      ? "bg-gradient-to-r from-[#f9bc60]/20 via-[#f9bc60]/10 to-[#f9bc60]/20 backdrop-blur-md border border-[#f9bc60]/30 shadow-lg"
-                      : "bg-gradient-to-r from-[#001e1d]/40 via-[#004643]/20 to-[#001e1d]/40 backdrop-blur-md border border-[#abd1c6]/20 shadow-sm"
-                  }`}
-                >
-                  <div className="relative p-4 flex items-center gap-4">
-                    <div className="flex-shrink-0 relative">
-                      <div
-                        className={`w-10 h-10 rounded-full ${getRankBg(donor.position)} flex items-center justify-center relative`}
-                      >
-                        {getRankIcon(donor.position)}
-                      </div>
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div
-                          className={`font-bold text-base ${
-                            donor.isTop
-                              ? "text-[#fffffe]"
-                              : "text-[#abd1c6]"
-                          }`}
-                        >
-                          {donor.name}
-                        </div>
-                        {donor.isTop && (
-                          <LucideIcons.Star size="md" className="text-yellow-400" />
-                        )}
-                      </div>
-                      <div
-                        className={`text-base font-bold ${
-                          donor.isTop
-                            ? "text-[#f9bc60]"
-                            : "text-[#abd1c6]"
-                        }`}
-                      >
-                        ₽{donor.amount}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Благодарность */}
-            <div className="p-3 bg-[#001e1d]/40 rounded-lg border border-[#abd1c6]/20">
-              <div className="text-sm font-medium text-[#abd1c6] mb-1">
-                Спасибо за поддержку!
-              </div>
-              <div className="text-sm text-[#abd1c6]/70">
-                💝 Каждая копейка помогает 💝
-              </div>
+            <div>
+              <h3 className="text-lg sm:text-xl font-semibold text-[#fffffe]">
+                Топ‑донатеры
+              </h3>
+              <p className="text-sm text-[#abd1c6]/85">
+                Пользователи, которые задонатили проекту больше всех
+              </p>
             </div>
           </div>
+          <Link
+            href="/heroes"
+            className="hidden sm:inline-flex items-center gap-1 rounded-full border border-[#abd1c6]/40 px-3 py-1 text-[11px] font-medium text-[#abd1c6] hover:bg-[#004643]/80 hover:text-[#fffffe] transition-colors"
+          >
+            <LucideIcons.Users size="xs" />
+            Все герои
+          </Link>
         </div>
+
+        {loading ? (
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-12 rounded-xl bg-[#001e1d]/40 border border-[#abd1c6]/20 animate-pulse"
+              />
+            ))}
+          </div>
+        ) : donors.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-[#abd1c6]/45 px-4 py-4 text-[13px] text-[#abd1c6] flex items-center justify-between gap-3 bg-[#001e1d]/40">
+            <span>Пока никто не попал в топ‑донатеров.</span>
+            <Link
+              href="/support"
+              className="inline-flex items-center gap-1 rounded-full bg-[#f9bc60] px-3 py-1 text-[11px] font-semibold text-[#001e1d] hover:bg-[#e8a545] transition-colors"
+            >
+              <LucideIcons.Heart size="xs" />
+              Поддержать
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {donors.map((donor) => (
+              <Link key={donor.id} href={`/profile/${donor.id}`}>
+                <motion.div
+                  whileHover={{ y: -3, scale: 1.02 }}
+                  className="flex items-center justify-between gap-4 rounded-2xl px-4 py-3 bg-[#001e1d]/40 hover:bg-[#004643]/70 transition-colors cursor-pointer border border-transparent hover:border-[#f9bc60]/50"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative">
+                      {donor.avatar ? (
+                        <div className="w-11 h-11 rounded-full overflow-hidden border border-[#abd1c6]/40">
+                          <img
+                            src={donor.avatar}
+                            alt={donor.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className={`w-11 h-11 rounded-full ${getAvatarBg(
+                            donor.position,
+                          )} flex items-center justify-center text-xs font-semibold text-[#001e1d]`}
+                        >
+                          {getRankIcon(donor.position)}
+                        </div>
+                      )}
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#001e1d] border border-[#f9bc60]/70 text-[10px] flex items-center justify-center text-[#f9bc60] shadow-sm">
+                        #{donor.position}
+                      </div>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-base font-semibold text-[#fffffe]">
+                        {donor.name}
+                      </p>
+                      <p className="text-sm text-[#f9bc60]">₽{donor.amount}</p>
+                    </div>
+                  </div>
+                  {(donor.vkLink || donor.telegramLink || donor.youtubeLink) && (
+                    <div className="flex items-center gap-1">
+                      {donor.vkLink && (
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            window.open(donor.vkLink!, "_blank", "noopener,noreferrer");
+                          }}
+                          className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-[#4c75a3]/60 text-[#4c75a3] bg-transparent hover:bg-[#4c75a3]/20 transition-colors"
+                          aria-label="VK"
+                        >
+                          <VKIcon className="w-3 h-3" />
+                        </button>
+                      )}
+                      {donor.telegramLink && (
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            window.open(
+                              donor.telegramLink!,
+                              "_blank",
+                              "noopener,noreferrer",
+                            );
+                          }}
+                          className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-[#229ED9]/60 text-[#229ED9] bg-transparent hover:bg-[#229ED9]/20 transition-colors"
+                          aria-label="Telegram"
+                        >
+                          <TelegramIcon className="w-3 h-3" />
+                        </button>
+                      )}
+                      {donor.youtubeLink && (
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            window.open(
+                              donor.youtubeLink!,
+                              "_blank",
+                              "noopener,noreferrer",
+                            );
+                          }}
+                          className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-[#ff4f45]/60 text-[#ff4f45] bg-transparent hover:bg-[#ff4f45]/20 transition-colors"
+                          aria-label="YouTube"
+                        >
+                          <YouTubeIcon className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </section>
   );
 }

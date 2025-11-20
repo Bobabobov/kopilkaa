@@ -1,8 +1,6 @@
 // lib/achievements/service.ts
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/db';
 import { Achievement, UserAchievement, AchievementProgress, AchievementStats, AchievementRarity, AchievementType } from './types';
-
-const prisma = new PrismaClient();
 
 export class AchievementService {
   // Получить все активные достижения

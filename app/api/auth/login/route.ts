@@ -6,20 +6,30 @@ import { AchievementService } from "@/lib/achievements/service";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
-    console.log("Login attempt for email:", email);
+    const { identifier, password } = await req.json();
+    const rawIdentifier = String(identifier ?? "").trim();
+    console.log("Login attempt for identifier:", rawIdentifier);
 
-    if (!email || !password) {
-      console.log("Missing email or password");
+    if (!rawIdentifier || !password) {
+      console.log("Missing identifier or password");
       return Response.json(
-        { error: "Введите email и пароль" },
+        { error: "Введите логин/email и пароль" },
         { status: 400 },
       );
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const lookupField = rawIdentifier.includes("@") ? "email" : "username";
+    const lookupValue = rawIdentifier
+      .toLowerCase()
+      .replace(/\s+/g, "");
+
+    const user = await prisma.user.findUnique({
+      where: lookupField === "email"
+        ? { email: lookupValue }
+        : { username: lookupValue },
+    });
     if (!user) {
-      console.log("User not found:", email);
+      console.log("User not found:", rawIdentifier);
       return Response.json(
         { error: "Такого пользователя не существует" },
         { status: 404 },
@@ -28,7 +38,7 @@ export async function POST(req: Request) {
 
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) {
-      console.log("Invalid password for user:", email);
+      console.log("Invalid password for user:", rawIdentifier);
       return Response.json({ error: "Неверный пароль" }, { status: 401 });
     }
 

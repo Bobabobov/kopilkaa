@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     const session = await getSession();
@@ -12,13 +12,14 @@ export async function GET(
       return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const take = Math.min(Number(searchParams.get("take") || 5), 20);
-    const cursor = searchParams.get("cursor") || undefined;
-    const otherUserId = params.userId;
+    const { userId: otherUserId } = await params;
 
+    // Получаем только первые 3 одобренные заявки
     const apps = await prisma.application.findMany({
-      where: { userId: otherUserId },
+      where: { 
+        userId: otherUserId,
+        status: "APPROVED" // Только одобренные заявки
+      },
       select: {
         id: true,
         status: true,
@@ -27,17 +28,10 @@ export async function GET(
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
-      take: take + 1,
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      take: 3, // Максимум 3 заявки
     });
 
-    let nextCursor: string | null = null;
-    if (apps.length > take) {
-      const next = apps.pop();
-      nextCursor = next ? next.id : null;
-    }
-
-    return NextResponse.json({ applications: apps, nextCursor });
+    return NextResponse.json({ applications: apps });
   } catch (error) {
     console.error("Other user recent applications error:", error);
     return NextResponse.json(

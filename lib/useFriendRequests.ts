@@ -1,12 +1,30 @@
 // lib/useFriendRequests.ts
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 export function useFriendRequests() {
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const loadRequests = useCallback(async () => {
+    try {
+      const response = await fetch("/api/profile/friends?type=received", {
+        cache: "no-store",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPendingCount(data.friendships?.length || 0);
+      } else {
+        setPendingCount(0);
+      }
+    } catch {
+      setPendingCount(0);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -32,15 +50,8 @@ export function useFriendRequests() {
           setLoading(true);
         }
 
-        const response = await fetch("/api/profile/friends?type=received");
         if (isMounted) {
-          if (response.ok) {
-            const data = await response.json();
-            setPendingCount(data.friendships?.length || 0);
-          } else {
-            setPendingCount(0);
-          }
-          setLoading(false);
+          await loadRequests();
         }
       } catch (error) {
         // Игнорируем ошибки
@@ -66,7 +77,20 @@ export function useFriendRequests() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, loadRequests]);
+
+  useEffect(() => {
+    const handleFriendsUpdated = () => {
+      if (isAuthenticated) {
+        loadRequests();
+      }
+    };
+
+    window.addEventListener("friends-updated", handleFriendsUpdated);
+    return () => {
+      window.removeEventListener("friends-updated", handleFriendsUpdated);
+    };
+  }, [isAuthenticated, loadRequests]);
 
   return { pendingCount, loading };
 }

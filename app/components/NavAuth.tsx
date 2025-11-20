@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type User = {
   id: string;
@@ -18,9 +19,29 @@ const REGISTER = "/register" as Route;
 export default function NavAuth() {
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  const notifyAuthChange = (isAuth: boolean) => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("auth-status-change", {
+          detail: { isAuthenticated: isAuth },
+        }),
+      );
+    }
+  };
 
   useEffect(() => {
-    fetch("/api/profile/me", { cache: "no-store" })
+    let cancelled = false;
+    
+    // Используем AbortController для отмены при размонтировании
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1000); // Таймаут 1 секунда
+    
+    fetch("/api/profile/me", { 
+      cache: "no-store",
+      signal: controller.signal,
+    })
       .then((r) => {
         if (!r.ok) {
           throw new Error(`HTTP error! status: ${r.status}`);
@@ -28,18 +49,47 @@ export default function NavAuth() {
         return r.json();
       })
       .then((d) => {
-        setUser(d.user);
+        if (!cancelled) {
+          setUser(d.user);
+          notifyAuthChange(true);
+        }
       })
       .catch((error) => {
-        console.error("Error fetching user:", error);
-        setUser(null);
+        if (!cancelled && error.name !== 'AbortError') {
+          console.error("Error fetching user:", error);
+        }
+        if (!cancelled) {
+          setUser(null);
+          notifyAuthChange(false);
+        }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        clearTimeout(timeoutId);
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+    
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, []);
 
   const logout = async () => {
+    try {
     await fetch("/api/auth/logout", { method: "POST" });
-    location.reload();
+      setUser(null);
+      notifyAuthChange(false);
+      // Перенаправляем на главную страницу
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout error:", error);
+      // В случае ошибки все равно перенаправляем на главную
+      router.push("/");
+      router.refresh();
+    }
   };
 
   if (loading) {

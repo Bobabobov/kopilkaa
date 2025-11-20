@@ -10,6 +10,9 @@ interface User {
   headerTheme?: string | null;
   avatarFrame?: string | null;
   hideEmail?: boolean;
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
   createdAt: string;
   lastSeen?: string | null;
 }

@@ -4,48 +4,34 @@ import Link from "next/link";
 
 export default function HeroesHero() {
   return (
-    <div className="flex items-center justify-center px-4 py-24 relative">
+    <div className="flex items-center justify-center px-4 py-16 md:py-20 relative">
       <div className="text-center max-w-4xl mx-auto">
-        {/* Основной заголовок */}
-        <h1
-          className="text-5xl md:text-7xl font-bold mb-6"
-          style={{ color: "#fffffe" }}
-        >
-          Поддержавшие
+        {/* Заголовок */}
+        <h1 className="text-4xl md:text-6xl font-bold mb-4 text-[#fffffe]">
+          Наши
           <br />
-          <span style={{ color: "#f9bc60" }}>проект</span>
+          <span className="text-[#f9bc60]">топ‑донатеры</span>
         </h1>
 
         {/* Описание */}
-        <p
-          className="text-xl md:text-2xl mb-8 leading-relaxed"
-          style={{ color: "#abd1c6" }}
-        >
-          Люди, которые поддержали проект
+        <p className="text-lg md:text-2xl mb-8 leading-relaxed text-[#abd1c6]">
+          Пользователи, которые задонатили проекту больше всех и помогли выйти в свет
+          десяткам историй.
         </p>
 
-        {/* CTA кнопка */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        {/* CTA */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <Link
             href="/support"
-            className="px-8 py-4 text-lg font-semibold rounded-xl transition-colors"
-            style={{
-              backgroundColor: "#f9bc60",
-              color: "#001e1d",
-            }}
+            className="px-8 py-3 text-base md:text-lg font-semibold rounded-full bg-[#f9bc60] text-[#001e1d] hover:bg-[#e8a545] transition-colors"
           >
             Поддержать проект
           </Link>
-
           <Link
             href="/"
-            className="px-8 py-4 text-lg font-semibold rounded-xl border-2 transition-colors"
-            style={{
-              borderColor: "#abd1c6",
-              color: "#abd1c6",
-            }}
+            className="text-sm md:text-base text-[#abd1c6] hover:text-[#fffffe] underline-offset-4 hover:underline"
           >
-            На главную
+            ← Вернуться на главную
           </Link>
         </div>
       </div>

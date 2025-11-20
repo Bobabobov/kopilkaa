@@ -6,7 +6,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -42,10 +42,18 @@ export default function LoginPage() {
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
 
-    if (!email.trim()) {
-      errors.email = "Введите email";
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errors.email = "Введите корректный email";
+    if (!identifier.trim()) {
+      errors.identifier = "Введите логин или email";
+    } else if (
+      identifier.includes("@") &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier.trim())
+    ) {
+      errors.identifier = "Введите корректный email";
+    } else if (
+      !identifier.includes("@") &&
+      identifier.trim().length < 3
+    ) {
+      errors.identifier = "Логин должен быть длиннее";
     }
 
     if (!password.trim()) {
@@ -72,7 +80,7 @@ export default function LoginPage() {
       const r = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier: identifier.trim(), password }),
       });
       const data = await r.json();
 
@@ -147,35 +155,38 @@ export default function LoginPage() {
                 className="block text-sm font-medium mb-2"
                 style={{ color: "#abd1c6" }}
               >
-                Email *
+                Email или логин *
               </label>
               <div className="relative">
                 <input
                   className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50 ${
-                    validationErrors.email
+                    validationErrors.identifier
                       ? "border-red-400 bg-red-50/10"
-                      : email.trim()
+                      : identifier.trim()
                         ? "border-[#abd1c6]/60 bg-[#abd1c6]/5"
                         : "border-[#abd1c6]/30 bg-[#004643]/50"
                   }`}
                   style={{
                     color: "#fffffe",
-                    backgroundColor: validationErrors.email
+                    backgroundColor: validationErrors.identifier
                       ? "rgba(239, 68, 68, 0.05)"
-                      : email.trim()
+                      : identifier.trim()
                         ? "rgba(171, 209, 198, 0.05)"
                         : "rgba(0, 70, 67, 0.5)",
                   }}
                   type="text"
-                  value={email}
+                  value={identifier}
                   onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (validationErrors.email) {
-                      setValidationErrors((prev) => ({ ...prev, email: "" }));
+                    setIdentifier(e.target.value);
+                    if (validationErrors.identifier) {
+                      setValidationErrors((prev) => ({
+                        ...prev,
+                        identifier: "",
+                      }));
                     }
                   }}
                 />
-                {email.trim() && !validationErrors.email && (
+                {identifier.trim() && !validationErrors.identifier && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                     <LucideIcons.CheckCircle
                       size="sm"
@@ -183,16 +194,16 @@ export default function LoginPage() {
                     />
                   </div>
                 )}
-                {validationErrors.email && (
+                {validationErrors.identifier && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                     <LucideIcons.XCircle size="sm" className="text-red-400" />
                   </div>
                 )}
               </div>
-              {validationErrors.email && (
+              {validationErrors.identifier && (
                 <div className="flex items-center gap-2 text-red-400 text-sm mt-2 animate-fadeIn">
                   <LucideIcons.Alert size="sm" />
-                  <span>{validationErrors.email}</span>
+                  <span>{validationErrors.identifier}</span>
                 </div>
               )}
             </div>

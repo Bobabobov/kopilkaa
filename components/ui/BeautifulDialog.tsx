@@ -131,7 +131,7 @@ export default function BeautifulDialog({
     }
   };
 
-const getGradient = () => {
+  const getGradient = () => {
     switch (type) {
       case "alert":
         return "from-red-500 to-rose-500";

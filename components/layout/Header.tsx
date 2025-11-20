@@ -15,21 +15,59 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [topBannerHeight, setTopBannerHeight] = useState(0);
 
-  // Проверяем авторизацию
+  // Проверяем авторизацию (не блокируем навигацию)
   useEffect(() => {
+    let cancelled = false;
+    
     const checkAuth = async () => {
       try {
-        const response = await fetch("/api/profile/me");
-        const isAuth = response.ok;
-        setIsAuthenticated(isAuth);
+        // Используем AbortController для отмены при размонтировании
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1000); // Таймаут 1 секунда
+        
+        const response = await fetch("/api/profile/me", {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!cancelled) {
+          const isAuth = response.ok;
+          setIsAuthenticated(isAuth);
+        }
       } catch (error) {
-        setIsAuthenticated(false);
+        if (!cancelled) {
+          setIsAuthenticated(false);
+        }
       } finally {
-        setAuthLoading(false);
+        if (!cancelled) {
+          setAuthLoading(false);
+        }
       }
     };
 
     checkAuth();
+    
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Слушаем глобальные изменения статуса авторизации
+  useEffect(() => {
+    const handleAuthChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ isAuthenticated?: boolean }>).detail;
+      if (typeof detail?.isAuthenticated === "boolean") {
+        setIsAuthenticated(detail.isAuthenticated);
+        setAuthLoading(false);
+      }
+    };
+
+    window.addEventListener("auth-status-change", handleAuthChange);
+    return () => {
+      window.removeEventListener("auth-status-change", handleAuthChange);
+    };
   }, []);
 
   // Определяем высоту TopBanner при загрузке

@@ -89,8 +89,13 @@ export default function SupportHero() {
             className="text-xl md:text-2xl mb-12 leading-relaxed max-w-4xl mx-auto"
             style={{ color: "#abd1c6" }}
           >
-            Нравится проект? Помоги ему существовать. 
-            Деньги идут на поддержку авторов.
+            Нравится проект? Помоги ему существовать.
+            {" "}
+            Деньги идут на поддержку авторов историй и развитие платформы.
+            {" "}
+            <span className="text-[#f9bc60]">
+              Привяжи свои соцсети — мы аккуратно покажем их рядом с твоим именем среди донаторов.
+            </span>
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">

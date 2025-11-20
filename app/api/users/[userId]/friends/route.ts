@@ -1,0 +1,54 @@
+// app/api/users/[userId]/friends/route.ts
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+
+interface RouteParams {
+  params: {
+    userId: string;
+  };
+}
+
+export async function GET(_req: Request, { params }: RouteParams) {
+  const { userId } = params;
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Не указан идентификатор пользователя" },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const friendships = await prisma.friendship.findMany({
+      where: {
+        status: "ACCEPTED",
+        OR: [{ requesterId: userId }, { receiverId: userId }],
+      },
+      include: {
+        requester: true,
+        receiver: true,
+      },
+    });
+
+    const friends = friendships.map((f) => {
+      const friend = f.requesterId === userId ? f.receiver : f.requester;
+      return {
+        id: friend.id,
+        name: friend.name,
+        email: friend.email,
+        avatar: friend.avatar,
+        lastSeen: friend.lastSeen,
+      };
+    });
+
+    return NextResponse.json({ success: true, friends });
+  } catch (error) {
+    console.error("Error fetching user friends:", error);
+    return NextResponse.json(
+      { error: "Ошибка получения списка друзей" },
+      { status: 500 },
+    );
+  }
+}
+
+

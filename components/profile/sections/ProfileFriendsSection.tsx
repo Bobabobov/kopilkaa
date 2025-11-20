@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
@@ -34,6 +34,7 @@ export default function ProfileFriendsSection() {
   const router = useRouter();
   const [friends, setFriends] = useState<Friendship[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<Friendship[]>([]);
+  const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -77,43 +78,49 @@ export default function ProfileFriendsSection() {
     }
   };
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        // Получаем ID текущего пользователя
-        const meRes = await fetch("/api/profile/me", { cache: "no-store" });
-        if (meRes.ok) {
-          const meData = await meRes.json();
-          setCurrentUserId(meData.user.id);
-        }
-
-        const [friendsRes, receivedRes] = await Promise.all([
-          fetch("/api/profile/friends?type=friends"),
-          fetch("/api/profile/friends?type=received"),
-        ]);
-
-        if (friendsRes.ok) {
-          const friendsData = await friendsRes.json();
-          setFriends(friendsData.friendships || []);
-        }
-
-        if (receivedRes.ok) {
-          const receivedData = await receivedRes.json();
-          const newRequests = receivedData.friendships || [];
-          setReceivedRequests(newRequests);
-          
-          // Загружаем последнюю прочитанную заявку из localStorage
-          const savedLastRead = localStorage.getItem('lastReadFriendRequestId');
-          setLastReadRequestId(savedLastRead);
-        }
-      } catch (err) {
-        console.error("Error fetching friends:", err);
-        setError(err instanceof Error ? err.message : "Неизвестная ошибка");
-      } finally {
-        setLoading(false);
+  const fetchFriends = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Получаем ID текущего пользователя
+      const meRes = await fetch("/api/profile/me", { cache: "no-store" });
+      if (meRes.ok) {
+        const meData = await meRes.json();
+        setCurrentUserId(meData.user.id);
       }
-    };
 
+      const [friendsRes, receivedRes, sentRes] = await Promise.all([
+        fetch("/api/profile/friends?type=friends"),
+        fetch("/api/profile/friends?type=received"),
+        fetch("/api/profile/friends?type=sent"),
+      ]);
+
+      if (friendsRes.ok) {
+        const friendsData = await friendsRes.json();
+        setFriends(friendsData.friendships || []);
+      }
+
+      if (receivedRes.ok) {
+        const receivedData = await receivedRes.json();
+        const newRequests = receivedData.friendships || [];
+        setReceivedRequests(newRequests);
+      if (sentRes.ok) {
+        const sentData = await sentRes.json();
+        setSentRequests(sentData.friendships || []);
+      }
+
+        // Загружаем последнюю прочитанную заявку из localStorage
+        const savedLastRead = localStorage.getItem("lastReadFriendRequestId");
+        setLastReadRequestId(savedLastRead);
+      }
+    } catch (err) {
+      console.error("Error fetching friends:", err);
+      setError(err instanceof Error ? err.message : "Неизвестная ошибка");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
     fetchFriends();
 
     // Обработчик для открытия модального окна друзей
@@ -134,7 +141,29 @@ export default function ProfileFriendsSection() {
         handleOpenFriendsModal as EventListener,
       );
     };
-  }, []);
+  }, [fetchFriends]);
+
+  useEffect(() => {
+    const handleFriendRequestNotification = () => {
+      fetchFriends();
+    };
+
+    window.addEventListener("friend-requests-updated", handleFriendRequestNotification);
+    return () => {
+      window.removeEventListener("friend-requests-updated", handleFriendRequestNotification);
+    };
+  }, [fetchFriends]);
+
+  useEffect(() => {
+    const handleFriendsUpdated = () => {
+      fetchFriends();
+    };
+
+    window.addEventListener("friends-updated", handleFriendsUpdated);
+    return () => {
+      window.removeEventListener("friends-updated", handleFriendsUpdated);
+    };
+  }, [fetchFriends]);
 
   // Определяем количество новых заявок в друзья
   const getNewRequestsCount = () => {
@@ -154,6 +183,7 @@ export default function ProfileFriendsSection() {
 
   const totalFriends = friends.length;
   const pendingRequests = receivedRequests.length;
+  const sentRequestsCount = sentRequests.length;
 
   return (
     <>
@@ -377,6 +407,29 @@ export default function ProfileFriendsSection() {
                       </div>
                     </div>
                     <LucideIcons.ChevronRight className="text-[#f9bc60]" size="sm" />
+                  </motion.div>
+                )}
+
+                {sentRequestsCount > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.65 }}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => {
+                      setInitialTab("sent");
+                      handleOpenModal();
+                    }}
+                    className="flex items-center justify-between p-4 rounded-xl bg-[#3b82f6]/10 hover:bg-[#3b82f6]/20 cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <LucideIcons.Send className="text-[#3b82f6]" size="sm" />
+                      <div>
+                        <p className="text-[#fffffe] font-medium">{sentRequestsCount} отправленных заявок</p>
+                        <p className="text-[#3b82f6] text-xs">Можно отменить или подождать ответа</p>
+                      </div>
+                    </div>
+                    <LucideIcons.ChevronRight className="text-[#3b82f6]" size="sm" />
                   </motion.div>
                 )}
 

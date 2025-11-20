@@ -9,10 +9,10 @@ export async function GET(request: NextRequest) {
       _count: {
         status: true,
       },
-    });
+    }).catch(() => []);
 
     // Получаем общее количество пользователей
-    const totalUsers = await prisma.user.count();
+    const totalUsers = await prisma.user.count().catch(() => 0);
 
     // Получаем количество новых пользователей за последние 7 дней
     const newUsers = await prisma.user.count({
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
           gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
         },
       },
-    });
+    }).catch(() => 0);
 
     // Формируем статистику
     const stats = {
@@ -49,12 +49,24 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ stats });
   } catch (error) {
     console.error("Error fetching stats:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    // Возвращаем пустую статистику вместо ошибки
+    return NextResponse.json({
+      stats: {
+        applications: {
+          total: 0,
+          pending: 0,
+          approved: 0,
+          rejected: 0,
+        },
+        users: {
+          total: 0,
+          new: 0,
+        },
+      },
+    });
   }
 }
+
 
 
 

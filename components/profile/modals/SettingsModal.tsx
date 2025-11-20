@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSettings } from "../hooks/useSettings";
-import { EmailEditor, NameEditor, EmailVisibilityToggle } from "../settings/ProfileEditors";
+import { EmailEditor, NameEditor, EmailVisibilityToggle, SocialLinkEditor } from "../settings/ProfileEditors";
 import {
   SettingsLoading,
   SettingsUnauthorized,
@@ -64,6 +64,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     handleNameChange,
     handleEmailChange,
     handleEmailVisibilityChange,
+    handleSocialLinkChange,
   } = useSettings();
 
   // Монтирование для Portal
@@ -241,6 +242,36 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   onToggle={handleEmailVisibilityChange}
                   disabled={saving}
                 />
+
+              {/* Социальные сети */}
+              <SettingsSection title="Социальные сети">
+                <div className="space-y-4">
+                  <SocialLinkEditor
+                    label="Профиль VK"
+                    placeholder="https://vk.com/username"
+                    value={user.vkLink}
+                    type="vk"
+                    onSave={(link) => handleSocialLinkChange("vkLink", link)}
+                    disabled={saving}
+                  />
+                  <SocialLinkEditor
+                    label="Telegram"
+                    placeholder="https://t.me/username"
+                    value={user.telegramLink}
+                    type="telegram"
+                    onSave={(link) => handleSocialLinkChange("telegramLink", link)}
+                    disabled={saving}
+                  />
+                  <SocialLinkEditor
+                    label="YouTube"
+                    placeholder="https://youtube.com/@username"
+                    value={user.youtubeLink}
+                    type="youtube"
+                    onSave={(link) => handleSocialLinkChange("youtubeLink", link)}
+                    disabled={saving}
+                  />
+                </div>
+              </SettingsSection>
 
                 {/* Дата регистрации */}
                 <ReadOnlyField

@@ -1,6 +1,6 @@
 // components/profile/OtherUserProfile.tsx
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -8,6 +8,7 @@ import OtherUserHeader from "./OtherUserHeader";
 import OtherUserCard from "./OtherUserCard";
 import OtherUserLoadingStates from "./OtherUserLoadingStates";
 import OtherUserStats from "./OtherUserStats";
+import OtherUserAchievements from "./OtherUserAchievements";
 import OtherUserActivity from "./OtherUserActivity";
 import RecentApplications from "./widgets/RecentApplications";
 import MutualFriends from "./widgets/MutualFriends";
@@ -33,7 +34,13 @@ type User = {
   headerTheme?: string | null;
   avatarFrame?: string | null;
   hideEmail?: boolean;
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
   lastSeen?: string | null;
+  isBanned?: boolean;
+  bannedUntil?: string | null;
+  bannedReason?: string | null;
 };
 
 type Friendship = {
@@ -59,6 +66,13 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     "friends" | "sent" | "received" | "search"
   >("friends");
   const { showToast, ToastComponent } = useBeautifulToast();
+
+  const emitFriendEvents = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("friends-updated"));
+      window.dispatchEvent(new CustomEvent("friend-requests-updated"));
+    }
+  }, []);
 
   // Проверка авторизации
   useEffect(() => {
@@ -100,6 +114,24 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
       );
   }, []);
 
+  const fetchFriendshipStatus = useCallback(async () => {
+    try {
+      const friendshipResponse = await fetch(`/api/profile/friends?type=all`, {
+        cache: "no-store",
+      });
+      if (friendshipResponse.ok) {
+        const friendshipData = await friendshipResponse.json();
+        const userFriendship = friendshipData.friendships.find(
+          (f: Friendship) =>
+            f.requesterId === userId || f.receiverId === userId,
+        );
+        setFriendship(userFriendship || null);
+      }
+    } catch (error) {
+      console.error("Load friendship data error:", error);
+    }
+  }, [userId]);
+
   // Загрузка данных пользователя
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -109,25 +141,29 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
         setLoading(true);
 
         // Загружаем данные пользователя
-        const userResponse = await fetch(`/api/users/${userId}`);
+        const userResponse = await fetch(`/api/users/${userId}`, {
+          cache: "no-store", // Не кешируем, чтобы всегда получать актуальные данные
+        });
         if (userResponse.ok) {
           const userData = await userResponse.json();
+          console.log("User data loaded:", {
+            id: userData.user?.id,
+            isBanned: userData.user?.isBanned,
+            bannedUntil: userData.user?.bannedUntil,
+            bannedReason: userData.user?.bannedReason,
+          });
           setUser(userData.user);
+        } else if (userResponse.status === 404) {
+          // Пользователь не найден (возможно удален)
+          setUser(null);
+          return;
         } else {
           console.error("User not found");
           return;
         }
 
         // Загружаем статус дружбы
-        const friendshipResponse = await fetch(`/api/profile/friends?type=all`);
-        if (friendshipResponse.ok) {
-          const friendshipData = await friendshipResponse.json();
-          const userFriendship = friendshipData.friendships.find(
-            (f: Friendship) =>
-              f.requesterId === userId || f.receiverId === userId,
-          );
-          setFriendship(userFriendship || null);
-        }
+        await fetchFriendshipStatus();
       } catch (error) {
         console.error("Load user data error:", error);
       } finally {
@@ -136,7 +172,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     };
 
     loadUserData();
-  }, [isAuthenticated, userId]);
+  }, [isAuthenticated, userId, fetchFriendshipStatus]);
 
   // Проверка, является ли пользователь владельцем профиля
   useEffect(() => {
@@ -169,6 +205,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
 
       if (response.ok) {
         setFriendship(data.friendship);
+        emitFriendEvents();
         showToast(
           "success",
           "Заявка отправлена!",
@@ -202,7 +239,8 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
       });
 
       if (response.ok) {
-        setFriendship({ ...friendship, status: "ACCEPTED" });
+        await fetchFriendshipStatus();
+        emitFriendEvents();
         showToast(
           "success",
           "Заявка принята!",
@@ -235,7 +273,8 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
       });
 
       if (response.ok) {
-        setFriendship({ ...friendship, status: "DECLINED" });
+        await fetchFriendshipStatus();
+        emitFriendEvents();
         showToast("info", "Заявка отклонена", "Заявка в друзья отклонена");
       } else {
         showToast(
@@ -271,41 +310,182 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     return <OtherUserLoadingStates state="not-found" />;
   }
 
+  // Проверяем, заблокирован ли пользователь
+  // Учитываем, что если bannedUntil истёк, пользователь не заблокирован
+  const isBanned = user.isBanned === true; // Явная проверка на true
+  const bannedUntil = user.bannedUntil ? new Date(user.bannedUntil) : null;
+  
+  // Пользователь действительно заблокирован только если:
+  // 1. isBanned = true
+  // 2. И либо нет даты окончания (заблокирован навсегда), либо дата еще не прошла
+  const isCurrentlyBanned = isBanned && (
+    !bannedUntil || // Заблокирован навсегда
+    bannedUntil > new Date() // Заблокирован временно, но срок еще не истёк
+  );
+  
+  // Пользователь заблокирован навсегда
+  const isBannedPermanent = isBanned && !bannedUntil;
+  
+  // Пользователь заблокирован временно
+  const isBannedTemporary = isBanned && bannedUntil && bannedUntil > new Date();
+
+  console.log("Ban check:", {
+    isBanned,
+    bannedUntil: bannedUntil?.toISOString(),
+    isCurrentlyBanned,
+    isBannedPermanent,
+    isBannedTemporary,
+    currentDate: new Date().toISOString(),
+  });
+
+  // Если пользователь действительно заблокирован, показываем только сообщение
+  if (isCurrentlyBanned) {
+    return (
+      <div className="min-h-screen relative overflow-hidden">
+        <UniversalBackground />
+        <div className="w-full px-6 pt-32 pb-8">
+          <div className="max-w-2xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-500/20 border-2 border-red-500/50 rounded-2xl p-8"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-red-500/30 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg
+                    className="w-6 h-6 text-red-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-red-400 mb-3">
+                    Пользователь заблокирован
+                  </h3>
+                  {isBannedPermanent ? (
+                    <p className="text-[#abd1c6] text-base">
+                      Этот аккаунт заблокирован навсегда.
+                    </p>
+                  ) : (
+                    <p className="text-[#abd1c6] text-base">
+                      Этот аккаунт заблокирован до{" "}
+                      {bannedUntil?.toLocaleDateString("ru-RU", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}{" "}
+                      г. в{" "}
+                      {bannedUntil?.toLocaleTimeString("ru-RU", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                      .
+                    </p>
+                  )}
+                  {user.bannedReason && (
+                    <p className="text-[#abd1c6] text-base mt-3">
+                      Причина: {user.bannedReason}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+        <ToastComponent />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Универсальный фон */}
       <UniversalBackground />
 
       {/* Header */}
-      <div className="mt-20">
+      <div className="mt-14 sm:mt-18">
         <OtherUserHeader user={user} />
       </div>
 
       {/* Main Content */}
-      <div className="w-full px-6 pt-32 pb-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-12 sm:pb-16">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* User Info Card - 3 колонки */}
-            <OtherUserCard
-              user={user}
-              friendship={friendship}
-              currentUserId={currentUserId}
-              onSendFriendRequest={sendFriendRequest}
-              onAcceptFriendRequest={acceptFriendRequest}
-              onDeclineFriendRequest={declineFriendRequest}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-6 xl:gap-8">
+            {/* Левая колонка — карточка пользователя */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="lg:col-span-4"
+            >
+              <OtherUserCard
+                user={user}
+                friendship={friendship}
+                currentUserId={currentUserId}
+                onSendFriendRequest={sendFriendRequest}
+                onAcceptFriendRequest={acceptFriendRequest}
+                onDeclineFriendRequest={declineFriendRequest}
+              />
+            </motion.div>
 
-            {/* Right Sidebar - 9 колонок */}
+            {/* Правая колонка */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="lg:col-span-9 space-y-6"
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="lg:col-span-8"
             >
-              <MutualFriends userId={userId} />
-              <RecentApplications userId={userId} />
-              <OtherUserStats userId={userId} />
-              <OtherUserActivity userId={userId} />
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 lg:gap-6">
+                {/* Первый ряд: Статистика + Достижения */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                >
+                  <OtherUserStats userId={userId} />
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <OtherUserAchievements userId={userId} />
+                </motion.div>
+
+                {/* Второй ряд: Общие друзья + Недавние заявки */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.35 }}
+                >
+                  <MutualFriends userId={userId} />
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <RecentApplications userId={userId} />
+                </motion.div>
+
+                {/* Третий ряд: Активность на всю ширину */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.45 }}
+                  className="xl:col-span-2"
+                >
+                  <OtherUserActivity userId={userId} />
+                </motion.div>
+              </div>
             </motion.div>
           </div>
         </div>

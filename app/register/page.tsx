@@ -6,6 +6,7 @@ import SuccessScreen from "@/components/auth/SuccessScreen";
 
 interface FormData {
   email: string;
+  username: string;
   name: string;
   password: string;
   password2: string;
@@ -51,6 +52,13 @@ export default function RegisterPage() {
       newErrors.email = "Введите корректный email адрес";
     }
 
+    if (!formData.username) {
+      newErrors.username = "Логин обязателен";
+    } else if (!/^[\p{L}\p{N}._-]{3,20}$/u.test(formData.username.trim())) {
+      newErrors.username =
+        "3–20 символов: буквы, цифры, точка, дефис или подчёркивание";
+    }
+
     if (!formData.name || formData.name.trim().length === 0) {
       newErrors.name = "Имя обязательно";
     } else if (formData.name.trim().length < 2) {
@@ -91,6 +99,7 @@ export default function RegisterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: formData.email.trim().toLowerCase(),
+          username: formData.username.trim().toLowerCase(),
           password: formData.password,
           name: formData.name.trim(),
         }),

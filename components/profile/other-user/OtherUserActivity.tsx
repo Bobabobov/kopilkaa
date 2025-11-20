@@ -112,8 +112,8 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {activities.map((activity, index) => (
+          <div className="space-y-3">
+            {activities.slice(0, 5).map((activity, index) => (
               <motion.div
                 key={activity.id || `other-activity-${index}`}
                 initial={{ opacity: 0, x: -20 }}

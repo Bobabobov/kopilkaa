@@ -67,7 +67,9 @@ export default function HomePage() {
           cacheStats(newStats);
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        // При ошибке используем значения по умолчанию (уже установлены)
+      })
       .finally(() => setLoading(false));
   }, []);
 

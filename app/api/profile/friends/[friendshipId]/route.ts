@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { friendshipId: string } },
+  { params }: { params: Promise<{ friendshipId: string }> },
 ) {
   const session = await getSession();
   if (!session) {
@@ -14,7 +14,7 @@ export async function PATCH(
 
   try {
     const { status } = await request.json();
-    const { friendshipId } = params;
+    const { friendshipId } = await params;
 
     if (!["ACCEPTED", "DECLINED"].includes(status)) {
       return NextResponse.json({ message: "Неверный статус" }, { status: 400 });
@@ -42,10 +42,26 @@ export async function PATCH(
       data: { status },
       include: {
         requester: {
-          select: { id: true, name: true, email: true, createdAt: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            createdAt: true,
+            vkLink: true,
+            telegramLink: true,
+            youtubeLink: true,
+          },
         },
         receiver: {
-          select: { id: true, name: true, email: true, createdAt: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            createdAt: true,
+            vkLink: true,
+            telegramLink: true,
+            youtubeLink: true,
+          },
         },
       },
     });
@@ -62,7 +78,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { friendshipId: string } },
+  { params }: { params: Promise<{ friendshipId: string }> },
 ) {
   const session = await getSession();
   if (!session) {
@@ -70,7 +86,8 @@ export async function DELETE(
   }
 
   try {
-    const { friendshipId } = params;
+    const { friendshipId } = await params;
+    console.log("=== DELETE /api/profile/friends/[friendshipId] ===", { friendshipId, userId: session.uid });
 
     // Проверяем, что пользователь является участником заявки
     const friendship = await prisma.friendship.findFirst({
@@ -81,17 +98,26 @@ export async function DELETE(
     });
 
     if (!friendship) {
+      console.log("Friendship not found:", { friendshipId, userId: session.uid });
       return NextResponse.json(
         { message: "Заявка не найдена" },
         { status: 404 },
       );
     }
 
+    console.log("Found friendship:", {
+      id: friendship.id,
+      requesterId: friendship.requesterId,
+      receiverId: friendship.receiverId,
+      status: friendship.status,
+    });
+
     // Удаляем заявку
     await prisma.friendship.delete({
       where: { id: friendshipId },
     });
 
+    console.log("Friendship deleted successfully");
     return NextResponse.json({ message: "Заявка удалена" });
   } catch (error) {
     console.error("Delete friendship error:", error);

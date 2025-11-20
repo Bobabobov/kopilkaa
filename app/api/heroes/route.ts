@@ -1,122 +1,80 @@
 // app/api/heroes/route.ts
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
   try {
-    // TODO: Когда система донатов будет реализована, здесь будет запрос к БД
-    // Пока возвращаем тестовые данные для демонстрации
-    
-    const heroes = [
-      {
-        id: "hero-1",
-        name: "Александр Великий",
-        avatar: null,
-        totalDonated: 15000,
-        donationCount: 25,
-        rank: 1,
-        joinedAt: new Date("2024-01-15"),
-        isSubscriber: true
-      },
-      {
-        id: "hero-2", 
-        name: "Мария Кюри",
-        avatar: null,
-        totalDonated: 12500,
-        donationCount: 18,
-        rank: 2,
-        joinedAt: new Date("2024-02-03"),
-        isSubscriber: true
-      },
-      {
-        id: "hero-3",
-        name: "Илон Маск",
-        avatar: null,
-        totalDonated: 8900,
-        donationCount: 12,
-        rank: 3,
-        joinedAt: new Date("2024-02-20"),
-        isSubscriber: false
-      },
-      {
-        id: "hero-4",
-        name: "Анна Ахматова",
-        avatar: null,
-        totalDonated: 5200,
-        donationCount: 8,
-        rank: 4,
-        joinedAt: new Date("2024-03-05"),
-        isSubscriber: true
-      },
-      {
-        id: "hero-5",
-        name: "Стив Джобс",
-        avatar: null,
-        totalDonated: 3700,
-        donationCount: 15,
-        rank: 5,
-        joinedAt: new Date("2024-03-12"),
-        isSubscriber: false
-      },
-      {
-        id: "hero-6",
-        name: "Фрида Кало",
-        avatar: null,
-        totalDonated: 2800,
-        donationCount: 6,
-        rank: 6,
-        joinedAt: new Date("2024-04-01"),
-        isSubscriber: true
-      },
-      {
-        id: "hero-7",
-        name: "Леонардо да Винчи",
-        avatar: null,
-        totalDonated: 2100,
-        donationCount: 9,
-        rank: 7,
-        joinedAt: new Date("2024-04-15"),
-        isSubscriber: false
-      },
-      {
-        id: "hero-8",
-        name: "Майя Плисецкая",
-        avatar: null,
-        totalDonated: 1500,
-        donationCount: 4,
-        rank: 8,
-        joinedAt: new Date("2024-05-02"),
-        isSubscriber: false
-      },
-      {
-        id: "hero-9",
-        name: "Альберт Эйнштейн",
-        avatar: null,
-        totalDonated: 1200,
-        donationCount: 3,
-        rank: 9,
-        joinedAt: new Date("2024-05-20"),
-        isSubscriber: true
-      },
-      {
-        id: "hero-10",
-        name: "Коко Шанель",
-        avatar: null,
-        totalDonated: 900,
-        donationCount: 2,
-        rank: 10,
-        joinedAt: new Date("2024-06-10"),
-        isSubscriber: false
-      }
-    ];
+    // Берём реальных пользователей, у которых есть одобренные заявки
+    const users = await prisma.user
+      .findMany({
+        where: {
+          applications: {
+            some: {
+              status: "APPROVED",
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          avatar: true,
+          createdAt: true,
+          vkLink: true,
+          telegramLink: true,
+          youtubeLink: true,
+          applications: {
+            where: {
+              status: "APPROVED",
+            },
+            select: {
+              amount: true,
+            },
+          },
+        },
+      })
+      .catch(() => []);
+
+    const heroesRaw = users
+      .map((user) => {
+        const totalDonated = user.applications.reduce(
+          (sum, app) => sum + app.amount,
+          0,
+        );
+        const donationCount = user.applications.length;
+
+        return {
+          id: user.id,
+          name: user.name || user.email.split("@")[0],
+          avatar: user.avatar,
+          totalDonated,
+          donationCount,
+          joinedAt: user.createdAt,
+          isSubscriber: donationCount >= 3,
+          vkLink: user.vkLink,
+          telegramLink: user.telegramLink,
+          youtubeLink: user.youtubeLink,
+        };
+      })
+      .filter((hero) => hero.totalDonated > 0)
+      .sort((a, b) => b.totalDonated - a.totalDonated);
+
+    const heroes = heroesRaw.map((hero, index) => ({
+      ...hero,
+      rank: index + 1,
+    }));
 
     return NextResponse.json(
       {
         heroes,
         total: heroes.length,
-        message: heroes.length === 0 ? "Пока нет героев проекта. Стань первым!" : null
+        message:
+          heroes.length === 0
+            ? "Пока нет героев проекта. Стань первым, кто поддержит историю!"
+            : null,
       },
       {
         headers: {
@@ -124,24 +82,24 @@ export async function GET() {
           "Pragma": "no-cache",
           "Expires": "0",
         },
-      }
+      },
     );
   } catch (error) {
     console.error("Ошибка при получении героев:", error);
+    // Возвращаем пустой список вместо падения страницы
     return NextResponse.json(
-      { 
-        error: "Ошибка при получении данных о героях",
+      {
         heroes: [],
-        total: 0
+        total: 0,
+        message: "Пока нет героев проекта. Стань первым, кто поддержит историю!",
       },
-      { 
-        status: 500,
+      {
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",
           "Pragma": "no-cache",
           "Expires": "0",
         },
-      }
+      },
     );
   }
 }

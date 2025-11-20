@@ -16,6 +16,9 @@ interface Hero {
   rank: number;
   joinedAt: Date;
   isSubscriber: boolean;
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
 }
 
 export default function HeroesPage() {

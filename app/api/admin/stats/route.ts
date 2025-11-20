@@ -13,31 +13,32 @@ export async function GET() {
       return NextResponse.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
 
-    // Статистика по заявкам
+    // Статистика по заявкам с обработкой ошибок
     const [pending, approved, rejected, total, totalAmount] = await Promise.all([
-      prisma.application.count({ where: { status: "PENDING" } }),
-      prisma.application.count({ where: { status: "APPROVED" } }),
-      prisma.application.count({ where: { status: "REJECTED" } }),
-      prisma.application.count(),
+      prisma.application.count({ where: { status: "PENDING" } }).catch(() => 0),
+      prisma.application.count({ where: { status: "APPROVED" } }).catch(() => 0),
+      prisma.application.count({ where: { status: "REJECTED" } }).catch(() => 0),
+      prisma.application.count().catch(() => 0),
       prisma.application
         .aggregate({
           _sum: { amount: true },
         })
-        .then((r) => r._sum.amount || 0),
+        .then((r) => r._sum.amount || 0)
+        .catch(() => 0),
     ]);
 
-    // Статистика по достижениям
+    // Статистика по достижениям с обработкой ошибок
     const [totalAchievements, activeAchievements, inactiveAchievements, exclusiveAchievements] = await Promise.all([
-      prisma.achievement.count(),
-      prisma.achievement.count({ where: { isActive: true } }),
-      prisma.achievement.count({ where: { isActive: false } }),
-      prisma.achievement.count({ where: { isExclusive: true } }),
+      prisma.achievement.count().catch(() => 0),
+      prisma.achievement.count({ where: { isActive: true } }).catch(() => 0),
+      prisma.achievement.count({ where: { isActive: false } }).catch(() => 0),
+      prisma.achievement.count({ where: { isExclusive: true } }).catch(() => 0),
     ]);
 
-    // Статистика по пользователям
+    // Статистика по пользователям с обработкой ошибок
     const [totalUsers, adminUsers] = await Promise.all([
-      prisma.user.count(),
-      prisma.user.count({ where: { role: 'ADMIN' } }),
+      prisma.user.count().catch(() => 0),
+      prisma.user.count({ where: { role: 'ADMIN' } }).catch(() => 0),
     ]);
 
     return NextResponse.json({

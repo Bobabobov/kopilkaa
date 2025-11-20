@@ -7,6 +7,7 @@ import PasswordField from "./PasswordField";
 
 interface FormData {
   email: string;
+  username: string;
   name: string;
   password: string;
   password2: string;
@@ -26,6 +27,7 @@ export default function RegisterForm({
 }: RegisterFormProps) {
   const [formData, setFormData] = useState<FormData>({
     email: "",
+    username: "",
     name: "",
     password: "",
     password2: "",
@@ -104,6 +106,17 @@ export default function RegisterForm({
               onChange={(value) => handleInputChange("email", value)}
               placeholder="your@email.com"
               error={errors.email}
+            />
+
+            {/* Username */}
+            <FormField
+              label="Логин"
+              type="input"
+              value={formData.username}
+              onChange={(value) => handleInputChange("username", value)}
+              placeholder="naprimer_user"
+              error={errors.username}
+              hint="3–20 символов: буквы любого языка, цифры, точка, дефис или подчёркивание"
             />
 
             {/* Имя */}

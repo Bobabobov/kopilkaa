@@ -27,7 +27,10 @@ function FriendsTabContent({ type, data, loading, currentUserId, getUserStatus, 
     );
   }
 
-  if (data.length === 0) {
+  // Убеждаемся, что data - это массив
+  const items = Array.isArray(data) ? data : [];
+
+  if (items.length === 0) {
     const messages = {
       friends: "У вас пока нет друзей",
       sent: "Нет отправленных заявок", 
@@ -43,7 +46,7 @@ function FriendsTabContent({ type, data, loading, currentUserId, getUserStatus, 
 
   return (
     <div className="space-y-3">
-      {data.map((item: any) => {
+      {items.map((item: any) => {
         const user = type === "friends" 
           ? (currentUserId === item.requesterId ? item.receiver : item.requester)
           : (type === "sent" ? item.receiver : item.requester);
@@ -52,21 +55,21 @@ function FriendsTabContent({ type, data, loading, currentUserId, getUserStatus, 
           <div key={item.id} className="flex items-center gap-3 p-3 bg-[#001e1d]/20 rounded-xl">
             <Link href={`/profile/${user.id}`} prefetch={false} className="flex items-center gap-3 flex-1 group">
               <div className="w-12 h-12 bg-[#004643] rounded-full flex items-center justify-center group-hover:ring-2 group-hover:ring-[#f9bc60]/40 transition">
-                {user.avatar ? (
-                  <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
-                ) : (
-                  <span className="text-[#f9bc60] font-bold">
-                    {(user.name || user.email.split("@")[0])[0].toUpperCase()}
-                  </span>
-                )}
-              </div>
-              
-              <div className="flex-1">
+              {user.avatar ? (
+                <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+              ) : (
+                <span className="text-[#f9bc60] font-bold">
+                  {(user.name || user.email.split("@")[0])[0].toUpperCase()}
+                </span>
+              )}
+            </div>
+            
+            <div className="flex-1">
                 <p className="text-[#fffffe] font-medium group-hover:underline">
                   {user.name || user.email.split("@")[0]}
                 </p>
                 <p className="text-[#abd1c6] text-sm">{getUserStatus(user.lastSeen ?? null).text}</p>
-              </div>
+            </div>
             </Link>
             
             <div className="flex gap-2">
@@ -81,11 +84,27 @@ function FriendsTabContent({ type, data, loading, currentUserId, getUserStatus, 
               )}
               {type === "sent" && actions.onCancelRequest && (
                 <button
-                  onClick={() => actions.onCancelRequest(item.id)}
-                  disabled={sendingRequests.has(item.id)}
-                  className="px-3 py-1 bg-[#6B7280]/20 hover:bg-[#6B7280]/30 text-[#abd1c6] text-sm rounded-lg transition-colors"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log("Cancel button clicked:", { 
+                      friendshipId: item.id, 
+                      userId: user.id, 
+                      item: item,
+                      isDisabled: sendingRequests.has(user.id)
+                    });
+                    if (!sendingRequests.has(user.id) && actions.onCancelRequest && item.id) {
+                      try {
+                        await actions.onCancelRequest(item.id, user.id);
+                      } catch (error) {
+                        console.error("Error in cancel handler:", error);
+                      }
+                    }
+                  }}
+                  disabled={sendingRequests.has(user.id) || !item.id}
+                  className="px-3 py-1 bg-[#6B7280]/20 hover:bg-[#6B7280]/30 text-[#abd1c6] text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Отменить
+                  {sendingRequests.has(user.id) ? "Отмена..." : "Отменить"}
                 </button>
               )}
               {type === "received" && (
@@ -147,38 +166,50 @@ function FriendsSearchContent({ searchQuery, setSearchQuery, searchResults, sear
             <div key={user.id} className="flex items-center gap-3 p-3 bg-[#001e1d]/20 rounded-xl">
               <Link href={`/profile/${user.id}`} prefetch={false} className="flex items-center gap-3 flex-1 group">
                 <div className="w-12 h-12 bg-[#004643] rounded-full flex items-center justify-center group-hover:ring-2 group-hover:ring-[#f9bc60]/40 transition">
-                  {user.avatar ? (
-                    <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
-                  ) : (
-                    <span className="text-[#f9bc60] font-bold">
-                      {(user.name || user.email.split("@")[0])[0].toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                
-                <div className="flex-1">
+                {user.avatar ? (
+                  <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+                ) : (
+                  <span className="text-[#f9bc60] font-bold">
+                    {(user.name || user.email.split("@")[0])[0].toUpperCase()}
+                  </span>
+                )}
+              </div>
+              
+              <div className="flex-1">
                   <p className="text-[#fffffe] font-medium group-hover:underline">
                     {user.name || user.email.split("@")[0]}
                   </p>
                   <p className="text-[#abd1c6] text-sm">{getUserStatus(user.lastSeen ?? null).text}</p>
-                </div>
+              </div>
               </Link>
               
               <div className="flex gap-2">
                 {user.friendshipStatus !== "PENDING" && user.friendshipStatus !== "ACCEPTED" && (
                   <button
-                    onClick={() => onSendRequest(user.id)}
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!sendingRequests.has(user.id) && onSendRequest) {
+                        await onSendRequest(user.id);
+                      }
+                    }}
                     disabled={sendingRequests.has(user.id)}
-                    className="px-4 py-2 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] font-semibold rounded-lg transition-colors disabled:opacity-50"
+                    className="px-4 py-2 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {sendingRequests.has(user.id) ? "Отправка..." : "Добавить"}
                   </button>
                 )}
                 {user.friendshipStatus === "PENDING" && user.isRequester && user.friendshipId && (
                   <button
-                    onClick={() => onCancelRequest(user.friendshipId, user.id)}
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!sendingRequests.has(user.id) && onCancelRequest && user.friendshipId) {
+                        await onCancelRequest(user.friendshipId, user.id);
+                      }
+                    }}
                     disabled={sendingRequests.has(user.id)}
-                    className="px-4 py-2 bg-[#6B7280] hover:bg-[#4B5563] text-[#fffffe] font-semibold rounded-lg transition-colors disabled:opacity-50"
+                    className="px-4 py-2 bg-[#6B7280] hover:bg-[#4B5563] text-[#fffffe] font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Отменить
                   </button>
@@ -292,11 +323,19 @@ export default function FriendsModal({
 
   // Обработчики действий
   const handleSendRequest = async (userId: string) => {
+    try {
     await sendFriendRequest(userId);
+    } catch (error) {
+      console.error("Error in handleSendRequest:", error);
+    }
   };
 
   const handleCancelRequest = async (friendshipId: string, userId: string) => {
+    try {
     await cancelFriendRequest(friendshipId, userId);
+    } catch (error) {
+      console.error("Error in handleCancelRequest:", error);
+    }
   };
 
   const handleAcceptRequest = async (friendshipId: string) => {

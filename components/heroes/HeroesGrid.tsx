@@ -4,6 +4,9 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import HeroesFilters from "./HeroesFilters";
 import HeroesTopThree from "./HeroesTopThree";
+import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
+import { VKIcon } from "@/components/ui/icons/VKIcon";
+import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 
 interface Hero {
   id: string;
@@ -14,6 +17,9 @@ interface Hero {
   rank: number;
   joinedAt: Date;
   isSubscriber: boolean;
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
 }
 
 interface HeroesGridProps {
@@ -99,12 +105,12 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
       <HeroesTopThree heroes={heroes} />
 
       {/* Заголовок с результатами */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <h3 className="text-3xl font-bold mb-3 md:mb-0" style={{ color: "#fffffe" }}>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <h3 className="text-2xl md:text-3xl font-bold mb-2 md:mb-0 text-[#fffffe]">
           Все донатеры
         </h3>
-        <div className="text-lg" style={{ color: "#abd1c6" }}>
-          {filteredAndSortedHeroes.length} из {heroes.length}
+        <div className="text-sm md:text-base text-[#abd1c6]">
+          Показано {filteredAndSortedHeroes.length} из {heroes.length}
         </div>
       </div>
 
@@ -116,16 +122,15 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredAndSortedHeroes.map((hero) => (
-            <Link key={hero.id} href={`/profile/${hero.id}`}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+          {filteredAndSortedHeroes.map((hero) => {
+            const hasSocialLinks =
+              !!hero.vkLink || !!hero.telegramLink || !!hero.youtubeLink;
+
+            return (
+              <Link key={hero.id} href={`/profile/${hero.id}`}>
               <div
-                className="p-6 rounded-2xl backdrop-blur-sm border-2 transition-colors cursor-pointer"
-                style={{
-                  backgroundColor: "rgba(0, 70, 67, 0.6)",
-                  borderColor: getRankBorder(hero.rank),
-                  boxShadow: hero.rank <= 3 ? `0 0 20px ${getRankBorder(hero.rank)}30` : "none",
-                }}
+                className="p-5 rounded-2xl border transition-colors cursor-pointer bg-[#001e1d]/60 border-[#abd1c6]/30 hover:border-[#f9bc60]/60 hover:bg-[#004643]/70"
               >
                 {/* Ранг */}
                 <div className="flex items-center justify-between mb-4">
@@ -153,7 +158,7 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                 </div>
 
                 {/* Аватар и имя */}
-                <div className="flex items-center gap-4 mb-5">
+                <div className="flex items-center gap-4 mb-4">
                   <div
                     className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-xl font-bold"
                     style={{
@@ -176,7 +181,7 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                 </div>
 
                 {/* Статистика */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div 
                     className="text-center p-3 rounded-xl" 
                     style={{ 
@@ -218,9 +223,54 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                     </p>
                   </div>
                 </div>
+                {/* Соцсети: фиксированное место, чтобы все карточки были одной высоты */}
+                <div className="mt-4 min-h-[36px] flex flex-wrap gap-2 items-center">
+                    {hasSocialLinks && hero.vkLink && (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          window.open(hero.vkLink!, "_blank", "noopener,noreferrer");
+                        }}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-[#4c75a3]/60 text-[#4c75a3] text-xs font-semibold bg-[#4c75a3]/10 hover:bg-[#4c75a3]/20 transition-colors"
+                      >
+                        <VKIcon className="w-3.5 h-3.5" />
+                        <span>VK</span>
+                      </button>
+                    )}
+                    {hasSocialLinks && hero.telegramLink && (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          window.open(hero.telegramLink!, "_blank", "noopener,noreferrer");
+                        }}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-[#229ED9]/60 text-[#229ED9] text-xs font-semibold bg-[#229ED9]/10 hover:bg-[#229ED9]/20 transition-colors"
+                      >
+                        <TelegramIcon className="w-3.5 h-3.5" />
+                        <span>Telegram</span>
+                      </button>
+                    )}
+                    {hasSocialLinks && hero.youtubeLink && (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          window.open(hero.youtubeLink!, "_blank", "noopener,noreferrer");
+                        }}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-[#ff4f45]/60 text-[#ff4f45] text-xs font-semibold bg-[#ff4f45]/10 hover:bg-[#ff4f45]/20 transition-colors"
+                      >
+                        <YouTubeIcon className="w-3.5 h-3.5" />
+                        <span>YouTube</span>
+                      </button>
+                    )}
+                </div>
               </div>
             </Link>
-          ))}
+          )})}
         </div>
       )}
     </div>

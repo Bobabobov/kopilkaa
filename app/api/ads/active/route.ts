@@ -13,7 +13,7 @@ export async function GET() {
         ]
       },
       orderBy: { createdAt: "desc" }
-    });
+    }).catch(() => null);
 
     if (!activeAd) {
       return NextResponse.json({ ad: null });
@@ -22,9 +22,7 @@ export async function GET() {
     return NextResponse.json({ ad: activeAd });
   } catch (error) {
     console.error("Error fetching active ad:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch active ad" },
-      { status: 500 }
-    );
+    // Возвращаем null вместо ошибки
+    return NextResponse.json({ ad: null });
   }
 }

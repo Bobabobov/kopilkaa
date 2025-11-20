@@ -47,16 +47,15 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-16 relative">
-      {/* Блок рекламы слева вверху */}
-      <div className="fixed left-4 z-20 hidden xl:block max-w-sm" style={{ top: '360px' }}>
+      {/* Блоки рекламы и топ-донатеров для очень широких экранов — по бокам */}
+      <div className="fixed left-4 z-20 hidden xl:block max-w-sm" style={{ top: "360px" }}>
         <AdSection />
       </div>
-      
-      {/* Блок топ донатеров справа вверху */}
-      <div className="fixed right-4 z-20 hidden xl:block max-w-sm" style={{ top: '360px' }}>
+
+      <div className="fixed right-4 z-20 hidden xl:block max-w-sm" style={{ top: "360px" }}>
         <TopDonors />
       </div>
-      
+
       <div className="text-center max-w-4xl mx-auto">
         {/* Основной заголовок */}
         <h1
@@ -251,6 +250,12 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
               </div>
             </motion.div>
           </div>
+        </div>
+
+        {/* Блоки рекламы и топ-донатеров для обычных экранов — под статистикой */}
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto xl:hidden">
+          <AdSection />
+          <TopDonors />
         </div>
 
       </div>

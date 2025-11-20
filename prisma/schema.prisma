@@ -35,9 +35,13 @@ enum AchievementType {
 model User {
   id           String          @id @default(cuid())
   email        String          @unique
+  username     String?         @unique
   passwordHash String
   name         String?
   avatar       String?
+  vkLink       String?
+  telegramLink String?
+  youtubeLink  String?
   headerTheme  String?         @default("default")
   avatarFrame  String?         @default("none")
   customFrameData String?      // JSON данные пользовательских рамок
@@ -55,6 +59,11 @@ model User {
   friendshipsReceived Friendship[] @relation("FriendshipReceiver")
   pageVisits   PageVisit[]
   storyLikes   StoryLike[]
+  reportsSent  UserReport[] @relation("ReportReporter")
+  reportsReceived UserReport[] @relation("ReportReported")
+  isBanned     Boolean      @default(false)
+  bannedUntil  DateTime?
+  bannedReason String?
 }
 
 model Application {
@@ -70,6 +79,7 @@ model Application {
   status       ApplicationStatus  @default(PENDING)
   adminComment String?
   createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 
   images       ApplicationImage[]
   likes        StoryLike[]
@@ -77,6 +87,7 @@ model Application {
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+  @@index([updatedAt])
 }
 
 model ApplicationImage {
@@ -264,4 +275,24 @@ model AdRequest {
   @@index([status])
   @@index([createdAt])
   @@index([email])
+}
+
+// Модель для жалоб на пользователей
+model UserReport {
+  id            String   @id @default(cuid())
+  reporterId    String
+  reporter      User     @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedId    String
+  reported      User     @relation("ReportReported", fields: [reportedId], references: [id], onDelete: Cascade)
+  reason        String
+  status        String   @default("pending") // pending, reviewed, resolved, dismissed
+  adminComment  String?
+  processedBy   String?  // ID администратора, обработавшего жалобу
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([reporterId])
+  @@index([reportedId])
+  @@index([status])
+  @@index([createdAt])
 }

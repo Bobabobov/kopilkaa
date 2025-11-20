@@ -38,16 +38,11 @@ export default function AdSection() {
   if (loading) {
     return (
       <div className="xl:order-4 order-4">
-        <div className="group relative">
-          <div className="absolute -inset-1 bg-gradient-to-br from-[#6B9071] via-[#AEC3B0] to-[#375534] rounded-xl blur-lg opacity-30 group-hover:opacity-50 transition duration-500"></div>
-          <div className="relative bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-md rounded-xl p-4 border border-[#abd1c6]/30 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 hover:-translate-y-2">
-            <div className="relative space-y-3 text-center">
-              <div className="w-10 h-10 mx-auto bg-gradient-to-br from-[#f9bc60] to-[#f9bc60] rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <LucideIcons.Megaphone size="sm" className="text-[#001e1d]" />
-              </div>
-              <div className="text-[#abd1c6] text-sm">Загрузка...</div>
-            </div>
+        <div className="rounded-3xl border border-[#abd1c6]/25 bg-[#001e1d]/60 px-5 py-5 shadow-xl shadow-black/30 flex flex-col items-center justify-center gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-[#f9bc60] flex items-center justify-center text-sm text-[#001e1d] shadow-md shadow-[#f9bc60]/50">
+            <LucideIcons.Megaphone size="sm" />
           </div>
+          <p className="text-sm text-[#abd1c6]">Загружаем рекламный блок…</p>
         </div>
       </div>
     );
@@ -64,83 +59,66 @@ export default function AdSection() {
   const displayAd = ad || defaultAd;
   return (
     <div className="xl:order-4 order-4">
-      <div
-        className="group relative"
-        data-sal="slide-right"
-        data-sal-delay="300"
-      >
-        <div className="absolute -inset-1 bg-gradient-to-br from-[#6B9071] via-[#AEC3B0] to-[#375534] rounded-xl blur-lg opacity-30 group-hover:opacity-50 transition duration-500"></div>
-        <div className="relative w-80 p-4 rounded-xl bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-md border border-[#abd1c6]/30 hover:border-[#abd1c6]/50 hover:scale-105 hover:-translate-y-2 transition-all duration-500 shadow-2xl hover:shadow-3xl">
-          <div className="relative space-y-3 text-center">
-            {/* Иконка */}
-            <div className="w-10 h-10 mx-auto bg-gradient-to-br from-[#f9bc60] to-[#f9bc60] rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <LucideIcons.Megaphone size="sm" className="text-[#001e1d]" />
-            </div>
+      <div className="rounded-3xl border border-[#abd1c6]/30 bg-gradient-to-br from-[#004643] via-[#003131] to-[#001e1d] px-5 py-5 sm:px-6 sm:py-6 shadow-2xl shadow-black/40">
+        {/* Верх: иконка и заголовок */}
+        <div className="flex flex-col items-center text-center mb-4">
+          <div className="w-10 h-10 rounded-2xl bg-[#f9bc60] flex items-center justify-center text-sm text-[#001e1d] shadow-md shadow-[#f9bc60]/50 mb-3">
+            <LucideIcons.Megaphone size="sm" />
+          </div>
+          <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] uppercase tracking-wide">
+            {displayAd.title || "Реклама"}
+          </h3>
+          <p className="mt-1 text-xs sm:text-sm text-[#abd1c6] leading-relaxed max-w-xs">
+            {displayAd.content}
+          </p>
+        </div>
 
-            {/* Заголовок */}
-            <h3 className="text-base font-bold text-[#fffffe]">
-              {displayAd.title}
-            </h3>
+        {/* Изображение */}
+        {displayAd.imageUrl && (
+          <div className="mt-3 mb-4">
+            <img
+              src={displayAd.imageUrl}
+              alt={displayAd.title}
+              className="w-full h-32 sm:h-40 object-cover rounded-2xl border border-[#abd1c6]/25"
+            />
+          </div>
+        )}
 
-            {/* Описание */}
-            <p className="text-xs text-[#abd1c6] leading-relaxed">
-              {displayAd.content}
-            </p>
+        {/* Кнопка перехода к рекламе */}
+        <div className="mt-3">
+          <a
+            href={displayAd.linkUrl || undefined}
+            target={displayAd.linkUrl ? "_blank" : undefined}
+            rel={displayAd.linkUrl ? "noopener noreferrer" : undefined}
+            className={`block w-full rounded-xl border px-4 py-3 text-sm font-semibold transition-colors ${
+              displayAd.linkUrl
+                ? "bg-[#f9bc60] text-[#001e1d] hover:bg-[#e8a545] border-transparent"
+                : "bg-transparent text-[#abd1c6]/70 border-[#abd1c6]/40 cursor-default"
+            }`}
+          >
+            {displayAd.linkUrl ? "Перейти к рекламе →" : "Скоро здесь может быть ваша реклама"}
+          </a>
+        </div>
 
-            {/* Изображение если есть */}
-            {displayAd.imageUrl && (
-              <div className="mt-3">
-                <img
-                  src={displayAd.imageUrl}
-                  alt={displayAd.title}
-                  className="w-full h-28 object-cover rounded-lg border border-[#abd1c6]/20"
-                />
-              </div>
-            )}
-
-            {/* Ссылка если есть */}
-            {displayAd.linkUrl && (
-              <div className="p-2 bg-[#001e1d]/40 rounded-lg border border-[#abd1c6]/30">
-                <a
-                  href={displayAd.linkUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-medium text-[#f9bc60] hover:text-[#f9bc60]/80 transition-colors"
-                >
-                  Перейти к рекламе →
-                </a>
-              </div>
-            )}
-
-            {/* Контакт для размещения рекламы */}
-            <div className="p-2 bg-[#001e1d]/40 rounded-lg border border-[#abd1c6]/30">
-              <div className="text-xs font-medium text-[#abd1c6] mb-1">
-                Разместить рекламу
-              </div>
-              <div className="text-xs text-[#abd1c6]/70">
-                📧 ads@kopilka.ru
-              </div>
-            </div>
-
-            {/* Статистика */}
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2 bg-[#001e1d]/40 rounded-lg">
-                <div className="font-bold text-[#fffffe]">
-                  1000+
-                </div>
-                <div className="text-[#abd1c6]/70">
-                  посетителей
-                </div>
-              </div>
-              <div className="p-2 bg-[#001e1d]/40 rounded-lg">
-                <div className="font-bold text-[#fffffe]">
-                  24/7
-                </div>
-                <div className="text-[#abd1c6]/70">показы</div>
-              </div>
-            </div>
+        {/* Контакт для размещения рекламы */}
+        <div className="mt-3 rounded-xl border border-[#abd1c6]/35 bg-[#001e1d]/40 px-4 py-3 text-left">
+          <div className="text-xs font-semibold text-[#fffffe] mb-1.5">
+            Разместить рекламу
+          </div>
+          <p className="text-[11px] text-[#abd1c6]/80 mb-1">
+            Расскажите о своём проекте нашей аудитории.
+          </p>
+          <div className="text-[11px] text-[#abd1c6] flex items-center gap-1">
+            <span>📧</span>
+            <a
+              href="mailto:ads@kopilka.ru"
+              className="hover:text-[#f9bc60] transition-colors"
+            >
+              ads@kopilka.ru
+            </a>
           </div>
         </div>
+
       </div>
     </div>
   );

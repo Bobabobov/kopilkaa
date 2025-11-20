@@ -12,6 +12,9 @@ interface User {
   createdAt: string;
   lastSeen?: string | null;
   hideEmail?: boolean;
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
   friendshipStatus?: "PENDING" | "ACCEPTED" | "DECLINED";
   friendshipId?: string;
   isRequester?: boolean;
@@ -76,6 +79,22 @@ export function useFriends(): UseFriendsReturn {
 
   const { showToast } = useBeautifulToast();
 
+  const emitFriendsUpdated = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("friends-updated"));
+    }
+  }, []);
+
+  const emitFriendRequestsUpdated = useCallback((count: number) => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("friend-requests-updated", {
+          detail: { count },
+        }),
+      );
+    }
+  }, []);
+
   // Утилита для определения статуса пользователя
   const getUserStatus = useCallback((lastSeen: string | null) => {
     if (!lastSeen) {
@@ -121,9 +140,9 @@ export function useFriends(): UseFriendsReturn {
 
       // Загружаем данные параллельно
       const [friendsRes, sentRes, receivedRes] = await Promise.all([
-        fetch("/api/profile/friends?type=friends"),
-        fetch("/api/profile/friends?type=sent"),
-        fetch("/api/profile/friends?type=received"),
+        fetch("/api/profile/friends?type=friends", { cache: "no-store" }),
+        fetch("/api/profile/friends?type=sent", { cache: "no-store" }),
+        fetch("/api/profile/friends?type=received", { cache: "no-store" }),
       ]);
 
       if (friendsRes.ok) {
@@ -138,15 +157,19 @@ export function useFriends(): UseFriendsReturn {
 
       if (receivedRes.ok) {
         const receivedData = await receivedRes.json();
-        setReceivedRequests(receivedData.friendships || []);
+        const newRequests = receivedData.friendships || [];
+        setReceivedRequests(newRequests);
+        emitFriendRequestsUpdated(newRequests.length);
       }
+
+      emitFriendsUpdated();
     } catch (error) {
       console.error("Error loading friends:", error);
       showToast("error", "Ошибка загрузки друзей");
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, emitFriendsUpdated, emitFriendRequestsUpdated]);
 
   // Поиск пользователей
   const searchUsers = useCallback(async (query: string) => {
@@ -158,8 +181,9 @@ export function useFriends(): UseFriendsReturn {
         ? `/api/users/search?q=${encodeURIComponent(query)}&limit=50`
         : "/api/users/search?limit=50";
 
-
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        cache: "no-store", // Не кешируем, чтобы всегда получать актуальные данные
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -196,7 +220,6 @@ export function useFriends(): UseFriendsReturn {
     try {
       setSendingRequests((prev) => new Set(prev).add(userId));
 
-
       const response = await fetch("/api/profile/friends", {
         method: "POST",
         headers: {
@@ -205,12 +228,23 @@ export function useFriends(): UseFriendsReturn {
         body: JSON.stringify({ receiverId: userId }),
       });
 
-
       if (response.ok) {
         const data = await response.json();
         showToast("success", "Заявка отправлена");
-        await loadFriends(); // Перезагружаем данные
-        await searchUsers(searchQuery); // Обновляем результаты поиска
+        
+        // Добавляем заявку в список отправленных оптимистично
+        if (data.friendship) {
+          setSentRequests((prev) => [...prev, data.friendship]);
+        }
+        
+        // Обновляем данные параллельно
+        await Promise.all([
+          loadFriends(),
+          // Небольшая задержка перед обновлением поиска, чтобы БД успела обновиться
+          new Promise(resolve => setTimeout(resolve, 100)).then(() => 
+            searchUsers(debouncedQuery || searchQuery)
+          ),
+        ]);
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
@@ -231,18 +265,35 @@ export function useFriends(): UseFriendsReturn {
   // Отмена заявки
   const cancelFriendRequest = async (friendshipId: string, userId: string) => {
     try {
+      console.log("Canceling friend request:", { friendshipId, userId });
       setSendingRequests((prev) => new Set(prev).add(userId));
 
       const response = await fetch(`/api/profile/friends/${friendshipId}`, {
         method: "DELETE",
+        cache: "no-store",
       });
 
+      console.log("Cancel response:", response.status, response.ok);
+
       if (response.ok) {
+        const data = await response.json();
+        console.log("Cancel success:", data);
         showToast("success", "Заявка отменена");
-        await loadFriends();
-        await searchUsers(searchQuery); // Обновляем результаты поиска
+        
+        // Удаляем заявку из списка отправленных оптимистично
+        setSentRequests((prev) => prev.filter((f) => f.id !== friendshipId));
+        
+        // Обновляем данные параллельно
+        await Promise.all([
+          loadFriends(),
+          // Небольшая задержка перед обновлением поиска, чтобы БД успела обновиться
+          new Promise(resolve => setTimeout(resolve, 100)).then(() => 
+            searchUsers(debouncedQuery || searchQuery)
+          ),
+        ]);
       } else {
         const errorData = await response.json();
+        console.error("Cancel error response:", errorData);
         showToast("error", errorData.message || "Ошибка отмены заявки");
       }
     } catch (error) {
@@ -271,18 +322,17 @@ export function useFriends(): UseFriendsReturn {
       if (response.ok) {
         showToast("success", "Заявка принята");
 
-        // Обновляем данные
-        const receivedRes = await fetch("/api/profile/friends?type=received");
-        if (receivedRes.ok) {
-          const receivedData = await receivedRes.json();
-          setReceivedRequests(receivedData || []);
-        }
+        // Удаляем заявку из списка полученных оптимистично
+        setReceivedRequests((prev) => prev.filter((f) => f.id !== friendshipId));
 
-        const friendsRes = await fetch("/api/profile/friends?type=friends");
-        if (friendsRes.ok) {
-          const friendsData = await friendsRes.json();
-          setFriends(friendsData.friendships || []);
-        }
+        // Обновляем данные параллельно
+        await Promise.all([
+          loadFriends(),
+          // Небольшая задержка перед обновлением поиска, чтобы БД успела обновиться
+          new Promise(resolve => setTimeout(resolve, 100)).then(() => 
+            searchUsers(debouncedQuery || searchQuery)
+          ),
+        ]);
       } else {
         const errorData = await response.json();
         showToast("error", errorData.message || "Ошибка принятия заявки");
@@ -307,11 +357,11 @@ export function useFriends(): UseFriendsReturn {
       if (response.ok) {
         showToast("success", "Заявка отклонена");
 
-        const receivedRes = await fetch("/api/profile/friends?type=received");
-        if (receivedRes.ok) {
-          const receivedData = await receivedRes.json();
-          setReceivedRequests(receivedData || []);
-        }
+        // Удаляем заявку из списка полученных оптимистично
+        setReceivedRequests((prev) => prev.filter((f) => f.id !== friendshipId));
+
+        // Обновляем данные
+        await loadFriends();
       } else {
         const errorData = await response.json();
         showToast("error", errorData.message || "Ошибка отклонения заявки");
@@ -331,12 +381,7 @@ export function useFriends(): UseFriendsReturn {
 
       if (response.ok) {
         showToast("success", "Друг удален");
-
-        const friendsRes = await fetch("/api/profile/friends?type=friends");
-        if (friendsRes.ok) {
-          const friendsData = await friendsRes.json();
-          setFriends(friendsData.friendships || []);
-        }
+        await loadFriends();
       } else {
         const errorData = await response.json();
         showToast("error", errorData.message || "Ошибка удаления друга");

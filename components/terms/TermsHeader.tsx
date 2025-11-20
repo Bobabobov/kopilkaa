@@ -1,20 +1,44 @@
 // components/terms/TermsHeader.tsx
 "use client";
 
+import { motion } from "framer-motion";
+
 export default function TermsHeader() {
   return (
-    <div className="text-center mb-12 animate-fade-in-up">
-      <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="text-center mb-12"
+    >
+      <motion.h1
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+        className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 drop-shadow-lg"
+      >
+        <span className="bg-gradient-to-r from-[#fffffe] via-[#f9bc60] to-[#fffffe] bg-clip-text text-transparent">
         Пользовательское соглашение
-      </h1>
-      <p className="text-xl text-gray-600 dark:text-gray-400 mb-6">
+        </span>
+      </motion.h1>
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        className="text-xl sm:text-2xl text-[#abd1c6] mb-6"
+      >
         и Политика конфиденциальности
-      </p>
-      <div className="flex items-center justify-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+      </motion.p>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-[#abd1c6]/80"
+      >
         <span>Версия: 1.0</span>
-        <span>•</span>
+        <span className="hidden sm:inline">•</span>
         <span>Дата вступления в силу: 25.09.2025</span>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

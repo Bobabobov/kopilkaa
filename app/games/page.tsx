@@ -3,11 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Lottie from "lottie-react";
+import { motion } from "framer-motion";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import GamePreview from "@/components/games/GamePreview";
-// Импортируем анимацию из папки app
-import maintenanceAnimation from "../Under Maintenance.json";
 
 export default function GamesPage() {
   const router = useRouter();
@@ -41,10 +39,11 @@ export default function GamesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Загрузка...</p>
+      <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+        <UniversalBackground />
+        <div className="relative z-10 text-center">
+          <div className="w-12 h-12 border-2 border-[#f9bc60] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#abd1c6]">Загрузка...</p>
         </div>
       </div>
     );
@@ -59,23 +58,79 @@ export default function GamesPage() {
       {/* Универсальный фон */}
       <UniversalBackground />
 
-      <div className="container mx-auto px-4 pt-32 pb-8 relative z-10">
-        {/* Основной контент */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+      <div className="w-full px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12 sm:pb-16 relative z-10">
+        <div className="max-w-6xl mx-auto">
+          {/* Заголовок */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-8 sm:mb-12"
+          >
+            <motion.h1
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 drop-shadow-lg"
+            >
+              <span className="bg-gradient-to-r from-[#fffffe] via-[#f9bc60] to-[#fffffe] bg-clip-text text-transparent">
             🎮 Игры
-          </h1>
-          <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-6">
-            Игры
-          </h2>
-          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-2xl mx-auto">
+              </span>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-lg sm:text-xl text-[#abd1c6] mb-8 max-w-2xl mx-auto leading-relaxed"
+            >
             Попробуйте наши игры! Каждая игра поможет вам расслабиться и
             заработать дополнительные очки.
-          </p>
+            </motion.p>
+
+            {/* Предупреждение о разработке */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="max-w-2xl mx-auto mb-8 sm:mb-12"
+            >
+              <div className="relative overflow-hidden bg-gradient-to-br from-[#f9bc60]/10 via-[#f9bc60]/5 to-[#abd1c6]/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-[#f9bc60]/30 hover:border-[#f9bc60]/50 transition-all duration-300 group">
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="absolute -top-4 -right-4 w-16 h-16 bg-[#f9bc60]/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
+                  <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-[#abd1c6]/10 rounded-full blur-lg group-hover:scale-110 transition-transform duration-500"></div>
+                </div>
+                <div className="relative z-10 flex items-start gap-4">
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    className="text-2xl sm:text-3xl flex-shrink-0"
+                  >
+                    ⚠️
+                  </motion.div>
+                  <div className="flex-1">
+                    <h3 className="text-base sm:text-lg font-bold text-[#f9bc60] mb-2">
+                      Сервис в разработке
+                    </h3>
+                    <p className="text-sm sm:text-base text-[#fffffe] leading-relaxed">
+                      Игровой сервис находится в активной разработке и может работать некорректно. 
+                      Некоторые функции могут быть недоступны или работать с ошибками. 
+                      Благодарим за понимание!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
 
           {/* Превью игр */}
-          <div className="max-w-4xl mx-auto mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="mb-8 sm:mb-12"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto justify-center">
+              <div className="md:col-start-1 md:col-end-2 lg:col-start-2 lg:col-end-3">
               <GamePreview
                 title="Tower Blocks"
                 description="3D игра на точность и реакцию! Стройте башню из движущихся блоков, кликая в нужный момент. Чем точнее - тем выше!"
@@ -85,91 +140,95 @@ export default function GamesPage() {
                 category="Аркада"
                 isAvailable={true}
               />
-
-              <GamePreview
-                title="Memory Cards"
-                description="Тренируйте память, находя пары одинаковых карт. Чем быстрее находите пары, тем больше очков получаете!"
-                icon="🧠"
-                href="/games/memory"
-                difficulty="Легко"
-                category="Память"
-                isAvailable={false}
-              />
-
-              <GamePreview
-                title="Stack Game"
-                description="Классическая игра на точность и реакцию. Постройте как можно более высокую башню из блоков, кликая в нужный момент!"
-                icon="📚"
-                href="/games/stack"
-                difficulty="Средне"
-                category="Аркада"
-                isAvailable={false}
-              />
+              </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          {/* Кнопки действий */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-8 sm:mb-12"
+          >
             <Link
               href="/profile"
-              className="bg-gradient-to-r from-pastel-mint-500 to-pastel-aqua-500 hover:from-pastel-mint-600 hover:to-pastel-aqua-600 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+              className="px-6 sm:px-8 py-3 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] hover:from-[#e8a545] hover:to-[#f9bc60] text-[#001e1d] font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-center"
             >
               Вернуться в профиль
             </Link>
             <Link
               href="/applications"
-              className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-8 py-3 rounded-xl font-semibold transition-all duration-300 border border-gray-200 dark:border-gray-600 shadow-lg hover:shadow-xl"
+              className="px-6 sm:px-8 py-3 bg-[#001e1d]/30 hover:bg-[#001e1d]/50 text-[#fffffe] font-semibold rounded-xl transition-all duration-300 border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 shadow-lg hover:shadow-xl text-center"
             >
               Подать заявку
             </Link>
-          </div>
-        </div>
+          </motion.div>
 
         {/* Дополнительная информация */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700/20 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto"
+          >
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[#abd1c6]/20 hover:shadow-3xl transition-all duration-500 group"
+            >
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-[#f9bc60]/15 to-[#abd1c6]/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
+              </div>
+              <div className="relative z-10 text-center">
               <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-lg font-bold text-[#fffffe] mb-2">
                 Разнообразие игр
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                <p className="text-sm text-[#abd1c6] leading-relaxed">
                 Планируем добавить различные типы игр: головоломки, аркады,
                 стратегии
               </p>
             </div>
+            </motion.div>
 
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700/20 text-center">
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[#abd1c6]/20 hover:shadow-3xl transition-all duration-500 group"
+            >
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-[#f9bc60]/15 to-[#abd1c6]/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
+              </div>
+              <div className="relative z-10 text-center">
               <div className="text-4xl mb-4">🏆</div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-lg font-bold text-[#fffffe] mb-2">
                 Система достижений
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                <p className="text-sm text-[#abd1c6] leading-relaxed">
                 Каждая игра будет интегрирована с системой достижений и
                 рейтингов
               </p>
             </div>
+            </motion.div>
 
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 dark:border-gray-700/20 text-center">
+            <motion.div
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[#abd1c6]/20 hover:shadow-3xl transition-all duration-500 group"
+            >
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-[#f9bc60]/15 to-[#abd1c6]/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
+              </div>
+              <div className="relative z-10 text-center">
               <div className="text-4xl mb-4">⚡</div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-lg font-bold text-[#fffffe] mb-2">
                 Быстрая разработка
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                <p className="text-sm text-[#abd1c6] leading-relaxed">
                 Мы активно работаем над играми и скоро представим первые
                 результаты
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* Анимация в самом низу */}
-        <div className="flex justify-center">
-          <Lottie
-            animationData={maintenanceAnimation}
-            loop={true}
-            autoplay={true}
-            className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80"
-          />
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </div>

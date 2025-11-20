@@ -13,6 +13,9 @@ type User = {
   avatar?: string | null;
   avatarFrame?: string | null;
   hideEmail?: boolean;
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
   lastSeen?: string;
 };
 
@@ -47,6 +50,10 @@ interface UseSettingsReturn {
   handleNameChange: (newName: string) => Promise<void>;
   handleEmailChange: (newEmail: string) => Promise<void>;
   handleEmailVisibilityChange: (hideEmail: boolean) => Promise<void>;
+  handleSocialLinkChange: (
+    field: "vkLink" | "telegramLink" | "youtubeLink",
+    link: string,
+  ) => Promise<void>;
   handleAvatarChange: (avatarUrl: string | null) => void;
   handleFrameChange: (frame: string) => void;
   handlePasswordChange: (
@@ -234,6 +241,54 @@ export function useSettings(): UseSettingsReturn {
           "error",
           "Ошибка",
           "Произошла ошибка при изменении видимости email",
+        );
+      } finally {
+        setSaving(false);
+      }
+    },
+    [showLocalNotification],
+  );
+
+  const handleSocialLinkChange = useCallback(
+    async (field: "vkLink" | "telegramLink" | "youtubeLink", link: string) => {
+      try {
+        setSaving(true);
+        const response = await fetch("/api/profile/me", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ [field]: link }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+          showLocalNotification(
+            "success",
+            "Успешно!",
+            field === "vkLink"
+              ? "Ссылка VK обновлена"
+              : field === "telegramLink"
+                ? "Ссылка Telegram обновлена"
+                : "Ссылка YouTube обновлена",
+          );
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          showLocalNotification(
+            "error",
+            "Ошибка",
+            errorData.error ||
+              errorData.message ||
+              "Не удалось обновить ссылку",
+          );
+        }
+      } catch (error) {
+        console.error("Error updating social link:", error);
+        showLocalNotification(
+          "error",
+          "Ошибка",
+          "Произошла ошибка при обновлении ссылки",
         );
       } finally {
         setSaving(false);
@@ -433,6 +488,7 @@ export function useSettings(): UseSettingsReturn {
     handleNameChange,
     handleEmailChange,
     handleEmailVisibilityChange,
+    handleSocialLinkChange,
     handleAvatarChange,
     handleFrameChange,
     handlePasswordChange,

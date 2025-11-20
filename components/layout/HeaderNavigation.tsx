@@ -40,6 +40,7 @@ export default function HeaderNavigation({
         <Link
           key={l.href}
           href={l.href}
+          prefetch={true}
           onClick={onLinkClick}
           className={cn(
             "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 drop-shadow-md",

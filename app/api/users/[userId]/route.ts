@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   const session = await getSession();
   if (!session) {
@@ -13,8 +13,11 @@ export async function GET(
   }
 
   try {
+    const { userId } = await params;
+    console.log("=== GET /api/users/[userId] ===", { userId });
+    
     const user = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: userId },
       select: {
         id: true,
         email: true,
@@ -23,9 +26,15 @@ export async function GET(
         headerTheme: true,
         avatarFrame: true,
         hideEmail: true,
+        vkLink: true,
+        telegramLink: true,
+        youtubeLink: true,
         lastSeen: true,
         createdAt: true,
         role: true,
+        isBanned: true,
+        bannedUntil: true,
+        bannedReason: true,
       },
     });
 
@@ -35,6 +44,13 @@ export async function GET(
         { status: 404 },
       );
     }
+
+    console.log("User data from DB:", {
+      id: user.id,
+      isBanned: user.isBanned,
+      bannedUntil: user.bannedUntil?.toISOString(),
+      bannedReason: user.bannedReason,
+    });
 
     return NextResponse.json({ user });
   } catch (error) {

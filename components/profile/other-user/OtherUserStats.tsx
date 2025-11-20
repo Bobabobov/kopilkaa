@@ -40,24 +40,11 @@ export default function OtherUserStats({ userId }: OtherUserStatsProps) {
 
   if (loading) {
     return (
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[#abd1c6]/20">
-        {/* Decorative background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-6 -right-6 w-16 h-16 bg-gradient-to-br from-[#f9bc60]/15 to-[#abd1c6]/10 rounded-full blur-xl"></div>
-          <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-[#abd1c6]/10 to-[#f9bc60]/10 rounded-full blur-lg"></div>
-        </div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-[#f9bc60] rounded-lg flex items-center justify-center text-[#001e1d] text-lg">
-              📊
-            </div>
-            <h3 className="text-lg font-semibold text-[#fffffe]">
-              Статистика
-            </h3>
-          </div>
-          <div className="text-center py-4">
-            <div className="animate-spin w-6 h-6 border-2 border-[#f9bc60] border-t-transparent rounded-full mx-auto"></div>
-          </div>
+      <div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl p-5 border border-[#abd1c6]/20 min-h-[160px]">
+        <div className="animate-pulse space-y-3">
+          <div className="h-5 bg-[#abd1c6]/20 rounded w-32" />
+          <div className="h-4 bg-[#abd1c6]/10 rounded w-24" />
+          <div className="h-10 bg-[#abd1c6]/10 rounded-xl" />
         </div>
       </div>
     );
@@ -65,27 +52,14 @@ export default function OtherUserStats({ userId }: OtherUserStatsProps) {
 
   if (!stats) {
     return (
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[#abd1c6]/20">
-        {/* Decorative background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-6 -right-6 w-16 h-16 bg-gradient-to-br from-[#f9bc60]/15 to-[#abd1c6]/10 rounded-full blur-xl"></div>
-          <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-[#abd1c6]/10 to-[#f9bc60]/10 rounded-full blur-lg"></div>
-        </div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-[#f9bc60] rounded-lg flex items-center justify-center text-[#001e1d] text-lg">
-              📊
-            </div>
-            <h3 className="text-lg font-semibold text-[#fffffe]">
-              Статистика
-            </h3>
+      <div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl p-5 border border-[#abd1c6]/20 min-h-[160px]">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-[#f9bc60] rounded-lg flex items-center justify-center text-[#001e1d] text-lg">
+            📊
           </div>
-          <div className="text-center py-4">
-            <p className="text-[#abd1c6] text-sm">
-              Не удалось загрузить статистику
-            </p>
-          </div>
+          <h3 className="text-lg font-semibold text-[#fffffe]">Статистика</h3>
         </div>
+        <p className="text-[#abd1c6] text-sm">Не удалось загрузить статистику</p>
       </div>
     );
   }
@@ -94,52 +68,28 @@ export default function OtherUserStats({ userId }: OtherUserStatsProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[#abd1c6]/20"
+      className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl p-5 border border-[#abd1c6]/20 min-h-[160px]"
     >
-      {/* Decorative background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-6 -right-6 w-16 h-16 bg-gradient-to-br from-[#f9bc60]/15 to-[#abd1c6]/10 rounded-full blur-xl"></div>
-        <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-[#abd1c6]/10 to-[#f9bc60]/10 rounded-full blur-lg"></div>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-8 h-8 bg-[#f9bc60] rounded-lg flex items-center justify-center text-[#001e1d] text-lg">
+          📊
+        </div>
+        <h3 className="text-lg font-semibold text-[#fffffe]">Статистика</h3>
       </div>
 
-      <div className="relative z-10">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 bg-[#f9bc60] rounded-lg flex items-center justify-center text-[#001e1d] text-lg">
-            📊
-          </div>
-          <h3 className="text-lg font-semibold text-[#fffffe]">
-            Статистика
-          </h3>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#001e1d]/30 border border-[#abd1c6]/15">
+          <span className="text-sm text-[#abd1c6]">Заявки</span>
+          <span className="text-base font-bold text-[#f9bc60]">
+            {stats.applicationsCount}
+          </span>
         </div>
 
-        <div className="space-y-4">
-          <div className="group flex items-center justify-between p-4 bg-[#001e1d]/30 rounded-2xl hover:bg-[#001e1d]/40 transition-all duration-300 border border-[#abd1c6]/10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#f9bc60]/20 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                📝
-              </div>
-              <span className="text-sm font-medium text-[#abd1c6]">
-                Заявки
-              </span>
-            </div>
-            <span className="text-lg font-bold text-[#f9bc60]">
-              {stats.applicationsCount}
-            </span>
-          </div>
-
-          <div className="group flex items-center justify-between p-4 bg-[#001e1d]/30 rounded-2xl hover:bg-[#001e1d]/40 transition-all duration-300 border border-[#abd1c6]/10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#abd1c6]/20 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                📅
-              </div>
-              <span className="text-sm font-medium text-[#abd1c6]">
-                На платформе
-              </span>
-            </div>
-            <span className="text-lg font-bold text-[#abd1c6]">
-              {stats.daysSinceRegistration} дн.
-            </span>
-          </div>
+        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[#001e1d]/30 border border-[#abd1c6]/15">
+          <span className="text-sm text-[#abd1c6]">На платформе</span>
+          <span className="text-base font-bold text-[#abd1c6]">
+            {stats.daysSinceRegistration} дн.
+          </span>
         </div>
       </div>
     </motion.div>

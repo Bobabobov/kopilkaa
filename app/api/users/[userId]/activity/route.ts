@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   const session = await getSession();
   if (!session) {
@@ -13,9 +13,11 @@ export async function GET(
   }
 
   try {
+    const { userId } = await params;
+
     // Проверяем, что пользователь существует
     const user = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -27,7 +29,7 @@ export async function GET(
 
     // Получаем последние заявки пользователя
     const applications = await prisma.application.findMany({
-      where: { userId: params.userId },
+      where: { userId },
       orderBy: { createdAt: "desc" },
       take: 5,
       select: {
@@ -47,12 +49,12 @@ export async function GET(
       })),
     ];
 
-    // Сортируем по дате и берем последние 10
+    // Сортируем по дате и берем последние 5
     activities.sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
-    const recentActivities = activities.slice(0, 10);
+    const recentActivities = activities.slice(0, 5);
 
     return NextResponse.json({ activities: recentActivities });
   } catch (error) {

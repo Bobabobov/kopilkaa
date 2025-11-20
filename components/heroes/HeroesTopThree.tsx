@@ -1,6 +1,9 @@
 // components/heroes/HeroesTopThree.tsx
 "use client";
 import Link from "next/link";
+import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
+import { VKIcon } from "@/components/ui/icons/VKIcon";
+import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 
 interface Hero {
   id: string;
@@ -11,6 +14,9 @@ interface Hero {
   rank: number;
   joinedAt: Date;
   isSubscriber: boolean;
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
 }
 
 interface HeroesTopThreeProps {
@@ -82,9 +88,53 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               <h4 className="text-lg font-bold mb-2" style={{ color: "#fffffe" }}>
                 {topThree[1].name}
               </h4>
-              <p className="text-xl font-bold" style={{ color: getRankColor(2) }}>
+              <p className="text-xl font-bold mb-3" style={{ color: getRankColor(2) }}>
                 ₽{topThree[1].totalDonated.toLocaleString()}
               </p>
+              <div className="mt-1 min-h-[40px] flex justify-center gap-2 flex-wrap">
+                  {topThree[1].vkLink && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        window.open(topThree[1].vkLink!, "_blank", "noopener,noreferrer");
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#4c75a3]/60 text-[#4c75a3] text-xs font-semibold bg-[#4c75a3]/10 hover:bg-[#4c75a3]/20 transition-colors"
+                    >
+                      <VKIcon className="w-3.5 h-3.5" />
+                      <span>VK</span>
+                    </button>
+                  )}
+                  {topThree[1].telegramLink && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        window.open(topThree[1].telegramLink!, "_blank", "noopener,noreferrer");
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#229ED9]/60 text-[#229ED9] text-xs font-semibold bg-[#229ED9]/10 hover:bg-[#229ED9]/20 transition-colors"
+                    >
+                      <TelegramIcon className="w-3.5 h-3.5" />
+                      <span>Telegram</span>
+                    </button>
+                  )}
+                  {topThree[1].youtubeLink && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        window.open(topThree[1].youtubeLink!, "_blank", "noopener,noreferrer");
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#ff4f45]/60 text-[#ff4f45] text-xs font-semibold bg-[#ff4f45]/10 hover:bg-[#ff4f45]/20 transition-colors"
+                    >
+                      <YouTubeIcon className="w-3.5 h-3.5" />
+                      <span>YouTube</span>
+                    </button>
+                  )}
+              </div>
             </div>
           </Link>
         )}
@@ -116,9 +166,53 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               <h4 className="text-xl font-bold mb-3" style={{ color: "#fffffe" }}>
                 {topThree[0].name}
               </h4>
-              <p className="text-2xl font-bold" style={{ color: getRankColor(1) }}>
+              <p className="text-2xl font-bold mb-3" style={{ color: getRankColor(1) }}>
                 ₽{topThree[0].totalDonated.toLocaleString()}
               </p>
+              <div className="mt-1 min-h-[40px] flex justify-center gap-2 flex-wrap">
+                  {topThree[0].vkLink && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        window.open(topThree[0].vkLink!, "_blank", "noopener,noreferrer");
+                      }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#4c75a3]/60 text-[#4c75a3] text-xs font-semibold bg-[#4c75a3]/10 hover:bg-[#4c75a3]/20 transition-colors"
+                    >
+                      <VKIcon className="w-3.5 h-3.5" />
+                      <span>VK</span>
+                    </button>
+                  )}
+                  {topThree[0].telegramLink && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        window.open(topThree[0].telegramLink!, "_blank", "noopener,noreferrer");
+                      }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#229ED9]/60 text-[#229ED9] text-xs font-semibold bg-[#229ED9]/10 hover:bg-[#229ED9]/20 transition-colors"
+                    >
+                      <TelegramIcon className="w-3.5 h-3.5" />
+                      <span>Telegram</span>
+                    </button>
+                  )}
+                  {topThree[0].youtubeLink && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        window.open(topThree[0].youtubeLink!, "_blank", "noopener,noreferrer");
+                      }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#ff4f45]/60 text-[#ff4f45] text-xs font-semibold bg-[#ff4f45]/10 hover:bg-[#ff4f45]/20 transition-colors"
+                    >
+                      <YouTubeIcon className="w-3.5 h-3.5" />
+                      <span>YouTube</span>
+                    </button>
+                  )}
+              </div>
             </div>
           </Link>
         )}
@@ -150,9 +244,53 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               <h4 className="text-lg font-bold mb-2" style={{ color: "#fffffe" }}>
                 {topThree[2].name}
               </h4>
-              <p className="text-xl font-bold" style={{ color: getRankColor(3) }}>
+              <p className="text-xl font-bold mb-3" style={{ color: getRankColor(3) }}>
                 ₽{topThree[2].totalDonated.toLocaleString()}
               </p>
+              <div className="mt-1 min-h-[40px] flex justify-center gap-2 flex-wrap">
+                  {topThree[2].vkLink && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        window.open(topThree[2].vkLink!, "_blank", "noopener,noreferrer");
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#4c75a3]/60 text-[#4c75a3] text-xs font-semibold bg-[#4c75a3]/10 hover:bg-[#4c75a3]/20 transition-colors"
+                    >
+                      <VKIcon className="w-3.5 h-3.5" />
+                      <span>VK</span>
+                    </button>
+                  )}
+                  {topThree[2].telegramLink && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        window.open(topThree[2].telegramLink!, "_blank", "noopener,noreferrer");
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#229ED9]/60 text-[#229ED9] text-xs font-semibold bg-[#229ED9]/10 hover:bg-[#229ED9]/20 transition-colors"
+                    >
+                      <TelegramIcon className="w-3.5 h-3.5" />
+                      <span>Telegram</span>
+                    </button>
+                  )}
+                  {topThree[2].youtubeLink && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        window.open(topThree[2].youtubeLink!, "_blank", "noopener,noreferrer");
+                      }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#ff4f45]/60 text-[#ff4f45] text-xs font-semibold bg-[#ff4f45]/10 hover:bg-[#ff4f45]/20 transition-colors"
+                    >
+                      <YouTubeIcon className="w-3.5 h-3.5" />
+                      <span>YouTube</span>
+                    </button>
+                  )}
+              </div>
             </div>
           </Link>
         )}
@@ -160,6 +298,16 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

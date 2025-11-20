@@ -116,7 +116,7 @@ export default function OtherUserHeader({ user }: OtherUserHeaderProps) {
         />
       </div>
 
-      <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-8">
             {/* Main user info */}

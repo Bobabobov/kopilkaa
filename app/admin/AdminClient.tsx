@@ -278,6 +278,12 @@ export default function AdminClient() {
                 >
                   Заявки на рекламу
                 </Link>
+                <Link
+                  href="/admin/reports"
+                  className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
+                >
+                  Жалобы
+                </Link>
               </div>
           </div>
 

@@ -14,8 +14,13 @@ export function EmptyState({ search, filter }: EmptyStateProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-12 text-center border border-slate-200 dark:border-slate-700/50 shadow-lg"
+      className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#003533] to-[#001e1d] backdrop-blur-2xl rounded-3xl p-10 sm:p-12 text-center border border-[#abd1c6]/25 shadow-2xl"
     >
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-8 -right-6 w-32 h-32 rounded-full bg-[#f9bc60]/10 blur-3xl" />
+        <div className="absolute -bottom-12 -left-10 w-36 h-36 rounded-full bg-[#abd1c6]/10 blur-3xl" />
+      </div>
+
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -25,26 +30,30 @@ export function EmptyState({ search, filter }: EmptyStateProps) {
           type: "spring",
           stiffness: 200,
         }}
-        className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/20 dark:to-green-900/20 flex items-center justify-center"
+        className="relative z-10 w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#f9bc60] to-[#e8a545] flex items-center justify-center shadow-[0_20px_60px_rgba(249,188,96,0.25)]"
       >
-        <LucideIcons.FileText size="xl" className="text-emerald-500" />
+        <LucideIcons.FileText size="xl" className="text-[#001e1d]" />
       </motion.div>
 
-      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+      <h3 className="relative z-10 text-2xl font-bold text-[#fffffe] mb-4">
         {hasFilters ? "Заявки не найдены" : "Пока нет заявок"}
       </h3>
 
-      <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+      <p className="relative z-10 text-[#abd1c6] mb-6 max-w-lg mx-auto leading-relaxed">
         {hasFilters
           ? "Попробуйте изменить фильтры или поисковый запрос"
           : "Станьте первым, кто поделится своей историей помощи!"}
       </p>
 
       {!hasFilters && (
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="relative z-10"
+        >
           <a
             href="/applications"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/30"
+            className="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] hover:from-[#e8a545] hover:to-[#f9bc60] text-[#001e1d] font-semibold rounded-2xl transition-all duration-300 shadow-lg shadow-[#f9bc60]/40 border border-[#f9bc60]/40"
           >
             <LucideIcons.Plus size="md" />
             Создать заявку

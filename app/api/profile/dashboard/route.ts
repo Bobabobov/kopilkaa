@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const userId = session.uid;
 
-    // Параллельно загружаем все необходимые данные
+    // Параллельно загружаем все необходимые данные с обработкой ошибок
     const [
       user,
       friendsData,
@@ -34,13 +34,16 @@ export async function GET(request: NextRequest) {
           role: true,
           name: true,
           avatar: true,
+          vkLink: true,
+          telegramLink: true,
+          youtubeLink: true,
           headerTheme: true,
           avatarFrame: true,
           hideEmail: true,
           createdAt: true,
           lastSeen: true,
         },
-      }),
+      }).catch(() => null),
 
       // Друзья с полной информацией
       prisma.friendship.findMany({
@@ -60,6 +63,9 @@ export async function GET(request: NextRequest) {
               avatarFrame: true,
               headerTheme: true,
               hideEmail: true,
+              vkLink: true,
+              telegramLink: true,
+              youtubeLink: true,
               createdAt: true,
               lastSeen: true,
             },
@@ -73,13 +79,16 @@ export async function GET(request: NextRequest) {
               avatarFrame: true,
               headerTheme: true,
               hideEmail: true,
+              vkLink: true,
+              telegramLink: true,
+              youtubeLink: true,
               createdAt: true,
               lastSeen: true,
             },
           },
         },
         orderBy: { createdAt: "desc" },
-      }),
+      }).catch(() => []),
 
       // Входящие заявки в друзья
       prisma.friendship.findMany({
@@ -97,13 +106,16 @@ export async function GET(request: NextRequest) {
               avatarFrame: true,
               headerTheme: true,
               hideEmail: true,
+              vkLink: true,
+              telegramLink: true,
+              youtubeLink: true,
               createdAt: true,
               lastSeen: true,
             },
           },
         },
         orderBy: { createdAt: "desc" },
-      }),
+      }).catch(() => []),
 
       // Достижения пользователя
       prisma.userAchievement.findMany({
@@ -113,7 +125,7 @@ export async function GET(request: NextRequest) {
         },
         orderBy: { unlockedAt: "desc" },
         take: 5, // Показываем только последние 5
-      }),
+      }).catch(() => []),
 
       // Статистика заявок
       prisma.application.findMany({
@@ -123,7 +135,7 @@ export async function GET(request: NextRequest) {
           status: true,
           amount: true,
         },
-      }),
+      }).catch(() => []),
 
       // Игровые рекорды
       prisma.gameRecord.findFirst({
@@ -132,7 +144,7 @@ export async function GET(request: NextRequest) {
           attempts: true,
           bestScore: true,
         },
-      }),
+      }).catch(() => null),
 
       // Уведомления
       prisma.storyLike.findMany({
@@ -159,11 +171,31 @@ export async function GET(request: NextRequest) {
         },
         orderBy: { createdAt: "desc" },
         take: 10, // Последние 10 уведомлений
-      }),
+      }).catch(() => []),
     ]);
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      // Если пользователь не найден, возвращаем пустые данные вместо ошибки
+      return NextResponse.json({
+        user: null,
+        friends: [],
+        receivedRequests: [],
+        achievements: [],
+        stats: {
+          totalApplications: 0,
+          approvedApplications: 0,
+          pendingApplications: 0,
+          rejectedApplications: 0,
+          totalAmountRequested: 0,
+          approvedAmount: 0,
+          friendsCount: 0,
+          receivedRequestsCount: 0,
+          achievementsCount: 0,
+          gamesPlayed: 0,
+          bestScore: 0,
+        },
+        notifications: [],
+      });
     }
 
     // Подсчитываем статистику

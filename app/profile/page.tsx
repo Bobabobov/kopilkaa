@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import ProfileHeader from "@/components/profile/sections/ProfileHeader";
 import ProfileLoading from "@/components/profile/sections/ProfileLoading";
 import UniversalBackground from "@/components/ui/UniversalBackground";
@@ -51,14 +52,21 @@ type User = {
   headerTheme?: string | null;
   avatarFrame?: string | null;
   hideEmail?: boolean;
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
   lastSeen?: string | null;
 };
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: profileData, loading, error, refetch } = useProfileDashboard();
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const user = profileData?.user || null;
+  const totalUserApplications = profileData?.stats?.totalApplications ?? 0;
+  const hasCreatedApplications = totalUserApplications > 0;
 
   const handleThemeChange = (newTheme: string | null) => {
     // Оптимистичное обновление - обновляем UI сразу
@@ -89,6 +97,49 @@ export default function ProfilePage() {
   useEffect(() => {
     setIsSettingsModalOpen(false);
   }, []);
+
+  // Открываем модальное окно друзей, если это передано через query-параметр
+  useEffect(() => {
+    const requestedTab = searchParams.get("friendsTab");
+    if (!requestedTab) return;
+
+    const allowedTabs = new Set(["friends", "sent", "received", "search"]);
+    const tab = allowedTabs.has(requestedTab)
+      ? (requestedTab as "friends" | "sent" | "received" | "search")
+      : "friends";
+
+    const timer = window.setTimeout(() => {
+      window.dispatchEvent(
+        new CustomEvent("open-friends-modal", {
+          detail: { tab },
+        }),
+      );
+    }, 150);
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("friendsTab");
+    const nextUrl = params.toString() ? `/profile?${params.toString()}` : "/profile";
+    router.replace(nextUrl, { scroll: true });
+
+    return () => clearTimeout(timer);
+  }, [searchParams, router]);
+
+  // Открываем модальное окно настроек (соцсети), если пришли с /support c параметром
+  useEffect(() => {
+    const settingsSource = searchParams.get("settings");
+    if (!settingsSource) return;
+
+    const timer = window.setTimeout(() => {
+      setIsSettingsModalOpen(true);
+    }, 150);
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("settings");
+    const nextUrl = params.toString() ? `/profile?${params.toString()}` : "/profile";
+    router.replace(nextUrl, { scroll: true });
+
+    return () => clearTimeout(timer);
+  }, [searchParams, router]);
 
   if (loading) {
     return <ProfileLoading />;
@@ -175,7 +226,6 @@ export default function ProfilePage() {
             className="mb-6 md:mb-8"
           >
             <div className="bg-gradient-to-r from-[#004643]/40 via-[#004643]/20 to-[#004643]/40 backdrop-blur-xl rounded-2xl p-6 border border-[#abd1c6]/20">
-              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                   <motion.div 
                     className="w-16 h-16 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-2xl flex items-center justify-center shadow-lg"
@@ -191,39 +241,14 @@ export default function ProfilePage() {
                     <p className="text-[#abd1c6] text-lg">
                       Проверьте активность и создайте новые истории
                     </p>
-                  </div>
-                </div>
-                
-                {/* Быстрые статистики */}
-                <div className="flex items-center gap-6">
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-[#10B981]/20 rounded-xl flex items-center justify-center mb-2">
-                      <LucideIcons.TrendingUp className="text-[#10B981]" size="md" />
-                    </div>
-                    <p className="text-[#10B981] font-bold text-lg">+{Math.floor(Math.random() * 5) + 1}</p>
-                    <p className="text-[#abd1c6] text-xs">Сегодня</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-[#3B82F6]/20 rounded-xl flex items-center justify-center mb-2">
-                      <LucideIcons.Heart className="text-[#3B82F6]" size="md" />
-                    </div>
-                    <p className="text-[#3B82F6] font-bold text-lg">{Math.floor(Math.random() * 10) + 1}</p>
-                    <p className="text-[#abd1c6] text-xs">Лайки</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-[#8B5CF6]/20 rounded-xl flex items-center justify-center mb-2">
-                      <LucideIcons.Users className="text-[#8B5CF6]" size="md" />
-                    </div>
-                    <p className="text-[#8B5CF6] font-bold text-lg">{Math.floor(Math.random() * 3) + 1}</p>
-                    <p className="text-[#abd1c6] text-xs">Друзья</p>
-                  </div>
                 </div>
               </div>
               
               {/* Подсказки для новых пользователей */}
-              {profileData && new Date().getTime() - new Date(user.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000 && (
+              {profileData &&
+                new Date().getTime() - new Date(user.createdAt).getTime() <
+                  7 * 24 * 60 * 60 * 1000 &&
+                !hasCreatedApplications && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}

@@ -1,6 +1,8 @@
 // components/terms/TermsSection.tsx
 "use client";
 
+import { motion } from "framer-motion";
+
 interface TermsSectionProps {
   number: string;
   title: string;
@@ -14,46 +16,30 @@ export default function TermsSection({
   children,
   delay = 0,
 }: TermsSectionProps) {
-  const getAnimationClass = () => {
-    switch (delay) {
-      case 0.3:
-        return "animate-fade-in-up-delay-3";
-      case 0.4:
-        return "animate-fade-in-up-delay-4";
-      case 0.5:
-        return "animate-fade-in-up-delay-5";
-      case 0.6:
-        return "animate-fade-in-up-delay-1";
-      case 0.7:
-        return "animate-fade-in-up-delay-2";
-      case 0.8:
-        return "animate-fade-in-up-delay-3";
-      case 0.9:
-        return "animate-fade-in-up-delay-4";
-      case 1.0:
-        return "animate-fade-in-up-delay-5";
-      case 1.1:
-        return "animate-fade-in-up-delay-1";
-      case 1.2:
-        return "animate-fade-in-up-delay-2";
-      case 1.3:
-        return "animate-fade-in-up-delay-3";
-      default:
-        return "animate-fade-in-up";
-    }
-  };
-
   return (
-    <section className={`mb-8 ${getAnimationClass()}`}>
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-        <span className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.5 }}
+      className="mb-8 sm:mb-12 pb-8 sm:pb-10 border-b border-[#abd1c6]/10 last:border-b-0 group"
+    >
+      <motion.h2
+        whileHover={{ x: 5 }}
+        className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#fffffe] mb-5 sm:mb-6 flex items-center gap-3 transition-all duration-300"
+      >
+        <motion.span
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-[#001e1d] text-sm sm:text-base font-bold shadow-lg group-hover:shadow-xl transition-all duration-300"
+        >
           {number}
+        </motion.span>
+        <span className="group-hover:text-[#f9bc60] transition-colors duration-300">
+          {title}
         </span>
-        {title}
-      </h2>
-      <div className="space-y-4 text-gray-700 dark:text-gray-300">
+      </motion.h2>
+      <div className="space-y-4 sm:space-y-5 text-[#abd1c6] text-sm sm:text-base leading-relaxed">
         {children}
       </div>
-    </section>
+    </motion.section>
   );
 }

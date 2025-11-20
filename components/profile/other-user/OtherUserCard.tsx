@@ -4,8 +4,13 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { getAvatarFrame } from "@/lib/header-customization";
 import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
+import ReportUserModal from "./modals/ReportUserModal";
+import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
+import { VKIcon } from "@/components/ui/icons/VKIcon";
+import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 
 interface User {
   id: string;
@@ -16,6 +21,9 @@ interface User {
   avatar?: string | null;
   avatarFrame?: string | null;
   hideEmail?: boolean;
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
 }
 
 interface Friendship {
@@ -44,13 +52,15 @@ export default function OtherUserCard({
 }: OtherUserCardProps) {
   const router = useRouter();
   const { showToast, confirm } = useBeautifulNotifications();
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  
   return (
-    <div className="lg:col-span-3">
+    <div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-[#abd1c6]/20 hover:shadow-3xl transition-all duration-500 group"
+        transition={{ delay: 0.1, duration: 0.5 }}
+        className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-3xl p-5 sm:p-6 lg:p-7 shadow-2xl border border-[#abd1c6]/20 hover:shadow-3xl hover:border-[#abd1c6]/30 transition-all duration-500 group sticky top-6"
       >
         {/* Decorative background */}
         <div className="absolute inset-0 overflow-hidden">
@@ -64,8 +74,8 @@ export default function OtherUserCard({
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-center mb-8"
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="text-center mb-5 sm:mb-6"
           >
             <div className="relative inline-block group/avatar">
               {(() => {
@@ -151,16 +161,66 @@ export default function OtherUserCard({
             >
               {!user.hideEmail ? user.email : "Email скрыт"}
             </motion.p>
+            {(user.vkLink || user.telegramLink || user.youtubeLink) && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 }}
+                className="mt-4 w-full"
+              >
+                <p className="text-xs uppercase tracking-wide text-center text-[#abd1c6]/70 mb-2">
+                  Соц сети
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {user.vkLink && (
+                    <a
+                      href={user.vkLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#4c75a3]/60 text-[#4c75a3] text-xs font-semibold bg-[#4c75a3]/10 hover:bg-[#4c75a3]/20 transition-colors"
+                      aria-label="VK"
+                    >
+                      <VKIcon className="w-4 h-4" />
+                      <span>VK</span>
+                    </a>
+                  )}
+                  {user.telegramLink && (
+                    <a
+                      href={user.telegramLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#229ED9]/60 text-[#229ED9] text-xs font-semibold bg-[#229ED9]/10 hover:bg-[#229ED9]/20 transition-colors"
+                      aria-label="Telegram"
+                    >
+                      <TelegramIcon className="w-4 h-4" />
+                      <span>Telegram</span>
+                    </a>
+                  )}
+                  {user.youtubeLink && (
+                    <a
+                      href={user.youtubeLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#ff4f45]/60 text-[#ff4f45] text-xs font-semibold bg-[#ff4f45]/10 hover:bg-[#ff4f45]/20 transition-colors"
+                      aria-label="YouTube"
+                    >
+                      <YouTubeIcon className="w-4 h-4" />
+                      <span>YouTube</span>
+                    </a>
+                  )}
+                </div>
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Информация */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="space-y-4 mb-8"
+            transition={{ delay: 0.5, duration: 0.4 }}
+            className="space-y-3 mb-5 sm:mb-6"
           >
-            <div className="group/info bg-[#001e1d]/30 rounded-2xl p-4 hover:bg-[#001e1d]/40 transition-all duration-300 border border-[#abd1c6]/10">
+            <div className="group/info bg-[#001e1d]/30 rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:bg-[#001e1d]/40 transition-all duration-300 border border-[#abd1c6]/10 hover:border-[#abd1c6]/20">
               <div className="flex justify-between items-center">
                 <span className="text-[#abd1c6] text-sm">
                   Дата регистрации:
@@ -176,8 +236,8 @@ export default function OtherUserCard({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="space-y-4"
+            transition={{ delay: 0.6, duration: 0.4 }}
+            className="space-y-3"
           >
             {!friendship && (
               <motion.button
@@ -287,7 +347,7 @@ export default function OtherUserCard({
             )}
 
             {/* Доп. действия — встроены в карточку */}
-            <div className="grid grid-cols-1 gap-2 pt-2 border-t border-[#abd1c6]/20">
+            <div className="grid grid-cols-1 gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-[#abd1c6]/20">
               {friendship && (
                 <button
                   onClick={async () => {
@@ -320,39 +380,42 @@ export default function OtherUserCard({
                       );
                     }
                   }}
-                  className="w-full px-3 py-2 rounded-lg bg-[#001e1d]/30 hover:bg-[#001e1d]/40 text-[#abd1c6] text-sm text-left transition"
+                  className="w-full px-4 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 text-red-400 font-medium text-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-red-500/20 flex items-center justify-center gap-2"
                 >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                   Удалить из друзей
                 </button>
               )}
               <button
-                onClick={() => {
-                  showToast(
-                    "info",
-                    "Жалоба отправлена",
-                    "Мы рассмотрим обращение и свяжемся при необходимости.",
-                  );
-                }}
-                className="w-full px-3 py-2 rounded-lg bg-[#001e1d]/30 hover:bg-[#001e1d]/40 text-[#abd1c6] text-sm text-left transition"
+                onClick={() => setIsReportModalOpen(true)}
+                className="w-full px-4 py-3 rounded-xl bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 border border-[#f9bc60]/30 hover:border-[#f9bc60]/50 text-[#f9bc60] font-medium text-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#f9bc60]/20 flex items-center justify-center gap-2"
               >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
                 Пожаловаться
-              </button>
-              <button
-                onClick={async () => {
-                  const agree = await confirm(
-                    "Заблокировать пользователя? Он не сможет отправлять вам заявки.",
-                    "Блокировка пользователя",
-                  );
-                  if (!agree) return;
-                  showToast(
-                    "success",
-                    "Пользователь заблокирован",
-                    "Функция блокировки будет доработана позже.",
-                  );
-                }}
-                className="w-full px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm text-left transition"
-              >
-                Заблокировать
               </button>
             </div>
 
@@ -360,8 +423,8 @@ export default function OtherUserCard({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="pt-4 border-t border-[#abd1c6]/20"
+              transition={{ delay: 0.7, duration: 0.4 }}
+              className="pt-3 sm:pt-4 border-t border-[#abd1c6]/20"
             >
               <div className="grid grid-cols-2 gap-2">
                 <motion.div
@@ -429,6 +492,14 @@ export default function OtherUserCard({
           </motion.div>
         </div>
       </motion.div>
+
+      {/* Модальное окно жалобы */}
+      <ReportUserModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        userId={user.id}
+        userName={user.name}
+      />
     </div>
   );
 }

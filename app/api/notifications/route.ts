@@ -27,16 +27,16 @@ function formatTimeAgo(date: Date): string {
 }
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
-  }
-
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
+    }
+
     const userId = session.uid;
     const notifications = [];
 
-    // Получаем новые лайки (последние 20 для группировки)
+    // Получаем новые лайки (последние 20 для группировки) с обработкой ошибок
     const recentLikes = await prisma.storyLike.findMany({
       where: { 
         application: {
@@ -61,7 +61,7 @@ export async function GET() {
           },
         },
       },
-    });
+    }).catch(() => []);
 
     // Группируем лайки по пользователю и истории (только последний лайк от каждого)
     const groupedLikes = new Map();
@@ -86,10 +86,11 @@ export async function GET() {
           createdAt: like.createdAt,
           timestamp: formatTimeAgo(new Date(like.createdAt)),
           isRead: false,
+          applicationId: like.applicationId,
         });
       });
 
-    // Получаем новые достижения
+    // Получаем новые достижения с обработкой ошибок
     const recentAchievements = await prisma.userAchievement.findMany({
       where: { userId },
       orderBy: { unlockedAt: "desc" },
@@ -103,7 +104,7 @@ export async function GET() {
           },
         },
       },
-    });
+    }).catch(() => []);
 
     // Добавляем достижения как уведомления
     recentAchievements.forEach((achievement) => {
@@ -117,6 +118,91 @@ export async function GET() {
         timestamp: formatTimeAgo(new Date(achievement.unlockedAt)),
         isRead: false,
         rarity: achievement.achievement.rarity,
+      });
+    });
+
+    // Получаем входящие заявки в друзья
+    const pendingFriendRequests = await prisma.friendship.findMany({
+      where: {
+        receiverId: userId,
+        status: "PENDING",
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      include: {
+        requester: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+          },
+        },
+      },
+    }).catch(() => []);
+
+    pendingFriendRequests.forEach((request) => {
+      const requester = request.requester;
+      const displayName = requester.name || requester.email.split("@")[0];
+
+      notifications.push({
+        id: `friend_request_${request.id}`,
+        type: "friend_request",
+        title: "Новая заявка в друзья",
+        message: `${displayName} хочет добавить вас в друзья`,
+        avatar: requester.avatar,
+        createdAt: request.createdAt,
+        timestamp: formatTimeAgo(new Date(request.createdAt)),
+        isRead: false,
+        requesterId: requester.id,
+        friendshipId: request.id,
+      });
+    });
+
+    // Получаем заявки с измененным статусом (одобренные или отклоненные)
+    // Показываем только те, где статус изменился недавно (за последние 7 дней)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const statusChangedApplications = await prisma.application.findMany({
+      where: {
+        userId: userId,
+        status: {
+          in: ["APPROVED", "REJECTED"],
+        },
+        updatedAt: {
+          gte: sevenDaysAgo, // Только недавно измененные
+        },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 10,
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        adminComment: true,
+        updatedAt: true,
+        createdAt: true,
+      },
+    }).catch(() => []);
+
+    // Добавляем уведомления о статусе заявок
+    // Показываем все одобренные/отклоненные заявки, обновленные за последние 7 дней
+    statusChangedApplications.forEach((application) => {
+      const statusText = application.status === "APPROVED" ? "одобрена" : "отклонена";
+      const statusEmoji = application.status === "APPROVED" ? "✅" : "❌";
+      
+      notifications.push({
+        id: `application_${application.id}_${application.status}`,
+        type: "application_status",
+        title: `Заявка ${statusText}`,
+        message: `${statusEmoji} Ваша заявка "${application.title || "Без названия"}" была ${statusText}${application.adminComment ? `. ${application.adminComment}` : ""}`,
+        avatar: null,
+        createdAt: application.updatedAt,
+        timestamp: formatTimeAgo(new Date(application.updatedAt)),
+        isRead: false,
+        applicationId: application.id,
+        status: application.status,
       });
     });
 

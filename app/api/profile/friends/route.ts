@@ -54,6 +54,9 @@ export async function GET(request: Request) {
             avatarFrame: true,
             headerTheme: true,
             hideEmail: true,
+            vkLink: true,
+            telegramLink: true,
+            youtubeLink: true,
             createdAt: true,
             lastSeen: true,
           },
@@ -67,6 +70,9 @@ export async function GET(request: Request) {
             avatarFrame: true,
             headerTheme: true,
             hideEmail: true,
+            vkLink: true,
+            telegramLink: true,
+            youtubeLink: true,
             createdAt: true,
             lastSeen: true,
           },
@@ -131,7 +137,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Проверяем, не существует ли уже заявка
+    // Проверяем, не существует ли уже заявка или блокировка
     const existingFriendship = await prisma.friendship.findFirst({
       where: {
         OR: [
@@ -142,10 +148,66 @@ export async function POST(request: Request) {
     });
 
     if (existingFriendship) {
+      // Проверяем, не заблокирован ли пользователь
+      if (existingFriendship.status === "BLOCKED") {
+        // Проверяем, кто заблокировал
+        const blockerId = existingFriendship.requesterId;
+        const blockedId = existingFriendship.receiverId;
+        
+        if (blockerId === receiverId && blockedId === session.uid) {
+          // Пользователь заблокировал вас - нельзя отправить заявку
+          console.log("Error: user blocked by receiver");
+          return NextResponse.json(
+            { message: "Вы заблокированы этим пользователем" },
+            { status: 403 },
+          );
+        } else if (blockerId === session.uid && blockedId === receiverId) {
+          // Вы заблокировали пользователя - удаляем блокировку и создаем заявку
+          console.log("User was blocked by requester, removing block and creating request");
+          // Удаляем блокировку
+          await prisma.friendship.delete({
+            where: { id: existingFriendship.id },
+          });
+          // Продолжаем создание заявки (не возвращаем ошибку)
+        } else {
+          // Неизвестная ситуация с блокировкой
+          console.log("Error: unknown block situation");
+          return NextResponse.json(
+            { message: "Заявка уже существует" },
+            { status: 400 },
+          );
+        }
+      } else if (existingFriendship.status === "PENDING" || existingFriendship.status === "ACCEPTED") {
+        // Заявка уже существует или пользователи уже друзья
       console.log("Error: friendship already exists:", existingFriendship);
       return NextResponse.json(
         { message: "Заявка уже существует" },
         { status: 400 },
+        );
+      } else if (existingFriendship.status === "DECLINED") {
+        // Заявка была отклонена - удаляем и создаем новую
+        console.log("Previous request was declined, creating new one");
+        await prisma.friendship.delete({
+          where: { id: existingFriendship.id },
+        });
+        // Продолжаем создание заявки
+      }
+    }
+    
+    // Дополнительная проверка: не заблокировал ли получатель отправителя
+    const reverseBlock = await prisma.friendship.findFirst({
+      where: {
+        requesterId: receiverId,
+        receiverId: session.uid,
+        status: "BLOCKED",
+      },
+    });
+    
+    if (reverseBlock) {
+      console.log("Error: requester is blocked by receiver");
+      return NextResponse.json(
+        { message: "Вы заблокированы этим пользователем" },
+        { status: 403 },
       );
     }
 
@@ -164,6 +226,9 @@ export async function POST(request: Request) {
             email: true,
             avatar: true,
             hideEmail: true,
+            vkLink: true,
+            telegramLink: true,
+            youtubeLink: true,
             createdAt: true,
           },
         },
@@ -174,6 +239,9 @@ export async function POST(request: Request) {
             email: true,
             avatar: true,
             hideEmail: true,
+            vkLink: true,
+            telegramLink: true,
+            youtubeLink: true,
             createdAt: true,
           },
         },

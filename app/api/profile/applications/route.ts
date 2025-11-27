@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    let applications = [];
+    let applications: any[] = [];
     
     try {
       applications = await prisma.application.findMany({

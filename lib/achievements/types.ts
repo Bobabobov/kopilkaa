@@ -12,8 +12,9 @@ export interface Achievement {
   isExclusive: boolean;
   maxCount: number;
   isActive: boolean;
-  validFrom?: Date;
-  validTo?: Date;
+  // В базе поле может быть null, поэтому учитываем и Date, и null, и отсутствие
+  validFrom?: Date | null;
+  validTo?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }

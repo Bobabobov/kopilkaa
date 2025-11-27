@@ -492,13 +492,4 @@ export const LucideIcons = {
   Gamepad2: ({ className = "", size = "md" }: IconProps) => (
     <Gamepad2 className={`${sizeClasses[size]} ${className}`} />
   ),
-
-  TrendingDown: ({ className = "", size = "md" }: IconProps) => (
-    <TrendingDown className={`${sizeClasses[size]} ${className}`} />
-  ),
-
-  PieChart: ({ className = "", size = "md" }: IconProps) => (
-    <PieChart className={`${sizeClasses[size]} ${className}`} />
-  ),
-
 };

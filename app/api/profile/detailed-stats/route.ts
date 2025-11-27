@@ -15,12 +15,12 @@ export async function GET() {
 
 
     // Инициализируем переменные с безопасными значениями по умолчанию
-    let applications = [];
-    let likesGiven = 0;
-    let likesReceived = 0;
-    let friendsCount = 0;
-    let achievements = [];
-    let userCreatedAt = null;
+   let applications: any[] = [];
+   let likesGiven = 0;
+   let likesReceived = 0;
+   let friendsCount = 0;
+   let achievements: any[] = [];
+   let userCreatedAt: { createdAt: Date } | null = null;
 
     try {
       // Параллельно получаем все данные с обработкой ошибок

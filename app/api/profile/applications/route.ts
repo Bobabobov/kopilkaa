@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           title: true,
-          description: true,
           status: true,
           amount: true,
           createdAt: true,
@@ -48,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     const formattedApplications = applications.map(app => ({
       ...app,
-      images: app.images ? app.images.map(img => img.url) : [],
+      images: app.images ? app.images.map((img: { url: string }) => img.url) : [],
     }));
 
     return NextResponse.json(

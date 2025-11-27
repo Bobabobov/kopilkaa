@@ -280,16 +280,13 @@ export default function ProfilePersonalStats() {
                     className="p-4 bg-[#004643]/20 rounded-xl border border-[#abd1c6]/10"
                   >
                     <div className="flex flex-col items-center text-center gap-3">
-                      <motion.div
-                        className="p-3 rounded-xl"
-                        style={{ backgroundColor: `${metric.color}20` }}
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                      >
-                        <IconComponent
-                          className="w-5 h-5"
-                          style={{ color: metric.color }}
-                        />
-                      </motion.div>
+<motion.div
+  className="p-3 rounded-xl"
+  style={{ backgroundColor: `${metric.color}20`, color: metric.color }}
+  whileHover={{ scale: 1.1, rotate: 5 }}
+>
+  <IconComponent className="w-5 h-5 text-current" />
+</motion.div>
                       <div>
                         <motion.p
                           className="text-3xl font-bold text-[#fffffe] leading-tight"

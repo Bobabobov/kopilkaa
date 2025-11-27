@@ -358,16 +358,16 @@ export default function ProfileAchievements() {
                       </div>
                       
                       {/* Chevron icon */}
-                      <motion.div
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        whileHover={{ x: 2 }}
-                      >
-                        <LucideIcons.ChevronRight 
-                          size="sm" 
-                          className="text-[#abd1c6]"
-                          style={{ color: rarityColor }}
-                        />
-                      </motion.div>
+<motion.div
+  className="opacity-0 group-hover:opacity-100 transition-opacity"
+  whileHover={{ x: 2 }}
+  style={{ color: rarityColor }}  // цвет на обёртке
+>
+  <LucideIcons.ChevronRight 
+    size="sm" 
+    className="text-current"
+  />
+</motion.div>
                     </div>
                   </motion.div>
                 );

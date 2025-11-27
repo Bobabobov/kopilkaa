@@ -280,6 +280,7 @@ export default function ProfilePersonalStats() {
                     className="p-4 bg-[#004643]/20 rounded-xl border border-[#abd1c6]/10"
                   >
                     <div className="flex flex-col items-center text-center gap-3">
+<<<<<<< Current (Your changes)
 <motion.div
   className="p-3 rounded-xl"
   style={{ backgroundColor: `${metric.color}20`, color: metric.color }}
@@ -287,6 +288,16 @@ export default function ProfilePersonalStats() {
 >
   <IconComponent className="w-5 h-5 text-current" />
 </motion.div>
+=======
+                      <motion.div
+                        className="p-3 rounded-xl"
+                        style={{ backgroundColor: `${metric.color}20`, color: metric.color }}
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                      >
+                        {/* Цвет задаём через color на контейнере, иконка наследует его через text-current */}
+                        <IconComponent className="w-5 h-5 text-current" />
+                      </motion.div>
+>>>>>>> Incoming (Background Agent changes)
                       <div>
                         <motion.p
                           className="text-3xl font-bold text-[#fffffe] leading-tight"
@@ -370,9 +381,10 @@ export default function ProfilePersonalStats() {
                       >
                         <div
                           className="p-2 rounded-full"
-                          style={{ backgroundColor: `${item.color}20` }}
+                          style={{ backgroundColor: `${item.color}20`, color: item.color }}
                         >
-                          <IconComponent className="w-4 h-4" style={{ color: item.color }} />
+                          {/* Цвет задаём на обёртке, иконка берёт его через text-current */}
+                          <IconComponent className="w-4 h-4 text-current" />
                         </div>
                         <div>
                           <p className="text-[#fffffe] font-semibold leading-tight">{item.label}</p>
@@ -430,12 +442,10 @@ export default function ProfilePersonalStats() {
                   <div className="flex items-center gap-4">
                     <div 
                       className="p-3 rounded-full"
-                      style={{ backgroundColor: `${item.color}20` }}
+                      style={{ backgroundColor: `${item.color}20`, color: item.color }}
                     >
-                      <IconComponent 
-                        className="w-6 h-6" 
-                        style={{ color: item.color }}
-                      />
+                      {/* Цвет задаём на контейнере, иконка наследует его через text-current */}
+                      <IconComponent className="w-6 h-6 text-current" />
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-[#fffffe]">
@@ -542,12 +552,10 @@ export default function ProfilePersonalStats() {
                 <div className="text-center">
                   <div 
                     className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center"
-                    style={{ backgroundColor: `${item.color}20` }}  
+                    style={{ backgroundColor: `${item.color}20`, color: item.color }}  
                   >
-                    <LucideIcons.Award 
-                      className="w-6 h-6" 
-                      style={{ color: item.color }}
-                    />
+                    {/* Цвет задаём на контейнере, иконка наследует его через text-current */}
+                    <LucideIcons.Award className="w-6 h-6 text-current" />
                   </div>
                   <p className="text-2xl font-bold text-[#fffffe] mb-1">
                     {item.value}

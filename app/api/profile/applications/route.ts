@@ -14,8 +14,9 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const limit = parseInt(searchParams.get("limit") || "10");
 
+    // Явно указываем тип, чтобы TypeScript не ругался на implicit any[]
     let applications: any[] = [];
     
     try {
@@ -45,8 +46,9 @@ export async function GET(request: NextRequest) {
       applications = [];
     }
 
-    const formattedApplications = applications.map(app => ({
+    const formattedApplications = applications.map((app) => ({
       ...app,
+      // Явно указываем тип для img, чтобы не было implicit any
       images: app.images ? app.images.map((img: { url: string }) => img.url) : [],
     }));
 

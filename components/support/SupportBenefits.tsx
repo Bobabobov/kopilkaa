@@ -67,9 +67,10 @@ export default function SupportBenefits() {
                     ease: "easeInOut"
                   }}
                   className="mb-6 mx-auto flex items-center justify-center w-20 h-20 rounded-full"
-                  style={{ backgroundColor: `${benefit.color}20`, border: `2px solid ${benefit.color}` }}
+                  style={{ backgroundColor: `${benefit.color}20`, border: `2px solid ${benefit.color}`, color: benefit.color }}
                 >
-                  <Icon className="w-10 h-10" style={{ color: benefit.color }} />
+                  {/* Цвет задаём на контейнере, иконка наследует его через text-current */}
+                  <Icon className="w-10 h-10 text-current" />
                 </motion.div>
                 
                 <h4 className="text-xl font-bold mb-4" style={{ color: "#fffffe" }}>

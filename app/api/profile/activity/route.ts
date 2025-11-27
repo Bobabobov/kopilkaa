@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       });
 
       // 2. Лайки (поставленные пользователем)
-      const recentLikes = await prisma.like.findMany({
+      const recentLikes = await prisma.storyLike.findMany({
         where: { userId: session.uid },
         select: {
           id: true,

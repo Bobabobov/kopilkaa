@@ -10,6 +10,7 @@ interface Advertisement {
   linkUrl?: string;
   expiresAt?: string;
   isActive: boolean;
+  placement?: string;
 }
 
 export default function AdSection() {
@@ -22,7 +23,9 @@ export default function AdSection() {
 
   const fetchActiveAd = async () => {
     try {
-      const response = await fetch("/api/ads/active");
+      const response = await fetch("/api/ads/active", {
+        cache: "no-store",
+      });
       if (response.ok) {
         const data = await response.json();
         setAd(data.ad);
@@ -58,67 +61,87 @@ export default function AdSection() {
   
   const displayAd = ad || defaultAd;
   return (
-    <div className="xl:order-4 order-4">
-      <div className="rounded-3xl border border-[#abd1c6]/30 bg-gradient-to-br from-[#004643] via-[#003131] to-[#001e1d] px-5 py-5 sm:px-6 sm:py-6 shadow-2xl shadow-black/40">
-        {/* Верх: иконка и заголовок */}
-        <div className="flex flex-col items-center text-center mb-4">
-          <div className="w-10 h-10 rounded-2xl bg-[#f9bc60] flex items-center justify-center text-sm text-[#001e1d] shadow-md shadow-[#f9bc60]/50 mb-3">
-            <LucideIcons.Megaphone size="sm" />
+    <div className="xl:order-4 order-4" style={{ maxWidth: 300 }}>
+      <div className="rounded-3xl border border-[#abd1c6]/30 bg-[#001e1d]/90 shadow-2xl shadow-black/40 overflow-hidden">
+        {/* Верх: метка «Реклама» */}
+        <div className="flex items-center justify-between px-4 pt-3 pb-1 text-[11px] text-[#abd1c6]/80">
+          <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-[#004643] border border-[#0b3b33]/60">
+            <LucideIcons.Megaphone size="xs" />
+            <span>Реклама</span>
           </div>
-          <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] uppercase tracking-wide">
-            {displayAd.title || "Реклама"}
-          </h3>
-          <p className="mt-1 text-xs sm:text-sm text-[#abd1c6] leading-relaxed max-w-xs">
-            {displayAd.content}
-          </p>
         </div>
 
-        {/* Изображение */}
-        {displayAd.imageUrl && (
-          <div className="mt-3 mb-4">
-            <img
-              src={displayAd.imageUrl}
-              alt={displayAd.title}
-              className="w-full h-32 sm:h-40 object-cover rounded-2xl border border-[#abd1c6]/25"
-            />
-          </div>
-        )}
-
-        {/* Кнопка перехода к рекламе */}
-        <div className="mt-3">
-          <a
-            href={displayAd.linkUrl || undefined}
-            target={displayAd.linkUrl ? "_blank" : undefined}
-            rel={displayAd.linkUrl ? "noopener noreferrer" : undefined}
-            className={`block w-full rounded-xl border px-4 py-3 text-sm font-semibold transition-colors ${
-              displayAd.linkUrl
-                ? "bg-[#f9bc60] text-[#001e1d] hover:bg-[#e8a545] border-transparent"
-                : "bg-transparent text-[#abd1c6]/70 border-[#abd1c6]/40 cursor-default"
-            }`}
+        {/* Основная зона баннера */}
+        <div className="px-3 pb-3">
+          <div
+            className="w-full rounded-2xl border border-[#abd1c6]/30 bg-[#001e1d] overflow-hidden"
           >
-            {displayAd.linkUrl ? "Перейти к рекламе →" : "Скоро здесь может быть ваша реклама"}
-          </a>
+            {/* Картинка (кликабельная, если есть ссылка) */}
+            {displayAd.imageUrl && (
+              <div className="w-full bg-black/10">
+                {displayAd.linkUrl ? (
+                  <a
+                    href={displayAd.linkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={displayAd.imageUrl}
+                      alt={displayAd.title}
+                      className="w-full h-auto object-cover cursor-pointer"
+                    />
+                  </a>
+                ) : (
+                  <img
+                    src={displayAd.imageUrl}
+                    alt={displayAd.title}
+                    className="w-full h-auto object-cover"
+                  />
+                )}
+              </div>
+            )}
+
+            {/* Текст + кнопка */}
+            <div className="p-3">
+              <h3 className="text-sm font-semibold text-[#fffffe] mb-1 line-clamp-2">
+                {displayAd.title || "Реклама"}
+              </h3>
+              <p className="text-[11px] text-[#abd1c6] leading-snug mb-3 line-clamp-4">
+                {displayAd.content}
+              </p>
+
+              <a
+                href={displayAd.linkUrl || undefined}
+                target={displayAd.linkUrl ? "_blank" : undefined}
+                rel={displayAd.linkUrl ? "noopener noreferrer" : undefined}
+                className={`block w-full rounded-lg px-3 py-2 text-xs font-semibold text-center transition-colors ${
+                  displayAd.linkUrl
+                    ? "bg-[#f9bc60] text-[#001e1d] hover:bg-[#e8a545]"
+                    : "bg-transparent text-[#abd1c6]/70 border border-[#abd1c6]/40 cursor-default"
+                }`}
+              >
+                {displayAd.linkUrl ? "Перейти на сайт" : "Скоро здесь может быть ваша реклама"}
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Контакт для размещения рекламы */}
-        <div className="mt-3 rounded-xl border border-[#abd1c6]/35 bg-[#001e1d]/40 px-4 py-3 text-left">
-          <div className="text-xs font-semibold text-[#fffffe] mb-1.5">
-            Разместить рекламу
+        <div className="px-4 pb-3 pt-2 border-t border-[#0b3b33]/80 bg-[#001e1d]/95">
+          <div className="text-[11px] font-semibold text-[#fffffe] mb-1">
+            Разместить рекламу на этом месте
           </div>
-          <p className="text-[11px] text-[#abd1c6]/80 mb-1">
-            Расскажите о своём проекте нашей аудитории.
-          </p>
-          <div className="text-[11px] text-[#abd1c6] flex items-center gap-1">
-            <span>📧</span>
+          <div className="text-[11px] text-[#abd1c6]/80">
+            Напишите на{" "}
             <a
               href="mailto:ads@kopilka.ru"
-              className="hover:text-[#f9bc60] transition-colors"
+              className="underline hover:text-[#f9bc60] transition-colors"
             >
               ads@kopilka.ru
             </a>
+            , указав ссылку на ваш сайт и желаемые даты.
           </div>
         </div>
-
       </div>
     </div>
   );

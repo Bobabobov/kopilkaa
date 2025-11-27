@@ -5,10 +5,10 @@ export function AdvertisingBenefits() {
     <section className="py-24 px-4 relative overflow-hidden">
       {/* Декоративные элементы */}
       <div className="absolute top-20 right-10 text-[#f9bc60]/5 text-[300px] font-bold leading-none pointer-events-none">
-        5000
+        START
       </div>
       <div className="absolute bottom-20 left-10 text-[#f9bc60]/5 text-[200px] font-bold leading-none pointer-events-none">
-        95%
+        BETA
       </div>
       
       <div className="container mx-auto max-w-6xl relative z-10">
@@ -16,10 +16,10 @@ export function AdvertisingBenefits() {
         {/* Заголовок с акцентом */}
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-6xl font-bold text-[#fffffe] mb-6">
-            Почему это работает
+            Как это будет работать
           </h2>
           <p className="text-xl text-[#abd1c6] max-w-3xl mx-auto">
-            Не обещаем золотые горы. Просто факты о нашей аудитории и результатах.
+            Проект на старте. Ниже — как мы всё устроим и каких результатов хотим добиться, опираясь на опыт похожих площадок.
           </p>
         </div>
 
@@ -31,29 +31,29 @@ export function AdvertisingBenefits() {
             <div className="flex flex-col lg:flex-row items-center gap-16">
               <div className="flex-1">
                 <div className="mb-8">
-                  <div className="text-[#f9bc60] text-7xl md:text-8xl font-bold mb-4 leading-none">
-                    5000+
+                  <div className="text-[#f9bc60] text-4xl md:text-5xl font-bold mb-4 leading-none uppercase tracking-[0.25em]">
+                    СТАРТ
                   </div>
                   <div className="text-3xl text-[#fffffe] font-bold mb-4">
-                    Реальных людей каждый день
+                    Проект только запускается
                   </div>
                   <p className="text-[#abd1c6] text-xl leading-relaxed">
-                    Не боты, не накрутка. Люди, которые действительно ищут помощь и поддержку. 
-                    Ваша реклама попадает именно к тем, кому она нужна.
+                    Мы честно: сейчас это запуск. Аудитория ещё небольшая, но растёт каждый день. 
+                    Поэтому первые рекламодатели получают максимум внимания — на сайте почти нет других объявлений.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-8">
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 bg-[#f9bc60] rounded-full"></div>
-                    <span className="text-[#abd1c6] text-lg">Живые люди</span>
+                    <span className="text-[#abd1c6] text-lg">Россия и СНГ</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 bg-[#f9bc60] rounded-full"></div>
-                    <span className="text-[#abd1c6] text-lg">200+ городов</span>
+                    <span className="text-[#abd1c6] text-lg">Люди, которые помогают и донатят</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 bg-[#f9bc60] rounded-full"></div>
-                    <span className="text-[#abd1c6] text-lg">Средний возраст 25-45</span>
+                    <span className="text-[#abd1c6] text-lg">Фокус на историях и реальных людях</span>
                   </div>
                 </div>
               </div>
@@ -108,17 +108,20 @@ export function AdvertisingBenefits() {
                     Кликают на рекламу
                   </div>
                   <p className="text-[#abd1c6] text-xl leading-relaxed">
-                    Средний CTR в интернете — 1-2%. У нас в 2-3 раза выше, потому что люди 
-                    приходят с конкретными запросами и готовы к действию.
+                    Это ориентир по опыту похожих проектов и форматов. Когда наберём достаточно данных, честно покажем реальные цифры именно нашего сайта.
                   </p>
                 </div>
                 <div className="bg-gradient-to-r from-[#004643]/60 to-[#001e1d]/60 border border-[#f9bc60]/30 rounded-2xl p-8 backdrop-blur-sm">
                   <div className="text-[#f9bc60] font-bold mb-3 flex items-center gap-3">
                     <span className="text-3xl">💡</span>
-                    <span className="text-2xl">Практический результат</span>
+                    <span className="text-2xl">Ориентир по результатам</span>
                   </div>
-                  <div className="text-[#fffffe] text-3xl font-bold mb-2">150-250 переходов в неделю</div>
-                  <div className="text-[#abd1c6] text-lg">с большого баннера</div>
+                  <div className="text-[#fffffe] text-3xl font-bold mb-2">
+                    До 150-250 переходов в неделю
+                  </div>
+                  <div className="text-[#abd1c6] text-lg">
+                    с большого баннера — оценка по рынку, не обещание
+                  </div>
                 </div>
               </div>
               <div className="w-full lg:w-1/2 bg-[#004643]/40 border border-[#abd1c6]/20 rounded-3xl p-8 backdrop-blur-sm">
@@ -193,8 +196,10 @@ export function AdvertisingBenefits() {
                 {/* Итоговый блок */}
                 <div className="mt-6 p-4 bg-gradient-to-r from-[#f9bc60]/10 to-[#e8a545]/10 rounded-xl border border-[#f9bc60]/20">
                   <div className="text-center">
-                    <div className="text-[#f9bc60] font-bold text-lg mb-1">В 2-3 раза эффективнее</div>
-                    <div className="text-[#abd1c6] text-sm">чем средний показатель по рынку</div>
+                    <div className="text-[#f9bc60] font-bold text-lg mb-1">Ориентируемся на эффективность выше средней</div>
+                    <div className="text-[#abd1c6] text-sm">
+                      цифры берём из опыта похожих площадок и будем обновлять по мере роста проекта
+                    </div>
                   </div>
                 </div>
               </div>

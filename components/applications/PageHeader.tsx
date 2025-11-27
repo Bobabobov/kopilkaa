@@ -5,7 +5,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function PageHeader() {
   return (
-    <div className="container-p mx-auto pt-32 pb-8 relative z-10">
+    <div className="container-p mx-auto pt-0 sm:pt-1 pb-8 relative z-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

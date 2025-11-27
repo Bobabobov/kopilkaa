@@ -58,7 +58,7 @@ export default function GamesPage() {
       {/* Универсальный фон */}
       <UniversalBackground />
 
-      <div className="w-full px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12 sm:pb-16 relative z-10">
+      <div className="w-full px-4 sm:px-6 lg:px-8 pt-10 sm:pt-12 pb-12 sm:pb-16 relative z-10">
         <div className="max-w-6xl mx-auto">
           {/* Заголовок */}
           <motion.div
@@ -83,8 +83,8 @@ export default function GamesPage() {
               transition={{ delay: 0.2, duration: 0.5 }}
               className="text-lg sm:text-xl text-[#abd1c6] mb-8 max-w-2xl mx-auto leading-relaxed"
             >
-            Попробуйте наши игры! Каждая игра поможет вам расслабиться и
-            заработать дополнительные очки.
+              Раздел игр сейчас в разработке. Мы готовим для вас мини‑игры, но пока
+              запуск игр временно недоступен.
             </motion.p>
 
             {/* Предупреждение о разработке */}
@@ -94,7 +94,7 @@ export default function GamesPage() {
               transition={{ delay: 0.3, duration: 0.5 }}
               className="max-w-2xl mx-auto mb-8 sm:mb-12"
             >
-              <div className="relative overflow-hidden bg-gradient-to-br from-[#f9bc60]/10 via-[#f9bc60]/5 to-[#abd1c6]/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-[#f9bc60]/30 hover:border-[#f9bc60]/50 transition-all duration-300 group">
+                      <div className="relative overflow-hidden bg-gradient-to-br from-[#f9bc60]/10 via-[#f9bc60]/5 to-[#abd1c6]/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-[#f9bc60]/30 hover:border-[#f9bc60]/50 transition-all duration-300 group">
                 <div className="absolute inset-0 overflow-hidden">
                   <div className="absolute -top-4 -right-4 w-16 h-16 bg-[#f9bc60]/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
                   <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-[#abd1c6]/10 rounded-full blur-lg group-hover:scale-110 transition-transform duration-500"></div>
@@ -109,12 +109,12 @@ export default function GamesPage() {
                   </motion.div>
                   <div className="flex-1">
                     <h3 className="text-base sm:text-lg font-bold text-[#f9bc60] mb-2">
-                      Сервис в разработке
+                      Раздел в разработке
                     </h3>
                     <p className="text-sm sm:text-base text-[#fffffe] leading-relaxed">
-                      Игровой сервис находится в активной разработке и может работать некорректно. 
-                      Некоторые функции могут быть недоступны или работать с ошибками. 
-                      Благодарим за понимание!
+                      Раздел игр сейчас временно «заморожен». Мы переделываем игры и механику,
+                      поэтому запуск недоступен. Как только всё будет готово — здесь появятся
+                      новые активные игры.
                     </p>
                   </div>
                 </div>
@@ -133,12 +133,12 @@ export default function GamesPage() {
               <div className="md:col-start-1 md:col-end-2 lg:col-start-2 lg:col-end-3">
               <GamePreview
                 title="Tower Blocks"
-                description="3D игра на точность и реакцию! Стройте башню из движущихся блоков, кликая в нужный момент. Чем точнее - тем выше!"
+                description="3D игра на точность и реакцию. Сейчас игра временно недоступна — раздел в разработке."
                 icon="🏗️"
                 href="/tower-blocks"
                 difficulty="Средне"
                 category="Аркада"
-                isAvailable={true}
+                isAvailable={false}
               />
               </div>
             </div>

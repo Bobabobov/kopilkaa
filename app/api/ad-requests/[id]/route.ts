@@ -56,7 +56,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await prisma.adRequest.delete({
+    // Используем deleteMany, чтобы не падать, если запись уже была удалена
+    await prisma.adRequest.deleteMany({
       where: { id: params.id },
     });
 

@@ -10,7 +10,7 @@ export default function TermsPage() {
     <div className="min-h-screen relative overflow-hidden">
       <UniversalBackground />
 
-      <div className="pt-20 sm:pt-24 pb-12 sm:pb-16 relative z-10">
+      <div className="pt-10 sm:pt-12 pb-12 sm:pb-16 relative z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <TermsHeader />
           <TermsContent />

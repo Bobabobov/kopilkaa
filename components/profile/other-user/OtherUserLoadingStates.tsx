@@ -76,18 +76,18 @@ export default function OtherUserLoadingStates({
   const content = getContent();
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-white/20 dark:border-gray-700/20"
+        className="relative w-full max-w-xl text-center bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] rounded-3xl px-8 py-10 shadow-2xl border border-[#abd1c6]/20"
       >
         <div className="text-6xl mb-4">{content.icon}</div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+        <h1 className="text-2xl md:text-3xl font-semibold text-[#fffffe] mb-4">
           {content.title}
         </h1>
         {content.description && (
-          <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg">
+          <p className="text-[#abd1c6] mb-8 text-base md:text-lg">
             {content.description}
           </p>
         )}
@@ -95,14 +95,14 @@ export default function OtherUserLoadingStates({
           (content.button.onClick ? (
             <button
               onClick={content.button.onClick}
-              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/40 focus:ring-offset-2 focus:ring-offset-[#004643]"
             >
               {content.button.text}
             </button>
           ) : (
             <Link
               href={content.button.href as any}
-              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/40 focus:ring-offset-2 focus:ring-offset-[#004643]"
             >
               {content.button.text}
             </Link>
@@ -113,10 +113,10 @@ export default function OtherUserLoadingStates({
               <Link
                 key={button.text || `button-${index}`}
                 href={button.href as any}
-                className={`inline-flex items-center px-6 py-3 font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
+                className={`inline-flex items-center justify-center px-6 py-3 font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/40 focus:ring-offset-2 focus:ring-offset-[#004643] ${
                   button.variant === "primary"
-                    ? "bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white"
-                    : "bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
+                    ? "bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] shadow-lg hover:shadow-xl"
+                    : "bg-[#001e1d]/40 hover:bg-[#001e1d]/60 text-[#fffffe] border border-[#abd1c6]/30"
                 }`}
               >
                 {button.text}

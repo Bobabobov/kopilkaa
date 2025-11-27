@@ -17,7 +17,43 @@ export function AdvertisingContact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
+
+    try {
+      // Если в контакте есть @ — это email, иначе считаем, что это телефон
+      const isEmail = formData.contact.includes("@");
+      const contact = formData.contact.trim();
+
+      const email = isEmail ? contact : "ads@kopilka.local";
+
+      const commentPrefix = isEmail
+        ? `Контакт: ${contact}\n\n`
+        : `Телефон: ${contact}\n\n`;
+
+      const body = {
+        companyName: formData.name.trim(),
+        email,
+        website: null,
+        format: formData.format || "other",
+        duration: 7, // по умолчанию 7 дней
+        bannerUrl: null,
+        comment: `${commentPrefix}${formData.message}`.trim() || null,
+      };
+
+      const response = await fetch("/api/ad-requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to send ad request", await response.text());
+        alert("Не удалось отправить заявку. Попробуйте ещё раз позже.");
+        setIsSubmitting(false);
+        return;
+      }
+
       setIsSubmitting(false);
       setIsSubmitted(true);
       setFormData({
@@ -26,7 +62,11 @@ export function AdvertisingContact() {
         format: "",
         message: "",
       });
-    }, 2000);
+    } catch (error) {
+      console.error("Error sending ad request:", error);
+      alert("Произошла ошибка при отправке заявки.");
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

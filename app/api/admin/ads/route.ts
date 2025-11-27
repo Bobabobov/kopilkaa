@@ -27,12 +27,21 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
-    
+
     if (!session || session.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { title, content, imageUrl, linkUrl, expiresAt, isActive } = await request.json();
+    const {
+      title,
+      content,
+      imageUrl,
+      linkUrl,
+      expiresAt,
+      isActive,
+      placement,
+      config,
+    } = await request.json();
 
     const ad = await prisma.advertisement.create({
       data: {
@@ -42,6 +51,8 @@ export async function POST(request: NextRequest) {
         linkUrl,
         expiresAt: expiresAt ? new Date(expiresAt) : null,
         isActive: isActive ?? true,
+        placement: placement || "home_sidebar",
+        config: config || null,
       },
     });
 

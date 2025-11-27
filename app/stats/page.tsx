@@ -87,7 +87,7 @@ export default function StatsPage() {
 
       {/* Stats */}
       {stats && (
-        <div className="w-full px-6 pt-32 pb-8 relative z-10">
+        <div className="w-full px-6 pt-8 pb-8 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Заявки */}
             <motion.div

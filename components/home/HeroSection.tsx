@@ -46,16 +46,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
   const { state, handleClick, getMessage } = useBulldog();
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16 relative">
-      {/* Блоки рекламы и топ-донатеров для очень широких экранов — по бокам */}
-      <div className="fixed left-4 z-20 hidden xl:block max-w-sm" style={{ top: "360px" }}>
-        <AdSection />
-      </div>
-
-      <div className="fixed right-4 z-20 hidden xl:block max-w-sm" style={{ top: "360px" }}>
-        <TopDonors />
-      </div>
-
+    <div className="min-h-screen flex items-start justify-center px-4 pt-8 pb-16 relative">
       <div className="text-center max-w-4xl mx-auto">
         {/* Основной заголовок */}
         <h1

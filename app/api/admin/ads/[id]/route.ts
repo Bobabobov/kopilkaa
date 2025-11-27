@@ -13,7 +13,16 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { title, content, imageUrl, linkUrl, expiresAt, isActive } = await request.json();
+    const {
+      title,
+      content,
+      imageUrl,
+      linkUrl,
+      expiresAt,
+      isActive,
+      placement,
+      config,
+    } = await request.json();
 
     const ad = await prisma.advertisement.update({
       where: { id: params.id },
@@ -24,6 +33,8 @@ export async function PUT(
         linkUrl,
         expiresAt: expiresAt ? new Date(expiresAt) : null,
         isActive,
+        placement: placement || "home_sidebar",
+        config: config || null,
       },
     });
 
@@ -48,7 +59,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await prisma.advertisement.delete({
+    // Используем deleteMany, чтобы не падать с ошибкой, если запись уже удалена
+    await prisma.advertisement.deleteMany({
       where: { id: params.id },
     });
 

@@ -10,6 +10,8 @@ interface StoryHeaderProps {
   authorId?: string;
   authorAvatar?: string | null;
   createdAt?: string;
+  isAd?: boolean;
+  authorExternalUrl?: string;
 }
 
 export default function StoryHeader({
@@ -18,9 +20,16 @@ export default function StoryHeader({
   authorId,
   authorAvatar,
   createdAt,
+  isAd = false,
+  authorExternalUrl,
 }: StoryHeaderProps) {
   return (
     <div className="mb-8">
+      {isAd && (
+        <div className="inline-flex items-center gap-2 px-3 py-1 mb-3 rounded-full border border-[#f9bc60]/60 bg-[#f9bc60]/10 text-xs font-semibold uppercase tracking-wide text-[#f9bc60]">
+          <span>Реклама</span>
+        </div>
+      )}
       <h1
         className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4"
         style={{ color: "#fffffe" }}
@@ -36,7 +45,21 @@ export default function StoryHeader({
         >
           {author && (
             <div className="flex items-center gap-2">
-              {authorId ? (
+              {authorExternalUrl ? (
+                <a
+                  href={authorExternalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 hover:opacity-90 transition-opacity duration-200 group"
+                >
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center shadow-md border border-white/40">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                  <span className="group-hover:text-yellow-400 transition-colors duration-200">
+                    {author}
+                  </span>
+                </a>
+              ) : authorId ? (
                 <Link
                   href={`/profile/${authorId}`}
                   className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 group"

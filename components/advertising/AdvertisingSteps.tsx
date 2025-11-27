@@ -207,15 +207,15 @@ export function AdvertisingSteps() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
                     <div className="bg-[#001e1d]/40 p-5 rounded-xl border border-[#f9bc60]/20 text-center">
                       <div className="text-3xl font-bold text-[#f9bc60] mb-1">5000+</div>
-                      <div className="text-[#abd1c6] text-sm">показов/день</div>
+                      <div className="text-[#abd1c6] text-sm">цель по показам в день</div>
                     </div>
                     <div className="bg-[#001e1d]/40 p-5 rounded-xl border border-[#f9bc60]/20 text-center">
                       <div className="text-3xl font-bold text-[#f9bc60] mb-1">150-250</div>
-                      <div className="text-[#abd1c6] text-sm">кликов/неделю</div>
+                      <div className="text-[#abd1c6] text-sm">ожидаемых кликов в неделю при активном трафике</div>
                     </div>
                     <div className="bg-[#001e1d]/40 p-5 rounded-xl border border-[#f9bc60]/20 text-center">
                       <div className="text-3xl font-bold text-[#f9bc60] mb-1">3-5%</div>
-                      <div className="text-[#abd1c6] text-sm">CTR</div>
+                      <div className="text-[#abd1c6] text-sm">ориентир по CTR по рынку</div>
                     </div>
                   </div>
                 </div>
@@ -243,7 +243,7 @@ export function AdvertisingSteps() {
                 Всё ещё думаете?
               </h3>
               <p className="text-xl md:text-2xl text-[#abd1c6] mb-10 max-w-2xl mx-auto leading-relaxed">
-                Пока вы думаете, ваши конкуренты уже получают клиентов с нашего сайта
+                Проект сейчас на старте. Это хороший момент, чтобы зайти одним из первых и получить больше внимания к вашей рекламе.
               </p>
               
               <a 
@@ -257,11 +257,11 @@ export function AdvertisingSteps() {
               <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[#abd1c6]">
                 <div className="flex items-center gap-2">
                   <LucideIcons.Check className="text-[#f9bc60]" size="sm" />
-                  <span className="text-sm">Ответ за 1 час</span>
+                  <span className="text-sm">Стараемся отвечать в течение часа</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <LucideIcons.Check className="text-[#f9bc60]" size="sm" />
-                  <span className="text-sm">Запуск за 24 часа</span>
+                  <span className="text-sm">Планируем запускать рекламу в течение 24 часов</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <LucideIcons.Check className="text-[#f9bc60]" size="sm" />

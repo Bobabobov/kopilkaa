@@ -10,7 +10,7 @@ export function AdvertisingHero() {
             Реклама,<br />которая работает
           </h1>
           <p className="text-xl text-[#abd1c6] max-w-2xl">
-            Без воды и красивых обещаний. Просто разместите рекламу и получите клиентов.
+            Проект только запускается, аудитория ещё растёт. Первые рекламодатели будут особенно заметны на сайте.
           </p>
         </div>
 
@@ -19,8 +19,10 @@ export function AdvertisingHero() {
           <div className="flex items-start gap-4 group">
             <div className="text-[#f9bc60] text-2xl font-bold mt-1">01</div>
             <div>
-              <div className="text-[#fffffe] text-xl font-medium mb-1">Видят тысячи людей</div>
-              <div className="text-[#abd1c6]">Ваша реклама на главной странице, где бывают все наши пользователи</div>
+              <div className="text-[#fffffe] text-xl font-medium mb-1">Вы — среди первых</div>
+              <div className="text-[#abd1c6]">
+                Реклама на главной странице в момент запуска проекта. Пока конкурентов мало, каждое размещение привлекает больше внимания.
+              </div>
             </div>
           </div>
 

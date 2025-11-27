@@ -211,12 +211,12 @@ export default function ProfilePage() {
       <UniversalBackground />
 
       {/* Header */}
-      <header className="mt-20" aria-label="Заголовок профиля">
+      <header className="mt-10" aria-label="Заголовок профиля">
         <ProfileHeader user={user} />
       </header>
 
       {/* Main Content */}
-      <div className="w-full px-4 md:px-6 pt-20 md:pt-32 pb-12 relative z-10">
+      <div className="w-full px-4 md:px-6 pt-10 md:pt-16 pb-12 relative z-10">
         <div className="max-w-7xl mx-auto">
           {/* Welcome Section */}
           <motion.div

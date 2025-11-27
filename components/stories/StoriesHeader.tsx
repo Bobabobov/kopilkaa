@@ -9,7 +9,7 @@ interface StoriesHeaderProps {
 
 export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
   return (
-    <div className="pt-24 pb-8">
+    <div className="pt-0 sm:pt-1 pb-6">
       {/* Заголовок */}
       <div className="text-center mb-8">
         <h1

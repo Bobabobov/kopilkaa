@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function StandardsPage() {
   return (
-    <div className="min-h-screen pt-24 pb-6 px-6" style={{ backgroundColor: "#004643" }}>
+    <div className="min-h-screen pt-8 pb-6 px-6" style={{ backgroundColor: "#004643" }}>
       <div className="max-w-4xl mx-auto">
         {/* Заголовок */}
         <div className="mb-8">

@@ -31,6 +31,7 @@ interface Story {
     likes: number;
   };
   userLiked?: boolean;
+  advertiserLink?: string;
 }
 
 export default function StoryPage() {
@@ -43,12 +44,128 @@ export default function StoryPage() {
   const [likesCount, setLikesCount] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
+  const loadAdStory = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch("/api/ads/stories", {
+        cache: "no-store",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const ad = data.ad as any;
+
+        if (ad) {
+          const config = (ad.config || {}) as {
+            storyTitle?: string;
+            storyText?: string;
+            storyImageUrls?: string[];
+            advertiserName?: string;
+            advertiserLink?: string;
+          };
+
+          const images: Array<{ url: string; sort: number }> = [];
+
+          if (Array.isArray(config.storyImageUrls)) {
+            config.storyImageUrls.forEach((url, index) => {
+              if (url) {
+                images.push({ url, sort: index + 1 });
+              }
+            });
+          } else if (ad.imageUrl) {
+            images.push({ url: ad.imageUrl as string, sort: 1 });
+          }
+
+          const advertiserName = config.advertiserName || "Команда проекта";
+          const advertiserLink: string | undefined =
+            config.advertiserLink || ad.linkUrl || undefined;
+
+          const adStory: Story = {
+            id: "ad",
+            title: config.storyTitle || ad.title || "Рекламная история",
+            summary:
+              ad.content ||
+              "Рекламная история в разделе /stories. Описание будет здесь.",
+            story: config.storyText || ad.content || "",
+            createdAt: ad.createdAt || new Date().toISOString(),
+            images,
+            user: {
+              id: "advertising",
+              name: advertiserName,
+              email: "ads@kopilka.local",
+              avatar: null,
+            },
+            _count: {
+              likes: 0,
+            },
+            userLiked: false,
+            advertiserLink,
+          };
+
+          setStory(adStory);
+          setLiked(false);
+          setLikesCount(0);
+          setLoading(false);
+          setError(null);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error loading stories ad:", error);
+    }
+
+    // Фолбэк — старый захардкоженный текст, если в админке нет активной истории
+    const fallbackStory: Story = {
+      id: "ad",
+      title: "Как работает реклама в историях",
+      summary:
+        "Подробно о том, как разместить рекламную историю на сайте, какие есть форматы и чего можно ожидать.",
+      story: `Проект сейчас на старте. Рекламная история — это отдельный блок на странице историй, который видят все посетители. Главное: вы занимаете заметное место там, где люди читают реальные истории других участников.
+
+Здесь можно простым человеческим языком рассказать о себе: чем вы занимаетесь, кому помогаете, почему вам можно доверять. Добавьте несколько фотографий — витрина, продукт, команда, процесс «до/после», — чтобы у человека сложилась живая картинка, а не сухое объявление.
+
+Мы не обещаем чудес и сотни заявок в первый день. Важно: мы честно показываем, где именно будет ваша реклама и как она выглядит на сайте, без приукрашивания и фейковых цифр.
+
+Когда проект наберёт статистику, мы добавим реальные данные по показам и кликам именно вашей рекламной истории. До этого момента все числа на странице рекламы — это аккуратные ориентиры по опыту похожих проектов, а не красивые обещания из воздуха.`,
+      createdAt: new Date().toISOString(),
+      images: [
+        { url: "/stories-preview.jpg", sort: 1 },
+        { url: "/stories-icon.png", sort: 2 },
+      ],
+      user: {
+        id: "advertising",
+        name: "Команда проекта",
+        email: "ads@kopilka.local",
+        avatar: null,
+      },
+      _count: {
+        likes: 0,
+      },
+      userLiked: false,
+      advertiserLink: "/advertising",
+    };
+
+    setStory(fallbackStory);
+    setLiked(false);
+    setLikesCount(0);
+    setLoading(false);
+    setError(null);
+  };
+
   useEffect(() => {
     // Проверяем авторизацию
     checkAuth();
     
     if (params.id) {
       const id = params.id as string;
+
+      // Специальная "история-реклама", не из базы
+      if (id === "ad") {
+        loadAdStory();
+        return;
+      }
 
       // Проверяем валидность ID - проверяем на любые недопустимые символы
       const hasInvalidChars = /[^a-zA-Z0-9]/.test(id);
@@ -235,6 +352,8 @@ export default function StoryPage() {
               authorId={story.user?.id}
               authorAvatar={story.user?.avatar}
               createdAt={story.createdAt}
+              isAd={story.id === "ad"}
+              authorExternalUrl={story.id === "ad" ? story.advertiserLink : undefined}
             />
 
             {/* Метаданные */}
@@ -244,6 +363,7 @@ export default function StoryPage() {
               likesCount={likesCount}
               onLike={handleLike}
               isAuthenticated={isAuthenticated}
+              isAd={story.id === "ad"}
             />
 
             {/* Контент */}
@@ -251,6 +371,7 @@ export default function StoryPage() {
               content={
                 story.story || story.summary || "Текст истории недоступен."
               }
+              isAd={story.id === "ad"}
             />
 
             {/* Изображения */}

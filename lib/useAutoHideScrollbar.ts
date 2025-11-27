@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 
 export function useAutoHideScrollbar() {
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  // Начальное значение null, чтобы удовлетворить типы React.useRef
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const handleScroll = (event: Event) => {

@@ -18,8 +18,9 @@ export function StoriesPagination({
 
   const getVisiblePages = () => {
     const delta = 2;
-    const range = [];
-    const rangeWithDots = [];
+    // Явно задаём типы, чтобы избежать any[]
+    const range: number[] = [];
+    const rangeWithDots: (number | string)[] = [];
 
     for (
       let i = Math.max(2, currentPage - delta);

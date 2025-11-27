@@ -34,7 +34,8 @@ export async function GET() {
     }
 
     const userId = session.uid;
-    const notifications = [];
+    // Явно указываем тип, чтобы TypeScript не ругался на implicit any[]
+    const notifications: any[] = [];
 
     // Получаем новые лайки (последние 20 для группировки) с обработкой ошибок
     const recentLikes = await prisma.storyLike.findMany({

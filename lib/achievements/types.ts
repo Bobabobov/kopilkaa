@@ -24,8 +24,9 @@ export interface UserAchievement {
   userId: string;
   achievementId: string;
   unlockedAt: Date;
-  grantedBy?: string;
-  grantedByName?: string;
+  // В базе эти поля могут быть null, поэтому учитываем это в типе
+  grantedBy?: string | null;
+  grantedByName?: string | null;
   achievement?: Achievement;
 }
 

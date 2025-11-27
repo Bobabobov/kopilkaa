@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     const formattedApplications = applications.map(app => ({
       ...app,
-      images: app.images ? app.images.map(img => img.url) : [],
+      images: app.images ? app.images.map((img: { url: string }) => img.url) : [],
     }));
 
     return NextResponse.json(

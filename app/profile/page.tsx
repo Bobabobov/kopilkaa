@@ -1,5 +1,10 @@
 // app/profile/page.tsx
 "use client";
+// Профиль сильно зависит от динамических данных и куков,
+// поэтому явно помечаем маршрут как динамический, чтобы Next
+// не пытался предрендерить /profile статически при билде.
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";

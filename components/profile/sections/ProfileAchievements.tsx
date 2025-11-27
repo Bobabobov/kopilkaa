@@ -358,18 +358,6 @@ export default function ProfileAchievements() {
                       </div>
                       
                       {/* Chevron icon */}
-<<<<<<< Current (Your changes)
-<motion.div
-  className="opacity-0 group-hover:opacity-100 transition-opacity"
-  whileHover={{ x: 2 }}
-  style={{ color: rarityColor }}  // цвет на обёртке
->
-  <LucideIcons.ChevronRight 
-    size="sm" 
-    className="text-current"
-  />
-</motion.div>
-=======
                       <motion.div
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                         whileHover={{ x: 2 }}
@@ -381,7 +369,6 @@ export default function ProfileAchievements() {
                           className="text-current"
                         />
                       </motion.div>
->>>>>>> Incoming (Background Agent changes)
                     </div>
                   </motion.div>
                 );

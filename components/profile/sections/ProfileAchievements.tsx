@@ -193,7 +193,6 @@ export default function ProfileAchievements() {
             >
               Достижения
             </motion.h3>
-<<<<<<< HEAD
             {stats && (
               <motion.p 
                 className="text-xs text-[#abd1c6]/70"
@@ -413,5 +412,3 @@ export default function ProfileAchievements() {
     </motion.div>
   );
 }
-=======
->>>>>>> 3cb1e8e901ba79b859e243edf8d0386d6ba9dbba

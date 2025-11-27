@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
-import dynamic from "next/dynamic";
+// Переименовываем импорт, чтобы не конфликтовал с export const dynamic
+import dynamicComponent from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProfileHeader from "@/components/profile/sections/ProfileHeader";
@@ -17,29 +18,29 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useProfileDashboard } from "@/lib/useProfileDashboard";
 
 // Ленивая загрузка компонентов для улучшения производительности
-const UserInfoCard = dynamic(() => import("@/components/profile/UserInfoCard"), {
+const UserInfoCard = dynamicComponent(() => import("@/components/profile/UserInfoCard"), {
   loading: () => <div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl border border-[#abd1c6]/20 h-64 animate-pulse" />,
   ssr: false,
 });
 
-const ProfilePersonalStats = dynamic(() => import("@/components/profile/sections/ProfilePersonalStats"), {
+const ProfilePersonalStats = dynamicComponent(() => import("@/components/profile/sections/ProfilePersonalStats"), {
   loading: () => <div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl border border-[#abd1c6]/20 h-64 animate-pulse" />,
   ssr: false,
 });
 
-const ProfileFriendsSection = dynamic(() => import("@/components/profile/sections/ProfileFriendsSection"), {
+const ProfileFriendsSection = dynamicComponent(() => import("@/components/profile/sections/ProfileFriendsSection"), {
   loading: () => <div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl border border-[#abd1c6]/20 h-48 animate-pulse" />,
   ssr: false,
 });
 
-const ProfileAchievements = dynamic(() => import("@/components/profile/sections/ProfileAchievements"), {
+const ProfileAchievements = dynamicComponent(() => import("@/components/profile/sections/ProfileAchievements"), {
   loading: () => <div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl border border-[#abd1c6]/20 h-40 animate-pulse" />,
   ssr: false,
 });
 
 
 // Lazy load heavy modals
-const SettingsModal = dynamic(
+const SettingsModal = dynamicComponent(
   () => import("@/components/profile/modals/SettingsModal"),
   {
     ssr: false,

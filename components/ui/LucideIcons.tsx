@@ -469,10 +469,6 @@ export const LucideIcons = {
     <Activity className={`${sizeClasses[size]} ${className}`} />
   ),
 
-  CheckCircle2: ({ className = "", size = "md" }: IconProps) => (
-    <CheckCircle2 className={`${sizeClasses[size]} ${className}`} />
-  ),
-
   TrendingDown: ({ className = "", size = "md" }: IconProps) => (
     <TrendingDown className={`${sizeClasses[size]} ${className}`} />
   ),

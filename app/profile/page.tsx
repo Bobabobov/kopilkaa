@@ -64,7 +64,17 @@ type User = {
   lastSeen?: string | null;
 };
 
+// Обёртка с Suspense — требуется Next.js для страниц,
+// которые используют useSearchParams в режиме CSR bailout.
 export default function ProfilePage() {
+  return (
+    <Suspense fallback={<ProfileLoading />}>
+      <ProfilePageContent />
+    </Suspense>
+  );
+}
+
+function ProfilePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: profileData, loading, error, refetch } = useProfileDashboard();

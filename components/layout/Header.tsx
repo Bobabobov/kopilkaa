@@ -89,7 +89,13 @@ export default function Header() {
     }
 
     if (topBanner) {
-      setTopBannerHeight(topBanner.offsetHeight);
+      const bannerHeight = topBanner.offsetHeight;
+      setTopBannerHeight(bannerHeight);
+
+      const header = document.querySelector('header') as HTMLElement | null;
+      if (header) {
+        header.style.top = `${bannerHeight}px`;
+      }
     }
 
     // На десктопе отслеживаем скролл, чтобы Header двигался синхронно с баннером

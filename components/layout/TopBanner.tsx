@@ -125,12 +125,7 @@ export default function TopBanner({
   }, []);
 
   // Отслеживаем скролл для постепенного скрытия баннера
-  // Для баннера с картинкой анимацию скрытия отключаем, чтобы не было "просветов" зелёного фона
   useEffect(() => {
-    if (adImageUrl) {
-      return;
-    }
-
     if (typeof window === "undefined") return;
 
     // На мобильных убираем анимацию скрытия при скролле,
@@ -217,18 +212,25 @@ export default function TopBanner({
   const finalLinkUrl = adLink || linkUrl;
   const hasImage = !!adImageUrl;
 
+  const handleBannerClick = () => {
+    if (!finalLinkUrl) return;
+    if (typeof window === "undefined") return;
+    window.location.href = finalLinkUrl;
+  };
+
   if (!isVisible) return null;
 
   return (
     <div
       data-top-banner
+      data-has-image={hasImage ? "true" : "false"}
       className={`${
         isMobile ? "relative mt-16 z-40" : "fixed top-0 left-0 right-0 z-[60]"
       } ${styles.bg} ${styles.border} border-b shadow-lg overflow-hidden ${
         isAnimating ? "" : 
         isHidden ? "" : 
         ""
-      }`}
+      } ${finalLinkUrl ? "cursor-pointer" : ""}`}
       style={{
         background:
           variant === "default" && !hasImage
@@ -236,8 +238,9 @@ export default function TopBanner({
             : "#001e1d",
         transform: isAnimating ? "translateY(-100%)" : undefined,
         transition: isAnimating ? "transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)" : "none",
-        willChange: "transform"
+        willChange: "transform",
       }}
+      onClick={handleBannerClick}
     >
       {/* Фоновое изображение рекламного баннера, если есть */}
       {hasImage && (
@@ -258,14 +261,8 @@ export default function TopBanner({
       >
         {/* Десктопная версия */}
         <div className="hidden md:flex items-center justify-between gap-4 h-full">
-          {/* Левая часть - контент */}
+          {/* Левая часть - только текст без иконки */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            {/* Иконка */}
-            <div className={`flex-shrink-0 ${styles.icon}`}>
-              <LucideIcons.Megaphone size="md" />
-            </div>
-            
-            {/* Текст */}
             <div className={`text-base font-medium ${styles.text}`}>
               {finalContent}
             </div>
@@ -273,36 +270,13 @@ export default function TopBanner({
 
           {/* Правая часть - кнопки */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            {/* Ссылка / кнопка действия */}
             {finalLinkUrl && (
               <a
                 href={finalLinkUrl}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 hover:scale-105 ${
-                  variant === "default"
-                    ? "bg-[#f9bc60] text-[#001e1d] hover:bg-[#f9bc60]/90"
-                    : "bg-white/20 text-white hover:bg-white/30"
-                }`}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg bg-[#f9bc60] text-[#001e1d] hover:bg-[#f9bc60]/90 transition-all duration-200 hover:scale-105`}
               >
-                {adLink ? "Перейти на сайт" : "Разместить рекламу"}
+                Перейти
               </a>
-            )}
-
-            {/* Кнопка закрытия */}
-            {isDismissible && (
-              <button
-                onClick={handleClose}
-                className={`p-2 rounded-lg transition-all duration-200 hover:scale-110 ${
-                  variant === "default"
-                    ? "hover:bg-[#abd1c6]/20"
-                    : "hover:bg-white/20"
-                }`}
-                aria-label="Закрыть баннер"
-              >
-                <LucideIcons.X 
-                  size="sm" 
-                  className={styles.text} 
-                />
-              </button>
             )}
           </div>
         </div>
@@ -312,34 +286,12 @@ export default function TopBanner({
           {/* Верхняя часть - текст и кнопка закрытия */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              {/* Иконка */}
-              <div className={`flex-shrink-0 ${styles.icon}`}>
-                <LucideIcons.Megaphone size="sm" />
-              </div>
-              
-              {/* Текст */}
+              {/* Только текст без иконки */}
               <div className={`text-sm font-medium ${styles.text} leading-relaxed`}>
                 {finalContent}
               </div>
             </div>
 
-            {/* Кнопка закрытия */}
-            {isDismissible && (
-              <button
-                onClick={handleClose}
-                className={`p-1 rounded-lg transition-all duration-200 hover:scale-110 flex-shrink-0 ${
-                  variant === "default"
-                    ? "hover:bg-[#abd1c6]/20"
-                    : "hover:bg-white/20"
-                }`}
-                aria-label="Закрыть баннер"
-              >
-                <LucideIcons.X 
-                  size="sm" 
-                  className={styles.text} 
-                />
-              </button>
-            )}
           </div>
 
           {/* Нижняя часть - кнопка действия */}
@@ -347,13 +299,9 @@ export default function TopBanner({
             <div className="flex justify-center">
               <a
                 href={finalLinkUrl}
-                className={`px-6 py-2 text-sm font-semibold rounded-lg transition-all duration-200 hover:scale-105 ${
-                  variant === "default"
-                    ? "bg-[#f9bc60] text-[#001e1d] hover:bg-[#f9bc60]/90"
-                    : "bg-white/20 text-white hover:bg-white/30"
-                }`}
-                >
-                {adLink ? "Перейти на сайт" : "Разместить рекламу"}
+                className={`px-6 py-2 text-sm font-semibold rounded-lg bg-[#f9bc60] text-[#001e1d] hover:bg-[#f9bc60]/90 transition-all duration-200 hover:scale-105`}
+              >
+                Перейти
               </a>
             </div>
           )}

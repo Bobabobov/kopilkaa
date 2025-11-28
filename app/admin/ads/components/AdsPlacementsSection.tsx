@@ -257,7 +257,9 @@ export default function AdsPlacementsSection() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {formData.placement !== "stories" && (
+              {formData.placement !== "stories" &&
+                formData.placement !== "home_sidebar" &&
+                formData.placement !== "home_banner" && (
                 <div>
                   <label className="block text-sm font-medium text-[#abd1c6] mb-2">
                     Заголовок
@@ -319,8 +321,8 @@ export default function AdsPlacementsSection() {
                   )}
                   {formData.placement === "home_sidebar" && (
                     <>
-                      <strong>Боковой блок на главной:</strong> вертикальный баннер
-                      ~300×600px.
+                      <strong>Блок под кнопками на главной:</strong> горизонтальный баннер
+                      примерно 600–900×220–260px.
                     </>
                   )}
                   {formData.placement === "stories" && (
@@ -361,7 +363,7 @@ export default function AdsPlacementsSection() {
                   }
                   className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none text-sm"
                 >
-                  <option value="home_sidebar">Главная — блок сбоку</option>
+                  <option value="home_sidebar">Главная — блок под кнопками</option>
                   <option value="home_banner">Главная — большой баннер</option>
                   <option value="stories">Раздел историй</option>
                   <option value="other">Другое / вручную</option>
@@ -514,7 +516,9 @@ export default function AdsPlacementsSection() {
               </div>
             )}
 
-            {formData.placement !== "stories" && (
+            {formData.placement !== "stories" &&
+              formData.placement !== "home_sidebar" &&
+              formData.placement !== "home_banner" && (
               <div>
                 <label className="block text-sm font-medium text-[#abd1c6] mb-2">
                   Содержание
@@ -615,7 +619,7 @@ export default function AdsPlacementsSection() {
                     </span>
                     {ad.placement && (
                       <span className="px-2 py-0.5 rounded-full bg-[#004643] text-[#abd1c6] border border-[#0b3b33]/70 text-[11px] uppercase tracking-wide">
-                        {ad.placement === "home_sidebar" && "Главная • сбоку"}
+                        {ad.placement === "home_sidebar" && "Главная • блок под кнопками"}
                         {ad.placement === "home_banner" && "Главная • баннер"}
                         {ad.placement === "stories" && "Истории"}
                         {ad.placement === "other" && "Другое"}

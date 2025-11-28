@@ -134,7 +134,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
         </motion.div>
 
         {/* Кнопки */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <Link
             href="/applications"
             className="px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-105"
@@ -156,6 +156,14 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           >
             Смотреть истории
           </Link>
+        </div>
+
+        {/* Рекламный блок (бывший боковой) — теперь под кнопками на главной
+            Показываем только на средних и больших экранах, на мобильных остаётся feed‑карточка сверху */}
+        <div className="mb-10 hidden md:flex justify-center">
+          <div className="w-full max-w-4xl">
+            <AdSection variant="sidebar" />
+          </div>
         </div>
 
         {/* Статистика платформы */}

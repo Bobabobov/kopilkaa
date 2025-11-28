@@ -71,12 +71,16 @@ export function middleware(req: NextRequest) {
     "Content-Security-Policy",
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://codepen.io https://cdnjs.cloudflare.com", // Разрешаем внешние скрипты для игр
+      // Разрешаем внешние скрипты для игр и Telegram-виджета
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://codepen.io https://cdnjs.cloudflare.com https://telegram.org",
       "style-src 'self' 'unsafe-inline'", // TailwindCSS требует unsafe-inline
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      "connect-src 'self'",
-      "frame-ancestors 'self'", // Разрешаем iframe для игр
+      // Разрешаем запросы к Telegram OAuth (для виджета входа)
+      "connect-src 'self' https://oauth.telegram.org https://telegram.org",
+      // Разрешаем встраивать iframe Telegram OAuth
+      "frame-src 'self' https://oauth.telegram.org https://telegram.org",
+      "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",
     ].join("; "),

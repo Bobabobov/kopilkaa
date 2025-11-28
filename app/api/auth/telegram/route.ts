@@ -115,6 +115,25 @@ export async function POST(req: NextRequest) {
       user = await prisma.user.create({
         data: createData,
       });
+    } else {
+      // Пользователь с таким Telegram уже есть — обновляем при необходимости
+      const updateData: any = {};
+
+      if (telegramUsername && user.telegramUsername !== telegramUsername) {
+        updateData.telegramUsername = telegramUsername;
+        updateData.telegramLink = `https://t.me/${telegramUsername}`;
+      }
+
+      if (telegramPhoto && !user.avatar) {
+        updateData.avatar = telegramPhoto;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: updateData,
+        });
+      }
     }
 
     await setSession({ uid: user.id, role: (user.role as any) || "USER" });

@@ -47,7 +47,19 @@ export default function LoginPage() {
   // Встраиваем Telegram Login Widget
   useEffect(() => {
     const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
-    if (!botUsername || !telegramContainerRef.current) return;
+    if (!botUsername) {
+      console.warn(
+        "NEXT_PUBLIC_TELEGRAM_BOT_USERNAME не задан — виджет Telegram не будет отображён",
+      );
+      return;
+    }
+
+    if (!telegramContainerRef.current) {
+      console.warn("Контейнер для Telegram-виджета не найден");
+      return;
+    }
+
+    console.log("Инициализируем Telegram Login Widget для бота:", botUsername);
 
     // Коллбек, который вызывает Telegram-виджет после успешной авторизации
     (window as any).onTelegramAuth = async (user: any) => {
@@ -86,6 +98,10 @@ export default function LoginPage() {
     script.setAttribute("data-lang", "ru");
     script.setAttribute("data-request-access", "write");
     script.setAttribute("data-onauth", "onTelegramAuth(user)");
+
+    script.onerror = () => {
+      console.error("Не удалось загрузить Telegram Login Widget");
+    };
 
     telegramContainerRef.current.innerHTML = "";
     telegramContainerRef.current.appendChild(script);
@@ -399,7 +415,7 @@ export default function LoginPage() {
             </p>
             <div
               ref={telegramContainerRef}
-              className="flex justify-center"
+              className="flex justify-center mt-2 min-h-[44px]"
             />
           </div>
 

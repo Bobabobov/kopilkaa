@@ -13,7 +13,15 @@ interface Advertisement {
   placement?: string;
 }
 
-export default function AdSection() {
+interface AdSectionProps {
+  /** 
+   * sidebar – компактный блок для боковой колонки (десктоп)
+   * feed – карточка внутри ленты (мобильный вариант в стиле vc.ru)
+   */
+  variant?: "sidebar" | "feed";
+}
+
+export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
   const [ad, setAd] = useState<Advertisement | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,6 +47,23 @@ export default function AdSection() {
 
   // Если нет активной рекламы, показываем дефолтный блок
   if (loading) {
+    if (variant === "feed") {
+      return (
+        <div className="w-full">
+          <div className="rounded-2xl bg-[#fffffe] text-[#111827] shadow-md border border-black/5 px-4 py-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#e5e7eb]" />
+              <div className="space-y-1">
+                <div className="h-3 w-32 rounded-full bg-[#e5e7eb]" />
+                <div className="h-3 w-40 rounded-full bg-[#e5e7eb]" />
+              </div>
+            </div>
+            <div className="h-8 w-24 rounded-full bg-[#d1d5db]" />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="xl:order-4 order-4">
         <div className="rounded-3xl border border-[#abd1c6]/25 bg-[#001e1d]/60 px-5 py-5 shadow-xl shadow-black/30 flex flex-col items-center justify-center gap-3">
@@ -54,12 +79,72 @@ export default function AdSection() {
   // Если нет активной рекламы, используем дефолтные данные
   const defaultAd = {
     title: "Реклама",
-    content: "Ваша реклама здесь поможет поддержать проект и достичь целевой аудитории",
+    content:
+      "Ваша реклама здесь поможет поддержать проект и достичь целевой аудитории",
     imageUrl: null,
     linkUrl: null,
   };
-  
+
   const displayAd = ad || defaultAd;
+
+  // Вариант карточки в ленте — лёгкая светлая карточка в стиле vc.ru
+  if (variant === "feed") {
+    return (
+      <div className="w-full">
+        <div className="rounded-2xl bg-[#fffffe] text-[#111827] shadow-md border border-black/5 px-4 py-4">
+          {/* Верхняя строка: метка «Реклама» и ссылка «Разместить» */}
+          <div className="flex items-center justify-between text-[11px] text-gray-500 mb-3">
+            <div className="flex items-center gap-1 font-semibold tracking-[0.16em] uppercase">
+              <span className="text-gray-400">Реклама</span>
+            </div>
+            <a
+              href="mailto:ads@kopilka.ru"
+              className="text-[11px] font-semibold text-[#2563eb] hover:text-[#1d4ed8] transition-colors"
+            >
+              Разместить
+            </a>
+          </div>
+
+          {/* Основной контент: мини‑картинка + текст */}
+          <div className="flex items-start gap-3 mb-3">
+            {displayAd.imageUrl && (
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-gray-100">
+                <img
+                  src={displayAd.imageUrl}
+                  alt={displayAd.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold mb-1">
+                {displayAd.title || "Реклама"}
+              </h3>
+              <p className="text-xs text-gray-700 leading-snug">
+                {displayAd.content}
+              </p>
+            </div>
+          </div>
+
+          {/* Кнопка действия */}
+          <a
+            href={displayAd.linkUrl || undefined}
+            target={displayAd.linkUrl ? "_blank" : undefined}
+            rel={displayAd.linkUrl ? "noopener noreferrer" : undefined}
+            className={`mt-1 inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${
+              displayAd.linkUrl
+                ? "bg-[#2563eb] text-white hover:bg-[#1d4ed8]"
+                : "bg-gray-100 text-gray-400 cursor-default"
+            }`}
+          >
+            Перейти
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Вариант для боковой колонки (десктоп)
   return (
     <div className="xl:order-4 order-4" style={{ maxWidth: 300 }}>
       <div className="rounded-3xl border border-[#abd1c6]/30 bg-[#001e1d]/90 shadow-2xl shadow-black/40 overflow-hidden">
@@ -73,11 +158,9 @@ export default function AdSection() {
 
         {/* Основная зона баннера */}
         <div className="px-3 pb-3">
-          <div
-            className="w-full rounded-2xl border border-[#abd1c6]/30 bg-[#001e1d] overflow-hidden"
-          >
+          <div className="w-full rounded-2xl border border-[#abd1c6]/30 bg-[#001e1d] overflow-hidden">
             {/* Картинка (кликабельная, если есть ссылка) */}
-        {displayAd.imageUrl && (
+            {displayAd.imageUrl && (
               <div className="w-full bg-black/10">
                 {displayAd.linkUrl ? (
                   <a
@@ -92,14 +175,14 @@ export default function AdSection() {
                     />
                   </a>
                 ) : (
-            <img
-              src={displayAd.imageUrl}
-              alt={displayAd.title}
+                  <img
+                    src={displayAd.imageUrl}
+                    alt={displayAd.title}
                     className="w-full h-auto object-cover"
-            />
+                  />
                 )}
-          </div>
-        )}
+              </div>
+            )}
 
             {/* Текст + кнопка */}
             <div className="p-3">
@@ -110,18 +193,20 @@ export default function AdSection() {
                 {displayAd.content}
               </p>
 
-          <a
-            href={displayAd.linkUrl || undefined}
-            target={displayAd.linkUrl ? "_blank" : undefined}
-            rel={displayAd.linkUrl ? "noopener noreferrer" : undefined}
+              <a
+                href={displayAd.linkUrl || undefined}
+                target={displayAd.linkUrl ? "_blank" : undefined}
+                rel={displayAd.linkUrl ? "noopener noreferrer" : undefined}
                 className={`block w-full rounded-lg px-3 py-2 text-xs font-semibold text-center transition-colors ${
-              displayAd.linkUrl
+                  displayAd.linkUrl
                     ? "bg-[#f9bc60] text-[#001e1d] hover:bg-[#e8a545]"
                     : "bg-transparent text-[#abd1c6]/70 border border-[#abd1c6]/40 cursor-default"
-            }`}
-          >
-                {displayAd.linkUrl ? "Перейти на сайт" : "Скоро здесь может быть ваша реклама"}
-          </a>
+                }`}
+              >
+                {displayAd.linkUrl
+                  ? "Перейти на сайт"
+                  : "Скоро здесь может быть ваша реклама"}
+              </a>
             </div>
           </div>
         </div>

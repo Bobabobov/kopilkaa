@@ -48,6 +48,11 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
   return (
     <div className="min-h-screen flex items-start justify-center px-4 pt-8 pb-16 relative">
       <div className="text-center max-w-4xl mx-auto">
+        {/* Рекламная карточка для мобильных — над основным заголовком */}
+        <div className="mb-6 max-w-md mx-auto md:hidden">
+          <AdSection variant="feed" />
+        </div>
+
         {/* Основной заголовок */}
         <h1
           className="text-5xl md:text-7xl font-bold mb-6"
@@ -130,7 +135,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
         </motion.div>
 
         {/* Кнопки */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
           <Link
             href="/applications"
             className="px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-105"
@@ -243,9 +248,8 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           </div>
         </div>
 
-        {/* Блоки рекламы и топ-донатеров для обычных экранов — под статистикой */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto xl:hidden">
-          <AdSection />
+        {/* Топ‑донатеры для мобильных под статистикой */}
+        <div className="mt-12 max-w-md mx-auto md:hidden">
           <TopDonors />
         </div>
 

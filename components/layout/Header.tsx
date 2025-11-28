@@ -14,7 +14,7 @@ export default function Header() {
   const [authLoading, setAuthLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [topBannerHeight, setTopBannerHeight] = useState(0);
-  const [headerTop, setHeaderTop] = useState(0);
+  const [menuTop, setMenuTop] = useState(64);
 
   // Проверяем авторизацию (не блокируем навигацию)
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function Header() {
       setTopBannerHeight(topBanner.offsetHeight);
     }
 
-    // Отслеживаем скролл, чтобы Header и мобильное меню двигались синхронно с баннером
+    // Отслеживаем скролл, чтобы Header двигался синхронно с баннером
     const handleScroll = () => {
       if (!topBanner) return;
       
@@ -93,7 +93,6 @@ export default function Header() {
       if (header) {
         const newTop = bannerHeight * (1 - hideProgress);
         header.style.top = `${newTop}px`;
-        setHeaderTop(newTop);
       }
     };
 
@@ -104,6 +103,27 @@ export default function Header() {
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // Отдельно вычисляем позицию нижней границы header,
+  // чтобы мобильное меню всегда открывалось сразу под ним
+  useEffect(() => {
+    const updateMenuTop = () => {
+      const header = document.querySelector('header') as HTMLElement | null;
+      if (header) {
+        const rect = header.getBoundingClientRect();
+        setMenuTop(rect.bottom);
+      }
+    };
+
+    updateMenuTop();
+    window.addEventListener("scroll", updateMenuTop, { passive: true });
+    window.addEventListener("resize", updateMenuTop);
+
+    return () => {
+      window.removeEventListener("scroll", updateMenuTop);
+      window.removeEventListener("resize", updateMenuTop);
     };
   }, []);
 
@@ -175,10 +195,10 @@ export default function Header() {
             transition={{ duration: 0.2 }}
             className="lg:hidden fixed left-0 right-0 z-40 border-t backdrop-blur-sm shadow-lg"
             style={{ 
-              backgroundColor: "#004643", 
+              backgroundColor: "#004643",
               borderColor: "#abd1c6",
-              // Открываем мобильное меню сразу под хедером (его текущий top из состояния) + высота хедера
-              top: `${headerTop + 64}px`
+              // Открываем мобильное меню сразу под нижней границей header
+              top: `${menuTop}px`
             }}
           >
             <div className="container-p py-4 space-y-2">

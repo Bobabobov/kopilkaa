@@ -91,15 +91,15 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
   if (variant === "feed") {
     return (
       <div className="w-full">
-        <div className="rounded-2xl bg-[#fffffe] text-[#111827] shadow-md border border-black/5 px-4 py-4">
+        <div className="rounded-3xl bg-[#001e1d] text-[#fffffe] shadow-lg border border-[#abd1c6]/30 px-4 py-4">
           {/* Верхняя строка: метка «Реклама» и ссылка «Разместить» */}
-          <div className="flex items-center justify-between text-[11px] text-gray-500 mb-3">
-            <div className="flex items-center gap-1 font-semibold tracking-[0.16em] uppercase">
-              <span className="text-gray-400">Реклама</span>
+          <div className="flex items-center justify-between text-[11px] mb-3">
+            <div className="flex items-center gap-1 font-semibold tracking-[0.16em] uppercase text-[#abd1c6]/80">
+              <span>Реклама</span>
             </div>
             <a
               href="mailto:ads@kopilka.ru"
-              className="text-[11px] font-semibold text-[#2563eb] hover:text-[#1d4ed8] transition-colors"
+              className="text-[11px] font-semibold text-[#f9bc60] hover:text-[#ffd27f] transition-colors"
             >
               Разместить
             </a>
@@ -108,7 +108,7 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
           {/* Основной контент: мини‑картинка + текст */}
           <div className="flex items-start gap-3 mb-3">
             {displayAd.imageUrl && (
-              <div className="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-gray-100">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-black/20">
                 <img
                   src={displayAd.imageUrl}
                   alt={displayAd.title}
@@ -116,11 +116,11 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
                 />
               </div>
             )}
-            <div className="flex-1">
+            <div className="flex-1 text-left">
               <h3 className="text-sm font-semibold mb-1">
                 {displayAd.title || "Реклама"}
               </h3>
-              <p className="text-xs text-gray-700 leading-snug">
+              <p className="text-xs text-[#abd1c6] leading-snug">
                 {displayAd.content}
               </p>
             </div>
@@ -133,8 +133,8 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
             rel={displayAd.linkUrl ? "noopener noreferrer" : undefined}
             className={`mt-1 inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${
               displayAd.linkUrl
-                ? "bg-[#2563eb] text-white hover:bg-[#1d4ed8]"
-                : "bg-gray-100 text-gray-400 cursor-default"
+                ? "bg-[#f9bc60] text-[#001e1d] hover:bg-[#e8a545]"
+                : "bg-transparent text-[#abd1c6]/50 border border-[#abd1c6]/40 cursor-default"
             }`}
           >
             Перейти

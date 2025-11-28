@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import AdSection from "@/components/home/AdSection";
-import TopDonors from "@/components/home/TopDonors";
 
 export default function SideBanners() {
   const pathname = usePathname();
@@ -14,23 +13,18 @@ export default function SideBanners() {
 
   return (
     <>
-      {/* Левый рекламный блок */}
+      {/* Правая компактная колонка для очень больших экранов:
+          только реклама, без топ‑донатеров */}
       <div
-        className="fixed left-4 z-30 hidden xl:block"
-        style={{ top: "360px", maxWidth: 320 }}
+        className="fixed right-6 z-30 hidden 2xl:block"
+        // смещаем ниже, чтобы не залезать под верхний рекламный баннер и шапку
+        style={{ top: "360px", maxWidth: 340 }}
       >
-        <AdSection />
-      </div>
-
-      {/* Правый блок с топ‑донатерами */}
-      <div
-        className="fixed right-4 z-30 hidden xl:block"
-        style={{ top: "360px", maxWidth: 360 }}
-      >
-        <TopDonors />
+        <AdSection variant="sidebar" />
       </div>
     </>
   );
 }
+
 
 

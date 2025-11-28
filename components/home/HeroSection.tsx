@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useBulldog } from "@/lib/useBulldog";
 import { useEffect } from "react";
 import AdSection from "./AdSection";
-import TopDonors from "./TopDonors";
 
 type Stats = {
   collected: number;
@@ -46,10 +45,10 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
   const { state, handleClick, getMessage } = useBulldog();
 
   return (
-    <div className="min-h-screen flex items-start justify-center px-4 pt-8 pb-16 relative">
+    <div className="flex items-start justify-center px-4 pt-8 pb-8 relative">
       <div className="text-center max-w-4xl mx-auto">
         {/* Рекламная карточка для мобильных — над основным заголовком */}
-        <div className="mb-6 max-w-md mx-auto md:hidden">
+        <div className="mb-4 -mx-4 px-4 md:hidden">
           <AdSection variant="feed" />
         </div>
 
@@ -246,11 +245,6 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
               </div>
             </motion.div>
           </div>
-        </div>
-
-        {/* Топ‑донатеры для мобильных под статистикой */}
-        <div className="mt-12 max-w-md mx-auto md:hidden">
-          <TopDonors />
         </div>
 
       </div>

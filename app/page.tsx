@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { cacheStats, getCachedStats } from "@/lib/cache";
 import PixelBackground from "@/components/ui/PixelBackground";
+import TopDonorsInline from "@/components/home/TopDonorsInline";
 
 // Lazy load heavy components
 const HeroSection = dynamic(() => import("@/components/home/HeroSection"), {
@@ -111,6 +112,8 @@ export default function HomePage() {
       <PixelBackground />
       <div className="relative z-10">
         <HeroSection stats={stats} loading={loading} />
+        {/* Лёгкий блок про топ‑донатёров между статистикой и следующим разделом */}
+        <TopDonorsInline />
         <HowItWorks />
         <RecentApplications />
         <FAQ />

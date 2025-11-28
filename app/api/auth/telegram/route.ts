@@ -26,22 +26,37 @@ export async function POST(req: NextRequest) {
 
     const telegramId = String(tgData.id);
     const telegramUsername = tgData.username || null;
+    const telegramPhoto = tgData.photo_url || null;
 
     const session = await getSession();
 
     if (session) {
       // Пользователь уже залогинен — привязываем Telegram к его аккаунту
+      const updateData: any = {
+        telegramId,
+        telegramUsername,
+      };
+
+      // Если Телеграм прислал аватар — сохраняем его как аватар профиля
+      if (telegramPhoto) {
+        updateData.avatar = telegramPhoto;
+      }
+
+      // Автоматически добавляем публичную ссылку на Telegram-профиль
+      if (telegramUsername) {
+        updateData.telegramLink = `https://t.me/${telegramUsername}`;
+      }
+
       const updated = await prisma.user.update({
         where: { id: session.uid },
-        data: {
-          telegramId,
-          telegramUsername,
-        },
+        data: updateData,
         select: {
           id: true,
           email: true,
           telegramId: true,
           telegramUsername: true,
+          avatar: true,
+          telegramLink: true,
         },
       });
 
@@ -75,17 +90,30 @@ export async function POST(req: NextRequest) {
         username = `${baseUsername.toLowerCase()}_${suffix++}`;
       }
 
+      const createData: any = {
+        email: pseudoEmail,
+        username,
+        // создаём случайный пароль, т.к. вход по нему не предполагается
+        passwordHash: "telegram-auto-user",
+        name:
+          [tgData.first_name, tgData.last_name].filter(Boolean).join(" ") || null,
+        telegramId,
+        telegramUsername,
+        role: "USER",
+      };
+
+      // Сохраняем аватар из Telegram, если есть
+      if (telegramPhoto) {
+        createData.avatar = telegramPhoto;
+      }
+
+      // Автоматически выставляем публичную ссылку на Telegram
+      if (telegramUsername) {
+        createData.telegramLink = `https://t.me/${telegramUsername}`;
+      }
+
       user = await prisma.user.create({
-        data: {
-          email: pseudoEmail,
-          username,
-          // создаём случайный пароль, т.к. вход по нему не предполагается
-          passwordHash: "telegram-auto-user",
-          name: [tgData.first_name, tgData.last_name].filter(Boolean).join(" ") || null,
-          telegramId,
-          telegramUsername,
-          role: "USER",
-        },
+        data: createData,
       });
     }
 

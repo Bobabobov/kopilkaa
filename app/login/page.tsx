@@ -66,6 +66,7 @@ export default function LoginPage() {
     // Коллбек, который вызывает Telegram-виджет после успешной авторизации
     (window as any).onTelegramAuth = async (user: any) => {
       try {
+        console.log("onTelegramAuth вызван, данные пользователя из Telegram:", user);
         setErr(null);
         setBusy(true);
 
@@ -77,11 +78,13 @@ export default function LoginPage() {
         const data = await r.json();
 
         if (!r.ok || !data?.success) {
+          console.error("Ошибка ответа /api/auth/telegram:", data);
           setErr(data?.error || "Ошибка входа через Telegram");
           return;
         }
 
         // Успешный вход / регистрация через Telegram
+        console.log("Успешный вход через Telegram, перенаправляем в профиль");
         window.location.href = "/profile";
       } catch (error: any) {
         console.error("Telegram login error:", error);

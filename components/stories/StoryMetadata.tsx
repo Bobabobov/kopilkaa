@@ -44,7 +44,7 @@ export default function StoryMetadata({
 
       {!isAd && (
         <>
-          {/* Красивая анимированная кнопка лайка */}
+      {/* Красивая анимированная кнопка лайка */}
           <LikeButton
             liked={liked}
             likesCount={likesCount}

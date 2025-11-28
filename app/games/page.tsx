@@ -94,7 +94,7 @@ export default function GamesPage() {
               transition={{ delay: 0.3, duration: 0.5 }}
               className="max-w-2xl mx-auto mb-8 sm:mb-12"
             >
-                      <div className="relative overflow-hidden bg-gradient-to-br from-[#f9bc60]/10 via-[#f9bc60]/5 to-[#abd1c6]/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-[#f9bc60]/30 hover:border-[#f9bc60]/50 transition-all duration-300 group">
+              <div className="relative overflow-hidden bg-gradient-to-br from-[#f9bc60]/10 via-[#f9bc60]/5 to-[#abd1c6]/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-[#f9bc60]/30 hover:border-[#f9bc60]/50 transition-all duration-300 group">
                 <div className="absolute inset-0 overflow-hidden">
                   <div className="absolute -top-4 -right-4 w-16 h-16 bg-[#f9bc60]/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
                   <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-[#abd1c6]/10 rounded-full blur-lg group-hover:scale-110 transition-transform duration-500"></div>

@@ -27,11 +27,11 @@ export async function GET() {
     if (!activeAd) {
       activeAd = await prisma.advertisement
         .findFirst({
-          where: {
-            isActive: true,
+      where: {
+        isActive: true,
             placement: { not: "home_banner" },
             ...dateWhere,
-          },
+      },
           orderBy: { createdAt: "desc" },
         })
         .catch(() => null);

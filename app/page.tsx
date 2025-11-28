@@ -108,7 +108,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-        <PixelBackground />
+      <PixelBackground />
       <div className="relative z-10">
         <HeroSection stats={stats} loading={loading} />
         <HowItWorks />

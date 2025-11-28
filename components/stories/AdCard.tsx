@@ -130,7 +130,7 @@ export function AdCard({ index }: AdCardProps) {
               )
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#f9bc60]/20 to-[#e8a545]/20 flex items-center justify-center border-2 border-[#f9bc60]/30 rounded-2xl">
-              <div className="text-center">
+            <div className="text-center">
                 <LucideIcons.Megaphone
                   size="lg"
                   className="text-[#f9bc60] mb-2 mx-auto"
@@ -165,13 +165,13 @@ export function AdCard({ index }: AdCardProps) {
           <div className="bg-gradient-to-r from-[#abd1c6]/80 to-[#94c4b8]/70 rounded-2xl p-3 border-2 border-[#abd1c6]/60 shadow-lg flex-shrink-0 transition-all duration-300 group-hover:shadow-xl group-hover:border-[#f9bc60]/40 group-hover:bg-gradient-to-r group-hover:from-[#abd1c6]/90 group-hover:to-[#94c4b8]/80">
             <div className="flex items-center justify-between text-xs">
               {!hasActiveAd && (
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 bg-gradient-to-r from-[#f9bc60]/20 to-[#e8a545]/20 rounded-lg px-2 py-1 shadow-md border border-[#f9bc60]/40 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-[#f9bc60]/60">
-                    <span className="font-bold text-[#001e1d] text-xs">
-                      от 2тыс
-                    </span>
-                  </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 bg-gradient-to-r from-[#f9bc60]/20 to-[#e8a545]/20 rounded-lg px-2 py-1 shadow-md border border-[#f9bc60]/40 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-[#f9bc60]/60">
+                  <span className="font-bold text-[#001e1d] text-xs">
+                    от 2тыс
+                  </span>
                 </div>
+              </div>
               )}
 
               <div className="flex items-center gap-1 bg-white/90 rounded-lg px-2 py-1 shadow-md border border-[#abd1c6]/40 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-[#f9bc60]/60">

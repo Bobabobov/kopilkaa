@@ -77,7 +77,7 @@ export default function AdSection() {
             className="w-full rounded-2xl border border-[#abd1c6]/30 bg-[#001e1d] overflow-hidden"
           >
             {/* Картинка (кликабельная, если есть ссылка) */}
-            {displayAd.imageUrl && (
+        {displayAd.imageUrl && (
               <div className="w-full bg-black/10">
                 {displayAd.linkUrl ? (
                   <a
@@ -92,14 +92,14 @@ export default function AdSection() {
                     />
                   </a>
                 ) : (
-                  <img
-                    src={displayAd.imageUrl}
-                    alt={displayAd.title}
+            <img
+              src={displayAd.imageUrl}
+              alt={displayAd.title}
                     className="w-full h-auto object-cover"
-                  />
+            />
                 )}
-              </div>
-            )}
+          </div>
+        )}
 
             {/* Текст + кнопка */}
             <div className="p-3">
@@ -110,18 +110,18 @@ export default function AdSection() {
                 {displayAd.content}
               </p>
 
-              <a
-                href={displayAd.linkUrl || undefined}
-                target={displayAd.linkUrl ? "_blank" : undefined}
-                rel={displayAd.linkUrl ? "noopener noreferrer" : undefined}
+          <a
+            href={displayAd.linkUrl || undefined}
+            target={displayAd.linkUrl ? "_blank" : undefined}
+            rel={displayAd.linkUrl ? "noopener noreferrer" : undefined}
                 className={`block w-full rounded-lg px-3 py-2 text-xs font-semibold text-center transition-colors ${
-                  displayAd.linkUrl
+              displayAd.linkUrl
                     ? "bg-[#f9bc60] text-[#001e1d] hover:bg-[#e8a545]"
                     : "bg-transparent text-[#abd1c6]/70 border border-[#abd1c6]/40 cursor-default"
-                }`}
-              >
+            }`}
+          >
                 {displayAd.linkUrl ? "Перейти на сайт" : "Скоро здесь может быть ваша реклама"}
-              </a>
+          </a>
             </div>
           </div>
         </div>

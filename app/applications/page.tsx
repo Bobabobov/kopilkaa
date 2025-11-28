@@ -287,7 +287,7 @@ export default function ApplicationsPage() {
     return (
       <div className="min-h-screen relative overflow-hidden">
         <UniversalBackground />
-
+        
         <div className="container-p mx-auto pt-0 sm:pt-1 pb-8 relative z-10">
           <SuccessScreen onNewApplication={() => setSubmitted(false)} />
         </div>

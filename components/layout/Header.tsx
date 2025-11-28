@@ -171,10 +171,12 @@ export default function Header() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden border-t backdrop-blur-sm shadow-lg"
+            className="lg:hidden fixed left-0 right-0 z-40 border-t backdrop-blur-sm shadow-lg"
             style={{ 
               backgroundColor: "#004643", 
-              borderColor: "#abd1c6"
+              borderColor: "#abd1c6",
+              // Открываем мобильное меню сразу под хедером и баннером
+              top: `${topBannerHeight + 64}px`
             }}
           >
             <div className="container-p py-4 space-y-2">

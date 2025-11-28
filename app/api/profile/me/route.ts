@@ -120,6 +120,7 @@ export async function GET() {
         phoneVerified: true,
         vkLink: true,
         telegramLink: true,
+        telegramUsername: true,
         youtubeLink: true,
         headerTheme: true,
         avatarFrame: true,
@@ -154,8 +155,18 @@ export async function GET() {
         .catch(console.error);
     }
 
+    // Нормализуем пользователя: если есть telegramUsername, но нет telegramLink,
+    // подставляем ссылку автоматически, чтобы профиль видел привязку Телеграма
+    const normalizedUser =
+      user && user.telegramUsername && !user.telegramLink
+        ? {
+            ...user,
+            telegramLink: `https://t.me/${user.telegramUsername}`,
+          }
+        : user;
+
     return Response.json(
-      { user },
+      { user: normalizedUser },
       {
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",

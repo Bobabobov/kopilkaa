@@ -68,8 +68,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Полноценный вход через Telegram
+    // 1) Пытаемся найти по telegramId
+    // 2) Если не нашли и есть username, ищем по username/telegramLink —
+    //    это позволяет "склеить" аккаунт, к которому ты заранее привязал ссылку на Telegram
     let user = await prisma.user.findFirst({
-      where: { telegramId },
+      where: telegramUsername
+        ? {
+            OR: [
+              { telegramId },
+              { telegramUsername },
+              { telegramLink: { contains: `t.me/${telegramUsername}` } },
+            ],
+          }
+        : { telegramId },
     });
 
     // Если пользователя ещё нет — автоматически регистрируем его
@@ -147,10 +158,16 @@ export async function POST(req: NextRequest) {
         telegramUsername: user.telegramUsername,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in /api/auth/telegram:", error);
+    const message =
+      error?.message ||
+      (typeof error === "string" ? error : "Неизвестная ошибка сервера");
     return NextResponse.json(
-      { success: false, error: "Ошибка авторизации через Telegram" },
+      {
+        success: false,
+        error: `Ошибка авторизации через Telegram: ${message}`,
+      },
       { status: 500 },
     );
   }

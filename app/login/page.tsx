@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: string;
   }>({});
+  const telegramContainerRef = useRef<HTMLDivElement | null>(null);
 
   // Проверяем авторизацию при загрузке
   useEffect(() => {
@@ -42,6 +43,60 @@ export default function LoginPage() {
 
     checkAuth();
   }, [router]);
+
+  // Встраиваем Telegram Login Widget
+  useEffect(() => {
+    const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
+    if (!botUsername || !telegramContainerRef.current) return;
+
+    // Коллбек, который вызывает Telegram-виджет после успешной авторизации
+    (window as any).onTelegramAuth = async (user: any) => {
+      try {
+        setErr(null);
+        setBusy(true);
+
+        const r = await fetch("/api/auth/telegram", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ telegram: user }),
+        });
+        const data = await r.json();
+
+        if (!r.ok || !data?.success) {
+          setErr(data?.error || "Ошибка входа через Telegram");
+          return;
+        }
+
+        // Успешный вход / регистрация через Telegram
+        window.location.href = "/profile";
+      } catch (error: any) {
+        console.error("Telegram login error:", error);
+        setErr(error?.message || "Ошибка входа через Telegram");
+      } finally {
+        setBusy(false);
+      }
+    };
+
+    const script = document.createElement("script");
+    script.src = "https://telegram.org/js/telegram-widget.js?22";
+    script.async = true;
+    script.setAttribute("data-telegram-login", botUsername);
+    script.setAttribute("data-size", "large");
+    script.setAttribute("data-radius", "12");
+    script.setAttribute("data-lang", "ru");
+    script.setAttribute("data-request-access", "write");
+    script.setAttribute("data-onauth", "onTelegramAuth(user)");
+
+    telegramContainerRef.current.innerHTML = "";
+    telegramContainerRef.current.appendChild(script);
+
+    return () => {
+      // Чистим контейнер при размонтировании
+      if (telegramContainerRef.current) {
+        telegramContainerRef.current.innerHTML = "";
+      }
+    };
+  }, []);
 
   // Функция валидации
   const validateForm = () => {
@@ -337,18 +392,16 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Пока просто макет кнопки Telegram-входа */}
-            <button
-              type="button"
-              className="w-full py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-300 border border-[#24A1DE]/60 text-[#24A1DE] mb-2 hover:bg-[#24A1DE]/10"
-              onClick={() =>
-                alert(
-                  "Вход через Telegram будет работать после подключения бота и домена. Бэкенд уже готов — останется только включить виджет.",
-                )
-              }
-            >
-              Войти через Telegram (скоро)
-            </button>
+          {/* Вход через Telegram */}
+          <div className="mb-4">
+            <p className="text-xs mb-2 text-center" style={{ color: "#abd1c6" }}>
+              Или войдите через Telegram:
+            </p>
+            <div
+              ref={telegramContainerRef}
+              className="flex justify-center"
+            />
+          </div>
 
             <button
               type="submit"

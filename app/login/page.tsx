@@ -44,8 +44,10 @@ export default function LoginPage() {
     checkAuth();
   }, [router]);
 
-  // Встраиваем Telegram Login Widget
+  // Встраиваем Telegram Login Widget (после того как прошла проверка авторизации)
   useEffect(() => {
+    if (checkingAuth) return;
+
     const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
     if (!botUsername) {
       console.warn(
@@ -112,7 +114,7 @@ export default function LoginPage() {
         telegramContainerRef.current.innerHTML = "";
       }
     };
-  }, []);
+  }, [checkingAuth]);
 
   // Функция валидации
   const validateForm = () => {

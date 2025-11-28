@@ -14,6 +14,7 @@ export default function Header() {
   const [authLoading, setAuthLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [topBannerHeight, setTopBannerHeight] = useState(0);
+  const [headerTop, setHeaderTop] = useState(0);
 
   // Проверяем авторизацию (не блокируем навигацию)
   useEffect(() => {
@@ -72,12 +73,12 @@ export default function Header() {
 
   // Определяем высоту TopBanner при загрузке
   useEffect(() => {
-    const topBanner = document.querySelector('[data-top-banner]') as HTMLElement;
+    const topBanner = document.querySelector('[data-top-banner]') as HTMLElement | null;
     if (topBanner) {
       setTopBannerHeight(topBanner.offsetHeight);
     }
-    
-    // Отслеживаем скролл, чтобы Header двигался синхронно с баннером
+
+    // Отслеживаем скролл, чтобы Header и мобильное меню двигались синхронно с баннером
     const handleScroll = () => {
       if (!topBanner) return;
       
@@ -92,6 +93,7 @@ export default function Header() {
       if (header) {
         const newTop = bannerHeight * (1 - hideProgress);
         header.style.top = `${newTop}px`;
+        setHeaderTop(newTop);
       }
     };
 
@@ -175,8 +177,8 @@ export default function Header() {
             style={{ 
               backgroundColor: "#004643", 
               borderColor: "#abd1c6",
-              // Открываем мобильное меню сразу под хедером и баннером
-              top: `${topBannerHeight + 64}px`
+              // Открываем мобильное меню сразу под хедером (его текущий top из состояния) + высота хедера
+              top: `${headerTop + 64}px`
             }}
           >
             <div className="container-p py-4 space-y-2">

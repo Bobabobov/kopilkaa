@@ -73,12 +73,26 @@ export default function Header() {
 
   // Определяем высоту TopBanner при загрузке
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const isMobile = window.innerWidth < 768;
     const topBanner = document.querySelector('[data-top-banner]') as HTMLElement | null;
+
+    // На мобильных не двигаем шапку вместе с баннером, чтобы избежать дёрганий
+    if (isMobile) {
+      setTopBannerHeight(0);
+      const header = document.querySelector('header') as HTMLElement | null;
+      if (header) {
+        header.style.top = "0px";
+      }
+      return;
+    }
+
     if (topBanner) {
       setTopBannerHeight(topBanner.offsetHeight);
     }
 
-    // Отслеживаем скролл, чтобы Header двигался синхронно с баннером
+    // На десктопе отслеживаем скролл, чтобы Header двигался синхронно с баннером
     const handleScroll = () => {
       if (!topBanner) return;
       

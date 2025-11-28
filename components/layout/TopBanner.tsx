@@ -21,6 +21,7 @@ export default function TopBanner({
   const [adContent, setAdContent] = useState<string | null>(null);
   const [adLink, setAdLink] = useState<string | null>(null);
   const [adImageUrl, setAdImageUrl] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const [desktopImageUrl, setDesktopImageUrl] = useState<string | null>(null);
   const [mobileImageUrl, setMobileImageUrl] = useState<string | null>(null);
 
@@ -87,6 +88,8 @@ export default function TopBanner({
 
   // Выбираем подходящее изображение в зависимости от ширины экрана
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const chooseImage = () => {
       if (!desktopImageUrl && !mobileImageUrl) {
         setAdImageUrl(null);
@@ -107,10 +110,32 @@ export default function TopBanner({
     return () => window.removeEventListener("resize", chooseImage);
   }, [desktopImageUrl, mobileImageUrl]);
 
+  // Отслеживаем ширину экрана, чтобы по‑разному вести себя на мобильных и десктопе
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Отслеживаем скролл для постепенного скрытия баннера
   // Для баннера с картинкой анимацию скрытия отключаем, чтобы не было "просветов" зелёного фона
   useEffect(() => {
     if (adImageUrl) {
+      return;
+    }
+
+    if (typeof window === "undefined") return;
+
+    // На мобильных убираем анимацию скрытия при скролле,
+    // чтобы не было "просветов" и дёрганий
+    if (window.innerWidth < 768) {
       return;
     }
 
@@ -197,7 +222,9 @@ export default function TopBanner({
   return (
     <div
       data-top-banner
-      className={`fixed top-0 left-0 right-0 z-[60] ${styles.bg} ${styles.border} border-b shadow-lg relative overflow-hidden ${
+      className={`${
+        isMobile ? "relative" : "fixed top-0 left-0 right-0"
+      } z-[60] ${styles.bg} ${styles.border} border-b shadow-lg overflow-hidden ${
         isAnimating ? "" : 
         isHidden ? "" : 
         ""

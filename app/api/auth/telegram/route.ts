@@ -30,7 +30,15 @@ export async function POST(req: NextRequest) {
 
     const session = await getSession();
 
-    if (session) {
+    // Проверяем, существует ли пользователь из сессии (после очистки БД сессия может остаться, а пользователя уже нет)
+    const sessionUser = session
+      ? await prisma.user.findUnique({
+          where: { id: session.uid },
+          select: { id: true },
+        })
+      : null;
+
+    if (session && sessionUser) {
       // Пользователь уже залогинен — привязываем Telegram к его аккаунту
       const updateData: any = {
         telegramId,
@@ -48,7 +56,7 @@ export async function POST(req: NextRequest) {
       }
 
       const updated = await prisma.user.update({
-        where: { id: session.uid },
+        where: { id: sessionUser.id },
         data: updateData,
         select: {
           id: true,

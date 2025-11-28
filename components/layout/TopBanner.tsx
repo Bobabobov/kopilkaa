@@ -223,8 +223,8 @@ export default function TopBanner({
     <div
       data-top-banner
       className={`${
-        isMobile ? "relative" : "fixed top-0 left-0 right-0"
-      } z-[60] ${styles.bg} ${styles.border} border-b shadow-lg overflow-hidden ${
+        isMobile ? "relative mt-16 z-40" : "fixed top-0 left-0 right-0 z-[60]"
+      } ${styles.bg} ${styles.border} border-b shadow-lg overflow-hidden ${
         isAnimating ? "" : 
         isHidden ? "" : 
         ""

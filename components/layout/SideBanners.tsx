@@ -16,9 +16,10 @@ export default function SideBanners() {
       {/* Правая компактная колонка для очень больших экранов:
           только реклама, без топ‑донатеров */}
       <div
-        className="fixed right-6 z-30 hidden 2xl:block"
+        className="fixed right-4 z-30 hidden 2xl:block"
         // смещаем ниже, чтобы не залезать под верхний рекламный баннер и шапку
-        style={{ top: "360px", maxWidth: 340 }}
+        // и уменьшаем ширину, чтобы на экранах вроде MacBook блок не наезжал на текст
+        style={{ top: "340px", maxWidth: 280 }}
       >
         <AdSection variant="sidebar" />
       </div>

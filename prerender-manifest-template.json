@@ -1,0 +1,12 @@
+{
+  "version": 3,
+  "routes": {},
+  "dynamicRoutes": {},
+  "notFoundRoutes": [],
+  "preview": {
+    "previewModeId": "development-id",
+    "previewModeSigningKey": "development-key",
+    "previewModeEncryptionKey": "development-encryption-key"
+  }
+}
+

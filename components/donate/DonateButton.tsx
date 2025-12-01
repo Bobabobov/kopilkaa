@@ -61,56 +61,34 @@ export default function DonateButton({ className = "", variant = "default" }: Do
   if (variant === "large") {
     return (
       <div className={className}>
-        <AnimatePresence mode="wait">
-          {!isOpen ? (
-            <motion.button
-              key="button"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              onClick={() => setIsOpen(true)}
-              className="w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 shadow-lg"
-              style={{
-                backgroundColor: "#f9bc60",
-                color: "#001e1d"
-              }}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <LucideIcons.Heart size="md" />
-                <span>Пополнить копилку</span>
-              </div>
-            </motion.button>
-          ) : (
-            <motion.div
-              key="form"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold" style={{ color: "#fffffe" }}>
-                  Введите сумму
-                </h3>
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="text-[#9ca3af] hover:text-[#f9bc60] transition-colors"
-                >
-                  ×
-                </button>
-              </div>
-              <DonateForm
-                amount={amount}
-                onAmountChange={setAmount}
-                onSubmit={handleSubmit}
-                loading={loading}
-                error={error}
-                quickAmounts={QUICK_AMOUNTS}
-                variant="inline"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <motion.button
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsOpen(true)}
+          className="px-12 py-4 text-xl font-bold rounded-2xl transition-all duration-300 hover:shadow-lg shadow-lg"
+          style={{
+            backgroundColor: "#f9bc60",
+            color: "#001e1d"
+          }}
+        >
+          <div className="flex items-center justify-center gap-2">
+            <LucideIcons.Heart size="md" />
+            <span>Пополнить копилку</span>
+          </div>
+        </motion.button>
+
+        <DonateModal
+          isOpen={isOpen}
+          onClose={resetForm}
+          amount={amount}
+          onAmountChange={setAmount}
+          onSubmit={handleSubmit}
+          loading={loading}
+          error={error}
+          quickAmounts={QUICK_AMOUNTS}
+        />
       </div>
     );
   }

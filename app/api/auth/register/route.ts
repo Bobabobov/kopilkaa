@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { setSession } from "@/lib/auth";
-// import { checkAndGrantAchievements } from "@/lib/achievements"; // Удалено - система достижений отключена
 
 export const runtime = "nodejs";
 
@@ -108,7 +107,7 @@ export async function POST(req: Request) {
         },
       });
 
-      console.log("[DEBUG] Phone verify code for register:", normalizedPhone, code);
+      // В продакшене код отправляется через SMS, здесь не логируем
     }
 
     // Сразу логиним (httpOnly-cookie через твой lib/auth.ts)

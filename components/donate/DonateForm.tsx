@@ -11,7 +11,6 @@ interface DonateFormProps {
   loading: boolean;
   error: string;
   quickAmounts: number[];
-  variant?: "modal" | "inline";
 }
 
 export function DonateForm({
@@ -21,24 +20,20 @@ export function DonateForm({
   loading,
   error,
   quickAmounts,
-  variant = "modal",
 }: DonateFormProps) {
-  if (variant === "inline") {
-    return (
-      <motion.form
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        onSubmit={onSubmit}
-        className="space-y-4 bg-[#001e1d]/50 backdrop-blur-sm rounded-2xl p-6 border border-[#1f2937]"
-      >
-        <div>
-          <label className="block text-sm font-medium mb-3" style={{ color: "#abd1c6" }}>
-            Сумма (₽)
-          </label>
+  return (
+    <form onSubmit={onSubmit} className="space-y-5">
+      <div>
+        <label className="block text-sm font-semibold mb-3" style={{ color: "#abd1c6" }}>
+          Сумма пожертвования
+        </label>
+        <div className="relative">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold" style={{ color: "#f9bc60" }}>
+            ₽
+          </div>
           <input
             type="number"
-            min="10"
+            min="1"
             max="100000"
             step="1"
             value={amount}
@@ -46,79 +41,23 @@ export function DonateForm({
             placeholder="100"
             required
             autoFocus
-            className="w-full px-4 py-3 rounded-xl border text-lg bg-[#020617] placeholder:text-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 transition-all"
-            style={{ borderColor: amount ? "#4b5563" : "#1f2937", color: "#fffffe" }}
+            className="w-full pl-12 pr-6 py-4 rounded-2xl border-2 text-xl font-semibold bg-gradient-to-br from-[#020617] to-[#001e1d] placeholder:text-[#6b7280] focus:outline-none focus:border-[#f9bc60] focus:ring-2 focus:ring-[#f9bc60]/30 transition-all duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            style={{
+              borderColor: amount ? "rgba(249, 188, 96, 0.4)" : "#1f2937",
+              color: "#fffffe"
+            }}
           />
         </div>
-
-        <QuickAmountButtons
-          amounts={quickAmounts}
-          selectedAmount={amount}
-          onSelect={(amt) => onAmountChange(amt.toString())}
-        />
-
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className="bg-red-500/10 border border-red-500/40 text-red-300 text-sm px-3 py-2 rounded-xl"
+        {amount && (
+          <motion.p
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-xs mt-2 text-center" 
+            style={{ color: "#6b7280" }}
           >
-            {error}
-          </motion.div>
+            Минимум: 1₽ • Максимум: 100 000₽
+          </motion.p>
         )}
-
-        <div className="flex gap-3 pt-2">
-          <button
-            type="button"
-            onClick={() => {
-              onAmountChange("");
-            }}
-            className="flex-1 py-3 px-4 rounded-xl font-semibold transition-all hover:scale-105"
-            style={{
-              backgroundColor: "#1f2937",
-              color: "#abd1c6"
-            }}
-          >
-            Отмена
-          </button>
-          <button
-            type="submit"
-            disabled={loading || !amount}
-            className="flex-1 py-3 px-4 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
-            style={{
-              backgroundColor: "#f9bc60",
-              color: "#001e1d"
-            }}
-          >
-            {loading ? "Создаём платёж..." : "Оплатить"}
-          </button>
-        </div>
-      </motion.form>
-    );
-  }
-
-  return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-2" style={{ color: "#abd1c6" }}>
-          Сумма (₽)
-        </label>
-        <input
-          type="number"
-          min="10"
-          max="100000"
-          step="1"
-          value={amount}
-          onChange={(e) => onAmountChange(e.target.value)}
-          placeholder="100"
-          required
-          autoFocus
-          className="w-full px-4 py-3 rounded-xl border text-lg bg-[#020617] placeholder:text-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 transition-all"
-          style={{
-            borderColor: amount ? "#4b5563" : "#1f2937",
-            color: "#fffffe"
-          }}
-        />
       </div>
 
       <QuickAmountButtons

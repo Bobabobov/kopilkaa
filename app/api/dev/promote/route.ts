@@ -2,10 +2,15 @@
 import { prisma } from "@/lib/db";
 
 export async function POST(req: Request) {
+  // Защита: только в development или с секретом
+  if (process.env.NODE_ENV === "production" && !process.env.PROMOTE_SECRET) {
+    return Response.json({ error: "Not available in production" }, { status: 403 });
+  }
+
   try {
     // Защита: обязательный секрет в заголовке
     const secret = req.headers.get("x-promote-secret") || "";
-    if (secret !== (process.env.PROMOTE_SECRET || "")) {
+    if (!process.env.PROMOTE_SECRET || secret !== process.env.PROMOTE_SECRET) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 

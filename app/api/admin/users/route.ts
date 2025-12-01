@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/admin/users - получить список пользователей для админа
 export async function GET(request: Request) {
   try {

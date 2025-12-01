@@ -32,7 +32,7 @@ export default function DonateSuccessPage() {
         {status === "success" && (
           <div className="space-y-6">
             <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: "#f9bc6020" }}>
-              <LucideIcons.CheckCircle size="lg" style={{ color: "#f9bc60" }} />
+              <LucideIcons.CheckCircle size="lg" className="text-[#f9bc60]" />
             </div>
             <h1 className="text-3xl font-bold" style={{ color: "#fffffe" }}>
               Спасибо за поддержку!
@@ -73,7 +73,7 @@ export default function DonateSuccessPage() {
         {status === "error" && (
           <div className="space-y-6">
             <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: "#ef444420" }}>
-              <LucideIcons.AlertCircle size="lg" style={{ color: "#ef4444" }} />
+              <LucideIcons.AlertCircle size="lg" className="text-[#ef4444]" />
             </div>
             <h1 className="text-3xl font-bold" style={{ color: "#fffffe" }}>
               Что-то пошло не так

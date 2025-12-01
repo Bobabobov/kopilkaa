@@ -37,3 +37,4 @@ export function QuickAmountButtons({ amounts, selectedAmount, onSelect }: QuickA
   );
 }
 
+

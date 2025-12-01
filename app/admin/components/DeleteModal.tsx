@@ -52,3 +52,4 @@ export function DeleteModal({ id, title, onClose, onConfirm }: DeleteModalProps)
   );
 }
 
+

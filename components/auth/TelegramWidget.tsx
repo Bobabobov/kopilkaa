@@ -62,3 +62,4 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
   );
 }
 
+

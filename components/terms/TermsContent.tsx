@@ -370,12 +370,54 @@ export default function TermsContent() {
           </p>
         </TermsSection>
 
-        {/* Контакты */}
+        {/* Реквизиты */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.3, duration: 0.5 }}
-          className="mt-12 p-6 sm:p-8 bg-gradient-to-br from-[#f9bc60]/10 via-[#f9bc60]/5 to-[#abd1c6]/10 rounded-2xl border border-[#f9bc60]/30 hover:border-[#f9bc60]/50 hover:shadow-lg hover:shadow-[#f9bc60]/20 transition-all duration-300 group/contact"
+          className="mt-12 p-6 sm:p-8 bg-gradient-to-br from-[#f9bc60]/10 via-[#f9bc60]/5 to-[#abd1c6]/10 rounded-2xl border border-[#f9bc60]/30 hover:border-[#f9bc60]/50 hover:shadow-lg hover:shadow-[#f9bc60]/20 transition-all duration-300 group/requisites"
+        >
+          <motion.h3
+            whileHover={{ scale: 1.02 }}
+            className="text-xl sm:text-2xl font-bold text-[#f9bc60] mb-5 flex items-center gap-3"
+          >
+            <motion.span
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+              className="text-2xl"
+            >
+              📄
+            </motion.span>
+            Реквизиты получателя платежей
+          </motion.h3>
+          <div className="space-y-3 text-[#abd1c6]">
+            <div className="flex items-center gap-3 group/item">
+              <span className="w-2 h-2 rounded-full bg-[#f9bc60] flex-shrink-0 group-hover/item:scale-150 transition-transform duration-200"></span>
+              <p className="text-[#fffffe]">
+                <strong className="text-[#f9bc60]">ФИО:</strong> Стулов Федор Федорович
+              </p>
+            </div>
+            <div className="flex items-center gap-3 group/item">
+              <span className="w-2 h-2 rounded-full bg-[#f9bc60] flex-shrink-0 group-hover/item:scale-150 transition-transform duration-200"></span>
+              <p className="text-[#fffffe]">
+                <strong className="text-[#f9bc60]">ИНН:</strong> 245607255602
+              </p>
+            </div>
+            <div className="flex items-center gap-3 group/item">
+              <span className="w-2 h-2 rounded-full bg-[#f9bc60] flex-shrink-0 group-hover/item:scale-150 transition-transform duration-200"></span>
+              <p className="text-[#fffffe]">
+                <strong className="text-[#f9bc60]">Статус:</strong> Самозанятый
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Контакты */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.4, duration: 0.5 }}
+          className="mt-6 p-6 sm:p-8 bg-gradient-to-br from-[#f9bc60]/10 via-[#f9bc60]/5 to-[#abd1c6]/10 rounded-2xl border border-[#f9bc60]/30 hover:border-[#f9bc60]/50 hover:shadow-lg hover:shadow-[#f9bc60]/20 transition-all duration-300 group/contact"
         >
           <motion.h3
             whileHover={{ scale: 1.02 }}
@@ -413,9 +455,9 @@ export default function TermsContent() {
               <span className="w-2 h-2 rounded-full bg-[#f9bc60] flex-shrink-0 group-hover/item:scale-150 transition-transform duration-200"></span>
               <p className="text-[#fffffe]">
                 <strong className="text-[#f9bc60]">Часы работы:</strong> ежедневно с 9:00 до 21:00 (МСК)
-            </p>
+              </p>
+            </div>
           </div>
-        </div>
         </motion.div>
       </div>
     </motion.div>

@@ -34,7 +34,7 @@ interface UseAdminApplicationsReturn {
 
   // Действия
   loadMore: () => Promise<void>;
-  refreshStats: () => void;
+  refreshStats: () => Promise<void>;
   refreshApplications: () => Promise<void>;
   toggleEmail: (id: string) => void;
   visibleEmails: Set<string>;

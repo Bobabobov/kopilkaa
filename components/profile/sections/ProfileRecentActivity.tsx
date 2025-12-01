@@ -197,7 +197,7 @@ export default function ProfileRecentActivity() {
       {/* Список активности */}
       <div className="p-4 sm:p-5 md:p-6 space-y-2 sm:space-y-3">
         {activities.map((activity, index) => {
-          const IconComponent = LucideIcons[activity.icon] || LucideIcons.Circle;
+          const IconComponent = LucideIcons[activity.icon] || LucideIcons.Activity;
           const content = (
             <motion.div
               initial={{ opacity: 0, x: -20 }}

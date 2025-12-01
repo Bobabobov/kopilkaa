@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Отключаем статическую генерацию для проблемных страниц
+  output: 'standalone',
+  
   // Оптимизация производительности
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],

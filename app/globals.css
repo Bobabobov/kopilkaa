@@ -94,6 +94,11 @@
     pointer-events: none;
   }
 
+  /* Радиальный градиент */
+  .bg-gradient-radial {
+    background: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+
   .dark .card {
     background: rgba(0, 70, 67, 0.8);
     border-color: rgba(171, 209, 198, 0.1);
@@ -618,5 +623,19 @@
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
+  }
+
+  /* Анимация shimmer для прогресс-бара */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
   }
 }

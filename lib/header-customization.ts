@@ -102,6 +102,20 @@ export const headerDecorations = {
 
 // Получить конфигурацию темы
 export function getHeaderTheme(themeKey: string) {
+  // Если это цветная тема (начинается с "color:")
+  if (themeKey.startsWith("color:")) {
+    const color = themeKey.replace("color:", "");
+    return {
+      name: "Цветная тема",
+      description: `Фон цвета ${color}`,
+      background: "color" as const,
+      color: color,
+      textColor: "text-white",
+      accentColor: "text-white",
+      decoration: "none",
+    };
+  }
+  
   return (
     headerThemes[themeKey as keyof typeof headerThemes] || headerThemes.default
   );
@@ -239,6 +253,19 @@ export const avatarFrames = {
 
 // Получить конфигурацию рамки
 export function getAvatarFrame(frameKey: string) {
+  // Если это цветная рамка (начинается с "color:")
+  if (frameKey.startsWith("color:")) {
+    const color = frameKey.replace("color:", "");
+    return {
+      name: "Цветная рамка",
+      description: `Рамка цвета ${color}`,
+      className: "",
+      borderColor: "",
+      type: "color" as const,
+      color: color,
+    };
+  }
+  
   return (
     avatarFrames[frameKey as keyof typeof avatarFrames] || avatarFrames.none
   );

@@ -28,7 +28,13 @@ export async function PATCH(req: Request) {
       "city",
       "abstract",
     ];
-    if (!validThemes.includes(headerTheme)) {
+    
+    // Проверяем, является ли это цветной темой (формат color:#HEX)
+    const isColorTheme = headerTheme.startsWith("color:#");
+    const isValidColor = isColorTheme && /^color:#[0-9A-Fa-f]{6}$/.test(headerTheme);
+    
+    // Если это не валидная готовая тема и не валидная цветная тема, возвращаем ошибку
+    if (!validThemes.includes(headerTheme) && !isValidColor) {
       return NextResponse.json(
         { error: "Недопустимая тема заголовка" },
         { status: 400 },

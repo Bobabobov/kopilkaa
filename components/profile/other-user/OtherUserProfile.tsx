@@ -3,26 +3,17 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import OtherUserHeader from "./OtherUserHeader";
-import OtherUserCard from "./OtherUserCard";
+import Link from "next/link";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 import OtherUserLoadingStates from "./OtherUserLoadingStates";
-import OtherUserStats from "./OtherUserStats";
+import OtherUserInfoCard from "./OtherUserInfoCard";
+import OtherUserPersonalStats from "./OtherUserPersonalStats";
 import OtherUserAchievements from "./OtherUserAchievements";
 import OtherUserActivity from "./OtherUserActivity";
-import RecentApplications from "./widgets/RecentApplications";
+import OtherUserDonations from "./OtherUserDonations";
 import MutualFriends from "./widgets/MutualFriends";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import UniversalBackground from "@/components/ui/UniversalBackground";
-
-// Lazy load heavy modal
-const FriendsModal = dynamic(
-  () => import("@/components/profile/modals/FriendsModal"),
-  {
-    ssr: false,
-    loading: () => <div className="hidden" />,
-  },
-);
 
 type User = {
   id: string;
@@ -61,10 +52,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [isFriendsModalOpen, setIsFriendsModalOpen] = useState(false);
-  const [friendsModalTab, setFriendsModalTab] = useState<
-    "friends" | "sent" | "received" | "search"
-  >("friends");
+  const [currentUserRole, setCurrentUserRole] = useState<"USER" | "ADMIN" | null>(null);
   const { showToast, ToastComponent } = useBeautifulToast();
 
   const emitFriendEvents = useCallback(() => {
@@ -83,6 +71,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
           const data = await response.json();
           setIsAuthenticated(true);
           setCurrentUserId(data.user.id);
+          setCurrentUserRole(data.user.role || "USER");
         } else {
           setIsAuthenticated(false);
         }
@@ -94,25 +83,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     checkAuth();
   }, []);
 
-  // Обработчик события для открытия модального окна друзей
-  useEffect(() => {
-    const handleOpenFriendsModal = (event: CustomEvent) => {
-      setIsFriendsModalOpen(true);
-      if (event.detail?.tab) {
-        setFriendsModalTab(event.detail.tab);
-      }
-    };
-
-    window.addEventListener(
-      "open-friends-modal",
-      handleOpenFriendsModal as EventListener,
-    );
-    return () =>
-      window.removeEventListener(
-        "open-friends-modal",
-        handleOpenFriendsModal as EventListener,
-      );
-  }, []);
 
   const fetchFriendshipStatus = useCallback(async () => {
     try {
@@ -405,101 +375,84 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     );
   }
 
+  const handleRemoveFriend = async () => {
+    if (!friendship?.id) return;
+    try {
+      const response = await fetch(`/api/profile/friends/${friendship.id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        await fetchFriendshipStatus();
+        emitFriendEvents();
+        showToast("success", "Пользователь удалён из друзей");
+      } else {
+        showToast("error", "Ошибка", "Не удалось удалить из друзей");
+      }
+    } catch (error) {
+      showToast("error", "Ошибка", "Не удалось удалить из друзей");
+    }
+  };
+
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden" role="main" aria-label="Профиль пользователя">
       {/* Универсальный фон */}
       <UniversalBackground />
 
-      {/* Header */}
-      <div className="mt-14 sm:mt-18">
-        <OtherUserHeader user={user} />
-      </div>
-
       {/* Main Content */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-12 sm:pb-16">
+      <div className="w-full px-3 sm:px-4 md:px-6 pt-0 sm:pt-8 md:pt-10 pb-8 sm:pb-10 md:pb-12 relative z-10">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-6 xl:gap-8">
-            {/* Левая колонка — карточка пользователя */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              className="lg:col-span-4"
+          {/* Кнопка возврата на свой профиль */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="mb-3 sm:mb-4"
+          >
+            <Link
+              href="/profile"
+              className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-[#001e1d]/40 hover:bg-[#001e1d]/60 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 rounded-lg transition-all duration-200 group"
             >
-              <OtherUserCard
-                user={user}
-                friendship={friendship}
-                currentUserId={currentUserId}
-                onSendFriendRequest={sendFriendRequest}
-                onAcceptFriendRequest={acceptFriendRequest}
-                onDeclineFriendRequest={declineFriendRequest}
-              />
-            </motion.div>
+              <LucideIcons.ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-[#abd1c6] group-hover:text-[#f9bc60] transition-colors flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-[#fffffe] group-hover:text-[#f9bc60] transition-colors">
+                Мой профиль
+              </span>
+            </Link>
+          </motion.div>
+
+          {/* Информация о пользователе */}
+          <div className="mb-4 sm:mb-6">
+            <OtherUserInfoCard
+              user={user}
+              friendship={friendship}
+              currentUserId={currentUserId}
+              currentUserRole={currentUserRole}
+              onSendFriendRequest={sendFriendRequest}
+              onAcceptFriendRequest={acceptFriendRequest}
+              onDeclineFriendRequest={declineFriendRequest}
+              onRemoveFriend={friendship?.status === "ACCEPTED" ? handleRemoveFriend : undefined}
+            />
+          </div>
+
+          {/* Основной контент */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 md:gap-6">
+            {/* Левая колонка */}
+            <section className="lg:col-span-8 space-y-4 sm:space-y-5 md:space-y-6">
+              <OtherUserPersonalStats userId={userId} />
+              <OtherUserActivity userId={userId} />
+            </section>
 
             {/* Правая колонка */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="lg:col-span-8"
-            >
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 lg:gap-6">
-                {/* Первый ряд: Статистика + Достижения */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.25 }}
-                >
-                  <OtherUserStats userId={userId} />
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <OtherUserAchievements userId={userId} />
-                </motion.div>
-
-                {/* Второй ряд: Общие друзья + Недавние заявки */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.35 }}
-                >
-                  <MutualFriends userId={userId} />
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  <RecentApplications userId={userId} />
-                </motion.div>
-
-                {/* Третий ряд: Активность на всю ширину */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.45 }}
-                  className="xl:col-span-2"
-                >
-                  <OtherUserActivity userId={userId} />
-                </motion.div>
-              </div>
-            </motion.div>
+            <aside className="lg:col-span-4 space-y-4 sm:space-y-5 md:space-y-6">
+              <OtherUserDonations userId={userId} />
+              <OtherUserAchievements userId={userId} />
+              <MutualFriends userId={userId} />
+            </aside>
           </div>
         </div>
       </div>
 
       {/* Красивые уведомления */}
       <ToastComponent />
-
-      {/* Модальное окно друзей */}
-      <FriendsModal
-        isOpen={isFriendsModalOpen}
-        onClose={() => setIsFriendsModalOpen(false)}
-        initialTab={friendsModalTab}
-      />
     </div>
   );
 }

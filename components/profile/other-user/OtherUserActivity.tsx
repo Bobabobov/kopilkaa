@@ -61,21 +61,17 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
 
   if (loading) {
     return (
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[#abd1c6]/20">
-        {/* Decorative background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-6 -right-6 w-16 h-16 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-full blur-xl"></div>
-          <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-lime-500/10 to-green-500/10 rounded-full blur-lg"></div>
-        </div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-[#f9bc60] rounded-lg flex items-center justify-center text-[#001e1d] text-lg">
-              ⚡
-            </div>
-            <h3 className="text-lg font-semibold text-[#fffffe]">Активность</h3>
+      <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[300px]">
+        <div className="animate-pulse space-y-3 sm:space-y-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#abd1c6]/20 rounded-lg"></div>
+            <div className="h-6 bg-[#abd1c6]/20 rounded w-1/4"></div>
           </div>
-          <div className="text-center py-4">
-            <div className="animate-spin w-6 h-6 border-2 border-[#f9bc60] border-t-transparent rounded-full mx-auto"></div>
+          <div className="space-y-2 sm:space-y-3">
+            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
+            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
+            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
+            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
           </div>
         </div>
       </div>

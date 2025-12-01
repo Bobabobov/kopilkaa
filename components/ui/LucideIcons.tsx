@@ -74,6 +74,7 @@ import {
   Bell,
   UserPlus,
   UserCheck,
+  UserMinus,
   Crown,
   Award,
   Medal,
@@ -459,6 +460,10 @@ export const LucideIcons = {
 
   UserCheck: ({ className = "", size = "md" }: IconProps) => (
     <UserCheck className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  UserMinus: ({ className = "", size = "md" }: IconProps) => (
+    <UserMinus className={`${sizeClasses[size]} ${className}`} />
   ),
 
   AlertTriangle: ({ className = "", size = "md" }: IconProps) => (

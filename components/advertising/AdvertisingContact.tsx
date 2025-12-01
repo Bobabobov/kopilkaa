@@ -23,7 +23,7 @@ export function AdvertisingContact() {
       const isEmail = formData.contact.includes("@");
       const contact = formData.contact.trim();
 
-      const email = isEmail ? contact : "ads@kopilka.local";
+      const email = isEmail ? contact : "support@kopilka-online.ru";
 
       const commentPrefix = isEmail
         ? `Контакт: ${contact}\n\n`

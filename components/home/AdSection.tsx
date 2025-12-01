@@ -98,7 +98,7 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
               <span>Реклама</span>
           </div>
             <a
-              href="mailto:ads@kopilka.ru"
+              href="mailto:support@kopilka-online.ru"
               className="text-[11px] font-semibold text-[#f9bc60] hover:text-[#ffd27f] transition-colors"
             >
               Разместить
@@ -200,10 +200,10 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
           <div className="absolute right-5 bottom-3 text-[11px] text-[#abd1c6]/85">
             Написать:{" "}
             <a
-              href="mailto:ads@kopilka.ru"
+              href="mailto:support@kopilka-online.ru"
               className="underline hover:text-[#f9bc60] transition-colors"
             >
-              ads@kopilka.ru
+              support@kopilka-online.ru
             </a>
           </div>
         </div>

@@ -220,6 +220,6 @@ model AdRequest {
 ## 📧 Контакты
 
 Для вопросов о размещении рекламы:
-- Email: ads@kopilka.ru
+- Email: support@kopilka-online.ru
 - Указан на странице `/advertising`
 

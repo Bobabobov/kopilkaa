@@ -39,7 +39,7 @@ export default function FooterContacts() {
               Email
             </div>
             <div className="text-sm" style={{ color: "#abd1c6" }}>
-              support@kopilka.ru
+              support@kopilka-online.ru
             </div>
           </div>
         </div>

@@ -94,7 +94,7 @@ export default function StoryPage() {
             user: {
               id: "advertising",
               name: advertiserName,
-              email: "ads@kopilka.local",
+              email: "support@kopilka-online.ru",
               avatar: null,
             },
             _count: {
@@ -137,7 +137,7 @@ export default function StoryPage() {
       user: {
         id: "advertising",
         name: "Команда проекта",
-        email: "ads@kopilka.local",
+        email: "support@kopilka-online.ru",
         avatar: null,
       },
       _count: {

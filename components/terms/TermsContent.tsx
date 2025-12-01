@@ -217,11 +217,7 @@ export default function TermsContent() {
             </li>
             <li className="flex items-start gap-3 group/item">
               <span className="w-1.5 h-1.5 rounded-full bg-[#f9bc60] mt-2 flex-shrink-0 group-hover/item:scale-150 transition-transform duration-200"></span>
-              <span className="flex-1">реквизиты для получения средств;</span>
-            </li>
-            <li className="flex items-start gap-3 group/item">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#f9bc60] mt-2 flex-shrink-0 group-hover/item:scale-150 transition-transform duration-200"></span>
-              <span className="flex-1">дополнительную информацию и документы.</span>
+              <span className="flex-1">дополнительную информацию и документы (изображения, описание ситуации).</span>
             </li>
           </ul>
 
@@ -231,12 +227,19 @@ export default function TermsContent() {
           </p>
 
           <p className="text-[#fffffe] leading-relaxed">
-            <strong className="text-[#f9bc60]">5.3.</strong> Пользователь несет полную ответственность за
-            достоверность информации в заявке.
+            <strong className="text-[#f9bc60]">5.3.</strong> После одобрения заявки Администратор связывается
+            с Пользователем для уточнения реквизитов и вручную переводит средства на указанный банковский
+            счёт или карту. Срок перевода определяется Администратором индивидуально, обычно в течение
+            1-3 рабочих дней после одобрения заявки.
           </p>
 
           <p className="text-[#fffffe] leading-relaxed">
-            <strong className="text-[#f9bc60]">5.4.</strong> Администратор не гарантирует, что заявка будет
+            <strong className="text-[#f9bc60]">5.4.</strong> Пользователь несет полную ответственность за
+            достоверность информации в заявке, включая корректность реквизитов для получения средств.
+          </p>
+
+          <p className="text-[#fffffe] leading-relaxed">
+            <strong className="text-[#f9bc60]">5.5.</strong> Администратор не гарантирует, что заявка будет
             одобрена или что Пользователь соберет желаемую сумму.
           </p>
         </TermsSection>
@@ -245,11 +248,18 @@ export default function TermsContent() {
         <TermsSection number="6" title="Пожертвования" delay={0.8}>
           <p className="text-[#fffffe] leading-relaxed">
             <strong className="text-[#f9bc60]">6.1.</strong> Пожертвования осуществляются добровольно и
-            безвозмездно.
+            безвозмездно через платёжную систему ЮKassa. Все пожертвования поступают в общую копилку
+            проекта.
           </p>
 
           <p className="text-[#fffffe] leading-relaxed">
-            <strong className="text-[#f9bc60]">6.2.</strong> Администратор не несет ответственности за:
+            <strong className="text-[#f9bc60]">6.2.</strong> Средства из копилки распределяются Администратором
+            между одобренными заявками по его усмотрению. Пожертвования не привязаны к конкретным заявкам
+            и могут быть использованы для поддержки любых одобренных заявок.
+          </p>
+
+          <p className="text-[#fffffe] leading-relaxed">
+            <strong className="text-[#f9bc60]">6.3.</strong> Администратор не несет ответственности за:
           </p>
           <ul className="list-none ml-0 sm:ml-2 space-y-3 text-[#fffffe]">
             <li className="flex items-start gap-3 group/item">
@@ -258,16 +268,20 @@ export default function TermsContent() {
             </li>
             <li className="flex items-start gap-3 group/item">
               <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 flex-shrink-0 group-hover/item:scale-150 transition-transform duration-200"></span>
-              <span className="flex-1">использование пожертвованных средств;</span>
+              <span className="flex-1">использование пожертвованных средств получателями;</span>
             </li>
             <li className="flex items-start gap-3 group/item">
               <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 flex-shrink-0 group-hover/item:scale-150 transition-transform duration-200"></span>
-              <span className="flex-1">результаты помощи, оказанной через Сервис.</span>
+              <span className="flex-1">результаты помощи, оказанной через Сервис;</span>
+            </li>
+            <li className="flex items-start gap-3 group/item">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 flex-shrink-0 group-hover/item:scale-150 transition-transform duration-200"></span>
+              <span className="flex-1">распределение средств между заявками.</span>
             </li>
           </ul>
 
           <p className="text-[#fffffe] leading-relaxed">
-            <strong className="text-[#f9bc60]">6.3.</strong> Пожертвования не подлежат возврату, за
+            <strong className="text-[#f9bc60]">6.4.</strong> Пожертвования не подлежат возврату, за
             исключением случаев, прямо предусмотренных законодательством.
           </p>
         </TermsSection>
@@ -442,7 +456,7 @@ export default function TermsContent() {
             <div className="flex items-center gap-3 group/item">
               <span className="w-2 h-2 rounded-full bg-[#f9bc60] flex-shrink-0 group-hover/item:scale-150 transition-transform duration-200"></span>
               <p className="text-[#fffffe]">
-                <strong className="text-[#f9bc60]">Email:</strong> support@kopilka.ru
+                <strong className="text-[#f9bc60]">Email:</strong> support@kopilka-online.ru
             </p>
             </div>
             <div className="flex items-center gap-3 group/item">

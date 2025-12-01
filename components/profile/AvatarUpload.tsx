@@ -136,12 +136,23 @@ export default function AvatarUpload({
 
   return (
     <>
-      <div className="relative inline-block group">
+      <motion.div 
+        className="relative inline-block group"
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 300 }}
+      >
         {/* Аватарка */}
         <div className="relative">
           {frame.type === "image" ? (
             // Рамка-картинка
-            <div className="w-28 h-28 rounded-2xl mx-auto mb-6 overflow-hidden relative border-2 border-[#abd1c6]/20">
+            <motion.div 
+              className="w-28 h-28 rounded-2xl mx-auto mb-6 overflow-hidden relative border-2 border-[#abd1c6]/30 shadow-2xl group-hover:border-[#f9bc60]/50 group-hover:shadow-[#f9bc60]/30 transition-all duration-300"
+              whileHover={{ rotate: [0, -5, 5, -5, 0] }}
+              transition={{ duration: 0.5 }}
+            >
+              {/* Декоративное свечение */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/20 via-transparent to-[#abd1c6]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+              
               {/* Рамка как фон */}
               <div
                 className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat rounded-2xl"
@@ -150,7 +161,11 @@ export default function AvatarUpload({
                 }}
               />
               {/* Аватар поверх рамки */}
-              <div className="absolute inset-2 rounded-xl overflow-hidden">
+              <motion.div 
+                className="absolute inset-2 rounded-xl overflow-hidden"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
                 {displayAvatar ? (
                   <img
                     src={displayAvatar}
@@ -161,38 +176,44 @@ export default function AvatarUpload({
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#004643] to-[#001e1d] text-[#abd1c6] font-bold text-2xl">
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] text-[#abd1c6] font-bold text-2xl">
                     <span className="relative z-10">{avatarLetter}</span>
                   </div>
                 )}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           ) : (
             // CSS рамка
-            <div
-              className={`w-28 h-28 rounded-2xl flex items-center justify-center text-[#abd1c6] font-bold text-2xl shadow-lg mx-auto mb-6 overflow-hidden border-2 border-[#abd1c6]/20 ${
+            <motion.div
+              className={`relative w-28 h-28 rounded-2xl flex items-center justify-center text-[#abd1c6] font-bold text-2xl shadow-2xl mx-auto mb-6 overflow-hidden border-2 border-[#abd1c6]/30 group-hover:border-[#f9bc60]/50 group-hover:shadow-[#f9bc60]/30 transition-all duration-300 ${
                 displayAvatar
                   ? "bg-[#001e1d]/40"
-                  : "bg-gradient-to-br from-[#004643] to-[#001e1d]"
-              }`}
+                  : "bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d]"
+              } ${frame.className}`}
+              whileHover={{ rotate: [0, -5, 5, -5, 0] }}
+              transition={{ duration: 0.5 }}
             >
+              {/* Декоративное свечение */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/20 via-transparent to-[#abd1c6]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+              
               {displayAvatar ? (
-                <img
+                <motion.img
                   src={displayAvatar}
                   alt="Аватарка"
-                  className={`w-full h-full object-cover rounded-2xl ${frameKey === "rainbow" ? "rounded-2xl" : ""}`}
+                  className={`w-full h-full object-cover rounded-2xl relative z-10 ${frameKey === "rainbow" ? "rounded-2xl" : ""}`}
+                  whileHover={{ scale: 1.05 }}
                   onError={(e) => {
                     e.currentTarget.style.display = "none";
                   }}
                 />
               ) : (
                 <div
-                  className={`w-full h-full flex items-center justify-center rounded-2xl ${frameKey === "rainbow" ? "rounded-2xl" : ""}`}
+                  className={`w-full h-full flex items-center justify-center rounded-2xl relative z-10 ${frameKey === "rainbow" ? "rounded-2xl" : ""}`}
                 >
                   <span className="relative z-10">{avatarLetter}</span>
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
 
           {/* Индикатор загрузки */}
@@ -211,41 +232,50 @@ export default function AvatarUpload({
 
         {/* Кнопки управления */}
         <div className="flex gap-2 justify-center flex-wrap">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
+          <motion.div
+            whileHover={{ scale: 1.08, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="px-4 py-2 bg-[#001e1d]/40 hover:bg-[#001e1d]/60 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 disabled:opacity-50 disabled:cursor-not-allowed text-[#fffffe] text-sm rounded-xl transition-all duration-300 flex items-center gap-2"
           >
-            <LucideIcons.Upload size="sm" />
-            {uploading ? "Загрузка..." : "Изменить"}
-          </motion.button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="px-4 py-2 bg-gradient-to-r from-[#001e1d]/50 to-[#001e1d]/40 hover:from-[#f9bc60]/30 hover:to-[#e8a545]/30 border border-[#abd1c6]/30 hover:border-[#f9bc60]/50 disabled:opacity-50 disabled:cursor-not-allowed text-[#fffffe] text-sm font-semibold rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-[#f9bc60]/20"
+            >
+              <LucideIcons.Upload size="sm" />
+              {uploading ? "Загрузка..." : "Изменить"}
+            </button>
+          </motion.div>
 
           {onFrameChange && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
+            <motion.div
+              whileHover={{ scale: 1.08, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => onFrameChange("")}
-              disabled={uploading}
-              className="px-4 py-2 bg-[#001e1d]/40 hover:bg-[#001e1d]/60 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 disabled:opacity-50 disabled:cursor-not-allowed text-[#fffffe] text-sm rounded-xl transition-all duration-300 flex items-center gap-2"
             >
-              <LucideIcons.Palette size="sm" />
-              Рамка
-            </motion.button>
+              <button
+                onClick={() => onFrameChange("")}
+                disabled={uploading}
+                className="px-4 py-2 bg-gradient-to-r from-[#001e1d]/50 to-[#001e1d]/40 hover:from-[#f9bc60]/30 hover:to-[#e8a545]/30 border border-[#abd1c6]/30 hover:border-[#f9bc60]/50 disabled:opacity-50 disabled:cursor-not-allowed text-[#fffffe] text-sm font-semibold rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-[#f9bc60]/20"
+              >
+                <LucideIcons.Palette size="sm" />
+                Рамка
+              </button>
+            </motion.div>
           )}
 
           {currentAvatar && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
+            <motion.div
+              whileHover={{ scale: 1.08, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              onClick={removeAvatar}
-              disabled={uploading}
-              className="px-4 py-2 bg-[#001e1d]/40 hover:bg-[#001e1d]/60 border border-[#abd1c6]/20 hover:border-red-400/40 disabled:opacity-50 disabled:cursor-not-allowed text-[#fffffe] text-sm rounded-xl transition-all duration-300 flex items-center gap-2"
             >
-              <LucideIcons.Trash size="sm" />
-              Удалить
-            </motion.button>
+              <button
+                onClick={removeAvatar}
+                disabled={uploading}
+                className="px-4 py-2 bg-gradient-to-r from-[#001e1d]/50 to-[#001e1d]/40 hover:from-red-500/30 hover:to-red-600/30 border border-[#abd1c6]/30 hover:border-red-400/50 disabled:opacity-50 disabled:cursor-not-allowed text-[#fffffe] text-sm font-semibold rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-red-500/20"
+              >
+                <LucideIcons.Trash size="sm" />
+                Удалить
+              </button>
+            </motion.div>
           )}
         </div>
 
@@ -257,7 +287,7 @@ export default function AvatarUpload({
           onChange={handleFileSelect}
           className="hidden"
         />
-      </div>
+      </motion.div>
 
       {/* Toast уведомления */}
       <ToastComponent />

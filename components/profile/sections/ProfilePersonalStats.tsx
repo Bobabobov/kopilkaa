@@ -182,67 +182,54 @@ export default function ProfilePersonalStats() {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="p-6 bg-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20"
+      transition={{ duration: 0.3 }}
+      className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6"
     >
       {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.1 }}
-        className="flex items-center gap-3 mb-6"
-      >
-        <div className="p-2 bg-[#f9bc60]/20 rounded-lg">
-          <LucideIcons.BarChart3 className="w-5 h-5 text-[#f9bc60]" />
+      <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5 md:mb-6">
+        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+          <LucideIcons.BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-[#f9bc60]" />
         </div>
-        <h2 className="text-xl font-bold text-[#fffffe]">Подробная статистика</h2>
-      </motion.div>
+        <div>
+          <h2 className="text-base sm:text-lg font-semibold text-[#fffffe]">Подробная статистика</h2>
+        </div>
+      </div>
 
       {/* Tab Navigation */}
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity:1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="flex flex-wrap gap-2 mb-6 border-b border-[#abd1c6]/20 pb-4"
-      >
-        {tabs.map((tab, index) => {
+      <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-5 md:mb-6 border-b border-[#abd1c6]/10 pb-3 sm:pb-4 overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+        {tabs.map((tab) => {
           const IconComponent = tab.icon;
           return (
-            <motion.button
+            <button
               key={tab.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 + index * 0.1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeTab === tab.id
-                  ? 'bg-[#f9bc60] text-[#001e1d] font-semibold'
-                  : 'bg-[#004643]/30 text-[#abd1c6] hover:bg-[#004643]/50'
+                  ? 'bg-[#f9bc60] text-[#001e1d]'
+                  : 'text-[#abd1c6] hover:bg-[#001e1d]/30'
               }`}
             >
-              <IconComponent className="w-4 h-4" />
-              {tab.label}
-            </motion.button>
+              <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="hidden xs:inline">{tab.label}</span>
+            </button>
           );
         })}
-      </motion.div>
+      </div>
 
       {/* Tab Content */}
       <AnimatePresence mode="wait">
         <motion.div 
           key={activeTab}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           className="space-y-6"
         >
         {activeTab === 'overview' && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-5 md:space-y-6">
             {/* Key Metrics */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
               {[
                 {
                   label: 'Всего заявок',
@@ -271,52 +258,42 @@ export default function ProfilePersonalStats() {
               ].map((metric, index) => {
                 const IconComponent = metric.icon;
                 return (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ delay: 0.1 + index * 0.1 }}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                    className="p-4 bg-[#004643]/20 rounded-xl border border-[#abd1c6]/10"
+                    className="p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10"
                   >
-                    <div className="flex flex-col items-center text-center gap-3">
-                      <motion.div
-                        className="p-3 rounded-xl"
-                        style={{ backgroundColor: `${metric.color}20`, color: metric.color }}
-                        whileHover={{ scale: 1.1, rotate: 5 }}
+                    <div className="flex flex-col items-center text-center gap-1.5 sm:gap-2">
+                      <div
+                        className="p-1.5 sm:p-2 rounded-lg"
+                        style={{ backgroundColor: `${metric.color}15`, color: metric.color }}
                       >
-                        <IconComponent className="w-5 h-5 text-current" />
-                      </motion.div>
+                        <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-current" />
+                      </div>
                       <div>
-                        <motion.p
-                          className="text-3xl font-bold text-[#fffffe] leading-tight"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.2 + index * 0.1 }}
-                        >
+                        <p className="text-xl sm:text-2xl font-bold text-[#fffffe] leading-tight">
                           {metric.value}
-                        </motion.p>
-                        <p className="text-sm text-[#abd1c6] leading-tight whitespace-normal">
+                        </p>
+                        <p className="text-[10px] sm:text-xs text-[#abd1c6] leading-tight whitespace-normal mt-0.5">
                           {metric.label}
                         </p>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
 
             {/* Success Breakdown */}
             {stats.applications.total > 0 && (
-              <div className="p-6 bg-[#004643]/20 rounded-2xl border border-[#abd1c6]/10 space-y-5">
-                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <div className="p-4 sm:p-5 md:p-6 bg-[#001e1d]/30 rounded-xl border border-[#abd1c6]/10 space-y-3 sm:space-y-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm uppercase tracking-wide text-[#abd1c6]/80">Успешность заявок</p>
-                    <p className="text-[#fffffe] font-medium">
+                    <p className="text-xs text-[#abd1c6] mb-1">Успешность заявок</p>
+                    <p className="text-[#fffffe] font-medium text-xs sm:text-sm">
                       Одобрено {stats.applications.approved} из {stats.applications.total} заявок
                     </p>
                   </div>
-                  <div className="text-3xl font-extrabold text-[#f9bc60]">
+                  <div className="text-xl sm:text-2xl font-bold text-[#f9bc60]">
                     {approvedPercent}%
                   </div>
                 </div>
@@ -338,7 +315,7 @@ export default function ProfilePersonalStats() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {[
                     {
                       label: "Одобрено",
@@ -366,17 +343,17 @@ export default function ProfilePersonalStats() {
                     return (
                       <div
                         key={item.label}
-                        className="p-3 rounded-xl bg-[#001e1d]/30 border border-[#abd1c6]/10 flex items-center gap-3"
+                        className="p-3 rounded-lg bg-[#001e1d]/20 border border-[#abd1c6]/10 flex items-center gap-2"
                       >
                         <div
-                          className="p-2 rounded-full"
-                          style={{ backgroundColor: `${item.color}20`, color: item.color }}
+                          className="p-1.5 rounded-lg"
+                          style={{ backgroundColor: `${item.color}15`, color: item.color }}
                         >
-                          <IconComponent className="w-4 h-4 text-current" />
+                          <IconComponent className="w-3.5 h-3.5 text-current" />
                         </div>
                         <div>
-                          <p className="text-[#fffffe] font-semibold leading-tight">{item.label}</p>
-                          <p className="text-sm text-[#abd1c6]">
+                          <p className="text-[#fffffe] font-medium text-xs leading-tight">{item.label}</p>
+                          <p className="text-xs text-[#abd1c6]">
                             {item.value} · {item.percent}%
                           </p>
                         </div>
@@ -385,8 +362,11 @@ export default function ProfilePersonalStats() {
                   })}
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#f9bc60]/10 border border-[#f9bc60]/20 text-sm text-[#f9bc60]">
-                  {successHint}
+                <div className="p-3 bg-[#f9bc60]/10 rounded-lg border border-[#f9bc60]/20 text-xs text-[#f9bc60]">
+                  <div className="flex items-start gap-2">
+                    <LucideIcons.Lightbulb className="text-[#f9bc60] flex-shrink-0 mt-0.5" size="sm" />
+                    <p>{successHint}</p>
+                  </div>
                 </div>
               </div>
             )}
@@ -425,22 +405,22 @@ export default function ProfilePersonalStats() {
               return (
                 <div
                   key={index}
-                  className="p-6 bg-[#004643]/20 rounded-xl border border-[#abd1c6]/10 hover:bg-[#004643]/30 transition-colors"
+                  className="p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10"
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     <div 
-                      className="p-3 rounded-full"
-                      style={{ backgroundColor: `${item.color}20`, color: item.color }}
+                      className="p-2 rounded-lg"
+                      style={{ backgroundColor: `${item.color}15`, color: item.color }}
                     >
                       <IconComponent 
-                        className="w-6 h-6 text-current"
+                        className="w-5 h-5 text-current"
                       />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-[#fffffe]">
+                      <p className="text-xl font-bold text-[#fffffe]">
                         {item.value}
                       </p>
-                      <p className="text-[#abd1c6]">{item.label}</p>
+                      <p className="text-xs text-[#abd1c6]">{item.label}</p>
                     </div>
                   </div>
                 </div>
@@ -481,22 +461,22 @@ export default function ProfilePersonalStats() {
               return (
                 <div
                   key={index}
-                  className="p-6 bg-[#004643]/20 rounded-xl border border-[#abd1c6]/10 hover:bg-[#004643]/30 transition-colors"
+                  className="p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10"
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     <div 
-                      className="p-3 rounded-full"
-                      style={{ backgroundColor: `${item.color}20`, color: item.color }}
+                      className="p-2 rounded-lg"
+                      style={{ backgroundColor: `${item.color}15`, color: item.color }}
                     >
                       <IconComponent 
-                        className="w-6 h-6 text-current"
+                        className="w-5 h-5 text-current"
                       />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-[#fffffe]">
+                      <p className="text-xl font-bold text-[#fffffe]">
                         {item.value}
                       </p>
-                      <p className="text-[#abd1c6]">{item.label}</p>
+                      <p className="text-xs text-[#abd1c6]">{item.label}</p>
                     </div>
                   </div>
                 </div>
@@ -535,22 +515,20 @@ export default function ProfilePersonalStats() {
             ].map((item, index) => (
               <div
                 key={index}
-                className="p-4 bg-[#004643]/20 rounded-xl border border-[#abd1c6]/10 hover:bg-[#004643]/30 transition-colors"
+                className="p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10 text-center"
               >
-                <div className="text-center">
-                  <div 
-                    className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center"
-                    style={{ backgroundColor: `${item.color}20`, color: item.color }}  
-                  >
-                    <LucideIcons.Award 
-                      className="w-6 h-6 text-current"
-                    />
-                  </div>
-                  <p className="text-2xl font-bold text-[#fffffe] mb-1">
-                    {item.value}
-                  </p>
-                  <p className="text-sm text-[#abd1c6]">{item.label}</p>
+                <div 
+                  className="w-10 h-10 rounded-lg mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: `${item.color}15`, color: item.color }}  
+                >
+                  <LucideIcons.Award 
+                    className="w-5 h-5 text-current"
+                  />
                 </div>
+                <p className="text-xl font-bold text-[#fffffe] mb-1">
+                  {item.value}
+                </p>
+                <p className="text-xs text-[#abd1c6]">{item.label}</p>
               </div>
             ))}
           </div>

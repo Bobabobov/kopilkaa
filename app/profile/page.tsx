@@ -11,7 +11,6 @@ import { motion } from "framer-motion";
 import dynamicComponent from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import ProfileHeader from "@/components/profile/sections/ProfileHeader";
 import ProfileLoading from "@/components/profile/sections/ProfileLoading";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import { LucideIcons } from "@/components/ui/LucideIcons";
@@ -35,6 +34,16 @@ const ProfileFriendsSection = dynamicComponent(() => import("@/components/profil
 
 const ProfileAchievements = dynamicComponent(() => import("@/components/profile/sections/ProfileAchievements"), {
   loading: () => <div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl border border-[#abd1c6]/20 h-40 animate-pulse" />,
+  ssr: false,
+});
+
+const ProfileDonations = dynamicComponent(() => import("@/components/profile/sections/ProfileDonations"), {
+  loading: () => <div className="bg-[#004643]/30 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 h-48 animate-pulse" />,
+  ssr: false,
+});
+
+const ProfileRecentActivity = dynamicComponent(() => import("@/components/profile/sections/ProfileRecentActivity"), {
+  loading: () => <div className="bg-[#004643]/30 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 h-48 animate-pulse" />,
   ssr: false,
 });
 
@@ -226,135 +235,59 @@ function ProfilePageContent() {
       {/* Универсальный фон */}
       <UniversalBackground />
 
-      {/* Header */}
-      <header className="mt-10" aria-label="Заголовок профиля">
-        <ProfileHeader user={user} />
-      </header>
-
       {/* Main Content */}
-      <div className="w-full px-4 md:px-6 pt-10 md:pt-16 pb-12 relative z-10">
+      <div className="w-full px-3 sm:px-4 md:px-6 pt-6 sm:pt-8 md:pt-10 pb-8 sm:pb-10 md:pb-12 relative z-10">
         <div className="max-w-7xl mx-auto">
-          {/* Welcome Section */}
+          {/* Информация о пользователе - упрощенная версия */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-6 md:mb-8"
+            transition={{ duration: 0.3 }}
+            className="mb-4 sm:mb-6"
           >
-            <div className="bg-gradient-to-r from-[#004643]/40 via-[#004643]/20 to-[#004643]/40 backdrop-blur-xl rounded-2xl p-6 border border-[#abd1c6]/20">
-                <div className="flex items-center gap-4">
-                  <motion.div 
-                    className="w-16 h-16 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-2xl flex items-center justify-center shadow-lg"
-                    whileHover={{ scale: 1.05, rotate: 5 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <LucideIcons.User className="text-[#001e1d]" size="lg" />
-                  </motion.div>
-                  <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-[#fffffe] mb-2">
-                      С возвращением, {user.name || "пользователь"}!
-                    </h1>
-                    <p className="text-[#abd1c6] text-lg">
-                      Проверьте активность и создайте новые истории
-                    </p>
-                </div>
-              </div>
-              
-              {/* Подсказки для новых пользователей */}
-              {profileData &&
-                new Date().getTime() - new Date(user.createdAt).getTime() <
-                  7 * 24 * 60 * 60 * 1000 &&
-                !hasCreatedApplications && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  transition={{ delay: 0.5 }}
-                  className="mt-6 pt-6 border-t border-[#abd1c6]/20"
-                >
-                  <div className="flex items-start gap-3 p-4 bg-[#f9bc60]/10 rounded-xl border border-[#f9bc60]/20">
-                    <LucideIcons.Lightbulb className="text-[#f9bc60] flex-shrink-0 mt-1" size="md" />
-                    <div>
-                      <h3 className="text-[#f9bc60] font-semibold mb-2">Добро пожаловать на платформу!</h3>
-                      <p className="text-[#abd1c6] text-sm mb-3">
-                        Начните с создания своей первой заявки или изучите истории других пользователей
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <Link
-                          href="/applications"
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-[#f9bc60]/20 text-[#f9bc60] rounded-lg text-sm font-medium hover:bg-[#f9bc60]/30 transition-colors"
-                        >
-                          <LucideIcons.Plus size="xs" />
-                          Создать заявку
-                        </Link>
-                        <Link
-                          href="/stories"
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-[#abd1c6]/20 text-[#abd1c6] rounded-lg text-sm font-medium hover:bg-[#abd1c6]/30 transition-colors"
-                        >
-                          <LucideIcons.BookOpen size="xs" />
-                          Смотреть истории
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </div>
+            <Suspense fallback={<div className="bg-[#004643]/30 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 h-64 animate-pulse" />}>
+              <UserInfoCard user={user} onThemeChange={handleThemeChange} />
+            </Suspense>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-            
-            {/* Left Sidebar - User Info - 3 колонки */}
-            <aside className="lg:col-span-3 space-y-4 md:space-y-6 order-1 lg:order-1" aria-label="Информация о пользователе">
-              <Suspense fallback={<div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl border border-[#abd1c6]/20 h-64 animate-pulse" />}>
-                <UserInfoCard user={user} onThemeChange={handleThemeChange} />
-              </Suspense>
-            </aside>
-
-            {/* Center - Main Content - 6 колонок */}
+          {/* Основной контент */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 md:gap-6">
+            {/* Левая колонка - Статистика и активность (8 колонок) */}
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="lg:col-span-6 space-y-4 md:space-y-6 order-3 lg:order-2"
-              aria-label="Основной контент"
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="lg:col-span-8 space-y-4 sm:space-y-5 md:space-y-6"
+              aria-label="Статистика и активность"
             >
-              {/* Подробная статистика */}
-              <Suspense fallback={<div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl border border-[#abd1c6]/20 h-64 animate-pulse" />}>
+              <Suspense fallback={<div className="bg-[#004643]/30 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 h-64 animate-pulse" />}>
                 <ProfilePersonalStats />
+              </Suspense>
+
+              <Suspense fallback={<div className="bg-[#004643]/30 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 h-48 animate-pulse" />}>
+                <ProfileRecentActivity />
               </Suspense>
             </motion.section>
 
-            {/* Right Sidebar - Friends & Activity - 3 колонки */}
+            {/* Правая колонка - Друзья, достижения и пожертвования (4 колонки) */}
             <motion.aside
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="lg:col-span-3 space-y-4 md:space-y-6 order-2 lg:order-3"
-              aria-label="Друзья и активность"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+              className="lg:col-span-4 space-y-4 sm:space-y-5 md:space-y-6"
+              aria-label="Друзья, достижения и пожертвования"
             >
-              {/* Friends with enhanced animations */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                <Suspense fallback={<div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl border border-[#abd1c6]/20 h-48 animate-pulse" />}>
-                  <ProfileFriendsSection />
-                </Suspense>
-              </motion.div>
+              <Suspense fallback={<div className="bg-[#004643]/30 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 h-48 animate-pulse" />}>
+                <ProfileFriendsSection />
+              </Suspense>
 
-              {/* Achievements with enhanced animations */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-              >
-                <Suspense fallback={<div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl border border-[#abd1c6]/20 h-40 animate-pulse" />}>
-                  <ProfileAchievements />
-                </Suspense>
-              </motion.div>
+              <Suspense fallback={<div className="bg-[#004643]/30 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 h-40 animate-pulse" />}>
+                <ProfileAchievements />
+              </Suspense>
 
-
+              <Suspense fallback={<div className="bg-[#004643]/30 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 h-48 animate-pulse" />}>
+                <ProfileDonations />
+              </Suspense>
             </motion.aside>
           </div>
         </div>

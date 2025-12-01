@@ -156,82 +156,53 @@ export default function ProfileAchievements() {
 
   return (
     <motion.div 
-      className="bg-gradient-to-br from-[#004643]/40 via-[#004643]/30 to-[#001e1d]/40 backdrop-blur-xl rounded-2xl p-6 border border-[#abd1c6]/20 overflow-hidden relative"
+      className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      whileHover={{ y: -2, boxShadow: "0 20px 40px -12px rgba(0, 0, 0, 0.25)" }}
+      transition={{ duration: 0.3 }}
     >
-      {/* Background glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/5 via-transparent to-[#8B5CF6]/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-      
       {/* Заголовок */}
-      <div className="flex items-center justify-between mb-6 relative z-10">
-        <div className="flex items-center gap-3">
-          <motion.div 
-            className="w-12 h-12 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center shadow-lg relative"
-            whileHover={{ scale: 1.1, rotate: 10 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <LucideIcons.Award className="text-[#001e1d]" size="lg" />
-            {stats && stats.unlockedAchievements > 0 && (
-              <motion.div
-                className="absolute -top-1 -right-1 w-5 h-5 bg-[#10B981] rounded-full flex items-center justify-center"
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              >
-                <span className="text-white text-xs font-bold">{stats.unlockedAchievements}</span>
-              </motion.div>
-            )}
-          </motion.div>
-          <div>
-            <motion.h3 
-              className="text-xl font-bold text-[#fffffe]"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              Достижения
-            </motion.h3>
-            {stats && (
-              <motion.p 
-                className="text-xs text-[#abd1c6]/70"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                {stats.unlockedAchievements} из {stats.totalAchievements} разблокировано
-              </motion.p>
-            )}
+      <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+            <div className="relative w-7 h-7 sm:w-8 sm:h-8 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+              <LucideIcons.Award className="text-[#f9bc60]" size="sm" />
+              {stats && stats.unlockedAchievements > 0 && (
+                <div className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#10B981] rounded-full flex items-center justify-center border border-[#001e1d]">
+                  <span className="text-white text-[9px] sm:text-[10px] font-bold">{stats.unlockedAchievements}</span>
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Достижения</h3>
+              {stats && (
+                <p className="text-[10px] sm:text-xs text-[#abd1c6] mt-0.5 truncate">
+                  {stats.unlockedAchievements} из {stats.totalAchievements}
+                </p>
+              )}
+            </div>
           </div>
+          
+          {stats && (
+            <div className="text-right flex-shrink-0">
+              <div className="text-lg sm:text-xl font-bold text-[#f9bc60]">
+                {Math.round(stats.completionPercentage)}%
+              </div>
+              <div className="text-[10px] sm:text-xs text-[#abd1c6]">прогресс</div>
+            </div>
+          )}
         </div>
-        
-        {stats && (
-          <motion.div 
-            className="text-right"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            <motion.div 
-              className="text-2xl font-bold text-[#f9bc60]"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ repeat: Infinity, duration: 3 }}
-            >
-              {Math.round(stats.completionPercentage)}%
-            </motion.div>
-            <div className="text-xs text-[#abd1c6]/60">прогресс</div>
-          </motion.div>
-        )}
       </div>
 
+      <div className="p-4 sm:p-5 md:p-6">
+
       {!achievements.length ? (
-        <div className="text-center py-12">
-          <div className="w-20 h-20 bg-[#abd1c6]/10 rounded-3xl flex items-center justify-center mx-auto mb-4">
+        <div className="text-center py-8 sm:py-10 md:py-12">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#abd1c6]/10 rounded-3xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
             <LucideIcons.Star className="text-[#abd1c6]" size="xl" />
           </div>
-          <p className="text-[#abd1c6] font-medium mb-1">Нет достижений</p>
-          <p className="text-sm text-[#abd1c6]/60">
+          <p className="text-sm sm:text-base text-[#abd1c6] font-medium mb-1">Нет достижений</p>
+          <p className="text-xs sm:text-sm text-[#abd1c6]/60 px-4">
             Выполняйте задания для получения
           </p>
         </div>
@@ -258,7 +229,7 @@ export default function ProfileAchievements() {
           )}
 
           {/* Список достижений */}
-          <div className="space-y-3 mb-4 relative z-10">
+          <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4 relative z-10">
             <AnimatePresence>
               {displayedAchievements.map((userAchievement, index) => {
                 const IconComponent = getAchievementIcon(userAchievement.achievement.type, userAchievement.achievement.name) || LucideIcons.Star;
@@ -276,98 +247,46 @@ export default function ProfileAchievements() {
                       type: "spring",
                       stiffness: 300
                     }}
-                    className="group bg-gradient-to-r from-[#001e1d]/40 to-[#001e1d]/20 rounded-xl p-4 border relative overflow-hidden"
+                    className="group bg-[#001e1d]/30 rounded-lg p-3 sm:p-4 border relative overflow-hidden"
                     style={{ borderColor: rarityColor + '30' }}
                     whileHover={{ 
-                      scale: 1.02,
-                      borderColor: rarityColor + '60',
+                      borderColor: rarityColor + '50',
                       backgroundColor: `${rarityColor}10`
                     }}
                   >
-                    {/* Glow effect на hover */}
-                    <motion.div
-                      className="absolute inset-0 opacity-0 rounded-xl"
-                      style={{ 
-                        background: `linear-gradient(135deg, ${rarityColor}20, transparent, ${rarityColor}10)`
-                      }}
-                      whileHover={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                    
-                    <div className="flex items-center gap-3 relative z-10">
-                      <motion.div 
-                        className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 relative"
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div 
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                         style={{ 
-                          backgroundColor: rarityColor + '25',
+                          backgroundColor: rarityColor + '20',
                           color: rarityColor
                         }}
-                        whileHover={{ 
-                          scale: 1.1,
-                          rotate: 5,
-                          boxShadow: `0 8px 20px ${rarityColor}40`
-                        }}
-                        transition={{ type: "spring", stiffness: 300 }}
                       >
-                        <IconComponent size="lg" className="text-current relative z-10" />
-                        
-                        {/* Particle effect для редких достижений */}
-                        {userAchievement.achievement.rarity === 'LEGENDARY' && (
-                          <motion.div
-                            className="absolute inset-0 rounded-xl"
-                            animate={{ 
-                              boxShadow: [
-                                `0 0 0 0 ${rarityColor}40`,
-                                `0 0 0 8px ${rarityColor}00`,
-                                `0 0 0 0 ${rarityColor}40`
-                              ]
-                            }}
-                            transition={{ 
-                              repeat: Infinity,
-                              duration: 2
-                            }}
-                          />
-                        )}
-                      </motion.div>
+                        <IconComponent size="sm" className="text-current" />
+                      </div>
                       
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <motion.h4 
-                            className="font-bold text-[#fffffe] text-sm"
-                            whileHover={{ color: rarityColor }}
-                          >
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                          <h4 className="font-semibold text-[#fffffe] text-xs sm:text-sm truncate">
                             {userAchievement.achievement.name}
-                          </motion.h4>
-                          <motion.span 
-                            className="text-xs px-2 py-0.5 rounded-full font-medium"
+                          </h4>
+                          <span 
+                            className="text-[10px] sm:text-xs px-1.5 py-0.5 rounded font-medium whitespace-nowrap flex-shrink-0"
                             style={{ 
                               backgroundColor: `${rarityColor}20`,
                               color: rarityColor
                             }}
-                            whileHover={{ scale: 1.05 }}
                           >
                             {rarityName}
-                          </motion.span>
+                          </span>
                         </div>
-                        <p className="text-xs text-[#abd1c6] line-clamp-2 group-hover:text-[#fffffe] transition-colors">
+                        <p className="text-xs text-[#abd1c6] line-clamp-2">
                           {userAchievement.achievement.description}
                         </p>
                         <p className="text-xs text-[#abd1c6]/60 mt-1">
-                          Получено: {new Date(userAchievement.unlockedAt).toLocaleDateString('ru-RU')}
+                          {new Date(userAchievement.unlockedAt).toLocaleDateString('ru-RU')}
                         </p>
                       </div>
-                      
-                      {/* Chevron icon */}
-                      <motion.div
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        whileHover={{ x: 2 }}
-                        // Цвет задаём обёртке, чтобы не использовать style на иконке (иначе TypeScript ругается)
-                        style={{ color: rarityColor }}
-                      >
-                        <LucideIcons.ChevronRight 
-                          size="sm" 
-                          className="text-current"
-                        />
-                      </motion.div>
                     </div>
                   </motion.div>
                 );
@@ -377,32 +296,19 @@ export default function ProfileAchievements() {
 
           {/* Кнопка "Показать все" */}
           {achievements.length > 2 && (
-            <motion.button
+            <button
               onClick={() => setShowModal(true)}
-              className="w-full py-3 px-4 bg-gradient-to-r from-[#f9bc60]/10 to-[#f9bc60]/5 hover:from-[#f9bc60]/20 hover:to-[#f9bc60]/10 rounded-xl border border-[#f9bc60]/20 text-[#f9bc60] text-sm font-semibold transition-all duration-200 hover:border-[#f9bc60]/40 relative overflow-hidden group"
-              whileHover={{ scale: 1.02, y: -1 }}
-              whileTap={{ scale: 0.98 }}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+              className="w-full py-2 sm:py-2.5 px-3 sm:px-4 bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 rounded-lg border border-[#f9bc60]/20 text-[#f9bc60] text-xs sm:text-sm font-medium transition-colors"
             >
-              {/* Background glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#f9bc60]/0 via-[#f9bc60]/10 to-[#f9bc60]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
-              <div className="flex items-center justify-center gap-2 relative z-10">
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                 <LucideIcons.Award size="sm" />
-                <span>Показать все {achievements.length} достижений</span>
-                <motion.div
-                  animate={{ x: [0, 3, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.5 }}
-                >
-                  <LucideIcons.ArrowRight size="sm" />
-                </motion.div>
+                <span className="whitespace-nowrap">Показать все {achievements.length} достижений</span>
               </div>
-            </motion.button>
+            </button>
           )}
         </>
       )}
+      </div>
 
       {/* Модальное окно */}
       <AchievementsModal

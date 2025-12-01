@@ -7,6 +7,7 @@ import TopBanner from "@/components/layout/TopBanner";
 import ScrollToTop from "@/components/ui/ScrollToTop";
 import { BeautifulNotificationsProvider } from "@/components/ui/BeautifulNotificationsProvider";
 import ProfilePreloadInitializer from "@/components/performance/ProfilePreloadInitializer";
+import AuthModalRoot from "@/components/auth/AuthModalRoot";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -32,6 +33,7 @@ export default function RootLayout({
             <main className="flex-1 container-p mx-auto">{children}</main>
             <Footer />
             <ScrollToTop />
+            <AuthModalRoot />
           </div>
         </BeautifulNotificationsProvider>
       </body>

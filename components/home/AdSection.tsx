@@ -84,38 +84,38 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
     imageUrl: null,
     linkUrl: null,
   };
-
+  
   const displayAd = ad || defaultAd;
 
   // Вариант карточки в ленте — лёгкая светлая карточка в стиле vc.ru
   if (variant === "feed") {
-    return (
+  return (
       <div className="w-full">
         <div className="rounded-3xl bg-[#001e1d] text-[#fffffe] shadow-lg border border-[#abd1c6]/30 px-4 py-4">
           {/* Верхняя строка: метка «Реклама» и ссылка «Разместить» */}
           <div className="flex items-center justify-between text-[11px] mb-3">
             <div className="flex items-center gap-1 font-semibold tracking-[0.16em] uppercase text-[#abd1c6]/80">
               <span>Реклама</span>
-            </div>
+          </div>
             <a
               href="mailto:ads@kopilka.ru"
               className="text-[11px] font-semibold text-[#f9bc60] hover:text-[#ffd27f] transition-colors"
             >
               Разместить
             </a>
-          </div>
+        </div>
 
           {/* Основной контент: мини‑картинка + текст */}
           <div className="flex items-start gap-3 mb-3">
-            {displayAd.imageUrl && (
+        {displayAd.imageUrl && (
               <div className="flex-shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-black/20">
-                <img
-                  src={displayAd.imageUrl}
-                  alt={displayAd.title}
+            <img
+              src={displayAd.imageUrl}
+              alt={displayAd.title}
                   className="w-full h-full object-cover"
-                />
-              </div>
-            )}
+            />
+          </div>
+        )}
             <div className="flex-1 text-left">
               <h3 className="text-sm font-semibold mb-1">
                 {displayAd.title || "Реклама"}

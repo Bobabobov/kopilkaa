@@ -12,9 +12,8 @@ type User = {
   name?: string | null;
 } | null;
 
-// Маршруты авторизации
-const LOGIN = "/login" as Route;
-const REGISTER = "/register" as Route;
+// Маршрут авторизации (используем модальное окно с параметром ?modal=auth)
+const LOGIN = "/?modal=auth" as Route;
 
 export default function NavAuth() {
   const [user, setUser] = useState<User>(null);
@@ -103,29 +102,16 @@ export default function NavAuth() {
 
   if (!user) {
     return (
-      <div className="flex items-center gap-2">
-        <Link
-          href={LOGIN}
-          className="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105"
-          style={{
-            color: "#fffffe",
-            backgroundColor: "rgba(171, 209, 198, 0.1)",
-            border: "1px solid rgba(171, 209, 198, 0.3)",
-          }}
-        >
-          Вход
-        </Link>
-        <Link
-          href={REGISTER}
-          className="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105"
-          style={{
-            backgroundColor: "#f9bc60",
-            color: "#001e1d",
-          }}
-        >
-          Регистрация
-        </Link>
-      </div>
+      <Link
+        href={LOGIN}
+        className="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105 whitespace-nowrap"
+        style={{
+          backgroundColor: "#f9bc60",
+          color: "#001e1d",
+        }}
+      >
+        Вход
+      </Link>
     );
   }
 

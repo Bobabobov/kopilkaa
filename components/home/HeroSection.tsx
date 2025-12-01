@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useBulldog } from "@/lib/useBulldog";
 import { useEffect } from "react";
 import AdSection from "./AdSection";
+import DonateButton from "@/components/donate/DonateButton";
 
 type Stats = {
   collected: number;
@@ -70,58 +71,61 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           Экспериментальная платформа житейских историй. Рассказывай, играй, участвуй в стримах. Без гарантий, без обещаний — только честность.
         </p>
 
-        {/* Кнопка доната */}
+        {/* Кнопки действий */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-center mb-12"
+          className="text-center mb-12 space-y-4"
         >
-          <Link href="/support">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              animate={{ 
-                boxShadow: [
-                  "0 0 20px rgba(249, 188, 96, 0.3)",
-                  "0 0 30px rgba(249, 188, 96, 0.6)", 
-                  "0 0 20px rgba(249, 188, 96, 0.3)"
-                ] 
-              }}
-              transition={{ 
-                boxShadow: { 
-                  duration: 2, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                } 
-              }}
-              className="px-12 py-4 text-xl font-bold rounded-2xl border-2 transition-all duration-300"
-              style={{
-                background: "linear-gradient(135deg, rgba(249, 188, 96, 0.1) 0%, rgba(249, 188, 96, 0.2) 100%)",
-                borderColor: "#f9bc60",
-                color: "#f9bc60",
-                backdropFilter: "blur(10px)",
-              }}
-            >
-              <motion.span
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="/support">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 animate={{ 
-                  textShadow: [
-                    "0 0 10px rgba(249, 188, 96, 0.5)",
-                    "0 0 20px rgba(249, 188, 96, 0.8)",
-                    "0 0 10px rgba(249, 188, 96, 0.5)"
-                  ]
+                  boxShadow: [
+                    "0 0 20px rgba(249, 188, 96, 0.3)",
+                    "0 0 30px rgba(249, 188, 96, 0.6)", 
+                    "0 0 20px rgba(249, 188, 96, 0.3)"
+                  ] 
                 }}
                 transition={{ 
-                  duration: 2.5, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
+                  boxShadow: { 
+                    duration: 2, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  } 
+                }}
+                className="px-12 py-4 text-xl font-bold rounded-2xl border-2 transition-all duration-300"
+                style={{
+                  background: "linear-gradient(135deg, rgba(249, 188, 96, 0.1) 0%, rgba(249, 188, 96, 0.2) 100%)",
+                  borderColor: "#f9bc60",
+                  color: "#f9bc60",
+                  backdropFilter: "blur(10px)",
                 }}
               >
-                💫 Стань частью истории
-              </motion.span>
-            </motion.button>
-          </Link>
+                <motion.span
+                  animate={{ 
+                    textShadow: [
+                      "0 0 10px rgba(249, 188, 96, 0.5)",
+                      "0 0 20px rgba(249, 188, 96, 0.8)",
+                      "0 0 10px rgba(249, 188, 96, 0.5)"
+                    ]
+                  }}
+                  transition={{ 
+                    duration: 2.5, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                >
+                  💫 Стань частью истории
+                </motion.span>
+              </motion.button>
+            </Link>
+            <DonateButton variant="large" />
+          </div>
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

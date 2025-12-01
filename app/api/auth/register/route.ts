@@ -51,13 +51,13 @@ export async function POST(req: Request) {
         "Логин может содержать 3-20 символов: буквы, цифры, ._-",
       );
 
-    if (!phoneRaw) {
-      return bad("Введите номер телефона");
-    }
-
-    const normalizedPhone = normalizePhone(phoneRaw);
-    if (!normalizedPhone) {
-      return bad("Введите корректный номер телефона");
+    // Телефон опционален
+    let normalizedPhone: string | null = null;
+    if (phoneRaw) {
+      normalizedPhone = normalizePhone(phoneRaw);
+      if (!normalizedPhone) {
+        return bad("Введите корректный номер телефона");
+      }
     }
 
     const exists = await prisma.user.findUnique({
@@ -72,18 +72,21 @@ export async function POST(req: Request) {
     });
     if (usernameExists) return bad("Этот логин уже занят", 409);
 
-    const phoneExists = await prisma.user.findFirst({
-      where: { phone: normalizedPhone },
-      select: { id: true },
-    });
-    if (phoneExists) return bad("Этот телефон уже используется", 409);
+    // Проверяем телефон только если он указан
+    if (normalizedPhone) {
+      const phoneExists = await prisma.user.findFirst({
+        where: { phone: normalizedPhone },
+        select: { id: true },
+      });
+      if (phoneExists) return bad("Этот телефон уже используется", 409);
+    }
 
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: {
         email,
         username: usernameRaw,
-        phone: normalizedPhone,
+        phone: normalizedPhone || null,
         phoneVerified: false,
         passwordHash,
         name: name || null,
@@ -92,19 +95,21 @@ export async function POST(req: Request) {
       select: { id: true, role: true, email: true },
     });
 
-    // Генерируем код подтверждения телефона
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    // Генерируем код подтверждения телефона только если телефон указан
+    if (normalizedPhone) {
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    await prisma.phoneLoginCode.create({
-      data: {
-        userId: user.id,
-        code,
-        expiresAt,
-      },
-    });
+      await prisma.phoneLoginCode.create({
+        data: {
+          userId: user.id,
+          code,
+          expiresAt,
+        },
+      });
 
-    console.log("[DEBUG] Phone verify code for register:", normalizedPhone, code);
+      console.log("[DEBUG] Phone verify code for register:", normalizedPhone, code);
+    }
 
     // Сразу логиним (httpOnly-cookie через твой lib/auth.ts)
     await setSession({ uid: user.id, role: user.role as "USER" | "ADMIN" });
@@ -115,9 +120,7 @@ export async function POST(req: Request) {
       {
         ok: true,
         user: { id: user.id, email: user.email },
-        phone: normalizedPhone,
-        // В тестовом режиме возвращаем код, чтобы ты мог видеть его без SMS
-        phoneCode: code,
+        phone: normalizedPhone || null,
       },
       { status: 201 },
     );

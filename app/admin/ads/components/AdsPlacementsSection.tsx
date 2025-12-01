@@ -260,26 +260,26 @@ export default function AdsPlacementsSection() {
               {formData.placement !== "stories" &&
                 formData.placement !== "home_sidebar" &&
                 formData.placement !== "home_banner" && (
-                <div>
-                  <label className="block text-sm font-medium text-[#abd1c6] mb-2">
-                    Заголовок
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                    className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none"
-                    placeholder="Краткий привлекательный заголовок"
-                    maxLength={40}
+              <div>
+                <label className="block text-sm font-medium text-[#abd1c6] mb-2">
+                  Заголовок
+                </label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none"
+                  placeholder="Краткий привлекательный заголовок"
+                  maxLength={40}
                     required={formData.placement !== "stories"}
-                  />
-                  <p className="text-xs text-[#abd1c6]/70 mt-1">
-                    Рекомендуемая длина: 20–40 символов ({formData.title.length}
-                    /40)
-                  </p>
-                </div>
+                />
+                <p className="text-xs text-[#abd1c6]/70 mt-1">
+                  Рекомендуемая длина: 20–40 символов ({formData.title.length}
+                  /40)
+                </p>
+              </div>
               )}
 
               <div>
@@ -519,26 +519,26 @@ export default function AdsPlacementsSection() {
             {formData.placement !== "stories" &&
               formData.placement !== "home_sidebar" &&
               formData.placement !== "home_banner" && (
-              <div>
-                <label className="block text-sm font-medium text-[#abd1c6] mb-2">
-                  Содержание
-                </label>
-                <textarea
-                  value={formData.content}
-                  onChange={(e) =>
-                    setFormData({ ...formData, content: e.target.value })
-                  }
-                  rows={4}
-                  className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none"
-                  placeholder="Подробное описание рекламы с призывом к действию"
-                  maxLength={120}
-                  required
-                />
-                <p className="text-xs text-[#abd1c6]/70 mt-1">
-                  Рекомендуемая длина: 60–120 символов (
-                  {formData.content.length}/120)
-                </p>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-[#abd1c6] mb-2">
+                Содержание
+              </label>
+              <textarea
+                value={formData.content}
+                onChange={(e) =>
+                  setFormData({ ...formData, content: e.target.value })
+                }
+                rows={4}
+                className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none"
+                placeholder="Подробное описание рекламы с призывом к действию"
+                maxLength={120}
+                required
+              />
+              <p className="text-xs text-[#abd1c6]/70 mt-1">
+                Рекомендуемая длина: 60–120 символов (
+                {formData.content.length}/120)
+              </p>
+            </div>
             )}
 
             <div className="flex items-center gap-4">

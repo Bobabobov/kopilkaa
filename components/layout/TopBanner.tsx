@@ -136,26 +136,26 @@ export default function TopBanner({
 
     const banner = document.querySelector("[data-top-banner]") as HTMLElement;
     if (!banner) return;
-
+    
     const bannerHeight = banner.offsetHeight;
-
+    
     const handleScroll = () => {
       const scrollY = window.scrollY;
-
+      
       // Рассчитываем процент скрытия баннера
       // Баннер начинает скрываться сразу и полностью скрывается когда прокрутили на его высоту
       const hideProgress = Math.min(scrollY / bannerHeight, 1);
-
+      
       // Применяем transform для плавного скрытия
       const translateY = -(hideProgress * 100);
       banner.style.transform = `translateY(${translateY}%)`;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-
+    
     // Вызываем сразу для начального состояния
     handleScroll();
-
+    
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -231,10 +231,10 @@ export default function TopBanner({
         isHidden ? "" : 
         ""
       } ${finalLinkUrl ? "cursor-pointer" : ""}`}
-      style={{
+      style={{ 
         background:
           variant === "default" && !hasImage
-            ? "linear-gradient(135deg, #004643 0%, #001e1d 100%)"
+          ? "linear-gradient(135deg, #004643 0%, #001e1d 100%)"
             : "#001e1d",
         transform: isAnimating ? "translateY(-100%)" : undefined,
         transition: isAnimating ? "transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)" : "none",

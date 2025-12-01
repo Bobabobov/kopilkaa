@@ -609,4 +609,14 @@
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
   }
+
+  /* Скрытие скроллбара */
+  .scrollbar-hide {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 }

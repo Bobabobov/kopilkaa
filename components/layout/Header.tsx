@@ -97,7 +97,7 @@ export default function Header() {
         header.style.top = `${bannerHeight}px`;
       }
     }
-
+    
     // На десктопе отслеживаем скролл, чтобы Header двигался синхронно с баннером
     const handleScroll = () => {
       if (!topBanner) return;
@@ -215,7 +215,7 @@ export default function Header() {
             transition={{ duration: 0.2 }}
             className="lg:hidden fixed left-0 right-0 z-40 border-t backdrop-blur-sm shadow-lg"
             style={{ 
-              backgroundColor: "#004643",
+              backgroundColor: "#004643", 
               borderColor: "#abd1c6",
               // Открываем мобильное меню сразу под нижней границей header
               top: `${menuTop}px`

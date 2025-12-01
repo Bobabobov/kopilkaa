@@ -2,7 +2,8 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { getAllAvatarFrames, getAvatarFrame } from "@/lib/header-customization";
 
@@ -79,15 +80,27 @@ export default function AvatarFrameCustomization({
 
   if (!isOpen) return null;
 
-  return (
-    <>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+  const modalContent = (
+    <AnimatePresence>
+      {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              onClose();
+            }
+          }}
         >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden"
+          >
           {/* Header */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
@@ -242,10 +255,21 @@ export default function AvatarFrameCustomization({
               {saving ? "Сохранение..." : "Сохранить"}
             </button>
           </div>
+          </motion.div>
         </motion.div>
-      </div>
-
-      <ToastComponent />
-    </>
+      )}
+    </AnimatePresence>
   );
+
+  // Рендерим модалку через Portal в body, чтобы она была поверх всего контента
+  if (typeof window !== "undefined") {
+    return (
+      <>
+        {createPortal(modalContent, document.body)}
+        <ToastComponent />
+      </>
+    );
+  }
+
+  return null;
 }

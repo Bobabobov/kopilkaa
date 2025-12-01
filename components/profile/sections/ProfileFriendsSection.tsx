@@ -190,44 +190,39 @@ export default function ProfileFriendsSection() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="bg-gradient-to-br from-[#004643]/40 via-[#004643]/30 to-[#004643]/40 backdrop-blur-xl rounded-2xl border border-[#abd1c6]/20 overflow-hidden shadow-lg"
+        transition={{ duration: 0.3 }}
+        className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden"
       >
-        {/* Простой заголовок */}
-        <div className="p-6 border-b border-[#abd1c6]/10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <motion.div 
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                className="w-10 h-10 bg-[#f9bc60]/20 rounded-xl flex items-center justify-center"
-              >
+        {/* Заголовок */}
+        <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
                 <LucideIcons.Users className="text-[#f9bc60]" size="sm" />
-              </motion.div>
-              <div>
-                <h3 className="text-lg font-semibold text-[#fffffe]">Мои друзья</h3>
-                <p className="text-sm text-[#abd1c6]">
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Мои друзья</h3>
+                <p className="text-[10px] sm:text-xs text-[#abd1c6] mt-0.5 truncate">
                   {totalFriends > 0 ? `${totalFriends} друзей` : 'Список друзей'}
                   {pendingRequests > 0 && ` · ${pendingRequests} заявок`}
                 </p>
               </div>
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={() => {
                 setInitialTab("friends");
                 handleOpenModal();
               }}
-              className="px-4 py-2 bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 text-[#f9bc60] rounded-lg transition-colors text-sm font-medium"
+              className="text-xs text-[#f9bc60] hover:text-[#e8a545] transition-colors flex-shrink-0 whitespace-nowrap"
             >
-              Все друзья
-            </motion.button>
+              Все
+            </button>
           </div>
         </div>
 
         {/* Контент */}
-        <div className="p-6">
+        <div className="p-4 sm:p-5 md:p-6">
           <AnimatePresence mode="wait">
             {loading ? (
               <motion.div 
@@ -312,16 +307,15 @@ export default function ProfileFriendsSection() {
                   return (
                     <motion.div
                       key={friendship.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      whileHover={{ scale: 1.02 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
                       onClick={() => router.push(`/profile/${friend.id}`)}
-                      className="flex items-center gap-4 p-4 rounded-xl bg-[#001e1d]/20 hover:bg-[#001e1d]/30 cursor-pointer transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#001e1d]/30 cursor-pointer transition-colors"
                     >
-                      {/* Простой аватар */}
+                      {/* Аватар */}
                       <div className="relative">
-                        <div className="w-14 h-14 rounded-full overflow-hidden bg-[#004643] flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#004643] flex items-center justify-center">
                           {friend.avatar ? (
                             <img
                               src={friend.avatar}
@@ -329,29 +323,29 @@ export default function ProfileFriendsSection() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <span className="text-[#f9bc60] font-bold text-xl">
+                            <span className="text-[#f9bc60] font-semibold text-lg">
                               {(friend.name || friend.email.split("@")[0])[0].toUpperCase()}
                             </span>
                           )}
                         </div>
                         
-                        {/* Простой онлайн индикатор */}
+                        {/* Онлайн индикатор */}
                         {isOnline && (
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#10B981] rounded-full border-2 border-[#001e1d]" />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#10B981] rounded-full border-2 border-[#001e1d]" />
                         )}
                       </div>
 
-                      {/* Простая информация */}
-                      <div className="flex-1">
-                        <p className="text-[#fffffe] font-medium text-base">
+                      {/* Информация */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[#fffffe] font-medium text-sm truncate">
                           {friend.name || friend.email.split("@")[0]}
                         </p>
-                        <p className="text-[#abd1c6] text-sm">
+                        <p className="text-[#abd1c6] text-xs mt-0.5">
                           {isOnline ? 'В сети' : 'Не в сети'}
                         </p>
                       </div>
 
-                      <LucideIcons.ChevronRight className="text-[#abd1c6]" size="sm" />
+                      <LucideIcons.ChevronRight className="text-[#abd1c6] flex-shrink-0" size="sm" />
                     </motion.div>
                   );
                 })}
@@ -362,20 +356,32 @@ export default function ProfileFriendsSection() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.03, y: -3 }}
                     onClick={() => {
                       setInitialTab("friends");
                       handleOpenModal();
                     }}
-                    className="flex items-center justify-between p-4 rounded-xl bg-[#001e1d]/10 hover:bg-[#001e1d]/20 cursor-pointer transition-colors"
+                    className="relative flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#001e1d]/40 to-[#001e1d]/20 hover:from-[#abd1c6]/10 hover:to-[#001e1d]/30 cursor-pointer transition-all duration-300 border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 shadow-md hover:shadow-lg overflow-hidden group"
                   >
-                    <div className="flex items-center gap-3">
-                      <LucideIcons.Users className="text-[#abd1c6]" size="sm" />
-                      <span className="text-[#fffffe] font-medium">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#abd1c6]/0 via-[#abd1c6]/5 to-[#abd1c6]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="flex items-center gap-3 relative z-10">
+                      <motion.div
+                        whileHover={{ rotate: 5, scale: 1.1 }}
+                        className="w-10 h-10 bg-gradient-to-br from-[#abd1c6]/30 to-[#94a1b2]/30 rounded-xl flex items-center justify-center"
+                      >
+                        <LucideIcons.Users className="text-[#abd1c6]" size="sm" />
+                      </motion.div>
+                      <span className="text-[#fffffe] font-bold">
                         Еще {totalFriends - 4} друзей
                       </span>
                     </div>
-                    <LucideIcons.ChevronRight className="text-[#abd1c6]" size="sm" />
+                    <motion.div
+                      animate={{ x: [0, 4, 0] }}
+                      transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                      className="relative z-10"
+                    >
+                      <LucideIcons.ChevronRight className="text-[#abd1c6] group-hover:text-[#abd1c6] transition-colors" size="sm" />
+                    </motion.div>
                   </motion.div>
                 )}
 

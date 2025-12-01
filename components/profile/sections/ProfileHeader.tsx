@@ -1,7 +1,6 @@
 "use client";
 
 import { useOnlineStatus } from "@/lib/useOnlineStatus";
-
 import { getHeaderTheme } from "@/lib/header-customization";
 
 interface User {
@@ -38,7 +37,6 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
 
     // Иначе показываем время последнего входа
     const diffInHours = Math.floor(diffInMinutes / 60);
-    const lastSeenText = "";
 
     if (diffInHours < 1)
       return { status: "offline", text: `${diffInMinutes}м назад` };
@@ -48,12 +46,18 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
     return { status: "offline", text: date.toLocaleDateString("ru-RU") };
   };
 
+  const status = getUserStatus(user.lastSeen || null);
+  const joinDate = new Date(user.createdAt).toLocaleDateString("ru-RU", {
+    year: "numeric",
+    month: "long",
+  });
+
   return (
     <div
-      className={`relative overflow-hidden backdrop-blur-xl border-b border-[#abd1c6]/20 ${
+      className={`relative overflow-hidden border-b border-[#abd1c6]/20 ${
         theme.background === "gradient"
           ? `bg-gradient-to-br ${(theme as any).gradient}`
-          : "bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d]"
+          : "bg-[#004643]"
       }`}
       style={
         theme.background === "image"
@@ -66,62 +70,32 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
           : {}
       }
     >
-
-
-      <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 pt-8 pb-20">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-8">
-            {/* Main user info */}
-            <div className="flex-1">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 text-[#fffffe]">
-                Мой профиль
-              </h1>
-
-
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-                <div className="flex items-center gap-3 text-sm text-[#abd1c6] opacity-90">
-                  <div className="w-3 h-3 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] rounded-full"></div>
-                  <span className="font-medium">
-                    Участник с{" "}
-                    <span className="text-[#f9bc60] font-semibold">
-                      {new Date(user.createdAt).toLocaleDateString("ru-RU")}
-                    </span>
-                  </span>
-                </div>
-
-                <div>
-                  {(() => {
-                    const status = getUserStatus(user.lastSeen || null);
-                    return (
-                      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border ${
-                        status.status === "online"
-                          ? "bg-[#abd1c6]/20 border-[#abd1c6]/40"
-                          : "bg-[#94a1b2]/10 border-[#94a1b2]/20"
-                      }`}>
-                        <div
-                          className={`w-2.5 h-2.5 rounded-full ${
-                            status.status === "online"
-                              ? "bg-[#abd1c6] animate-pulse"
-                              : "bg-[#94a1b2]"
-                          }`}
-                        ></div>
-                        <span className={`text-sm font-semibold ${
-                          status.status === "online"
-                            ? "text-[#abd1c6]"
-                            : "text-[#94a1b2]"
-                        }`}>
-                          {status.status === "online"
-                            ? status.text
-                            : `Последний вход: ${status.text}`}
-                        </span>
-                      </div>
-                    );
-                  })()}
-                </div>
-
+          <div className="flex flex-col items-center text-center">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-[#fffffe] mb-2">
+              {user.name || "Пользователь"}
+            </h1>
+            
+            <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-[#abd1c6]">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#abd1c6]"></div>
+                <span>Участник с {joinDate}</span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    status.status === "online"
+                      ? "bg-[#abd1c6] animate-pulse"
+                      : "bg-[#94a1b2]"
+                  }`}
+                ></div>
+                <span>
+                  {status.status === "online" ? status.text : `Был ${status.text}`}
+                </span>
               </div>
             </div>
-
           </div>
         </div>
       </div>

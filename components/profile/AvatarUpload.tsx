@@ -182,6 +182,41 @@ export default function AvatarUpload({
                 )}
               </motion.div>
             </motion.div>
+          ) : frame.type === "color" ? (
+            // Цветная рамка
+            <motion.div 
+              className="w-28 h-28 rounded-2xl mx-auto mb-6 overflow-hidden relative border-2 border-[#abd1c6]/30 shadow-2xl group-hover:border-[#f9bc60]/50 group-hover:shadow-[#f9bc60]/30 transition-all duration-300"
+              style={{
+                backgroundColor: (frame as any).color || "#004643",
+              }}
+              whileHover={{ rotate: [0, -5, 5, -5, 0] }}
+              transition={{ duration: 0.5 }}
+            >
+              {/* Декоративное свечение */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/20 via-transparent to-[#abd1c6]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+              
+              {/* Аватар поверх цветной рамки */}
+              <motion.div 
+                className="absolute inset-2 rounded-xl overflow-hidden"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
+                {displayAvatar ? (
+                  <img
+                    src={displayAvatar}
+                    alt="Аватарка"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] text-[#abd1c6] font-bold text-2xl">
+                    <span className="relative z-10">{avatarLetter}</span>
+                  </div>
+                )}
+              </motion.div>
+            </motion.div>
           ) : (
             // CSS рамка
             <motion.div

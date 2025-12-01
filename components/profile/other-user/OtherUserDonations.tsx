@@ -23,7 +23,11 @@ interface DonationsData {
   stats: DonationsStats;
 }
 
-export default function ProfileDonations() {
+interface OtherUserDonationsProps {
+  userId: string;
+}
+
+export default function OtherUserDonations({ userId }: OtherUserDonationsProps) {
   const [data, setData] = useState<DonationsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +35,7 @@ export default function ProfileDonations() {
   useEffect(() => {
     const fetchDonations = async () => {
       try {
-        const response = await fetch("/api/profile/donations", {
+        const response = await fetch(`/api/users/${userId}/donations`, {
           cache: "no-store",
         });
 
@@ -50,7 +54,7 @@ export default function ProfileDonations() {
     };
 
     fetchDonations();
-  }, []);
+  }, [userId]);
 
   const formatAmount = (amount: number) => {
     return new Intl.NumberFormat("ru-RU", {
@@ -125,7 +129,7 @@ export default function ProfileDonations() {
               <LucideIcons.Heart className="text-[#f9bc60]" size="sm" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Мои пожертвования</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Пожертвования</h3>
             </div>
           </div>
         </div>
@@ -135,7 +139,7 @@ export default function ProfileDonations() {
           </div>
           <p className="text-sm sm:text-base text-[#abd1c6] font-medium mb-1">Пока нет пожертвований</p>
           <p className="text-xs sm:text-sm text-[#abd1c6]/60 px-4">
-            Ваша поддержка помогает другим людям
+            Пользователь ещё не поддержал ни одну заявку
           </p>
         </div>
       </motion.div>
@@ -143,7 +147,11 @@ export default function ProfileDonations() {
   }
 
   return (
-    <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden"
     >
       {/* Заголовок */}
       <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
@@ -153,7 +161,7 @@ export default function ProfileDonations() {
               <LucideIcons.Heart className="text-[#f9bc60]" size="sm" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Мои пожертвования</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Пожертвования</h3>
               <p className="text-[10px] sm:text-xs text-[#abd1c6] mt-0.5">
                 Всего: {formatAmount(data.stats.totalDonated)}
               </p>
@@ -219,7 +227,7 @@ export default function ProfileDonations() {
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 

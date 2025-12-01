@@ -133,10 +133,15 @@ export default function ProfileRecentActivity() {
 
   if (loading) {
     return (
-      <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-[#abd1c6]/20 rounded w-32"></div>
-          <div className="space-y-2">
+      <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[300px]">
+        <div className="animate-pulse space-y-3 sm:space-y-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#abd1c6]/20 rounded-lg"></div>
+            <div className="h-6 bg-[#abd1c6]/20 rounded w-1/4"></div>
+          </div>
+          <div className="space-y-2 sm:space-y-3">
+            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
+            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
             <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
             <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
           </div>
@@ -147,11 +152,7 @@ export default function ProfileRecentActivity() {
 
   if (activities.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden"
+      <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden"
       >
         <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -172,17 +173,12 @@ export default function ProfileRecentActivity() {
             Ваши действия будут отображаться здесь
           </p>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden"
-    >
+    <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden">
       {/* Заголовок */}
       <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
         <div className="flex items-center gap-2 sm:gap-3">
@@ -243,7 +239,7 @@ export default function ProfileRecentActivity() {
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

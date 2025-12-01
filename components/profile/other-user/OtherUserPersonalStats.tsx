@@ -11,7 +11,7 @@ interface DetailedStats {
     approved: number;
     rejected: number;
     totalAmount: number;
-    approvalRate: number;
+    averageAmount: number;
   };
   activity: {
     likesGiven: number;
@@ -52,7 +52,11 @@ const getRussianPlural = (
   return forms[2];
 };
 
-export default function ProfilePersonalStats() {
+interface OtherUserPersonalStatsProps {
+  userId: string;
+}
+
+export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStatsProps) {
   const [data, setData] = useState<DetailedStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +65,7 @@ export default function ProfilePersonalStats() {
   useEffect(() => {
     const fetchDetailedStats = async () => {
       try {
-        const response = await fetch('/api/profile/detailed-stats', {
+        const response = await fetch(`/api/users/${userId}/detailed-stats`, {
           cache: 'no-store',
         });
 
@@ -85,7 +89,7 @@ export default function ProfilePersonalStats() {
     };
 
     fetchDetailedStats();
-  }, []);
+  }, [userId]);
 
   const calculatedStats = useMemo(() => {
     if (!data) return null;
@@ -128,73 +132,52 @@ export default function ProfilePersonalStats() {
     return (
       <div className="p-6 bg-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20">
         <div className="text-center py-8">
-          <LucideIcons.AlertTriangle className="w-8 h-8 text-red-400 mx-auto mb-4" />
-          <p className="text-red-400">Ошибка загрузки: {error}</p>
+          <LucideIcons.AlertTriangle className="text-red-400 mx-auto mb-2" size="lg" />
+          <p className="text-sm text-[#abd1c6]">{error}</p>
         </div>
       </div>
     );
   }
 
-  if (!calculatedStats) return null;
+  if (!calculatedStats) {
+    return null;
+  }
 
   const stats = calculatedStats;
-  const achievementsLabel = getRussianPlural(stats.achievements.total, [
-    "Достижение",
-    "Достижения",
-    "Достижений",
-  ]);
+  const approvedPercent = stats.applications.total > 0
+    ? Math.round((stats.applications.approved / stats.applications.total) * 100)
+    : 0;
+  const pendingPercent = stats.applications.total > 0
+    ? Math.round((stats.applications.pending / stats.applications.total) * 100)
+    : 0;
+  const rejectedPercent = stats.applications.total > 0
+    ? Math.round((stats.applications.rejected / stats.applications.total) * 100)
+    : 0;
+
   const friendsLabel = getRussianPlural(stats.activity.friendsCount, [
-    "Друг",
-    "Друга",
-    "Друзей",
+    "друг",
+    "друга",
+    "друзей",
+  ]);
+  const achievementsLabel = getRussianPlural(stats.achievements.total, [
+    "достижение",
+    "достижения",
+    "достижений",
   ]);
 
   const tabs = [
-    { id: 'overview' as const, label: 'Обзор', icon: LucideIcons.PieChart },
+    { id: 'overview' as const, label: 'Обзор', icon: LucideIcons.LayoutGrid },
     { id: 'applications' as const, label: 'Заявки', icon: LucideIcons.FileText },
     { id: 'social' as const, label: 'Социальное', icon: LucideIcons.Users },
     { id: 'achievements' as const, label: 'Достижения', icon: LucideIcons.Award },
   ];
 
-  const totalApplications = stats.applications.total || 0;
-  const approvedPercent = totalApplications
-    ? Math.round((stats.applications.approved / totalApplications) * 100)
-    : 0;
-  const rejectedPercent = totalApplications
-    ? Math.round((stats.applications.rejected / totalApplications) * 100)
-    : 0;
-  const pendingPercent = Math.max(0, 100 - approvedPercent - rejectedPercent);
-
-  const successHint = (() => {
-    if (totalApplications === 0) {
-      return "Создайте первую заявку и проверьте, как быстро её увидит админ.";
-    }
-
-    if (totalApplications < 3) {
-      return stats.applications.approved === totalApplications
-        ? "Все ваши заявки одобрены — отличный старт!"
-        : "Пока мало данных, но каждая подробная история повышает шанс на одобрение.";
-    }
-
-    // Используем локально вычисленный процент одобренных заявок,
-    // чтобы избежать возможных расхождений в серверной статистике.
-    if (approvedPercent >= 80) {
-      return "Отличный результат: большинство ваших заявок одобряют. Продолжайте в том же духе!";
-    }
-
-    if (approvedPercent >= 60) {
-      return "Хороший уровень одобрения. Ещё немного точнее формулируйте цель и сумму — и процент станет ещё выше.";
-    }
-
-    if (approvedPercent >= 40) {
-      return "Есть куда расти. Попробуйте подробнее описывать цель и прикладывать доказательства — это повышает шанс одобрения.";
-    }
-
-    return "Почти все заявки отклоняются. Проверьте правила, уточните сумму и покажите, зачем именно нужны деньги.";
-  })();
-
   return (
-    <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6"
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6"
     >
       {/* Header */}
       <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5 md:mb-6">
@@ -235,7 +218,7 @@ export default function ProfilePersonalStats() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="space-y-6"
+          className="space-y-4 sm:space-y-5 md:space-y-6"
         >
         {activeTab === 'overview' && (
           <div className="space-y-4 sm:space-y-5 md:space-y-6">
@@ -339,7 +322,7 @@ export default function ProfilePersonalStats() {
                       label: "В ожидании",
                       value: stats.applications.pending,
                       percent: pendingPercent,
-                      color: "#F59E0B",
+                      color: "#F97316",
                       icon: LucideIcons.Clock,
                     },
                     {
@@ -349,35 +332,33 @@ export default function ProfilePersonalStats() {
                       color: "#EF4444",
                       icon: LucideIcons.XCircle,
                     },
-                  ].map((item) => {
+                  ].map((item, index) => {
                     const IconComponent = item.icon;
                     return (
                       <div
-                        key={item.label}
-                        className="p-3 rounded-lg bg-[#001e1d]/20 border border-[#abd1c6]/10 flex items-center gap-2"
+                        key={index}
+                        className="flex items-center gap-2 p-2 sm:p-3 bg-[#001e1d]/20 rounded-lg"
                       >
                         <div
                           className="p-1.5 rounded-lg"
-                          style={{ backgroundColor: `${item.color}15`, color: item.color }}
+                          style={{ backgroundColor: `${item.color}20`, color: item.color }}
                         >
-                          <IconComponent className="w-3.5 h-3.5 text-current" />
+                          <IconComponent className="w-4 h-4 text-current" />
                         </div>
-                        <div>
-                          <p className="text-[#fffffe] font-medium text-xs leading-tight">{item.label}</p>
-                          <p className="text-xs text-[#abd1c6]">
-                            {item.value} · {item.percent}%
-                          </p>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs sm:text-sm font-semibold text-[#fffffe]">
+                            {item.value}
+                          </div>
+                          <div className="text-[10px] sm:text-xs text-[#abd1c6]">
+                            {item.label}
+                          </div>
+                        </div>
+                        <div className="text-xs sm:text-sm font-bold" style={{ color: item.color }}>
+                          {item.percent}%
                         </div>
                       </div>
                     );
                   })}
-                </div>
-
-                <div className="p-3 bg-[#f9bc60]/10 rounded-lg border border-[#f9bc60]/20 text-xs text-[#f9bc60]">
-                  <div className="flex items-start gap-2">
-                    <LucideIcons.Lightbulb className="text-[#f9bc60] flex-shrink-0 mt-0.5" size="sm" />
-                    <p>{successHint}</p>
-                  </div>
                 </div>
               </div>
             )}
@@ -385,167 +366,100 @@ export default function ProfilePersonalStats() {
         )}
 
         {activeTab === 'applications' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[
-              { 
-                label: 'Ожидают', 
-                value: stats.applications.pending, 
-                color: '#F59E0B',
-                icon: LucideIcons.Clock
-              },
-              { 
-                label: 'Одобрено', 
-                value: stats.applications.approved, 
-                color: '#10B981',
-                icon: LucideIcons.CheckCircle2
-              },
-              { 
-                label: 'Отклонено', 
-                value: stats.applications.rejected, 
-                color: '#EF4444',
-                icon: LucideIcons.XCircle
-              },
-              { 
-                label: 'Общая сумма', 
-                value: `₽${stats.applications.totalAmount}`, 
-                color: '#3B82F6',
-                icon: LucideIcons.DollarSign
-              }
-            ].map((item, index) => {
-              const IconComponent = item.icon;
-              return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+              {[
+                { label: 'Всего', value: stats.applications.total, color: '#3B82F6' },
+                { label: 'Одобрено', value: stats.applications.approved, color: '#10B981' },
+                { label: 'В ожидании', value: stats.applications.pending, color: '#F97316' },
+                { label: 'Отклонено', value: stats.applications.rejected, color: '#EF4444' },
+              ].map((item, index) => (
                 <div
                   key={index}
-                  className="p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10"
+                  className="p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10 text-center"
                 >
-                  <div className="flex items-center gap-3">
-                    <div 
-                      className="p-2 rounded-lg"
-                      style={{ backgroundColor: `${item.color}15`, color: item.color }}
-                    >
-                      <IconComponent 
-                        className="w-5 h-5 text-current"
-                      />
-                    </div>
-                    <div>
-                      <p className="text-xl font-bold text-[#fffffe]">
-                        {item.value}
-                      </p>
-                      <p className="text-xs text-[#abd1c6]">{item.label}</p>
-                    </div>
+                  <div className="text-lg sm:text-xl font-bold text-[#fffffe] mb-1" style={{ color: item.color }}>
+                    {item.value}
                   </div>
+                  <div className="text-[10px] sm:text-xs text-[#abd1c6]">{item.label}</div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
+            {stats.applications.totalAmount > 0 && (
+              <div className="p-4 bg-[#001e1d]/30 rounded-xl border border-[#abd1c6]/10">
+                <div className="text-sm text-[#abd1c6] mb-2">Общая сумма заявок</div>
+                <div className="text-2xl font-bold text-[#f9bc60]">
+                  {new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(stats.applications.totalAmount)}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {activeTab === 'social' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[
-              { 
-                label: 'Лайков поставлено', 
-                value: stats.activity.likesGiven, 
-                color: '#EF4444',
-                icon: LucideIcons.ThumbsUp
-              },
-              { 
-                label: 'Лайков получено', 
-                value: stats.activity.likesReceived, 
-                color: '#10B981',
-                icon: LucideIcons.Heart
-              },
-              { 
-                label: 'Количество друзей', 
-                value: stats.activity.friendsCount, 
-                color: '#8B5CF6',
-                icon: LucideIcons.Users
-              },
-              { 
-                label: 'Дней активности', 
-                value: stats.activity.daysActive, 
-                color: '#F59E0B',
-                icon: LucideIcons.Calendar
-              }
-            ].map((item, index) => {
-              const IconComponent = item.icon;
-              return (
-                <div
-                  key={index}
-                  className="p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10"
-                >
-                  <div className="flex items-center gap-3">
-                    <div 
-                      className="p-2 rounded-lg"
-                      style={{ backgroundColor: `${item.color}15`, color: item.color }}
-                    >
-                      <IconComponent 
-                        className="w-5 h-5 text-current"
-                      />
-                    </div>
-                    <div>
-                      <p className="text-xl font-bold text-[#fffffe]">
-                        {item.value}
-                      </p>
-                      <p className="text-xs text-[#abd1c6]">{item.label}</p>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+              {[
+                { label: 'Друзей', value: stats.activity.friendsCount, icon: LucideIcons.Users, color: '#8B5CF6' },
+                { label: 'Лайков поставлено', value: stats.activity.likesGiven, icon: LucideIcons.Heart, color: '#E91E63' },
+                { label: 'Лайков получено', value: stats.activity.likesReceived, icon: LucideIcons.Heart, color: '#E91E63' },
+                { label: 'Дней на платформе', value: stats.activity.daysActive, icon: LucideIcons.Calendar, color: '#F59E0B' },
+              ].map((item, index) => {
+                const IconComponent = item.icon;
+                return (
+                  <div
+                    key={index}
+                    className="p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10"
+                  >
+                    <div className="flex flex-col items-center text-center gap-1.5 sm:gap-2">
+                      <div
+                        className="p-1.5 sm:p-2 rounded-lg"
+                        style={{ backgroundColor: `${item.color}15`, color: item.color }}
+                      >
+                        <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-current" />
+                      </div>
+                      <div>
+                        <p className="text-xl sm:text-2xl font-bold text-[#fffffe] leading-tight">
+                          {item.value}
+                        </p>
+                        <p className="text-[10px] sm:text-xs text-[#abd1c6] leading-tight whitespace-normal mt-0.5">
+                          {item.label}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
 
         {activeTab === 'achievements' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { 
-                label: 'Обычные', 
-                value: stats.achievements.common, 
-                color: '#6B7280',
-                rarity: 'COMMON'
-              },
-              { 
-                label: 'Редкие', 
-                value: stats.achievements.rare, 
-                color: '#3B82F6',
-                rarity: 'RARE'
-              },
-              { 
-                label: 'Эпические', 
-                value: stats.achievements.epic, 
-                color: '#8B5CF6',
-                rarity: 'EPIC'
-              },
-              { 
-                label: 'Легендарные', 
-                value: stats.achievements.legendary, 
-                color: '#F59E0B',
-                rarity: 'LEGENDARY'
-              }
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10 text-center"
-              >
-                <div 
-                  className="w-10 h-10 rounded-lg mx-auto mb-2 flex items-center justify-center"
-                  style={{ backgroundColor: `${item.color}15`, color: item.color }}  
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+              {[
+                { label: 'Всего', value: stats.achievements.total, color: '#94a1b2' },
+                { label: 'Обычных', value: stats.achievements.common, color: '#94a1b2' },
+                { label: 'Редких', value: stats.achievements.rare, color: '#abd1c6' },
+                { label: 'Эпических', value: stats.achievements.epic, color: '#e16162' },
+                { label: 'Легендарных', value: stats.achievements.legendary, color: '#f9bc60' },
+              ].map((item, index) => (
+                <div
+                  key={index}
+                  className="p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10 text-center"
                 >
-                  <LucideIcons.Award 
-                    className="w-5 h-5 text-current"
-                  />
+                  <div className="text-lg sm:text-xl font-bold text-[#fffffe] mb-1" style={{ color: item.color }}>
+                    {item.value}
+                  </div>
+                  <div className="text-[10px] sm:text-xs text-[#abd1c6]">{item.label}</div>
                 </div>
-                <p className="text-xl font-bold text-[#fffffe] mb-1">
-                  {item.value}
-                </p>
-                <p className="text-xs text-[#abd1c6]">{item.label}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
         </motion.div>
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
+

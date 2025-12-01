@@ -94,3 +94,4 @@ scripts/cleanup-test-data.js
 *.7z
 *.tar.gz
 prisma/*.db
+prisma/*.db

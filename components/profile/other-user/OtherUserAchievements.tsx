@@ -2,7 +2,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import type { AchievementStats as AchievementStatsType } from "@/lib/achievements/types";
 import OtherUserAchievementsModal from "./OtherUserAchievementsModal";
@@ -79,13 +78,20 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
 
   if (loading) {
     return (
-      <div className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl p-5 border border-[#abd1c6]/20 min-h-[180px]">
-        <div className="animate-pulse space-y-3">
-          <div className="h-5 bg-[#abd1c6]/20 rounded w-32" />
-          <div className="h-4 bg-[#abd1c6]/10 rounded w-24" />
-          <div className="grid grid-cols-1 gap-2">
-            <div className="h-10 bg-[#abd1c6]/10 rounded-xl" />
-            <div className="h-10 bg-[#abd1c6]/10 rounded-xl" />
+      <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[250px]">
+        <div className="animate-pulse space-y-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#abd1c6]/20 rounded-lg"></div>
+            <div className="h-6 bg-[#abd1c6]/20 rounded w-1/2"></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
+            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
+          </div>
+          <div className="h-12 bg-[#abd1c6]/10 rounded-lg"></div>
+          <div className="space-y-2">
+            <div className="h-14 bg-[#abd1c6]/10 rounded-lg"></div>
+            <div className="h-14 bg-[#abd1c6]/10 rounded-lg"></div>
           </div>
         </div>
       </div>
@@ -93,10 +99,7 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-[#004643]/40 via-[#004643]/30 to-[#001e1d]/40 backdrop-blur-xl rounded-2xl p-5 border border-[#abd1c6]/20 overflow-hidden relative min-h-[180px] flex flex-col"
+    <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[250px]"
     >
       {/* Заголовок */}
       <div className="flex items-center justify-between mb-4">
@@ -166,7 +169,7 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
           />
         </>
       )}
-    </motion.div>
+    </div>
   );
 }
 

@@ -3,9 +3,11 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: Request,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   const session = await getSession();
   if (!session) {
@@ -13,9 +15,11 @@ export async function GET(
   }
 
   try {
+    const { userId } = await params;
+    
     // Проверяем, что пользователь существует
     const user = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: userId },
     });
 
     if (!user) {
@@ -28,10 +32,10 @@ export async function GET(
     // Получаем статистику пользователя
     const [applicationsCount, userData] = await Promise.all([
       prisma.application.count({
-        where: { userId: params.userId },
+        where: { userId: userId },
       }),
       prisma.user.findUnique({
-        where: { id: params.userId },
+        where: { id: userId },
         select: { createdAt: true },
       }),
     ]);

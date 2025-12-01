@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { getAllAvatarFrames, getAvatarFrame } from "@/lib/header-customization";
+import ColorWheel from "./ColorWheel";
 
 interface User {
   id: string;
@@ -132,110 +133,126 @@ export default function AvatarFrameCustomization({
           </div>
 
           {/* Content */}
-          <div className="p-6 max-h-96 overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {frames.map((frame, index) => {
-                const isSelected = selectedFrame === frame.key;
-                const frameConfig = getAvatarFrame(frame.key);
+          <div className="p-6 max-h-[70vh] overflow-y-auto">
+            {/* Рамки-картинки */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Готовые рамки
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {frames.map((frame, index) => {
+                  const isSelected = selectedFrame === frame.key;
+                  const frameConfig = getAvatarFrame(frame.key);
 
-                return (
-                  <motion.div
-                    key={frame.key || `frame-${index}`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSelectedFrame(frame.key)}
-                    className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${
-                      isSelected
-                        ? "border-emerald-500 shadow-lg shadow-emerald-500/20"
-                        : "border-gray-200 dark:border-gray-700 hover:border-emerald-300"
-                    }`}
-                  >
-                    {/* Preview */}
-                    <div className="p-6 flex justify-center">
-                      {frameConfig.type === "image" ? (
-                        // Рамка-картинка
-                        <div className="w-16 h-16 rounded-lg overflow-hidden relative">
-                          {/* Рамка как фон */}
+                  return (
+                    <motion.div
+                      key={frame.key || `frame-${index}`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setSelectedFrame(frame.key)}
+                      className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                        isSelected
+                          ? "border-emerald-500 shadow-lg shadow-emerald-500/20"
+                          : "border-gray-200 dark:border-gray-700 hover:border-emerald-300"
+                      }`}
+                    >
+                      {/* Preview */}
+                      <div className="p-4 flex justify-center">
+                        {frameConfig.type === "image" ? (
+                          // Рамка-картинка
+                          <div className="w-16 h-16 rounded-lg overflow-hidden relative">
+                            {/* Рамка как фон */}
+                            <div
+                              className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat rounded-lg"
+                              style={{
+                                backgroundImage: `url(${frameConfig.imageUrl})`,
+                              }}
+                            />
+                            {/* Аватар поверх рамки */}
+                            <div className="absolute inset-2 rounded-md overflow-hidden">
+                              {user.avatar ? (
+                                <img
+                                  src={user.avatar}
+                                  alt="Аватар"
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600 text-white font-bold text-xl">
+                                  {user.name
+                                    ? user.name[0].toUpperCase()
+                                    : user.email[0].toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          // CSS рамка
                           <div
-                            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat rounded-lg"
-                            style={{
-                              backgroundImage: `url(${frameConfig.imageUrl})`,
-                            }}
-                          />
-                          {/* Аватар поверх рамки */}
-                          <div className="absolute inset-2 rounded-md overflow-hidden">
+                            className={`w-16 h-16 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg ${frameConfig.className} ${
+                              user.avatar
+                                ? "bg-gray-100 dark:bg-gray-700"
+                                : "bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600"
+                            }`}
+                          >
                             {user.avatar ? (
                               <img
                                 src={user.avatar}
                                 alt="Аватар"
-                                className="w-full h-full object-cover"
+                                className={`w-full h-full object-cover rounded-lg ${frame.key === "rainbow" ? "rounded-lg" : ""}`}
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600 text-white font-bold text-xl">
+                              <div
+                                className={`w-full h-full flex items-center justify-center rounded-lg ${frame.key === "rainbow" ? "rounded-lg" : ""}`}
+                              >
                                 {user.name
                                   ? user.name[0].toUpperCase()
                                   : user.email[0].toUpperCase()}
                               </div>
                             )}
                           </div>
-                        </div>
-                      ) : (
-                        // CSS рамка
-                        <div
-                          className={`w-16 h-16 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg ${frameConfig.className} ${
-                            user.avatar
-                              ? "bg-gray-100 dark:bg-gray-700"
-                              : "bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600"
-                          }`}
-                        >
-                          {user.avatar ? (
-                            <img
-                              src={user.avatar}
-                              alt="Аватар"
-                              className={`w-full h-full object-cover rounded-lg ${frame.key === "rainbow" ? "rounded-lg" : ""}`}
+                        )}
+                      </div>
+
+                      {/* Frame info */}
+                      <div className="p-2 bg-white dark:bg-gray-800">
+                        <h4 className="text-xs font-semibold text-gray-900 dark:text-white text-center truncate">
+                          {frame.name}
+                        </h4>
+                      </div>
+
+                      {/* Selection indicator */}
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
                             />
-                          ) : (
-                            <div
-                              className={`w-full h-full flex items-center justify-center rounded-lg ${frame.key === "rainbow" ? "rounded-lg" : ""}`}
-                            >
-                              {user.name
-                                ? user.name[0].toUpperCase()
-                                : user.email[0].toUpperCase()}
-                            </div>
-                          )}
+                          </svg>
                         </div>
                       )}
-                    </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
 
-                    {/* Frame info */}
-                    <div className="p-3 bg-white dark:bg-gray-800">
-                      <h4 className="font-semibold text-gray-900 dark:text-white">
-                        {frame.name}
-                      </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {frame.description}
-                      </p>
-                    </div>
-
-                    {/* Selection indicator */}
-                    {isSelected && (
-                      <div className="absolute top-2 right-2 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
-                        <svg
-                          className="w-4 h-4 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
+            {/* Цветовой круг */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Выбор цвета (Цветовой круг Иттена)
+              </h3>
+              <div className="flex justify-center">
+                <ColorWheel
+                  selectedColor={selectedFrame?.startsWith("color:") ? selectedFrame : null}
+                  onColorChange={(color) => setSelectedFrame(`color:${color}`)}
+                />
+              </div>
             </div>
           </div>
 

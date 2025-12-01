@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { AchievementService } from '@/lib/achievements/service';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/achievements - получить все достижения
 export async function GET() {
   try {

@@ -1,6 +1,8 @@
 // app/api/stories/route.ts
 import { prisma } from "@/lib/db";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);

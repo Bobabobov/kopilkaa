@@ -84,6 +84,10 @@ backups/
 test-*
 debug-*
 
+# Test scripts (keep in repo but ignore changes)
+scripts/*test*.js
+scripts/cleanup-test-data.js
+
 # Archives
 *.zip
 *.rar

@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log("[DEBUG] Phone verify code for", normalized, ":", code);
+    // В продакшене код отправляется через SMS, здесь не логируем
 
     return NextResponse.json({
       success: true,

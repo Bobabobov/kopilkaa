@@ -59,8 +59,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // В бою тут нужно отправить SMS, а код не возвращать
-    console.log("[DEBUG] Phone login code for", normalized, ":", code);
+    // В продакшене код отправляется через SMS, здесь не логируем
 
     return NextResponse.json({
       success: true,

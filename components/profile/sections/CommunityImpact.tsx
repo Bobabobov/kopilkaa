@@ -26,13 +26,13 @@ export default function CommunityImpact() {
         color: "#e16162",
         description: "Человек получили помощь",
       },
-      {
-        label: "Собрано средств",
-        value: 125000,
-        icon: "Coins",
-        color: "#f9bc60",
-        description: "Рублей через ваши заявки",
-      },
+    {
+      label: "Собрано средств",
+      value: 125000,
+      icon: "Coin",
+      color: "#f9bc60",
+      description: "Рублей через ваши заявки",
+    },
       {
         label: "Лайков получено",
         value: 156,

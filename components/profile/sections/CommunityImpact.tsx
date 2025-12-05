@@ -105,12 +105,12 @@ export default function CommunityImpact() {
                   className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
                   style={{ 
                     backgroundColor: `${stat.color}20`,
-                    border: `2px solid ${stat.color}40`
+                    border: `2px solid ${stat.color}40`,
+                    color: stat.color
                   }}
                 >
                   <IconComponent 
                     size="sm"
-                    color={stat.color}
                   />
                 </div>
                 <div className="flex-1 min-w-0">

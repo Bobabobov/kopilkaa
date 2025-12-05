@@ -110,12 +110,12 @@ export default function QuickStatsWidget() {
                 className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center"
                 style={{ 
                   backgroundColor: `${stat.color}20`,
-                  border: `2px solid ${stat.color}40`
+                  border: `2px solid ${stat.color}40`,
+                  color: stat.color
                 }}
               >
                 <IconComponent 
                   size="md"
-                  style={{ color: stat.color }}
                 />
               </div>
             </motion.div>

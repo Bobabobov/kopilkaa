@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -33,7 +34,9 @@ export default function RootLayout({
             <main className="flex-1 container-p mx-auto">{children}</main>
             <Footer />
             <ScrollToTop />
-            <AuthModalRoot />
+            <Suspense fallback={null}>
+              <AuthModalRoot />
+            </Suspense>
           </div>
         </BeautifulNotificationsProvider>
       </body>

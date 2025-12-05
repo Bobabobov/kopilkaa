@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import AdminClient from "./AdminClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   // серверная проверка доступа — у нас один админ (ты)
   const s = await getSession();

@@ -1,12 +1,24 @@
 // app/donate/success/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function DonateSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="w-16 h-16 border-4 border-[#f9bc60] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <DonateSuccessContent />
+    </Suspense>
+  );
+}
+
+function DonateSuccessContent() {
   const searchParams = useSearchParams();
   const paymentId = searchParams.get("payment_id");
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");

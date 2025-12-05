@@ -109,7 +109,7 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
       const errorMessage = error.message || "Не удалось создать баг-репорт";
       // Сообщение про лимит уже показано в форме, тост не нужен
       if (!errorMessage.includes("1 баг-репорт")) {
-        showToast("error", "Ошибка", errorMessage);
+      showToast("error", "Ошибка", errorMessage);
       }
     } finally {
       setSubmitting(false);
@@ -129,11 +129,11 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
       <div className="relative z-10">
         <div className="flex flex-col gap-2 mb-4">
           <h2 className="text-xl font-bold text-[#fffffe] flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#e16162] to-[#d14d4e] rounded-xl flex items-center justify-center shadow-lg">
-              <LucideIcons.AlertTriangle className="text-white" size="sm" />
-            </div>
-            Сообщить о проблеме
-          </h2>
+          <div className="w-10 h-10 bg-gradient-to-br from-[#e16162] to-[#d14d4e] rounded-xl flex items-center justify-center shadow-lg">
+            <LucideIcons.AlertTriangle className="text-white" size="sm" />
+          </div>
+          Сообщить о проблеме
+        </h2>
           <p className="text-xs text-[#f9bc60] bg-[#e16162]/10 border border-[#e16162]/30 rounded-lg px-3 py-2">
             Можно отправлять только 1 баг-репорт в сутки
           </p>

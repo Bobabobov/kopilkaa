@@ -173,22 +173,22 @@ export default function Header() {
 
   return (
     <>
-      {/* Spacer для Header + TopBanner */}
-      <div 
-        style={{ 
+              {/* Spacer для Header + TopBanner */}
+              <div 
+                style={{ 
           height: `${headerHeight + topBannerHeight}px`
-        }} 
-      />
+                }} 
+              />
 
-      <header
-        className="fixed left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg"
-        style={{ 
-          backgroundColor: "#004643", 
-          borderColor: "#abd1c6",
+              <header
+                className="fixed left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg"
+                style={{ 
+                  backgroundColor: "#004643", 
+                  borderColor: "#abd1c6",
           top: `${topBannerHeight}px`,
           height: `${headerHeight}px`
-        }}
-      >
+                }}
+              >
         <div className="container-p mx-auto flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 h-full">
           {/* Логотип слева */}
           <HeaderLogo />

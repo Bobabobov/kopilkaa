@@ -50,7 +50,7 @@ export default function DonateButton({ isMobile = false }: DonateButtonProps) {
   return (
     <Link href="/support" className="block">
       <motion.span
-        whileHover={{
+        whileHover={{ 
           scale: 1.03,
           backgroundColor: "rgba(249, 188, 96, 0.1)",
         }}

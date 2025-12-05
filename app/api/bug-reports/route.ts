@@ -96,7 +96,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { title, description, category, images } = body;
-
+    
     const isAdmin = session.role === "ADMIN";
 
     // Ограничение: не больше 1 заявки в сутки на пользователя (для обычных пользователей)

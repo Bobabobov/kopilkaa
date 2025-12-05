@@ -42,7 +42,7 @@ const STATUS_PRESETS = [
 export default function ReportsPage() {
   const router = useRouter();
 
-  const [user, setUser] = useState<{ id: string; role?: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; email?: string; role?: string } | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -104,8 +104,8 @@ export default function ReportsPage() {
       if (!data?.user) {
         setAuthError("Нужно войти или зарегистрироваться");
         setUser(null);
-        return;
-      }
+          return;
+        }
 
       setUser(data.user);
     } catch (err: any) {
@@ -123,7 +123,7 @@ export default function ReportsPage() {
 
   const loadReports = useCallback(
     async (nextPage = page, keepLoading = true) => {
-      if (!user) return;
+    if (!user) return;
       if (keepLoading) setLoadingReports(true);
       setReportsError(null);
 
@@ -355,9 +355,9 @@ export default function ReportsPage() {
           </div>
 
           <div className="lg:col-span-2 space-y-4">
-            <BugReportFilters
-              statusFilter={statusFilter}
-              onStatusChange={setStatusFilter}
+              <BugReportFilters
+                statusFilter={statusFilter}
+                onStatusChange={setStatusFilter}
             />
 
             {reportsError && (
@@ -372,16 +372,16 @@ export default function ReportsPage() {
               </div>
             )}
 
-            <BugReportList
-              reports={reports}
-              loading={loadingReports}
-              page={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
+              <BugReportList
+                reports={reports}
+                loading={loadingReports}
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
               isAdmin={isAdmin}
               onStatusUpdate={handleStatusUpdate}
               onDeleteReport={handleDeleteReport}
-            />
+              />
           </div>
         </div>
       </div>

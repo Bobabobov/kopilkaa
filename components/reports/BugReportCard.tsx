@@ -189,17 +189,17 @@ export default function BugReportCard({
                     {updatingStatus ? "..." : "Сохранить"}
                   </button>
                   {onDeleteReport && (
-                    <button
+                            <button
                       type="button"
-                      onClick={(e) => {
+                              onClick={(e) => {
                         e.preventDefault();
-                        e.stopPropagation();
+                                e.stopPropagation();
                         onDeleteReport(report.id);
-                      }}
+                              }}
                       className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#e16162] text-white hover:bg-[#d14d4e] transition-colors"
                     >
                       Удалить
-                    </button>
+                            </button>
                   )}
                 </div>
               ) : (

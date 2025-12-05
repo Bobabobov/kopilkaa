@@ -110,7 +110,7 @@ export default function CommunityImpact() {
                 >
                   <IconComponent 
                     size="sm"
-                    style={{ color: stat.color }}
+                    color={stat.color}
                   />
                 </div>
                 <div className="flex-1 min-w-0">

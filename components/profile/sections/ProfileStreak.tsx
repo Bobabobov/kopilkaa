@@ -53,12 +53,12 @@ export default function ProfileStreak() {
               className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center"
               style={{ 
                 backgroundColor: `${flameColor}20`,
-                border: `2px solid ${flameColor}40`
+              border: `2px solid ${flameColor}40`,
+              color: flameColor
               }}
             >
               <LucideIcons.Zap 
                 size="md"
-                style={{ color: flameColor }}
               />
             </motion.div>
             <div>

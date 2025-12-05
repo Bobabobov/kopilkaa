@@ -73,17 +73,39 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
       animate={{ opacity: 1, y: 0 }}
       className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl p-5 border border-[#abd1c6]/20 min-h-[160px] flex flex-col"
     >
-      <div className="flex items-center justify-between mb-3">
+      <motion.div 
+        className="flex items-center justify-between mb-3"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#f9bc60] flex items-center justify-center text-xs text-[#001e1d]">
+          <motion.div 
+            className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#f9bc60] to-[#e8a545] flex items-center justify-center text-sm text-[#001e1d] shadow-lg shadow-[#f9bc60]/30"
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              repeatDelay: 2
+            }}
+          >
             👥
-          </div>
-          <h3 className="text-sm font-semibold text-[#fffffe]">Друзья</h3>
+          </motion.div>
+          <h3 className="text-sm font-bold text-[#fffffe] bg-gradient-to-r from-[#fffffe] to-[#abd1c6] bg-clip-text text-transparent">
+            Друзья
+          </h3>
         </div>
-        <span className="text-xs font-semibold text-[#f9bc60] bg-[#f9bc60]/10 px-2.5 py-1 rounded-full">
+        <motion.span 
+          className="text-xs font-bold text-[#f9bc60] bg-gradient-to-br from-[#f9bc60]/20 to-[#e8a545]/10 px-3 py-1.5 rounded-full border border-[#f9bc60]/30 shadow-md"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", delay: 0.2 }}
+        >
           {users.length}
-        </span>
-      </div>
+        </motion.span>
+      </motion.div>
 
       <div className="space-y-2 flex-1">
         {users.slice(0, 3).map((u, index) => (
@@ -93,24 +115,27 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.05 }}
           >
-            <Link
-              href={`/profile/${u.id}`}
-              prefetch={false}
-              className="flex items-center gap-3 px-3 py-2 rounded-xl bg-[#001e1d]/30 hover:bg-[#001e1d]/50 border border-[#abd1c6]/15 hover:border-[#f9bc60]/40 transition-colors"
+            <motion.div
+              whileHover={{ scale: 1.02, x: 5 }}
             >
+              <Link
+                href={`/profile/${u.id}`}
+                prefetch={false}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#001e1d]/40 to-[#001e1d]/20 hover:from-[#001e1d]/60 hover:to-[#001e1d]/40 border border-[#abd1c6]/20 hover:border-[#f9bc60]/50 transition-all hover:shadow-lg hover:shadow-[#f9bc60]/20"
+              >
               {u.avatar ? (
                 <img
                   src={u.avatar}
                   alt=""
-                  className="w-8 h-8 rounded-full object-cover"
+                  className="w-9 h-9 rounded-full object-cover border-2 border-[#abd1c6]/30"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#004643] to-[#001e1d] text-[#f9bc60] flex items-center justify-center text-xs font-bold border border-[#f9bc60]/40">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#004643] to-[#001e1d] text-[#f9bc60] flex items-center justify-center text-xs font-bold border-2 border-[#f9bc60]/40 shadow-md">
                   {(u.name || u.email.split("@")[0])[0].toUpperCase()}
                 </div>
               )}
               <div className="min-w-0">
-                <p className="truncate text-xs font-medium text-[#fffffe]">
+                <p className="truncate text-xs font-semibold text-[#fffffe]">
                   {u.name || u.email.split("@")[0]}
                 </p>
                 {u.lastSeen && (
@@ -121,6 +146,7 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
                 )}
               </div>
             </Link>
+            </motion.div>
           </motion.div>
         ))}
       </div>

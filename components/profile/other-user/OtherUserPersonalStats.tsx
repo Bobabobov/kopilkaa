@@ -179,15 +179,32 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
       transition={{ duration: 0.3 }}
       className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6"
     >
-      {/* Header */}
-      <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5 md:mb-6">
-        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-          <LucideIcons.BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-[#f9bc60]" />
-        </div>
+      {/* Улучшенный заголовок */}
+      <motion.div 
+        className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5 md:mb-6"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <motion.div 
+          className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#f9bc60]/30"
+          animate={{ 
+            rotate: [0, 5, -5, 0],
+            scale: [1, 1.05, 1]
+          }}
+          transition={{ 
+            duration: 3,
+            repeat: Infinity,
+            repeatDelay: 2
+          }}
+        >
+          <LucideIcons.BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-[#001e1d]" />
+        </motion.div>
         <div>
-          <h2 className="text-base sm:text-lg font-semibold text-[#fffffe]">Подробная статистика</h2>
+          <h2 className="text-base sm:text-lg font-bold text-[#fffffe] bg-gradient-to-r from-[#fffffe] to-[#f9bc60] bg-clip-text text-transparent">
+            Подробная статистика
+          </h2>
         </div>
-      </div>
+      </motion.div>
 
       {/* Tab Navigation */}
       <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-5 md:mb-6 border-b border-[#abd1c6]/10 pb-3 sm:pb-4 overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
@@ -252,17 +269,22 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
               ].map((metric, index) => {
                 const IconComponent = metric.icon;
                 return (
-                  <div
+                  <motion.div
                     key={index}
-                    className="p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10"
+                    className="p-3 sm:p-4 bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 transition-all hover:shadow-lg hover:shadow-[#f9bc60]/20"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ scale: 1.05, y: -5 }}
                   >
                     <div className="flex flex-col items-center text-center gap-1.5 sm:gap-2">
-                      <div
-                        className="p-1.5 sm:p-2 rounded-lg"
-                        style={{ backgroundColor: `${metric.color}15`, color: metric.color }}
+                      <motion.div
+                        className="p-2 sm:p-2.5 rounded-xl shadow-md"
+                        style={{ backgroundColor: `${metric.color}20`, color: metric.color }}
+                        whileHover={{ rotate: 15, scale: 1.1 }}
                       >
                         <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-current" />
-                      </div>
+                      </motion.div>
                       <div>
                         <p className="text-xl sm:text-2xl font-bold text-[#fffffe] leading-tight">
                           {metric.value}
@@ -272,7 +294,7 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>

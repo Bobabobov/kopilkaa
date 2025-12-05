@@ -37,6 +37,13 @@ export function StoryCard({ story, index }: StoryCardProps) {
     router.push(`/stories/${story.id}`);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleCardClick();
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -49,8 +56,12 @@ export function StoryCard({ story, index }: StoryCardProps) {
       className="group"
     >
       <div
+        role="link"
+        tabIndex={0}
+        aria-label={`Открыть историю: ${story.title}`}
         onClick={handleCardClick}
-        className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 border border-[#abd1c6]/40 hover:-translate-y-2 hover:scale-[1.02] h-full max-w-full overflow-hidden flex flex-col group-hover:border-[#f9bc60]/60 cursor-pointer"
+        onKeyDown={handleKeyDown}
+        className="bg-gradient-to-br from-white/95 to-white/85 backdrop-blur-xl rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 border border-[#abd1c6]/40 hover:-translate-y-2 hover:scale-[1.02] h-full max-w-full overflow-hidden flex flex-col group-hover:border-[#f9bc60]/60 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60"
         style={{
           background:
             "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 50%, rgba(249,188,96,0.1) 100%)",
@@ -63,6 +74,9 @@ export function StoryCard({ story, index }: StoryCardProps) {
             <img
               src={mainImage}
               alt={story.title}
+              loading="lazy"
+              width={800}
+              height={320}
               className="w-full h-52 object-cover group-hover:scale-110 transition-all duration-700 ease-out"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent group-hover:from-black/20 transition-all duration-500"></div>

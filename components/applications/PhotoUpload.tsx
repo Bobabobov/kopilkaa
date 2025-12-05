@@ -49,14 +49,37 @@ export default function PhotoUpload({
       transition={{ duration: 0.5, delay }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={onDrop}
-      className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 p-6 bg-transparent hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors duration-300 relative"
+      className="relative overflow-hidden rounded-2xl border-2 border-dashed border-[#abd1c6]/30 p-6 bg-gradient-to-br from-[#004643]/40 to-[#001e1d]/20 hover:border-[#f9bc60]/50 transition-all duration-300 hover:shadow-xl hover:shadow-[#f9bc60]/20"
     >
+      {/* Декоративные элементы */}
+      <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#f9bc60]/10 rounded-full blur-2xl"></div>
+      <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-[#e16162]/10 rounded-full blur-xl"></div>
+      
+      <div className="relative z-10">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <LucideIcons.Image size="sm" className="text-emerald-500" />
-          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-            Фотографии <span className="text-gray-500">(до {maxPhotos})</span>
-          </span>
+        <div className="flex items-center gap-3">
+          <motion.div
+            className="w-10 h-10 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center shadow-lg shadow-[#f9bc60]/30"
+            animate={{ 
+              rotate: [0, 5, -5, 0],
+              scale: [1, 1.05, 1]
+            }}
+            transition={{ 
+              duration: 3,
+              repeat: Infinity,
+              repeatDelay: 2
+            }}
+          >
+            <LucideIcons.Image className="text-[#001e1d]" size="sm" />
+          </motion.div>
+          <div>
+            <span className="text-sm font-bold text-[#fffffe] block">
+              Фотографии
+            </span>
+            <span className="text-xs text-[#abd1c6]">
+              {photos.length} / {maxPhotos} загружено
+            </span>
+          </div>
         </div>
         <input
           type="file"
@@ -67,13 +90,20 @@ export default function PhotoUpload({
           id="photo-upload"
         />
         <motion.label
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
           htmlFor="photo-upload"
-          className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-medium rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl"
+          className="relative px-5 py-2.5 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] hover:from-[#e8a545] hover:to-[#f9bc60] text-[#001e1d] text-sm font-bold rounded-xl transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl hover:shadow-[#f9bc60]/40 overflow-hidden group"
         >
-          <LucideIcons.Upload size="sm" className="inline mr-2" />
-          Выбрать файлы
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+            animate={{ x: ["-100%", "100%"] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          ></motion.div>
+          <span className="relative z-10 flex items-center gap-2">
+            <LucideIcons.Upload size="sm" />
+            Выбрать файлы
+          </span>
         </motion.label>
       </div>
 
@@ -82,41 +112,66 @@ export default function PhotoUpload({
           {photos.map((photo, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.8, rotate: 5 }}
+              transition={{ delay: index * 0.1 }}
               className="relative group"
             >
-              <div className="aspect-square rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600 bg-transparent">
+              <div className="aspect-square rounded-xl overflow-hidden border-2 border-[#abd1c6]/30 bg-[#001e1d]/20 group-hover:border-[#f9bc60]/50 transition-all duration-300 shadow-lg group-hover:shadow-xl group-hover:shadow-[#f9bc60]/20">
                 <img
                   src={photo.url}
                   alt={`Preview ${index + 1}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="text-white text-xs font-medium bg-black/50 backdrop-blur-sm px-2 py-1 rounded">
+                    Фото {index + 1}
+                  </div>
+                </div>
               </div>
 
-              <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => removePhoto(index)}
-                  className="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors duration-200"
-                >
-                  <LucideIcons.Trash size="xs" />
-                </motion.button>
-              </div>
+              <motion.button
+                whileHover={{ scale: 1.15, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => removePhoto(index)}
+                className="absolute top-2 right-2 w-8 h-8 bg-gradient-to-br from-[#e16162] to-[#d14d4e] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:shadow-[#e16162]/40 transition-all duration-300 opacity-0 group-hover:opacity-100"
+              >
+                <LucideIcons.Trash size="xs" />
+              </motion.button>
             </motion.div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-8">
-          <LucideIcons.Image size="lg" className="text-gray-400 mx-auto mb-2" />
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
-            Перетащите фотографии сюда или нажмите "Выбрать файлы"
+        <motion.div 
+          className="text-center py-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <motion.div
+            animate={{ 
+              y: [0, -10, 0],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{ 
+              duration: 3,
+              repeat: Infinity,
+              repeatDelay: 1
+            }}
+            className="inline-block mb-4"
+          >
+            <LucideIcons.Image size="xl" className="text-[#abd1c6]/50" />
+          </motion.div>
+          <p className="text-[#abd1c6] text-sm font-medium mb-2">
+            Перетащите фотографии сюда
           </p>
-        </div>
+          <p className="text-[#abd1c6]/70 text-xs">
+            или нажмите "Выбрать файлы"
+          </p>
+        </motion.div>
       )}
+      </div>
     </motion.div>
   );
 }

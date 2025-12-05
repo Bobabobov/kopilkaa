@@ -138,7 +138,7 @@ export default function BeautifulToast({
             damping: 25,
             duration: 0.4,
           }}
-          className="fixed top-6 left-6 z-[9999]"
+          className="fixed top-6 right-6 z-[9999]"
         >
           <div className="relative">
             {/* Основная плашка */}

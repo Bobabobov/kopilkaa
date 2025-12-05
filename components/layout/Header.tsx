@@ -15,6 +15,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [topBannerHeight, setTopBannerHeight] = useState(0);
   const [menuTop, setMenuTop] = useState(64);
+  const [headerHeight, setHeaderHeight] = useState(64);
 
   // Проверяем авторизацию (не блокируем навигацию)
   useEffect(() => {
@@ -129,6 +130,17 @@ export default function Header() {
   // Отдельно вычисляем позицию нижней границы header,
   // чтобы мобильное меню всегда открывалось сразу под ним
   useEffect(() => {
+    const updateHeaderHeight = () => {
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+      setHeaderHeight(isMobile ? 56 : 64);
+    };
+    updateHeaderHeight();
+    window.addEventListener("resize", updateHeaderHeight);
+    return () => window.removeEventListener("resize", updateHeaderHeight);
+  }, []);
+
+  // Позиция меню на мобильных — сразу под хедером
+  useEffect(() => {
     const updateMenuTop = () => {
       const header = document.querySelector('header') as HTMLElement | null;
       if (header) {
@@ -161,22 +173,23 @@ export default function Header() {
 
   return (
     <>
-              {/* Spacer для Header + TopBanner */}
-              <div 
-                style={{ 
-                  height: `${64 + topBannerHeight}px`
-                }} 
-              />
+      {/* Spacer для Header + TopBanner */}
+      <div 
+        style={{ 
+          height: `${headerHeight + topBannerHeight}px`
+        }} 
+      />
 
-              <header
-                className="fixed left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg"
-                style={{ 
-                  backgroundColor: "#004643", 
-                  borderColor: "#abd1c6",
-                  top: `${topBannerHeight}px`
-                }}
-              >
-        <div className="container-p mx-auto flex h-16 items-center justify-between gap-4">
+      <header
+        className="fixed left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg"
+        style={{ 
+          backgroundColor: "#004643", 
+          borderColor: "#abd1c6",
+          top: `${topBannerHeight}px`,
+          height: `${headerHeight}px`
+        }}
+      >
+        <div className="container-p mx-auto flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 h-full">
           {/* Логотип слева */}
           <HeaderLogo />
 
@@ -191,7 +204,7 @@ export default function Header() {
           </div>
 
           {/* Правая часть - показываем на средних и больших экранах */}
-          <div className="hidden sm:flex items-center gap-2 w-[280px] justify-end flex-shrink-0">
+          <div className="hidden sm:flex items-center gap-2 w-[260px] sm:w-[280px] justify-end flex-shrink-0">
             <DonateButton />
             {isAuthenticated && !authLoading && <NotificationBell />}
             <NavAuth />

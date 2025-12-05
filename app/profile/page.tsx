@@ -148,6 +148,20 @@ const ProfileRecentActivity = dynamicComponent(() => import("@/components/profil
 });
 
 
+
+const MotivationalCard = dynamicComponent(() => import("@/components/profile/sections/MotivationalCard"), {
+  loading: () => (
+    <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[150px]">
+      <div className="animate-pulse space-y-4">
+        <div className="h-20 bg-[#abd1c6]/10 rounded-lg"></div>
+      </div>
+    </div>
+  ),
+  ssr: false,
+});
+
+
+
 // Lazy load heavy modals
 const SettingsModal = dynamicComponent(
   () => import("@/components/profile/modals/SettingsModal"),
@@ -350,6 +364,7 @@ function ProfilePageContent() {
               className="lg:col-span-8 space-y-4 sm:space-y-5 md:space-y-6"
               aria-label="Статистика и активность"
             >
+              <MotivationalCard />
               <ProfilePersonalStats />
               <ProfileRecentActivity />
             </section>

@@ -99,9 +99,10 @@ export default function ApplicationPreview({
           </div>
           <button
             onClick={onClose}
-            className="group p-3 hover:bg-[#abd1c6]/10 rounded-2xl transition-all duration-300 text-[#fffffe] hover:text-[#abd1c6] hover:scale-110 border border-transparent hover:border-[#abd1c6]/20"
+            className="group p-3 hover:bg-[#abd1c6]/10 rounded-2xl transition-all duration-300 text-[#fffffe] hover:text-[#abd1c6] hover:scale-110 border border-transparent hover:border-[#abd1c6]/20 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60"
+            aria-label="Закрыть предпросмотр"
           >
-            <LucideIcons.X size="lg" className="group-hover:rotate-90 transition-transform duration-300" />
+            <LucideIcons.X size="lg" className="group-hover:rotate-90 transition-transform duration-300" aria-hidden="true" />
           </button>
         </div>
 
@@ -198,10 +199,13 @@ export default function ApplicationPreview({
                     <img
                       src={photo.url}
                       alt={`Фото ${index + 1}`}
+                      loading="lazy"
+                      width={320}
+                      height={240}
                       className="w-full h-24 object-cover rounded-xl border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 transition-all duration-300 hover:scale-105 hover:shadow-lg"
                     />
                     <div className="absolute inset-0 bg-black/0 hover:bg-black/20 rounded-xl transition-all duration-300 flex items-center justify-center opacity-0 group-hover/image:opacity-100">
-                      <LucideIcons.ZoomIn size="sm" className="text-white" />
+                      <LucideIcons.ZoomIn size="sm" className="text-white" aria-hidden="true" />
                     </div>
                   </div>
                 ))}
@@ -215,17 +219,17 @@ export default function ApplicationPreview({
           {/* Декоративная линия */}
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-[#abd1c6]/50 to-transparent"></div>
           
-          <div className="flex gap-4 justify-end">
+          <div className="flex gap-4 justify-end flex-wrap">
             <button
               onClick={onClose}
-              className="group px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-gray-500/20 flex items-center gap-3"
+              className="group px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-gray-500/20 inline-flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50"
             >
               <LucideIcons.Edit3 size="sm" className="group-hover:rotate-12 transition-transform duration-300" />
               Редактировать
             </button>
             <button
               onClick={onConfirm}
-              className="group px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-emerald-400/20 flex items-center gap-3"
+              className="group px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-emerald-400/20 inline-flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-emerald-300/60"
             >
               <LucideIcons.Send size="sm" className="group-hover:translate-x-1 transition-transform duration-300" />
               Отправить заявку

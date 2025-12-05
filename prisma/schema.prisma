@@ -1,6 +1,6 @@
 // prisma/schema.prisma
 datasource db {
-  provider = "sqlite"      // если решишь перейти на Postgres — скажешь, переделаем URL/миграции
+  provider = "sqlite" // если решишь перейти на Postgres — скажешь, переделаем URL/миграции
   url      = env("DATABASE_URL")
 }
 
@@ -33,62 +33,64 @@ enum AchievementType {
 }
 
 model User {
-  id           String          @id @default(cuid())
-  email        String          @unique
-  username     String?         @unique
-  passwordHash String
-  name         String?
-  avatar       String?
-  phone        String?         @unique
-  phoneVerified Boolean        @default(false)
-  telegramId   String?         @unique
+  id               String    @id @default(cuid())
+  email            String    @unique
+  username         String?   @unique
+  passwordHash     String
+  name             String?
+  avatar           String?
+  phone            String?   @unique
+  phoneVerified    Boolean   @default(false)
+  telegramId       String?   @unique
   telegramUsername String?
-  vkLink       String?
-  telegramLink String?
-  youtubeLink  String?
-  headerTheme  String?         @default("default")
-  avatarFrame  String?         @default("none")
-  customFrameData String?      // JSON данные пользовательских рамок
-  hideEmail    Boolean         @default(true)  // Скрывать email в профиле по умолчанию
-  role         String          @default("USER")
-  createdAt    DateTime        @default(now())
-  lastSeen     DateTime        @default(now())
-  lastCommentAt DateTime?      // Время последнего комментария для кулдауна
+  vkLink           String?
+  telegramLink     String?
+  youtubeLink      String?
+  headerTheme      String?   @default("default")
+  avatarFrame      String?   @default("none")
+  customFrameData  String? // JSON данные пользовательских рамок
+  hideEmail        Boolean   @default(true) // Скрывать email в профиле по умолчанию
+  role             String    @default("USER")
+  createdAt        DateTime  @default(now())
+  lastSeen         DateTime  @default(now())
+  lastCommentAt    DateTime? // Время последнего комментария для кулдауна
 
-  applications Application[]
-  gameRecords  GameRecord[]
-  userTree     UserTree?
-  userAchievements UserAchievement[]
-  friendshipsSent     Friendship[] @relation("FriendshipRequester")
-  friendshipsReceived Friendship[] @relation("FriendshipReceiver")
-  pageVisits   PageVisit[]
-  storyLikes   StoryLike[]
-  reportsSent  UserReport[] @relation("ReportReporter")
-  reportsReceived UserReport[] @relation("ReportReported")
-  donations    Donation[]
-  phoneLoginCodes PhoneLoginCode[]
-  isBanned     Boolean      @default(false)
-  bannedUntil  DateTime?
-  bannedReason String?
+  applications        Application[]
+  gameRecords         GameRecord[]
+  userTree            UserTree?
+  userAchievements    UserAchievement[]
+  friendshipsSent     Friendship[]      @relation("FriendshipRequester")
+  friendshipsReceived Friendship[]      @relation("FriendshipReceiver")
+  pageVisits          PageVisit[]
+  storyLikes          StoryLike[]
+  reportsSent         UserReport[]      @relation("ReportReporter")
+  reportsReceived     UserReport[]      @relation("ReportReported")
+  bugReports          BugReport[]       @relation("BugReportAuthor")
+  bugReportLikes      BugReportLike[]   @relation("BugReportLikes")
+  donations           Donation[]
+  phoneLoginCodes     PhoneLoginCode[]
+  isBanned            Boolean           @default(false)
+  bannedUntil         DateTime?
+  bannedReason        String?
 }
 
 model Application {
-  id           String             @id @default(cuid())
-  userId       String
-  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   title        String
   summary      String
   story        String
-  amount       Int              @default(0)
+  amount       Int               @default(0)
   payment      String
-  status       ApplicationStatus  @default(PENDING)
+  status       ApplicationStatus @default(PENDING)
   adminComment String?
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
-  images       ApplicationImage[]
-  likes        StoryLike[]
+  images ApplicationImage[]
+  likes  StoryLike[]
 
   @@index([userId])
   @@index([status])
@@ -97,12 +99,12 @@ model Application {
 }
 
 model ApplicationImage {
-  id            String   @id @default(cuid())
+  id            String      @id @default(cuid())
   applicationId String
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
-  url           String
-  sort          Int
+  url  String
+  sort Int
 
   @@index([applicationId])
   @@index([sort])
@@ -110,18 +112,18 @@ model ApplicationImage {
 
 // Модель для игровых записей
 model GameRecord {
-  id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  gameType      String    // Тип игры: leaf-flight, etc.
-  attempts      Int       @default(0)    // Количество попыток
-  maxAttempts   Int       @default(3)    // Максимальное количество попыток
-  bestScore     Int?      // Лучший результат
-  cooldownEnd   DateTime? // Конец кулдауна
-  lastPlayed    DateTime? // Последняя игра
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameType    String // Тип игры: leaf-flight, etc.
+  attempts    Int       @default(0) // Количество попыток
+  maxAttempts Int       @default(3) // Максимальное количество попыток
+  bestScore   Int? // Лучший результат
+  cooldownEnd DateTime? // Конец кулдауна
+  lastPlayed  DateTime? // Последняя игра
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
   @@unique([userId, gameType])
   @@index([userId])
   @@index([gameType])
@@ -130,23 +132,23 @@ model GameRecord {
 
 // Модель для дерева мотивации
 model UserTree {
-  id            String    @id @default(cuid())
-  userId        String    @unique
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  level         Int       @default(0)
-  streak        Int       @default(0)
-  maxStreak     Int       @default(0)
-  totalWatered  Int       @default(0)
-  lastWatered   DateTime?
-  treeType      String?   // oak, sakura, etc.
-  potType       String?   // clay, ceramic, etc.
-  background    String?   // garden, forest, etc.
-  decorations   String?   // JSON array of decorations
-  isCustomized  Boolean   @default(false)
-  customizedAt  DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level        Int       @default(0)
+  streak       Int       @default(0)
+  maxStreak    Int       @default(0)
+  totalWatered Int       @default(0)
+  lastWatered  DateTime?
+  treeType     String? // oak, sakura, etc.
+  potType      String? // clay, ceramic, etc.
+  background   String? // garden, forest, etc.
+  decorations  String? // JSON array of decorations
+  isCustomized Boolean   @default(false)
+  customizedAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
   @@index([userId])
 }
 
@@ -161,13 +163,13 @@ model Achievement {
   isExclusive Boolean           @default(false)
   maxCount    Int               @default(1) // Максимальное количество раз, которое можно получить
   isActive    Boolean           @default(true)
-  validFrom   DateTime?         // Дата начала действия
-  validTo     DateTime?         // Дата окончания действия
+  validFrom   DateTime? // Дата начала действия
+  validTo     DateTime? // Дата окончания действия
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
-  
+
   userAchievements UserAchievement[]
-  
+
   @@index([rarity])
   @@index([type])
   @@index([isActive])
@@ -177,15 +179,15 @@ model Achievement {
 
 // Модель для связи пользователей с достижениями
 model UserAchievement {
-  id           String      @id @default(cuid())
-  userId       String
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   achievementId String
-  achievement  Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-  unlockedAt   DateTime    @default(now())
-  grantedBy    String?     // ID администратора, который выдал достижение
-  grantedByName String?    // Имя администратора для отображения
-  
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt    DateTime    @default(now())
+  grantedBy     String? // ID администратора, который выдал достижение
+  grantedByName String? // Имя администратора для отображения
+
   @@unique([userId, achievementId])
   @@index([userId])
   @@index([achievementId])
@@ -194,15 +196,15 @@ model UserAchievement {
 
 // Модель для дружбы между пользователями
 model Friendship {
-  id          String            @id @default(cuid())
+  id          String           @id @default(cuid())
   requesterId String
-  requester   User              @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  requester   User             @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
   receiverId  String
-  receiver    User              @relation("FriendshipReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-  status      FriendshipStatus  @default(PENDING)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  
+  receiver    User             @relation("FriendshipReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
   @@unique([requesterId, receiverId])
   @@index([requesterId])
   @@index([receiverId])
@@ -218,9 +220,9 @@ enum FriendshipStatus {
 }
 
 enum DonationType {
-  SUPPORT   // входящий донат/подписка
-  PAYOUT    // вывод авторам (уменьшает копилку)
-  ADJUST    // ручная корректировка баланса
+  SUPPORT // входящий донат/подписка
+  PAYOUT // вывод авторам (уменьшает копилку)
+  ADJUST // ручная корректировка баланса
 }
 
 model Donation {
@@ -228,7 +230,7 @@ model Donation {
   userId    String?
   user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
   type      DonationType @default(SUPPORT)
-  amount    Int          // сумма в рублях (пока), >0
+  amount    Int // сумма в рублях (пока), >0
   comment   String?
   createdAt DateTime     @default(now())
 
@@ -256,10 +258,10 @@ model PageVisit {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  page      String   // путь страницы, например "/applications"
-  timeSpent Int      // время в миллисекундах
+  page      String // путь страницы, например "/applications"
+  timeSpent Int // время в миллисекундах
   visitDate DateTime @default(now())
-  
+
   @@index([userId])
   @@index([page])
   @@index([visitDate])
@@ -267,13 +269,13 @@ model PageVisit {
 
 // Модель для лайков историй
 model StoryLike {
-  id            String   @id @default(cuid())
+  id            String      @id @default(cuid())
   userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   applicationId String
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  createdAt     DateTime @default(now())
-  
+  createdAt     DateTime    @default(now())
+
   @@unique([userId, applicationId])
   @@index([userId])
   @@index([applicationId])
@@ -301,19 +303,19 @@ model Advertisement {
 
 // Модель для заявок на размещение рекламы
 model AdRequest {
-  id            String   @id @default(cuid())
-  companyName   String   // Название компании/проекта
-  email         String   // Контактный email
-  website       String?  // Ссылка на сайт/соцсеть
-  format        String   // Формат размещения (banner, post, telegram)
-  duration      Int      // Срок в днях
-  bannerUrl     String?  // URL загруженного баннера
-  comment       String?  // Комментарий от рекламодателя
-  status        String   @default("new") // new, processing, approved, rejected
-  adminComment  String?  // Комментарий администратора
-  processedBy   String?  // ID администратора, обработавшего заявку
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  companyName  String // Название компании/проекта
+  email        String // Контактный email
+  website      String? // Ссылка на сайт/соцсеть
+  format       String // Формат размещения (banner, post, telegram)
+  duration     Int // Срок в днях
+  bannerUrl    String? // URL загруженного баннера
+  comment      String? // Комментарий от рекламодателя
+  status       String   @default("new") // new, processing, approved, rejected
+  adminComment String? // Комментарий администратора
+  processedBy  String? // ID администратора, обработавшего заявку
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([status])
   @@index([createdAt])
@@ -322,20 +324,72 @@ model AdRequest {
 
 // Модель для жалоб на пользователей
 model UserReport {
-  id            String   @id @default(cuid())
-  reporterId    String
-  reporter      User     @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
-  reportedId    String
-  reported      User     @relation("ReportReported", fields: [reportedId], references: [id], onDelete: Cascade)
-  reason        String
-  status        String   @default("pending") // pending, reviewed, resolved, dismissed
-  adminComment  String?
-  processedBy   String?  // ID администратора, обработавшего жалобу
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  reporterId   String
+  reporter     User     @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedId   String
+  reported     User     @relation("ReportReported", fields: [reportedId], references: [id], onDelete: Cascade)
+  reason       String
+  status       String   @default("pending") // pending, reviewed, resolved, dismissed
+  adminComment String?
+  processedBy  String? // ID администратора, обработавшего жалобу
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([reporterId])
   @@index([reportedId])
   @@index([status])
   @@index([createdAt])
+}
+
+// Модель для баг-репортов
+model BugReport {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation("BugReportAuthor", fields: [userId], references: [id], onDelete: Cascade)
+
+  title        String // Краткое описание проблемы (до 40 символов)
+  description  String // Подробное описание (до 700 символов)
+  category     String  @default("MODERATOR") // MODERATOR, DEVELOPER, DESIGNER, OTHER
+  status       String  @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+  adminComment String? // Комментарий администратора
+  processedBy  String? // ID администратора, обработавшего баг-репорт
+
+  images BugReportImage[]
+  likes  BugReportLike[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+}
+
+model BugReportImage {
+  id          String    @id @default(cuid())
+  bugReportId String
+  bugReport   BugReport @relation(fields: [bugReportId], references: [id], onDelete: Cascade)
+
+  url  String
+  sort Int    @default(0)
+
+  @@index([bugReportId])
+  @@index([sort])
+}
+
+model BugReportLike {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation("BugReportLikes", fields: [userId], references: [id], onDelete: Cascade)
+  bugReportId String
+  bugReport   BugReport @relation(fields: [bugReportId], references: [id], onDelete: Cascade)
+  isLike      Boolean   @default(true) // true = лайк, false = дизлайк
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, bugReportId])
+  @@index([userId])
+  @@index([bugReportId])
+  @@index([isLike])
 }

@@ -153,44 +153,74 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
       transition={{ duration: 0.3 }}
       className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden"
     >
-      {/* Заголовок */}
-      <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
+      {/* Улучшенный заголовок */}
+      <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10 bg-gradient-to-r from-[#001e1d]/30 to-transparent">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <LucideIcons.Heart className="text-[#f9bc60]" size="sm" />
-            </div>
+            <motion.div 
+              className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#f9bc60]/30"
+              animate={{ 
+                scale: [1, 1.1, 1],
+                rotate: [0, 5, -5, 0]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                repeatDelay: 2
+              }}
+            >
+              <LucideIcons.Heart className="text-[#001e1d]" size="sm" />
+            </motion.div>
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Пожертвования</h3>
-              <p className="text-[10px] sm:text-xs text-[#abd1c6] mt-0.5">
-                Всего: {formatAmount(data.stats.totalDonated)}
+              <h3 className="text-base sm:text-lg font-bold text-[#fffffe] truncate bg-gradient-to-r from-[#fffffe] to-[#f9bc60] bg-clip-text text-transparent">
+                Пожертвования
+              </h3>
+              <p className="text-[10px] sm:text-xs text-[#abd1c6] mt-0.5 font-medium">
+                Всего: <span className="text-[#f9bc60] font-bold">{formatAmount(data.stats.totalDonated)}</span>
               </p>
             </div>
           </div>
-          <div className="text-right flex-shrink-0">
-            <div className="text-lg sm:text-xl font-bold text-[#f9bc60]">
+          <motion.div 
+            className="text-right flex-shrink-0"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", delay: 0.2 }}
+          >
+            <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-[#f9bc60] to-[#e8a545] bg-clip-text text-transparent">
               {data.stats.donationsCount}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">пожертвований</div>
-          </div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">пожертвований</div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Статистика */}
-      <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10 bg-[#001e1d]/20">
+      {/* Улучшенная статистика */}
+      <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10 bg-gradient-to-br from-[#001e1d]/30 to-[#001e1d]/10">
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          <div className="text-center p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10">
-            <div className="text-xl sm:text-2xl font-bold text-[#f9bc60] mb-1">
+          <motion.div 
+            className="text-center p-4 sm:p-5 bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-xl border border-[#f9bc60]/20 shadow-lg hover:shadow-xl hover:shadow-[#f9bc60]/20 transition-all"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            whileHover={{ scale: 1.05 }}
+          >
+            <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-[#f9bc60] to-[#e8a545] bg-clip-text text-transparent mb-2">
               {formatAmount(data.stats.totalDonated)}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">Всего пожертвовано</div>
-          </div>
-          <div className="text-center p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10">
-            <div className="text-xl sm:text-2xl font-bold text-[#abd1c6] mb-1">
+            <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">Всего пожертвовано</div>
+          </motion.div>
+          <motion.div 
+            className="text-center p-4 sm:p-5 bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20 shadow-lg hover:shadow-xl transition-all"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ scale: 1.05 }}
+          >
+            <div className="text-2xl sm:text-3xl font-bold text-[#abd1c6] mb-2">
               {data.stats.donationsCount}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">Количество</div>
-          </div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">Количество</div>
+          </motion.div>
         </div>
       </div>
 
@@ -203,12 +233,16 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="flex items-center justify-between p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10 hover:border-[#f9bc60]/30 transition-colors"
+              className="flex items-center justify-between p-3 sm:p-4 bg-gradient-to-r from-[#001e1d]/40 to-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20 hover:border-[#f9bc60]/50 transition-all hover:shadow-lg hover:shadow-[#f9bc60]/20"
+              whileHover={{ scale: 1.02, x: 5 }}
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <motion.div 
+                  className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#f9bc60]/30 to-[#e8a545]/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md"
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                >
                   <LucideIcons.Heart className="text-[#f9bc60]" size="sm" />
-                </div>
+                </motion.div>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm sm:text-base font-semibold text-[#fffffe]">
                     {formatAmount(donation.amount)}

@@ -29,40 +29,51 @@ export default function SubmitSection({
       className="space-y-4"
     >
       <motion.button
-        whileHover={{ scale: 1.02 }}
+        whileHover={{ scale: 1.02, y: -2 }}
         whileTap={{ scale: 0.98 }}
         type="submit"
         disabled={submitting || uploading}
-        className="w-full px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:shadow-none disabled:cursor-not-allowed"
+        className="relative w-full px-8 py-4 bg-gradient-to-r from-[#f9bc60] via-[#e8a545] to-[#f9bc60] hover:from-[#e8a545] hover:via-[#f9bc60] hover:to-[#e8a545] disabled:from-gray-400 disabled:to-gray-500 text-[#001e1d] font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-[#f9bc60]/40 disabled:shadow-none disabled:cursor-not-allowed overflow-hidden group"
       >
-        <div className="flex items-center justify-center gap-3">
+        {/* Анимированный фон */}
+        <motion.span
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent block"
+          animate={{ x: ["-100%", "100%"] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        ></motion.span>
+        <span className="relative z-10 inline-flex items-center justify-center gap-3">
           {submitting ? (
             <>
-              <motion.div
+              <motion.span
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               >
                 <LucideIcons.Refresh size="sm" />
-              </motion.div>
+              </motion.span>
               <span>Отправка заявки...</span>
             </>
           ) : uploading ? (
             <>
-              <motion.div
+              <motion.span
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               >
                 <LucideIcons.Upload size="sm" />
-              </motion.div>
+              </motion.span>
               <span>Загрузка фото...</span>
             </>
           ) : (
             <>
-              <LucideIcons.Send size="sm" />
+              <motion.span
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <LucideIcons.Send size="sm" />
+              </motion.span>
               <span>Отправить заявку</span>
             </>
           )}
-        </div>
+        </span>
       </motion.button>
 
       {left !== null && (
@@ -103,13 +114,18 @@ export default function SubmitSection({
 
       {err && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-4 border border-red-200 dark:border-red-800 rounded-xl"
+          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          className="p-4 border-2 border-[#e16162]/50 rounded-xl bg-gradient-to-br from-[#e16162]/10 to-[#d14d4e]/5 backdrop-blur-sm"
         >
-          <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-            <LucideIcons.Alert size="sm" />
-            <span className="font-medium">{err}</span>
+          <div className="flex items-center gap-3 text-[#e16162]">
+            <motion.span
+              animate={{ rotate: [0, -10, 10, 0] }}
+              transition={{ duration: 0.5, repeat: 2 }}
+            >
+              <LucideIcons.Alert size="sm" />
+            </motion.span>
+            <span className="font-semibold">{err}</span>
           </div>
         </motion.div>
       )}

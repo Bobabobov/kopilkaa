@@ -91,12 +91,29 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
       </div>
 
       <div className="relative z-10">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 bg-[#f9bc60] rounded-lg flex items-center justify-center text-[#001e1d] text-lg">
+        <motion.div 
+          className="flex items-center gap-3 mb-6"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+        >
+          <motion.div 
+            className="w-10 h-10 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-[#001e1d] text-xl shadow-lg shadow-[#f9bc60]/30"
+            animate={{ 
+              rotate: [0, 10, -10, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              repeatDelay: 3
+            }}
+          >
             ⚡
-          </div>
-          <h3 className="text-lg font-semibold text-[#fffffe]">Активность</h3>
-        </div>
+          </motion.div>
+          <h3 className="text-lg font-bold text-[#fffffe] bg-gradient-to-r from-[#fffffe] to-[#abd1c6] bg-clip-text text-transparent">
+            Активность
+          </h3>
+        </motion.div>
 
         {activities.length === 0 ? (
           <div className="text-center py-8">
@@ -115,11 +132,14 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="group flex items-start gap-4 p-4 rounded-2xl bg-[#001e1d]/30 border border-[#abd1c6]/10 hover:bg-[#001e1d]/40 transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                className="group flex items-start gap-4 p-4 rounded-2xl bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl hover:shadow-[#f9bc60]/20"
               >
-                <div className="w-10 h-10 bg-[#f9bc60]/20 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                <motion.div 
+                  className="w-12 h-12 bg-gradient-to-br from-[#f9bc60]/30 to-[#e8a545]/20 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-md"
+                  whileHover={{ rotate: 15, scale: 1.2 }}
+                >
                   {getActivityIcon(activity.type)}
-                </div>
+                </motion.div>
                 <div className="flex-1 min-w-0">
                   <div
                     className="text-sm font-semibold text-[#fffffe] mb-1"

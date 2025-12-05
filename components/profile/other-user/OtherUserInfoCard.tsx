@@ -121,21 +121,46 @@ function OtherUserInfoCard({
           : {}),
       }}
     >
-      {/* Декоративные градиентные круги */}
-      <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#f9bc60]/10 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-[#e16162]/10 rounded-full blur-3xl"></div>
+      {/* Улучшенные декоративные элементы */}
+      <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-[#f9bc60]/20 via-[#e8a545]/15 to-transparent rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-tr from-[#e16162]/20 via-[#d14d4e]/15 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       <div 
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-60 h-60 rounded-full blur-3xl"
         style={{
-          background: "radial-gradient(circle, rgba(171, 209, 198, 0.08) 0%, rgba(171, 209, 198, 0.04) 50%, transparent 100%)"
+          background: "radial-gradient(circle, rgba(171, 209, 198, 0.12) 0%, rgba(171, 209, 198, 0.06) 50%, transparent 100%)",
+          animation: "pulse 4s ease-in-out infinite"
         }}
       ></div>
       
-      {/* Декоративные линии */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent"></div>
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent"></div>
-      <div className="absolute top-0 left-0 h-full w-px bg-gradient-to-b from-transparent via-[#abd1c6]/30 to-transparent"></div>
-      <div className="absolute top-0 right-0 h-full w-px bg-gradient-to-b from-transparent via-[#abd1c6]/30 to-transparent"></div>
+      {/* Анимированные декоративные линии с градиентами */}
+      <motion.div 
+        className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#f9bc60]/40 to-transparent"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.8 }}
+      ></motion.div>
+      <motion.div 
+        className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#abd1c6]/40 to-transparent"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      ></motion.div>
+      <motion.div 
+        className="absolute top-0 left-0 h-full w-px bg-gradient-to-b from-transparent via-[#abd1c6]/30 to-transparent"
+        initial={{ scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      ></motion.div>
+      <motion.div 
+        className="absolute top-0 right-0 h-full w-px bg-gradient-to-b from-transparent via-[#abd1c6]/30 to-transparent"
+        initial={{ scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+      ></motion.div>
+      
+      {/* Дополнительные световые эффекты */}
+      <div className="absolute top-10 right-10 w-32 h-32 bg-[#f9bc60]/5 rounded-full blur-2xl"></div>
+      <div className="absolute bottom-10 left-10 w-24 h-24 bg-[#e16162]/5 rounded-full blur-xl"></div>
 
       {/* Затемнение для читаемости текста */}
       {theme.background !== "color" ? (
@@ -229,12 +254,22 @@ function OtherUserInfoCard({
             </div>
           </div>
           <div className="flex items-center justify-center gap-2 mb-1">
-            <h2 
-              className="text-lg sm:text-xl font-semibold"
-              style={{ color: textColor }}
+            <motion.h2 
+              className="text-lg sm:text-xl font-bold bg-gradient-to-r from-[#fffffe] via-[#abd1c6] to-[#fffffe] bg-clip-text text-transparent"
+              style={{ 
+                color: textColor,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundImage: isColorTheme && backgroundColor 
+                  ? `linear-gradient(135deg, ${textColor}, ${secondaryTextColor}, ${textColor})`
+                  : undefined
+              }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
             >
               {user.name || "Пользователь"}
-            </h2>
+            </motion.h2>
             {user.role === "ADMIN" && (
               currentUserRole === "ADMIN" ? (
                 <Link
@@ -274,18 +309,31 @@ function OtherUserInfoCard({
                 className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 md:gap-4 text-xs mb-2 sm:mb-3"
                 style={{ color: secondaryTextColor }}
               >
-            <div className="flex items-center gap-1.5">
-              <div
-                className={`w-2 h-2 rounded-full ${
+            <motion.div 
+              className="flex items-center gap-1.5"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <motion.div
+                className={`w-2.5 h-2.5 rounded-full ${
                   status.status === "online"
-                    ? "bg-[#abd1c6] animate-pulse"
+                    ? "bg-[#10B981] shadow-lg shadow-[#10B981]/50"
                     : "bg-[#94a1b2]"
                 }`}
-              ></div>
-              <span className="whitespace-nowrap">
+                animate={status.status === "online" ? {
+                  scale: [1, 1.3, 1],
+                  opacity: [1, 0.7, 1]
+                } : {}}
+                transition={{ 
+                  duration: 2,
+                  repeat: status.status === "online" ? Infinity : 0
+                }}
+              ></motion.div>
+              <span className="whitespace-nowrap font-medium">
                 {status.status === "online" ? status.text : `Был ${status.text}`}
               </span>
-            </div>
+            </motion.div>
             <span className="hidden sm:inline">•</span>
             <div className="flex items-center gap-1.5">
               <LucideIcons.Calendar className="w-3.5 h-3.5 flex-shrink-0" />
@@ -298,43 +346,54 @@ function OtherUserInfoCard({
             </div>
           </div>
 
-          {/* Социальные сети */}
+          {/* Улучшенные социальные сети */}
           {(user.vkLink || user.telegramLink || user.youtubeLink) && (
-            <div className="flex items-center justify-center gap-3 mb-3 sm:mb-4">
+            <motion.div 
+              className="flex items-center justify-center gap-3 mb-3 sm:mb-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
               {user.vkLink && (
-                <a
+                <motion.a
                   href={user.vkLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 sm:p-3 rounded-xl border-2 border-[#0077FF]/50 bg-[#0077FF]/15 hover:bg-[#0077FF]/25 hover:border-[#0077FF]/70 transition-all shadow-lg shadow-[#0077FF]/20"
+                  className="p-3 sm:p-3.5 rounded-xl border-2 border-[#0077FF]/60 bg-gradient-to-br from-[#0077FF]/20 to-[#0077FF]/10 hover:from-[#0077FF]/30 hover:to-[#0077FF]/20 hover:border-[#0077FF]/80 transition-all shadow-lg shadow-[#0077FF]/30 hover:shadow-xl hover:shadow-[#0077FF]/40 hover:scale-110"
                   aria-label="VK"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <VKIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0077FF]" />
-                </a>
+                </motion.a>
               )}
               {user.telegramLink && (
-                <a
+                <motion.a
                   href={user.telegramLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 sm:p-3 rounded-xl border-2 border-[#0088cc]/50 bg-[#0088cc]/15 hover:bg-[#0088cc]/25 hover:border-[#0088cc]/70 transition-all shadow-lg shadow-[#0088cc]/20"
+                  className="p-3 sm:p-3.5 rounded-xl border-2 border-[#0088cc]/60 bg-gradient-to-br from-[#0088cc]/20 to-[#0088cc]/10 hover:from-[#0088cc]/30 hover:to-[#0088cc]/20 hover:border-[#0088cc]/80 transition-all shadow-lg shadow-[#0088cc]/30 hover:shadow-xl hover:shadow-[#0088cc]/40 hover:scale-110"
                   aria-label="Telegram"
+                  whileHover={{ scale: 1.1, rotate: -5 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <TelegramIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#0088cc]" />
-                </a>
+                </motion.a>
               )}
               {user.youtubeLink && (
-                <a
+                <motion.a
                   href={user.youtubeLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2.5 sm:p-3 rounded-xl border-2 border-[#FF0000]/50 bg-[#FF0000]/15 hover:bg-[#FF0000]/25 hover:border-[#FF0000]/70 transition-all shadow-lg shadow-[#FF0000]/20"
+                  className="p-3 sm:p-3.5 rounded-xl border-2 border-[#FF0000]/60 bg-gradient-to-br from-[#FF0000]/20 to-[#FF0000]/10 hover:from-[#FF0000]/30 hover:to-[#FF0000]/20 hover:border-[#FF0000]/80 transition-all shadow-lg shadow-[#FF0000]/30 hover:shadow-xl hover:shadow-[#FF0000]/40 hover:scale-110"
                   aria-label="YouTube"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <YouTubeIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#FF0000]" />
-                </a>
+                </motion.a>
               )}
-            </div>
+            </motion.div>
           )}
         </div>
 
@@ -348,13 +407,15 @@ function OtherUserInfoCard({
           }}
         >
           {!friendship && (
-            <button
+            <motion.button
               onClick={onSendFriendRequest}
-              className="w-full flex items-center justify-center gap-2 p-2.5 sm:p-3 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] font-semibold rounded-lg transition-colors text-sm"
+              className="w-full flex items-center justify-center gap-2 p-2.5 sm:p-3 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] hover:from-[#e8a545] hover:to-[#f9bc60] text-[#001e1d] font-bold rounded-lg transition-all text-sm shadow-lg shadow-[#f9bc60]/30 hover:shadow-xl hover:shadow-[#f9bc60]/40"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <LucideIcons.UserPlus size="sm" />
               <span>Добавить в друзья</span>
-            </button>
+            </motion.button>
           )}
 
           {friendship &&

@@ -178,7 +178,16 @@ export default function ProfileRecentActivity() {
   }
 
   return (
-    <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden relative"
+    >
+      {/* Декоративные элементы */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#abd1c6]/10 to-transparent rounded-full blur-2xl"></div>
+      
+      <div className="relative z-10">
       {/* Заголовок */}
       <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
         <div className="flex items-center gap-2 sm:gap-3">
@@ -239,7 +248,8 @@ export default function ProfileRecentActivity() {
           );
         })}
       </div>
-    </div>
+      </div>
+    </motion.div>
   );
 }
 

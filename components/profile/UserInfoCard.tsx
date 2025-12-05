@@ -164,6 +164,7 @@ function UserInfoCard({ user, onThemeChange }: UserInfoCardProps) {
         ></div>
       ) : null}
       
+      
       <div className="relative z-10">
       {/* Аватар и основная информация */}
       <div className="text-center p-3 sm:p-5 md:p-6 pb-3 sm:pb-4">

@@ -73,10 +73,10 @@ export default function DonateButton({ className = "", variant = "default" }: Do
             color: "#001e1d"
           }}
         >
-          <div className="flex items-center justify-center gap-2">
+          <span className="inline-flex items-center justify-center gap-2">
             <LucideIcons.Heart size="md" />
             <span>Пополнить копилку</span>
-          </div>
+          </span>
         </motion.button>
 
         <DonateModal

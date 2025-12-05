@@ -128,7 +128,7 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
               !!hero.vkLink || !!hero.telegramLink || !!hero.youtubeLink;
 
             return (
-              <Link key={hero.id} href={`/profile/${hero.id}`}>
+              <Link key={hero.id} href={`/profile/${hero.id}`} className="block focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 rounded-2xl">
               <div
                 className="p-5 rounded-2xl border transition-colors cursor-pointer bg-[#001e1d]/60 border-[#abd1c6]/30 hover:border-[#f9bc60]/60 hover:bg-[#004643]/70"
               >

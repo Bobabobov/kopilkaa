@@ -34,10 +34,9 @@ export default function PageHeader() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-4xl sm:text-5xl font-bold mb-4"
-          style={{ color: "#fffffe" }}
+          className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-[#fffffe] via-[#abd1c6] to-[#f9bc60] bg-clip-text text-transparent"
         >
-          📝 Подача заявки
+          Подача заявки
         </motion.h1>
 
         <motion.p

@@ -35,7 +35,7 @@ export default function NavAuth() {
     
     // Используем AbortController для отмены при размонтировании
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1000); // Таймаут 1 секунда
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // Таймаут 5 секунд
     
     fetch("/api/profile/me", { 
       cache: "no-store",

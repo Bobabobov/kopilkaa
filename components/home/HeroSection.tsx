@@ -80,8 +80,8 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           className="text-center mb-12 space-y-4"
         >
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/support">
-              <motion.button
+            <Link href="/support" className="inline-block">
+              <motion.span
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 animate={{ 
@@ -98,7 +98,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
                     ease: "easeInOut" 
                   } 
                 }}
-                className="px-12 py-4 text-xl font-bold rounded-2xl border-2 transition-all duration-300"
+                className="inline-flex items-center justify-center px-12 py-4 text-xl font-bold rounded-2xl border-2 transition-all duration-300"
                 style={{
                   background: "linear-gradient(135deg, rgba(249, 188, 96, 0.1) 0%, rgba(249, 188, 96, 0.2) 100%)",
                   borderColor: "#f9bc60",
@@ -122,7 +122,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
                 >
                   💫 Стань частью истории
                 </motion.span>
-              </motion.button>
+              </motion.span>
             </Link>
             <DonateButton variant="large" />
           </div>

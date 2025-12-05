@@ -5,6 +5,8 @@ import {
   Shield,
   Heart,
   ThumbsUp,
+  ThumbsDown,
+  Camera,
   Users,
   DollarSign,
   BarChart3,
@@ -19,6 +21,7 @@ import {
   X,
   HelpCircle,
   CheckCircle,
+  Circle,
   Clock,
   ArrowRight,
   ArrowLeft,
@@ -84,6 +87,7 @@ import {
   PieChart,
   Lightbulb,
   Gamepad2,
+  Code,
 } from "lucide-react";
 
 interface IconProps {
@@ -136,6 +140,14 @@ export const LucideIcons = {
 
   ThumbsUp: ({ className = "", size = "md" }: IconProps) => (
     <ThumbsUp className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  ThumbsDown: ({ className = "", size = "md" }: IconProps) => (
+    <ThumbsDown className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Camera: ({ className = "", size = "md" }: IconProps) => (
+    <Camera className={`${sizeClasses[size]} ${className}`} />
   ),
 
   TrendingUp: ({ className = "", size = "md" }: IconProps) => (
@@ -248,6 +260,10 @@ export const LucideIcons = {
 
   CheckCircle2: ({ className = "", size = "md" }: IconProps) => (
     <CheckCircle2 className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Circle: ({ className = "", size = "md" }: IconProps) => (
+    <Circle className={`${sizeClasses[size]} ${className}`} />
   ),
 
   Clock: ({ className = "", size = "md" }: IconProps) => (
@@ -472,6 +488,10 @@ export const LucideIcons = {
 
   Activity: ({ className = "", size = "md" }: IconProps) => (
     <Activity className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Code: ({ className = "", size = "md" }: IconProps) => (
+    <Code className={`${sizeClasses[size]} ${className}`} />
   ),
 
   TrendingDown: ({ className = "", size = "md" }: IconProps) => (

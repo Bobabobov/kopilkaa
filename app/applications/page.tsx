@@ -10,6 +10,7 @@ import { usePageTimeTracking } from "@/lib/usePageTimeTracking";
 import ProgressBar from "@/components/applications/ProgressBar";
 import FormField from "@/components/ui/FormField";
 import UniversalBackground from "@/components/ui/UniversalBackground";
+import MotivationalMessages from "@/components/applications/MotivationalMessages";
 
 // Lazy load heavy components
 const PhotoUpload = dynamic(() => import("@/components/applications/PhotoUpload"), {
@@ -165,6 +166,19 @@ export default function ApplicationsPage() {
     payment.length <= LIMITS.paymentMax &&
     photos.length <= LIMITS.maxPhotos;
 
+  // Подсчет заполненных полей для мотивационных сообщений
+  const getCharCount = (text: string) => text.replace(/\s/g, "").length;
+  const filledFields = [
+    getCharCount(title) > 0,
+    getCharCount(summary) > 0,
+    getCharCount(story) >= LIMITS.storyMin,
+    amount.length > 0 && parseInt(amount) >= LIMITS.amountMin,
+    getCharCount(payment) >= LIMITS.paymentMin,
+    photos.length > 0,
+  ].filter(Boolean).length;
+  const totalFields = 6;
+  const progressPercentage = Math.round((filledFields / totalFields) * 100);
+
   const uploadAll = async (): Promise<string[]> => {
     if (!photos.length) return [];
     setUploading(true);
@@ -300,63 +314,106 @@ export default function ApplicationsPage() {
       {/* Фон */}
       <UniversalBackground />
 
+      {/* Дополнительные декоративные элементы */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[#f9bc60]/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#e16162]/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#abd1c6]/3 rounded-full blur-3xl"></div>
+      </div>
 
       <PageHeader />
 
       {/* Main Content */}
-      <div className="container-p mx-auto max-w-7xl relative z-10 px-4">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+      <div className="container-p mx-auto max-w-7xl relative z-10 px-3 sm:px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
           {/* Left Sidebar with Tips */}
-          <div className="xl:col-span-1">
+          <div className="xl:col-span-1 order-2 lg:order-1">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="sticky top-8 space-y-6"
+              className="lg:sticky lg:top-8 space-y-6"
             >
-              {/* Tips Section */}
-              <div className="backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 dark:border-slate-700/30">
-                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  <span className="text-emerald-500">💡</span>
-                  Советы
-                </h3>
-                <div className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
-                  <div className="flex items-start gap-3">
-                    <span className="text-green-500 mt-0.5 flex-shrink-0">
-                      ✓
+              {/* Улучшенная секция с советами */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="relative overflow-hidden backdrop-blur-sm rounded-2xl p-6 border border-[#abd1c6]/30 bg-gradient-to-br from-[#004643]/60 to-[#001e1d]/40 shadow-xl"
+              >
+                {/* Декоративные элементы */}
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#f9bc60]/10 rounded-full blur-2xl"></div>
+                <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-[#e16162]/10 rounded-full blur-xl"></div>
+                
+                <div className="relative z-10">
+                  <motion.h3 
+                    className="flex items-center gap-3 text-xl font-bold mb-6"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <motion.div
+                      className="w-10 h-10 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center shadow-lg shadow-[#f9bc60]/30"
+                      animate={{ 
+                        rotate: [0, 10, -10, 0],
+                        scale: [1, 1.1, 1]
+                      }}
+                      transition={{ 
+                        duration: 3,
+                        repeat: Infinity,
+                        repeatDelay: 2
+                      }}
+                    >
+                      <LucideIcons.Lightbulb className="text-[#001e1d]" size="sm" />
+                    </motion.div>
+                    <span className="bg-gradient-to-r from-[#fffffe] to-[#abd1c6] bg-clip-text text-transparent">
+                      Советы
                     </span>
-                    <span>Будьте конкретными в описании ситуации</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-green-500 mt-0.5 flex-shrink-0">
-                      ✓
-                    </span>
-                    <span>Приложите фотографии для подтверждения</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-green-500 mt-0.5 flex-shrink-0">
-                      ✓
-                    </span>
-                    <span>Укажите точную сумму, которая нужна</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-green-500 mt-0.5 flex-shrink-0">
-                      ✓
-                    </span>
-                    <span>Опишите, как планируете использовать средства</span>
+                  </motion.h3>
+                  
+                  <div className="space-y-4">
+                    {[
+                      { icon: LucideIcons.Target, text: "Будьте конкретными в описании ситуации", color: "#10B981" },
+                      { icon: LucideIcons.Image, text: "Приложите фотографии для подтверждения", color: "#3B82F6" },
+                      { icon: LucideIcons.DollarSign, text: "Укажите точную сумму, которая нужна", color: "#F59E0B" },
+                      { icon: LucideIcons.FileText, text: "Опишите, как планируете использовать средства", color: "#8B5CF6" },
+                    ].map((tip, index) => {
+                      const IconComponent = tip.icon;
+                      return (
+                        <motion.div
+                          key={index}
+                          className="flex items-start gap-3 p-3 rounded-xl bg-[#001e1d]/30 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 transition-all hover:shadow-lg hover:shadow-[#f9bc60]/20"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.6 + index * 0.1 }}
+                          whileHover={{ scale: 1.02, x: 5 }}
+                        >
+                          <motion.div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md"
+                            style={{ backgroundColor: `${tip.color}20`, color: tip.color }}
+                            whileHover={{ rotate: 15, scale: 1.1 }}
+                          >
+                            <IconComponent size="xs" />
+                          </motion.div>
+                          <span className="text-sm text-[#abd1c6] font-medium pt-1">
+                            {tip.text}
+                          </span>
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
 
           {/* Main Form */}
-          <div className="xl:col-span-3">
+          <div className="xl:col-span-3 order-1 lg:order-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="space-y-8"
+              className="space-y-6 sm:space-y-8"
             >
 
               <form className="grid gap-6" onSubmit={submit}>
@@ -367,6 +424,13 @@ export default function ApplicationsPage() {
                   amount={amount}
                   payment={payment}
                   photos={photos}
+                />
+
+                {/* Мотивационные сообщения */}
+                <MotivationalMessages
+                  progress={progressPercentage}
+                  filledFields={filledFields}
+                  totalFields={totalFields}
                 />
 
                 <div>

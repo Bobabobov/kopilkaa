@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useFriends } from "@/components/profile/hooks/useFriends";
 import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { FriendsList } from "@/components/friends/FriendsList";
+import { FriendsSearch } from "@/components/friends/FriendsSearch";
 
 type Tab = "friends" | "sent" | "received" | "search";
 
@@ -383,9 +385,9 @@ function FriendsPageContent() {
 
   return (
     <div className="min-h-screen text-[#fffffe]">
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 space-y-6 sm:space-y-8">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 space-y-6 sm:space-y-8 min-w-0">
         {/* Шапка */}
-        <div className="relative overflow-hidden rounded-2xl border border-[#abd1c6]/20 bg-[#052d29] px-4 sm:px-6 lg:px-8 py-6 sm:py-7">
+        <div className="relative overflow-hidden rounded-2xl border border-[#abd1c6]/20 bg-[#052d29] px-4 sm:px-6 lg:px-8 py-6 sm:py-7 min-w-0">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -left-10 -top-10 w-44 h-44 bg-[#f9bc60]/10 blur-3xl" />
             <div className="absolute -right-8 top-0 w-36 h-36 bg-[#abd1c6]/10 blur-3xl" />
@@ -427,11 +429,11 @@ function FriendsPageContent() {
         </div>
 
         {/* Статистика */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 min-w-0">
           {summary.map((item) => (
             <div
               key={item.label}
-              className={`rounded-2xl border ${item.color} p-4 flex items-center gap-3 shadow-md`}
+              className={`rounded-2xl border ${item.color} p-4 flex items-center gap-3 shadow-md min-w-0`}
             >
               <div className="w-10 h-10 rounded-xl bg-[#001e1d]/60 flex items-center justify-center">
                 {item.icon}
@@ -448,9 +450,9 @@ function FriendsPageContent() {
         </div>
 
         {/* Контент */}
-        <div className="bg-[#052d29] rounded-2xl border border-[#abd1c6]/20 shadow-2xl overflow-hidden">
+        <div className="bg-[#052d29] rounded-2xl border border-[#abd1c6]/20 shadow-2xl overflow-hidden min-w-0">
           <div className="flex-shrink-0 bg-[#021e1c]/95 border-b border-[#abd1c6]/15 px-3 sm:px-5 py-2 sm:py-3 overflow-x-auto">
-            <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full">
+            <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full min-w-0">
               {tabs.map((tab) => {
                 const active = activeTab === tab.id;
                 return (
@@ -491,7 +493,7 @@ function FriendsPageContent() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
-                  <FriendsTabContent
+                  <FriendsList
                     type="friends"
                     data={friends}
                     loading={loading}
@@ -510,7 +512,7 @@ function FriendsPageContent() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
-                  <FriendsTabContent
+                  <FriendsList
                     type="sent"
                     data={sentRequests}
                     loading={loading}
@@ -529,7 +531,7 @@ function FriendsPageContent() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
-                  <FriendsTabContent
+                  <FriendsList
                     type="received"
                     data={receivedRequests}
                     loading={loading}
@@ -551,7 +553,7 @@ function FriendsPageContent() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
-                  <FriendsSearchContent
+                  <FriendsSearch
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                     searchResults={searchResults}

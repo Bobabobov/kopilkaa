@@ -62,7 +62,7 @@ export default function ApplicationPreview({
 
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+      className="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-md flex items-start md:items-center justify-center p-3 sm:p-4 animate-fadeIn"
       onClick={onClose}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
@@ -71,7 +71,7 @@ export default function ApplicationPreview({
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 via-transparent to-green-900/20"></div>
       
       <div
-        className="relative bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] rounded-3xl p-8 max-w-6xl w-full max-h-[95vh] overflow-hidden shadow-2xl border border-[#abd1c6]/30 animate-slideUp backdrop-blur-xl"
+        className="relative bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 max-w-6xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-[#abd1c6]/30 animate-slideUp backdrop-blur-xl"
         onClick={(e) => e.stopPropagation()}
         onWheel={handleWheel}
         onKeyDown={handleKeyDown}
@@ -85,16 +85,15 @@ export default function ApplicationPreview({
         {/* Блестящий эффект сверху */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#abd1c6]/50 to-transparent"></div>
         {/* Заголовок */}
-        <div className="relative flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
               <LucideIcons.Eye size="lg" className="text-white" />
             </div>
             <div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-[#fffffe] to-[#abd1c6] bg-clip-text text-transparent">
+              <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#fffffe] to-[#abd1c6] bg-clip-text text-transparent">
                 Предпросмотр заявки
               </h2>
-              <p className="text-[#abd1c6]/70 text-sm mt-1">Проверьте данные перед отправкой</p>
             </div>
           </div>
           <button
@@ -108,12 +107,12 @@ export default function ApplicationPreview({
 
         {/* Содержимое предпросмотра */}
         <div 
-          className="overflow-y-auto max-h-[calc(95vh-280px)] space-y-6 pr-3 scrollbar-thin scrollbar-thumb-[#abd1c6]/30 scrollbar-track-transparent"
+          className="overflow-y-auto max-h-[calc(92vh-220px)] space-y-4 sm:space-y-6 pr-2 sm:pr-3 scrollbar-thin scrollbar-thumb-[#abd1c6]/30 scrollbar-track-transparent"
           onWheel={handleWheel}
         >
           {/* Заголовок заявки */}
-          <div className="group bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-2xl p-6 border border-[#abd1c6]/20 hover:border-[#abd1c6]/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="group bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-2xl p-4 sm:p-6 border border-[#abd1c6]/20 hover:border-[#abd1c6]/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10">
+            <div className="flex items-center gap-3 mb-3 sm:mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
                 <LucideIcons.Home size="sm" className="text-white" />
               </div>
@@ -125,8 +124,8 @@ export default function ApplicationPreview({
           </div>
 
           {/* Краткое описание */}
-          <div className="group bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-2xl p-6 border border-[#abd1c6]/20 hover:border-[#abd1c6]/30 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="group bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-2xl p-4 sm:p-6 border border-[#abd1c6]/20 hover:border-[#abd1c6]/30 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
+            <div className="flex items-center gap-3 mb-3 sm:mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
                 <LucideIcons.MessageCircle size="sm" className="text-white" />
               </div>
@@ -138,8 +137,8 @@ export default function ApplicationPreview({
           </div>
 
           {/* Подробная история */}
-          <div className="group bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-2xl p-6 border border-[#abd1c6]/20 hover:border-[#abd1c6]/30 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="group bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-2xl p-4 sm:p-6 border border-[#abd1c6]/20 hover:border-[#abd1c6]/30 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/10">
+            <div className="flex items-center gap-3 mb-3 sm:mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <LucideIcons.FileText size="sm" className="text-white" />
               </div>
@@ -153,8 +152,8 @@ export default function ApplicationPreview({
           </div>
 
           {/* Сумма */}
-          <div className="group bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-2xl p-6 border border-[#abd1c6]/20 hover:border-[#abd1c6]/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="group bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-2xl p-4 sm:p-6 border border-[#abd1c6]/20 hover:border-[#abd1c6]/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10">
+            <div className="flex items-center gap-3 mb-3 sm:mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center">
                 <LucideIcons.DollarSign size="sm" className="text-white" />
               </div>
@@ -168,8 +167,8 @@ export default function ApplicationPreview({
           </div>
 
           {/* Реквизиты */}
-          <div className="group bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-2xl p-6 border border-[#abd1c6]/20 hover:border-[#abd1c6]/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="group bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-2xl p-4 sm:p-6 border border-[#abd1c6]/20 hover:border-[#abd1c6]/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10">
+            <div className="flex items-center gap-3 mb-3 sm:mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
                 <LucideIcons.CreditCard size="sm" className="text-white" />
               </div>
@@ -193,7 +192,7 @@ export default function ApplicationPreview({
                   Фотографии ({photos.length})
                 </h3>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                 {photos.map((photo, index) => (
                   <div key={index} className="relative group/image">
                     <img
@@ -202,7 +201,7 @@ export default function ApplicationPreview({
                       loading="lazy"
                       width={320}
                       height={240}
-                      className="w-full h-24 object-cover rounded-xl border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                      className="w-full h-24 sm:h-28 md:h-32 object-cover rounded-xl border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 transition-all duration-300 hover:scale-105 hover:shadow-lg"
                     />
                     <div className="absolute inset-0 bg-black/0 hover:bg-black/20 rounded-xl transition-all duration-300 flex items-center justify-center opacity-0 group-hover/image:opacity-100">
                       <LucideIcons.ZoomIn size="sm" className="text-white" aria-hidden="true" />

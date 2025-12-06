@@ -46,7 +46,7 @@ const SAVE_KEY = 'application_form_data';
 const LIMITS = {
   titleMax: 40,
   summaryMax: 140,
-  storyMin: 200,
+  storyMin: 10,
   storyMax: 3000,
   amountMin: 1,
   amountMax: 1000000,
@@ -78,7 +78,6 @@ export default function ApplicationsPage() {
   const [err, setErr] = useState<string | null>(null);
   const [left, setLeft] = useState<number | null>(null); // для лимита 24ч
   const [submitted, setSubmitted] = useState(false); // для экрана успеха
-  const [showPreview, setShowPreview] = useState(false); // для предпросмотра заявки
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   // Восстановление данных при загрузке страницы
@@ -224,12 +223,6 @@ export default function ApplicationsPage() {
       return;
     }
 
-    // Показываем предпросмотр перед отправкой
-    if (!showPreview) {
-      setShowPreview(true);
-      return;
-    }
-
     try {
       setSubmitting(true);
       const urls = await uploadAll();
@@ -259,7 +252,6 @@ export default function ApplicationsPage() {
 
       // Успех
       setSubmitted(true);
-      setShowPreview(false);
       // Очищаем форму при успешной отправке
       setPhotos([]);
       setTitle("");
@@ -271,7 +263,6 @@ export default function ApplicationsPage() {
       localStorage.removeItem(SAVE_KEY);
     } catch (e: any) {
       setErr(e.message || "Ошибка");
-      setShowPreview(false);
     } finally {
       setSubmitting(false);
     }
@@ -471,7 +462,7 @@ export default function ApplicationsPage() {
                     value={story}
                     onChange={setStory}
                     placeholder="Расскажите подробно о вашей ситуации, что привело к необходимости помощи, как планируете использовать средства..."
-                    hint="Подробное описание ситуации (минимум 200, максимум 3000 символов)"
+                  hint="Подробное описание ситуации (минимум 10, максимум 3000 символов)"
                     minLength={LIMITS.storyMin}
                     maxLength={LIMITS.storyMax}
                     delay={0.3}
@@ -533,22 +524,6 @@ export default function ApplicationsPage() {
         </div>
       </div>
 
-      {/* Модальное окно предпросмотра заявки */}
-      {showPreview && (
-        <ApplicationPreview
-          title={title}
-          summary={summary}
-          story={story}
-          amount={amount}
-          payment={payment}
-          photos={photos}
-          onClose={() => setShowPreview(false)}
-          onConfirm={async () => {
-            setShowPreview(false);
-            await submit(); // Отправляем заявку
-          }}
-        />
-      )}
     </div>
   );
 }

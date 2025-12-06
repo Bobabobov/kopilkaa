@@ -52,15 +52,9 @@ export default function OtherUserLoadingStates({
           title: "Пользователь удалён",
           description: "Этот аккаунт был удалён из системы",
           button: {
-            href: "#",
+            href: "/friends?tab=search",
             text: "Вернуться к поиску",
-            onClick: () => {
-              // Открываем модальное окно друзей с вкладкой поиска
-              const event = new CustomEvent("open-friends-modal", {
-                detail: { tab: "search" },
-              });
-              window.dispatchEvent(event);
-            },
+            onClick: undefined,
           },
         };
       default:

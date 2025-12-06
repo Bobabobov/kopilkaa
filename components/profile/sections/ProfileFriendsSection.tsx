@@ -1,15 +1,9 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useRouter } from "next/navigation";
-
-// Lazy load heavy modal
-const FriendsModal = dynamic(() => import("../modals/FriendsModal"), {
-  ssr: false,
-  loading: () => <div className="hidden" />,
-});
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -37,10 +31,6 @@ export default function ProfileFriendsSection() {
   const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [initialTab, setInitialTab] = useState<
-    "friends" | "sent" | "received" | "search"
-  >("friends");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [lastReadRequestId, setLastReadRequestId] = useState<string | null>(null);
 
@@ -65,17 +55,6 @@ export default function ProfileFriendsSection() {
     if (diffMinutes < 60) return `${Math.floor(diffMinutes)} мин назад`;
     if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)} ч назад`;
     return `${Math.floor(diffMinutes / 1440)} дн назад`;
-  };
-
-  // Отмечаем заявки как прочитанные при открытии модального окна
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-    // Сохраняем ID последней заявки как прочитанную
-    if (receivedRequests.length > 0) {
-      const latestRequestId = receivedRequests[0].id;
-      setLastReadRequestId(latestRequestId);
-      localStorage.setItem('lastReadFriendRequestId', latestRequestId);
-    }
   };
 
   const fetchFriends = useCallback(async () => {
@@ -122,25 +101,6 @@ export default function ProfileFriendsSection() {
 
   useEffect(() => {
     fetchFriends();
-
-    // Обработчик для открытия модального окна друзей
-    const handleOpenFriendsModal = (event: CustomEvent) => {
-      const tab = event.detail?.tab || "friends";
-      setInitialTab(tab);
-      handleOpenModal();
-    };
-
-    window.addEventListener(
-      "open-friends-modal",
-      handleOpenFriendsModal as EventListener,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "open-friends-modal",
-        handleOpenFriendsModal as EventListener,
-      );
-    };
   }, [fetchFriends]);
 
   useEffect(() => {
@@ -185,6 +145,15 @@ export default function ProfileFriendsSection() {
   const pendingRequests = receivedRequests.length;
   const sentRequestsCount = sentRequests.length;
 
+  const goToFriends = (tab: "friends" | "sent" | "received" | "search") => {
+    if (receivedRequests.length > 0) {
+      const latestRequestId = receivedRequests[0].id;
+      setLastReadRequestId(latestRequestId);
+      localStorage.setItem("lastReadFriendRequestId", latestRequestId);
+    }
+    router.push(`/friends?tab=${tab}`);
+  };
+
   return (
     <>
       <motion.div 
@@ -211,8 +180,7 @@ export default function ProfileFriendsSection() {
 
             <button
               onClick={() => {
-                setInitialTab("friends");
-                handleOpenModal();
+                goToFriends("friends");
               }}
               className="text-xs text-[#f9bc60] hover:text-[#e8a545] transition-colors flex-shrink-0 whitespace-nowrap"
             >
@@ -280,8 +248,7 @@ export default function ProfileFriendsSection() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    setInitialTab("search");
-                    handleOpenModal();
+                    goToFriends("search");
                   }}
                   className="px-6 py-2 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] rounded-xl transition-colors text-sm font-medium"
                 >
@@ -358,8 +325,7 @@ export default function ProfileFriendsSection() {
                     transition={{ delay: 0.5 }}
                     whileHover={{ scale: 1.03, y: -3 }}
                     onClick={() => {
-                      setInitialTab("friends");
-                      handleOpenModal();
+                      goToFriends("friends");
                     }}
                     className="relative flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#001e1d]/40 to-[#001e1d]/20 hover:from-[#abd1c6]/10 hover:to-[#001e1d]/30 cursor-pointer transition-all duration-300 border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 shadow-md hover:shadow-lg overflow-hidden group"
                   >
@@ -393,8 +359,7 @@ export default function ProfileFriendsSection() {
                     transition={{ delay: 0.6 }}
                     whileHover={{ scale: 1.02 }}
                     onClick={() => {
-                      setInitialTab("received");
-                      handleOpenModal();
+                      goToFriends("received");
                     }}
                     className="flex items-center justify-between p-4 rounded-xl bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 cursor-pointer transition-colors"
                   >
@@ -423,8 +388,7 @@ export default function ProfileFriendsSection() {
                     transition={{ delay: 0.65 }}
                     whileHover={{ scale: 1.02 }}
                     onClick={() => {
-                      setInitialTab("sent");
-                      handleOpenModal();
+                      goToFriends("sent");
                     }}
                     className="flex items-center justify-between p-4 rounded-xl bg-[#3b82f6]/10 hover:bg-[#3b82f6]/20 cursor-pointer transition-colors"
                   >
@@ -447,8 +411,7 @@ export default function ProfileFriendsSection() {
                     transition={{ delay: 0.7 }}
                     whileHover={{ scale: 1.02 }}
                     onClick={() => {
-                      setInitialTab("search");
-                      handleOpenModal();
+                      goToFriends("search");
                     }}
                     className="flex items-center justify-center p-4 rounded-xl border border-dashed border-[#abd1c6]/30 hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/5 cursor-pointer transition-all"
                   >
@@ -464,12 +427,6 @@ export default function ProfileFriendsSection() {
         </div>
       </motion.div>
 
-      {/* Модальное окно друзей */}
-      <FriendsModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        initialTab={initialTab}
-      />
     </>
   );
 }

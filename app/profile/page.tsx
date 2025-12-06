@@ -237,7 +237,7 @@ function ProfilePageContent() {
     setIsSettingsModalOpen(false);
   }, []);
 
-  // Открываем модальное окно друзей, если это передано через query-параметр
+  // Перенаправляем на страницу друзей, если пришёл friendsTab
   useEffect(() => {
     const requestedTab = searchParams.get("friendsTab");
     if (!requestedTab) return;
@@ -247,20 +247,11 @@ function ProfilePageContent() {
       ? (requestedTab as "friends" | "sent" | "received" | "search")
       : "friends";
 
-    const timer = window.setTimeout(() => {
-      window.dispatchEvent(
-        new CustomEvent("open-friends-modal", {
-          detail: { tab },
-        }),
-      );
-    }, 150);
-
     const params = new URLSearchParams(searchParams.toString());
     params.delete("friendsTab");
     const nextUrl = params.toString() ? `/profile?${params.toString()}` : "/profile";
     router.replace(nextUrl, { scroll: true });
-
-    return () => clearTimeout(timer);
+    router.push(`/friends?tab=${tab}`);
   }, [searchParams, router]);
 
   // Открываем модальное окно настроек (соцсети), если пришли с /support c параметром

@@ -128,15 +128,7 @@ export default function OtherUserHeader({ user }: OtherUserHeaderProps) {
                 transition={{ delay: 0.2 }}
               >
                 <Link
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    // Открываем модальное окно друзей
-                    const event = new CustomEvent("open-friends-modal", {
-                      detail: { tab: "friends" },
-                    });
-                    window.dispatchEvent(event);
-                  }}
+                  href="/friends?tab=friends"
                   className="p-2 hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105"
                   title="Назад к поиску"
                 >

@@ -432,15 +432,7 @@ export default function OtherUserCard({
                   whileTap={{ scale: 0.99 }}
                 >
                   <Link
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      // Открываем модальное окно друзей с вкладкой поиска
-                      const event = new CustomEvent("open-friends-modal", {
-                        detail: { tab: "search" },
-                      });
-                      window.dispatchEvent(event);
-                    }}
+                    href="/friends?tab=search"
                     className="group px-3 py-2 bg-[#001e1d]/30 hover:bg-[#001e1d]/40 text-[#abd1c6] rounded-lg transition-all duration-200 text-center text-sm font-medium block border border-[#abd1c6]/10"
                   >
                     <div className="flex items-center justify-center gap-1.5">

@@ -150,15 +150,7 @@ export default function NotificationBell() {
   };
 
   const openFriendsModal = useCallback((tab: FriendsTab) => {
-    if (typeof window !== "undefined" && window.location.pathname.startsWith("/profile")) {
-      window.dispatchEvent(
-        new CustomEvent("open-friends-modal", {
-          detail: { tab },
-        }),
-      );
-    } else {
-      router.push(`/profile?friendsTab=${tab}`);
-    }
+    router.push(`/friends?tab=${tab}`);
   }, [router]);
 
   const getRarityColor = (rarity?: string) => {

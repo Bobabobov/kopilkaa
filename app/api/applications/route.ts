@@ -27,6 +27,7 @@ export async function POST(req: Request) {
     const titleMax = isAdmin ? 100 : 40;
     const summaryMax = isAdmin ? 300 : 140;
     const storyMax = isAdmin ? 10000 : 3000;
+    const storyMin = 10;
     const paymentMax = isAdmin ? 500 : 200;
 
     if (!title || title.length > titleMax)
@@ -39,9 +40,9 @@ export async function POST(req: Request) {
         { error: `Кратко обязательно (≤ ${summaryMax})` },
         { status: 400 },
       );
-    if (!story || story.length < 200 || story.length > storyMax)
+    if (!story || story.length < storyMin || story.length > storyMax)
       return Response.json(
-        { error: `История 200–${storyMax} символов` },
+        { error: `История ${storyMin}–${storyMax} символов` },
         { status: 400 },
       );
     if (

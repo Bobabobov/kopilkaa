@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -264,7 +264,7 @@ function FriendsSearchContent({
   );
 }
 
-export default function FriendsPage() {
+function FriendsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
@@ -569,6 +569,20 @@ export default function FriendsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function FriendsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center text-[#abd1c6]">
+          Загружаем друзей...
+        </div>
+      }
+    >
+      <FriendsPageContent />
+    </Suspense>
   );
 }
 

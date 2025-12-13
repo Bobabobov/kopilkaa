@@ -344,8 +344,8 @@ function ProfilePageContent() {
       <UniversalBackground />
 
       {/* Main Content */}
-      <div className="relative z-10 w-full px-3 sm:px-4 md:px-6 pt-4 sm:pt-8 md:pt-10 pb-8 sm:pb-10 md:pb-12">
-        <div className="max-w-6xl mx-auto space-y-5">
+      <div className="relative z-10 w-full px-2 xs:px-3 sm:px-4 md:px-5 lg:px-6 pt-3 xs:pt-4 sm:pt-6 md:pt-8 lg:pt-10 pb-6 xs:pb-8 sm:pb-10 md:pb-12">
+        <div className="max-w-6xl mx-auto space-y-4 xs:space-y-5 sm:space-y-6">
           {/* Информация о пользователе */}
           <div>
             <ProfileHeaderCard
@@ -359,14 +359,14 @@ function ProfilePageContent() {
           </div>
 
           {/* Основной контент: двухколоночный макет */}
-          <main className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-5 md:gap-6">
-            <section className="space-y-5 md:space-y-6">
+          <main className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-4 xs:gap-5 sm:gap-6 md:gap-6 lg:gap-7">
+            <section className="space-y-4 xs:space-y-5 sm:space-y-6 md:space-y-6">
               <MotivationalCard />
               <ProfilePersonalStats />
               <ProfileRecentActivity />
             </section>
 
-            <aside className="space-y-5 md:space-y-6">
+            <aside className="space-y-4 xs:space-y-5 sm:space-y-6 md:space-y-6">
               <ProfileFriendsSection />
               <ProfileAchievements />
               <ProfileDonations />

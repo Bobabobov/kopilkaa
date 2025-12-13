@@ -278,11 +278,11 @@ export default function ProfileFriendsSection() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2, delay: index * 0.05 }}
                       onClick={() => router.push(`/profile/${friend.id}`)}
-                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#001e1d]/30 cursor-pointer transition-colors"
+                      className="flex items-center gap-2 xs:gap-3 p-2.5 xs:p-3 rounded-lg hover:bg-[#001e1d]/30 cursor-pointer transition-colors"
                     >
                       {/* Аватар */}
                       <div className="relative">
-                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#004643] flex items-center justify-center">
+                        <div className="w-10 h-10 xs:w-12 xs:h-12 rounded-lg overflow-hidden bg-[#004643] flex items-center justify-center">
                           {friend.avatar ? (
                             <img
                               src={friend.avatar}
@@ -290,7 +290,7 @@ export default function ProfileFriendsSection() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <span className="text-[#f9bc60] font-semibold text-lg">
+                            <span className="text-[#f9bc60] font-semibold text-base xs:text-lg">
                               {(friend.name || friend.email.split("@")[0])[0].toUpperCase()}
                             </span>
                           )}
@@ -298,16 +298,16 @@ export default function ProfileFriendsSection() {
                         
                         {/* Онлайн индикатор */}
                         {isOnline && (
-                          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#10B981] rounded-full border-2 border-[#001e1d]" />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3 xs:w-3.5 xs:h-3.5 h-3 bg-[#10B981] rounded-full border-2 border-[#001e1d]" />
                         )}
                       </div>
 
                       {/* Информация */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-[#fffffe] font-medium text-sm truncate">
+                        <p className="text-[#fffffe] font-medium text-xs xs:text-sm truncate">
                           {friend.name || friend.email.split("@")[0]}
                         </p>
-                        <p className="text-[#abd1c6] text-xs mt-0.5">
+                        <p className="text-[#abd1c6] text-[10px] xs:text-xs mt-0.5">
                           {isOnline ? 'В сети' : 'Не в сети'}
                         </p>
                       </div>
@@ -327,17 +327,17 @@ export default function ProfileFriendsSection() {
                     onClick={() => {
                       goToFriends("friends");
                     }}
-                    className="relative flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#001e1d]/40 to-[#001e1d]/20 hover:from-[#abd1c6]/10 hover:to-[#001e1d]/30 cursor-pointer transition-all duration-300 border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 shadow-md hover:shadow-lg overflow-hidden group"
+                    className="relative flex items-center justify-between p-3 xs:p-4 rounded-xl xs:rounded-2xl bg-gradient-to-r from-[#001e1d]/40 to-[#001e1d]/20 hover:from-[#abd1c6]/10 hover:to-[#001e1d]/30 cursor-pointer transition-all duration-300 border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 shadow-md hover:shadow-lg overflow-hidden group"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-[#abd1c6]/0 via-[#abd1c6]/5 to-[#abd1c6]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="flex items-center gap-3 relative z-10">
+                    <div className="flex items-center gap-2 xs:gap-3 relative z-10">
                       <motion.div
                         whileHover={{ rotate: 5, scale: 1.1 }}
-                        className="w-10 h-10 bg-gradient-to-br from-[#abd1c6]/30 to-[#94a1b2]/30 rounded-xl flex items-center justify-center"
+                        className="w-8 h-8 xs:w-10 xs:h-10 bg-gradient-to-br from-[#abd1c6]/30 to-[#94a1b2]/30 rounded-lg xs:rounded-xl flex items-center justify-center"
                       >
                         <LucideIcons.Users className="text-[#abd1c6]" size="sm" />
                       </motion.div>
-                      <span className="text-[#fffffe] font-bold">
+                      <span className="text-[#fffffe] font-bold text-xs xs:text-sm">
                         Еще {totalFriends - 4} друзей
                       </span>
                     </div>
@@ -361,9 +361,9 @@ export default function ProfileFriendsSection() {
                     onClick={() => {
                       goToFriends("received");
                     }}
-                    className="flex items-center justify-between p-4 rounded-xl bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 cursor-pointer transition-colors"
+                    className="flex items-center justify-between p-3 xs:p-4 rounded-xl bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 cursor-pointer transition-colors"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 xs:gap-3">
                       <div className="relative">
                         <LucideIcons.UserCheck className="text-[#f9bc60]" size="sm" />
                         {newRequestsCount > 0 && (
@@ -371,9 +371,9 @@ export default function ProfileFriendsSection() {
                         )}
                       </div>
                       <div>
-                        <p className="text-[#fffffe] font-medium">{pendingRequests} заявок в друзья</p>
+                        <p className="text-[#fffffe] font-medium text-xs xs:text-sm">{pendingRequests} заявок в друзья</p>
                         {newRequestsCount > 0 && (
-                          <p className="text-[#f9bc60] text-xs">{newRequestsCount} новых</p>
+                          <p className="text-[#f9bc60] text-[10px] xs:text-xs">{newRequestsCount} новых</p>
                         )}
                       </div>
                     </div>
@@ -390,13 +390,13 @@ export default function ProfileFriendsSection() {
                     onClick={() => {
                       goToFriends("sent");
                     }}
-                    className="flex items-center justify-between p-4 rounded-xl bg-[#3b82f6]/10 hover:bg-[#3b82f6]/20 cursor-pointer transition-colors"
+                    className="flex items-center justify-between p-3 xs:p-4 rounded-xl bg-[#3b82f6]/10 hover:bg-[#3b82f6]/20 cursor-pointer transition-colors"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 xs:gap-3">
                       <LucideIcons.Send className="text-[#3b82f6]" size="sm" />
                       <div>
-                        <p className="text-[#fffffe] font-medium">{sentRequestsCount} отправленных заявок</p>
-                        <p className="text-[#3b82f6] text-xs">Можно отменить или подождать ответа</p>
+                        <p className="text-[#fffffe] font-medium text-xs xs:text-sm">{sentRequestsCount} отправленных заявок</p>
+                        <p className="text-[#3b82f6] text-[10px] xs:text-xs">Можно отменить или подождать ответа</p>
                       </div>
                     </div>
                     <LucideIcons.ChevronRight className="text-[#3b82f6]" size="sm" />
@@ -413,11 +413,11 @@ export default function ProfileFriendsSection() {
                     onClick={() => {
                       goToFriends("search");
                     }}
-                    className="flex items-center justify-center p-4 rounded-xl border border-dashed border-[#abd1c6]/30 hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/5 cursor-pointer transition-all"
+                    className="flex items-center justify-center p-3 xs:p-4 rounded-xl border border-dashed border-[#abd1c6]/30 hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/5 cursor-pointer transition-all"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 xs:gap-3">
                       <LucideIcons.UserPlus className="text-[#10B981]" size="sm" />
-                      <span className="text-[#fffffe] font-medium">Найти друзей</span>
+                      <span className="text-[#fffffe] font-medium text-xs xs:text-sm">Найти друзей</span>
                     </div>
                   </motion.div>
                 )}

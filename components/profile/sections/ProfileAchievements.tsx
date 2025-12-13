@@ -229,7 +229,7 @@ export default function ProfileAchievements() {
           )}
 
           {/* Список достижений */}
-          <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4 relative z-10">
+          <div className="space-y-2 xs:space-y-2.5 sm:space-y-3 mb-3 sm:mb-4 relative z-10">
             <AnimatePresence>
               {displayedAchievements.map((userAchievement, index) => {
                 const IconComponent = getAchievementIcon(userAchievement.achievement.type, userAchievement.achievement.name) || LucideIcons.Star;
@@ -247,16 +247,16 @@ export default function ProfileAchievements() {
                       type: "spring",
                       stiffness: 300
                     }}
-                    className="group bg-[#001e1d]/30 rounded-lg p-3 sm:p-4 border relative overflow-hidden"
+                    className="group bg-[#001e1d]/30 rounded-lg p-2.5 xs:p-3 sm:p-4 border relative overflow-hidden"
                     style={{ borderColor: rarityColor + '30' }}
                     whileHover={{ 
                       borderColor: rarityColor + '50',
                       backgroundColor: `${rarityColor}10`
                     }}
                   >
-                    <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 xs:gap-2.5 sm:gap-3">
                       <div 
-                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                        className="w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                         style={{ 
                           backgroundColor: rarityColor + '20',
                           color: rarityColor
@@ -266,12 +266,12 @@ export default function ProfileAchievements() {
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-                          <h4 className="font-semibold text-[#fffffe] text-xs sm:text-sm truncate">
+                        <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-1.5 sm:gap-2 mb-1">
+                          <h4 className="font-semibold text-[#fffffe] text-[11px] xs:text-xs sm:text-sm truncate">
                             {userAchievement.achievement.name}
                           </h4>
                           <span 
-                            className="text-[10px] sm:text-xs px-1.5 py-0.5 rounded font-medium whitespace-nowrap flex-shrink-0"
+                            className="text-[9px] xs:text-[10px] sm:text-xs px-1 xs:px-1.5 py-0.5 rounded font-medium whitespace-nowrap flex-shrink-0"
                             style={{ 
                               backgroundColor: `${rarityColor}20`,
                               color: rarityColor
@@ -280,10 +280,10 @@ export default function ProfileAchievements() {
                             {rarityName}
                           </span>
                         </div>
-                        <p className="text-xs text-[#abd1c6] line-clamp-2">
+                        <p className="text-[10px] xs:text-xs text-[#abd1c6] line-clamp-2">
                           {userAchievement.achievement.description}
                         </p>
-                        <p className="text-xs text-[#abd1c6]/60 mt-1">
+                        <p className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6]/60 mt-0.5 xs:mt-1">
                           {new Date(userAchievement.unlockedAt).toLocaleDateString('ru-RU')}
                         </p>
                       </div>
@@ -298,11 +298,14 @@ export default function ProfileAchievements() {
           {achievements.length > 2 && (
             <button
               onClick={() => (window.location.href = "/achievements")}
-              className="w-full py-2 sm:py-2.5 px-3 sm:px-4 bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 rounded-lg border border-[#f9bc60]/20 text-[#f9bc60] text-xs sm:text-sm font-medium transition-colors"
+              className="w-full py-2 xs:py-2.5 sm:py-2.5 px-3 xs:px-4 bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 rounded-lg border border-[#f9bc60]/20 text-[#f9bc60] text-[10px] xs:text-xs sm:text-sm font-medium transition-colors"
             >
               <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                 <LucideIcons.Award size="sm" />
-                <span className="whitespace-nowrap">Показать все {achievements.length} достижений</span>
+                <span className="whitespace-nowrap text-center">
+                  <span className="hidden xs:inline">Показать все {achievements.length} достижений</span>
+                  <span className="xs:hidden">Все достижения ({achievements.length})</span>
+                </span>
               </div>
             </button>
           )}

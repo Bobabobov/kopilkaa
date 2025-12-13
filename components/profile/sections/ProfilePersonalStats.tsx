@@ -216,20 +216,20 @@ export default function ProfilePersonalStats() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-5 md:mb-6 border-b border-[#abd1c6]/10 pb-3 sm:pb-4 overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+      <div className="flex flex-wrap gap-1 xs:gap-1.5 sm:gap-2 mb-4 sm:mb-5 md:mb-6 border-b border-[#abd1c6]/10 pb-3 sm:pb-4 overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0 scrollbar-hide">
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+              className={`flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 xs:px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] xs:text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                 activeTab === tab.id
                   ? 'bg-[#f9bc60] text-[#001e1d]'
                   : 'text-[#abd1c6] hover:bg-[#001e1d]/30'
               }`}
             >
-              <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+              <IconComponent className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
               <span className="hidden xs:inline">{tab.label}</span>
             </button>
           );
@@ -249,7 +249,7 @@ export default function ProfilePersonalStats() {
         {activeTab === 'overview' && (
           <div className="space-y-4 sm:space-y-5 md:space-y-6">
             {/* Key Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+            <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 xs:gap-2.5 sm:gap-3 md:gap-4">
               {[
                 {
                   label: 'Всего заявок',
@@ -335,7 +335,7 @@ export default function ProfilePersonalStats() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
                   {[
                     {
                       label: "Одобрено",
@@ -394,7 +394,7 @@ export default function ProfilePersonalStats() {
         )}
 
         {activeTab === 'applications' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             {[
               { 
                 label: 'Ожидают', 
@@ -450,7 +450,7 @@ export default function ProfilePersonalStats() {
         )}
 
         {activeTab === 'social' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             {[
               { 
                 label: 'Лайков поставлено', 
@@ -506,7 +506,7 @@ export default function ProfilePersonalStats() {
         )}
 
         {activeTab === 'achievements' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 xs:gap-4 sm:gap-4">
             {[
               { 
                 label: 'Обычные', 

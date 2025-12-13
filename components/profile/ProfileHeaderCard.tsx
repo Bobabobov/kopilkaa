@@ -280,22 +280,22 @@ export default function ProfileHeaderCard({
       transition={{ duration: 0.25 }}
       className="w-full"
     >
-      <div className="w-full mx-auto px-3 sm:px-4">
+      <div className="w-full mx-auto px-2 xs:px-3 sm:px-4">
         <div className="relative">
           <div
-            className="relative h-[230px] sm:h-[250px] md:h-[270px] rounded-[30px] overflow-hidden shadow-[0_18px_44px_rgba(0,0,0,0.16)] bg-[#0b7d6d]"
+            className="relative h-[180px] xs:h-[200px] sm:h-[230px] md:h-[250px] lg:h-[270px] rounded-[20px] sm:rounded-[24px] md:rounded-[30px] overflow-hidden shadow-[0_18px_44px_rgba(0,0,0,0.16)] bg-[#0b7d6d]"
             style={coverStyle}
           >
             <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.06),transparent_35%),radial-gradient(80%_60%_at_20%_20%,rgba(255,255,255,0.08),transparent_55%),radial-gradient(70%_50%_at_80%_0%,rgba(30,209,177,0.12),transparent_50%)]" />
           </div>
 
-          <div className="relative -mt-14 sm:-mt-16 md:-mt-18">
-            <div className="rounded-[26px] bg-gradient-to-br from-[#0f1f1c] via-[#0c2622] to-[#0b1e1a] border border-[#1d8a78]/45 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
-              <div className="p-5 sm:p-7 md:p-8 flex flex-col gap-8">
-                <div className="grid gap-8 lg:grid-cols-[auto_1fr]">
-                  <div className="flex flex-col items-center gap-4">
+          <div className="relative -mt-10 sm:-mt-12 md:-mt-14 lg:-mt-16 xl:-mt-18">
+            <div className="rounded-[20px] sm:rounded-[26px] bg-gradient-to-br from-[#0f1f1c] via-[#0c2622] to-[#0b1e1a] border border-[#1d8a78]/45 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
+              <div className="p-4 sm:p-5 md:p-7 lg:p-8 flex flex-col gap-6 sm:gap-8">
+                <div className="grid gap-6 sm:gap-8 lg:grid-cols-[auto_1fr]">
+                  <div className="flex flex-col items-center gap-3 sm:gap-4">
                     {isOwner ? (
-                      <div className="-mt-12 sm:-mt-14 transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:shadow-none hover:brightness-100 [&_*]:transition-none [&_*]:duration-0 [&_*]:transform-none [&_*:hover]:transform-none">
+                      <div className="-mt-10 sm:-mt-12 md:-mt-14 transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:shadow-none hover:brightness-100 [&_*]:transition-none [&_*]:duration-0 [&_*]:transform-none [&_*:hover]:transform-none">
                         <AvatarUpload
                           currentAvatar={currentAvatar}
                           userName={user.name || (!user.hideEmail ? user.email : "Пользователь")}
@@ -308,7 +308,7 @@ export default function ProfileHeaderCard({
                         />
                       </div>
                     ) : (
-                      <div className="relative -mt-10 sm:-mt-12 w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border border-[#1d8a78]/55 bg-[#0f2623] shadow-[0_18px_40px_rgba(0,0,0,0.22)] ring-4 ring-[#f9bc60]/40 transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:shadow-[0_18px_40px_rgba(0,0,0,0.22)] [&_*]:transition-none [&_*]:duration-0 [&_*]:transform-none [&_*:hover]:transform-none">
+                      <div className="relative -mt-8 sm:-mt-10 md:-mt-12 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border border-[#1d8a78]/55 bg-[#0f2623] shadow-[0_18px_40px_rgba(0,0,0,0.22)] ring-2 sm:ring-4 ring-[#f9bc60]/40 transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:shadow-[0_18px_40px_rgba(0,0,0,0.22)] [&_*]:transition-none [&_*]:duration-0 [&_*]:transform-none [&_*:hover]:transform-none">
                         {user.avatar ? (
                           <img
                             src={user.avatar}
@@ -316,12 +316,12 @@ export default function ProfileHeaderCard({
                             className="w-full h-full object-cover transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:brightness-100"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-[#f9bc60]">
+                          <div className="w-full h-full flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-bold text-[#f9bc60]">
                             {(user.name || user.email || "П")[0].toUpperCase()}
                           </div>
                         )}
                         <span
-                          className={`absolute bottom-2 right-2 w-3.5 h-3.5 rounded-full border-2 border-white ${
+                          className={`absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${
                             status.status === "online" ? "bg-emerald-400" : "bg-slate-400"
                           }`}
                           aria-label={status.status === "online" ? "Онлайн" : "Оффлайн"}
@@ -332,11 +332,11 @@ export default function ProfileHeaderCard({
 
                   </div>
 
-                  <div className="flex-1 flex flex-col gap-5">
-                    <div className="flex flex-col gap-3">
-                      <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex-1 flex flex-col gap-4 sm:gap-5">
+                    <div className="flex flex-col gap-2 sm:gap-3">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <motion.h1
-                          className="text-2xl sm:text-3xl font-semibold text-[#fffffe] leading-tight"
+                          className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-[#fffffe] leading-tight break-words"
                           initial={{ opacity: 0, y: -6 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.2 }}
@@ -345,63 +345,64 @@ export default function ProfileHeaderCard({
                           {user.name || "Пользователь"}
                         </motion.h1>
                         {user.role === "ADMIN" && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-1 text-xs font-bold text-[#001e1d] shadow-sm">
-                            <LucideIcons.Shield className="w-4 h-4" />
-                            ADMIN
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-[#001e1d] shadow-sm">
+                            <LucideIcons.Shield className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden xs:inline">ADMIN</span>
                           </span>
                         )}
                       </div>
 
-                      <div className="space-y-1 text-sm text-[#abd1c6]" style={{ color: secondaryTextColor }}>
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <span className="inline-flex items-center gap-1.5">
+                      <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-[#abd1c6]" style={{ color: secondaryTextColor }}>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                            <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs">
                               <span
-                                className={`w-2.5 h-2.5 rounded-full ${
+                                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full flex-shrink-0 ${
                                   status.status === "online" ? "bg-emerald-400" : "bg-slate-500"
                                 }`}
                               />
-                              {status.status === "online" ? status.text : `Был ${status.text}`}
+                              <span className="truncate">{status.status === "online" ? status.text : `Был ${status.text}`}</span>
                             </span>
                             {isOwner && (
-                              <span className="inline-flex items-center gap-1.5 text-[#abd1c6]">
-                                <LucideIcons.Mail className="w-4 h-4" />
-                                {user.hideEmail ? "Email скрыт" : user.email}
+                              <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[#abd1c6] text-[10px] sm:text-xs">
+                                <LucideIcons.Mail className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="truncate max-w-[150px] sm:max-w-none">{user.hideEmail ? "Email скрыт" : user.email}</span>
                               </span>
                             )}
-                            <span className="inline-flex items-center gap-1.5">
-                              <LucideIcons.Calendar className="w-4 h-4" />
-                              {formatDate(user.createdAt)}
+                            <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs">
+                              <LucideIcons.Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                              <span className="truncate">{formatDate(user.createdAt)}</span>
                             </span>
                             {user.lastSeen && (
-                              <span className="inline-flex items-center gap-1.5">
-                                <LucideIcons.Clock className="w-4 h-4" />
-                                Активность: {status.text}
+                              <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs hidden sm:inline-flex">
+                                <LucideIcons.Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="truncate">Активность: {status.text}</span>
                               </span>
                             )}
                           </div>
 
                           {isOwner ? (
-                            <div className="relative flex items-center gap-3 flex-shrink-0">
+                            <div className="relative flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
                               <Link
                                 href="/support"
-                                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-amber-200/50 bg-amber-500/12 px-3 py-1.5 min-h-[34px] text-xs sm:text-sm font-medium text-[#fff8ea] transition hover:-translate-y-[1px] hover:bg-amber-500/20"
+                                className="inline-flex items-center justify-center gap-1 sm:gap-1.5 rounded-full border border-amber-200/50 bg-amber-500/12 px-2 sm:px-3 py-1.5 min-h-[32px] sm:min-h-[34px] text-[10px] sm:text-xs md:text-sm font-medium text-[#fff8ea] transition hover:-translate-y-[1px] hover:bg-amber-500/20 whitespace-nowrap"
                               >
                                 <LucideIcons.Heart size="sm" />
-                                Поддержать проект
+                                <span className="hidden xs:inline">Поддержать проект</span>
+                                <span className="xs:hidden">Поддержать</span>
                               </Link>
                               {hasSocialLinks && <SocialLinks user={user} />}
                               <button
                                 onClick={() => setIsActionsMenuOpen((v) => !v)}
-                                className={`${moreBtnClass} min-w-[120px] justify-center`}
+                                className={`${moreBtnClass} min-w-[80px] sm:min-w-[120px] justify-center`}
                                 aria-label="Меню ещё"
                               >
                                 <LucideIcons.More size="sm" />
-                                Ещё
+                                <span className="hidden sm:inline">Ещё</span>
                               </button>
                               {isActionsMenuOpen && (
                                 <div
-                                  className="absolute right-0 z-20 mt-2 w-52 sm:w-60 rounded-2xl border border-white/12 bg-[#0f2522]/95 backdrop-blur-md shadow-[0_18px_40px_rgba(0,0,0,0.22)] p-2 space-y-1.5"
+                                  className="absolute right-0 z-20 mt-2 w-48 sm:w-52 md:w-60 rounded-2xl border border-white/12 bg-[#0f2522]/95 backdrop-blur-md shadow-[0_18px_40px_rgba(0,0,0,0.22)] p-2 space-y-1.5"
                                   onMouseLeave={() => setIsActionsMenuOpen(false)}
                                 >
                                   <button
@@ -410,7 +411,7 @@ export default function ProfileHeaderCard({
                                       onOpenSettings?.();
                                       setIsActionsMenuOpen(false);
                                     }}
-                                    className="w-full inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-[#eafef8] border border-transparent hover:border-white/10 hover:bg-white/6 transition"
+                                    className="w-full inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-[#eafef8] border border-transparent hover:border-white/10 hover:bg-white/6 transition"
                                   >
                                     <LucideIcons.Settings size="sm" />
                                     Редактировать
@@ -421,7 +422,7 @@ export default function ProfileHeaderCard({
                                       onBackgroundChange?.();
                                       setIsActionsMenuOpen(false);
                                     }}
-                                    className="w-full inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-[#eafef8] border border-transparent hover:border-white/10 hover:bg-white/6 transition"
+                                    className="w-full inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-[#eafef8] border border-transparent hover:border-white/10 hover:bg-white/6 transition"
                                   >
                                     <LucideIcons.Image size="sm" />
                                     Изменить обложку
@@ -431,7 +432,7 @@ export default function ProfileHeaderCard({
                                       setShowFrameCustomization(true);
                                       setIsActionsMenuOpen(false);
                                     }}
-                                    className="w-full inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-[#eafef8] border border-transparent hover:border-white/10 hover:bg-white/6 transition"
+                                    className="w-full inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-[#eafef8] border border-transparent hover:border-white/10 hover:bg-white/6 transition"
                                   >
                                     <LucideIcons.Upload size="sm" />
                                     Изменить аватар
@@ -444,23 +445,24 @@ export default function ProfileHeaderCard({
                               {hasSocialLinks && <SocialLinks user={user} />}
                               <Link
                                 href="/support"
-                                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-amber-200/50 bg-amber-500/12 px-3 py-1.5 min-h-[34px] text-xs sm:text-sm font-medium text-[#fff8ea] transition hover:-translate-y-[1px] hover:bg-amber-500/20"
+                                className="inline-flex items-center justify-center gap-1 sm:gap-1.5 rounded-full border border-amber-200/50 bg-amber-500/12 px-2 sm:px-3 py-1.5 min-h-[32px] sm:min-h-[34px] text-[10px] sm:text-xs md:text-sm font-medium text-[#fff8ea] transition hover:-translate-y-[1px] hover:bg-amber-500/20 whitespace-nowrap"
                               >
                                 <LucideIcons.Heart size="sm" />
-                                Поддержать проект
+                                <span className="hidden xs:inline">Поддержать проект</span>
+                                <span className="xs:hidden">Поддержать</span>
                               </Link>
                               {friendActionBlock()}
                               <button
                                 onClick={() => setIsGuestActionsOpen((v) => !v)}
-                                className={`${moreBtnClass} min-w-[120px] justify-center`}
+                                className={`${moreBtnClass} min-w-[80px] sm:min-w-[120px] justify-center`}
                                 aria-label="Меню действий гостя"
                               >
                                 <LucideIcons.More size="sm" />
-                                Ещё
+                                <span className="hidden sm:inline">Ещё</span>
                               </button>
                               {isGuestActionsOpen && (
                                 <div
-                                  className="absolute right-0 top-full z-20 mt-2 w-48 sm:w-56 rounded-2xl border border-white/12 bg-[#0f2522]/95 backdrop-blur-md shadow-[0_18px_40px_rgba(0,0,0,0.22)] p-2 space-y-1.5"
+                                  className="absolute right-0 top-full z-20 mt-2 w-44 sm:w-48 md:w-56 rounded-2xl border border-white/12 bg-[#0f2522]/95 backdrop-blur-md shadow-[0_18px_40px_rgba(0,0,0,0.22)] p-2 space-y-1.5"
                                   onMouseLeave={() => setIsGuestActionsOpen(false)}
                                 >
                                   <button
@@ -471,7 +473,7 @@ export default function ProfileHeaderCard({
                                       );
                                       setIsGuestActionsOpen(false);
                                     }}
-                                    className="w-full inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-[#eafef8] border border-transparent hover:border-white/10 hover:bg-white/6 transition"
+                                    className="w-full inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-[#eafef8] border border-transparent hover:border-white/10 hover:bg-white/6 transition"
                                   >
                                     <LucideIcons.Flag size="sm" />
                                     Пожаловаться

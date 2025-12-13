@@ -204,7 +204,7 @@ export default function ProfileRecentActivity() {
       </div>
 
       {/* Список активности */}
-      <div className="p-4 sm:p-5 md:p-6 space-y-2 sm:space-y-3">
+      <div className="p-4 xs:p-4 sm:p-5 md:p-6 space-y-2 xs:space-y-2.5 sm:space-y-3">
         {activities.map((activity, index) => {
           const IconComponent = LucideIcons[activity.icon] || LucideIcons.Activity;
           const content = (
@@ -212,12 +212,12 @@ export default function ProfileRecentActivity() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`flex items-start gap-3 p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10 hover:border-[${activity.color}]/30 transition-colors ${
+              className={`flex items-start gap-2 xs:gap-3 p-2.5 xs:p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10 hover:border-[${activity.color}]/30 transition-colors ${
                 activity.link ? "cursor-pointer" : ""
               }`}
             >
               <div
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                className="w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{
                   backgroundColor: `${activity.color}20`,
                   color: activity.color,
@@ -226,13 +226,13 @@ export default function ProfileRecentActivity() {
                 <IconComponent size="sm" className="text-current" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm sm:text-base font-semibold text-[#fffffe] mb-0.5 truncate">
+                <div className="text-xs xs:text-sm sm:text-base font-semibold text-[#fffffe] mb-0.5 truncate">
                   {activity.title}
                 </div>
-                <div className="text-xs sm:text-sm text-[#abd1c6] mb-1 line-clamp-2">
+                <div className="text-[10px] xs:text-xs sm:text-sm text-[#abd1c6] mb-0.5 xs:mb-1 line-clamp-2">
                   {activity.description}
                 </div>
-                <div className="text-[10px] sm:text-xs text-[#abd1c6]/60">
+                <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6]/60">
                   {formatDate(activity.date)}
                 </div>
               </div>

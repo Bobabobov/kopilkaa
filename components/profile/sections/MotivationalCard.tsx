@@ -79,7 +79,7 @@ export default function MotivationalCard() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="bg-gradient-to-br from-[#004643] to-[#001e1d] rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 relative overflow-hidden group"
+      className="bg-gradient-to-br from-[#004643] to-[#001e1d] rounded-xl border border-[#abd1c6]/20 p-3 xs:p-4 sm:p-5 md:p-6 relative overflow-hidden group"
     >
       {/* Анимированные декоративные элементы */}
       <motion.div 
@@ -111,12 +111,12 @@ export default function MotivationalCard() {
             transition={{ duration: 0.6, ease: "easeInOut" }}
             className="space-y-4"
           >
-            <div className="flex items-start gap-3 sm:gap-4">
+            <div className="flex items-start gap-2.5 xs:gap-3 sm:gap-4">
               <motion.div 
                 initial={{ rotate: -180, scale: 0 }}
                 animate={{ rotate: 0, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${quote.gradient} shadow-lg relative overflow-hidden`}
+                className={`w-10 h-10 xs:w-12 xs:h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${quote.gradient} shadow-lg relative overflow-hidden`}
               >
                 {/* Блестящий эффект на иконке */}
                 <motion.div
@@ -139,11 +139,11 @@ export default function MotivationalCard() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="text-sm sm:text-base text-[#fffffe] font-medium leading-relaxed mb-2 relative"
+                  className="text-xs xs:text-sm sm:text-base text-[#fffffe] font-medium leading-relaxed mb-1.5 xs:mb-2 relative"
                 >
-                  <span className="text-2xl text-[#abd1c6]/40 absolute -left-2 -top-1">"</span>
-                  <span className="relative z-10 pl-4">{quote.text}</span>
-                  <span className="text-2xl text-[#abd1c6]/40">"</span>
+                  <span className="text-xl xs:text-2xl text-[#abd1c6]/40 absolute -left-1.5 xs:-left-2 -top-0.5 xs:-top-1">"</span>
+                  <span className="relative z-10 pl-3 xs:pl-4">{quote.text}</span>
+                  <span className="text-xl xs:text-2xl text-[#abd1c6]/40">"</span>
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -152,7 +152,7 @@ export default function MotivationalCard() {
                   className="flex items-center gap-2"
                 >
                   <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent"></div>
-                  <p className="text-xs text-[#abd1c6] font-medium whitespace-nowrap">
+                  <p className="text-[10px] xs:text-xs text-[#abd1c6] font-medium whitespace-nowrap">
                     — {quote.author}
                   </p>
                   <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent"></div>
@@ -163,16 +163,16 @@ export default function MotivationalCard() {
         </AnimatePresence>
 
         {/* Улучшенные индикаторы */}
-        <div className="flex items-center justify-between mt-5 pt-4 border-t border-[#abd1c6]/10">
-          <div className="flex items-center gap-1.5">
+        <div className="flex items-center justify-between mt-4 xs:mt-5 pt-3 xs:pt-4 border-t border-[#abd1c6]/10">
+          <div className="flex items-center gap-1 xs:gap-1.5">
             {motivationalQuotes.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentQuote(index)}
                 className={`relative transition-all duration-300 ${
                   index === currentQuote 
-                    ? 'w-8 h-2' 
-                    : 'w-2 h-2 hover:w-4'
+                    ? 'w-6 xs:w-8 h-1.5 xs:h-2' 
+                    : 'w-1.5 xs:w-2 h-1.5 xs:h-2 hover:w-3 xs:hover:w-4'
                 } rounded-full ${
                   index === currentQuote 
                     ? `bg-gradient-to-r ${quote.gradient} shadow-lg` 
@@ -190,7 +190,7 @@ export default function MotivationalCard() {
               </button>
             ))}
           </div>
-          <div className="text-xs text-[#abd1c6]/60">
+          <div className="text-[10px] xs:text-xs text-[#abd1c6]/60">
             {currentQuote + 1} / {motivationalQuotes.length}
           </div>
         </div>

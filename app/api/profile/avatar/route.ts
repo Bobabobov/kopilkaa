@@ -4,14 +4,13 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { randomUUID } from "crypto";
 import { writeFile, mkdir } from "fs/promises";
-import { join, extname } from "path";
+import { extname } from "path";
+import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
 
 export const runtime = "nodejs";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ADMIN_MAX_SIZE = 20 * 1024 * 1024; // 20MB для админов
-// Используем переменную окружения или дефолтный путь
-const UPLOAD_DIR = process.env.UPLOAD_DIR || join(process.cwd(), "uploads");
 
 // POST /api/profile/avatar - загрузить аватарку
 export async function POST(req: NextRequest) {
@@ -47,13 +46,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const UPLOAD_DIR = getUploadDir();
     await mkdir(UPLOAD_DIR, { recursive: true });
 
     const buf = Buffer.from(await file.arrayBuffer());
     const ext = extname(file.name || "").toLowerCase() || ".jpg";
     const id = randomUUID().replace(/-/g, "");
     const filename = `avatar_${session.uid}_${id}${ext}`;
-    const filepath = join(UPLOAD_DIR, filename);
+    const filepath = getUploadFilePath(filename);
 
     await writeFile(filepath, buf);
     

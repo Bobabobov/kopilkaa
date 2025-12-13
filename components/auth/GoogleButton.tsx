@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import Script from "next/script";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface GoogleButtonProps {
@@ -47,14 +47,12 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
       return;
     }
 
-    // Проверяем, не загружен ли скрипт уже
-    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
-    
+    // Проверяем, загружен ли Google уже
     if (window.google?.accounts?.id) {
       // Google уже загружен, инициализируем сразу
       initializeGoogle(clientId);
-    } else if (existingScript) {
-      // Скрипт уже добавлен, ждем загрузки
+    } else {
+      // Ждем загрузки скрипта (он загружается через Script компонент)
       const checkInterval = setInterval(() => {
         if (window.google?.accounts?.id) {
           clearInterval(checkInterval);
@@ -62,48 +60,14 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
         }
       }, 100);
       
-      // Таймаут на 5 секунд
+      // Таймаут на 10 секунд
       setTimeout(() => {
         clearInterval(checkInterval);
         if (!window.google?.accounts?.id) {
           setError("Таймаут загрузки Google Identity Services");
           setLoading(false);
         }
-      }, 5000);
-    } else {
-      // Загружаем Google Identity Services скрипт
-      const script = document.createElement("script");
-      script.src = "https://accounts.google.com/gsi/client";
-      script.async = true;
-      script.defer = true;
-      script.crossOrigin = "anonymous";
-
-      script.onload = () => {
-        // Ждем немного, чтобы Google API точно загрузился
-        const checkInterval = setInterval(() => {
-          if (window.google?.accounts?.id) {
-            clearInterval(checkInterval);
-            initializeGoogle(clientId);
-          }
-        }, 100);
-        
-        // Таймаут на 3 секунды после загрузки скрипта
-        setTimeout(() => {
-          clearInterval(checkInterval);
-          if (!window.google?.accounts?.id) {
-            setError("Google Identity Services не инициализирован");
-            setLoading(false);
-          }
-        }, 3000);
-      };
-
-      script.onerror = () => {
-        console.error("Не удалось загрузить Google Identity Services");
-        setError("Не удалось загрузить Google Identity Services. Проверьте подключение к интернету.");
-        setLoading(false);
-      };
-
-      document.head.appendChild(script);
+      }, 10000);
     }
 
     function initializeGoogle(clientId: string) {
@@ -188,6 +152,18 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
 
   return (
     <div className="w-full">
+      {/* Загружаем скрипт Google через next/script для правильной обработки CORS */}
+      {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="lazyOnload"
+          onError={() => {
+            setError("Не удалось загрузить Google Identity Services");
+            setLoading(false);
+          }}
+        />
+      )}
+      
       {loading && !error && (
         <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] text-[#abd1c6] flex items-center justify-center gap-2.5 border border-[#1f2937]/50">
           <div className="w-4 h-4 border-2 border-[#abd1c6] border-t-transparent rounded-full animate-spin" />

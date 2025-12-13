@@ -78,8 +78,8 @@ export function middleware(req: NextRequest) {
       "font-src 'self' data:",
       // Разрешаем запросы к Telegram OAuth и Google OAuth (для виджета входа)
       "connect-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com",
-      // Разрешаем встраивать iframe Telegram OAuth
-      "frame-src 'self' https://oauth.telegram.org https://telegram.org",
+      // Разрешаем встраивать iframe Telegram OAuth и Google OAuth
+      "frame-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com",
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",

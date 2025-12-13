@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
@@ -26,9 +26,13 @@ declare global {
 export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const initializedRef = useRef(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (checkingAuth || initializedRef.current) return;
+    setLoading(true);
+    setError(null);
 
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     if (!clientId) {
@@ -97,13 +101,18 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
         });
 
         initializedRef.current = true;
+        setLoading(false);
       } catch (error) {
         console.error("Ошибка инициализации Google:", error);
+        setError("Ошибка инициализации Google");
+        setLoading(false);
       }
     };
 
     script.onerror = () => {
       console.error("Не удалось загрузить Google Identity Services");
+      setError("Не удалось загрузить Google Identity Services");
+      setLoading(false);
     };
 
     document.head.appendChild(script);
@@ -116,16 +125,35 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
     };
   }, [checkingAuth, onAuth]);
 
-  // Если Google Client ID не задан, показываем заглушку
+  // Если Google Client ID не задан, показываем заглушку с сообщением
   if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
-    return null;
+    return (
+      <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] text-[#6b7280] flex items-center justify-center gap-2.5 border border-[#1f2937]/50 cursor-not-allowed">
+        <LucideIcons.AlertCircle size="sm" />
+        <span>Google авторизация недоступна</span>
+      </div>
+    );
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="flex justify-center min-h-[44px] relative w-full"
-    />
+    <div className="w-full">
+      {loading && !error && (
+        <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] text-[#abd1c6] flex items-center justify-center gap-2.5 border border-[#1f2937]/50">
+          <div className="w-4 h-4 border-2 border-[#abd1c6] border-t-transparent rounded-full animate-spin" />
+          <span>Загрузка Google...</span>
+        </div>
+      )}
+      {error && (
+        <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] text-[#6b7280] flex items-center justify-center gap-2.5 border border-[#1f2937]/50">
+          <LucideIcons.AlertCircle size="sm" />
+          <span>{error}</span>
+        </div>
+      )}
+      <div
+        ref={containerRef}
+        className="flex justify-center min-h-[44px] relative w-full"
+      />
+    </div>
   );
 }
 

@@ -223,9 +223,9 @@ async function main() {
         type: (update.type as AchievementType) ?? AchievementType.SPECIAL,
         kind: (update as any).kind ?? AchievementKind.NORMAL,
         maxCount: (update.maxCount as number | undefined) ?? 1,
-        isExclusive: update.isExclusive ?? false,
-        isHidden: update.isHidden ?? false,
-        isSeasonal: update.isSeasonal ?? false,
+        isExclusive: (update.isExclusive as boolean | undefined) ?? false,
+        isHidden: (update.isHidden as boolean | undefined) ?? false,
+        isSeasonal: (update.isSeasonal as boolean | undefined) ?? false,
         isActive: true,
       },
     });

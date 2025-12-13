@@ -260,7 +260,7 @@ export default function HeaderCustomization({
             </div>
             <div className="flex justify-center bg-[#001e1d]/40 rounded-xl p-6 border border-[#abd1c6]/20">
               <ColorWheel
-                selectedColor={selectedColorValue || undefined}
+                selectedColor={selectedColorValue || null}
                 onColorChange={(color) => {
                   setSelectedColor(`color:${color}`);
                   setSelectedTheme(""); // Сбрасываем выбор готовой темы

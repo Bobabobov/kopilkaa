@@ -2,7 +2,7 @@
 "use client";
 
 import { Achievement, UserAchievement } from '@/lib/achievements/types';
-import { RARITY_COLORS, RARITY_NAMES } from '@/lib/achievements/types';
+import { RARITY_COLORS, RARITY_NAMES, type AchievementRarity } from '@/lib/achievements/types';
 import { LucideIcons } from '@/components/ui/LucideIcons';
 import { motion } from 'framer-motion';
 
@@ -38,7 +38,7 @@ export function AchievementCard({
   
   const IconComponent = LucideIcons[achievement.icon as keyof typeof LucideIcons] || LucideIcons.Star;
   
-  const getShortRarityName = (rarity: string) => RARITY_NAMES[rarity as any] || rarity;
+  const getShortRarityName = (rarity: string) => RARITY_NAMES[rarity as AchievementRarity] || rarity;
 
   const rarityTheme: Record<
     string,

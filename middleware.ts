@@ -73,7 +73,7 @@ export function middleware(req: NextRequest) {
       "default-src 'self'",
       // Разрешаем внешние скрипты для игр, Telegram-виджета и Google OAuth
       "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://codepen.io https://cdnjs.cloudflare.com https://telegram.org https://accounts.google.com",
-      "style-src 'self' 'unsafe-inline'", // TailwindCSS требует unsafe-inline
+      "style-src 'self' 'unsafe-inline' https://accounts.google.com", // TailwindCSS требует unsafe-inline, Google OAuth требует стили
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
       // Разрешаем запросы к Telegram OAuth и Google OAuth (для виджета входа)

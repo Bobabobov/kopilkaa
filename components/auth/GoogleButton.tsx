@@ -162,6 +162,8 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
               containerRef.current.innerHTML = "";
               
               // Рендерим стандартную кнопку Google
+              // Получаем ширину контейнера для правильной ширины кнопки
+              const containerWidth = containerRef.current.offsetWidth || 300;
               window.google.accounts.id.renderButton(containerRef.current, {
                 type: "standard",
                 theme: "outline",
@@ -169,7 +171,7 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
                 text: "signin_with",
                 shape: "rectangular",
                 logo_alignment: "left",
-                width: "100%",
+                width: containerWidth,
               });
               
               // Кликаем по кнопке программно

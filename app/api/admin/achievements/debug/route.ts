@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
         unlocked: p.isUnlocked,
       })),
       eligibleNormals: achievements.filter(
-        (a) => (a.kind ?? 'NORMAL') === 'NORMAL' && !a.isExclusive && !a.isHidden && !a.isSeasonal
+        (a: any) => (a.kind ?? 'NORMAL') === 'NORMAL' && !a.isExclusive && !a.isHidden && !a.isSeasonal
       ).length,
     },
   });

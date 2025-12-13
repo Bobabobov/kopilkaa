@@ -220,7 +220,7 @@ async function main() {
         description: update.description ?? slug,
         icon: 'Star',
         rarity: 'COMMON',
-        type: update.type ?? AchievementType.SPECIAL,
+        type: (update.type as AchievementType) ?? AchievementType.SPECIAL,
         kind: (update as any).kind ?? AchievementKind.NORMAL,
         maxCount: update.maxCount ?? 1,
         isExclusive: update.isExclusive ?? false,

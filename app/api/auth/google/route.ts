@@ -11,22 +11,62 @@ interface GoogleAuthData {
   sub: string; // Google user ID
 }
 
+// Функция для декодирования JWT токена с поддержкой UTF-8
+function decodeJWT(token: string): any {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      Buffer.from(base64, "base64")
+        .toString("binary")
+        .split("")
+        .map((c) => {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("Ошибка декодирования JWT:", error);
+    throw new Error("Не удалось декодировать JWT токен");
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const googleData = body?.google as GoogleAuthData | undefined;
+    const googleData = body?.google as { credential: string } | GoogleAuthData | undefined;
 
-    if (!googleData || !googleData.credential || !googleData.email || !googleData.sub) {
+    if (!googleData || !googleData.credential) {
       return NextResponse.json(
         { success: false, error: "Некорректные данные Google" },
         { status: 400 },
       );
     }
 
-    const googleId = googleData.sub;
-    const googleEmail = googleData.email.toLowerCase().trim();
-    const googleName = googleData.name || null;
-    const googlePicture = googleData.picture || null;
+    // Декодируем JWT токен на сервере для правильной обработки UTF-8
+    let payload: any;
+    try {
+      payload = decodeJWT(googleData.credential);
+    } catch (error) {
+      return NextResponse.json(
+        { success: false, error: "Ошибка декодирования токена Google" },
+        { status: 400 },
+      );
+    }
+
+    // Используем данные из токена или из переданных данных (для обратной совместимости)
+    const googleId = payload.sub || (googleData as any).sub;
+    const googleEmail = (payload.email || (googleData as any).email || "").toLowerCase().trim();
+    const googleName = payload.name || (googleData as any).name || null;
+    const googlePicture = payload.picture || (googleData as any).picture || null;
+
+    if (!googleId || !googleEmail) {
+      return NextResponse.json(
+        { success: false, error: "Некорректные данные Google" },
+        { status: 400 },
+      );
+    }
 
     const session = await getSession();
 

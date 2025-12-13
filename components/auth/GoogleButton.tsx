@@ -93,31 +93,10 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
               return;
             }
 
-            // Декодируем JWT токен (базовая декодировка без проверки подписи на клиенте)
-            try {
-              // Правильное декодирование base64 с поддержкой UTF-8
-              const base64Url = response.credential.split(".")[1];
-              const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-              const jsonPayload = decodeURIComponent(
-                atob(base64)
-                  .split("")
-                  .map((c) => {
-                    return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-                  })
-                  .join("")
-              );
-              const payload = JSON.parse(jsonPayload);
-
-              await onAuth({
-                credential: response.credential,
-                email: payload.email,
-                name: payload.name || null,
-                picture: payload.picture || null,
-                sub: payload.sub,
-              });
-            } catch (error) {
-              console.error("Ошибка декодирования Google токена:", error);
-            }
+            // Отправляем credential на сервер, где он будет правильно декодирован
+            await onAuth({
+              credential: response.credential,
+            });
           },
         });
 

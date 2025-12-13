@@ -6,9 +6,10 @@ import Link from "next/link";
 
 interface DonateButtonProps {
   isMobile?: boolean;
+  onLinkClick?: () => void;
 }
 
-export default function DonateButton({ isMobile = false }: DonateButtonProps) {
+export default function DonateButton({ isMobile = false, onLinkClick }: DonateButtonProps) {
 
   const commonAnimation = {
     borderColor: [
@@ -23,7 +24,7 @@ export default function DonateButton({ isMobile = false }: DonateButtonProps) {
 
   if (isMobile) {
     return (
-      <Link href="/support" className="block">
+      <Link href="/support" onClick={onLinkClick} className="block">
         <motion.span
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -48,7 +49,7 @@ export default function DonateButton({ isMobile = false }: DonateButtonProps) {
   }
 
   return (
-    <Link href="/support" className="block">
+    <Link href="/support" onClick={onLinkClick} className="block">
       <motion.span
         whileHover={{ 
           scale: 1.03,

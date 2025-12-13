@@ -9,6 +9,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import { AchievementCard } from "@/components/achievements";
 import GrantAchievementModal from "./components/GrantAchievementModal";
+import RevokeAchievementModal from "./components/RevokeAchievementModal";
 import { getRarityLabel } from "@/lib/achievements/rarity";
 
 export default function AdminAchievementsClient() {
@@ -24,6 +25,7 @@ export default function AdminAchievementsClient() {
 
   // Модалки
   const [showGrantModal, setShowGrantModal] = useState(false);
+  const [showRevokeModal, setShowRevokeModal] = useState(false);
 
   useEffect(() => {
     loadAchievements();
@@ -228,6 +230,15 @@ export default function AdminAchievementsClient() {
               </button>
 
               <button
+                onClick={() => setShowRevokeModal(true)}
+                className="px-4 py-2 lg:px-6 lg:py-2 bg-[#e16162]/90 text-white font-semibold rounded-xl hover:bg-[#e16162] transition-colors flex items-center gap-2 text-sm lg:text-base"
+              >
+                <LucideIcons.Trash2 size="sm" />
+                <span className="hidden sm:inline">Забрать достижение</span>
+                <span className="sm:hidden">Забрать</span>
+              </button>
+
+              <button
                 onClick={loadAchievements}
                 className="px-4 py-2 lg:px-6 lg:py-2 bg-white/10 text-[#fffffe] font-semibold rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 text-sm lg:text-base"
               >
@@ -289,6 +300,17 @@ export default function AdminAchievementsClient() {
           onClose={() => setShowGrantModal(false)}
           onSuccess={() => {
             setShowGrantModal(false);
+            loadAchievements();
+          }}
+        />
+      )}
+
+      {showRevokeModal && (
+        <RevokeAchievementModal
+          achievements={achievements}
+          onClose={() => setShowRevokeModal(false)}
+          onSuccess={() => {
+            setShowRevokeModal(false);
             loadAchievements();
           }}
         />

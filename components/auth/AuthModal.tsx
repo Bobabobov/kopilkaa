@@ -13,6 +13,7 @@ interface AuthModalProps {
   mode: AuthMode;
   checkingAuth: boolean;
   onTelegramAuth: (user: any) => Promise<void>;
+  onGoogleAuth: (data: any) => Promise<void>;
   onEmailLogin: (identifier: string, password: string) => Promise<void>;
   onEmailSignup: (email: string, name: string, password: string) => Promise<void>;
   busy: boolean;
@@ -23,6 +24,7 @@ export function AuthModal({
   mode,
   checkingAuth,
   onTelegramAuth,
+  onGoogleAuth,
   onEmailLogin,
   onEmailSignup,
   busy,
@@ -114,7 +116,7 @@ export function AuthModal({
             >
               {showEmailForm 
                 ? (isSignup ? "Зарегистрируйтесь по почте" : "Войдите по почте")
-                : (isSignup ? "Продолжите через Telegram или зарегистрируйтесь по почте" : "Продолжите через Telegram или войдите по почте")
+                : (isSignup ? "Продолжите через Telegram, Google или зарегистрируйтесь по почте" : "Продолжите через Telegram, Google или войдите по почте")
               }
             </motion.p>
           </div>
@@ -127,6 +129,7 @@ export function AuthModal({
                   showEmailForm={showEmailForm}
                   checkingAuth={checkingAuth}
                   onTelegramAuth={onTelegramAuth}
+                  onGoogleAuth={onGoogleAuth}
                   onEmailSignup={onEmailSignup}
                   busy={busy}
                   error={error}
@@ -136,6 +139,7 @@ export function AuthModal({
                   showEmailForm={showEmailForm}
                   checkingAuth={checkingAuth}
                   onTelegramAuth={onTelegramAuth}
+                  onGoogleAuth={onGoogleAuth}
                   onEmailLogin={onEmailLogin}
                   busy={busy}
                   error={error}

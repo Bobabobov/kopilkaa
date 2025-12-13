@@ -6,12 +6,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import OtherUserLoadingStates from "./OtherUserLoadingStates";
-import OtherUserInfoCard from "./OtherUserInfoCard";
 import OtherUserPersonalStats from "./OtherUserPersonalStats";
 import OtherUserAchievements from "./OtherUserAchievements";
 import OtherUserActivity from "./OtherUserActivity";
 import OtherUserDonations from "./OtherUserDonations";
 import MutualFriends from "./widgets/MutualFriends";
+import ProfileHeaderCard from "@/components/profile/ProfileHeaderCard";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 
@@ -52,7 +52,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [currentUserRole, setCurrentUserRole] = useState<"USER" | "ADMIN" | null>(null);
   const { showToast, ToastComponent } = useBeautifulToast();
 
   const emitFriendEvents = useCallback(() => {
@@ -71,7 +70,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
           const data = await response.json();
           setIsAuthenticated(true);
           setCurrentUserId(data.user.id);
-          setCurrentUserRole(data.user.role || "USER");
         } else {
           setIsAuthenticated(false);
         }
@@ -82,7 +80,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
 
     checkAuth();
   }, []);
-
 
   const fetchFriendshipStatus = useCallback(async () => {
     try {
@@ -116,12 +113,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
         });
         if (userResponse.ok) {
           const userData = await userResponse.json();
-          console.log("User data loaded:", {
-            id: userData.user?.id,
-            isBanned: userData.user?.isBanned,
-            bannedUntil: userData.user?.bannedUntil,
-            bannedReason: userData.user?.bannedReason,
-          });
           setUser(userData.user);
         } else if (userResponse.status === 404) {
           // Пользователь не найден (возможно удален)
@@ -299,15 +290,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   // Пользователь заблокирован временно
   const isBannedTemporary = isBanned && bannedUntil && bannedUntil > new Date();
 
-  console.log("Ban check:", {
-    isBanned,
-    bannedUntil: bannedUntil?.toISOString(),
-    isCurrentlyBanned,
-    isBannedPermanent,
-    isBannedTemporary,
-    currentDate: new Date().toISOString(),
-  });
-
   // Если пользователь действительно заблокирован, показываем только сообщение
   if (isCurrentlyBanned) {
     return (
@@ -393,6 +375,15 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     }
   };
 
+  const friendshipStatus: "none" | "requested" | "incoming" | "friends" =
+    !friendship
+      ? "none"
+      : friendship.status === "ACCEPTED"
+      ? "friends"
+      : friendship.requesterId === currentUserId
+      ? "requested"
+      : "incoming";
+
   return (
     <div className="min-h-screen relative overflow-hidden" role="main" aria-label="Профиль пользователя">
       {/* Универсальный фон */}
@@ -400,7 +391,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
 
       {/* Main Content */}
       <div className="w-full px-3 sm:px-4 md:px-6 pt-0 sm:pt-8 md:pt-10 pb-8 sm:pb-10 md:pb-12 relative z-10">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-[1200px] mx-auto">
           {/* Кнопка возврата на свой профиль */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -421,31 +412,34 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
 
           {/* Информация о пользователе */}
           <div className="mb-4 sm:mb-6">
-            <OtherUserInfoCard
+            <ProfileHeaderCard
               user={user}
-              friendship={friendship}
-              currentUserId={currentUserId}
-              currentUserRole={currentUserRole}
-              onSendFriendRequest={sendFriendRequest}
-              onAcceptFriendRequest={acceptFriendRequest}
-              onDeclineFriendRequest={declineFriendRequest}
+              isOwner={false}
+              friendshipStatus={friendshipStatus}
+              onSendRequest={sendFriendRequest}
+              onAcceptIncoming={acceptFriendRequest}
+              onDeclineIncoming={declineFriendRequest}
               onRemoveFriend={friendship?.status === "ACCEPTED" ? handleRemoveFriend : undefined}
             />
+          </div>
+
+          {/* Общие друзья (если есть) */}
+          <div className="mb-4 sm:mb-6">
+            <MutualFriends userId={userId} />
           </div>
 
           {/* Основной контент */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 md:gap-6">
             {/* Левая колонка */}
-            <section className="lg:col-span-8 space-y-4 sm:space-y-5 md:space-y-6">
+            <section className="lg:col-span-7 space-y-4 sm:space-y-5 md:space-y-6">
               <OtherUserPersonalStats userId={userId} />
-              <OtherUserActivity userId={userId} />
+              <OtherUserAchievements userId={userId} />
             </section>
 
             {/* Правая колонка */}
-            <aside className="lg:col-span-4 space-y-4 sm:space-y-5 md:space-y-6">
+            <aside className="lg:col-span-5 space-y-4 sm:space-y-5 md:space-y-6">
               <OtherUserDonations userId={userId} />
-              <OtherUserAchievements userId={userId} />
-              <MutualFriends userId={userId} />
+              <OtherUserActivity userId={userId} />
             </aside>
           </div>
         </div>

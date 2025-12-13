@@ -105,7 +105,7 @@ class ProfilePreloader {
     if (typeof window === "undefined") return;
 
     // Предзагружаем компоненты профиля
-    import("@/components/profile/UserInfoCard");
+    import("@/components/profile/ProfileHeaderCard");
     import("@/components/profile/sections/ProfileFriendsSection");
     import("@/components/profile/sections/ProfileAchievements");
     import("@/components/profile/sections/ProfilePersonalStats");

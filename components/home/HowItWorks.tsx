@@ -60,8 +60,8 @@ export default function HowItWorks() {
       // Если пользователь авторизован, ведем на создание заявки
       window.location.href = "/applications";
     } else {
-      // Если не авторизован, ведем на регистрацию
-      window.location.href = "/register";
+      // Если не авторизован, открываем модалку входа/регистрации
+      window.location.href = "/?modal=auth/signup";
     }
   };
 

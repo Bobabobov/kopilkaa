@@ -113,12 +113,12 @@ export default function ApplicationsPage() {
       .then((r) => r.json())
       .then((d) => {
         if (!d.user) {
-          router.push("/register");
+          router.push("/?modal=auth/signup");
           return;
         }
         setUser(d.user);
       })
-      .catch(() => router.push("/register"))
+      .catch(() => router.push("/?modal=auth/signup"))
       .finally(() => setLoadingAuth(false));
   }, [router]);
 
@@ -214,7 +214,7 @@ export default function ApplicationsPage() {
 
     // Дополнительная проверка авторизации при отправке
     if (!user) {
-      router.push("/register");
+      router.push("/?modal=auth/signup");
       return;
     }
 
@@ -241,7 +241,7 @@ export default function ApplicationsPage() {
       const d = await r.json();
       if (r.status === 401) {
         // Если сессия истекла во время заполнения формы
-        router.push("/register");
+        router.push("/?modal=auth");
         return;
       }
       if (r.status === 429 && d?.leftMs) {

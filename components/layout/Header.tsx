@@ -2,6 +2,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 import NavAuth from "@/app/components/NavAuth";
 import HeaderLogo from "./HeaderLogo";
 import HeaderNavigation from "./HeaderNavigation";
@@ -16,6 +17,7 @@ export default function Header() {
   const [topBannerHeight, setTopBannerHeight] = useState(0);
   const [menuTop, setMenuTop] = useState(64);
   const [headerHeight, setHeaderHeight] = useState(64);
+  const pathname = usePathname();
 
   // Проверяем авторизацию (не блокируем навигацию)
   useEffect(() => {
@@ -171,6 +173,11 @@ export default function Header() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Закрываем мобильное меню при изменении маршрута
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   return (
     <>
               {/* Spacer для Header + TopBanner */}
@@ -221,42 +228,54 @@ export default function Header() {
       {/* Мобильное меню */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="lg:hidden fixed left-0 right-0 z-40 border-t backdrop-blur-sm shadow-lg"
-            style={{ 
-              backgroundColor: "#004643", 
-              borderColor: "#abd1c6",
-              // Открываем мобильное меню сразу под нижней границей header
-              top: `${menuTop}px`
-            }}
-          >
-            <div className="container-p py-4 space-y-2">
-              {/* Навигационные ссылки */}
-              <div className="space-y-1">
-                <HeaderNavigation
-                  className="flex-col space-y-1"
-                  onLinkClick={() => setMobileMenuOpen(false)}
-                />
-              </div>
+          <>
+            {/* Подложка для затемнения */}
+            <motion.div
+              className="fixed inset-0 z-30 lg:hidden bg-black/40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              onClick={() => setMobileMenuOpen(false)}
+            />
 
-              {/* Уведомления и авторизация для мобильных */}
-              <div className="pt-2 border-t border-white/20">
-                <div className="px-4 space-y-3">
-                  <DonateButton isMobile={true} />
-                  {isAuthenticated && !authLoading && (
-                    <div className="flex justify-center">
-                      <NotificationBell />
-                    </div>
-                  )}
-                  <NavAuth />
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden fixed left-0 right-0 z-40 border-t backdrop-blur-sm shadow-2xl rounded-b-3xl"
+              style={{ 
+                backgroundColor: "#004643", 
+                borderColor: "#abd1c6",
+                top: `${menuTop}px`,
+                maxHeight: `calc(100vh - ${menuTop + 12}px)`,
+              }}
+            >
+              <div className="container-p py-4 space-y-3 overflow-y-auto">
+                {/* Навигационные ссылки */}
+                <div className="space-y-2">
+                  <HeaderNavigation
+                    className="flex-col space-y-1 text-base"
+                    onLinkClick={() => setMobileMenuOpen(false)}
+                  />
+                </div>
+
+                {/* Уведомления и авторизация для мобильных */}
+                <div className="pt-3 border-t border-white/15">
+                  <div className="px-2 sm:px-4 space-y-3">
+                    <NavAuth isMobile onLinkClick={() => setMobileMenuOpen(false)} />
+                    <DonateButton isMobile={true} onLinkClick={() => setMobileMenuOpen(false)} />
+                    {isAuthenticated && !authLoading && (
+                      <div className="flex justify-center">
+                        <NotificationBell />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

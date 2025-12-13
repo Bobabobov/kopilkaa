@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { RARITY_NAMES, AchievementRarity } from "@/lib/achievements/types";
 
 type FriendsTab = "friends" | "sent" | "received" | "search";
 
@@ -117,6 +118,11 @@ export default function NotificationBell() {
       setUnreadCount(0);
     }
   }, [isOpen, notifications.length]);
+
+  const getRarityLabel = (rarity?: string) => {
+    if (!rarity) return "";
+    return RARITY_NAMES[rarity as AchievementRarity] || rarity;
+  };
 
   useEffect(() => {
     const handleFriendsUpdated = () => {
@@ -310,7 +316,7 @@ export default function NotificationBell() {
                                 color: getRarityColor(notification.rarity)
                               }}
                             >
-                              {notification.rarity}
+                              {getRarityLabel(notification.rarity)}
                             </div>
                           )}
                         </div>

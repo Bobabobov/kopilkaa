@@ -17,21 +17,24 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useProfileDashboard } from "@/lib/useProfileDashboard";
 
 // Ленивая загрузка компонентов для улучшения производительности
-const UserInfoCard = dynamicComponent(() => import("@/components/profile/UserInfoCard"), {
-  loading: () => (
-    <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[350px]">
-      <div className="animate-pulse space-y-4">
-        <div className="flex justify-center">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 bg-[#abd1c6]/20 rounded-lg"></div>
+const ProfileHeaderCard = dynamicComponent(
+  () => import("@/components/profile/ProfileHeaderCard"),
+  {
+    loading: () => (
+      <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[350px]">
+        <div className="animate-pulse space-y-4">
+          <div className="flex justify-center">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 bg-[#abd1c6]/20 rounded-lg"></div>
+          </div>
+          <div className="h-6 bg-[#abd1c6]/20 rounded w-32 mx-auto"></div>
+          <div className="h-4 bg-[#abd1c6]/10 rounded w-48 mx-auto"></div>
+          <div className="h-10 bg-[#abd1c6]/10 rounded-lg mt-6"></div>
         </div>
-        <div className="h-6 bg-[#abd1c6]/20 rounded w-32 mx-auto"></div>
-        <div className="h-4 bg-[#abd1c6]/10 rounded w-48 mx-auto"></div>
-        <div className="h-10 bg-[#abd1c6]/10 rounded-lg mt-6"></div>
       </div>
-    </div>
-  ),
-  ssr: false,
-});
+    ),
+    ssr: false,
+  },
+);
 
 const ProfilePersonalStats = dynamicComponent(() => import("@/components/profile/sections/ProfilePersonalStats"), {
   loading: () => (
@@ -341,35 +344,34 @@ function ProfilePageContent() {
       <UniversalBackground />
 
       {/* Main Content */}
-      <div className="w-full px-3 sm:px-4 md:px-6 pt-0 sm:pt-8 md:pt-10 pb-8 sm:pb-10 md:pb-12 relative z-10">
-        <div className="max-w-7xl mx-auto">
+      <div className="relative z-10 w-full px-3 sm:px-4 md:px-6 pt-4 sm:pt-8 md:pt-10 pb-8 sm:pb-10 md:pb-12">
+        <div className="max-w-6xl mx-auto space-y-5">
           {/* Информация о пользователе */}
-          <div className="mb-4 sm:mb-6">
-            <UserInfoCard user={user} onThemeChange={handleThemeChange} />
+          <div>
+            <ProfileHeaderCard
+              user={user}
+              isOwner
+              friendshipStatus="friends"
+              onThemeChange={handleThemeChange}
+              onBackgroundChange={() => setIsSettingsModalOpen(false)}
+              onOpenSettings={() => setIsSettingsModalOpen(true)}
+            />
           </div>
 
-          {/* Основной контент */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 md:gap-6">
-            {/* Левая колонка - Статистика и активность (8 колонок) */}
-            <section
-              className="lg:col-span-8 space-y-4 sm:space-y-5 md:space-y-6"
-              aria-label="Статистика и активность"
-            >
+          {/* Основной контент: двухколоночный макет */}
+          <main className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-5 md:gap-6">
+            <section className="space-y-5 md:space-y-6">
               <MotivationalCard />
               <ProfilePersonalStats />
               <ProfileRecentActivity />
             </section>
 
-            {/* Правая колонка - Друзья, достижения и пожертвования (4 колонки) */}
-            <aside
-              className="lg:col-span-4 space-y-4 sm:space-y-5 md:space-y-6"
-              aria-label="Друзья, достижения и пожертвования"
-            >
+            <aside className="space-y-5 md:space-y-6">
               <ProfileFriendsSection />
               <ProfileAchievements />
               <ProfileDonations />
             </aside>
-          </div>
+          </main>
         </div>
       </div>
 

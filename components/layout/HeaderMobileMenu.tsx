@@ -75,8 +75,9 @@ export default function HeaderMobileMenu() {
 
               {/* Авторизация для мобильных */}
               <div className="pt-2 border-t border-white/20 dark:border-white/10">
-                <div className="px-4">
-                  <NavAuth />
+                <div className="px-4 space-y-3">
+                  <NavAuth isMobile />
+                  <DonateButton isMobile />
                 </div>
               </div>
             </div>

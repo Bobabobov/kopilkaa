@@ -46,12 +46,12 @@ export default function BugReportDetailPage() {
       .then((r) => r.json())
       .then((d) => {
         if (!d.user) {
-          router.push("/register");
+          router.push("/?modal=auth");
           return;
         }
         setUser(d.user);
       })
-      .catch(() => router.push("/register"))
+      .catch(() => router.push("/?modal=auth"))
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -334,6 +334,9 @@ export default function BugReportDetailPage() {
     </div>
   );
 }
+
+
+
 
 
 

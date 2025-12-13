@@ -1,15 +1,20 @@
 // lib/achievements/types.ts
 export type AchievementRarity = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'EXCLUSIVE';
 export type AchievementType = 'STREAK' | 'APPLICATIONS' | 'GAMES' | 'SOCIAL' | 'SPECIAL' | 'COMMUNITY' | 'CREATIVITY';
+export type AchievementKind = 'NORMAL' | 'META';
 
 export interface Achievement {
   id: string;
+  slug?: string | null;
   name: string;
   description: string;
   icon: string;
   rarity: AchievementRarity;
   type: AchievementType;
+  kind?: AchievementKind;
   isExclusive: boolean;
+  isHidden?: boolean;
+  isSeasonal?: boolean;
   maxCount: number;
   isActive: boolean;
   // В базе поле может быть null, поэтому учитываем и Date, и null, и отсутствие
@@ -35,6 +40,8 @@ export interface AchievementProgress {
   progress: number;
   maxProgress: number;
   isUnlocked: boolean;
+  current?: number;
+  target?: number;
   unlockedAt?: Date;
   progressPercentage: number;
 }

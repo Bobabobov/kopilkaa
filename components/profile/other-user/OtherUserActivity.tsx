@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 type Activity = {
   id: string;
@@ -39,25 +40,31 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case "application_created":
-        return "📝";
-      case "profile_updated":
-        return "👤";
-      default:
-        return "📌";
+    case "application_created":
+      return <LucideIcons.FileText size="sm" />;
+    case "profile_updated":
+      return <LucideIcons.User size="sm" />;
+    case "donation":
+      return <LucideIcons.Heart size="sm" />;
+    default:
+      return <LucideIcons.Activity size="sm" />;
     }
   };
 
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case "application_created":
-        return "text-emerald-600 dark:text-emerald-400";
-      case "profile_updated":
-        return "text-green-600 dark:text-green-400";
-      default:
-        return "text-gray-600 dark:text-gray-400";
-    }
-  };
+const relativeTime = (date: string) => {
+  const d = new Date(date);
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "только что";
+  if (minutes < 60) return `${minutes} мин назад`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} ч назад`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "вчера";
+  if (days < 7) return `${days} дн назад`;
+  return d.toLocaleDateString("ru-RU");
+};
 
   if (loading) {
     return (
@@ -132,11 +139,11 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="group flex items-start gap-4 p-4 rounded-2xl bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl hover:shadow-[#f9bc60]/20"
+                className="group flex items-start gap-3 p-3.5 rounded-2xl bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl hover:shadow-[#f9bc60]/20"
               >
                 <motion.div 
-                  className="w-12 h-12 bg-gradient-to-br from-[#f9bc60]/30 to-[#e8a545]/20 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-md"
-                  whileHover={{ rotate: 15, scale: 1.2 }}
+                  className="w-10 h-10 bg-gradient-to-br from-[#f9bc60]/30 to-[#e8a545]/20 rounded-xl flex items-center justify-center text-lg text-[#001e1d] group-hover:scale-110 transition-transform shadow-md"
+                  whileHover={{ rotate: 12, scale: 1.15 }}
                 >
                   {getActivityIcon(activity.type)}
                 </motion.div>
@@ -146,8 +153,10 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
                   >
                     {activity.description}
                   </div>
-                  <div className="text-xs text-[#94a3b8]">
-                    {new Date(activity.createdAt).toLocaleString("ru-RU")}
+                  <div className="text-xs text-[#94a3b8] flex items-center gap-2">
+                    <span>{relativeTime(activity.createdAt)}</span>
+                    <span className="w-1 h-1 rounded-full bg-[#94a3b8]/50" />
+                    <span>{new Date(activity.createdAt).toLocaleDateString("ru-RU")}</span>
                   </div>
                 </div>
               </motion.div>

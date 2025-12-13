@@ -297,7 +297,7 @@ export default function ProfileAchievements() {
           {/* Кнопка "Показать все" */}
           {achievements.length > 2 && (
             <button
-              onClick={() => setShowModal(true)}
+              onClick={() => (window.location.href = "/achievements")}
               className="w-full py-2 sm:py-2.5 px-3 sm:px-4 bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 rounded-lg border border-[#f9bc60]/20 text-[#f9bc60] text-xs sm:text-sm font-medium transition-colors"
             >
               <div className="flex items-center justify-center gap-1.5 sm:gap-2">
@@ -310,11 +310,7 @@ export default function ProfileAchievements() {
       )}
       </div>
 
-      {/* Модальное окно */}
-      <AchievementsModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-      />
+      {/* Модальное окно убрали: переход теперь на страницу /achievements */}
     </motion.div>
   );
 }

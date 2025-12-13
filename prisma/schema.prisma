@@ -43,6 +43,8 @@ model User {
   phoneVerified    Boolean   @default(false)
   telegramId       String?   @unique
   telegramUsername String?
+  googleId         String?   @unique
+  googleEmail      String?
   vkLink           String?
   telegramLink     String?
   youtubeLink      String?
@@ -155,12 +157,16 @@ model UserTree {
 // Модель для достижений
 model Achievement {
   id          String            @id @default(cuid())
+  slug        String?           @unique
   name        String
   description String
   icon        String
   rarity      AchievementRarity @default(COMMON)
   type        AchievementType   @default(SPECIAL)
+  kind        AchievementKind   @default(NORMAL)
   isExclusive Boolean           @default(false)
+  isHidden    Boolean           @default(false)
+  isSeasonal  Boolean           @default(false)
   maxCount    Int               @default(1) // Максимальное количество раз, которое можно получить
   isActive    Boolean           @default(true)
   validFrom   DateTime? // Дата начала действия
@@ -217,6 +223,12 @@ enum FriendshipStatus {
   ACCEPTED
   DECLINED
   BLOCKED
+}
+
+// Тип достижения: обычное или мета
+enum AchievementKind {
+  NORMAL
+  META
 }
 
 enum DonationType {

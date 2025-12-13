@@ -9,6 +9,7 @@ import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { FriendsList } from "@/components/friends/FriendsList";
 import { FriendsSearch } from "@/components/friends/FriendsSearch";
+import { FriendsSidebar } from "@/components/friends/FriendsSidebar";
 
 type Tab = "friends" | "sent" | "received" | "search";
 
@@ -326,10 +327,10 @@ function FriendsPageContent() {
   }, [lastReadRequestId, receivedRequests]);
 
   const tabs = [
-    { id: "friends" as Tab, label: "Друзья", count: friends.length, icon: "👥" },
-    { id: "sent" as Tab, label: "Отправленные", count: sentRequests.length, icon: "📤" },
-    { id: "received" as Tab, label: "Полученные", count: receivedRequests.length, icon: "📥" },
-    { id: "search" as Tab, label: "Поиск", icon: "🔍" },
+    { id: "friends" as Tab, label: "Друзья", count: friends.length, icon: <LucideIcons.UsersRound size="sm" /> },
+    { id: "sent" as Tab, label: "Отправленные", count: sentRequests.length, icon: <LucideIcons.Send size="sm" /> },
+    { id: "received" as Tab, label: "Полученные", count: receivedRequests.length, icon: <LucideIcons.Inbox size="sm" /> },
+    { id: "search" as Tab, label: "Поиск", icon: <LucideIcons.Search size="sm" /> },
   ];
 
   const handleSendRequest = async (userId: string) => {
@@ -356,21 +357,21 @@ function FriendsPageContent() {
     {
       label: "Всего друзей",
       value: friends.length,
-      icon: <LucideIcons.Users className="text-[#f9bc60]" size="md" />,
-      color: "bg-[#f9bc60]/10 border-[#f9bc60]/25",
+      icon: <LucideIcons.Users className="text-[#f9bc60]" size="sm" />,
+      color: "bg-white/5 border-[#f9bc60]/20",
     },
     {
       label: "Входящие заявки",
       value: receivedRequests.length,
-      icon: <LucideIcons.UserPlus className="text-[#10B981]" size="md" />,
-      color: "bg-[#10B981]/10 border-[#10B981]/25",
+      icon: <LucideIcons.UserPlus className="text-[#10B981]" size="sm" />,
+      color: "bg-white/5 border-[#10B981]/20",
       hint: newRequestsCount > 0 ? `${newRequestsCount} новых` : undefined,
     },
     {
       label: "Отправленные",
       value: sentRequests.length,
-      icon: <LucideIcons.Send className="text-[#3b82f6]" size="md" />,
-      color: "bg-[#3b82f6]/10 border-[#3b82f6]/25",
+      icon: <LucideIcons.Send className="text-[#3b82f6]" size="sm" />,
+      color: "bg-white/5 border-[#3b82f6]/20",
     },
   ];
 
@@ -385,9 +386,9 @@ function FriendsPageContent() {
 
   return (
     <div className="min-h-screen text-[#fffffe]">
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 space-y-6 sm:space-y-8 min-w-0">
+      <div className="w-full max-w-[1280px] mx-auto px-3 sm:px-5 lg:px-8 py-8 sm:py-10 lg:py-12 space-y-6 sm:space-y-8 min-w-0">
         {/* Шапка */}
-        <div className="relative overflow-hidden rounded-2xl border border-[#abd1c6]/20 bg-[#052d29] px-4 sm:px-6 lg:px-8 py-6 sm:py-7 min-w-0">
+        <div className="relative overflow-hidden rounded-2xl border border-[#abd1c6]/20 bg-[#052d29] px-4 sm:px-6 lg:px-8 py-6 sm:py-7 min-w-0 mt-6">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -left-10 -top-10 w-44 h-44 bg-[#f9bc60]/10 blur-3xl" />
             <div className="absolute -right-8 top-0 w-36 h-36 bg-[#abd1c6]/10 blur-3xl" />
@@ -400,11 +401,11 @@ function FriendsPageContent() {
                 Управляйте друзьями, отвечайте на заявки или находите новых людей. Всё в одном месте.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 sm:gap-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={goToSearch}
-                className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[#f9bc60] text-[#001e1d] font-semibold hover:bg-[#e8a545] transition-colors"
+                  className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-[#f9bc60] text-[#001e1d] font-semibold hover:bg-[#e8a545] transition-transform transition-colors shadow-[0_0_8px_rgba(255,210,115,0.4)] hover:shadow-[0_0_14px_rgba(255,210,115,0.55)] hover:scale-105"
               >
                 <LucideIcons.UserPlus size="sm" />
                 Найти друзей
@@ -433,9 +434,9 @@ function FriendsPageContent() {
           {summary.map((item) => (
             <div
               key={item.label}
-              className={`rounded-2xl border ${item.color} p-4 flex items-center gap-3 shadow-md min-w-0`}
+              className={`rounded-2xl border ${item.color} p-3 sm:p-4 flex items-center gap-3 shadow-md min-w-0`}
             >
-              <div className="w-10 h-10 rounded-xl bg-[#001e1d]/60 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center">
                 {item.icon}
               </div>
               <div className="min-w-0">
@@ -449,125 +450,129 @@ function FriendsPageContent() {
           ))}
         </div>
 
-        {/* Контент */}
-        <div className="bg-[#052d29] rounded-2xl border border-[#abd1c6]/20 shadow-2xl overflow-hidden min-w-0">
-          <div className="flex-shrink-0 bg-[#021e1c]/95 border-b border-[#abd1c6]/15 px-3 sm:px-5 py-2 sm:py-3 overflow-x-auto">
+        {/* Контент + боковая панель */}
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px] gap-4 lg:gap-6 items-start min-w-0">
+          <div className="bg-[#052d29] rounded-2xl border border-[#abd1c6]/20 shadow-2xl overflow-hidden min-w-0">
+            <div className="flex-shrink-0 bg-[#021e1c]/95 border-b border-[#abd1c6]/15 px-3 sm:px-5 py-2 sm:py-3 overflow-x-auto">
             <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full min-w-0">
-              {tabs.map((tab) => {
-                const active = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => {
-                      setActiveTab(tab.id);
-                      router.replace(`/friends?tab=${tab.id}`);
-                    }}
-                    className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-full whitespace-nowrap transition-all ${
+                {tabs.map((tab) => {
+                  const active = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        router.replace(`/friends?tab=${tab.id}`);
+                      }}
+                    className={`px-3 sm:px-4 py-2.5 text-sm font-semibold rounded-full whitespace-nowrap transition-all shadow-sm ${
                       active
-                        ? "bg-[#f9bc60] text-[#001e1d] shadow-lg"
-                        : "bg-[#0a2d29] text-[#abd1c6] border border-[#abd1c6]/30 hover:border-[#f9bc60]/50 hover:text-[#fffffe]"
+                        ? "bg-[#f9bc60] text-[#001e1d] shadow-[0_10px_30px_-12px_rgba(249,188,96,0.7)] ring-2 ring-[#f9bc60]/70"
+                        : "bg-[#0a2d29] text-[#abd1c6] border border-[#abd1c6]/30 hover:border-[#f9bc60]/60 hover:text-[#fffffe]"
                     }`}
-                  >
+                    >
                     <span className="inline-flex items-center gap-2">
-                      <span>{tab.icon}</span>
+                      <span className="text-[#fffffe]">{tab.icon}</span>
                       <span>{tab.label}</span>
-                      {tab.count !== undefined && tab.count > 0 && (
-                        <span className="px-2 py-0.5 text-xs rounded-full bg-[#001e1d]/80 text-[#f9bc60] font-semibold">
-                          {tab.count}
-                        </span>
-                      )}
-                    </span>
-                  </button>
-                );
-              })}
+                        {tab.count !== undefined && tab.count > 0 && (
+                          <span className="px-2 py-0.5 text-xs rounded-full bg-[#001e1d]/80 text-[#f9bc60] font-semibold">
+                            {tab.count}
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="p-4 sm:p-6">
+              <AnimatePresence mode="wait">
+                {activeTab === "friends" && (
+                  <motion.div
+                    key="friends"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <FriendsList
+                      type="friends"
+                      data={friends}
+                      loading={loading}
+                      currentUserId={currentUserId}
+                      getUserStatus={getUserStatus}
+                      sendingRequests={sendingRequests}
+                      actions={{ onRemoveFriend: handleRemoveFriend }}
+                    />
+                  </motion.div>
+                )}
+
+                {activeTab === "sent" && (
+                  <motion.div
+                    key="sent"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <FriendsList
+                      type="sent"
+                      data={sentRequests}
+                      loading={loading}
+                      currentUserId={currentUserId}
+                      getUserStatus={getUserStatus}
+                      sendingRequests={sendingRequests}
+                      actions={{ onCancelRequest: handleCancelRequest }}
+                    />
+                  </motion.div>
+                )}
+
+                {activeTab === "received" && (
+                  <motion.div
+                    key="received"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <FriendsList
+                      type="received"
+                      data={receivedRequests}
+                      loading={loading}
+                      currentUserId={currentUserId}
+                      getUserStatus={getUserStatus}
+                      sendingRequests={sendingRequests}
+                      actions={{
+                        onAcceptRequest: handleAcceptRequest,
+                        onDeclineRequest: handleDeclineRequest,
+                      }}
+                    />
+                  </motion.div>
+                )}
+
+                {activeTab === "search" && (
+                  <motion.div
+                    key="search"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <FriendsSearch
+                      searchQuery={searchQuery}
+                      setSearchQuery={setSearchQuery}
+                      searchResults={searchResults}
+                      searchLoading={searchLoading}
+                      currentUserId={currentUserId}
+                      getUserStatus={getUserStatus}
+                      sendingRequests={sendingRequests}
+                      onSendRequest={handleSendRequest}
+                      onCancelRequest={handleCancelRequest}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
-          <div className="p-4 sm:p-6">
-            <AnimatePresence mode="wait">
-              {activeTab === "friends" && (
-                <motion.div
-                  key="friends"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                >
-                  <FriendsList
-                    type="friends"
-                    data={friends}
-                    loading={loading}
-                    currentUserId={currentUserId}
-                    getUserStatus={getUserStatus}
-                    sendingRequests={sendingRequests}
-                    actions={{ onRemoveFriend: handleRemoveFriend }}
-                  />
-                </motion.div>
-              )}
-
-              {activeTab === "sent" && (
-                <motion.div
-                  key="sent"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                >
-                  <FriendsList
-                    type="sent"
-                    data={sentRequests}
-                    loading={loading}
-                    currentUserId={currentUserId}
-                    getUserStatus={getUserStatus}
-                    sendingRequests={sendingRequests}
-                    actions={{ onCancelRequest: handleCancelRequest }}
-                  />
-                </motion.div>
-              )}
-
-              {activeTab === "received" && (
-                <motion.div
-                  key="received"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                >
-                  <FriendsList
-                    type="received"
-                    data={receivedRequests}
-                    loading={loading}
-                    currentUserId={currentUserId}
-                    getUserStatus={getUserStatus}
-                    sendingRequests={sendingRequests}
-                    actions={{
-                      onAcceptRequest: handleAcceptRequest,
-                      onDeclineRequest: handleDeclineRequest,
-                    }}
-                  />
-                </motion.div>
-              )}
-
-              {activeTab === "search" && (
-                <motion.div
-                  key="search"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                >
-                  <FriendsSearch
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                    searchResults={searchResults}
-                    searchLoading={searchLoading}
-                    currentUserId={currentUserId}
-                    getUserStatus={getUserStatus}
-                    sendingRequests={sendingRequests}
-                    onSendRequest={handleSendRequest}
-                    onCancelRequest={handleCancelRequest}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <FriendsSidebar />
         </div>
       </div>
     </div>

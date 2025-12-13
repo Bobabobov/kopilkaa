@@ -13,7 +13,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
     }
 
-    const achievements = await AchievementService.getAllAchievements();
+    const achievements = await AchievementService.getUserAchievementProgress(session.uid);
     
     return NextResponse.json({
       success: true,

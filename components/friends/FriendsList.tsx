@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface FriendsListProps {
   type: "friends" | "sent" | "received";
@@ -26,6 +29,8 @@ export function FriendsList({
   sendingRequests,
   actions,
 }: FriendsListProps) {
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
   if (loading) {
     return (
       <div className="text-center py-10">
@@ -52,7 +57,7 @@ export function FriendsList({
 
   return (
     <div className="space-y-3 min-w-0">
-      {items.map((item: any) => {
+      {items.map((item: any, idx: number) => {
         const user =
           type === "friends"
             ? currentUserId === item.requesterId
@@ -62,17 +67,30 @@ export function FriendsList({
             ? item.receiver
             : item.requester;
 
+        const userStatus = getUserStatus(user.lastSeen ?? null);
+        const isOnline = userStatus.status === "online";
+        const friendSince = item.createdAt
+          ? new Date(item.createdAt).toLocaleDateString("ru-RU")
+          : "";
+        const isAccepted = item.status === "ACCEPTED" || type === "friends";
+
         return (
-          <div
+          <motion.div
             key={item.id}
-            className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-[#001e1d]/25 rounded-xl border border-[#abd1c6]/15 hover:border-[#f9bc60]/30 transition-colors w-full min-w-0"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.03, duration: 0.25, ease: "easeOut" }}
+            whileHover={{ scale: 1.01 }}
+            className="relative flex flex-col gap-4 p-4 sm:p-5 bg-[#001e1d]/25 rounded-xl border border-[#abd1c6]/15 hover:border-[#f9bc60]/30 hover:bg-white/5 transition-colors w-full min-w-0"
           >
             <Link
               href={`/profile/${user.id}`}
               prefetch={false}
-              className="flex items-center gap-3 flex-1 group min-w-0"
+              className="flex items-center gap-4 flex-1 group min-w-0"
+              aria-label="Посмотреть профиль"
+              title="Перейти в профиль"
             >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#004643] rounded-full flex items-center justify-center group-hover:ring-2 group-hover:ring-[#f9bc60]/40 transition flex-shrink-0">
+              <div className="relative w-16 h-16 sm:w-[72px] sm:h-[72px] bg-[#004643] rounded-full flex items-center justify-center group-hover:ring-2 group-hover:ring-[#f9bc60]/40 transition flex-shrink-0">
                 {user.avatar ? (
                   <img
                     src={user.avatar}
@@ -84,29 +102,72 @@ export function FriendsList({
                     {(user.name || user.email.split("@")[0])[0].toUpperCase()}
                   </span>
                 )}
+                <span
+                  className={`absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 rounded-full border-2 border-[#001e1d] ${
+                    isOnline ? "bg-green-400" : "bg-gray-500"
+                  }`}
+                  aria-label={isOnline ? "Онлайн" : "Оффлайн"}
+                  title={isOnline ? "Онлайн" : "Оффлайн"}
+                />
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="text-[#fffffe] font-medium group-hover:underline truncate">
-                  {user.name || user.email.split("@")[0]}
-                </p>
-                <p className="text-[#abd1c6] text-sm">
-                  {getUserStatus(user.lastSeen ?? null).text}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-[#fffffe] text-lg font-semibold group-hover:underline truncate">
+                    {user.name || user.email.split("@")[0]}
+                  </p>
+                  {isAccepted && (
+                    <LucideIcons.CheckCircle2
+                      size="sm"
+                      className="text-[#10B981] flex-shrink-0"
+                    />
+                  )}
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#94a3b8]">
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full bg-[#001e1d]/50 ${
+                      isOnline ? "text-green-300" : "text-gray-300"
+                    }`}
+                    title={isOnline ? "Онлайн" : "Оффлайн"}
+                  >
+                    <span
+                      className={`w-3 h-3 rounded-full border border-[#001e1d] ${
+                        isOnline ? "bg-green-400" : "bg-gray-500"
+                      }`}
+                    />
+                    {userStatus.text}
+                  </span>
+                  <span className="text-[#f9bc60]">•</span>
+                  <span className="inline-flex items-center gap-1">
+                    <LucideIcons.Calendar size="xs" className="text-[#abd1c6]" />
+                    <span className="text-[#94a3b8]">Друг с {friendSince || "—"}</span>
+                  </span>
+                  <span
+                    className="inline-flex items-center gap-1 text-[#f9bc60]"
+                    title="Достижения пользователя"
+                  >
+                    <LucideIcons.Crown size="xs" className="text-[#f9bc60]" />
+                    Достижения
+                  </span>
+                </div>
               </div>
             </Link>
 
+            <div className="border-b border-white/10" />
+
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-              {type === "friends" && actions.onRemoveFriend && (
-                <button
-                  type="button"
-                  onClick={() => actions.onRemoveFriend?.(item.id)}
-                  disabled={sendingRequests.has(item.id)}
-                  className="px-3 py-1.5 bg-red-500/15 hover:bg-red-500/25 text-red-400 text-sm rounded-lg transition-colors disabled:opacity-60 w-full sm:w-auto"
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Link
+                  href={`/profile/${user.id}`}
+                  prefetch={false}
+                  className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg border border-[#abd1c6]/25 text-[#abd1c6] hover:border-[#f9bc60]/60 hover:text-[#fffffe] hover:bg-white/5 transition-colors"
+                  aria-label="Перейти в профиль"
+                  title="Перейти в профиль"
                 >
-                  Удалить
-                </button>
-              )}
+                  <LucideIcons.ExternalLink size="sm" />
+                  <span className="text-sm font-medium">Профиль</span>
+                </Link>
+              </div>
 
               {type === "sent" && actions.onCancelRequest && (
                 <button
@@ -149,8 +210,52 @@ export function FriendsList({
                   )}
                 </>
               )}
+
+              {type === "friends" && actions.onRemoveFriend && (
+                <div className="relative ml-auto">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenMenuId((prev) => (prev === item.id ? null : item.id));
+                    }}
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-lg border border-[#abd1c6]/25 text-[#abd1c6] hover:border-[#f9bc60]/60 hover:text-[#fffffe] transition-colors"
+                    aria-label="Еще действия"
+                    title="Открыть меню действий"
+                  >
+                    <LucideIcons.More size="sm" />
+                  </button>
+
+                  <div
+                    className={`absolute right-0 top-11 min-w-[180px] rounded-xl border border-[#abd1c6]/20 bg-[#001e1d]/95 shadow-xl transition duration-150 origin-top-right ${
+                      openMenuId === item.id
+                        ? "opacity-100 scale-100"
+                        : "pointer-events-none opacity-0 scale-95"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenMenuId(null);
+                        actions.onRemoveFriend?.(item.id);
+                      }}
+                      disabled={sendingRequests.has(item.id)}
+                      className="w-full text-left px-4 py-2.5 text-sm text-[#fffffe] hover:bg-[#f9bc60]/10 transition-colors disabled:opacity-60 rounded-t-xl"
+                    >
+                      Удалить друга
+                    </button>
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full text-left px-4 py-2.5 text-sm text-[#abd1c6] hover:bg-[#f9bc60]/10 transition-colors rounded-b-xl cursor-not-allowed opacity-70"
+                    >
+                      Блокировать (скоро)
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </div>

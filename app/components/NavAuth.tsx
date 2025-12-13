@@ -15,7 +15,12 @@ type User = {
 // Маршрут авторизации (используем модальное окно с параметром ?modal=auth)
 const LOGIN = "/?modal=auth" as Route;
 
-export default function NavAuth() {
+interface NavAuthProps {
+  isMobile?: boolean;
+  onLinkClick?: () => void;
+}
+
+export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps) {
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -104,22 +109,43 @@ export default function NavAuth() {
     return (
       <Link
         href={LOGIN}
-        className="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105 whitespace-nowrap"
-        style={{
-          backgroundColor: "#f9bc60",
-          color: "#001e1d",
-        }}
+        onClick={onLinkClick}
+        className={
+          isMobile
+            ? "block w-full rounded-lg border text-sm font-semibold transition-all duration-200 px-4 py-3 text-center hover:scale-[1.01]"
+            : "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105 whitespace-nowrap"
+        }
+        style={
+          isMobile
+            ? {
+                backgroundColor: "rgba(249, 188, 96, 0.05)",
+                borderColor: "rgba(249, 188, 96, 0.6)",
+                color: "#f9bc60",
+              }
+            : {
+                backgroundColor: "#f9bc60",
+                color: "#001e1d",
+              }
+        }
       >
         Вход
       </Link>
     );
   }
 
+  const handleLogout = async () => {
+    onLinkClick?.();
+    await logout();
+  };
+
   return (
-    <div className="flex items-center gap-2">
+    <div className={`flex ${isMobile ? "flex-col w-full gap-2" : "items-center gap-2"}`}>
       <Link
         href="/profile"
-        className="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105 whitespace-nowrap"
+        onClick={onLinkClick}
+        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105 ${
+          isMobile ? "w-full text-center" : "whitespace-nowrap"
+        }`}
         style={{
           color: "#fffffe",
           backgroundColor: "rgba(171, 209, 198, 0.1)",
@@ -132,7 +158,10 @@ export default function NavAuth() {
       {user.role === "ADMIN" && (
         <Link
           href="/admin"
-          className="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105"
+          onClick={onLinkClick}
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105 ${
+            isMobile ? "w-full text-center" : ""
+          }`}
           style={{
             backgroundColor: "#f9bc60",
             color: "#001e1d",
@@ -143,8 +172,10 @@ export default function NavAuth() {
         </Link>
       )}
       <button
-        onClick={logout}
-        className="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105"
+        onClick={handleLogout}
+        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105 ${
+          isMobile ? "w-full text-center" : ""
+        }`}
         style={{
           color: "#fffffe",
           backgroundColor: "rgba(171, 209, 198, 0.1)",

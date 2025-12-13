@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import type { AchievementStats as AchievementStatsType } from "@/lib/achievements/types";
 import OtherUserAchievementsModal from "./OtherUserAchievementsModal";
+import { AchievementsTimeline } from "./widgets/AchievementsTimeline";
 
 interface UserAchievement {
   id: string;
@@ -174,6 +175,15 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
               </motion.div>
             ))}
           </div>
+
+          <AchievementsTimeline
+            achievements={achievements.map((ua) => ({
+              id: ua.id,
+              title: ua.achievement.name,
+              date: new Date(ua.unlockedAt).toLocaleDateString("ru-RU"),
+              rarity: getRarityName(ua.achievement.rarity),
+            }))}
+          />
 
           {achievements.length > 3 && (
             <button

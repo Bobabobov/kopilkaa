@@ -4,12 +4,14 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { TelegramWidget } from "./TelegramWidget";
+import { GoogleButton } from "./GoogleButton";
 import { EmailLoginForm } from "./EmailLoginForm";
 
 interface LoginViewProps {
   showEmailForm: boolean;
   checkingAuth: boolean;
   onTelegramAuth: (user: any) => Promise<void>;
+  onGoogleAuth: (data: any) => Promise<void>;
   onEmailLogin: (identifier: string, password: string) => Promise<void>;
   busy: boolean;
   error: string | null;
@@ -19,6 +21,7 @@ export function LoginView({
   showEmailForm,
   checkingAuth,
   onTelegramAuth,
+  onGoogleAuth,
   onEmailLogin,
   busy,
   error,
@@ -37,6 +40,18 @@ export function LoginView({
               Через Telegram
             </p>
             <TelegramWidget onAuth={onTelegramAuth} checkingAuth={checkingAuth} />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.32 }}
+            className="mb-6"
+          >
+            <p className="text-xs mb-4 text-center text-[#6b7280] uppercase tracking-wider font-semibold">
+              Через Google
+            </p>
+            <GoogleButton onAuth={onGoogleAuth} checkingAuth={checkingAuth} />
           </motion.div>
 
           <motion.div

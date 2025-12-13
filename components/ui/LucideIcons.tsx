@@ -8,6 +8,7 @@ import {
   ThumbsDown,
   Camera,
   Users,
+  UsersRound,
   DollarSign,
   BarChart3,
   Star,
@@ -82,12 +83,16 @@ import {
   Award,
   Medal,
   Activity,
+  Inbox,
+  Flag,
   CheckCircle2,
   TrendingDown,
   PieChart,
   Lightbulb,
   Gamepad2,
   Code,
+  MoreVertical,
+  Infinity,
 } from "lucide-react";
 
 interface IconProps {
@@ -128,6 +133,10 @@ export const LucideIcons = {
 
   Users: ({ className = "", size = "md" }: IconProps) => (
     <Users className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  UsersRound: ({ className = "", size = "md" }: IconProps) => (
+    <UsersRound className={`${sizeClasses[size]} ${className}`} />
   ),
 
   Stats: ({ className = "", size = "md" }: IconProps) => (
@@ -458,6 +467,10 @@ export const LucideIcons = {
     <Zap className={`${sizeClasses[size]} ${className}`} />
   ),
 
+  Infinity: ({ className = "", size = "md" }: IconProps) => (
+    <Infinity className={`${sizeClasses[size]} ${className}`} />
+  ),
+
   Building2: ({ className = "", size = "md" }: IconProps) => (
     <Building2 className={`${sizeClasses[size]} ${className}`} />
   ),
@@ -490,6 +503,14 @@ export const LucideIcons = {
     <Activity className={`${sizeClasses[size]} ${className}`} />
   ),
 
+  Inbox: ({ className = "", size = "md" }: IconProps) => (
+    <Inbox className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Flag: ({ className = "", size = "md" }: IconProps) => (
+    <Flag className={`${sizeClasses[size]} ${className}`} />
+  ),
+
   Code: ({ className = "", size = "md" }: IconProps) => (
     <Code className={`${sizeClasses[size]} ${className}`} />
   ),
@@ -512,5 +533,9 @@ export const LucideIcons = {
 
   Gamepad2: ({ className = "", size = "md" }: IconProps) => (
     <Gamepad2 className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  More: ({ className = "", size = "md" }: IconProps) => (
+    <MoreVertical className={`${sizeClasses[size]} ${className}`} />
   ),
 };

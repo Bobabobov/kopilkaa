@@ -250,7 +250,7 @@ export default function ReportsPage() {
             <p className="text-[#abd1c6]">{authError}</p>
             <div className="flex items-center justify-center gap-3">
               <button
-                onClick={() => router.push("/register")}
+                onClick={() => router.push("/?modal=auth")}
                 className="px-4 py-2 rounded-lg bg-[#f9bc60] text-[#001e1d] font-semibold"
               >
                 Войти/зарегистрироваться

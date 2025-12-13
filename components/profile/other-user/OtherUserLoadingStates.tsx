@@ -28,12 +28,12 @@ export default function OtherUserLoadingStates({
             "Войдите в аккаунт или зарегистрируйтесь, чтобы просмотреть профили",
           buttons: [
             {
-              href: "/login",
+              href: "/?modal=auth",
               text: "Войти в аккаунт",
               variant: "primary",
             },
             {
-              href: "/register",
+              href: "/?modal=auth/signup",
               text: "Зарегистрироваться",
               variant: "secondary",
             },

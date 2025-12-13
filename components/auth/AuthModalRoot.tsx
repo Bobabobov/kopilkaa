@@ -112,6 +112,33 @@ export default function AuthModalRoot() {
     }
   };
 
+  const handleGoogleAuth = async (data: any) => {
+    try {
+      setError(null);
+      setBusy(true);
+
+      const r = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ google: data }),
+      });
+      const responseData = await r.json();
+
+      if (!r.ok || !responseData?.success) {
+        console.error("Ошибка ответа /api/auth/google:", responseData);
+        setError(responseData?.error || "Ошибка входа через Google");
+        return;
+      }
+
+      window.location.href = "/profile";
+    } catch (error: any) {
+      console.error("Google login error:", error);
+      setError(error?.message || "Ошибка входа через Google");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const handleEmailLogin = async (identifier: string, password: string) => {
     try {
       setError(null);
@@ -183,6 +210,7 @@ export default function AuthModalRoot() {
       mode={mode}
       checkingAuth={checkingAuth}
       onTelegramAuth={handleTelegramAuth}
+      onGoogleAuth={handleGoogleAuth}
       onEmailLogin={handleEmailLogin}
       onEmailSignup={handleEmailSignup}
       busy={busy}

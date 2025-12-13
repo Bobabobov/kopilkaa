@@ -41,11 +41,24 @@ export default function HeaderCustomization({
   );
   const [saving, setSaving] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
+  const selectedThemeKey = selectedColor ? selectedColor : selectedTheme;
+  const selectedThemeConfig = selectedColor
+    ? {
+        background: "color",
+        color: selectedColor.replace("color:", ""),
+        textColor: "text-[#fffffe]",
+        accentColor: "text-[#f9bc60]",
+      }
+    : getHeaderTheme(selectedThemeKey || "default");
   
   // Автоскрытие скроллбаров
   useAutoHideScrollbar();
 
   const themes = getAllHeaderThemes();
+
+  const themeName =
+    selectedColor ? "Своя палитра" : themes.find((t) => t.key === selectedThemeKey)?.name || "Default";
+  const selectedColorValue = selectedColor ? selectedColor.replace("color:", "") : null;
 
   // Монтирование для Portal
   useEffect(() => {
@@ -129,14 +142,14 @@ export default function HeaderCustomization({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className="rounded-3xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] border border-[#abd1c6]/30 mx-4 flex flex-col custom-scrollbar"
+        className="rounded-3xl shadow-2xl max-w-5xl w-full max-h-[88vh] overflow-hidden bg-gradient-to-br from-[#053c3a] via-[#043231] to-[#011e1d] border border-[#1d8a78]/30 mx-4 flex flex-col custom-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-6 border-b border-[#abd1c6]/20 flex-shrink-0">
+        <div className="p-6 border-b border-[#1d8a78]/25 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#f9bc60] rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#f9bc60] rounded-2xl flex items-center justify-center shadow-[0_10px_30px_rgba(249,188,96,0.35)]">
                 <svg
                   className="w-6 h-6 text-[#001e1d]"
                   fill="none"
@@ -155,14 +168,14 @@ export default function HeaderCustomization({
                 <h2 className="text-2xl font-bold text-[#fffffe]">
                   Тема заголовка
                 </h2>
-                <p className="text-[#abd1c6]">
+                <p className="text-[#9fc9bd]">
                   Выберите тему для заголовка вашего профиля
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-10 h-10 bg-[#abd1c6]/20 hover:bg-[#abd1c6]/30 rounded-xl flex items-center justify-center transition-colors"
+              className="w-10 h-10 bg-white/10 hover:bg-white/15 rounded-xl flex items-center justify-center transition-colors"
             >
               <svg
                 className="w-5 h-5 text-[#fffffe]"
@@ -182,23 +195,58 @@ export default function HeaderCustomization({
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto p-6">
+        <div className="overflow-y-auto p-6 space-y-6">
+          {/* Preview */}
+          <div className="rounded-2xl border border-[#abd1c6]/20 bg-[#001e1d]/60 overflow-hidden shadow-lg">
+            <div
+              className="h-36 sm:h-40 w-full relative"
+              style={
+                selectedThemeConfig.background === "image"
+                  ? {
+                      backgroundImage: `url(${(selectedThemeConfig as any).image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center center",
+                      backgroundRepeat: "no-repeat",
+                    }
+                  : selectedThemeConfig.background === "gradient"
+                  ? { backgroundImage: (selectedThemeConfig as any).gradient }
+                  : selectedThemeConfig.background === "color"
+                  ? { background: (selectedThemeConfig as any).color || "#004643" }
+                  : { background: "linear-gradient(135deg,#1fe0ba,#0a4c43)" }
+              }
+            >
+              <div className="absolute inset-0 bg-black/12" />
+              <div className="absolute inset-0 px-6 sm:px-8 py-5 flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 text-xs font-semibold text-white">
+                    Предпросмотр
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white drop-shadow">
+                    Мой профиль
+                  </h3>
+                  <p className="text-sm text-white/90 drop-shadow">
+                    Добро пожаловать, <span className="font-semibold text-[#f9bc60]">Пользователь</span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-semibold text-white">
+                    {selectedColor ? "Своя палитра" : themeName}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Цветовой круг */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-[#fffffe] mb-4">
-              Выбор цвета (Цветовой круг Иттена)
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-[#fffffe]">
+                  Цветовой круг Иттена
             </h3>
-            <div className="flex justify-center bg-[#001e1d]/40 rounded-xl p-6 border border-[#abd1c6]/20">
-              <ColorWheel
-                selectedColor={selectedColor}
-                onColorChange={(color) => {
-                  setSelectedColor(`color:${color}`);
-                  setSelectedTheme(""); // Сбрасываем выбор готовой темы
-                }}
-              />
+                <p className="text-sm text-[#abd1c6]">Создайте собственный цвет заголовка</p>
             </div>
             {selectedColor && (
-              <div className="mt-4 flex justify-center">
                 <button
                   onClick={() => {
                     setSelectedColor(null);
@@ -208,15 +256,29 @@ export default function HeaderCustomization({
                 >
                   Сбросить цвет
                 </button>
+              )}
+            </div>
+            <div className="flex justify-center bg-[#001e1d]/40 rounded-xl p-6 border border-[#abd1c6]/20">
+              <ColorWheel
+                selectedColor={selectedColorValue || undefined}
+                onColorChange={(color) => {
+                  setSelectedColor(`color:${color}`);
+                  setSelectedTheme(""); // Сбрасываем выбор готовой темы
+                }}
+              />
               </div>
-            )}
           </div>
 
           {/* Готовые темы */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-[#fffffe] mb-4">
+                <h3 className="text-lg font-semibold text-[#fffffe]">
               Готовые темы
             </h3>
+                <p className="text-sm text-[#abd1c6]">Подборка готовых пресетов с превью</p>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {themes.map((theme, index) => {
                 const isSelected = !selectedColor && selectedTheme === theme.key;

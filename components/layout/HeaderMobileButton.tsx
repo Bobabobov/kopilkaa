@@ -14,7 +14,9 @@ export default function HeaderMobileButton({
   return (
     <button
       onClick={onClick}
-      className="lg:hidden p-3 rounded-xl transition-all duration-200 drop-shadow-md"
+      aria-label={isOpen ? "Закрыть меню" : "Открыть меню"}
+      aria-expanded={isOpen}
+      className="lg:hidden p-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 active:scale-95 transition-all duration-200 drop-shadow-md"
       style={{ color: "#fffffe" }}
     >
       <svg

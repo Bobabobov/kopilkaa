@@ -1,6 +1,7 @@
 // app/api/profile/header-theme/route.ts
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { headerThemes } from "@/lib/header-customization";
 import { NextResponse } from "next/server";
 
 export async function PATCH(req: Request) {
@@ -19,15 +20,8 @@ export async function PATCH(req: Request) {
       );
     }
 
-    // Валидация темы
-    const validThemes = [
-      "default",
-      "nature",
-      "ocean",
-      "space",
-      "city",
-      "abstract",
-    ];
+    // Валидация темы: разрешены все ключи из headerThemes + цветовые
+    const validThemes = Object.keys(headerThemes);
     
     // Проверяем, является ли это цветной темой (формат color:#HEX)
     const isColorTheme = headerTheme.startsWith("color:#");

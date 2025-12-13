@@ -1,11 +1,28 @@
 "use client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import FooterBrand from "./FooterBrand";
 import FooterContacts from "./FooterContacts";
 import FooterLinks from "./FooterLinks";
 import FooterCopyright from "./FooterCopyright";
 
 export default function Footer() {
+  const router = useRouter();
+
+  const handleBulldogClick = async () => {
+    try {
+      const res = await fetch("/api/profile/me", { cache: "no-store" });
+      const data = await res.json();
+      if (data?.user) {
+        router.push("/");
+      } else {
+        router.push("/?modal=auth");
+      }
+    } catch {
+      router.push("/?modal=auth");
+    }
+  };
+
   return (
     <footer className="relative overflow-visible bg-gradient-to-br from-[#004643] via-[#003c3a] to-[#001e1d]">
       {/* Эффект свечения линии */}
@@ -13,12 +30,15 @@ export default function Footer() {
 
       {/* Бульдог на линии разделителя */}
       <div
-        className="absolute z-20"
+        className="absolute z-20 cursor-pointer select-none"
         style={{
           right: "24px",
           top: "0",
           transform: "translateY(calc(-100% + 40px))",
         }}
+        onClick={handleBulldogClick}
+        role="button"
+        aria-label="Перейти на главную"
       >
         <Image
           src="/buldog.png"

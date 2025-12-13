@@ -47,19 +47,78 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
       return;
     }
 
-    // Загружаем Google Identity Services скрипт
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
+    // Проверяем, не загружен ли скрипт уже
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+    
+    if (window.google?.accounts?.id) {
+      // Google уже загружен, инициализируем сразу
+      initializeGoogle(clientId);
+    } else if (existingScript) {
+      // Скрипт уже добавлен, ждем загрузки
+      const checkInterval = setInterval(() => {
+        if (window.google?.accounts?.id) {
+          clearInterval(checkInterval);
+          initializeGoogle(clientId);
+        }
+      }, 100);
+      
+      // Таймаут на 5 секунд
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!window.google?.accounts?.id) {
+          setError("Таймаут загрузки Google Identity Services");
+          setLoading(false);
+        }
+      }, 5000);
+    } else {
+      // Загружаем Google Identity Services скрипт
+      const script = document.createElement("script");
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = true;
+      script.crossOrigin = "anonymous";
 
-    script.onload = () => {
+      script.onload = () => {
+        // Ждем немного, чтобы Google API точно загрузился
+        const checkInterval = setInterval(() => {
+          if (window.google?.accounts?.id) {
+            clearInterval(checkInterval);
+            initializeGoogle(clientId);
+          }
+        }, 100);
+        
+        // Таймаут на 3 секунды после загрузки скрипта
+        setTimeout(() => {
+          clearInterval(checkInterval);
+          if (!window.google?.accounts?.id) {
+            setError("Google Identity Services не инициализирован");
+            setLoading(false);
+          }
+        }, 3000);
+      };
+
+      script.onerror = () => {
+        console.error("Не удалось загрузить Google Identity Services");
+        setError("Не удалось загрузить Google Identity Services. Проверьте подключение к интернету.");
+        setLoading(false);
+      };
+
+      document.head.appendChild(script);
+    }
+
+    function initializeGoogle(clientId: string) {
       if (!window.google?.accounts?.id) {
         console.error("Google Identity Services не загружен");
+        setError("Google Identity Services не загружен");
+        setLoading(false);
         return;
       }
 
-      if (!containerRef.current) return;
+      if (!containerRef.current) {
+        setError("Контейнер для кнопки не найден");
+        setLoading(false);
+        return;
+      }
 
       try {
         window.google.accounts.id.initialize({
@@ -90,7 +149,7 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
         });
 
         // Рендерим кнопку
-        window.google.accounts.id.renderButton(containerRef.current, {
+        window.google.accounts.id.renderButton(containerRef.current!, {
           type: "standard",
           theme: "outline",
           size: "large",
@@ -107,15 +166,7 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
         setError("Ошибка инициализации Google");
         setLoading(false);
       }
-    };
-
-    script.onerror = () => {
-      console.error("Не удалось загрузить Google Identity Services");
-      setError("Не удалось загрузить Google Identity Services");
-      setLoading(false);
-    };
-
-    document.head.appendChild(script);
+    }
 
     return () => {
       if (containerRef.current) {

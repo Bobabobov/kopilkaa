@@ -55,6 +55,15 @@ export async function POST(req: NextRequest) {
     const filepath = join(UPLOAD_DIR, filename);
 
     await writeFile(filepath, buf);
+    
+    // Проверяем, что файл действительно сохранён
+    const { access, constants } = await import("fs/promises");
+    try {
+      await access(filepath, constants.F_OK);
+    } catch (error) {
+      console.error("File was not saved correctly:", filepath);
+      throw new Error("Failed to save file");
+    }
 
     const avatarUrl = `/api/uploads/${filename}`;
 

@@ -68,12 +68,23 @@ export default function AvatarFrameCustomization({
           />
           <div className="absolute inset-2 rounded-md overflow-hidden">
             {user.avatar ? (
-              <img src={user.avatar} alt="Аватар" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600 text-white font-bold text-xl">
-                {appliedAvatarFallback}
-              </div>
-            )}
+              <img 
+                src={user.avatar} 
+                alt="Аватар" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Скрываем изображение при ошибке и показываем fallback
+                  e.currentTarget.style.display = "none";
+                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (fallback) {
+                    fallback.style.display = "flex";
+                  }
+                }}
+              />
+            ) : null}
+            <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600 text-white font-bold text-xl ${user.avatar ? "hidden" : ""}`}>
+              {appliedAvatarFallback}
+            </div>
           </div>
         </div>
       );
@@ -94,10 +105,23 @@ export default function AvatarFrameCustomization({
         }
       >
         {user.avatar ? (
-          <img src={user.avatar} alt="Аватар" className="w-full h-full object-cover rounded-lg" />
-        ) : (
-          appliedAvatarFallback
-        )}
+          <img 
+            src={user.avatar} 
+            alt="Аватар" 
+            className="w-full h-full object-cover rounded-lg"
+            onError={(e) => {
+              // Скрываем изображение при ошибке и показываем fallback
+              e.currentTarget.style.display = "none";
+              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+              if (fallback) {
+                fallback.style.display = "flex";
+              }
+            }}
+          />
+        ) : null}
+        <div className={`w-full h-full flex items-center justify-center ${user.avatar ? "hidden" : ""}`}>
+          {appliedAvatarFallback}
+        </div>
       </div>
     );
   };

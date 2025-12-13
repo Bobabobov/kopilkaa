@@ -279,18 +279,25 @@ export default function NotificationBell() {
                               src={notification.avatar}
                               alt="Аватар"
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                // Скрываем изображение при ошибке и показываем fallback
+                                e.currentTarget.style.display = "none";
+                                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (fallback) {
+                                  fallback.style.display = "flex";
+                                }
+                              }}
                             />
-                          ) : (
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                              notification.type === "application_status" && notification.status === "APPROVED"
-                                ? "bg-[#10B981]/20"
-                                : notification.type === "application_status" && notification.status === "REJECTED"
-                                ? "bg-red-500/20"
-                                : "bg-[#abd1c6]/20"
-                            }`}>
-                              {getNotificationIcon(notification.type, notification.rarity, notification.status)}
-                            </div>
-                          )}
+                          ) : null}
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${notification.avatar ? "hidden" : ""} ${
+                            notification.type === "application_status" && notification.status === "APPROVED"
+                              ? "bg-[#10B981]/20"
+                              : notification.type === "application_status" && notification.status === "REJECTED"
+                              ? "bg-red-500/20"
+                              : "bg-[#abd1c6]/20"
+                          }`}>
+                            {getNotificationIcon(notification.type, notification.rarity, notification.status)}
+                          </div>
                         </div>
 
                         {/* Контент */}

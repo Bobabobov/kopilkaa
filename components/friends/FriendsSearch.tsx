@@ -63,12 +63,19 @@ export function FriendsSearch({
                       src={user.avatar}
                       alt=""
                       className="w-full h-full rounded-full object-cover"
+                      onError={(e) => {
+                        // Скрываем изображение при ошибке и показываем fallback
+                        e.currentTarget.style.display = "none";
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallback) {
+                          fallback.style.display = "flex";
+                        }
+                      }}
                     />
-                  ) : (
-                    <span className="text-[#f9bc60] font-bold">
-                      {(user.name || user.email.split("@")[0])[0].toUpperCase()}
-                    </span>
-                  )}
+                  ) : null}
+                  <span className={`text-[#f9bc60] font-bold ${user.avatar ? "hidden" : ""}`}>
+                    {(user.name || user.email.split("@")[0])[0].toUpperCase()}
+                  </span>
                 </div>
 
                 <div className="flex-1 min-w-0">

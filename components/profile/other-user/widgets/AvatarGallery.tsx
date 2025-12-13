@@ -24,6 +24,10 @@ export function AvatarGallery({ avatars }: AvatarGalleryProps) {
             src={src}
             alt=""
             className="w-full h-full object-cover"
+            onError={(e) => {
+              // Скрываем изображение при ошибке загрузки
+              e.currentTarget.style.display = "none";
+            }}
           />
         </motion.div>
       ))}

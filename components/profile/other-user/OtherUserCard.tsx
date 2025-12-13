@@ -100,14 +100,21 @@ export default function OtherUserCard({
                             src={user.avatar}
                             alt="Аватар"
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Скрываем изображение при ошибке и показываем fallback
+                              e.currentTarget.style.display = "none";
+                              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                              if (fallback) {
+                                fallback.style.display = "flex";
+                              }
+                            }}
                           />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600 text-white font-bold text-xl">
-                            {user.name
-                              ? user.name[0].toUpperCase()
-                              : user.email[0].toUpperCase()}
-                          </div>
-                        )}
+                        ) : null}
+                        <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600 text-white font-bold text-xl ${user.avatar ? "hidden" : ""}`}>
+                          {user.name
+                            ? user.name[0].toUpperCase()
+                            : user.email[0].toUpperCase()}
+                        </div>
                       </div>
                     </div>
                   );
@@ -126,16 +133,23 @@ export default function OtherUserCard({
                           src={user.avatar}
                           alt="Аватар"
                           className={`w-full h-full object-cover rounded-lg ${frameKey === "rainbow" ? "rounded-lg" : ""}`}
+                          onError={(e) => {
+                            // Скрываем изображение при ошибке и показываем fallback
+                            e.currentTarget.style.display = "none";
+                            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (fallback) {
+                              fallback.style.display = "flex";
+                            }
+                          }}
                         />
-                      ) : (
-                        <div
-                          className={`w-full h-full flex items-center justify-center rounded-lg ${frameKey === "rainbow" ? "rounded-lg" : ""}`}
-                        >
-                          {user.name
-                            ? user.name[0].toUpperCase()
-                            : user.email[0].toUpperCase()}
-                        </div>
-                      )}
+                      ) : null}
+                      <div
+                        className={`w-full h-full flex items-center justify-center rounded-lg ${frameKey === "rainbow" ? "rounded-lg" : ""} ${user.avatar ? "hidden" : ""}`}
+                      >
+                        {user.name
+                          ? user.name[0].toUpperCase()
+                          : user.email[0].toUpperCase()}
+                      </div>
                     </div>
                   );
                 }

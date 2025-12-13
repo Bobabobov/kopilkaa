@@ -288,12 +288,19 @@ export default function ProfileFriendsSection() {
                               src={friend.avatar}
                               alt={friend.name || "Аватар"}
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                // Скрываем изображение при ошибке и показываем fallback
+                                e.currentTarget.style.display = "none";
+                                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (fallback) {
+                                  fallback.style.display = "flex";
+                                }
+                              }}
                             />
-                          ) : (
-                            <span className="text-[#f9bc60] font-semibold text-base xs:text-lg">
-                              {(friend.name || friend.email.split("@")[0])[0].toUpperCase()}
-                            </span>
-                          )}
+                          ) : null}
+                          <span className={`text-[#f9bc60] font-semibold text-base xs:text-lg ${friend.avatar ? "hidden" : ""}`}>
+                            {(friend.name || friend.email.split("@")[0])[0].toUpperCase()}
+                          </span>
                         </div>
                         
                         {/* Онлайн индикатор */}

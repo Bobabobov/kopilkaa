@@ -128,12 +128,19 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
                   src={u.avatar}
                   alt=""
                   className="w-9 h-9 rounded-full object-cover border-2 border-[#abd1c6]/30"
+                  onError={(e) => {
+                    // Скрываем изображение при ошибке и показываем fallback
+                    e.currentTarget.style.display = "none";
+                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                    if (fallback) {
+                      fallback.style.display = "flex";
+                    }
+                  }}
                 />
-              ) : (
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#004643] to-[#001e1d] text-[#f9bc60] flex items-center justify-center text-xs font-bold border-2 border-[#f9bc60]/40 shadow-md">
-                  {(u.name || u.email.split("@")[0])[0].toUpperCase()}
-                </div>
-              )}
+              ) : null}
+              <div className={`w-9 h-9 rounded-full bg-gradient-to-br from-[#004643] to-[#001e1d] text-[#f9bc60] flex items-center justify-center text-xs font-bold border-2 border-[#f9bc60]/40 shadow-md ${u.avatar ? "hidden" : ""}`}>
+                {(u.name || u.email.split("@")[0])[0].toUpperCase()}
+              </div>
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold text-[#fffffe]">
                   {u.name || u.email.split("@")[0]}

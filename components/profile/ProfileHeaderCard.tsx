@@ -314,12 +314,19 @@ export default function ProfileHeaderCard({
                             src={user.avatar}
                             alt=""
                             className="w-full h-full object-cover transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:brightness-100"
+                            onError={(e) => {
+                              // Скрываем изображение при ошибке и показываем fallback
+                              e.currentTarget.style.display = "none";
+                              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                              if (fallback) {
+                                fallback.style.display = "flex";
+                              }
+                            }}
                           />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-bold text-[#f9bc60]">
-                            {(user.name || user.email || "П")[0].toUpperCase()}
-                          </div>
-                        )}
+                        ) : null}
+                        <div className={`w-full h-full flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-bold text-[#f9bc60] ${user.avatar ? "hidden" : ""}`}>
+                          {(user.name || user.email || "П")[0].toUpperCase()}
+                        </div>
                         <span
                           className={`absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${
                             status.status === "online" ? "bg-emerald-400" : "bg-slate-400"

@@ -127,10 +127,19 @@ export function FriendsSidebar() {
                           src={person.avatar}
                           alt=""
                           className="w-full h-full rounded-full object-cover"
+                          onError={(e) => {
+                            // Скрываем изображение при ошибке и показываем fallback
+                            e.currentTarget.style.display = "none";
+                            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (fallback) {
+                              fallback.style.display = "flex";
+                            }
+                          }}
                         />
-                      ) : (
-                        (person.name || person.email || "?")[0]?.toUpperCase()
-                      )}
+                      ) : null}
+                      <span className={`${person.avatar ? "hidden" : ""}`}>
+                        {(person.name || person.email || "?")[0]?.toUpperCase()}
+                      </span>
                     </div>
                     <Link
                       href={`/profile/${person.id}`}

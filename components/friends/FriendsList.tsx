@@ -10,7 +10,7 @@ interface FriendsListProps {
   data: any[];
   loading: boolean;
   currentUserId: string | null;
-  getUserStatus: (lastSeen: string | null) => { text: string };
+  getUserStatus: (lastSeen: string | null) => { status: "online" | "offline"; text: string };
   sendingRequests: Set<string>;
   actions: {
     onRemoveFriend?: (id: string) => Promise<void> | void;

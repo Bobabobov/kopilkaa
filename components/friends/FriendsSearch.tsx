@@ -8,7 +8,7 @@ interface FriendsSearchProps {
   searchResults: any[];
   searchLoading: boolean;
   currentUserId: string | null;
-  getUserStatus: (lastSeen: string | null) => { text: string };
+  getUserStatus: (lastSeen: string | null) => { status: "online" | "offline"; text: string };
   sendingRequests: Set<string>;
   onSendRequest: (userId: string) => Promise<void> | void;
   onCancelRequest: (friendshipId: string, userId: string) => Promise<void> | void;

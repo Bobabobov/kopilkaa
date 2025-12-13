@@ -222,7 +222,7 @@ async function main() {
         rarity: 'COMMON',
         type: (update.type as AchievementType) ?? AchievementType.SPECIAL,
         kind: (update as any).kind ?? AchievementKind.NORMAL,
-        maxCount: update.maxCount ?? 1,
+        maxCount: (update.maxCount as number | undefined) ?? 1,
         isExclusive: update.isExclusive ?? false,
         isHidden: update.isHidden ?? false,
         isSeasonal: update.isSeasonal ?? false,

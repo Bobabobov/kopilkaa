@@ -301,7 +301,7 @@ export default function AvatarFrameCustomization({
               <h3 className="text-lg font-semibold text-[#fffffe]">Своя рамка</h3>
               <div className="flex justify-center bg-[#001e1d]/50 rounded-xl p-6 border border-[#1d8a78]/25">
                 <ColorWheel
-                  selectedColor={selectedColorValue || undefined}
+                  selectedColor={selectedColorValue || null}
                   onColorChange={(color) => setSelectedFrame(`color:${color}`)}
                 />
               </div>

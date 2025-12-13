@@ -10,7 +10,8 @@ export const runtime = "nodejs";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ADMIN_MAX_SIZE = 20 * 1024 * 1024; // 20MB для админов
-const UPLOAD_DIR = join(process.cwd(), "uploads");
+// Используем переменную окружения или дефолтный путь
+const UPLOAD_DIR = process.env.UPLOAD_DIR || join(process.cwd(), "uploads");
 
 // POST /api/profile/avatar - загрузить аватарку
 export async function POST(req: NextRequest) {
@@ -57,11 +58,27 @@ export async function POST(req: NextRequest) {
     await writeFile(filepath, buf);
     
     // Проверяем, что файл действительно сохранён
-    const { access, constants } = await import("fs/promises");
+    const { access, constants, stat } = await import("fs/promises");
     try {
       await access(filepath, constants.F_OK);
-    } catch (error) {
-      console.error("File was not saved correctly:", filepath);
+      const fileStat = await stat(filepath);
+      if (!fileStat.isFile()) {
+        throw new Error("Saved path is not a file");
+      }
+      console.log("Avatar saved successfully:", {
+        filename,
+        filepath,
+        size: fileStat.size,
+        uploadDir: UPLOAD_DIR,
+        cwd: process.cwd(),
+      });
+    } catch (error: any) {
+      console.error("File was not saved correctly:", {
+        filepath,
+        uploadDir: UPLOAD_DIR,
+        cwd: process.cwd(),
+        error: error?.message || String(error),
+      });
       throw new Error("Failed to save file");
     }
 

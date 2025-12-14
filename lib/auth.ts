@@ -89,11 +89,14 @@ export function verifySession(
 export async function getSession(): Promise<SessionPayload | null> {
   try {
     const cookieStore = await cookies();
+    if (!cookieStore) {
+      return null;
+    }
     const token = cookieStore.get(COOKIE_NAME)?.value;
     const session = verifySession(token);
     return session;
   } catch (error) {
-    console.error("Error getting session:", error);
+    // Игнорируем ошибки, связанные с cookies в неправильном контексте
     return null;
   }
 }
@@ -102,6 +105,11 @@ export async function setSession(payload: Omit<SessionPayload, "exp">) {
   try {
     const token = signSession(payload);
     const cookieStore = await cookies();
+    
+    if (!cookieStore) {
+      console.warn("Cookie store is not available");
+      return;
+    }
 
     cookieStore.set(COOKIE_NAME, token, {
       httpOnly: true,
@@ -111,6 +119,7 @@ export async function setSession(payload: Omit<SessionPayload, "exp">) {
       maxAge: MAX_AGE,
     });
   } catch (error) {
+    // Игнорируем ошибки, связанные с cookies в неправильном контексте
     console.error("Error setting session:", error);
   }
 }
@@ -118,12 +127,19 @@ export async function setSession(payload: Omit<SessionPayload, "exp">) {
 export async function clearSession() {
   try {
     const cookieStore = await cookies();
+    
+    if (!cookieStore) {
+      console.warn("Cookie store is not available");
+      return;
+    }
+    
     cookieStore.set(COOKIE_NAME, "", {
       httpOnly: true,
       expires: new Date(0),
       path: "/",
     });
   } catch (error) {
+    // Игнорируем ошибки, связанные с cookies в неправильном контексте
     console.error("Error clearing session:", error);
   }
 }

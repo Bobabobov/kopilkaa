@@ -316,8 +316,10 @@ export default function ProfileHeaderCard({
                             className="w-full h-full object-cover transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:brightness-100"
                             onError={(e) => {
                               // Скрываем изображение при ошибке и показываем fallback
-                              e.currentTarget.style.display = "none";
-                              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                              const target = e.currentTarget;
+                              target.style.display = "none";
+                              target.src = ""; // Очищаем src, чтобы предотвратить повторные попытки загрузки
+                              const fallback = target.nextElementSibling as HTMLElement;
                               if (fallback) {
                                 fallback.style.display = "flex";
                               }

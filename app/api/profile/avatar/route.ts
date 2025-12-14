@@ -8,6 +8,8 @@ import { extname } from "path";
 import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
 
 export const runtime = "nodejs";
+// Увеличиваем лимит размера тела запроса для загрузки файлов
+export const maxDuration = 30;
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ADMIN_MAX_SIZE = 20 * 1024 * 1024; // 20MB для админов

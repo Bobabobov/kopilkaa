@@ -46,6 +46,12 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     script.setAttribute("data-lang", "ru");
     script.setAttribute("data-request-access", "write");
     script.setAttribute("data-onauth", "onTelegramAuth(user)");
+    
+    // Указываем домен для Telegram виджета (если задан)
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+    if (siteUrl && siteUrl.startsWith('https://')) {
+      script.setAttribute("data-auth-url", siteUrl);
+    }
 
     script.onerror = () => {
       console.error("Не удалось загрузить Telegram Login Widget");

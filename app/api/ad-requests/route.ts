@@ -5,10 +5,10 @@ import { getSession } from "@/lib/auth";
 // POST - создание новой заявки на рекламу (публичный)
 export async function POST(request: NextRequest) {
   try {
-    const { companyName, email, website, format, duration, bannerUrl, comment } = await request.json();
+    const { companyName, email, telegram, website, format, duration, bannerUrl, imageUrls, mobileBannerUrls, comment } = await request.json();
 
     // Валидация обязательных полей
-    if (!companyName || !email || !format || !duration) {
+    if (!companyName || !email || !format || !duration || !comment) {
       return NextResponse.json(
         { error: "Заполните все обязательные поля" },
         { status: 400 }
@@ -32,16 +32,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Валидация количества изображений
+    if (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 5) {
+      return NextResponse.json(
+        { error: "Можно загрузить до 5 изображений" },
+        { status: 400 }
+      );
+    }
+
+    if (mobileBannerUrls && Array.isArray(mobileBannerUrls) && mobileBannerUrls.length > 5) {
+      return NextResponse.json(
+        { error: "Можно загрузить до 5 мобильных баннеров" },
+        { status: 400 }
+      );
+    }
+
+    // Валидация комментария (обязательное поле, максимум 400 символов)
+    const commentTrimmed = comment?.trim() || "";
+    if (!commentTrimmed) {
+      return NextResponse.json(
+        { error: "Поле 'Что-то ещё?' обязательно для заполнения" },
+        { status: 400 }
+      );
+    }
+    if (commentTrimmed.length > 400) {
+      return NextResponse.json(
+        { error: "Комментарий не должен превышать 400 символов" },
+        { status: 400 }
+      );
+    }
+
     // Создание заявки
     const adRequest = await prisma.adRequest.create({
       data: {
         companyName,
         email,
+        telegram: telegram || null,
         website: website || null,
         format,
         duration,
-        bannerUrl: bannerUrl || null,
-        comment: comment || null,
+        bannerUrl: bannerUrl || null, // Для обратной совместимости
+        imageUrls: imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0 ? imageUrls : null,
+        mobileBannerUrls: mobileBannerUrls && Array.isArray(mobileBannerUrls) && mobileBannerUrls.length > 0 ? mobileBannerUrls : null,
+        comment: commentTrimmed,
         status: "new",
       },
     });

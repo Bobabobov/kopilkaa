@@ -37,21 +37,16 @@ export default function ControlPanel({
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.7 }}
-      className="relative overflow-hidden bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl border border-gray-100 dark:border-gray-700"
+      transition={{ duration: 0.6, delay: 0.3 }}
+      className="relative overflow-hidden bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl border border-[#abd1c6]/20 mb-6 sm:mb-8"
     >
-      {/* Декоративный фон */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-indigo-500/5"></div>
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/10 to-blue-400/10 rounded-full blur-2xl"></div>
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-400/10 to-pink-400/10 rounded-full blur-xl"></div>
-
-      <div className="relative">
+      <div className="relative z-10">
         {/* Заголовок */}
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-[#fffffe] flex items-center gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center shadow-lg">
               <svg
-                className="w-5 h-5 text-white"
+                className="w-5 h-5 sm:w-6 sm:h-6 text-[#001e1d]"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -69,7 +64,7 @@ export default function ControlPanel({
 
           <button
             onClick={onReset}
-            className="group px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-medium rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+            className="group px-4 sm:px-6 py-2 sm:py-3 bg-[#001e1d]/60 hover:bg-[#001e1d]/80 text-[#abd1c6] hover:text-[#fffffe] font-bold rounded-lg sm:rounded-xl transition-all duration-300 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 shadow-lg hover:shadow-xl text-sm sm:text-base"
           >
             <span className="flex items-center gap-2">
               <svg
@@ -91,15 +86,15 @@ export default function ControlPanel({
         </div>
 
         {/* Основные фильтры */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
           {/* Поиск */}
-          <div className="lg:col-span-2 xl:col-span-1">
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <label className="block text-xs sm:text-sm font-bold text-[#abd1c6] mb-2 sm:mb-3">
               Поиск заявок
             </label>
             <div className="relative">
               <svg
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-[#abd1c6]"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -112,8 +107,8 @@ export default function ControlPanel({
                 />
               </svg>
               <input
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                placeholder="Поиск по заголовку, описанию, истории..."
+                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-[#001e1d]/60 border border-[#abd1c6]/30 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all duration-300 text-[#fffffe] placeholder:text-[#abd1c6]/60 text-sm sm:text-base"
+                placeholder="Поиск по заголовку, описанию..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
               />
@@ -122,35 +117,35 @@ export default function ControlPanel({
 
           {/* Статус */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-xs sm:text-sm font-bold text-[#abd1c6] mb-2 sm:mb-3">
               Статус
             </label>
             <select
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-[#001e1d]/60 border border-[#abd1c6]/30 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all duration-300 text-[#fffffe] text-sm sm:text-base"
               value={status}
               onChange={(e) =>
                 onStatusChange(e.target.value as "ALL" | ApplicationStatus)
               }
             >
-              <option value="ALL">Все статусы</option>
-              <option value="PENDING">В обработке</option>
-              <option value="APPROVED">Одобрено</option>
-              <option value="REJECTED">Отказано</option>
+              <option value="ALL" className="bg-[#001e1d]">Все статусы</option>
+              <option value="PENDING" className="bg-[#001e1d]">В обработке</option>
+              <option value="APPROVED" className="bg-[#001e1d]">Одобрено</option>
+              <option value="REJECTED" className="bg-[#001e1d]">Отказано</option>
             </select>
           </div>
 
           {/* Сумма от */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-xs sm:text-sm font-bold text-[#abd1c6] mb-2 sm:mb-3">
               Сумма от
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">
+              <span className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-[#f9bc60] font-bold text-sm sm:text-base">
                 ₽
               </span>
               <input
                 type="number"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-[#001e1d]/60 border border-[#abd1c6]/30 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all duration-300 text-[#fffffe] placeholder:text-[#abd1c6]/60 text-sm sm:text-base"
                 placeholder="0"
                 value={minAmount}
                 onChange={(e) => onMinAmountChange(e.target.value)}
@@ -160,16 +155,16 @@ export default function ControlPanel({
 
           {/* Сумма до */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-xs sm:text-sm font-bold text-[#abd1c6] mb-2 sm:mb-3">
               Сумма до
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">
+              <span className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-[#f9bc60] font-bold text-sm sm:text-base">
                 ₽
               </span>
               <input
                 type="number"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-[#001e1d]/60 border border-[#abd1c6]/30 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all duration-300 text-[#fffffe] placeholder:text-[#abd1c6]/60 text-sm sm:text-base"
                 placeholder="∞"
                 value={maxAmount}
                 onChange={(e) => onMaxAmountChange(e.target.value)}
@@ -180,36 +175,36 @@ export default function ControlPanel({
 
         {/* Сортировка */}
         <div className="flex flex-col sm:flex-row gap-4 items-end">
-          <div className="flex-1">
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+          <div className="flex-1 w-full">
+            <label className="block text-xs sm:text-sm font-bold text-[#abd1c6] mb-2 sm:mb-3">
               Сортировка
             </label>
             <select
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-[#001e1d]/60 border border-[#abd1c6]/30 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all duration-300 text-[#fffffe] text-sm sm:text-base"
               value={sortBy}
               onChange={(e) =>
                 onSortByChange(e.target.value as "date" | "amount" | "status")
               }
             >
-              <option value="date">По дате</option>
-              <option value="amount">По сумме</option>
-              <option value="status">По статусу</option>
+              <option value="date" className="bg-[#001e1d]">По дате</option>
+              <option value="amount" className="bg-[#001e1d]">По сумме</option>
+              <option value="status" className="bg-[#001e1d]">По статусу</option>
             </select>
           </div>
 
-          <div className="flex-1">
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+          <div className="flex-1 w-full">
+            <label className="block text-xs sm:text-sm font-bold text-[#abd1c6] mb-2 sm:mb-3">
               Порядок
             </label>
             <select
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-gray-900 dark:text-white"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-[#001e1d]/60 border border-[#abd1c6]/30 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all duration-300 text-[#fffffe] text-sm sm:text-base"
               value={sortOrder}
               onChange={(e) =>
                 onSortOrderChange(e.target.value as "asc" | "desc")
               }
             >
-              <option value="desc">По убыванию</option>
-              <option value="asc">По возрастанию</option>
+              <option value="desc" className="bg-[#001e1d]">По убыванию</option>
+              <option value="asc" className="bg-[#001e1d]">По возрастанию</option>
             </select>
           </div>
         </div>

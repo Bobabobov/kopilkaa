@@ -239,17 +239,14 @@ export default function BugReportCard({
         <div className="flex items-center justify-between pt-4 border-t border-[#abd1c6]/20">
           <div className="flex items-center gap-4 text-xs text-[#abd1c6]">
             <div className="flex items-center gap-1.5">
-              {report.user.avatar ? (
-                <img
-                  src={report.user.avatar}
-                  alt={report.user.name || "User"}
-                  className="w-6 h-6 rounded-full"
-                />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#004643] to-[#001e1d] flex items-center justify-center text-[#f9bc60] text-xs font-bold">
-                  {(report.user.name || report.user.email)[0].toUpperCase()}
-                </div>
-              )}
+              <img
+                src={report.user.avatar || "/default-avatar.png"}
+                alt={report.user.name || "User"}
+                className="w-6 h-6 rounded-full"
+                onError={(e) => {
+                  e.currentTarget.src = "/default-avatar.png";
+                }}
+              />
               <span>{report.user.name || report.user.email.split("@")[0]}</span>
             </div>
             <span>•</span>

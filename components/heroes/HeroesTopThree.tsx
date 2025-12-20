@@ -55,50 +55,48 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
   };
 
   return (
-    <div className="mb-12">
-      <h3 className="text-2xl font-bold mb-6 text-center" style={{ color: "#fffffe" }}>
+    <div className="mb-8 sm:mb-10 md:mb-12">
+      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 text-center px-4" style={{ color: "#fffffe" }}>
         🏆 Топ донатеры
       </h3>
       
-      <div className="flex flex-col md:flex-row justify-center items-stretch md:items-end gap-6 max-w-4xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-center items-stretch sm:items-end gap-4 sm:gap-5 md:gap-6 max-w-4xl mx-auto px-2">
         {/* 2-е место */}
         {topThree[1] && (
           <Link
             href={`/profile/${topThree[1].id}`}
-            className="order-2 md:order-1 flex-1 max-w-[280px]"
+            className="order-2 sm:order-1 flex-1 max-w-full sm:max-w-[280px]"
           >
             <div 
-              className="p-6 rounded-2xl backdrop-blur-sm border-2 transition-colors cursor-pointer text-center h-full flex flex-col"
+              className="p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl backdrop-blur-sm border-2 transition-colors cursor-pointer text-center h-full flex flex-col"
               style={{
                 backgroundColor: "rgba(0, 70, 67, 0.6)",
                 borderColor: getRankColor(2),
                 boxShadow: `0 0 15px ${getRankColor(2)}30`,
-                minWidth: "220px",
-                minHeight: "260px"
+                minHeight: "240px"
               }}
             >
-              <div className="text-3xl mb-2">{getRankIcon(2)}</div>
+              <div className="text-2xl sm:text-3xl mb-2">{getRankIcon(2)}</div>
               <div
-                className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-xl font-bold mx-auto mb-3"
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-lg sm:text-xl font-bold mx-auto mb-2 sm:mb-3"
                 style={{
-                  backgroundImage: topThree[1].avatar ? `url(${topThree[1].avatar})` : undefined,
+                  backgroundImage: `url(${topThree[1].avatar || "/default-avatar.png"})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
-                  color: topThree[1].avatar ? "transparent" : "#001e1d",
+                  color: "transparent",
                 }}
               >
-                {!topThree[1].avatar && topThree[1].name.charAt(0).toUpperCase()}
               </div>
-              <h4 className="text-lg font-bold mb-2" style={{ color: "#fffffe" }}>
+              <h4 className="text-base sm:text-lg font-bold mb-2 break-words" style={{ color: "#fffffe" }}>
                 {topThree[1].name}
               </h4>
               <p
-                className="text-lg md:text-xl font-bold mb-3 whitespace-nowrap"
+                className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 break-words"
                 style={{ color: getRankColor(2) }}
               >
                 ₽{topThree[1].totalDonated.toLocaleString()}
               </p>
-              <div className="mt-1 min-h-[40px] flex justify-center gap-2 flex-wrap mt-auto">
+              <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto">
                   {topThree[1].vkLink && (
                     <button
                       type="button"
@@ -150,40 +148,38 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
         {topThree[0] && (
           <Link
             href={`/profile/${topThree[0].id}`}
-            className="order-1 md:order-2 flex-1 max-w-[300px]"
+            className="order-1 sm:order-2 flex-1 max-w-full sm:max-w-[300px]"
           >
             <div 
-              className="p-6 rounded-2xl backdrop-blur-sm border-2 transition-colors cursor-pointer text-center h-full flex flex-col"
+              className="p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl backdrop-blur-sm border-2 transition-colors cursor-pointer text-center h-full flex flex-col"
               style={{
                 backgroundColor: "rgba(0, 70, 67, 0.6)",
                 borderColor: getRankColor(1),
                 boxShadow: `0 0 25px ${getRankColor(1)}40`,
-                minWidth: "220px",
                 minHeight: "260px"
               }}
             >
-              <div className="text-4xl mb-3">{getRankIcon(1)}</div>
+              <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{getRankIcon(1)}</div>
               <div
-                className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-2xl font-bold mx-auto mb-4"
+                className="w-16 h-16 sm:w-[72px] sm:h-[72px] md:w-20 md:h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-xl sm:text-2xl font-bold mx-auto mb-3 sm:mb-4"
                 style={{
-                  backgroundImage: topThree[0].avatar ? `url(${topThree[0].avatar})` : undefined,
+                  backgroundImage: `url(${topThree[0].avatar || "/default-avatar.png"})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
-                  color: topThree[0].avatar ? "transparent" : "#001e1d",
+                  color: "transparent",
                 }}
               >
-                {!topThree[0].avatar && topThree[0].name.charAt(0).toUpperCase()}
               </div>
-              <h4 className="text-xl font-bold mb-3" style={{ color: "#fffffe" }}>
+              <h4 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 break-words" style={{ color: "#fffffe" }}>
                 {topThree[0].name}
               </h4>
               <p
-                className="text-xl md:text-2xl font-bold mb-3 whitespace-nowrap"
+                className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 break-words"
                 style={{ color: getRankColor(1) }}
               >
                 ₽{topThree[0].totalDonated.toLocaleString()}
               </p>
-              <div className="mt-1 min-h-[40px] flex justify-center gap-2 flex-wrap mt-auto">
+              <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto">
                   {topThree[0].vkLink && (
                     <button
                       type="button"
@@ -235,40 +231,38 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
         {topThree[2] && (
           <Link
             href={`/profile/${topThree[2].id}`}
-            className="order-3 flex-1 max-w-[280px]"
+            className="order-3 flex-1 max-w-full sm:max-w-[280px]"
           >
             <div 
-              className="p-6 rounded-2xl backdrop-blur-sm border-2 transition-colors cursor-pointer text-center h-full flex flex-col"
+              className="p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl backdrop-blur-sm border-2 transition-colors cursor-pointer text-center h-full flex flex-col"
               style={{
                 backgroundColor: "rgba(0, 70, 67, 0.6)",
                 borderColor: getRankColor(3),
                 boxShadow: `0 0 15px ${getRankColor(3)}30`,
-                minWidth: "220px",
-                minHeight: "260px"
+                minHeight: "240px"
               }}
             >
-              <div className="text-3xl mb-2">{getRankIcon(3)}</div>
+              <div className="text-2xl sm:text-3xl mb-2">{getRankIcon(3)}</div>
               <div
-                className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-xl font-bold mx-auto mb-3"
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-lg sm:text-xl font-bold mx-auto mb-2 sm:mb-3"
                 style={{
-                  backgroundImage: topThree[2].avatar ? `url(${topThree[2].avatar})` : undefined,
+                  backgroundImage: `url(${topThree[2].avatar || "/default-avatar.png"})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
-                  color: topThree[2].avatar ? "transparent" : "#001e1d",
+                  color: "transparent",
                 }}
               >
-                {!topThree[2].avatar && topThree[2].name.charAt(0).toUpperCase()}
               </div>
-              <h4 className="text-lg font-bold mb-2" style={{ color: "#fffffe" }}>
+              <h4 className="text-base sm:text-lg font-bold mb-2 break-words" style={{ color: "#fffffe" }}>
                 {topThree[2].name}
               </h4>
               <p
-                className="text-lg md:text-xl font-bold mb-3 whitespace-nowrap"
+                className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 break-words"
                 style={{ color: getRankColor(3) }}
               >
                 ₽{topThree[2].totalDonated.toLocaleString()}
               </p>
-              <div className="mt-1 min-h-[40px] flex justify-center gap-2 flex-wrap mt-auto">
+              <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto">
                   {topThree[2].vkLink && (
                     <button
                       type="button"

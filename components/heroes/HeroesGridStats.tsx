@@ -47,27 +47,27 @@ export default function HeroesGridStats({ heroes }: HeroesGridStatsProps) {
 
   return (
     <div className="text-center">
-      <h2 className="text-2xl font-bold mb-8" style={{ color: "#fffffe" }}>
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 sm:mb-8 px-4" style={{ color: "#fffffe" }}>
         Статистика
       </h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-5xl mx-auto px-2">
         {statsData.map((stat) => (
           <div
             key={stat.label}
-            className="p-6 rounded-2xl backdrop-blur-sm border"
+            className="p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl backdrop-blur-sm border"
             style={{
               backgroundColor: "rgba(0, 70, 67, 0.6)",
               borderColor: "rgba(171, 209, 198, 0.3)",
             }}
           >
             <div
-              className="text-2xl md:text-3xl font-bold mb-2"
+              className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2 break-words"
               style={{ color: stat.color }}
             >
               {stat.value}
             </div>
-            <div className="text-base" style={{ color: "#abd1c6" }}>
+            <div className="text-xs sm:text-sm md:text-base" style={{ color: "#abd1c6" }}>
               {stat.label}
             </div>
           </div>

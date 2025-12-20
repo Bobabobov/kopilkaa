@@ -6,6 +6,7 @@ import { useBulldog } from "@/lib/useBulldog";
 import { useEffect } from "react";
 import AdSection from "./AdSection";
 import DonateButton from "@/components/donate/DonateButton";
+import TelegramChannel from "./TelegramChannel";
 
 type Stats = {
   collected: number;
@@ -168,6 +169,11 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           <div className="w-full max-w-4xl">
             <AdSection variant="sidebar" />
           </div>
+        </div>
+
+        {/* Telegram канал */}
+        <div className="mb-10">
+          <TelegramChannel />
         </div>
 
         {/* Статистика платформы */}

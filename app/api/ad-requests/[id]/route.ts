@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth";
 // PUT - обновление статуса заявки (только для админов)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const session = await getSession();
@@ -14,6 +14,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const resolvedParams = await Promise.resolve(params);
     const { status, adminComment } = await request.json();
 
     // Валидация статуса
@@ -26,7 +27,7 @@ export async function PUT(
     }
 
     const adRequest = await prisma.adRequest.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: {
         status,
         adminComment: adminComment || null,
@@ -44,10 +45,12 @@ export async function PUT(
   }
 }
 
+export const dynamic = "force-dynamic";
+
 // DELETE - удаление заявки (только для админов)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const session = await getSession();
@@ -56,9 +59,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const resolvedParams = await Promise.resolve(params);
+
     // Используем deleteMany, чтобы не падать, если запись уже была удалена
     await prisma.adRequest.deleteMany({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
     });
 
     return NextResponse.json({ message: "Заявка удалена" });

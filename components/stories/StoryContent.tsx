@@ -7,72 +7,8 @@ interface StoryContentProps {
 }
 
 export default function StoryContent({ content, isAd = false }: StoryContentProps) {
-  const paragraphs = content.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
-
-  const renderParagraph = (text: string, index: number) => {
-    if (!isAd) {
-      return (
-        <p key={index} className="mb-4 last:mb-0 leading-relaxed text-lg" style={{ color: "#001e1d" }}>
-          {text}
-        </p>
-      );
-    }
-
-    // Специальное оформление для рекламной истории
-    if (text.startsWith("Проект сейчас на старте")) {
-      return (
-        <p
-          key={index}
-          className="mb-4 last:mb-0 leading-relaxed text-lg font-medium"
-          style={{ color: "#001e1d" }}
-        >
-          {text}
-        </p>
-      );
-    }
-
-    if (text.startsWith("Здесь можно простым человеческим языком")) {
-      return (
-        <p
-          key={index}
-          className="mb-4 last:mb-0 leading-relaxed text-lg rounded-2xl px-4 py-3 bg-[#004643]/5 border border-[#abd1c6]/40"
-          style={{ color: "#001e1d" }}
-        >
-          {text}
-        </p>
-      );
-    }
-
-    if (text.startsWith("Мы не обещаем чудес")) {
-      return (
-        <p
-          key={index}
-          className="mb-4 last:mb-0 leading-relaxed text-lg border-l-4 pl-4 rounded-r-2xl bg-[#f9bc60]/10 border-[#f9bc60]"
-          style={{ color: "#001e1d" }}
-        >
-          {text}
-        </p>
-      );
-    }
-
-    if (text.startsWith("Когда проект наберёт статистику")) {
-      return (
-        <p
-          key={index}
-          className="mb-0 leading-relaxed text-lg text-[#004643]"
-        >
-          {text}
-        </p>
-      );
-    }
-
-    return (
-      <p key={index} className="mb-4 last:mb-0 leading-relaxed text-lg" style={{ color: "#001e1d" }}>
-        {text}
-      </p>
-    );
-  };
-
+  // Для всех историй (обычных и рекламных) используем HTML рендеринг
+  // Теперь рекламные истории тоже поддерживают форматирование через RichTextEditor
   return (
     <div
       className="relative bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-xl mb-8 overflow-hidden"
@@ -86,9 +22,8 @@ export default function StoryContent({ content, isAd = false }: StoryContentProp
         <div className="prose prose-lg max-w-none">
           <div
             className="break-words overflow-wrap-anywhere text-lg"
-          >
-            {paragraphs.map(renderParagraph)}
-          </div>
+            dangerouslySetInnerHTML={{ __html: content }}
+          />
         </div>
       </div>
     </div>

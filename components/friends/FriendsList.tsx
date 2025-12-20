@@ -91,24 +91,14 @@ export function FriendsList({
               title="Перейти в профиль"
             >
               <div className="relative w-16 h-16 sm:w-[72px] sm:h-[72px] bg-[#004643] rounded-full flex items-center justify-center group-hover:ring-2 group-hover:ring-[#f9bc60]/40 transition flex-shrink-0">
-                {user.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt=""
-                    className="w-full h-full rounded-full object-cover"
-                    onError={(e) => {
-                      // Скрываем изображение при ошибке и показываем fallback
-                      e.currentTarget.style.display = "none";
-                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                      if (fallback) {
-                        fallback.style.display = "flex";
-                      }
-                    }}
-                  />
-                ) : null}
-                <span className={`text-[#f9bc60] font-bold ${user.avatar ? "hidden" : ""}`}>
-                  {(user.name || user.email.split("@")[0])[0].toUpperCase()}
-                </span>
+                <img
+                  src={user.avatar || "/default-avatar.png"}
+                  alt=""
+                  className="w-full h-full rounded-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "/default-avatar.png";
+                  }}
+                />
                 <span
                   className={`absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 rounded-full border-2 border-[#001e1d] ${
                     isOnline ? "bg-green-400" : "bg-gray-500"

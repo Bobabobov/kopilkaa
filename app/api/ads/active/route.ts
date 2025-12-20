@@ -23,13 +23,13 @@ export async function GET() {
       .catch(() => null);
 
     // 2. Если нет отдельного размещения "home_sidebar" —
-    //    берём любую другую активную рекламу, кроме большого баннера
+    //    берём любую другую активную рекламу, кроме большого баннера и stories
     if (!activeAd) {
       activeAd = await prisma.advertisement
         .findFirst({
       where: {
         isActive: true,
-            placement: { not: "home_banner" },
+            placement: { notIn: ["home_banner", "stories"] },
             ...dateWhere,
       },
           orderBy: { createdAt: "desc" },

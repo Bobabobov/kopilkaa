@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession, setSession } from "@/lib/auth";
 import { verifyTelegramAuth, TelegramAuthData } from "@/lib/telegramAuth";
+import { checkUserBan } from "@/lib/ban-check";
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,6 +40,23 @@ export async function POST(req: NextRequest) {
       : null;
 
     if (session && sessionUser) {
+      // Проверяем блокировку перед привязкой
+      const banStatus = await checkUserBan(sessionUser.id);
+      if (banStatus.isBanned) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Ваш аккаунт заблокирован",
+            banInfo: {
+              reason: banStatus.bannedReason,
+              until: banStatus.bannedUntil?.toISOString() || null,
+              isPermanent: banStatus.isPermanent,
+            },
+          },
+          { status: 403 }
+        );
+      }
+
       // Пользователь уже залогинен — привязываем Telegram к его аккаунту
       const updateData: any = {
         telegramId,
@@ -153,6 +171,23 @@ export async function POST(req: NextRequest) {
           data: updateData,
         });
       }
+    }
+
+    // Проверяем блокировку перед входом
+    const banStatus = await checkUserBan(user.id);
+    if (banStatus.isBanned) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Ваш аккаунт заблокирован",
+          banInfo: {
+            reason: banStatus.bannedReason,
+            until: banStatus.bannedUntil?.toISOString() || null,
+            isPermanent: banStatus.isPermanent,
+          },
+        },
+        { status: 403 }
+      );
     }
 
     await setSession({ uid: user.id, role: (user.role as any) || "USER" });

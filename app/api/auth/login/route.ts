@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { setSession } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 import { AchievementService } from "@/lib/achievements/service";
+import { checkUserBan } from "@/lib/ban-check";
 
 export async function POST(req: Request) {
   try {
@@ -40,6 +41,27 @@ export async function POST(req: Request) {
     if (!ok) {
       console.log("Invalid password for user:", rawIdentifier);
       return Response.json({ error: "Неверный пароль" }, { status: 401 });
+    }
+
+    // Проверяем блокировку пользователя
+    const banStatus = await checkUserBan(user.id);
+    if (banStatus.isBanned) {
+      const reason = banStatus.bannedReason || "Нарушение правил";
+      const until = banStatus.bannedUntil 
+        ? ` до ${banStatus.bannedUntil.toLocaleDateString("ru-RU")}`
+        : " навсегда";
+      
+      return Response.json(
+        { 
+          error: "Ваш аккаунт заблокирован", 
+          banInfo: {
+            reason,
+            until: banStatus.bannedUntil?.toISOString() || null,
+            isPermanent: banStatus.isPermanent,
+          }
+        },
+        { status: 403 }
+      );
     }
 
     console.log("Login successful for user:", user.id);

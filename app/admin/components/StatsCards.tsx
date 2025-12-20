@@ -65,37 +65,48 @@ export default function StatsCards({ stats }: StatsCardsProps) {
     },
   ];
 
+  const getCardStyle = (index: number) => {
+    const styles = [
+      { bg: "from-[#f9bc60]/10 to-[#e8a545]/10", border: "border-[#f9bc60]/30", icon: "from-[#f9bc60] to-[#e8a545]", value: "text-[#f9bc60]" },
+      { bg: "from-[#abd1c6]/10 to-[#94c4b8]/10", border: "border-[#abd1c6]/30", icon: "from-[#abd1c6] to-[#94c4b8]", value: "text-[#abd1c6]" },
+      { bg: "from-[#f9bc60]/10 to-[#e8a545]/10", border: "border-[#f9bc60]/30", icon: "from-[#f9bc60] to-[#e8a545]", value: "text-[#f9bc60]" },
+      { bg: "from-[#10B981]/10 to-[#059669]/10", border: "border-[#10B981]/30", icon: "from-[#10B981] to-[#059669]", value: "text-[#10B981]" },
+      { bg: "from-[#e16162]/10 to-[#dc2626]/10", border: "border-[#e16162]/30", icon: "from-[#e16162] to-[#dc2626]", value: "text-[#e16162]" },
+    ];
+    return styles[index % styles.length];
+  };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 mb-8 lg:mb-12">
-      {cards.map((card, index) => (
-        <motion.div
-          key={card.title}
-          initial={{ opacity: 0, y: 30, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.6, delay: card.delay }}
-          className="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-2xl lg:rounded-3xl p-4 lg:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-        >
-          <div
-            className={`absolute inset-0 bg-gradient-to-br ${card.gradient} transition-all duration-500`}
-          ></div>
-          <div className="relative">
-            <div
-              className={`inline-flex items-center justify-center w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-r ${card.iconGradient} rounded-xl lg:rounded-2xl mb-3 lg:mb-4 group-hover:scale-110 transition-transform duration-300`}
-            >
-              <span className="text-2xl lg:text-3xl">{card.icon}</span>
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12">
+      {cards.map((card, index) => {
+        const style = getCardStyle(index);
+        return (
+          <motion.div
+            key={card.title}
+            initial={{ opacity: 0, y: 30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, delay: card.delay }}
+            className={`group relative overflow-hidden bg-gradient-to-br ${style.bg} rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border ${style.border}`}
+          >
+            <div className="relative">
+              <div
+                className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-r ${style.icon} rounded-lg sm:rounded-xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
+              >
+                <span className="text-xl sm:text-2xl md:text-3xl">{card.icon}</span>
+              </div>
+              <div className="text-xs sm:text-sm font-bold text-[#abd1c6] mb-1 sm:mb-2 uppercase tracking-wide">
+                {card.title}
+              </div>
+              <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black ${style.value} mb-1 sm:mb-2`}>
+                {card.value}
+              </div>
+              <div className="text-xs text-[#abd1c6]/70">
+                {card.description}
+              </div>
             </div>
-            <div className="text-xs lg:text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
-              {card.title}
-            </div>
-            <div className={`text-2xl lg:text-4xl font-bold ${card.valueColor} mb-2`}>
-              {card.value}
-            </div>
-            <div className="text-xs text-gray-400 dark:text-gray-500">
-              {card.description}
-            </div>
-          </div>
-        </motion.div>
-      ))}
+          </motion.div>
+        );
+      })}
     </div>
   );
 }

@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const session = await getSession();
@@ -12,6 +14,9 @@ export async function PUT(
     if (!session || session.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // Обрабатываем params как Promise или объект
+    const { id } = await Promise.resolve(params);
 
     const {
       title,
@@ -25,7 +30,7 @@ export async function PUT(
     } = await request.json();
 
     const ad = await prisma.advertisement.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
         content,
@@ -50,7 +55,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const session = await getSession();
@@ -59,16 +64,46 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Используем deleteMany, чтобы не падать с ошибкой, если запись уже удалена
-    await prisma.advertisement.deleteMany({
-      where: { id: params.id },
+    // Обрабатываем params как Promise или объект
+    const resolvedParams = await Promise.resolve(params);
+    const id = resolvedParams.id;
+
+    console.log("Deleting ad with id:", id);
+
+    // Проверяем существование записи перед удалением
+    const existingAd = await prisma.advertisement.findUnique({
+      where: { id },
     });
 
+    if (!existingAd) {
+      console.log("Advertisement not found:", id);
+      return NextResponse.json(
+        { error: "Advertisement not found" },
+        { status: 404 }
+      );
+    }
+
+    // Удаляем запись
+    await prisma.advertisement.delete({
+      where: { id },
+    });
+
+    console.log("Advertisement deleted successfully:", id);
+
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error deleting ad:", error);
+    
+    // Если ошибка о том, что запись не найдена
+    if (error.code === "P2025" || error.message?.includes("Record to delete does not exist")) {
+      return NextResponse.json(
+        { error: "Advertisement not found" },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Failed to delete ad" },
+      { error: "Failed to delete ad", details: error.message },
       { status: 500 }
     );
   }

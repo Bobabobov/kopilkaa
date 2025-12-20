@@ -12,6 +12,7 @@ import OtherUserActivity from "./OtherUserActivity";
 import OtherUserDonations from "./OtherUserDonations";
 import MutualFriends from "./widgets/MutualFriends";
 import ProfileHeaderCard from "@/components/profile/ProfileHeaderCard";
+import ReportUserModal from "./modals/ReportUserModal";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 
@@ -52,6 +53,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
 
   const emitFriendEvents = useCallback(() => {
@@ -80,6 +82,21 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
 
     checkAuth();
   }, []);
+
+  // Обработчик события для открытия модального окна жалобы
+  useEffect(() => {
+    const handleOpenReportModal = (event: Event) => {
+      const customEvent = event as CustomEvent<{ userId: string }>;
+      if (customEvent.detail?.userId === userId) {
+        setIsReportModalOpen(true);
+      }
+    };
+
+    window.addEventListener("open-report-user-modal", handleOpenReportModal);
+    return () => {
+      window.removeEventListener("open-report-user-modal", handleOpenReportModal);
+    };
+  }, [userId]);
 
   const fetchFriendshipStatus = useCallback(async () => {
     try {
@@ -320,7 +337,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-red-400 mb-3">
-                    Пользователь заблокирован
+                    Чечик в бане
                   </h3>
                   {isBannedPermanent ? (
                     <p className="text-[#abd1c6] text-base">
@@ -447,6 +464,14 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
 
       {/* Красивые уведомления */}
       <ToastComponent />
+
+      {/* Модальное окно жалобы */}
+      <ReportUserModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        userId={userId}
+        userName={user.name}
+      />
     </div>
   );
 }

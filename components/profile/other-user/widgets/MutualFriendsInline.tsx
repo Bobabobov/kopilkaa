@@ -29,25 +29,15 @@ export function MutualFriendsInline({ friends }: MutualFriendsInlineProps) {
           whileHover={{ scale: 1.1 }}
         >
           <Link href={`/profile/${f.id}`} prefetch={false}>
-            {f.avatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img 
-                src={f.avatar} 
-                alt="" 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Скрываем изображение при ошибке и показываем fallback
-                  e.currentTarget.style.display = "none";
-                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                  if (fallback) {
-                    fallback.style.display = "flex";
-                  }
-                }}
-              />
-            ) : null}
-            <div className={`w-full h-full flex items-center justify-center text-[#f9bc60] text-xs font-bold ${f.avatar ? "hidden" : ""}`}>
-              {(f.name || f.email || "?")[0]?.toUpperCase()}
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src={f.avatar || "/default-avatar.png"} 
+              alt="" 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = "/default-avatar.png";
+              }}
+            />
           </Link>
         </motion.div>
       ))}

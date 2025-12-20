@@ -113,11 +113,11 @@ export default function AdminClient() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: "#004643" }}>
       <UniversalBackground />
 
       <div className="relative z-10">
-        <div className="container mx-auto px-4 pt-24 pb-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">
           <AdminHeader />
 
           {/* Статистика */}

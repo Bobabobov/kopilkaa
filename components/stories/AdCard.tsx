@@ -24,6 +24,13 @@ interface StoriesAd {
   config?: StoriesAdConfig | null;
 }
 
+// Функция для извлечения чистого текста из HTML
+const stripHTML = (html: string): string => {
+  if (!html) return "";
+  // Простой способ: убираем все HTML теги через регулярное выражение
+  return html.replace(/<[^>]*>/g, "").trim();
+};
+
 export function AdCard({ index }: AdCardProps) {
   const router = useRouter();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -66,11 +73,13 @@ export function AdCard({ index }: AdCardProps) {
         const textFromAd = ad.content || config.storyText || "";
 
         if (titleFromAd) {
-          setCardTitle(titleFromAd);
+          // Извлекаем чистый текст из HTML для заголовка
+          setCardTitle(stripHTML(titleFromAd));
         }
 
         if (textFromAd) {
-          setCardText(textFromAd);
+          // Извлекаем чистый текст из HTML для превью
+          setCardText(stripHTML(textFromAd));
         }
       } catch (error) {
         console.error("Error loading stories ad preview:", error);

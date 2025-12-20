@@ -11,6 +11,7 @@ import ProgressBar from "@/components/applications/ProgressBar";
 import FormField from "@/components/ui/FormField";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import MotivationalMessages from "@/components/applications/MotivationalMessages";
+import RichTextEditor from "@/components/applications/RichTextEditor";
 
 // Lazy load heavy components
 const PhotoUpload = dynamic(() => import("@/components/applications/PhotoUpload"), {
@@ -305,12 +306,6 @@ export default function ApplicationsPage() {
       {/* Фон */}
       <UniversalBackground />
 
-      {/* Дополнительные декоративные элементы */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-[#f9bc60]/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#e16162]/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#abd1c6]/3 rounded-full blur-3xl"></div>
-      </div>
 
       <PageHeader />
 
@@ -455,18 +450,19 @@ export default function ApplicationsPage() {
                 </div>
 
                 <div>
-                  <FormField
-                    type="textarea"
-                    label="Подробная история"
-                    icon="FileText"
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#abd1c6" }}>
+                    Подробная история *
+                  </label>
+                  <p className="text-xs text-[#abd1c6]/70 mb-3">
+                    Подробное описание ситуации (минимум 10, максимум 3000 символов). Используйте кнопки для форматирования текста.
+                  </p>
+                  <RichTextEditor
                     value={story}
                     onChange={setStory}
                     placeholder="Расскажите подробно о вашей ситуации, что привело к необходимости помощи, как планируете использовать средства..."
-                  hint="Подробное описание ситуации (минимум 10, максимум 3000 символов)"
                     minLength={LIMITS.storyMin}
                     maxLength={LIMITS.storyMax}
-                    delay={0.3}
-                    required={true}
+                    rows={8}
                   />
                 </div>
 

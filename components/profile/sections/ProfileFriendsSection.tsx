@@ -283,24 +283,14 @@ export default function ProfileFriendsSection() {
                       {/* Аватар */}
                       <div className="relative">
                         <div className="w-10 h-10 xs:w-12 xs:h-12 rounded-lg overflow-hidden bg-[#004643] flex items-center justify-center">
-                          {friend.avatar ? (
-                            <img
-                              src={friend.avatar}
-                              alt={friend.name || "Аватар"}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                // Скрываем изображение при ошибке и показываем fallback
-                                e.currentTarget.style.display = "none";
-                                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                                if (fallback) {
-                                  fallback.style.display = "flex";
-                                }
-                              }}
-                            />
-                          ) : null}
-                          <span className={`text-[#f9bc60] font-semibold text-base xs:text-lg ${friend.avatar ? "hidden" : ""}`}>
-                            {(friend.name || friend.email.split("@")[0])[0].toUpperCase()}
-                          </span>
+                          <img
+                            src={friend.avatar || "/default-avatar.png"}
+                            alt={friend.name || "Аватар"}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "/default-avatar.png";
+                            }}
+                          />
                         </div>
                         
                         {/* Онлайн индикатор */}

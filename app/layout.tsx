@@ -5,10 +5,10 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import TopBanner from "@/components/layout/TopBanner";
-import ScrollToTop from "@/components/ui/ScrollToTop";
 import { BeautifulNotificationsProvider } from "@/components/ui/BeautifulNotificationsProvider";
 import ProfilePreloadInitializer from "@/components/performance/ProfilePreloadInitializer";
-import AuthModalRoot from "@/components/auth/AuthModalRoot";
+import BanCheck from "@/components/auth/BanCheck";
+import ProtectedLayout from "@/components/layout/ProtectedLayout";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -28,16 +28,9 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <BeautifulNotificationsProvider>
           <ProfilePreloadInitializer />
-          <div className="min-h-screen flex flex-col">
-            <TopBanner />
-            <Header />
-            <main className="flex-1 container-p mx-auto">{children}</main>
-            <Footer />
-            <ScrollToTop />
-            <Suspense fallback={null}>
-              <AuthModalRoot />
-            </Suspense>
-          </div>
+          <BanCheck>
+            <ProtectedLayout>{children}</ProtectedLayout>
+          </BanCheck>
         </BeautifulNotificationsProvider>
       </body>
     </html>

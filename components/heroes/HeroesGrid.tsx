@@ -105,41 +105,41 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
       <HeroesTopThree heroes={heroes} />
 
       {/* Заголовок с результатами */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <h3 className="text-2xl md:text-3xl font-bold mb-2 md:mb-0 text-[#fffffe]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-2">
+        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#fffffe]">
           Все донатеры
         </h3>
-        <div className="text-sm md:text-base text-[#abd1c6]">
+        <div className="text-xs sm:text-sm md:text-base text-[#abd1c6]">
           Показано {filteredAndSortedHeroes.length} из {heroes.length}
         </div>
       </div>
 
       {/* Сетка героев */}
       {filteredAndSortedHeroes.length === 0 ? (
-        <div className="text-center py-12">
-          <p style={{ color: "#abd1c6" }}>
+        <div className="text-center py-8 sm:py-12">
+          <p className="text-sm sm:text-base" style={{ color: "#abd1c6" }}>
             Ничего не найдено
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
           {filteredAndSortedHeroes.map((hero) => {
             const hasSocialLinks =
               !!hero.vkLink || !!hero.telegramLink || !!hero.youtubeLink;
 
             return (
-              <Link key={hero.id} href={`/profile/${hero.id}`} className="block focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 rounded-2xl">
+              <Link key={hero.id} href={`/profile/${hero.id}`} className="block focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 rounded-xl sm:rounded-2xl">
               <div
-                className="p-5 rounded-2xl border transition-colors cursor-pointer bg-[#001e1d]/60 border-[#abd1c6]/30 hover:border-[#f9bc60]/60 hover:bg-[#004643]/70"
+                className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border transition-colors cursor-pointer bg-[#001e1d]/60 border-[#abd1c6]/30 hover:border-[#f9bc60]/60 hover:bg-[#004643]/70"
               >
                 {/* Ранг */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
                     {getRankIcon(hero.rank) && (
-                      <span className="text-2xl">{getRankIcon(hero.rank)}</span>
+                      <span className="text-xl sm:text-2xl flex-shrink-0">{getRankIcon(hero.rank)}</span>
                     )}
                     <span 
-                      className="text-lg font-bold" 
+                      className="text-base sm:text-lg font-bold whitespace-nowrap" 
                       style={{ 
                         color: hero.rank <= 3 ? getRankBorder(hero.rank) : "#f9bc60" 
                       }}
@@ -148,7 +148,7 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                     </span>
                   </div>
                   {hero.isSubscriber && (
-                    <span className="text-sm px-3 py-1 rounded-full" style={{ 
+                    <span className="text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full whitespace-nowrap flex-shrink-0" style={{ 
                       backgroundColor: "rgba(249, 188, 96, 0.2)", 
                       color: "#f9bc60" 
                     }}>
@@ -158,32 +158,31 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                 </div>
 
                 {/* Аватар и имя */}
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4 min-w-0">
                   <div
-                    className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-xl font-bold"
+                    className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-lg sm:text-xl font-bold flex-shrink-0"
                     style={{
-                      backgroundImage: hero.avatar ? `url(${hero.avatar})` : undefined,
+                      backgroundImage: `url(${hero.avatar || "/default-avatar.png"})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
-                      color: hero.avatar ? "transparent" : "#001e1d",
+                      color: "transparent",
                     }}
                   >
-                    {!hero.avatar && hero.name.charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold" style={{ color: "#fffffe" }}>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base sm:text-lg font-bold truncate" style={{ color: "#fffffe" }}>
                       {hero.name}
                     </h3>
-                    <p className="text-sm" style={{ color: "#abd1c6" }}>
+                    <p className="text-xs sm:text-sm truncate" style={{ color: "#abd1c6" }}>
                       С {formatDate(hero.joinedAt)}
                     </p>
                   </div>
                 </div>
 
                 {/* Статистика */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <div 
-                    className="text-center p-3 rounded-xl" 
+                    className="text-center p-2 sm:p-3 rounded-lg sm:rounded-xl" 
                     style={{ 
                       backgroundColor: hero.rank <= 3 
                         ? `${getRankBorder(hero.rank)}20` 
@@ -191,19 +190,19 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                     }}
                   >
                     <p 
-                      className="text-xl font-bold" 
+                      className="text-lg sm:text-xl font-bold break-words" 
                       style={{ 
                         color: hero.rank <= 3 ? getRankBorder(hero.rank) : "#f9bc60" 
                       }}
                     >
                       ₽{hero.totalDonated.toLocaleString()}
                     </p>
-                    <p className="text-sm" style={{ color: "#abd1c6" }}>
+                    <p className="text-xs sm:text-sm" style={{ color: "#abd1c6" }}>
                       Поддержал
                     </p>
                   </div>
                   <div 
-                    className="text-center p-3 rounded-xl" 
+                    className="text-center p-2 sm:p-3 rounded-lg sm:rounded-xl" 
                     style={{ 
                       backgroundColor: hero.rank <= 3 
                         ? `${getRankBorder(hero.rank)}15` 
@@ -211,20 +210,20 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                     }}
                   >
                     <p 
-                      className="text-xl font-bold" 
+                      className="text-lg sm:text-xl font-bold" 
                       style={{ 
                         color: hero.rank <= 3 ? getRankBorder(hero.rank) : "#abd1c6" 
                       }}
                     >
                       {hero.donationCount}
                     </p>
-                    <p className="text-sm" style={{ color: "#abd1c6" }}>
+                    <p className="text-xs sm:text-sm" style={{ color: "#abd1c6" }}>
                       Донатов
                     </p>
                   </div>
                 </div>
                 {/* Соцсети: фиксированное место, чтобы все карточки были одной высоты */}
-                <div className="mt-4 min-h-[36px] flex flex-wrap gap-2 items-center">
+                <div className="mt-3 sm:mt-4 min-h-[32px] sm:min-h-[36px] flex flex-wrap gap-1.5 sm:gap-2 items-center">
                     {hasSocialLinks && hero.vkLink && (
                       <button
                         type="button"

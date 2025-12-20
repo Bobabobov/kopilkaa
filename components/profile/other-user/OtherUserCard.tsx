@@ -95,26 +95,14 @@ export default function OtherUserCard({
                       />
                       {/* Аватар поверх рамки */}
                       <div className="absolute inset-2 rounded-md overflow-hidden">
-                        {user.avatar ? (
-                          <img
-                            src={user.avatar}
-                            alt="Аватар"
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              // Скрываем изображение при ошибке и показываем fallback
-                              e.currentTarget.style.display = "none";
-                              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                              if (fallback) {
-                                fallback.style.display = "flex";
-                              }
-                            }}
-                          />
-                        ) : null}
-                        <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600 text-white font-bold text-xl ${user.avatar ? "hidden" : ""}`}>
-                          {user.name
-                            ? user.name[0].toUpperCase()
-                            : user.email[0].toUpperCase()}
-                        </div>
+                        <img
+                          src={user.avatar || "/default-avatar.png"}
+                          alt="Аватар"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "/default-avatar.png";
+                          }}
+                        />
                       </div>
                     </div>
                   );
@@ -122,34 +110,16 @@ export default function OtherUserCard({
                   // CSS рамка (only 'none' remains now)
                   return (
                     <div
-                      className={`w-24 h-24 rounded-lg flex items-center justify-center text-white font-bold text-2xl shadow-2xl mx-auto mb-4 group-hover/avatar:scale-105 transition-transform duration-300 ${frame.className} ${
-                        user.avatar
-                          ? "bg-gray-100 dark:bg-gray-700"
-                          : "bg-gradient-to-br from-emerald-500 via-green-500 to-lime-600"
-                      }`}
+                      className={`w-24 h-24 rounded-lg shadow-2xl mx-auto mb-4 group-hover/avatar:scale-105 transition-transform duration-300 ${frame.className}`}
                     >
-                      {user.avatar ? (
-                        <img
-                          src={user.avatar}
-                          alt="Аватар"
-                          className={`w-full h-full object-cover rounded-lg ${frameKey === "rainbow" ? "rounded-lg" : ""}`}
-                          onError={(e) => {
-                            // Скрываем изображение при ошибке и показываем fallback
-                            e.currentTarget.style.display = "none";
-                            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                            if (fallback) {
-                              fallback.style.display = "flex";
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <div
-                        className={`w-full h-full flex items-center justify-center rounded-lg ${frameKey === "rainbow" ? "rounded-lg" : ""} ${user.avatar ? "hidden" : ""}`}
-                      >
-                        {user.name
-                          ? user.name[0].toUpperCase()
-                          : user.email[0].toUpperCase()}
-                      </div>
+                      <img
+                        src={user.avatar || "/default-avatar.png"}
+                        alt="Аватар"
+                        className={`w-full h-full object-cover rounded-lg ${frameKey === "rainbow" ? "rounded-lg" : ""}`}
+                        onError={(e) => {
+                          e.currentTarget.src = "/default-avatar.png";
+                        }}
+                      />
                     </div>
                   );
                 }

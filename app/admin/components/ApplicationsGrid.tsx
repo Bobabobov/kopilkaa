@@ -38,20 +38,20 @@ export default function ApplicationsGrid({
 }: ApplicationsGridProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {[...Array(5)].map((_, index) => (
           <div
             key={index}
-            className="bg-white dark:bg-gray-800 rounded-3xl p-4 sm:p-8 shadow-lg border border-gray-100 dark:border-gray-700 animate-pulse"
+            className="bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-xl border border-[#abd1c6]/20 animate-pulse"
           >
             <div className="space-y-4">
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-              <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-6 bg-[#abd1c6]/20 rounded w-3/4"></div>
+              <div className="h-4 bg-[#abd1c6]/20 rounded w-1/2"></div>
+              <div className="h-20 bg-[#abd1c6]/20 rounded"></div>
               <div className="flex gap-2">
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+                <div className="h-8 bg-[#abd1c6]/20 rounded w-20"></div>
+                <div className="h-8 bg-[#abd1c6]/20 rounded w-20"></div>
+                <div className="h-8 bg-[#abd1c6]/20 rounded w-20"></div>
               </div>
             </div>
           </div>
@@ -66,14 +66,14 @@ export default function ApplicationsGrid({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-700"
+        className="bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl border border-[#e16162]/40"
       >
         <div className="text-center">
           <motion.div 
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-red-500 text-6xl mb-4"
+            className="text-[#e16162] text-4xl sm:text-6xl mb-4"
           >
             ⚠️
           </motion.div>
@@ -81,7 +81,7 @@ export default function ApplicationsGrid({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-xl font-bold text-gray-900 dark:text-white mb-2"
+            className="text-lg sm:text-xl font-black text-[#fffffe] mb-2"
           >
             Ошибка загрузки
           </motion.h3>
@@ -89,7 +89,7 @@ export default function ApplicationsGrid({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-gray-600 dark:text-gray-400 mb-6"
+            className="text-[#abd1c6] mb-6 text-sm sm:text-base"
           >
             {error}
           </motion.p>
@@ -100,7 +100,7 @@ export default function ApplicationsGrid({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] hover:from-[#e8a545] hover:to-[#f9bc60] text-[#001e1d] rounded-lg sm:rounded-xl transition-all duration-300 font-bold shadow-lg hover:shadow-xl text-sm sm:text-base"
           >
             Попробовать снова
           </motion.button>
@@ -115,14 +115,14 @@ export default function ApplicationsGrid({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg border border-gray-100 dark:border-gray-700"
+        className="bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl border border-[#abd1c6]/20"
       >
         <div className="text-center">
           <motion.div 
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-gray-400 text-6xl mb-4"
+            className="text-[#abd1c6] text-4xl sm:text-6xl mb-4"
           >
             📋
           </motion.div>
@@ -130,7 +130,7 @@ export default function ApplicationsGrid({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-xl font-bold text-gray-900 dark:text-white mb-2"
+            className="text-lg sm:text-xl font-black text-[#fffffe] mb-2"
           >
             Заявки не найдены
           </motion.h3>
@@ -138,7 +138,7 @@ export default function ApplicationsGrid({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-gray-600 dark:text-gray-400"
+            className="text-[#abd1c6] text-sm sm:text-base"
           >
             Попробуйте изменить фильтры поиска
           </motion.p>
@@ -148,7 +148,7 @@ export default function ApplicationsGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6">
+    <div className="grid grid-cols-1 gap-4 sm:gap-6">
       {applications.map((application, index) => (
         <ApplicationCard
           key={application.id}

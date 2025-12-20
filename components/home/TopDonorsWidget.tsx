@@ -87,19 +87,16 @@ export default function TopDonorsWidget() {
                 <div className="flex items-center justify-between gap-3 rounded-xl border border-[#abd1c6]/30 bg-[#001e1d]/80 px-3 py-2 hover:border-[#f9bc60]/70 hover:bg-[#004643]/80 transition-colors cursor-pointer">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="relative flex-shrink-0">
-                      {donor.avatar ? (
-                        <div className="h-9 w-9 rounded-full overflow-hidden border border-[#abd1c6]/40">
-                          <img
-                            src={donor.avatar}
-                            alt={donor.name}
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f9bc60] text-[11px] font-semibold text-[#001e1d]">
-                          #{donor.position}
-                        </div>
-                      )}
+                      <div className="h-9 w-9 rounded-full overflow-hidden border border-[#abd1c6]/40">
+                        <img
+                          src={donor.avatar || "/default-avatar.png"}
+                          alt={donor.name}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "/default-avatar.png";
+                          }}
+                        />
+                      </div>
                     </div>
                     <div className="min-w-0">
                       <p className="truncate text-[13px] font-semibold">

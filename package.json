@@ -15,6 +15,11 @@
   "dependencies": {
     "@next-safe/middleware": "^0.10.0",
     "@prisma/client": "^6.16.3",
+    "@tiptap/extension-placeholder": "^3.14.0",
+    "@tiptap/extension-text-align": "^3.14.0",
+    "@tiptap/extension-underline": "^3.14.0",
+    "@tiptap/react": "^3.14.0",
+    "@tiptap/starter-kit": "^3.14.0",
     "autoprefixer": "^10.4.19",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",

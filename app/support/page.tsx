@@ -7,6 +7,7 @@ import SupportToggle from "@/components/support/SupportToggle";
 import SubscriptionPlans from "@/components/support/SubscriptionPlans";
 import OneTimeSupport from "@/components/support/OneTimeSupport";
 import SupportBenefits from "@/components/support/SupportBenefits";
+import SupportFAQ from "@/components/support/SupportFAQ";
 
 export default function SupportPage() {
   const [subscriptionAmount, setSubscriptionAmount] = useState("");
@@ -79,6 +80,8 @@ export default function SupportPage() {
         )}
 
         <SupportBenefits />
+        
+        <SupportFAQ />
       </div>
     </div>
   );

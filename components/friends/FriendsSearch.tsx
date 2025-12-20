@@ -58,24 +58,14 @@ export function FriendsSearch({
                 className="flex items-center gap-3 flex-1 group min-w-0"
               >
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#004643] rounded-full flex items-center justify-center group-hover:ring-2 group-hover:ring-[#f9bc60]/40 transition flex-shrink-0">
-                  {user.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt=""
-                      className="w-full h-full rounded-full object-cover"
-                      onError={(e) => {
-                        // Скрываем изображение при ошибке и показываем fallback
-                        e.currentTarget.style.display = "none";
-                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                        if (fallback) {
-                          fallback.style.display = "flex";
-                        }
-                      }}
-                    />
-                  ) : null}
-                  <span className={`text-[#f9bc60] font-bold ${user.avatar ? "hidden" : ""}`}>
-                    {(user.name || user.email.split("@")[0])[0].toUpperCase()}
-                  </span>
+                  <img
+                    src={user.avatar || "/default-avatar.png"}
+                    alt=""
+                    className="w-full h-full rounded-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "/default-avatar.png";
+                    }}
+                  />
                 </div>
 
                 <div className="flex-1 min-w-0">

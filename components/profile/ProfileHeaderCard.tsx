@@ -309,26 +309,14 @@ export default function ProfileHeaderCard({
                       </div>
                     ) : (
                       <div className="relative -mt-8 sm:-mt-10 md:-mt-12 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden border border-[#1d8a78]/55 bg-[#0f2623] shadow-[0_18px_40px_rgba(0,0,0,0.22)] ring-2 sm:ring-4 ring-[#f9bc60]/40 transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:shadow-[0_18px_40px_rgba(0,0,0,0.22)] [&_*]:transition-none [&_*]:duration-0 [&_*]:transform-none [&_*:hover]:transform-none">
-                        {user.avatar ? (
-                          <img
-                            src={user.avatar}
-                            alt=""
-                            className="w-full h-full object-cover transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:brightness-100"
-                            onError={(e) => {
-                              // Скрываем изображение при ошибке и показываем fallback
-                              const target = e.currentTarget;
-                              target.style.display = "none";
-                              target.src = ""; // Очищаем src, чтобы предотвратить повторные попытки загрузки
-                              const fallback = target.nextElementSibling as HTMLElement;
-                              if (fallback) {
-                                fallback.style.display = "flex";
-                              }
-                            }}
-                          />
-                        ) : null}
-                        <div className={`w-full h-full flex items-center justify-center text-xl sm:text-2xl md:text-3xl font-bold text-[#f9bc60] ${user.avatar ? "hidden" : ""}`}>
-                          {(user.name || user.email || "П")[0].toUpperCase()}
-                        </div>
+                        <img
+                          src={user.avatar || "/default-avatar.png"}
+                          alt=""
+                          className="w-full h-full object-cover transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:brightness-100"
+                          onError={(e) => {
+                            e.currentTarget.src = "/default-avatar.png";
+                          }}
+                        />
                         <span
                           className={`absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${
                             status.status === "online" ? "bg-emerald-400" : "bg-slate-400"

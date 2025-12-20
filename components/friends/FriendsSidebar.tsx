@@ -120,26 +120,16 @@ export function FriendsSidebar() {
                   className="p-3 rounded-xl border border-[#abd1c6]/15 bg-[#001e1d]/40 shadow-sm hover:bg-white/5 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-[#004643] flex items-center justify-center text-[#f9bc60] font-semibold flex-shrink-0">
-                      {person.avatar ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={person.avatar}
-                          alt=""
-                          className="w-full h-full rounded-full object-cover"
-                          onError={(e) => {
-                            // Скрываем изображение при ошибке и показываем fallback
-                            e.currentTarget.style.display = "none";
-                            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                            if (fallback) {
-                              fallback.style.display = "flex";
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <span className={`${person.avatar ? "hidden" : ""}`}>
-                        {(person.name || person.email || "?")[0]?.toUpperCase()}
-                      </span>
+                    <div className="w-10 h-10 rounded-full bg-[#004643] flex items-center justify-center flex-shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={person.avatar || "/default-avatar.png"}
+                        alt=""
+                        className="w-full h-full rounded-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = "/default-avatar.png";
+                        }}
+                      />
                     </div>
                     <Link
                       href={`/profile/${person.id}`}

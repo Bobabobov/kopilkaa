@@ -175,21 +175,18 @@ export default function TopDonors() {
                   <div className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#f9bc60]/20 blur-xl" />
                   <div className="relative flex items-center gap-4">
                     <div className="relative flex-shrink-0">
-                      {topDonor.avatar ? (
-                        <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-[#f9bc60] shadow-md shadow-[#f9bc60]/40">
-                          <img
-                            src={topDonor.avatar}
-                            alt={topDonor.name}
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div
-                          className="flex h-14 w-14 items-center justify-center rounded-full bg-[#f9bc60] text-base font-semibold text-[#001e1d] shadow-md shadow-[#f9bc60]/40"
-                        >
+                      <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-[#f9bc60] shadow-md shadow-[#f9bc60]/40">
+                        <img
+                          src={topDonor.avatar || "/default-avatar.png"}
+                          alt={topDonor.name}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "/default-avatar.png";
+                          }}
+                        />
+                      </div>
                           {getRankIcon(1)}
                         </div>
-                      )}
                       <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#001e1d] border border-[#f9bc60]/80 text-[10px] text-[#f9bc60] shadow-sm">
                         #1
                       </div>
@@ -304,31 +301,20 @@ export default function TopDonors() {
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="relative flex-shrink-0">
-                            {donor.avatar ? (
-                              <div
-                                className={`overflow-hidden rounded-full border border-[#abd1c6]/40 ${
-                                  isSecond ? "h-11 w-11" : "h-10 w-10"
-                                }`}
-                              >
-                                <img
-                                  src={donor.avatar}
-                                  alt={donor.name}
-                                  className="h-full w-full object-cover"
-                                />
-                              </div>
-                            ) : (
-                              <div
-                                className={`rounded-full ${getAvatarBg(
-                                  donor.position,
-                                )} flex items-center justify-center font-semibold text-[#001e1d] ${
-                                  isSecond
-                                    ? "h-11 w-11 text-[12px]"
-                                    : "h-10 w-10 text-[11px]"
-                                }`}
-                              >
-                                {getRankIcon(donor.position)}
-                              </div>
-                            )}
+                            <div
+                              className={`overflow-hidden rounded-full border border-[#abd1c6]/40 ${
+                                isSecond ? "h-11 w-11" : "h-10 w-10"
+                              }`}
+                            >
+                              <img
+                                src={donor.avatar || "/default-avatar.png"}
+                                alt={donor.name}
+                                className="h-full w-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.src = "/default-avatar.png";
+                                }}
+                              />
+                            </div>
                             <div className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#001e1d] border border-[#f9bc60]/80 text-[9px] text-[#f9bc60] shadow-sm">
                               #{donor.position}
                             </div>

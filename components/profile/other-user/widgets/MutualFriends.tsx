@@ -123,24 +123,14 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
                 prefetch={false}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#001e1d]/40 to-[#001e1d]/20 hover:from-[#001e1d]/60 hover:to-[#001e1d]/40 border border-[#abd1c6]/20 hover:border-[#f9bc60]/50 transition-all hover:shadow-lg hover:shadow-[#f9bc60]/20"
               >
-              {u.avatar ? (
-                <img
-                  src={u.avatar}
-                  alt=""
-                  className="w-9 h-9 rounded-full object-cover border-2 border-[#abd1c6]/30"
-                  onError={(e) => {
-                    // Скрываем изображение при ошибке и показываем fallback
-                    e.currentTarget.style.display = "none";
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                    if (fallback) {
-                      fallback.style.display = "flex";
-                    }
-                  }}
-                />
-              ) : null}
-              <div className={`w-9 h-9 rounded-full bg-gradient-to-br from-[#004643] to-[#001e1d] text-[#f9bc60] flex items-center justify-center text-xs font-bold border-2 border-[#f9bc60]/40 shadow-md ${u.avatar ? "hidden" : ""}`}>
-                {(u.name || u.email.split("@")[0])[0].toUpperCase()}
-              </div>
+              <img
+                src={u.avatar || "/default-avatar.png"}
+                alt=""
+                className="w-9 h-9 rounded-full object-cover border-2 border-[#abd1c6]/30"
+                onError={(e) => {
+                  e.currentTarget.src = "/default-avatar.png";
+                }}
+              />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold text-[#fffffe]">
                   {u.name || u.email.split("@")[0]}

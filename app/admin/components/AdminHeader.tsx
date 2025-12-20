@@ -1,50 +1,55 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 
 export function AdminHeader() {
+  const pathname = usePathname();
+
+  const navLinks = [
+    { href: "/admin", label: "Заявки" },
+    { href: "/admin/achievements", label: "Достижения" },
+    { href: "/admin/ads", label: "Реклама" },
+    { href: "/admin/reports", label: "Жалобы" },
+  ];
+
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4 sm:gap-6"
+    >
       <div>
-        <h1
-          className="text-3xl lg:text-4xl font-bold mb-2"
-          style={{ color: "#fffffe" }}
-        >
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2 text-[#fffffe]">
           🔧 Админ Панель
         </h1>
-        <p className="text-base lg:text-lg" style={{ color: "#abd1c6" }}>
+        <p className="text-sm sm:text-base md:text-lg text-[#abd1c6]">
           Управление заявками и статистика платформы
         </p>
       </div>
       
       {/* Навигация */}
-      <div className="flex flex-wrap gap-2">
-        <Link
-          href="/admin"
-          className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base bg-[#f9bc60] text-[#001e1d] font-semibold rounded-lg hover:bg-[#f9bc60]/90 transition-colors"
-        >
-          Заявки
-        </Link>
-        <Link
-          href="/admin/achievements"
-          className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
-        >
-          Достижения
-        </Link>
-        <Link
-          href="/admin/ads"
-          className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
-        >
-          Реклама
-        </Link>
-        <Link
-          href="/admin/reports"
-          className="px-3 py-2 text-sm lg:px-4 lg:py-2 lg:text-base bg-[#abd1c6] text-[#001e1d] font-semibold rounded-lg hover:bg-[#abd1c6]/90 transition-colors"
-        >
-          Жалобы
-        </Link>
+      <div className="flex flex-wrap gap-2 sm:gap-3">
+        {navLinks.map((link) => {
+          const isActive = pathname === link.href;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base font-bold rounded-lg sm:rounded-xl transition-all duration-300 ${
+                isActive
+                  ? "bg-[#f9bc60] text-[#001e1d] shadow-lg shadow-[#f9bc60]/30"
+                  : "bg-[#001e1d]/60 text-[#abd1c6] hover:bg-[#001e1d]/80 hover:text-[#fffffe] border border-[#abd1c6]/20"
+              }`}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
       </div>
-    </div>
+    </motion.div>
   );
 }
 

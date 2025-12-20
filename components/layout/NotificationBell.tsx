@@ -274,22 +274,15 @@ export default function NotificationBell() {
                       <div className="flex items-start gap-3">
                         {/* Аватар или иконка */}
                         <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#004643] flex items-center justify-center flex-shrink-0 border border-[#abd1c6]/20">
-                          {notification.avatar ? (
-                            <img
-                              src={notification.avatar}
-                              alt="Аватар"
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                // Скрываем изображение при ошибке и показываем fallback
-                                e.currentTarget.style.display = "none";
-                                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                                if (fallback) {
-                                  fallback.style.display = "flex";
-                                }
-                              }}
-                            />
-                          ) : null}
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${notification.avatar ? "hidden" : ""} ${
+                          <img
+                            src={notification.avatar || "/default-avatar.png"}
+                            alt="Аватар"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "/default-avatar.png";
+                            }}
+                          />
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center hidden ${
                             notification.type === "application_status" && notification.status === "APPROVED"
                               ? "bg-[#10B981]/20"
                               : notification.type === "application_status" && notification.status === "REJECTED"

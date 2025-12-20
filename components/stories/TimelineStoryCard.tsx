@@ -105,20 +105,14 @@ export function TimelineStoryCard({ story, index }: TimelineStoryCardProps) {
               {/* Author */}
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                  {story.user.avatar ? (
-                    <img
-                      src={story.user.avatar}
-                      alt="Аватар"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-600 dark:text-gray-400 font-bold">
-                      {(story.user.name ||
-                        (!story.user.hideEmail
-                          ? story.user.email
-                          : "Пользователь"))[0].toUpperCase()}
-                    </div>
-                  )}
+                  <img
+                    src={story.user.avatar || "/default-avatar.png"}
+                    alt="Аватар"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "/default-avatar.png";
+                    }}
+                  />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">

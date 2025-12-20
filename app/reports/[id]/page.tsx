@@ -217,17 +217,14 @@ export default function BugReportDetailPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-[#abd1c6]/20">
               <div className="flex items-center gap-4 text-sm text-[#abd1c6]">
                 <div className="flex items-center gap-2">
-                  {report.user.avatar ? (
-                    <img
-                      src={report.user.avatar}
-                      alt={report.user.name || "User"}
-                      className="w-8 h-8 rounded-full"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#004643] to-[#001e1d] flex items-center justify-center text-[#f9bc60] text-sm font-bold">
-                      {(report.user.name || report.user.email)[0].toUpperCase()}
-                    </div>
-                  )}
+                  <img
+                    src={report.user.avatar || "/default-avatar.png"}
+                    alt={report.user.name || "User"}
+                    className="w-8 h-8 rounded-full"
+                    onError={(e) => {
+                      e.currentTarget.src = "/default-avatar.png";
+                    }}
+                  />
                   <span className="font-medium">{report.user.name || report.user.email.split("@")[0]}</span>
                 </div>
                 <span>•</span>

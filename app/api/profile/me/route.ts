@@ -1,6 +1,7 @@
 // app/api/profile/me/route.ts
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { checkUserBan } from "@/lib/ban-check";
 
 type SocialLinkType = "vk" | "telegram" | "youtube";
 
@@ -105,6 +106,20 @@ export async function GET() {
     const session = await getSession();
     if (!session)
       return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+    // Проверяем блокировку пользователя
+    const banStatus = await checkUserBan(session.uid);
+    if (banStatus.isBanned) {
+      return Response.json({
+        error: "Banned",
+        banned: true,
+        banInfo: {
+          reason: banStatus.bannedReason,
+          until: banStatus.bannedUntil?.toISOString() || null,
+          isPermanent: banStatus.isPermanent,
+        },
+      }, { status: 403 });
+    }
 
     // Получаем пользователя без обновления lastSeen при каждом запросе
     const user = await prisma.user.findUnique({

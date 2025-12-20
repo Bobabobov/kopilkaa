@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { checkUserBan } from "@/lib/ban-check";
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +11,20 @@ export async function GET(request: NextRequest) {
 
     if (!session) {
       return NextResponse.json({ authorized: false }, { status: 401 });
+    }
+
+    // Проверяем блокировку пользователя
+    const banStatus = await checkUserBan(session.uid);
+    if (banStatus.isBanned) {
+      return NextResponse.json({
+        authorized: false,
+        banned: true,
+        banInfo: {
+          reason: banStatus.bannedReason,
+          until: banStatus.bannedUntil?.toISOString() || null,
+          isPermanent: banStatus.isPermanent,
+        },
+      }, { status: 403 });
     }
 
     // Получаем данные пользователя из базы

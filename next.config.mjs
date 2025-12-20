@@ -3,7 +3,11 @@ const nextConfig = {
   // Оптимизация производительности
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
+    optimizeCss: true,
   },
+  
+  // Отключение source maps в продакшене для ускорения
+  productionBrowserSourceMaps: false,
   
   // Оптимизация изображений
   images: {

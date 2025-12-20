@@ -146,9 +146,11 @@ export default function ApplicationPreview({
                 Подробная история
               </h3>
             </div>
-            <div className="text-[#fffffe] whitespace-pre-wrap break-words leading-relaxed max-w-full overflow-wrap-anywhere">
-              {story}
-            </div>
+            <div 
+              className="text-[#fffffe] break-words leading-relaxed max-w-full overflow-wrap-anywhere prose prose-sm max-w-none"
+              style={{ color: "#fffffe" }}
+              dangerouslySetInnerHTML={{ __html: story }}
+            />
           </div>
 
           {/* Сумма */}

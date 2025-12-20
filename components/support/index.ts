@@ -3,6 +3,7 @@ export { default as SupportToggle } from './SupportToggle';
 export { default as SubscriptionPlans } from './SubscriptionPlans';
 export { default as OneTimeSupport } from './OneTimeSupport';
 export { default as SupportBenefits } from './SupportBenefits';
+export { default as SupportFAQ } from './SupportFAQ';
 
 
 

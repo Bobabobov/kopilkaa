@@ -8,6 +8,8 @@ type Stats = {
   requests: number;
   approved: number;
   people: number;
+  supporters: number;
+  balance: number;
 };
 
 // Компонент для анимированного числа
@@ -39,20 +41,26 @@ export default function SupportHero() {
     requests: 0,
     approved: 0,
     people: 0,
+    supporters: 0,
+    balance: 0,
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Загружаем статистику
-    fetch("/api/stats", { cache: "no-store" })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.stats) {
+    Promise.all([
+      fetch("/api/stats", { cache: "no-store" }).then((res) => res.json()),
+      fetch("/api/heroes", { cache: "no-store" }).then((res) => res.json()),
+    ])
+      .then(([statsData, heroesData]) => {
+        if (statsData && statsData.stats) {
           const newStats = {
-            collected: 0, // Пока нет системы донатов
-            requests: data.stats.applications.total || 0,
-            approved: data.stats.applications.approved || 0,
-            people: data.stats.users.total || 0,
+            collected: statsData.stats.donations?.totalIn || 0,
+            requests: statsData.stats.applications.total || 0,
+            approved: statsData.stats.applications.approved || 0,
+            people: statsData.stats.users.total || 0,
+            supporters: heroesData?.total || 0,
+            balance: statsData.stats.donations?.balance || 0,
           };
           setStats(newStats);
         }
@@ -61,7 +69,7 @@ export default function SupportHero() {
       .finally(() => setLoading(false));
   }, []);
   return (
-    <section className="py-20 px-4 relative">
+    <section className="py-8 sm:py-10 px-3 sm:px-4 relative">
       <div className="max-w-6xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -69,7 +77,7 @@ export default function SupportHero() {
           transition={{ duration: 0.6 }}
         >
           <motion.h1
-            className="text-5xl md:text-7xl font-bold mb-6"
+            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-semibold mb-4 sm:mb-5 leading-tight"
             animate={{
               textShadow: [
                 "0 0 20px rgba(249, 188, 96, 0.3)",
@@ -86,37 +94,52 @@ export default function SupportHero() {
           </motion.h1>
           
           <p
-            className="text-xl md:text-2xl mb-12 leading-relaxed max-w-4xl mx-auto"
+            className="text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto px-2"
             style={{ color: "#abd1c6" }}
           >
-            Нравится проект? Помоги ему существовать.
+            Нравится проект? Помоги ему существовать и развиваться.
             {" "}
-            Деньги идут на поддержку авторов историй и развитие платформы.
+            Каждый рубль идёт на поддержку авторов историй.
             {" "}
-            <span className="text-[#f9bc60]">
-              Привяжи свои соцсети — мы аккуратно покажем их рядом с твоим именем среди донаторов.
+            <span className="text-[#f9bc60] font-medium">
+              Привяжи соцсети — они появятся рядом с твоим именем в списках донаторов.
             </span>
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-4xl mx-auto">
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-[#004643]/30 backdrop-blur-sm border border-[#abd1c6]/20 rounded-3xl p-6"
+              whileHover={{ scale: 1.03, y: -2 }}
+              className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/20 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg hover:border-[#abd1c6]/30 transition-all duration-300"
             >
-              <div className="text-3xl font-bold mb-2" style={{ color: "#f9bc60" }}>
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: "#f9bc60" }}>
                 {loading ? "0" : <AnimatedNumber value={stats.approved} />}
               </div>
-              <div style={{ color: "#abd1c6" }}>Поддержано историй</div>
+              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Поддержано историй</div>
             </motion.div>
             
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="bg-[#004643]/30 backdrop-blur-sm border border-[#abd1c6]/20 rounded-3xl p-6"
+              whileHover={{ scale: 1.03, y: -2 }}
+              className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/20 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg hover:border-[#abd1c6]/30 transition-all duration-300"
             >
-              <div className="text-3xl font-bold mb-2" style={{ color: "#f9bc60" }}>
-                0
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: "#f9bc60" }}>
+                {loading ? "0" : <AnimatedNumber value={stats.supporters} />}
               </div>
-              <div style={{ color: "#abd1c6" }}>Активных донатеров</div>
+              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Активных донатеров</div>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.03, y: -2 }}
+              className="bg-[#f9bc60]/10 backdrop-blur-sm border border-[#f9bc60]/30 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg transition-all duration-300 sm:col-span-2 md:col-span-1"
+            >
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: "#f9bc60" }}>
+                {loading ? "0" : (
+                  <span>
+                    <AnimatedNumber value={Math.floor(stats.balance / 1000)} />
+                    <span className="text-xl sm:text-2xl">К</span>
+                  </span>
+                )}
+              </div>
+              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Баланс копилки</div>
             </motion.div>
           </div>
         </motion.div>

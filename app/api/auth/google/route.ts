@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession, setSession } from "@/lib/auth";
+import { checkUserBan } from "@/lib/ban-check";
 
 interface GoogleAuthData {
   credential: string; // Google ID token
@@ -79,6 +80,23 @@ export async function POST(req: NextRequest) {
       : null;
 
     if (session && sessionUser) {
+      // Проверяем блокировку перед привязкой
+      const banStatus = await checkUserBan(sessionUser.id);
+      if (banStatus.isBanned) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Ваш аккаунт заблокирован",
+            banInfo: {
+              reason: banStatus.bannedReason,
+              until: banStatus.bannedUntil?.toISOString() || null,
+              isPermanent: banStatus.isPermanent,
+            },
+          },
+          { status: 403 }
+        );
+      }
+
       // Пользователь уже залогинен — привязываем Google к его аккаунту
       const updateData: any = {
         googleId,
@@ -177,6 +195,11 @@ export async function POST(req: NextRequest) {
         updateData.googleEmail = googleEmail;
       }
 
+      // Обновляем основной email, если его нет или он отличается от Google email
+      if (!user.email || user.email.toLowerCase() !== googleEmail.toLowerCase()) {
+        updateData.email = googleEmail;
+      }
+
       if (googlePicture && !user.avatar) {
         updateData.avatar = googlePicture;
       }
@@ -191,6 +214,23 @@ export async function POST(req: NextRequest) {
           data: updateData,
         });
       }
+    }
+
+    // Проверяем блокировку перед входом
+    const banStatus = await checkUserBan(user.id);
+    if (banStatus.isBanned) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Ваш аккаунт заблокирован",
+          banInfo: {
+            reason: banStatus.bannedReason,
+            until: banStatus.bannedUntil?.toISOString() || null,
+            isPermanent: banStatus.isPermanent,
+          },
+        },
+        { status: 403 }
+      );
     }
 
     await setSession({ uid: user.id, role: (user.role as any) || "USER" });

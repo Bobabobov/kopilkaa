@@ -10,7 +10,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 type UserLite = {
   id: string;
   name?: string | null;
-  email: string;
+  email: string | null;
   avatar?: string | null;
   lastSeen?: string | null;
 };

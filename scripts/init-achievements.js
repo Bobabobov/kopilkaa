@@ -3,7 +3,7 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
-// Базовые достижения
+// Полный список достижений из lib/achievements/config.ts
 const defaultAchievements = [
   // === ЗАЯВКИ ===
   {
@@ -68,6 +68,26 @@ const defaultAchievements = [
     maxCount: 1,
     isActive: true,
   },
+  {
+    name: 'Чемпион башни',
+    description: 'Постройте башню высотой 15+ блоков',
+    icon: 'Building2',
+    rarity: 'EPIC',
+    type: 'GAMES',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    name: 'Игроман',
+    description: 'Сыграйте в игры 50 раз',
+    icon: 'Target',
+    rarity: 'LEGENDARY',
+    type: 'GAMES',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
 
   // === СОЦИАЛЬНЫЕ ===
   {
@@ -75,6 +95,26 @@ const defaultAchievements = [
     description: 'Добавьте первого друга',
     icon: 'Heart',
     rarity: 'COMMON',
+    type: 'SOCIAL',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    name: 'Социальная бабочка',
+    description: 'Добавьте 10 друзей',
+    icon: 'Users',
+    rarity: 'RARE',
+    type: 'SOCIAL',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    name: 'Сердце сообщества',
+    description: 'Поставьте 50 лайков историям',
+    icon: 'Heart',
+    rarity: 'EPIC',
     type: 'SOCIAL',
     isExclusive: false,
     maxCount: 1,
@@ -92,6 +132,26 @@ const defaultAchievements = [
     maxCount: 1,
     isActive: true,
   },
+  {
+    name: 'Привычка',
+    description: 'Входите на сайт 7 дней подряд',
+    icon: 'Flame',
+    rarity: 'RARE',
+    type: 'STREAK',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    name: 'Преданность',
+    description: 'Входите на сайт 30 дней подряд',
+    icon: 'Flame',
+    rarity: 'LEGENDARY',
+    type: 'STREAK',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
 
   // === СООБЩЕСТВО ===
   {
@@ -100,6 +160,58 @@ const defaultAchievements = [
     icon: 'Heart',
     rarity: 'RARE',
     type: 'COMMUNITY',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    name: 'Ангел-хранитель',
+    description: 'Помогите 25 людям',
+    icon: 'Shield',
+    rarity: 'EPIC',
+    type: 'COMMUNITY',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    name: 'Герой сообщества',
+    description: 'Помогите 100 людям',
+    icon: 'Star',
+    rarity: 'LEGENDARY',
+    type: 'COMMUNITY',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+
+  // === ТВОРЧЕСТВО ===
+  {
+    name: 'Рассказчик',
+    description: 'Напишите историю длиннее 100 слов',
+    icon: 'FileText',
+    rarity: 'COMMON',
+    type: 'CREATIVITY',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    name: 'Мастер слова',
+    description: 'Напишите историю длиннее 500 слов',
+    icon: 'Edit3',
+    rarity: 'RARE',
+    type: 'CREATIVITY',
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    name: 'Вдохновение',
+    description: 'Ваша история получила 10+ лайков',
+    icon: 'Star',
+    rarity: 'EPIC',
+    type: 'CREATIVITY',
     isExclusive: false,
     maxCount: 1,
     isActive: true,
@@ -113,6 +225,26 @@ const defaultAchievements = [
     rarity: 'EXCLUSIVE',
     type: 'SPECIAL',
     isExclusive: true,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    name: 'Легенда',
+    description: 'Получите все остальные достижения',
+    icon: 'Crown',
+    rarity: 'EXCLUSIVE',
+    type: 'SPECIAL',
+    isExclusive: true,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    name: 'Благодарность',
+    description: 'Получили помощь от сообщества',
+    icon: 'Heart',
+    rarity: 'RARE',
+    type: 'SPECIAL',
+    isExclusive: false,
     maxCount: 1,
     isActive: true,
   },

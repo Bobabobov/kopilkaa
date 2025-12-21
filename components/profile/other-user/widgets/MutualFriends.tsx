@@ -9,7 +9,7 @@ import OtherUserFriendsModal from "../OtherUserFriendsModal";
 type UserLite = {
   id: string;
   name?: string | null;
-  email: string;
+  email: string | null;
   avatar?: string | null;
   lastSeen?: string | null;
 };

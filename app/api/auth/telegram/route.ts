@@ -111,7 +111,6 @@ export async function POST(req: NextRequest) {
 
     // Если пользователя ещё нет — автоматически регистрируем его
     if (!user) {
-      const pseudoEmail = `tg_${telegramId}@telegram.local`;
       const baseUsername = telegramUsername || `tg${telegramId}`;
       let username = baseUsername.toLowerCase();
 
@@ -128,7 +127,8 @@ export async function POST(req: NextRequest) {
       }
 
       const createData: any = {
-        email: pseudoEmail,
+        // Не устанавливаем email для пользователей Telegram - им почта не нужна
+        email: null,
         username,
         // создаём случайный пароль, т.к. вход по нему не предполагается
         passwordHash: "telegram-auto-user",

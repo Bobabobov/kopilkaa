@@ -18,7 +18,7 @@ import UniversalBackground from "@/components/ui/UniversalBackground";
 
 type User = {
   id: string;
-  email: string;
+  email: string | null;
   role: "USER" | "ADMIN";
   name?: string | null;
   createdAt: string;

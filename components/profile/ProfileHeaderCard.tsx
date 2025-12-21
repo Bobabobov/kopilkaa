@@ -16,7 +16,7 @@ import { getOverlayOpacity, getSecondaryTextColorForBackground, getTextColorForB
 
 type User = {
   id: string;
-  email: string;
+  email: string | null;
   role: "USER" | "ADMIN";
   name?: string | null;
   createdAt: string;
@@ -298,7 +298,7 @@ export default function ProfileHeaderCard({
                       <div className="-mt-10 sm:-mt-12 md:-mt-14 transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:shadow-none hover:brightness-100 [&_*]:transition-none [&_*]:duration-0 [&_*]:transform-none [&_*:hover]:transform-none">
                         <AvatarUpload
                           currentAvatar={currentAvatar}
-                          userName={user.name || (!user.hideEmail ? user.email : "Пользователь")}
+                          userName={user.name || (!user.hideEmail && user.email ? user.email : "Пользователь")}
                           avatarFrame={currentAvatarFrame}
                           onAvatarChange={(val) => {
                             setCurrentAvatar(val);
@@ -363,7 +363,9 @@ export default function ProfileHeaderCard({
                             {isOwner && (
                               <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[#abd1c6] text-[10px] sm:text-xs">
                                 <LucideIcons.Mail className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                                <span className="truncate max-w-[150px] sm:max-w-none">{user.hideEmail ? "Email скрыт" : user.email}</span>
+                                <span className="truncate max-w-[150px] sm:max-w-none">
+                                  {!user.email ? "Email не указан" : user.hideEmail ? "Email скрыт" : user.email}
+                                </span>
                               </span>
                             )}
                             <span className="inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs">

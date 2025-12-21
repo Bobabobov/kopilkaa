@@ -185,8 +185,7 @@ export default function TopDonors() {
                           }}
                         />
                       </div>
-                          {getRankIcon(1)}
-                        </div>
+                      {getRankIcon(1)}
                       <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#001e1d] border border-[#f9bc60]/80 text-[10px] text-[#f9bc60] shadow-sm">
                         #1
                       </div>

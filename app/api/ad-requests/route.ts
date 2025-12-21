@@ -72,8 +72,8 @@ export async function POST(request: NextRequest) {
         format,
         duration,
         bannerUrl: bannerUrl || null, // Для обратной совместимости
-        imageUrls: imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0 ? imageUrls : null,
-        mobileBannerUrls: mobileBannerUrls && Array.isArray(mobileBannerUrls) && mobileBannerUrls.length > 0 ? mobileBannerUrls : null,
+        imageUrls: imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0 ? imageUrls : undefined,
+        mobileBannerUrls: mobileBannerUrls && Array.isArray(mobileBannerUrls) && mobileBannerUrls.length > 0 ? mobileBannerUrls : undefined,
         comment: commentTrimmed,
         status: "new",
       },

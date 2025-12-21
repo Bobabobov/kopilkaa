@@ -111,8 +111,7 @@ export default function SupportFAQ() {
                     className="flex-shrink-0"
                   >
                     <LucideIcons.ChevronDown
-                      className="w-5 h-5 sm:w-6 sm:h-6 opacity-70"
-                      style={{ color: "#abd1c6" }}
+                      className="w-5 h-5 sm:w-6 sm:h-6 opacity-70 text-[#abd1c6]"
                     />
                   </motion.div>
                 </button>

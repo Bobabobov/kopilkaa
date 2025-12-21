@@ -27,6 +27,9 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
       setError("Telegram авторизация недоступна");
       return;
     }
+    
+    // Убираем @ из username, если он есть (Telegram Widget требует username без @)
+    const cleanBotUsername = botUsername.replace(/^@/, '');
 
     if (!containerRef.current) {
       console.warn("Контейнер для Telegram-виджета не найден");
@@ -40,7 +43,7 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     const script = document.createElement("script");
     script.src = "https://telegram.org/js/telegram-widget.js?22";
     script.async = true;
-    script.setAttribute("data-telegram-login", botUsername);
+    script.setAttribute("data-telegram-login", cleanBotUsername);
     script.setAttribute("data-size", "large");
     script.setAttribute("data-radius", "12");
     script.setAttribute("data-lang", "ru");

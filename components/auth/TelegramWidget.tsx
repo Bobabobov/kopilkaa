@@ -10,14 +10,26 @@ interface TelegramWidgetProps {
 }
 
 export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const modalContainerRef = useRef<HTMLDivElement | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showWidget, setShowWidget] = useState(false);
 
+  // Устанавливаем глобальный callback один раз
   useEffect(() => {
-    if (checkingAuth) return;
+    (window as any).onTelegramAuth = async (user: any) => {
+      console.log("Telegram auth callback called", user);
+      await onAuth(user);
+    };
+
+    return () => {
+      delete (window as any).onTelegramAuth;
+    };
+  }, [onAuth]);
+
+  // Загружаем виджет когда модалка открыта
+  useEffect(() => {
+    if (!showWidget || checkingAuth) return;
 
     const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
     if (!botUsername) {
@@ -31,14 +43,10 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     // Убираем @ из username, если он есть (Telegram Widget требует username без @)
     const cleanBotUsername = botUsername.replace(/^@/, '');
 
-    if (!containerRef.current) {
+    if (!modalContainerRef.current) {
       console.warn("Контейнер для Telegram-виджета не найден");
       return;
     }
-
-    (window as any).onTelegramAuth = async (user: any) => {
-      await onAuth(user);
-    };
 
     const script = document.createElement("script");
     script.src = "https://telegram.org/js/telegram-widget.js?22";
@@ -49,12 +57,6 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     script.setAttribute("data-lang", "ru");
     script.setAttribute("data-request-access", "write");
     script.setAttribute("data-onauth", "onTelegramAuth(user)");
-    
-    // Указываем домен для Telegram виджета (если задан)
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
-    if (siteUrl && siteUrl.startsWith('https://')) {
-      script.setAttribute("data-auth-url", siteUrl);
-    }
 
     script.onerror = () => {
       console.error("Не удалось загрузить Telegram Login Widget");
@@ -65,29 +67,19 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
       setIsReady(true);
     };
 
-    // Загружаем виджет в скрытый контейнер
-    const targetContainer = containerRef.current;
+    // Загружаем виджет напрямую в модальный контейнер
+    const targetContainer = modalContainerRef.current;
     if (targetContainer) {
       targetContainer.innerHTML = "";
       targetContainer.appendChild(script);
     }
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = "";
-      }
       if (modalContainerRef.current) {
         modalContainerRef.current.innerHTML = "";
       }
     };
-  }, [checkingAuth, onAuth]);
-
-  // Когда модальное окно открывается, копируем виджет в модальный контейнер
-  useEffect(() => {
-    if (showWidget && containerRef.current && modalContainerRef.current) {
-      modalContainerRef.current.innerHTML = containerRef.current.innerHTML;
-    }
-  }, [showWidget]);
+  }, [showWidget, checkingAuth]);
 
 
   // Если Telegram Bot Username не задан, показываем заглушку
@@ -126,12 +118,6 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
             </svg>
             <span className="relative z-10">Войти через Telegram</span>
           </motion.button>
-          
-          {/* Скрытый контейнер для загрузки Telegram виджета */}
-          <div
-            ref={containerRef}
-            className="hidden"
-          />
           
           {/* Модальное окно с Telegram виджетом */}
           {showWidget && (

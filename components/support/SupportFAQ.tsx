@@ -94,7 +94,9 @@ export default function SupportFAQ() {
                         border: `2px solid ${item.color}`,
                       }}
                     >
-                      <Icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: item.color }} />
+                      <span style={{ color: item.color }}>
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </span>
                     </div>
                     <h4
                       className="text-base sm:text-lg font-semibold flex-1"

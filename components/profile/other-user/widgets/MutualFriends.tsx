@@ -133,7 +133,7 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
               />
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold text-[#fffffe]">
-                  {u.name || u.email.split("@")[0]}
+                  {u.name || (u.email ? u.email.split("@")[0] : "Пользователь")}
                 </p>
                 {u.lastSeen && (
                   <p className="text-[10px] text-[#abd1c6]/70">

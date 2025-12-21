@@ -158,16 +158,18 @@ export default function OtherUserFriendsModal({
                     />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#004643] to-[#001e1d] text-[#f9bc60] flex items-center justify-center text-xs font-bold border border-[#f9bc60]/40">
-                      {(u.name || u.email.split("@")[0])[0].toUpperCase()}
+                      {(u.name || (u.email ? u.email.split("@")[0] : "П"))[0].toUpperCase()}
                     </div>
                   )}
                   <div className="min-w-0">
                     <p className="truncate text-xs font-medium text-[#fffffe]">
-                      {u.name || u.email.split("@")[0]}
+                      {u.name || (u.email ? u.email.split("@")[0] : "Пользователь")}
                     </p>
-                    <p className="text-[10px] text-[#abd1c6]/70 truncate">
-                      {u.email}
-                    </p>
+                    {u.email && (
+                      <p className="text-[10px] text-[#abd1c6]/70 truncate">
+                        {u.email}
+                      </p>
+                    )}
                   </div>
                 </Link>
               ))

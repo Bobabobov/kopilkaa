@@ -104,7 +104,7 @@ export default function SupportBenefits() {
             className="mb-4 sm:mb-5 mx-auto flex items-center justify-center w-16 h-16 sm:w-18 sm:h-18 rounded-full"
             style={{ backgroundColor: "#f9bc6020", border: "2px solid #f9bc60" }}
           >
-            <LucideIcons.Trophy className="w-8 h-8 sm:w-9 sm:h-9" style={{ color: "#f9bc60" }} />
+            <LucideIcons.Trophy className="w-8 h-8 sm:w-9 sm:h-9 text-[#f9bc60]" />
           </motion.div>
 
           <h4 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 sm:mb-4" style={{ color: "#fffffe" }}>

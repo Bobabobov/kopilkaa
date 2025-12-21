@@ -144,7 +144,7 @@ export default function BannedPage() {
                 }}
                 className="px-6 py-3 bg-[#001e1d] hover:bg-[#002724] text-[#abd1c6] font-semibold rounded-xl border border-[#abd1c6]/30 hover:border-[#f9bc60]/50 transition-all duration-200 flex items-center gap-2"
               >
-                <LucideIcons.LogOut size="sm" />
+                <LucideIcons.Logout size="sm" />
                 Выйти из аккаунта
               </button>
             </div>

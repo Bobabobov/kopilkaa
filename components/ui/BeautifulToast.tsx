@@ -138,33 +138,33 @@ export default function BeautifulToast({
             damping: 25,
             duration: 0.4,
           }}
-          className="fixed top-6 right-6 z-[9999]"
+          className="fixed top-4 right-4 sm:top-6 sm:right-6 left-4 sm:left-auto z-[9999] max-w-sm sm:max-w-xs mx-auto sm:mx-0"
         >
-          <div className="relative">
+          <div className="relative w-full">
             {/* Основная плашка */}
             <div
-              className={`relative ${config.bgColor} rounded-lg shadow-md border ${config.borderColor} p-3 max-w-xs backdrop-blur-sm`}
+              className={`relative ${config.bgColor} rounded-lg shadow-md border ${config.borderColor} p-3 sm:p-3 w-full backdrop-blur-sm`}
             >
               {/* Аккуратное внутреннее свечение */}
               <div
                 className={`absolute inset-0 rounded-lg bg-gradient-to-r ${config.gradient} opacity-5`}
               ></div>
-              <div className="relative z-10 flex items-start gap-2">
+              <div className="relative z-10 flex items-start gap-2 sm:gap-2">
                 <div className="flex-shrink-0">
                   <div
-                    className={`w-6 h-6 bg-gradient-to-r ${config.gradient} rounded-full flex items-center justify-center shadow-sm`}
+                    className={`w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-r ${config.gradient} rounded-full flex items-center justify-center shadow-sm`}
                   >
                     {config.icon}
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
-                    className={`text-xs font-semibold ${config.textColor} leading-tight`}
+                    className={`text-[11px] sm:text-xs font-semibold ${config.textColor} leading-tight break-words`}
                   >
                     {title}
                   </p>
                   {message && (
-                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5 leading-relaxed">
+                    <p className="text-[11px] sm:text-xs text-gray-600 dark:text-gray-300 mt-0.5 leading-relaxed break-words">
                       {message}
                     </p>
                   )}
@@ -172,9 +172,10 @@ export default function BeautifulToast({
                 <button
                   onClick={onClose}
                   className="flex-shrink-0 p-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                  aria-label="Закрыть уведомление"
                 >
                   <svg
-                    className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                    className="w-3 h-3 sm:w-3 sm:h-3 text-gray-500 dark:text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

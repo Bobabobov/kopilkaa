@@ -190,24 +190,24 @@ export default function ApplicationsModal({
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="mx-6 mb-4 p-3 rounded-lg text-sm font-medium shadow-lg"
+                className="mx-4 sm:mx-6 mb-4 p-2.5 sm:p-3 rounded-lg text-xs sm:text-sm font-medium shadow-lg"
                 style={{
                   background: "linear-gradient(135deg, #f9bc60, #fac570)",
                   color: "#001e1d",
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">
+                  <span className="text-base sm:text-lg flex-shrink-0">
                     {localNotification.type === "success"
                       ? "✅"
                       : localNotification.type === "error"
                         ? "❌"
                         : "ℹ️"}
                   </span>
-                  <div>
-                    <div className="font-bold">{localNotification.title}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold break-words">{localNotification.title}</div>
                     <div
-                      className="text-sm"
+                      className="text-xs sm:text-sm break-words"
                       style={{ color: "#001e1d", opacity: 0.8 }}
                     >
                       {localNotification.message}

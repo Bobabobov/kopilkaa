@@ -159,19 +159,19 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="mx-6 mb-4 p-4 rounded-xl shadow-lg"
+                className="mx-4 sm:mx-6 mb-4 p-3 sm:p-4 rounded-xl shadow-lg"
                 style={{
                   background:
                     "linear-gradient(to right, #abd1c6/20, #f9bc60/20)",
                   borderColor: "#abd1c6",
                 }}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: "#f9bc60" }}
                   >
-                    <span className="text-white text-sm">
+                    <span className="text-white text-xs sm:text-sm">
                       {localNotification.type === "success"
                         ? "✓"
                         : localNotification.type === "error"
@@ -179,11 +179,11 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                           : "ℹ"}
                     </span>
                   </div>
-                  <div>
-                    <div className="font-semibold" style={{ color: "#001e1d" }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm sm:text-base break-words" style={{ color: "#001e1d" }}>
                       {localNotification.title}
                     </div>
-                    <div className="text-sm" style={{ color: "#abd1c6" }}>
+                    <div className="text-xs sm:text-sm break-words" style={{ color: "#abd1c6" }}>
                       {localNotification.message}
                     </div>
                   </div>

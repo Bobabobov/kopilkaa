@@ -11,7 +11,7 @@ import ColorWheel from "./ColorWheel";
 
 interface User {
   id: string;
-  email: string;
+  email: string | null;
   role: "USER" | "ADMIN";
   name?: string | null;
   createdAt: string;

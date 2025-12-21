@@ -216,14 +216,14 @@ export default function NotificationBell() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 top-full mt-2 w-80 max-h-96 bg-gradient-to-br from-[#004643] to-[#001e1d] rounded-2xl shadow-2xl border border-[#abd1c6]/20 overflow-hidden z-50"
+            className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-[calc(100vw-2rem)] sm:max-w-none max-h-[calc(100vh-8rem)] sm:max-h-96 bg-gradient-to-br from-[#004643] to-[#001e1d] rounded-2xl shadow-2xl border border-[#abd1c6]/20 overflow-hidden z-50"
           >
             {/* Заголовок */}
-            <div className="p-4 border-b border-[#abd1c6]/20">
+            <div className="p-3 sm:p-4 border-b border-[#abd1c6]/20">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-[#fffffe]">Уведомления</h3>
+                <h3 className="text-base sm:text-lg font-bold text-[#fffffe]">Уведомления</h3>
                 {notifications.length > 0 && (
-                  <span className="text-xs text-[#abd1c6]/60">
+                  <span className="text-[11px] sm:text-xs text-[#abd1c6]/60">
                     {notifications.length} всего
                   </span>
                 )}
@@ -231,14 +231,14 @@ export default function NotificationBell() {
             </div>
 
             {/* Список уведомлений */}
-            <div className="max-h-80 overflow-y-auto">
+            <div className="max-h-[calc(100vh-12rem)] sm:max-h-80 overflow-y-auto">
               {loading ? (
-                <div className="p-6 text-center">
+                <div className="p-4 sm:p-6 text-center">
                   <LucideIcons.Loader2 className="text-[#abd1c6] animate-spin mx-auto mb-2" size="lg" />
                   <p className="text-sm text-[#abd1c6]">Загрузка...</p>
                 </div>
               ) : notifications.length === 0 ? (
-                <div className="p-6 text-center">
+                <div className="p-4 sm:p-6 text-center">
                   <LucideIcons.Bell className="text-[#abd1c6]/60 mx-auto mb-2" size="lg" />
                   <p className="text-sm text-[#abd1c6]">Нет уведомлений</p>
                 </div>
@@ -250,7 +250,7 @@ export default function NotificationBell() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="p-4 hover:bg-[#abd1c6]/5 transition-colors cursor-pointer"
+                      className="p-3 sm:p-4 hover:bg-[#abd1c6]/5 transition-colors cursor-pointer"
                       onClick={() => {
                         if (notification.type === "application_status" && notification.applicationId) {
                           // Для одобренных заявок переходим на страницу истории
@@ -271,9 +271,9 @@ export default function NotificationBell() {
                         }
                       }}
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-2 sm:gap-3">
                         {/* Аватар или иконка */}
-                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#004643] flex items-center justify-center flex-shrink-0 border border-[#abd1c6]/20">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-[#004643] flex items-center justify-center flex-shrink-0 border border-[#abd1c6]/20">
                           <img
                             src={notification.avatar || "/default-avatar.png"}
                             alt="Аватар"
@@ -296,14 +296,14 @@ export default function NotificationBell() {
                         {/* Контент */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-1">
-                            <h4 className="font-semibold text-[#fffffe] text-sm">
+                            <h4 className="font-semibold text-[#fffffe] text-xs sm:text-sm break-words">
                               {notification.title}
                             </h4>
-                            <span className="text-xs text-[#abd1c6]/60 flex-shrink-0">
+                            <span className="text-[10px] sm:text-xs text-[#abd1c6]/60 flex-shrink-0 ml-1">
                               {notification.timestamp}
                             </span>
                           </div>
-                          <p className="text-xs text-[#abd1c6] line-clamp-2">
+                          <p className="text-[11px] sm:text-xs text-[#abd1c6] line-clamp-2 break-words">
                             {notification.message}
                           </p>
                           
@@ -329,8 +329,8 @@ export default function NotificationBell() {
 
             {/* Футер */}
             {notifications.length > 0 && (
-              <div className="p-3 border-t border-[#abd1c6]/20 bg-[#001e1d]/50">
-                <button className="w-full text-xs text-[#abd1c6] hover:text-[#fffffe] transition-colors text-center py-1">
+              <div className="p-2 sm:p-3 border-t border-[#abd1c6]/20 bg-[#001e1d]/50">
+                <button className="w-full text-[11px] sm:text-xs text-[#abd1c6] hover:text-[#fffffe] transition-colors text-center py-1.5 sm:py-1">
                   Показать все уведомления
                 </button>
               </div>

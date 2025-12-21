@@ -217,11 +217,14 @@ export default function Header() {
             <NavAuth />
           </div>
 
-          {/* Кнопка мобильного меню */}
-          <HeaderMobileButton
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            isOpen={mobileMenuOpen}
-          />
+          {/* Правая часть для мобильных - колокольчик и бургер меню */}
+          <div className="flex sm:hidden items-center gap-2">
+            {isAuthenticated && !authLoading && <NotificationBell />}
+            <HeaderMobileButton
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              isOpen={mobileMenuOpen}
+            />
+          </div>
         </div>
       </header>
 
@@ -261,16 +264,11 @@ export default function Header() {
                   />
                 </div>
 
-                {/* Уведомления и авторизация для мобильных */}
+                {/* Авторизация для мобильных */}
                 <div className="pt-3 border-t border-white/15">
                   <div className="px-2 sm:px-4 space-y-3">
                     <NavAuth isMobile onLinkClick={() => setMobileMenuOpen(false)} />
                     <DonateButton isMobile={true} onLinkClick={() => setMobileMenuOpen(false)} />
-                    {isAuthenticated && !authLoading && (
-                      <div className="flex justify-center">
-                        <NotificationBell />
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>

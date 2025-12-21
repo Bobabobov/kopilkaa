@@ -65,7 +65,7 @@ export default function OneTimeSupport({
           className="text-center mb-6 sm:mb-8"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#e16162]/10 border border-[#e16162]/30 mb-3">
-            <LucideIcons.Zap className="w-4 h-4" style={{ color: "#e16162" }} />
+            <LucideIcons.Zap className="w-4 h-4 text-[#e16162]" />
             <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#e16162" }}>
               Разовая
             </span>
@@ -113,7 +113,7 @@ export default function OneTimeSupport({
                       transition={{ type: "spring", stiffness: 200, damping: 15 }}
                       className="absolute top-2 right-2"
                     >
-                      <LucideIcons.CheckCircle className="w-4 h-4" style={{ color: "#fffffe" }} />
+                      <LucideIcons.CheckCircle className="w-4 h-4 text-[#fffffe]" />
                     </motion.div>
                   )}
                   <div className="relative z-10">

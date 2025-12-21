@@ -3,7 +3,7 @@ const nextConfig = {
   // Оптимизация производительности
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
-    optimizeCss: true,
+    // optimizeCss: true, // Отключено из-за проблем с модулем critters
   },
   
   // Отключение source maps в продакшене для ускорения

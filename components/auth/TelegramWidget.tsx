@@ -58,14 +58,28 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     script.setAttribute("data-request-access", "write");
     script.setAttribute("data-onauth", "onTelegramAuth(user)");
 
+    // Добавляем таймаут для случая, когда скрипт не загружается
+    let timeoutId: NodeJS.Timeout | null = null;
+    
     script.onerror = () => {
       console.error("Не удалось загрузить Telegram Login Widget");
-      setError("Не удалось загрузить Telegram");
+      setError("Не удалось загрузить Telegram. Возможно, блокировщик рекламы или настройки приватности браузера блокируют загрузку. Попробуйте войти через Google или по почте.");
+      setIsReady(false);
+      if (timeoutId) clearTimeout(timeoutId);
     };
 
     script.onload = () => {
       setIsReady(true);
+      if (timeoutId) clearTimeout(timeoutId);
     };
+    
+    // Устанавливаем таймаут
+    timeoutId = setTimeout(() => {
+      if (!isReady) {
+        console.error("Таймаут загрузки Telegram Login Widget");
+        setError("Таймаут загрузки Telegram. Попробуйте войти через Google или по почте.");
+      }
+    }, 10000);
 
     // Загружаем виджет напрямую в модальный контейнер
     const targetContainer = modalContainerRef.current;
@@ -77,6 +91,9 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     return () => {
       if (modalContainerRef.current) {
         modalContainerRef.current.innerHTML = "";
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
     };
   }, [showWidget, checkingAuth]);

@@ -54,17 +54,18 @@ export default function Toast({
       initial={{ opacity: 0, y: -50, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -50, scale: 0.9 }}
-      className={`fixed top-4 right-4 z-[9999] pointer-events-auto ${getBgColor()} text-white px-6 py-4 rounded-xl shadow-2xl backdrop-blur-sm border border-white/20 max-w-sm`}
+      className={`fixed top-3 right-3 left-3 xs:top-4 xs:right-4 xs:left-auto sm:top-6 sm:right-6 z-[9999] pointer-events-auto ${getBgColor()} text-white px-4 py-3 xs:px-5 xs:py-3.5 sm:px-6 sm:py-4 rounded-lg xs:rounded-xl shadow-2xl backdrop-blur-sm border border-white/20 max-w-full xs:max-w-sm sm:max-w-md mx-auto xs:mx-0`}
     >
-      <div className="flex items-center gap-3">
-        <span className="text-xl">{getIcon()}</span>
-        <span className="font-medium">{message}</span>
+      <div className="flex items-center gap-2.5 xs:gap-3 sm:gap-3">
+        <span className="text-lg xs:text-xl sm:text-2xl flex-shrink-0">{getIcon()}</span>
+        <span className="font-medium text-sm xs:text-base sm:text-lg flex-1 min-w-0 break-words">{message}</span>
         <button
           onClick={onClose}
-          className="ml-2 text-white/80 hover:text-white transition-colors"
+          className="ml-1 xs:ml-2 text-white/80 hover:text-white transition-colors flex-shrink-0 p-1 rounded active:scale-95"
+          aria-label="Закрыть уведомление"
         >
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -98,7 +99,7 @@ export function useToast() {
   };
 
   const ToastContainer = () => (
-    <div className="fixed top-4 right-4 z-[9999] space-y-2 pointer-events-none">
+    <div className="fixed top-3 right-3 left-3 xs:top-4 xs:right-4 xs:left-auto sm:top-6 sm:right-6 z-[9999] space-y-2 xs:space-y-2.5 sm:space-y-3 pointer-events-none max-w-full xs:max-w-sm sm:max-w-md mx-auto xs:mx-0">
       <AnimatePresence>
         {toasts.map((toast) => (
           <div key={toast.id} className="pointer-events-auto">

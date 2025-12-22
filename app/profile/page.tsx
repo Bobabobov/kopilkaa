@@ -182,7 +182,6 @@ type User = {
   createdAt: string;
   avatar?: string | null;
   headerTheme?: string | null;
-  avatarFrame?: string | null;
   hideEmail?: boolean;
   vkLink?: string | null;
   telegramLink?: string | null;

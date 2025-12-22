@@ -51,18 +51,20 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
       initializeGoogle(clientId);
     } else {
       // Ждем загрузки скрипта (он загружается через Script компонент)
+      let timeoutId: NodeJS.Timeout | null = null;
       const checkInterval = setInterval(() => {
         if (window.google?.accounts?.id) {
+          if (timeoutId) clearTimeout(timeoutId);
           clearInterval(checkInterval);
           initializeGoogle(clientId);
         }
       }, 100);
       
       // Таймаут на 10 секунд
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         clearInterval(checkInterval);
         if (!window.google?.accounts?.id) {
-          setError("Таймаут загрузки Google Identity Services");
+          setError("Таймаут загрузки Google Identity Services. Возможно, блокировщик рекламы или настройки приватности браузера блокируют загрузку. Попробуйте войти через Telegram или по почте.");
           setLoading(false);
         }
       }, 10000);
@@ -112,6 +114,7 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
         containerRef.current.innerHTML = "";
       }
       initializedRef.current = false;
+      // Очистка таймаута будет выполнена в самом useEffect
     };
   }, [checkingAuth, onAuth]);
 
@@ -133,8 +136,17 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
           src="https://accounts.google.com/gsi/client"
           strategy="lazyOnload"
           onError={() => {
-            setError("Не удалось загрузить Google Identity Services");
+            setError("Не удалось загрузить Google Identity Services. Возможно, блокировщик рекламы или настройки приватности браузера блокируют загрузку. Попробуйте войти через Telegram или по почте.");
             setLoading(false);
+          }}
+          onLoad={() => {
+            // Даем время на инициализацию
+            setTimeout(() => {
+              if (!window.google?.accounts?.id && !error) {
+                setError("Google Identity Services не инициализирован. Попробуйте войти через Telegram или по почте.");
+                setLoading(false);
+              }
+            }, 2000);
           }}
         />
       )}

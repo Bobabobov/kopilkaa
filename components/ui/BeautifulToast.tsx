@@ -19,7 +19,7 @@ const toastConfig = {
   success: {
     icon: (
       <svg
-        className="w-4 h-4 text-white"
+        className="w-full h-full text-white"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -40,7 +40,7 @@ const toastConfig = {
   error: {
     icon: (
       <svg
-        className="w-5 h-5 text-white"
+        className="w-full h-full text-white"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -61,7 +61,7 @@ const toastConfig = {
   warning: {
     icon: (
       <svg
-        className="w-5 h-5 text-white"
+        className="w-full h-full text-white"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -82,7 +82,7 @@ const toastConfig = {
   info: {
     icon: (
       <svg
-        className="w-5 h-5 text-white"
+        className="w-full h-full text-white"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -138,44 +138,46 @@ export default function BeautifulToast({
             damping: 25,
             duration: 0.4,
           }}
-          className="fixed top-4 right-4 sm:top-6 sm:right-6 left-4 sm:left-auto z-[9999] max-w-sm sm:max-w-xs mx-auto sm:mx-0"
+          className="fixed top-3 right-3 left-3 xs:top-4 xs:right-4 xs:left-auto sm:top-6 sm:right-6 z-[9999] max-w-full xs:max-w-sm sm:max-w-md mx-auto xs:mx-0"
         >
           <div className="relative w-full">
             {/* Основная плашка */}
             <div
-              className={`relative ${config.bgColor} rounded-lg shadow-md border ${config.borderColor} p-3 sm:p-3 w-full backdrop-blur-sm`}
+              className={`relative ${config.bgColor} rounded-lg shadow-lg sm:shadow-xl border ${config.borderColor} p-3 xs:p-3.5 sm:p-4 w-full backdrop-blur-sm`}
             >
               {/* Аккуратное внутреннее свечение */}
               <div
                 className={`absolute inset-0 rounded-lg bg-gradient-to-r ${config.gradient} opacity-5`}
               ></div>
-              <div className="relative z-10 flex items-start gap-2 sm:gap-2">
+              <div className="relative z-10 flex items-start gap-2.5 xs:gap-3 sm:gap-3">
                 <div className="flex-shrink-0">
                   <div
-                    className={`w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-r ${config.gradient} rounded-full flex items-center justify-center shadow-sm`}
+                    className={`w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 bg-gradient-to-r ${config.gradient} rounded-full flex items-center justify-center shadow-sm`}
                   >
-                    {config.icon}
+                    <div className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4">
+                      {config.icon}
+                    </div>
                   </div>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 pr-1">
                   <p
-                    className={`text-[11px] sm:text-xs font-semibold ${config.textColor} leading-tight break-words`}
+                    className={`text-xs xs:text-sm sm:text-base font-semibold ${config.textColor} leading-tight break-words`}
                   >
                     {title}
                   </p>
                   {message && (
-                    <p className="text-[11px] sm:text-xs text-gray-600 dark:text-gray-300 mt-0.5 leading-relaxed break-words">
+                    <p className="text-xs xs:text-sm sm:text-sm text-gray-600 dark:text-gray-300 mt-1 xs:mt-1.5 leading-relaxed break-words">
                       {message}
                     </p>
                   )}
                 </div>
                 <button
                   onClick={onClose}
-                  className="flex-shrink-0 p-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                  className="flex-shrink-0 p-1 xs:p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 active:scale-95"
                   aria-label="Закрыть уведомление"
                 >
                   <svg
-                    className="w-3 h-3 sm:w-3 sm:h-3 text-gray-500 dark:text-gray-400"
+                    className="w-4 h-4 xs:w-4 xs:h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

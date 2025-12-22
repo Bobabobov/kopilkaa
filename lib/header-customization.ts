@@ -56,6 +56,24 @@ export const headerThemes = {
     accentColor: "text-pink-300",
     decoration: "abstract",
   },
+  pigg: {
+    name: "Pigg",
+    description: "Свинка",
+    background: "image",
+    image: "/header-themes/pigg.png",
+    textColor: "text-white",
+    accentColor: "text-pink-300",
+    decoration: "none",
+  },
+  test: {
+    name: "Test",
+    description: "Тестовая тема",
+    background: "image",
+    image: "/header-themes/test.png",
+    textColor: "text-white",
+    accentColor: "text-blue-300",
+    decoration: "none",
+  },
 };
 
 export const headerDecorations = {

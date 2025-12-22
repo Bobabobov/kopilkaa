@@ -77,9 +77,9 @@ export default function RichTextEditor({
   const textLength = getTextLength(editor.getHTML());
 
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`space-y-2 w-full max-w-full overflow-hidden ${className}`}>
       {/* Панель инструментов */}
-      <div className="flex flex-wrap gap-2 p-3 bg-[#001e1d]/40 rounded-xl border border-[#abd1c6]/20">
+      <div className="flex flex-wrap gap-2 p-3 bg-[#001e1d]/40 rounded-xl border border-[#abd1c6]/20 w-full max-w-full">
         {/* Жирный */}
         <button
           type="button"
@@ -226,14 +226,16 @@ export default function RichTextEditor({
       </div>
 
       {/* Редактор */}
-      <EditorContent
-        editor={editor}
-        className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus-within:border-[#f9bc60] focus-within:ring-2 focus-within:ring-[#f9bc60]/50 ${
-          editor.isFocused
-            ? "border-[#f9bc60] bg-[#abd1c6]/5"
-            : "border-[#abd1c6]/30 bg-[#004643]/50"
-        }`}
-      />
+      <div className="w-full max-w-full overflow-hidden">
+        <EditorContent
+          editor={editor}
+          className={`w-full max-w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus-within:border-[#f9bc60] focus-within:ring-2 focus-within:ring-[#f9bc60]/50 ${
+            editor.isFocused
+              ? "border-[#f9bc60] bg-[#abd1c6]/5"
+              : "border-[#abd1c6]/30 bg-[#004643]/50"
+          }`}
+        />
+      </div>
 
       {/* Стили для редактора */}
       <style jsx global>{`
@@ -242,6 +244,11 @@ export default function RichTextEditor({
           color: #fffffe;
           min-height: ${rows * 1.75}rem;
           line-height: 1.6;
+          word-wrap: break-word;
+          word-break: break-word;
+          overflow-wrap: break-word;
+          max-width: 100%;
+          overflow-x: hidden;
         }
         .ProseMirror ul,
         .ProseMirror ol {
@@ -249,6 +256,10 @@ export default function RichTextEditor({
           margin-top: 0.5rem;
           margin-bottom: 0.5rem;
           padding-left: 0;
+          max-width: 100%;
+          word-wrap: break-word;
+          word-break: break-word;
+          overflow-wrap: break-word;
         }
         .ProseMirror ul {
           list-style-type: disc;
@@ -259,6 +270,10 @@ export default function RichTextEditor({
         .ProseMirror li {
           margin-bottom: 0.25rem;
           display: list-item;
+          word-wrap: break-word;
+          word-break: break-word;
+          overflow-wrap: break-word;
+          max-width: 100%;
         }
         .ProseMirror h3 {
           font-size: 1.25rem;
@@ -266,9 +281,18 @@ export default function RichTextEditor({
           margin-top: 1rem;
           margin-bottom: 0.5rem;
           color: #fffffe;
+          word-wrap: break-word;
+          word-break: break-word;
+          overflow-wrap: break-word;
+          max-width: 100%;
+          line-height: 1.4;
         }
         .ProseMirror p {
           margin-bottom: 0.5rem;
+          word-wrap: break-word;
+          word-break: break-word;
+          overflow-wrap: break-word;
+          max-width: 100%;
         }
         .ProseMirror p.is-editor-empty:first-child::before {
           content: attr(data-placeholder);

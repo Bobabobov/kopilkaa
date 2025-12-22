@@ -127,8 +127,6 @@ export async function POST(req: NextRequest) {
       }
 
       const createData: any = {
-        // Не устанавливаем email для пользователей Telegram - им почта не нужна
-        email: null,
         username,
         // создаём случайный пароль, т.к. вход по нему не предполагается
         passwordHash: "telegram-auto-user",
@@ -137,6 +135,9 @@ export async function POST(req: NextRequest) {
         telegramId,
         telegramUsername,
         role: "USER",
+        // Устанавливаем email только если он не требуется (для совместимости со старыми схемами)
+        // Если в БД email обязателен, используем временный email на основе telegramId
+        email: `telegram-${telegramId}@telegram.local`,
       };
 
       // Сохраняем аватар из Telegram, если есть

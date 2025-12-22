@@ -225,7 +225,7 @@ export default function BugReportDetailPage() {
                       e.currentTarget.src = "/default-avatar.png";
                     }}
                   />
-                  <span className="font-medium">{report.user.name || report.user.email.split("@")[0]}</span>
+                  <span className="font-medium">{report.user.name || (report.user.email ? report.user.email.split("@")[0] : "Пользователь")}</span>
                 </div>
                 <span>•</span>
                 <div className="flex items-center gap-1.5">

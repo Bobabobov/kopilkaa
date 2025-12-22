@@ -44,7 +44,7 @@ export async function GET() {
 
         return {
           id: user.id,
-          name: user.name || user.email.split("@")[0],
+          name: user.name || (user.email ? user.email.split("@")[0] : "Пользователь"),
           avatar: user.avatar,
           totalDonated,
           donationCount,

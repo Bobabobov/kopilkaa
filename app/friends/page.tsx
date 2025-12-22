@@ -81,7 +81,7 @@ function FriendsTabContent({
 
                 <div className="flex-1 min-w-0">
                   <p className="text-[#fffffe] font-medium group-hover:underline truncate">
-                  {user.name || user.email.split("@")[0]}
+                  {user.name || (user.email ? user.email.split("@")[0] : "Пользователь")}
                 </p>
                 <p className="text-[#abd1c6] text-sm">
                   {getUserStatus(user.lastSeen ?? null).text}
@@ -203,14 +203,14 @@ function FriendsSearchContent({
                     />
                   ) : (
                     <span className="text-[#f9bc60] font-bold">
-                      {(user.name || user.email.split("@")[0])[0].toUpperCase()}
+                      {(user.name || (user.email ? user.email.split("@")[0] : "Пользователь"))[0].toUpperCase()}
                     </span>
                   )}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <p className="text-[#fffffe] font-medium group-hover:underline truncate">
-                    {user.name || user.email.split("@")[0]}
+                    {user.name || (user.email ? user.email.split("@")[0] : "Пользователь")}
                   </p>
                   <p className="text-[#abd1c6] text-sm">
                     {getUserStatus(user.lastSeen ?? null).text}

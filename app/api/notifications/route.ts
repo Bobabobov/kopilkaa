@@ -84,7 +84,7 @@ export async function GET() {
           id: `like_${like.userId}_${like.applicationId}`,
           type: "like",
           title: "Новый лайк",
-          message: `${like.user.name || like.user.email.split("@")[0]} лайкнул вашу историю "${like.application.title}"`,
+          message: `${like.user.name || (like.user.email ? like.user.email.split("@")[0] : "Пользователь")} лайкнул вашу историю "${like.application.title}"`,
           avatar: like.user.avatar,
           createdAt: like.createdAt,
           timestamp: formatTimeAgo(new Date(like.createdAt)),
@@ -146,7 +146,7 @@ export async function GET() {
 
     pendingFriendRequests.forEach((request) => {
       const requester = request.requester;
-      const displayName = requester.name || requester.email.split("@")[0];
+      const displayName = requester.name || (requester.email ? requester.email.split("@")[0] : "Пользователь");
 
       notifications.push({
         id: `friend_request_${request.id}`,

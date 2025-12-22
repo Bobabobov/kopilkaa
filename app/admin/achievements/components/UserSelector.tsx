@@ -39,8 +39,8 @@ export default function UserSelector({
     const searchTerm = userSearch.toLowerCase();
     return (
       user.name?.toLowerCase().includes(searchTerm) ||
-      user.email.toLowerCase().includes(searchTerm) ||
-      user.email.split('@')[0].toLowerCase().includes(searchTerm)
+      (user.email ? user.email.toLowerCase().includes(searchTerm) : false) ||
+      (user.email ? user.email.split('@')[0].toLowerCase() : "").includes(searchTerm)
     );
   });
 

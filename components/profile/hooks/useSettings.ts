@@ -11,7 +11,6 @@ type User = {
   name?: string | null;
   createdAt: string;
   avatar?: string | null;
-  avatarFrame?: string | null;
   hideEmail?: boolean;
   phone?: string | null;
   phoneVerified?: boolean;
@@ -59,7 +58,6 @@ interface UseSettingsReturn {
     link: string,
   ) => Promise<void>;
   handleAvatarChange: (avatarUrl: string | null) => void;
-  handleFrameChange: (frame: string) => void;
   handlePasswordChange: (
     oldPassword: string,
     newPassword: string,
@@ -355,15 +353,6 @@ export function useSettings(): UseSettingsReturn {
     [user],
   );
 
-  // Изменение рамки аватарки
-  const handleFrameChange = useCallback(
-    (frame: string) => {
-      if (user) {
-        setUser({ ...user, avatarFrame: frame });
-      }
-    },
-    [user],
-  );
 
   // Изменение пароля
   const handlePasswordChange = async (
@@ -539,7 +528,6 @@ export function useSettings(): UseSettingsReturn {
     handlePhoneChange,
     handleSocialLinkChange,
     handleAvatarChange,
-    handleFrameChange,
     handlePasswordChange,
     handlePasswordSubmit,
     cancelPasswordChange,

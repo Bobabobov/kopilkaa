@@ -6,17 +6,13 @@ import AvatarUpload from "@/components/profile/AvatarUpload";
 interface AvatarSectionProps {
   currentAvatar: string | null;
   userName: string;
-  avatarFrame?: string | null;
   onAvatarChange: (avatarUrl: string | null) => void;
-  onFrameChange?: (frame: string) => void;
 }
 
 export default function AvatarSection({
   currentAvatar,
   userName,
-  avatarFrame,
   onAvatarChange,
-  onFrameChange,
 }: AvatarSectionProps) {
   return (
     <motion.div
@@ -32,9 +28,7 @@ export default function AvatarSection({
           <AvatarUpload
             currentAvatar={currentAvatar}
             userName={userName}
-            avatarFrame={avatarFrame}
             onAvatarChange={onAvatarChange}
-            onFrameChange={onFrameChange}
           />
         </div>
       </div>

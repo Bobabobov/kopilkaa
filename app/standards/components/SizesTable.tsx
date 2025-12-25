@@ -5,31 +5,36 @@ import { motion } from 'framer-motion';
 const tableData = [
   {
     format: "Большой баннер",
-    container: "100% × 250px",
+    container: "100% × 250px (десктоп) / 300px (мобилка)",
     image: (
       <>
-        Десктоп: 1600–1920×180–250px<br/>
-        <span className="text-xs text-[#f9bc60]">Мобильный: 800–1080×200–300px</span>
+        Десктоп: 1400×250px (contain)<br/>
+        <span className="text-xs text-[#f9bc60]">Мобильный: 1080×300px (contain)</span>
       </>
     ),
-    maxImages: "2 (1+1)"
+    maxImages: "2 (десктоп + мобилка)"
   },
   {
-    format: "Блок на главной",
-    container: "320px × 160–192px",
-    image: "600–900×220–260px",
-    maxImages: "1"
-  },
-  {
-    format: "Рекламная история",
-    container: "Адаптивная ширина",
+    format: "Главная — блок под кнопками",
+    container: "до ~900px × 260px (десктоп) / карточка (мобилка)",
     image: (
       <>
-        Превью: 16:9 (h-208px)<br/>
-        <span className="text-xs">Основные: любые</span>
+        Десктоп: 900×260px<br/>
+        <span className="text-xs text-[#f9bc60]">Мобилка (опц.): иконка 256×256px+</span>
       </>
     ),
-    maxImages: "5"
+    maxImages: "1–2 (десктоп + мобилка опц.)"
+  },
+  {
+    format: "Раздел историй — рекламная история",
+    container: "Карточка: h-208px (превью) / страница истории",
+    image: (
+      <>
+        Превью: 16:9, 1280×720px+<br/>
+        <span className="text-xs">Внутри истории: до 5 изображений</span>
+      </>
+    ),
+    maxImages: "1 превью + до 5 в истории"
   },
   {
     format: "Telegram-пост",
@@ -42,6 +47,7 @@ const tableData = [
 export function SizesTable() {
   return (
     <motion.section
+      id="sizes"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-100px" }}

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 export function RequirementsSection() {
   return (
     <motion.section
+      id="requirements"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-100px" }}
@@ -51,6 +52,18 @@ export function RequirementsSection() {
                   <li>• <strong className="text-[#fffffe]">Форматы:</strong> JPG, PNG, WebP</li>
                   <li>• <strong className="text-[#fffffe]">Размер:</strong> до 5MB на изображение</li>
                   <li>• <strong className="text-[#fffffe]">Качество:</strong> HD</li>
+                </ul>
+              </div>
+
+              <div className="p-4 bg-[#004643]/30 rounded-xl border border-[#abd1c6]/5">
+                <h3 className="text-base font-semibold text-[#f9bc60] mb-2 flex items-center gap-2">
+                  <span>🎬</span>
+                  Видео (для большого баннера)
+                </h3>
+                <ul className="space-y-1.5 text-[#abd1c6] text-sm">
+                  <li>• <strong className="text-[#fffffe]">Форматы:</strong> MP4, WebM</li>
+                  <li>• <strong className="text-[#fffffe]">Размер:</strong> до 5MB на файл</li>
+                  <li>• <strong className="text-[#fffffe]">Показ:</strong> contain (видео целиком, без обрезки)</li>
                 </ul>
               </div>
             </div>

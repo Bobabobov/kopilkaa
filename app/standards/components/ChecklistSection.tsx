@@ -11,8 +11,8 @@ const basicInfo = [
 ];
 
 const contentMedia = [
-  "Изображения загружены или URL указаны",
-  "Для большого баннера: 2 изображения (1+1)",
+  "Креативы загружены файлом или указаны URL (изображение/видео — где доступно)",
+  "Большой баннер: 2 версии креатива (десктоп 1400×250 и мобилка 1080×300)",
   "Доп. информация заполнена (до 400 символов)",
   "Размеры изображений соответствуют требованиям",
   "Все файлы оптимизированы (до 5MB)"
@@ -21,6 +21,7 @@ const contentMedia = [
 export function ChecklistSection() {
   return (
     <motion.section
+      id="checklist"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-100px" }}

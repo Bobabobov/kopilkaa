@@ -32,7 +32,7 @@ export function StandardsHero() {
           </h1>
           
           <p className="text-base sm:text-lg md:text-xl text-[#abd1c6] max-w-2xl mx-auto leading-relaxed px-4">
-            Всё, что нужно знать для эффективной рекламы на платформе
+            Понятные требования к креативам, размерам и размещениям — без лишней воды
           </p>
         </motion.div>
       </div>

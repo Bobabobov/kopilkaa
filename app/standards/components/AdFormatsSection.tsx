@@ -7,6 +7,7 @@ import { adFormats } from './adFormatsData';
 export function AdFormatsSection() {
   return (
     <motion.section
+      id="formats"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-100px" }}
@@ -28,7 +29,7 @@ export function AdFormatsSection() {
             Форматы рекламы
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-[#abd1c6] max-w-2xl mx-auto px-4">
-            Четыре варианта размещения. Выберите подходящий формат для вашей рекламы
+            Актуальные форматы размещения и требования к креативам
           </p>
         </motion.div>
       </div>

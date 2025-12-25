@@ -38,8 +38,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Проверяем типы файлов
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    // Проверяем типы файлов (картинки + видео для TopBanner)
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "video/mp4",
+      "video/webm",
+    ];
     for (const file of files) {
       if (!allowedTypes.includes(file.type)) {
         return NextResponse.json(

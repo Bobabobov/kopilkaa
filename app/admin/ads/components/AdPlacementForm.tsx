@@ -7,7 +7,7 @@ import BannerMobileField from "./placement-form/BannerMobileField";
 import SidebarMobileFields from "./placement-form/SidebarMobileFields";
 import ContentField from "./placement-form/ContentField";
 import FormActions from "./placement-form/FormActions";
-import { useImageUpload, useMultipleImageUpload } from "./placement-form/useImageUpload";
+import { useImageUpload, useMultipleImageUpload, useVideoUpload } from "./placement-form/useImageUpload";
 
 interface AdPlacementFormProps {
   formData: AdFormData;
@@ -44,6 +44,34 @@ export default function AdPlacementForm({
     handleFileSelect: handleSidebarMobileImageFileSelect,
     clearPreview: clearSidebarMobileImage,
   } = useImageUpload();
+
+  const {
+    uploading: uploadingBannerImage,
+    previewFile: bannerImageFile,
+    handleFileSelect: handleBannerImageFileSelect,
+    clearPreview: clearBannerImage,
+  } = useImageUpload();
+
+  const {
+    uploading: uploadingBannerMobileImage,
+    previewFile: bannerMobileImageFile,
+    handleFileSelect: handleBannerMobileImageFileSelect,
+    clearPreview: clearBannerMobileImage,
+  } = useImageUpload();
+
+  const {
+    uploading: uploadingBannerVideo,
+    previewFile: bannerVideoFile,
+    handleFileSelect: handleBannerVideoFileSelect,
+    clearPreview: clearBannerVideo,
+  } = useVideoUpload();
+
+  const {
+    uploading: uploadingBannerMobileVideo,
+    previewFile: bannerMobileVideoFile,
+    handleFileSelect: handleBannerMobileVideoFileSelect,
+    clearPreview: clearBannerMobileVideo,
+  } = useVideoUpload();
 
   const {
     uploading: uploadingStoryImages,
@@ -116,6 +144,70 @@ export default function AdPlacementForm({
     updateField("sidebarMobileImageUrl", "");
   };
 
+  const handleBannerImageFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleBannerImageFileSelect(e, (url) => {
+      updateField("imageUrl", url);
+    });
+  };
+
+  const handleBannerImageUrlChange = (url: string) => {
+    updateField("imageUrl", url);
+    clearBannerImage();
+  };
+
+  const handleBannerImageRemove = () => {
+    clearBannerImage();
+    updateField("imageUrl", "");
+  };
+
+  const handleBannerMobileImageFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleBannerMobileImageFileSelect(e, (url) => {
+      updateField("bannerMobileImageUrl", url);
+    });
+  };
+
+  const handleBannerMobileImageUrlChange = (url: string) => {
+    updateField("bannerMobileImageUrl", url);
+    clearBannerMobileImage();
+  };
+
+  const handleBannerMobileImageRemove = () => {
+    clearBannerMobileImage();
+    updateField("bannerMobileImageUrl", "");
+  };
+
+  const handleBannerVideoFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleBannerVideoFileSelect(e, (url) => {
+      updateField("bannerVideoUrl", url);
+    });
+  };
+
+  const handleBannerVideoUrlChange = (url: string) => {
+    updateField("bannerVideoUrl", url);
+    clearBannerVideo();
+  };
+
+  const handleBannerVideoRemove = () => {
+    clearBannerVideo();
+    updateField("bannerVideoUrl", "");
+  };
+
+  const handleBannerMobileVideoFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleBannerMobileVideoFileSelect(e, (url) => {
+      updateField("bannerMobileVideoUrl", url);
+    });
+  };
+
+  const handleBannerMobileVideoUrlChange = (url: string) => {
+    updateField("bannerMobileVideoUrl", url);
+    clearBannerMobileVideo();
+  };
+
+  const handleBannerMobileVideoRemove = () => {
+    clearBannerMobileVideo();
+    updateField("bannerMobileVideoUrl", "");
+  };
+
   const handleStoryImageFileSelectWrapper = (
     index: number,
     e: React.ChangeEvent<HTMLInputElement>
@@ -149,14 +241,18 @@ export default function AdPlacementForm({
               ? previewImageFile
               : formData.placement === "home_sidebar"
                 ? sidebarImageFile
-                : undefined
+                : formData.placement === "home_banner"
+                  ? bannerImageFile
+                  : undefined
           }
           uploadingPreview={
             formData.placement === "stories"
               ? uploadingPreview
               : formData.placement === "home_sidebar"
                 ? uploadingSidebarImage
-                : undefined
+                : formData.placement === "home_banner"
+                  ? uploadingBannerImage
+                  : undefined
           }
           onFieldChange={updateField}
           onPreviewFileSelect={
@@ -164,21 +260,27 @@ export default function AdPlacementForm({
               ? handlePreviewFileSelectWrapper
               : formData.placement === "home_sidebar"
                 ? handleSidebarImageFileSelectWrapper
-                : undefined
+                : formData.placement === "home_banner"
+                  ? handleBannerImageFileSelectWrapper
+                  : undefined
           }
           onPreviewUrlChange={
             formData.placement === "stories"
               ? handlePreviewUrlChange
               : formData.placement === "home_sidebar"
                 ? handleSidebarImageUrlChange
-                : undefined
+                : formData.placement === "home_banner"
+                  ? handleBannerImageUrlChange
+                  : undefined
           }
           onPreviewRemove={
             formData.placement === "stories"
               ? handlePreviewRemove
               : formData.placement === "home_sidebar"
                 ? handleSidebarImageRemove
-                : undefined
+                : formData.placement === "home_banner"
+                  ? handleBannerImageRemove
+                  : undefined
           }
         />
 
@@ -196,7 +298,25 @@ export default function AdPlacementForm({
         )}
 
         {formData.placement === "home_banner" && (
-          <BannerMobileField formData={formData} onFieldChange={updateField} />
+          <BannerMobileField
+            formData={formData}
+            previewImageFile={bannerMobileImageFile}
+            uploadingPreview={uploadingBannerMobileImage}
+            onFieldChange={updateField}
+            onMobileImageFileSelect={handleBannerMobileImageFileSelectWrapper}
+            onMobileImageUrlChange={handleBannerMobileImageUrlChange}
+            onMobileImageRemove={handleBannerMobileImageRemove}
+            bannerVideoPreviewFile={bannerVideoFile}
+            uploadingBannerVideo={uploadingBannerVideo}
+            onBannerVideoFileSelect={handleBannerVideoFileSelectWrapper}
+            onBannerVideoUrlChange={handleBannerVideoUrlChange}
+            onBannerVideoRemove={handleBannerVideoRemove}
+            bannerMobileVideoPreviewFile={bannerMobileVideoFile}
+            uploadingBannerMobileVideo={uploadingBannerMobileVideo}
+            onBannerMobileVideoFileSelect={handleBannerMobileVideoFileSelectWrapper}
+            onBannerMobileVideoUrlChange={handleBannerMobileVideoUrlChange}
+            onBannerMobileVideoRemove={handleBannerMobileVideoRemove}
+          />
         )}
 
         {formData.placement === "home_sidebar" && (

@@ -76,6 +76,8 @@ export function middleware(req: NextRequest) {
       "style-src 'self' 'unsafe-inline' https://accounts.google.com", // TailwindCSS требует unsafe-inline, Google OAuth требует стили
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
+      // Разрешаем загрузку видео с внешних источников
+      "media-src 'self' blob: data: https:",
       // Разрешаем запросы к Telegram OAuth и Google OAuth (для виджета входа)
       "connect-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com",
       // Разрешаем встраивать iframe Telegram OAuth и Google OAuth

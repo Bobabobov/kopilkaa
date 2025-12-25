@@ -28,7 +28,8 @@ export default function BasicFields({
   const showImageUrl = formData.placement !== "stories";
   const isStories = formData.placement === "stories";
   const isHomeSidebar = formData.placement === "home_sidebar";
-  const showImageUpload = isStories || isHomeSidebar;
+  const isHomeBanner = formData.placement === "home_banner";
+  const showImageUpload = isStories || isHomeSidebar || isHomeBanner;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -71,7 +72,9 @@ export default function BasicFields({
               ? "Картинка для превью в /stories"
               : isHomeSidebar
                 ? "Изображение для блока под кнопками"
-                : "URL изображения (опционально)"}
+                : isHomeBanner
+                  ? "Изображение для большого баннера (десктоп)"
+                  : "URL изображения (опционально)"}
           </label>
           {showImageUpload &&
           previewImageFile !== undefined &&
@@ -86,7 +89,7 @@ export default function BasicFields({
               onFileSelect={onPreviewFileSelect}
               onUrlChange={onPreviewUrlChange}
               onRemove={onPreviewRemove}
-              inputId={isStories ? "stories-preview-image-upload" : "sidebar-desktop-image-upload"}
+              inputId={isStories ? "stories-preview-image-upload" : isHomeSidebar ? "sidebar-desktop-image-upload" : "banner-desktop-image-upload"}
             />
           ) : (
             <input

@@ -73,11 +73,10 @@ export default function Header() {
   }, []);
 
   // Синхронизация Header с TopBanner при скролле (только на десктопе)
+  // Важно: не привязываемся к querySelector('[data-top-banner]') на маунте,
+  // потому что TopBanner может появляться позже (после загрузки рекламы).
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    const topBanner = document.querySelector('[data-top-banner]') as HTMLElement | null;
-    if (!topBanner) return;
 
     const handleScroll = () => {
       // Используем CSS media query через matchMedia вместо window.innerWidth
@@ -86,8 +85,12 @@ export default function Header() {
       if (!isDesktop) return;
 
       const scrollY = window.scrollY;
-      const bannerHeight = topBanner.offsetHeight;
-      const hideProgress = Math.min(scrollY / bannerHeight, 1);
+      const cssValue = getComputedStyle(document.documentElement)
+        .getPropertyValue("--top-banner-height")
+        .trim();
+      const bannerHeight = Number.parseFloat(cssValue || "0") || 0;
+      const hideProgress =
+        bannerHeight > 0 ? Math.min(scrollY / bannerHeight, 1) : 1;
       
       if (headerRef.current) {
         const newTop = bannerHeight * (1 - hideProgress);

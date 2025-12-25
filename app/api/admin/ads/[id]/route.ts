@@ -29,18 +29,32 @@ export async function PUT(
       config,
     } = await request.json();
 
-    const ad = await prisma.advertisement.update({
-      where: { id },
-      data: {
-        title,
-        content,
-        imageUrl,
-        linkUrl,
-        expiresAt: expiresAt ? new Date(expiresAt) : null,
-        isActive,
-        placement: placement || "home_sidebar",
-        config: config || null,
-      },
+    const finalPlacement: string = placement || "home_sidebar";
+    const finalIsActive: boolean = !!isActive;
+
+    // Гарантируем "один активный баннер на слот" для home_banner:
+    // если этот баннер становится активным home_banner — деактивируем остальные активные home_banner.
+    const ad = await prisma.$transaction(async (tx) => {
+      if (finalPlacement === "home_banner" && finalIsActive) {
+        await tx.advertisement.updateMany({
+          where: { placement: "home_banner", isActive: true, NOT: { id } },
+          data: { isActive: false },
+        });
+      }
+
+      return tx.advertisement.update({
+        where: { id },
+        data: {
+          title,
+          content,
+          imageUrl,
+          linkUrl,
+          expiresAt: expiresAt ? new Date(expiresAt) : null,
+          isActive: finalIsActive,
+          placement: finalPlacement,
+          config: config || null,
+        },
+      });
     });
 
     return NextResponse.json({ ad });

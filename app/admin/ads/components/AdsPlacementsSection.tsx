@@ -26,6 +26,8 @@ export default function AdsPlacementsSection() {
     advertiserName: "",
     advertiserLink: "",
     bannerMobileImageUrl: "",
+    bannerVideoUrl: "",
+    bannerMobileVideoUrl: "",
     sidebarMobileImageUrl: "",
     sidebarMobileTitle: "",
     sidebarMobileContent: "",
@@ -78,6 +80,8 @@ export default function AdsPlacementsSection() {
       } else if (formData.placement === "home_banner") {
         config = {
           bannerMobileImageUrl: formData.bannerMobileImageUrl || undefined,
+          bannerVideoUrl: formData.bannerVideoUrl || undefined,
+          bannerMobileVideoUrl: formData.bannerMobileVideoUrl || undefined,
         };
       } else if (formData.placement === "home_sidebar") {
         config = {
@@ -141,6 +145,8 @@ export default function AdsPlacementsSection() {
       advertiserName: ad.config?.advertiserName || "",
       advertiserLink: ad.config?.advertiserLink || "",
       bannerMobileImageUrl: ad.config?.bannerMobileImageUrl || "",
+      bannerVideoUrl: ad.config?.bannerVideoUrl || "",
+      bannerMobileVideoUrl: ad.config?.bannerMobileVideoUrl || "",
       sidebarMobileImageUrl: ad.config?.sidebarMobileImageUrl || "",
       sidebarMobileTitle: ad.config?.sidebarMobileTitle || "",
       sidebarMobileContent: ad.config?.sidebarMobileContent || "",
@@ -185,6 +191,8 @@ export default function AdsPlacementsSection() {
       advertiserName: "",
       advertiserLink: "",
       bannerMobileImageUrl: "",
+      bannerVideoUrl: "",
+      bannerMobileVideoUrl: "",
       sidebarMobileImageUrl: "",
       sidebarMobileTitle: "",
       sidebarMobileContent: "",

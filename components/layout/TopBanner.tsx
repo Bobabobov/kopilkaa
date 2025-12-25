@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface TopBannerProps {
@@ -9,9 +9,21 @@ interface TopBannerProps {
   variant?: "default" | "success" | "warning" | "info";
 }
 
+type ResolvedAsset = {
+  type: "video" | "image" | null;
+  url: string | null;
+};
+
+type ResolvedBannerResponse = {
+  desktop: ResolvedAsset;
+  mobile: ResolvedAsset;
+  content: string | null;
+  linkUrl: string | null;
+} | null;
+
 export default function TopBanner({
-  content = "🎉 Добро пожаловать на Копилку! Разместите свою рекламу и получите больше клиентов",
-  linkUrl = "/advertising",
+  content,
+  linkUrl,
   isDismissible = true,
   variant = "default"
 }: TopBannerProps) {
@@ -20,9 +32,16 @@ export default function TopBanner({
   const [isHidden, setIsHidden] = useState(false);
   const [adContent, setAdContent] = useState<string | null>(null);
   const [adLink, setAdLink] = useState<string | null>(null);
-  const [adImageUrl, setAdImageUrl] = useState<string | null>(null);
-  const [desktopImageUrl, setDesktopImageUrl] = useState<string | null>(null);
-  const [mobileImageUrl, setMobileImageUrl] = useState<string | null>(null);
+  const [hasActiveAd, setHasActiveAd] = useState(false);
+  const [desktopAsset, setDesktopAsset] = useState<ResolvedAsset>({
+    type: null,
+    url: null,
+  });
+  const [mobileAsset, setMobileAsset] = useState<ResolvedAsset>({
+    type: null,
+    url: null,
+  });
+  const [isMobile, setIsMobile] = useState(false);
   const bannerRef = useRef<HTMLDivElement>(null);
 
 
@@ -37,79 +56,52 @@ export default function TopBanner({
     }
   }, []);
 
-  // Загружаем рекламный баннер (тип размещения home_banner)
+  // Загружаем рекламный баннер (тип размещения home_banner) — через универсальный API
   useEffect(() => {
     const fetchBannerAd = async () => {
       try {
-        const response = await fetch("/api/ads/banner");
+        const response = await fetch("/api/ads?placement=home_banner", {
+          cache: "no-store",
+        });
         if (!response.ok) return;
 
-        const data = await response.json();
-        const ad = data.ad as
-          | {
-              title?: string;
-              content?: string;
-              linkUrl?: string | null;
-              imageUrl?: string | null;
-              config?: {
-                bannerMobileImageUrl?: string | null;
-              } | null;
-            }
-          | null;
+        const data = (await response.json()) as ResolvedBannerResponse;
 
-        if (ad) {
-          setAdContent(ad.content || ad.title || null);
-          setAdLink(ad.linkUrl ?? null);
-
-          // Базовое изображение (десктоп)
-          const fallbackImage = "/gabriel-cardinal-goosebumps-patreon.gif";
-          const desktop =
-            (ad.imageUrl && ad.imageUrl.trim()) || fallbackImage;
-
-          // Мобильное — отдельное поле или тот же баннер
-          const mobile =
-            (ad.config?.bannerMobileImageUrl &&
-              ad.config.bannerMobileImageUrl.trim()) ||
-            desktop;
-
-          setDesktopImageUrl(desktop);
-          setMobileImageUrl(mobile);
-        } else {
-          setDesktopImageUrl(null);
-          setMobileImageUrl(null);
+        if (!data) {
+          setHasActiveAd(false);
+          setDesktopAsset({ type: null, url: null });
+          setMobileAsset({ type: null, url: null });
+          setAdContent(null);
+          setAdLink(null);
+          return;
         }
+
+        setHasActiveAd(true);
+        setDesktopAsset(data.desktop);
+        setMobileAsset(data.mobile);
+        setAdContent(data.content);
+        setAdLink(data.linkUrl);
       } catch (error) {
         console.error("Error loading top banner ad:", error);
+        setHasActiveAd(false);
       }
     };
 
     fetchBannerAd();
   }, []);
 
-  // Выбираем подходящее изображение через CSS media queries
+  // Определяем mobile/desktop (767/768) и обновляем состояние
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const chooseImage = () => {
-      if (!desktopImageUrl && !mobileImageUrl) {
-        setAdImageUrl(null);
-        return;
-      }
-
-      // Используем matchMedia вместо window.innerWidth
-      const isMobile = window.matchMedia("(max-width: 767px)").matches;
-      if (isMobile) {
-        setAdImageUrl(mobileImageUrl || desktopImageUrl);
-      } else {
-        setAdImageUrl(desktopImageUrl || mobileImageUrl);
-      }
+    const updateIsMobile = () => {
+      setIsMobile(window.matchMedia("(max-width: 767px)").matches);
     };
-
-    chooseImage();
+    updateIsMobile();
 
     // Используем matchMedia для отслеживания изменений
     const mobileQuery = window.matchMedia("(max-width: 767px)");
-    const handleChange = () => chooseImage();
+    const handleChange = () => updateIsMobile();
     
     // Современный способ через addEventListener
     if (mobileQuery.addEventListener) {
@@ -120,7 +112,7 @@ export default function TopBanner({
       mobileQuery.addListener(handleChange);
       return () => mobileQuery.removeListener(handleChange);
     }
-  }, [desktopImageUrl, mobileImageUrl]);
+  }, []);
 
   // Устанавливаем CSS-переменную для высоты TopBanner
   useEffect(() => {
@@ -142,15 +134,17 @@ export default function TopBanner({
       resizeObserver.observe(bannerRef.current);
     }
 
-    return () => {
-      window.removeEventListener("resize", updateBannerHeight);
-      resizeObserver.disconnect();
-    };
-  }, [isVisible, adImageUrl]);
+      return () => {
+        window.removeEventListener("resize", updateBannerHeight);
+        resizeObserver.disconnect();
+      };
+  }, [isVisible, isMobile, desktopAsset.url, mobileAsset.url]);
 
   // Отслеживаем скролл для постепенного скрытия баннера (только на десктопе)
   useEffect(() => {
-    if (typeof window === "undefined" || !bannerRef.current) return;
+    if (typeof window === "undefined") return;
+    if (!isVisible) return;
+    if (!bannerRef.current) return;
 
     // Используем matchMedia вместо window.innerWidth
     const desktopQuery = window.matchMedia("(min-width: 768px)");
@@ -158,17 +152,17 @@ export default function TopBanner({
     const handleScroll = () => {
       // Проверяем через matchMedia, а не через window.innerWidth
       if (!desktopQuery.matches) return;
-
+      
       const banner = bannerRef.current;
       if (!banner) return;
-      
+
       const bannerHeight = banner.offsetHeight;
       const scrollY = window.scrollY;
       
       // Рассчитываем процент скрытия баннера
       const hideProgress = Math.min(scrollY / bannerHeight, 1);
       
-      // Применяем transform для плавного скрытия
+      // Применяем transform для плавного скрытия (как было до изменений)
       const translateY = -(hideProgress * 100);
       banner.style.transform = `translateY(${translateY}%)`;
     };
@@ -201,7 +195,7 @@ export default function TopBanner({
         desktopQuery.removeListener(handleMediaChange);
       }
     };
-  }, [adImageUrl]);
+  }, [isVisible]);
 
   const handleClose = () => {
     if (!isDismissible) return;
@@ -250,72 +244,112 @@ export default function TopBanner({
 
   const styles = getVariantStyles();
 
-  const finalContent = adContent || content;
-  const finalLinkUrl = adLink || linkUrl;
-  const hasImage = !!adImageUrl;
+  const finalContent = adContent ?? content ?? null;
+  const finalLinkUrl = adLink ?? linkUrl ?? null;
+  const activeAsset = isMobile ? mobileAsset : desktopAsset;
+  const hasVideo = activeAsset.type === "video" && !!activeAsset.url;
+  const hasImage = activeAsset.type === "image" && !!activeAsset.url;
+  const fallbackImageUrl = isMobile ? "/mobilefod.png" : "/fonnn.png";
+  const hasMedia = hasVideo || hasImage;
+  const shouldUseFallbackCreative = !hasMedia;
+  const creativeIsVideo = hasVideo;
+  const creativeUrl =
+    (hasVideo ? activeAsset.url : hasImage ? activeAsset.url : fallbackImageUrl) ||
+    fallbackImageUrl;
+
+  // Ссылка клика:
+  // - если активной рекламы нет => заглушка ведёт на /advertising
+  // - если реклама есть => ведём только на ссылку из админки (если задана)
+  const clickUrl = hasActiveAd ? (adLink ?? null) : "/advertising";
 
   const handleBannerClick = () => {
-    if (!finalLinkUrl) return;
+    if (!clickUrl) return;
     if (typeof window === "undefined") return;
-    window.location.href = finalLinkUrl;
+    window.location.href = clickUrl;
   };
 
   if (!isVisible) return null;
+  // Если нет активной рекламы — показываем фоновую картинку из /public (desktop: fonnn.png, mobile: mobilefod.png)
+  // Если нет вообще ничего и fallback вдруг отсутствует — скрываем баннер
+  if (!hasMedia && !finalContent && !finalLinkUrl && !fallbackImageUrl) return null;
 
   return (
     <div
       ref={bannerRef}
       data-top-banner
       data-has-image={hasImage ? "true" : "false"}
-      className={`top-banner-component ${
-        styles.bg
+      className={`top-banner-component h-[300px] md:h-[250px] ${
+        variant === "default" ? "bg-[#eef1f4]" : styles.bg
       } ${styles.border} border-b shadow-lg overflow-hidden ${
         isAnimating ? "" : 
         isHidden ? "" : 
         ""
-      } ${finalLinkUrl ? "cursor-pointer" : ""}`}
+      } ${clickUrl ? "cursor-pointer" : ""}`}
       style={{ 
-        background:
-          variant === "default" && !hasImage
-          ? "linear-gradient(135deg, #004643 0%, #001e1d 100%)"
-            : "#001e1d",
+        // Фон большого баннера (variant=default) всегда нейтральный, как на vc.ru
+        backgroundColor: variant === "default" ? "#eef1f4" : "#001e1d",
+        backgroundImage:
+          variant === "default" ? "none" : undefined,
         transform: isAnimating ? "translateY(-100%)" : undefined,
         transition: isAnimating ? "transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)" : "none",
         willChange: "transform",
       }}
       onClick={handleBannerClick}
     >
-      {/* Фоновое изображение рекламного баннера, если есть */}
-      {hasImage && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <img
-            src={adImageUrl}
-            alt="Рекламный баннер"
-            className="w-full h-full object-cover object-center"
-          />
-          {/* Лёгкий затемняющий градиент только для читаемости текста */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/20 to-transparent" />
+      {/* CreativeLayer: креатив как на vc.ru — центрированный блок фикс. max-width, object-contain (без cover/кропа/зума) */}
+      {creativeIsVideo ? (
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
+          <div className="w-full h-full max-w-[1400px]">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              className="w-full h-full object-contain object-center bg-transparent"
+              style={{ backgroundColor: "transparent" }}
+              onError={(e) => {
+                console.error("Error loading video:", activeAsset.url, e);
+              }}
+            >
+              <source src={creativeUrl || undefined} />
+            </video>
+          </div>
+        </div>
+      ) : (
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
+          <div className="w-full h-full max-w-[1400px]">
+            <img
+              src={creativeUrl || undefined}
+              alt=""
+              className="w-full h-full object-contain object-center"
+              draggable={false}
+            />
+          </div>
         </div>
       )}
 
+      {/* OverlayLayer убран по требованию: без затемнения/наложений */}
+
       <div
-        className="container-p mx-auto px-4 py-4 relative z-10"
-        style={{ height: "250px" }}
+        className="container-p max-w-[1680px] mx-auto py-4 relative z-10 h-[300px] md:h-[250px]"
       >
         {/* Десктопная версия */}
         <div className="hidden md:flex items-center justify-between gap-4 h-full">
           {/* Левая часть - только текст без иконки */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className={`text-base font-medium ${styles.text}`}>
-              {finalContent}
-            </div>
+            {finalContent && (
+              <div className={`text-base font-medium ${styles.text}`}>
+                {finalContent}
+              </div>
+            )}
           </div>
 
           {/* Правая часть - кнопки */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            {finalLinkUrl && (
+            {clickUrl && (
               <a
-                href={finalLinkUrl}
+                href={clickUrl}
                 className={`px-4 py-2 text-sm font-semibold rounded-lg bg-[#f9bc60] text-[#001e1d] hover:bg-[#f9bc60]/90 transition-all duration-200 hover:scale-105`}
               >
                 Перейти
@@ -330,18 +364,20 @@ export default function TopBanner({
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2 flex-1 min-w-0">
               {/* Только текст без иконки */}
-              <div className={`text-sm font-medium ${styles.text} leading-relaxed`}>
-                {finalContent}
-              </div>
+              {finalContent && (
+                <div className={`text-sm font-medium ${styles.text} leading-relaxed`}>
+                  {finalContent}
+                </div>
+              )}
             </div>
 
           </div>
 
           {/* Нижняя часть - кнопка действия */}
-          {finalLinkUrl && (
+          {clickUrl && (
             <div className="flex justify-center">
               <a
-                href={finalLinkUrl}
+                href={clickUrl}
                 className={`px-6 py-2 text-sm font-semibold rounded-lg bg-[#f9bc60] text-[#001e1d] hover:bg-[#f9bc60]/90 transition-all duration-200 hover:scale-105`}
               >
                 Перейти

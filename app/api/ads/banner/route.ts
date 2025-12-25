@@ -1,29 +1,14 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { findActiveAdByPlacement } from "../route";
 
+// DEPRECATED: используйте GET /api/ads?placement=home_banner
+// Оставлено для обратной совместимости. Контракт ответа НЕ меняем: { ad: Advertisement | null }
 export async function GET() {
   try {
-    const activeBanner = await prisma.advertisement
-      .findFirst({
-        where: {
-          isActive: true,
-          placement: "home_banner",
-          OR: [
-            { expiresAt: null },
-            { expiresAt: { gt: new Date() } },
-          ],
-        },
-        orderBy: { createdAt: "desc" },
-      })
-      .catch(() => null);
-
-    if (!activeBanner) {
-      return NextResponse.json({ ad: null });
-    }
-
-    return NextResponse.json({ ad: activeBanner });
+    const ad = await findActiveAdByPlacement("home_banner");
+    return NextResponse.json({ ad: ad ?? null });
   } catch (error) {
-    console.error("Error fetching banner ad:", error);
+    console.error("Error fetching banner ad (deprecated route):", error);
     return NextResponse.json({ ad: null });
   }
 }

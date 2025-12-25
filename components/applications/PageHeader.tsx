@@ -21,13 +21,13 @@ export default function PageHeader() {
             type: "spring",
             stiffness: 200,
           }}
-          className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 shadow-lg"
-          style={{
-            background: "linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)",
-            boxShadow: "0 10px 25px rgba(249, 188, 96, 0.3)",
-          }}
+          className="inline-flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 mb-6"
         >
-          <LucideIcons.FileText size="xl" className="text-white" />
+          <img 
+            src="/kopibym.png" 
+            alt="Заявка" 
+            className="w-full h-full object-contain"
+          />
         </motion.div>
 
         <motion.h1

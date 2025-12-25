@@ -34,27 +34,39 @@ export default function ProfileFriendsSection() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [lastReadRequestId, setLastReadRequestId] = useState<string | null>(null);
 
-  // Функция для определения онлайн статуса
-  const getOnlineStatus = (lastSeen?: string | null) => {
-    if (!lastSeen) return false;
-    const lastSeenDate = new Date(lastSeen);
-    const now = new Date();
-    const diffMinutes = (now.getTime() - lastSeenDate.getTime()) / (1000 * 60);
-    return diffMinutes < 5; // Считаем онлайн если был активен менее 5 минут назад
-  };
-
-  // Функция для форматирования времени последнего визита
-  const getLastSeenText = (lastSeen?: string | null) => {
-    if (!lastSeen) return "Давно не был в сети";
+  // Функция для определения статуса пользователя (как в других компонентах)
+  const getUserStatus = (lastSeen: string | null) => {
+    if (!lastSeen) return { status: "offline" as const, text: "Никогда не был в сети" };
     
-    const lastSeenDate = new Date(lastSeen);
+    const date = new Date(lastSeen);
     const now = new Date();
-    const diffMinutes = (now.getTime() - lastSeenDate.getTime()) / (1000 * 60);
     
-    if (diffMinutes < 5) return "В сети";
-    if (diffMinutes < 60) return `${Math.floor(diffMinutes)} мин назад`;
-    if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)} ч назад`;
-    return `${Math.floor(diffMinutes / 1440)} дн назад`;
+    // Проверяем валидность даты
+    if (isNaN(date.getTime())) {
+      return { status: "offline" as const, text: "Никогда не был в сети" };
+    }
+    
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    
+    // Если разница отрицательная (дата в будущем) или пользователь был активен в последние 5 минут - считаем онлайн
+    if (diffInMinutes < 0 || diffInMinutes < 5) {
+      return { status: "online" as const, text: "Онлайн" };
+    }
+    
+    // Иначе показываем время последнего входа
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    
+    if (diffInHours < 1) {
+      return { status: "offline" as const, text: `${diffInMinutes}м назад` };
+    }
+    if (diffInHours < 24) {
+      return { status: "offline" as const, text: `${diffInHours}ч назад` };
+    }
+    if (diffInHours < 48) {
+      return { status: "offline" as const, text: "Вчера" };
+    }
+    return { status: "offline" as const, text: date.toLocaleDateString("ru-RU") };
   };
 
   const fetchFriends = useCallback(async () => {
@@ -269,7 +281,8 @@ export default function ProfileFriendsSection() {
                     ? friendship.receiver 
                     : friendship.requester;
                   
-                  const isOnline = getOnlineStatus(friend.lastSeen);
+                  const status = getUserStatus(friend.lastSeen || null);
+                  const isOnline = status.status === "online";
                   
                   return (
                     <motion.div
@@ -305,7 +318,7 @@ export default function ProfileFriendsSection() {
                           {friend.name || friend.email.split("@")[0]}
                         </p>
                         <p className="text-[#abd1c6] text-[10px] xs:text-xs mt-0.5">
-                          {isOnline ? 'В сети' : 'Не в сети'}
+                          {status.text}
                         </p>
                       </div>
 

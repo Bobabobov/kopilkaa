@@ -49,6 +49,7 @@ model User {
   telegramLink     String?
   youtubeLink      String?
   headerTheme      String?   @default("default")
+  headerDominantColor String? // Доминантный цвет из обложки
   avatarFrame      String?   @default("none")
   customFrameData  String? // JSON данные пользовательских рамок
   hideEmail        Boolean   @default(true) // Скрывать email в профиле по умолчанию

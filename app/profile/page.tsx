@@ -338,7 +338,11 @@ function ProfilePageContent() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden" role="main" aria-label="Профиль пользователя">
+    <div 
+      className="min-h-screen relative overflow-hidden" 
+      role="main" 
+      aria-label="Профиль пользователя"
+    >
       {/* Универсальный фон */}
       <UniversalBackground />
 

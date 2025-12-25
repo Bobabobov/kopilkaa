@@ -1,6 +1,6 @@
 // components/layout/Header.tsx
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import NavAuth from "@/app/components/NavAuth";
@@ -14,9 +14,8 @@ export default function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [topBannerHeight, setTopBannerHeight] = useState(0);
-  const [menuTop, setMenuTop] = useState(64);
-  const [headerHeight, setHeaderHeight] = useState(64);
+  const [menuTop, setMenuTop] = useState(0);
+  const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
 
   // Проверяем авторизацию (не блокируем навигацию)
@@ -25,9 +24,8 @@ export default function Header() {
     
     const checkAuth = async () => {
       try {
-        // Используем AbortController для отмены при размонтировании
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1000); // Таймаут 1 секунда
+        const timeoutId = setTimeout(() => controller.abort(), 1000);
         
         const response = await fetch("/api/profile/me", {
           signal: controller.signal,
@@ -74,54 +72,30 @@ export default function Header() {
     };
   }, []);
 
-  // Определяем высоту TopBanner при загрузке
+  // Синхронизация Header с TopBanner при скролле (только на десктопе)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const isMobile = window.innerWidth < 768;
     const topBanner = document.querySelector('[data-top-banner]') as HTMLElement | null;
+    if (!topBanner) return;
 
-    // На мобильных не двигаем шапку вместе с баннером, чтобы избежать дёрганий
-    if (isMobile) {
-      setTopBannerHeight(0);
-      const header = document.querySelector('header') as HTMLElement | null;
-      if (header) {
-        header.style.top = "0px";
-      }
-      return;
-    }
-
-    if (topBanner) {
-      const bannerHeight = topBanner.offsetHeight;
-      setTopBannerHeight(bannerHeight);
-
-      const header = document.querySelector('header') as HTMLElement | null;
-      if (header) {
-        header.style.top = `${bannerHeight}px`;
-      }
-    }
-    
-    // На десктопе отслеживаем скролл, чтобы Header двигался синхронно с баннером
     const handleScroll = () => {
-      if (!topBanner) return;
+      // Используем CSS media query через matchMedia вместо window.innerWidth
+      const isDesktop = window.matchMedia("(min-width: 768px)").matches;
       
+      if (!isDesktop) return;
+
       const scrollY = window.scrollY;
       const bannerHeight = topBanner.offsetHeight;
-      
-      // Рассчитываем на сколько скрыт баннер
       const hideProgress = Math.min(scrollY / bannerHeight, 1);
       
-      // Header двигается вверх по мере скрытия баннера
-      const header = document.querySelector('header') as HTMLElement;
-      if (header) {
+      if (headerRef.current) {
         const newTop = bannerHeight * (1 - hideProgress);
-        header.style.top = `${newTop}px`;
+        headerRef.current.style.top = `${newTop}px`;
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // Вызываем сразу для начального состояния
     handleScroll();
     
     return () => {
@@ -129,42 +103,25 @@ export default function Header() {
     };
   }, []);
 
-  // Отдельно вычисляем позицию нижней границы header,
-  // чтобы мобильное меню всегда открывалось сразу под ним
+  // Вычисляем позицию мобильного меню один раз при открытии
   useEffect(() => {
-    const updateHeaderHeight = () => {
-      const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
-      setHeaderHeight(isMobile ? 56 : 64);
-    };
-    updateHeaderHeight();
-    window.addEventListener("resize", updateHeaderHeight);
-    return () => window.removeEventListener("resize", updateHeaderHeight);
-  }, []);
+    if (!mobileMenuOpen || !headerRef.current) return;
 
-  // Позиция меню на мобильных — сразу под хедером
-  useEffect(() => {
     const updateMenuTop = () => {
-      const header = document.querySelector('header') as HTMLElement | null;
-      if (header) {
-        const rect = header.getBoundingClientRect();
+      const rect = headerRef.current?.getBoundingClientRect();
+      if (rect) {
         setMenuTop(rect.bottom);
       }
     };
 
     updateMenuTop();
-    window.addEventListener("scroll", updateMenuTop, { passive: true });
-    window.addEventListener("resize", updateMenuTop);
+  }, [mobileMenuOpen]);
 
-    return () => {
-      window.removeEventListener("scroll", updateMenuTop);
-      window.removeEventListener("resize", updateMenuTop);
-    };
-  }, []);
-
-  // Закрываем мобильное меню при изменении размера экрана
+  // Закрываем мобильное меню при изменении размера экрана (lg+)
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
+      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+      if (isDesktop) {
         setMobileMenuOpen(false);
       }
     };
@@ -180,50 +137,57 @@ export default function Header() {
 
   return (
     <>
-              {/* Spacer для Header + TopBanner */}
-              <div 
-                style={{ 
-          height: `${headerHeight + topBannerHeight}px`
-                }} 
+      {/* Spacer для Header + TopBanner через CSS-переменную */}
+      <div 
+        className="header-spacer"
+        style={{ 
+          height: "var(--header-offset)"
+        }} 
+      />
+
+      <header
+        ref={headerRef}
+        className="fixed left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg header-component"
+        style={{ 
+          backgroundColor: "#004643", 
+          borderColor: "#abd1c6",
+          top: "var(--top-banner-height)",
+          height: "var(--header-height)"
+        }}
+      >
+        <div className="container-p mx-auto flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 h-full relative">
+          {/* Левая часть: логотип (flex-shrink-0) */}
+          <div className="flex-shrink-0">
+            <HeaderLogo />
+          </div>
+
+          {/* Центр: навигация (абсолютно по центру) */}
+          <div className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
+            <HeaderNavigation />
+          </div>
+
+          {/* Правая часть: кнопки (flex-shrink-0, без ml-auto) */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* DonateButton - скрыт на мобильных */}
+            <div className="hidden sm:block">
+              <DonateButton />
+            </div>
+            
+            {/* NotificationBell - виден всегда (если авторизован) */}
+            {isAuthenticated && !authLoading && <NotificationBell />}
+            
+            {/* NavAuth - скрыт на мобильных */}
+            <div className="hidden sm:block">
+              <NavAuth />
+            </div>
+            
+            {/* HeaderMobileButton - виден только на мобильных */}
+            <div className="sm:hidden">
+              <HeaderMobileButton
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                isOpen={mobileMenuOpen}
               />
-
-              <header
-                className="fixed left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg"
-                style={{ 
-                  backgroundColor: "#004643", 
-                  borderColor: "#abd1c6",
-          top: `${topBannerHeight}px`,
-          height: `${headerHeight}px`
-                }}
-              >
-        <div className="container-p mx-auto flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 h-full">
-          {/* Логотип слева */}
-          <HeaderLogo />
-
-          {/* Промежуточная навигация для планшетов */}
-          <div className="hidden lg:flex xl:hidden">
-            <HeaderNavigation />
-          </div>
-
-          {/* Полная навигация для больших экранов */}
-          <div className="hidden xl:flex flex-1 justify-center">
-            <HeaderNavigation />
-          </div>
-
-          {/* Правая часть - показываем на средних и больших экранах */}
-          <div className="hidden sm:flex items-center gap-2 w-[260px] sm:w-[280px] justify-end flex-shrink-0">
-            <DonateButton />
-            {isAuthenticated && !authLoading && <NotificationBell />}
-            <NavAuth />
-          </div>
-
-          {/* Правая часть для мобильных - колокольчик и бургер меню */}
-          <div className="flex sm:hidden items-center gap-2">
-            {isAuthenticated && !authLoading && <NotificationBell />}
-            <HeaderMobileButton
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              isOpen={mobileMenuOpen}
-            />
+            </div>
           </div>
         </div>
       </header>

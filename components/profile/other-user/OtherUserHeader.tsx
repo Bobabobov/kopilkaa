@@ -66,7 +66,7 @@ export default function OtherUserHeader({ user }: OtherUserHeaderProps) {
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
             }
-          : {}
+          : undefined
       }
     >
       {/* Enhanced background overlay */}

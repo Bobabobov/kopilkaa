@@ -23,6 +23,41 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Функция для определения статуса пользователя
+  const getUserStatus = (lastSeen: string | null) => {
+    if (!lastSeen) return { status: "offline" as const, text: "Никогда не был в сети" };
+    
+    const date = new Date(lastSeen);
+    const now = new Date();
+    
+    // Проверяем валидность даты
+    if (isNaN(date.getTime())) {
+      return { status: "offline" as const, text: "Никогда не был в сети" };
+    }
+    
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    
+    // Если разница отрицательная (дата в будущем) или пользователь был активен в последние 5 минут - считаем онлайн
+    if (diffInMinutes < 0 || diffInMinutes < 5) {
+      return { status: "online" as const, text: "Онлайн" };
+    }
+    
+    // Иначе показываем время последнего входа
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    
+    if (diffInHours < 1) {
+      return { status: "offline" as const, text: `${diffInMinutes}м назад` };
+    }
+    if (diffInHours < 24) {
+      return { status: "offline" as const, text: `${diffInHours}ч назад` };
+    }
+    if (diffInHours < 48) {
+      return { status: "offline" as const, text: "Вчера" };
+    }
+    return { status: "offline" as const, text: date.toLocaleDateString("ru-RU") };
+  };
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -131,16 +166,21 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
                   e.currentTarget.src = "/default-avatar.png";
                 }}
               />
-              <div className="min-w-0">
-                <p className="truncate text-xs font-semibold text-[#fffffe]">
-                  {u.name || (u.email ? u.email.split("@")[0] : "Пользователь")}
-                </p>
-                {u.lastSeen && (
-                  <p className="text-[10px] text-[#abd1c6]/70">
-                    Был(а) в сети:{" "}
-                    {new Date(u.lastSeen).toLocaleDateString("ru-RU")}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="truncate text-xs font-semibold text-[#fffffe]">
+                    {u.name || (u.email ? u.email.split("@")[0] : "Пользователь")}
                   </p>
-                )}
+                  {getUserStatus(u.lastSeen || null).status === "online" && (
+                    <div className="w-2 h-2 bg-[#10B981] rounded-full flex-shrink-0" />
+                  )}
+                </div>
+                <p className="text-[10px] text-[#abd1c6]/70 mt-0.5">
+                  {getUserStatus(u.lastSeen || null).status === "online" 
+                    ? "Онлайн" 
+                    : `Был(а) в сети: ${getUserStatus(u.lastSeen || null).text}`
+                  }
+                </p>
               </div>
             </Link>
             </motion.div>

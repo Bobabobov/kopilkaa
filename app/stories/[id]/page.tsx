@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import PixelBackground from "@/components/ui/PixelBackground";
+import { motion } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
+import UniversalBackground from "@/components/ui/UniversalBackground";
 import {
   StoryHeader,
   StoryContent,
@@ -262,7 +264,7 @@ export default function StoryPage() {
   if (loading) {
     return (
       <div className="min-h-screen">
-        <PixelBackground />
+        <UniversalBackground />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div
@@ -279,7 +281,7 @@ export default function StoryPage() {
   if (error) {
     return (
       <div className="min-h-screen">
-        <PixelBackground />
+        <UniversalBackground />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="text-6xl mb-4">⚠️</div>
@@ -308,7 +310,7 @@ export default function StoryPage() {
   if (!story) {
     return (
       <div className="min-h-screen">
-        <PixelBackground />
+        <UniversalBackground />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="text-6xl mb-4">📖</div>
@@ -336,7 +338,7 @@ export default function StoryPage() {
 
   return (
     <div className="min-h-screen">
-      <PixelBackground />
+      <UniversalBackground />
       <div className="relative z-10">
         {/* Навигация */}
         <StoryNavigation />
@@ -379,8 +381,46 @@ export default function StoryPage() {
               <StoryImages images={story.images} title={story.title} />
             )}
 
+            {/* Информационный блок для рекламы */}
+            {story.id === "ad" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="mt-8 bg-gradient-to-br from-[#f9bc60]/10 via-[#f9bc60]/5 to-transparent backdrop-blur-sm rounded-3xl p-6 sm:p-8 border-2 border-[#f9bc60]/30 shadow-xl"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#f9bc60] to-[#e8a545] flex items-center justify-center shadow-lg">
+                    <LucideIcons.Megaphone size="lg" className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-[#fffffe] mb-2">
+                      Рекламная история
+                    </h3>
+                    <p className="text-[#abd1c6] leading-relaxed mb-4">
+                      Это рекламная история в разделе историй. Рекламодатель может разместить здесь информацию о себе, своих услугах или продуктах. История отображается в первой позиции списка и доступна всем посетителям сайта.
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <div className="flex items-center gap-2 text-sm text-[#abd1c6]">
+                        <LucideIcons.Star size="sm" className="text-[#f9bc60]" />
+                        <span>Первая позиция в списке</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[#abd1c6]">
+                        <LucideIcons.Users size="sm" className="text-[#f9bc60]" />
+                        <span>Доступна всем посетителям</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[#abd1c6]">
+                        <LucideIcons.Calendar size="sm" className="text-[#f9bc60]" />
+                        <span>От 2000₽/неделя</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             {/* Действия */}
-            <StoryActions />
+            <StoryActions isAd={story.id === "ad"} advertiserLink={story.advertiserLink} />
           </div>
         </div>
       </div>

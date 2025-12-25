@@ -23,10 +23,6 @@ export async function POST(request: NextRequest) {
     }
 
     // TODO: После установки SDK добавить проверку подписи
-    // const signature = request.headers.get('x-yookassa-signature');
-    // if (!verifySignature(body, signature, secretKey)) {
-    //   return NextResponse.json({ error: "Неверная подпись" }, { status: 401 });
-    // }
 
     const event = body.event; // 'payment.succeeded' или 'payment.canceled'
     const payment = body.object;
@@ -71,13 +67,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// Для проверки подписи (после установки SDK)
-function verifySignature(body: any, signature: string | null, secret: string): boolean {
-  if (!signature) return false;
-  // TODO: Реализовать проверку подписи ЮKassa
-  return true; // временно
-}
-
-
-

@@ -26,6 +26,9 @@ export default function AdsPlacementsSection() {
     advertiserName: "",
     advertiserLink: "",
     bannerMobileImageUrl: "",
+    sidebarMobileImageUrl: "",
+    sidebarMobileTitle: "",
+    sidebarMobileContent: "",
   });
 
   useEffect(() => {
@@ -75,6 +78,12 @@ export default function AdsPlacementsSection() {
       } else if (formData.placement === "home_banner") {
         config = {
           bannerMobileImageUrl: formData.bannerMobileImageUrl || undefined,
+        };
+      } else if (formData.placement === "home_sidebar") {
+        config = {
+          sidebarMobileImageUrl: formData.sidebarMobileImageUrl || undefined,
+          sidebarMobileTitle: formData.sidebarMobileTitle || undefined,
+          sidebarMobileContent: formData.sidebarMobileContent || undefined,
         };
       }
 
@@ -132,6 +141,9 @@ export default function AdsPlacementsSection() {
       advertiserName: ad.config?.advertiserName || "",
       advertiserLink: ad.config?.advertiserLink || "",
       bannerMobileImageUrl: ad.config?.bannerMobileImageUrl || "",
+      sidebarMobileImageUrl: ad.config?.sidebarMobileImageUrl || "",
+      sidebarMobileTitle: ad.config?.sidebarMobileTitle || "",
+      sidebarMobileContent: ad.config?.sidebarMobileContent || "",
     });
     setShowForm(true);
   };
@@ -173,6 +185,9 @@ export default function AdsPlacementsSection() {
       advertiserName: "",
       advertiserLink: "",
       bannerMobileImageUrl: "",
+      sidebarMobileImageUrl: "",
+      sidebarMobileTitle: "",
+      sidebarMobileContent: "",
     };
   };
 

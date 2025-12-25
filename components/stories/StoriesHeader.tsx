@@ -12,12 +12,21 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
     <div className="pt-0 sm:pt-1 pb-6">
       {/* Заголовок */}
       <div className="text-center mb-8">
-        <h1
-          className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4"
-          style={{ color: "#fffffe" }}
-        >
-          📖 Истории Помощи
-        </h1>
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
+            <img 
+              src="/kopibook.png" 
+              alt="Истории" 
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <h1
+            className="text-4xl sm:text-5xl md:text-6xl font-bold"
+            style={{ color: "#fffffe" }}
+          >
+            Истории Помощи
+          </h1>
+        </div>
 
         <p
           className="text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto px-4"

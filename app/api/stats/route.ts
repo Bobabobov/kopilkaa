@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-export const dynamic = 'force-dynamic';
+// Кэшируем статистику на 5 секунд через Next.js revalidate
+export const revalidate = 5;
 
 export async function GET(request: NextRequest) {
   try {

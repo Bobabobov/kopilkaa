@@ -8,15 +8,3 @@ export { default as SupportFAQ } from './SupportFAQ';
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-

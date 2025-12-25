@@ -17,6 +17,9 @@ export interface Advertisement {
     advertiserName?: string;
     advertiserLink?: string;
     bannerMobileImageUrl?: string;
+    sidebarMobileImageUrl?: string;
+    sidebarMobileTitle?: string;
+    sidebarMobileContent?: string;
   } | null;
 }
 
@@ -34,6 +37,9 @@ export interface AdFormData {
   advertiserName: string;
   advertiserLink: string;
   bannerMobileImageUrl: string;
+  sidebarMobileImageUrl: string;
+  sidebarMobileTitle: string;
+  sidebarMobileContent: string;
 }
 
 

@@ -1,13 +1,15 @@
 "use client";
 
 import { AdvertisingContact } from "@/components/advertising";
+import UniversalBackground from "@/components/ui/UniversalBackground";
 import Link from "next/link";
 
 export default function AdvertisingPage() {
   return (
-    <div className="min-h-screen pb-20" style={{ backgroundColor: "#004643" }}>
+    <div className="min-h-screen pb-20 relative">
+      <UniversalBackground />
       {/* Герой секция */}
-      <div className="py-32 px-4 relative">
+      <div className="py-32 px-4 relative z-10">
         <div className="container mx-auto max-w-5xl">
           <div className="mb-16">
             <h1 className="text-6xl md:text-8xl font-bold text-[#fffffe] mb-6 tracking-tight">
@@ -72,7 +74,7 @@ export default function AdvertisingPage() {
       </div>
 
       {/* Форматы рекламы */}
-      <section id="formats" className="py-24 px-4">
+      <section id="formats" className="py-24 px-4 relative z-10">
         <div className="container mx-auto max-w-6xl">
           <div className="mb-16">
             <h2 className="text-5xl font-bold text-[#fffffe] mb-4">Что можно купить</h2>
@@ -180,7 +182,7 @@ export default function AdvertisingPage() {
       </section>
 
       {/* Выбор способа подачи заявки */}
-      <section id="contact" className="py-24 px-4">
+      <section id="contact" className="py-24 px-4 relative z-10">
         <div className="container mx-auto max-w-4xl">
           <div className="mb-12 text-center">
             <h2 className="text-5xl font-bold text-[#fffffe] mb-4">Оставить заявку</h2>
@@ -276,7 +278,7 @@ export default function AdvertisingPage() {
       </section>
 
       {/* Форма */}
-      <div id="contact-form">
+      <div id="contact-form" className="relative z-10">
         <AdvertisingContact />
       </div>
     </div>

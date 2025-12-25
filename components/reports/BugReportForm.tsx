@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 
@@ -16,6 +16,7 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
   const [images, setImages] = useState<{ file: File; url: string }[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +53,9 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Скрываем предыдущее сообщение об успехе при новой отправке
+    setSuccessMessage(false);
 
     if (!title.trim() || !description.trim()) {
       showToast("error", "Ошибка", "Заполните все обязательные поля");
@@ -95,7 +99,8 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
         throw new Error(data.message || data.error || "Ошибка создания баг-репорта");
       }
 
-      showToast("success", "Успешно!", "Баг-репорт создан");
+      // Показываем сообщение об успехе внутри формы
+      setSuccessMessage(true);
       
       // Очищаем форму
       setTitle("");
@@ -104,6 +109,11 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
       
       // Передаем созданный баг-репорт для немедленного отображения
       onReportCreated(data.report);
+      
+      // Автоматически скрываем сообщение через 5 секунд
+      setTimeout(() => {
+        setSuccessMessage(false);
+      }, 5000);
     } catch (error: any) {
       console.error("Submit error:", error);
       const errorMessage = error.message || "Не удалось создать баг-репорт";
@@ -138,6 +148,46 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
             Можно отправлять только 1 баг-репорт в сутки
           </p>
         </div>
+
+        {/* Сообщение об успешной отправке */}
+        <AnimatePresence>
+          {successMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="mb-4 rounded-lg bg-gradient-to-r from-emerald-500/20 to-green-500/20 border border-emerald-400/40 p-4 flex items-center gap-3"
+            >
+            <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-emerald-300">Баг-репорт создан</p>
+              <p className="text-xs text-emerald-200/80 mt-0.5">Ваш отчёт успешно отправлен</p>
+            </div>
+            <button
+              onClick={() => setSuccessMessage(false)}
+              className="flex-shrink-0 p-1 rounded-md hover:bg-emerald-500/20 transition-colors"
+              aria-label="Закрыть"
+            >
+              <LucideIcons.X size="xs" className="text-emerald-300" />
+            </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Заголовок */}

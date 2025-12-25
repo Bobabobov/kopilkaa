@@ -1,7 +1,8 @@
 // app/api/applications/recent/route.ts
 import { prisma } from "@/lib/db";
 
-export const dynamic = 'force-dynamic';
+// Кэшируем на 10 секунд (реже обновляется чем статистика)
+export const revalidate = 10;
 
 export async function GET(req: Request) {
   try {

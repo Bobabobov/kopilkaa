@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import UniversalBackground from "@/components/ui/UniversalBackground";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import ApplicationHeader from "./components/ApplicationHeader";
 import ApplicationTitle from "./components/ApplicationTitle";
@@ -114,23 +115,28 @@ export default function AdminApplicationPage({
 
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#004643" }}>
-        <motion.div 
-          className="text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="w-12 h-12 border-4 border-[#f9bc60] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p style={{ color: "#abd1c6" }}>Загрузка...</p>
-        </motion.div>
+      <div className="min-h-screen flex items-center justify-center relative">
+        <UniversalBackground />
+        <div className="relative z-10">
+          <motion.div 
+            className="text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="w-12 h-12 border-4 border-[#f9bc60] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p style={{ color: "#abd1c6" }}>Загрузка...</p>
+          </motion.div>
+        </div>
       </div>
     );
 
   if (err)
     return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: "#004643" }}>
-        <motion.div 
+      <div className="min-h-screen flex items-center justify-center px-4 relative">
+        <UniversalBackground />
+        <div className="relative z-10">
+          <motion.div 
           className="text-center max-w-4xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -139,13 +145,15 @@ export default function AdminApplicationPage({
         >
           {err}
         </motion.div>
+          </div>
+        </div>
       </div>
     );
 
   if (!item) return null;
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: "#004643" }}>
+    <div className="min-h-screen relative overflow-hidden">
       {/* Decorative Background */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-[#f9bc60]/5 to-transparent rounded-full blur-3xl"></div>

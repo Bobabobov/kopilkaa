@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import OptimizedImage from "@/components/ui/OptimizedImage";
 import { useRouter } from "next/navigation";
 
 interface AdCardProps {
@@ -120,26 +119,26 @@ export function AdCard({ index }: AdCardProps) {
         {/* Изображение */}
         <div className="relative mb-4 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg h-52">
           {previewImage ? (
-            previewImage.startsWith("http")
-              ? (
-                <img
-                  src={previewImage}
-                  alt="Превью рекламной истории"
-                  className="w-full h-full object-cover"
-                />
-              )
-              : (
-                <OptimizedImage
-                  src={previewImage}
-                  alt="Превью рекламной истории"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 420px"
-                  className="w-full h-full"
-                />
-              )
+            <img
+              src={previewImage}
+              alt="Превью рекламной истории"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Если изображение не загрузилось, показываем placeholder
+                const target = e.target as HTMLImageElement;
+                target.style.display = "none";
+                const parent = target.parentElement;
+                if (parent) {
+                  const placeholder = parent.querySelector(".image-placeholder") as HTMLElement;
+                  if (placeholder) {
+                    placeholder.style.display = "flex";
+                  }
+                }
+              }}
+            />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#f9bc60]/20 to-[#e8a545]/20 flex items-center justify-center border-2 border-[#f9bc60]/30 rounded-2xl">
-            <div className="text-center">
+            <div className="image-placeholder w-full h-full bg-gradient-to-br from-[#f9bc60]/20 to-[#e8a545]/20 flex items-center justify-center border-2 border-[#f9bc60]/30 rounded-2xl">
+              <div className="text-center">
                 <LucideIcons.Megaphone
                   size="lg"
                   className="text-[#f9bc60] mb-2 mx-auto"

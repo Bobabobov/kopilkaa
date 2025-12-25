@@ -55,22 +55,33 @@ export async function GET(req: Request) {
       prisma.application.count({ where }).catch(() => 0),
     ]);
 
-    return Response.json({
+    const responseData = {
       page,
       limit,
       total,
       pages: Math.ceil(total / limit),
       items,
+    };
+
+    return new Response(JSON.stringify(responseData), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
   } catch (error) {
     console.error("Error fetching stories:", error);
-    // Возвращаем пустой результат при ошибке
-    return Response.json({
+    return new Response(JSON.stringify({
       page: 1,
       limit: 12,
       total: 0,
       pages: 0,
       items: [],
+    }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
   }
 }

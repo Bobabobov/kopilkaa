@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface TopBannerProps {
@@ -21,9 +21,9 @@ export default function TopBanner({
   const [adContent, setAdContent] = useState<string | null>(null);
   const [adLink, setAdLink] = useState<string | null>(null);
   const [adImageUrl, setAdImageUrl] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
   const [desktopImageUrl, setDesktopImageUrl] = useState<string | null>(null);
   const [mobileImageUrl, setMobileImageUrl] = useState<string | null>(null);
+  const bannerRef = useRef<HTMLDivElement>(null);
 
 
   // Проверяем, был ли баннер уже закрыт пользователем
@@ -86,7 +86,7 @@ export default function TopBanner({
     fetchBannerAd();
   }, []);
 
-  // Выбираем подходящее изображение в зависимости от ширины экрана
+  // Выбираем подходящее изображение через CSS media queries
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -96,7 +96,8 @@ export default function TopBanner({
         return;
       }
 
-      const isMobile = window.innerWidth < 768;
+      // Используем matchMedia вместо window.innerWidth
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
       if (isMobile) {
         setAdImageUrl(mobileImageUrl || desktopImageUrl);
       } else {
@@ -106,44 +107,65 @@ export default function TopBanner({
 
     chooseImage();
 
-    window.addEventListener("resize", chooseImage);
-    return () => window.removeEventListener("resize", chooseImage);
+    // Используем matchMedia для отслеживания изменений
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+    const handleChange = () => chooseImage();
+    
+    // Современный способ через addEventListener
+    if (mobileQuery.addEventListener) {
+      mobileQuery.addEventListener("change", handleChange);
+      return () => mobileQuery.removeEventListener("change", handleChange);
+    } else {
+      // Fallback для старых браузеров
+      mobileQuery.addListener(handleChange);
+      return () => mobileQuery.removeListener(handleChange);
+    }
   }, [desktopImageUrl, mobileImageUrl]);
 
-  // Отслеживаем ширину экрана, чтобы по‑разному вести себя на мобильных и десктопе
+  // Устанавливаем CSS-переменную для высоты TopBanner
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!bannerRef.current) return;
 
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+    const updateBannerHeight = () => {
+      const height = bannerRef.current?.offsetHeight || 0;
+      document.documentElement.style.setProperty("--top-banner-height", `${height}px`);
     };
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
+    updateBannerHeight();
 
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Отслеживаем скролл для постепенного скрытия баннера
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    // На мобильных убираем анимацию скрытия при скролле,
-    // чтобы не было "просветов" и дёрганий
-    if (window.innerWidth < 768) {
-      return;
+    // Обновляем при изменении размера окна
+    window.addEventListener("resize", updateBannerHeight);
+    
+    // Используем ResizeObserver для отслеживания изменений размера элемента
+    const resizeObserver = new ResizeObserver(updateBannerHeight);
+    if (bannerRef.current) {
+      resizeObserver.observe(bannerRef.current);
     }
 
-    const banner = document.querySelector("[data-top-banner]") as HTMLElement;
-    if (!banner) return;
-    
-    const bannerHeight = banner.offsetHeight;
+    return () => {
+      window.removeEventListener("resize", updateBannerHeight);
+      resizeObserver.disconnect();
+    };
+  }, [isVisible, adImageUrl]);
+
+  // Отслеживаем скролл для постепенного скрытия баннера (только на десктопе)
+  useEffect(() => {
+    if (typeof window === "undefined" || !bannerRef.current) return;
+
+    // Используем matchMedia вместо window.innerWidth
+    const desktopQuery = window.matchMedia("(min-width: 768px)");
     
     const handleScroll = () => {
+      // Проверяем через matchMedia, а не через window.innerWidth
+      if (!desktopQuery.matches) return;
+
+      const banner = bannerRef.current;
+      if (!banner) return;
+      
+      const bannerHeight = banner.offsetHeight;
       const scrollY = window.scrollY;
       
       // Рассчитываем процент скрытия баннера
-      // Баннер начинает скрываться сразу и полностью скрывается когда прокрутили на его высоту
       const hideProgress = Math.min(scrollY / bannerHeight, 1);
       
       // Применяем transform для плавного скрытия
@@ -151,13 +173,33 @@ export default function TopBanner({
       banner.style.transform = `translateY(${translateY}%)`;
     };
 
+    // Слушаем изменения media query
+    const handleMediaChange = () => {
+      if (!desktopQuery.matches && bannerRef.current) {
+        // На мобильных сбрасываем transform
+        bannerRef.current.style.transform = "";
+      }
+      handleScroll();
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     
-    // Вызываем сразу для начального состояния
+    // Современный способ через addEventListener
+    if (desktopQuery.addEventListener) {
+      desktopQuery.addEventListener("change", handleMediaChange);
+    } else {
+      desktopQuery.addListener(handleMediaChange);
+    }
+    
     handleScroll();
     
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      if (desktopQuery.removeEventListener) {
+        desktopQuery.removeEventListener("change", handleMediaChange);
+      } else {
+        desktopQuery.removeListener(handleMediaChange);
+      }
     };
   }, [adImageUrl]);
 
@@ -222,11 +264,12 @@ export default function TopBanner({
 
   return (
     <div
+      ref={bannerRef}
       data-top-banner
       data-has-image={hasImage ? "true" : "false"}
-      className={`${
-        isMobile ? "relative mt-16 z-40" : "fixed top-0 left-0 right-0 z-[60]"
-      } ${styles.bg} ${styles.border} border-b shadow-lg overflow-hidden ${
+      className={`top-banner-component ${
+        styles.bg
+      } ${styles.border} border-b shadow-lg overflow-hidden ${
         isAnimating ? "" : 
         isHidden ? "" : 
         ""

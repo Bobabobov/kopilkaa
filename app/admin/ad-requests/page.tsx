@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import UniversalBackground from "@/components/ui/UniversalBackground";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +14,9 @@ export default function AdRequestsPage() {
   }, [router]);
 
   return (
-    <div
-      className="flex items-center justify-center min-h-screen pt-24"
-      style={{ backgroundColor: "#004643" }}
-    >
-      <div className="text-center text-[#abd1c6]">
+    <div className="flex items-center justify-center min-h-screen pt-24 relative">
+      <UniversalBackground />
+      <div className="relative z-10 text-center text-[#abd1c6]">
         <div className="text-xl mb-2">Раздел заявок перенесён</div>
         <p className="mb-2">
           Сейчас все заявки на рекламу находятся в разделе{" "}

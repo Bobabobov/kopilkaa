@@ -26,13 +26,22 @@ export default function StoryHeader({
   return (
     <div className="mb-8">
       {isAd && (
-        <div className="inline-flex items-center gap-2 px-3 py-1 mb-3 rounded-full border border-[#f9bc60]/60 bg-[#f9bc60]/10 text-xs font-semibold uppercase tracking-wide text-[#f9bc60]">
-          <span>Реклама</span>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-xl border-2 border-[#f9bc60] bg-gradient-to-r from-[#f9bc60]/20 via-[#f9bc60]/15 to-[#f9bc60]/20 backdrop-blur-sm text-sm font-black uppercase tracking-wider text-[#f9bc60] shadow-lg shadow-[#f9bc60]/20"
+        >
+          <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse"></span>
+          <span>РЕКЛАМНАЯ ИСТОРИЯ</span>
+          <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse"></span>
+        </motion.div>
       )}
       <h1
-        className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4"
-        style={{ color: "#fffffe" }}
+        className={`text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4 transition-all duration-500 ${
+          isAd ? "bg-gradient-to-r from-[#fffffe] via-[#f9bc60] to-[#fffffe] bg-clip-text text-transparent" : ""
+        }`}
+        style={isAd ? {} : { color: "#fffffe" }}
       >
         {title}
       </h1>

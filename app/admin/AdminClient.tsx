@@ -113,7 +113,7 @@ export default function AdminClient() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#004643" }}>
+    <div className="min-h-screen relative">
       <UniversalBackground />
 
       <div className="relative z-10">

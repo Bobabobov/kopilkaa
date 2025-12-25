@@ -9,6 +9,7 @@ export function AdminHeader() {
 
   const navLinks = [
     { href: "/admin", label: "Заявки" },
+    { href: "/admin/users", label: "Пользователи" },
     { href: "/admin/achievements", label: "Достижения" },
     { href: "/admin/ads", label: "Реклама" },
     { href: "/admin/reports", label: "Жалобы" },

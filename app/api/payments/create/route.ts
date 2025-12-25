@@ -51,36 +51,10 @@ export async function POST(request: NextRequest) {
     // npm install @yookassa/sdk
     
     // Пока возвращаем заглушку - после установки SDK раскомментируй код ниже
+    // TODO: Раскомментировать после установки SDK
     return NextResponse.json({
       success: false,
       error: "SDK не установлен. Выполни: npm install @yookassa/sdk",
-      // TODO: Раскомментировать после установки SDK
-      /*
-      const { Client } = require('@yookassa/sdk');
-      const client = new Client(shopId, secretKey);
-      
-      const payment = await client.createPayment({
-        amount: {
-          value: amountNum.toFixed(2),
-          currency: 'RUB'
-        },
-        confirmation: {
-          type: 'redirect',
-          return_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/donate/success?payment_id=${paymentId}`
-        },
-        description: comment || `Донат в копилку проекта`,
-        metadata: {
-          userId: userId || 'anonymous',
-          paymentId: paymentId
-        }
-      }, paymentId);
-
-      return NextResponse.json({
-        success: true,
-        paymentId: payment.id,
-        confirmationUrl: payment.confirmation.confirmation_url
-      });
-      */
     });
 
   } catch (error: any) {

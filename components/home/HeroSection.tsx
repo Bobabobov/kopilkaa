@@ -1,12 +1,11 @@
 "use client";
 import Link from "next/link";
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import Image from "next/image";
+import { motion } from "framer-motion";
 import { useBulldog } from "@/lib/useBulldog";
-import { useEffect } from "react";
 import AdSection from "./AdSection";
 import DonateButton from "@/components/donate/DonateButton";
 import TelegramChannel from "./TelegramChannel";
+import AnimatedNumber from "./AnimatedNumber";
 
 type Stats = {
   collected: number;
@@ -20,40 +19,12 @@ interface HeroSectionProps {
   loading: boolean;
 }
 
-// Компонент для анимированного числа
-function AnimatedNumber({ value, prefix = "", suffix = "" }: { value: number; prefix?: string; suffix?: string }) {
-  const motionValue = useMotionValue(0);
-  const rounded = useTransform(motionValue, (latest) => Math.round(latest));
-
-  useEffect(() => {
-    const controls = animate(motionValue, value, {
-      duration: 2,
-      ease: "easeOut",
-    });
-
-    return controls.stop;
-  }, [motionValue, value]);
-
-  return (
-    <motion.span>
-      {prefix}
-      <motion.span>{rounded}</motion.span>
-      {suffix}
-    </motion.span>
-  );
-}
-
 export default function HeroSection({ stats, loading }: HeroSectionProps) {
   const { state, handleClick, getMessage } = useBulldog();
 
   return (
     <div className="flex items-start justify-center px-4 pt-8 pb-8 relative">
       <div className="text-center max-w-4xl mx-auto">
-        {/* Рекламная карточка для мобильных — над основным заголовком */}
-        <div className="mb-4 -mx-4 px-4 md:hidden">
-          <AdSection variant="feed" />
-        </div>
-
         {/* Основной заголовок */}
         <h1
           className="text-5xl md:text-7xl font-bold mb-6"
@@ -163,10 +134,15 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           </Link>
         </div>
 
+        {/* Рекламная карточка для мобильных — между кнопками и Telegram каналом */}
+        <div className="mb-10 md:hidden">
+          <AdSection variant="feed" />
+        </div>
+
         {/* Рекламный блок (бывший боковой) — теперь под кнопками на главной
-            Показываем только на средних и больших экранах, на мобильных остаётся feed‑карточка сверху */}
+            Показываем только на средних и больших экранах */}
         <div className="mb-10 hidden md:flex justify-center">
-          <div className="w-full max-w-4xl">
+          <div className="w-full" style={{ maxWidth: '900px' }}>
             <AdSection variant="sidebar" />
           </div>
         </div>

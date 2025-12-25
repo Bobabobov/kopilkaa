@@ -8,7 +8,7 @@ import NotFoundActions from "./components/NotFoundActions";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen w-full relative overflow-hidden" style={{ backgroundColor: "#004643" }}>
+    <div className="min-h-screen w-full relative overflow-hidden">
       <UniversalBackground />
       <NotFoundDecorations />
 

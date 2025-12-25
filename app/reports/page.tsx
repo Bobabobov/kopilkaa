@@ -290,8 +290,12 @@ export default function ReportsPage() {
           transition={{ duration: 0.5 }}
           className="text-center space-y-4"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-lg bg-gradient-to-br from-[#e16162] to-[#d14d4e]">
-            <LucideIcons.AlertTriangle className="text-white" size="lg" />
+          <div className="inline-flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56">
+            <img 
+              src="/kopibag.png" 
+              alt="Баг-репорты" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[#fffffe] via-[#abd1c6] to-[#e16162] bg-clip-text text-transparent">
             Баг-репорты

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect } from "react";
 import {
   StoriesHeader,
   StoryCard,
@@ -8,113 +8,34 @@ import {
   StoriesLoading,
   StoriesEmptyState,
 } from "@/components/stories";
-import PixelBackground from "@/components/ui/PixelBackground";
-
-interface Story {
-  id: string;
-  title: string;
-  summary: string;
-  createdAt: string;
-  images: Array<{ url: string; sort: number }>;
-  user: {
-    id: string;
-    name: string | null;
-    email: string;
-    avatar: string | null;
-  };
-  _count: {
-    likes: number;
-  };
-}
+import UniversalBackground from "@/components/ui/UniversalBackground";
+import { useStories } from "@/hooks/useStories";
 
 export default function StoriesPage() {
-  const [query, setQuery] = useState("");
-  const [stories, setStories] = useState<Story[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const observerTarget = useRef<HTMLDivElement>(null);
-  const previousQuery = useRef("");
-
-  // Загрузка историй
-  const loadStories = useCallback(async (page: number, isNewSearch = false) => {
-    try {
-      if (page === 1) {
-        setLoading(true);
-      } else {
-        setLoadingMore(true);
-      }
-
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: "12",
-        ...(query && { q: query }),
-      });
-
-      const response = await fetch(`/api/stories?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        const newStories = data.items || [];
-        
-        if (isNewSearch || page === 1) {
-          // При новом поиске - заменяем истории
-          setStories(newStories);
-        } else {
-          // При подгрузке - добавляем к существующим
-          setStories(prev => [...prev, ...newStories]);
-        }
-        
-        // Проверяем, есть ли ещё страницы
-        setHasMore(page < (data.pages || 1));
-      } else {
-        console.error("Failed to load stories");
-        if (page === 1) {
-          setStories([]);
-        }
-      }
-    } catch (error) {
-      console.error("Error loading stories:", error);
-      if (page === 1) {
-        setStories([]);
-      }
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, [query]);
-
-  // Загрузка при изменении поиска
-  useEffect(() => {
-    const isNewSearch = query !== previousQuery.current;
-    previousQuery.current = query;
-    
-    if (isNewSearch) {
-      setCurrentPage(1);
-      setHasMore(true);
-      loadStories(1, true);
-    }
-  }, [query, loadStories]);
-
-  // Загрузка при первом рендере
-  useEffect(() => {
-    loadStories(1, true);
-  }, []);
+  const {
+    stories,
+    loading,
+    loadingMore,
+    hasMore,
+    query,
+    setQuery,
+    loadNextPage,
+    observerTargetRef,
+    isInitialLoad,
+  } = useStories();
 
   // Intersection Observer для бесконечной прокрутки
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !loadingMore && hasMore && !loading) {
-          const nextPage = currentPage + 1;
-          setCurrentPage(nextPage);
-          loadStories(nextPage, false);
+          loadNextPage();
         }
       },
       { threshold: 0.1, rootMargin: "100px" }
     );
 
-    const currentTarget = observerTarget.current;
+    const currentTarget = observerTargetRef.current;
     if (currentTarget) {
       observer.observe(currentTarget);
     }
@@ -124,14 +45,16 @@ export default function StoriesPage() {
         observer.unobserve(currentTarget);
       }
     };
-  }, [loadingMore, hasMore, currentPage, loading, loadStories]);
+  }, [loadingMore, hasMore, loading, loadNextPage, observerTargetRef]);
 
   const hasQuery = query.trim().length > 0;
+  // Анимируем карточки только при первой загрузке (не при подгрузке следующих страниц)
+  const shouldAnimate = isInitialLoad && !loading;
 
   return (
     <div className="min-h-screen">
-      {/* Пиксельный фон */}
-      <PixelBackground />
+      {/* Фон */}
+      <UniversalBackground />
 
       {/* Header */}
       <StoriesHeader query={query} onQueryChange={setQuery} />
@@ -157,10 +80,15 @@ export default function StoriesPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {/* Рекламная карточка всегда первая */}
                 <AdCard index={0} />
-                
+
                 {/* Истории */}
                 {stories.map((story, index) => (
-                  <StoryCard key={story.id} story={story} index={index + 1} />
+                  <StoryCard
+                    key={story.id}
+                    story={story}
+                    index={index + 1}
+                    animate={shouldAnimate}
+                  />
                 ))}
               </div>
 
@@ -178,7 +106,7 @@ export default function StoriesPage() {
 
               {/* Невидимый элемент для отслеживания скролла */}
               {hasMore && !loadingMore && (
-                <div ref={observerTarget} className="h-20" />
+                <div ref={observerTargetRef} className="h-20" />
               )}
 
               {/* Сообщение о конце списка */}

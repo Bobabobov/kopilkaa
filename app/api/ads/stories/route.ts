@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
+// Явно указываем, что роут динамический (не кэшируется)
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const ad = await prisma.advertisement.findFirst({
@@ -17,6 +20,12 @@ export async function GET() {
       },
     });
 
+    if (!ad) {
+      console.log("No active stories ad found");
+      return NextResponse.json({ ad: null });
+    }
+
+    console.log("Found active stories ad:", { id: ad.id, placement: ad.placement, isActive: ad.isActive });
     return NextResponse.json({ ad });
   } catch (error) {
     console.error("Error fetching stories advertisement:", error);

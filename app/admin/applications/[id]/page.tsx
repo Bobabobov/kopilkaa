@@ -137,15 +137,14 @@ export default function AdminApplicationPage({
         <UniversalBackground />
         <div className="relative z-10">
           <motion.div 
-          className="text-center max-w-4xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          style={{ color: "#e16162" }}
-        >
-          {err}
-        </motion.div>
-          </div>
+            className="text-center max-w-4xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ color: "#e16162" }}
+          >
+            {err}
+          </motion.div>
         </div>
       </div>
     );

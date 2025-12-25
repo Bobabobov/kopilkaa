@@ -1,5 +1,5 @@
 // components/notifications/index.ts
-export { Notification, NotificationType } from './types';
+export type { Notification, NotificationType } from './types';
 export * from './utils';
 export { useNotifications } from './hooks/useNotifications';
 export { useNotificationBell } from './hooks/useNotificationBell';

@@ -19,7 +19,7 @@ type ResolvedAdResponse = {
 
 const TOP_BANNER_FALLBACK_IMAGE = "/gabriel-cardinal-goosebumps-patreon.gif";
 
-export async function findActiveAdByPlacement(placement: string) {
+async function findActiveAdByPlacement(placement: string) {
   const now = new Date();
   return prisma.advertisement
     .findFirst({

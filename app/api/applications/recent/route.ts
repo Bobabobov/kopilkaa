@@ -1,6 +1,9 @@
 // app/api/applications/recent/route.ts
 import { prisma } from "@/lib/db";
 
+// Явно указываем, что роут динамический (использует request.url)
+export const dynamic = 'force-dynamic';
+
 // Кэшируем на 10 секунд (реже обновляется чем статистика)
 export const revalidate = 10;
 

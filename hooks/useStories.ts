@@ -35,7 +35,7 @@ interface UseStoriesReturn {
   setQuery: (query: string) => void;
   loadNextPage: () => void;
   resetAndSearch: (newQuery: string) => void;
-  observerTargetRef: React.RefObject<HTMLDivElement>;
+  observerTargetRef: React.RefObject<HTMLDivElement | null>;
   isInitialLoad: boolean; // Флаг первой загрузки для анимаций
 }
 

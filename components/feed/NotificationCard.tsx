@@ -239,7 +239,9 @@ export default function NotificationCard({
                           borderColor: getRarityColor(notification.rarity) + '40',
                         }}
                       >
-                        <LucideIcons.Star className="w-4 h-4" style={{ color: getRarityColor(notification.rarity) }} />
+                        <span style={{ color: getRarityColor(notification.rarity) }}>
+                          <LucideIcons.Star className="w-4 h-4" />
+                        </span>
                         <span className="text-xs sm:text-sm font-medium" style={{ color: getRarityColor(notification.rarity) }}>
                           {getRarityLabel(notification.rarity)}
                         </span>

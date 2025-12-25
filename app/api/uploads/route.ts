@@ -4,10 +4,10 @@ import { writeFile, mkdir } from "fs/promises";
 import { join, extname } from "path";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/auth";
+import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ADMIN_MAX_SIZE = 20 * 1024 * 1024; // 20MB для админов
-const UPLOAD_DIR = join(process.cwd(), "uploads");
 
 // POST /api/uploads - загрузить файлы
 export async function POST(req: NextRequest) {
@@ -49,19 +49,20 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const UPLOAD_DIR = getUploadDir();
     await mkdir(UPLOAD_DIR, { recursive: true });
 
     const uploadedFiles = [];
 
     for (const file of files) {
       const arrayBuffer = await file.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
+      const buffer = Buffer.from(arrayBuffer);
       const ext = extname(file.name || "").toLowerCase() || ".jpg";
       const id = randomUUID().replace(/-/g, "");
       const filename = `${id}${ext}`;
-      const filepath = join(UPLOAD_DIR, filename);
+      const filepath = getUploadFilePath(filename);
 
-      await writeFile(filepath, uint8Array);
+      await writeFile(filepath, buffer);
 
       const url = `/api/uploads/${filename}`;
       uploadedFiles.push({ url, filename });

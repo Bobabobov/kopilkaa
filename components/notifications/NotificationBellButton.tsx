@@ -8,7 +8,7 @@ interface NotificationBellButtonProps {
   isOpen: boolean;
   unreadCount: number;
   onClick: () => void;
-  buttonRef: React.RefObject<HTMLButtonElement>;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 export default function NotificationBellButton({

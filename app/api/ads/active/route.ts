@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
+// Явно указываем, что роут динамический (не кэшируется)
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const now = new Date();
@@ -20,7 +23,10 @@ export async function GET() {
         },
         orderBy: { createdAt: "desc" },
       })
-      .catch(() => null);
+      .catch((error) => {
+        console.error("Error fetching home_sidebar ad:", error);
+        return null;
+      });
 
     // 2. Если нет отдельного размещения "home_sidebar" —
     //    берём любую другую активную рекламу, кроме большого баннера и stories
@@ -34,13 +40,18 @@ export async function GET() {
       },
           orderBy: { createdAt: "desc" },
         })
-        .catch(() => null);
+        .catch((error) => {
+          console.error("Error fetching fallback ad:", error);
+          return null;
+        });
     }
 
     if (!activeAd) {
+      console.log("No active ad found for home_sidebar");
       return NextResponse.json({ ad: null });
     }
 
+    console.log("Found active ad:", { id: activeAd.id, placement: activeAd.placement, isActive: activeAd.isActive });
     return NextResponse.json({ ad: activeAd });
   } catch (error) {
     console.error("Error fetching active ad:", error);

@@ -54,7 +54,7 @@
   .top-banner-component {
     position: relative;
     z-index: 40;
-    margin-top: 64px; /* Отступ для Header на мобильных */
+    margin-top: var(--header-height); /* Отступ для Header на мобильных */
   }
 
   @media (min-width: 768px) {

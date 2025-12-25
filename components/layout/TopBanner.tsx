@@ -344,18 +344,6 @@ export default function TopBanner({
               </div>
             )}
           </div>
-
-          {/* Правая часть - кнопки */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            {clickUrl && (
-              <a
-                href={clickUrl}
-                className={`px-4 py-2 text-sm font-semibold rounded-lg bg-[#f9bc60] text-[#001e1d] hover:bg-[#f9bc60]/90 transition-all duration-200 hover:scale-105`}
-              >
-                Перейти
-              </a>
-            )}
-          </div>
         </div>
 
         {/* Мобильная версия */}
@@ -372,18 +360,6 @@ export default function TopBanner({
             </div>
 
           </div>
-
-          {/* Нижняя часть - кнопка действия */}
-          {clickUrl && (
-            <div className="flex justify-center">
-              <a
-                href={clickUrl}
-                className={`px-6 py-2 text-sm font-semibold rounded-lg bg-[#f9bc60] text-[#001e1d] hover:bg-[#f9bc60]/90 transition-all duration-200 hover:scale-105`}
-              >
-                Перейти
-              </a>
-            </div>
-          )}
         </div>
       </div>
     </div>

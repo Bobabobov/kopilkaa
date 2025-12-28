@@ -8,7 +8,6 @@ interface SubmitSectionProps {
   submitting: boolean;
   uploading: boolean;
   left: number | null;
-  msg: string | null;
   err: string | null;
   onSubmit: (e: React.FormEvent) => void;
 }
@@ -17,7 +16,6 @@ export default function SubmitSection({
   submitting,
   uploading,
   left,
-  msg,
   err,
   onSubmit,
 }: SubmitSectionProps) {
@@ -95,19 +93,6 @@ export default function SubmitSection({
                 ? `Лимит: 1 заявка в 24 часа (осталось ${msToHuman(left)})`
                 : "Можете отправить заявку"}
             </span>
-          </div>
-        </motion.div>
-      )}
-
-      {msg && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-4 border border-green-200 dark:border-green-800 rounded-xl"
-        >
-          <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-            <LucideIcons.CheckCircle size="sm" />
-            <span className="font-medium">{msg}</span>
           </div>
         </motion.div>
       )}

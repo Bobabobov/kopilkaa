@@ -1,5 +1,5 @@
 // app/api/admin/users/[userId]/delete/route.ts
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
@@ -7,8 +7,8 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ userId: string }> },
 ) {
-  const session = await getSession();
-  if (!session || session.role !== "ADMIN") {
+  const admin = await getAllowedAdminUser();
+  if (!admin) {
     return NextResponse.json({ message: "Доступ запрещён" }, { status: 403 });
   }
 

@@ -30,6 +30,10 @@ interface FormFieldProps {
 
   // Дополнительные свойства
   rows?: number;
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement> & {
+    ref?: React.Ref<HTMLInputElement>;
+  };
+  textareaProps?: React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 }
 
 export default function FormField({
@@ -49,6 +53,8 @@ export default function FormField({
   delay = 0,
   compact = false,
   rows = 6,
+  inputProps,
+  textareaProps,
 }: FormFieldProps) {
   // Подсчет символов (без пробелов для textarea, с пробелами для input)
   const charCount =
@@ -97,6 +103,9 @@ export default function FormField({
 
   const IconComponent = icon ? LucideIcons[icon] : null;
   const ValidationIconComponent = getValidationIcon();
+  const htmlInputType =
+    type === "email" ? "text" : type === "input" ? "text" : type;
+  const finalInputType = inputProps?.type ?? htmlInputType;
 
   return (
     <div
@@ -121,6 +130,7 @@ export default function FormField({
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             rows={compact ? 2 : rows}
+            {...textareaProps}
             className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50 resize-none ${
               error || isRequiredEmpty
                 ? "border-red-400 bg-red-50/10"
@@ -156,10 +166,11 @@ export default function FormField({
                     ? "rgba(171, 209, 198, 0.05)"
                     : "rgba(0, 70, 67, 0.5)",
             }}
-            type={type === "email" ? "text" : type}
+            type={finalInputType}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
+            {...inputProps}
           />
         )}
 

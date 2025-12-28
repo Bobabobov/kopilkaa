@@ -1,12 +1,12 @@
 // app/api/admin/applications/stats/route.ts
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const s = await getSession();
-  if (!s || s.role !== "ADMIN")
+  const admin = await getAllowedAdminUser();
+  if (!admin)
     return Response.json({ error: "Forbidden" }, { status: 403 });
 
   const [pending, approved, rejected, total, totalAmount] = await Promise.all([

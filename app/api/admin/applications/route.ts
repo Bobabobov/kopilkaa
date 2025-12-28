@@ -1,13 +1,14 @@
 // app/api/admin/applications/route.ts
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
+import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET(req: Request) {
-  const s = await getSession();
-  if (!s || s.role !== "ADMIN")
+  const admin = await getAllowedAdminUser();
+  if (!admin)
     return Response.json({ error: "Forbidden" }, { status: 403 });
 
   const { searchParams } = new URL(req.url);
@@ -81,12 +82,17 @@ export async function GET(req: Request) {
     prisma.application.count({ where }),
   ]);
 
+  const safeItems = items.map((it: any) => ({
+    ...it,
+    story: sanitizeApplicationStoryHtml(it.story),
+  }));
+
   return Response.json({
     page,
     limit,
     total,
     pages: Math.ceil(total / limit),
-    items,
+    items: safeItems,
   }, {
     headers: {
       'Cache-Control': 'no-cache, no-store, must-revalidate',

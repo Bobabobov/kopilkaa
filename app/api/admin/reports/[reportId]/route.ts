@@ -1,5 +1,5 @@
 // app/api/admin/reports/[reportId]/route.ts
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
@@ -7,8 +7,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ reportId: string }> },
 ) {
-  const session = await getSession();
-  if (!session || session.role !== "ADMIN") {
+  const admin = await getAllowedAdminUser();
+  if (!admin) {
     return NextResponse.json({ message: "Доступ запрещён" }, { status: 403 });
   }
 
@@ -32,7 +32,7 @@ export async function PATCH(
       data: {
         status: status || report.status,
         adminComment: adminComment || report.adminComment,
-        processedBy: session.uid,
+        processedBy: admin.id,
       },
     });
 

@@ -1,6 +1,7 @@
 // app/api/applications/mine/route.ts
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
 export const dynamic = 'force-dynamic';
 
@@ -39,11 +40,16 @@ export async function GET(req: Request) {
     prisma.application.count({ where: { userId: session.uid } }),
   ]);
 
+  const safeItems = items.map((it: any) => ({
+    ...it,
+    story: sanitizeApplicationStoryHtml(it.story),
+  }));
+
   return Response.json({
     page,
     limit,
     total,
     pages: Math.ceil(total / limit),
-    items,
+    items: safeItems,
   });
 }

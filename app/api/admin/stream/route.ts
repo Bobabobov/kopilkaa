@@ -1,13 +1,13 @@
 // app/api/admin/stream/route.ts
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { subscribe } from "@/lib/sse";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET() {
-  const s = await getSession();
-  if (!s || s.role !== "ADMIN")
+  const admin = await getAllowedAdminUser();
+  if (!admin)
     return new Response("Forbidden", { status: 403 });
 
   const encoder = new TextEncoder();

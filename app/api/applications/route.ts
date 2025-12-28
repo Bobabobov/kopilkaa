@@ -3,6 +3,10 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { AchievementService } from "@/lib/achievements/service";
 import { publish } from "@/lib/sse";
+import {
+  getPlainTextLenFromHtml,
+  sanitizeApplicationStoryHtml,
+} from "@/lib/applications/sanitize";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -22,6 +26,9 @@ export async function POST(req: Request) {
         images: string[];
       };
 
+    const sanitizedStory = sanitizeApplicationStoryHtml(story);
+    const storyTextLen = getPlainTextLenFromHtml(sanitizedStory);
+
     // Валидация длин (расширенные лимиты для администратора)
     const isAdmin = session.role === "ADMIN";
     const titleMax = isAdmin ? 100 : 40;
@@ -40,7 +47,7 @@ export async function POST(req: Request) {
         { error: `Кратко обязательно (≤ ${summaryMax})` },
         { status: 400 },
       );
-    if (!story || story.length < storyMin || story.length > storyMax)
+    if (!sanitizedStory || storyTextLen < storyMin || storyTextLen > storyMax)
       return Response.json(
         { error: `История ${storyMin}–${storyMax} символов` },
         { status: 400 },
@@ -96,7 +103,7 @@ export async function POST(req: Request) {
           userId: session.uid,
           title,
           summary,
-          story,
+          story: sanitizedStory,
           amount: parseInt(amount),
           payment,
         },

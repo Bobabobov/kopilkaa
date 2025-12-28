@@ -1,5 +1,5 @@
 // app/api/admin/bug-reports/[id]/route.ts
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
@@ -9,8 +9,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getSession();
-  if (!session || session.role !== "ADMIN") {
+  const admin = await getAllowedAdminUser();
+  if (!admin) {
     return NextResponse.json({ message: "Доступ запрещён" }, { status: 403 });
   }
 
@@ -34,7 +34,7 @@ export async function PATCH(
       data: {
         status: status || bugReport.status,
         adminComment: adminComment || bugReport.adminComment,
-        processedBy: session.uid,
+        processedBy: admin.id,
       },
       include: {
         user: {
@@ -63,8 +63,8 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getSession();
-  if (!session || session.role !== "ADMIN") {
+  const admin = await getAllowedAdminUser();
+  if (!admin) {
     return NextResponse.json({ message: "Доступ запрещён" }, { status: 403 });
   }
 

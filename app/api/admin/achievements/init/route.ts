@@ -1,14 +1,14 @@
 // app/api/admin/achievements/init/route.ts
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getAllowedAdminUser } from '@/lib/adminAccess';
 import { prisma } from '@/lib/db';
 import { DEFAULT_ACHIEVEMENTS } from '@/lib/achievements/config';
 
 // POST /api/admin/achievements/init - инициализировать базовые достижения
 export async function POST(request: Request) {
   try {
-    const session = await getSession();
-    if (!session?.uid || session.role !== 'ADMIN') {
+    const admin = await getAllowedAdminUser();
+    if (!admin) {
       return NextResponse.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
 

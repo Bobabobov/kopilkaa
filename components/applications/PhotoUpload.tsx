@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
@@ -16,6 +17,35 @@ export default function PhotoUpload({
   maxPhotos,
   delay = 0.5,
 }: PhotoUploadProps) {
+  const prevUrlsRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    const prev = prevUrlsRef.current;
+    const next = photos.map((p) => p.url);
+    const removed = prev.filter((u) => !next.includes(u));
+    removed.forEach((u) => {
+      try {
+        URL.revokeObjectURL(u);
+      } catch {
+        // ignore
+      }
+    });
+    prevUrlsRef.current = next;
+  }, [photos]);
+
+  useEffect(() => {
+    return () => {
+      prevUrlsRef.current.forEach((u) => {
+        try {
+          URL.revokeObjectURL(u);
+        } catch {
+          // ignore
+        }
+      });
+      prevUrlsRef.current = [];
+    };
+  }, []);
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const mappedFiles = files.map((f) => ({
@@ -27,6 +57,14 @@ export default function PhotoUpload({
   };
 
   const removePhoto = (index: number) => {
+    const target = photos[index];
+    if (target?.url) {
+      try {
+        URL.revokeObjectURL(target.url);
+      } catch {
+        // ignore
+      }
+    }
     const newPhotos = photos.filter((_, i) => i !== index);
     onPhotosChange(newPhotos);
   };

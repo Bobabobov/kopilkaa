@@ -1,7 +1,7 @@
 // app/api/uploads/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
-import { join, extname } from "path";
+import { extname } from "path";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/auth";
 import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
@@ -64,7 +64,18 @@ export async function POST(req: NextRequest) {
     for (const file of files) {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const ext = extname(file.name || "").toLowerCase() || ".jpg";
+      const mimeToExt: Record<string, string> = {
+        "image/jpeg": ".jpg",
+        "image/png": ".png",
+        "image/gif": ".gif",
+        "image/webp": ".webp",
+        "video/mp4": ".mp4",
+        "video/webm": ".webm",
+      };
+      const ext =
+        mimeToExt[file.type] ||
+        extname(file.name || "").toLowerCase() ||
+        ".bin";
       const id = randomUUID().replace(/-/g, "");
       const filename = `${id}${ext}`;
       const filepath = getUploadFilePath(filename);

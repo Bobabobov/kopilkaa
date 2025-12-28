@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { AchievementService } from "@/lib/achievements/service";
 
 export const dynamic = "force-dynamic";
@@ -10,12 +10,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Debug endpoint disabled in production" }, { status: 403 });
   }
 
-  const session = await getSession();
-  if (!session?.uid || session.role !== "ADMIN") {
+  const admin = await getAllowedAdminUser();
+  if (!admin) {
     return NextResponse.json({ error: "Доступ запрещён" }, { status: 403 });
   }
 
-  const userId = req.nextUrl.searchParams.get("userId") || session.uid;
+  const userId = req.nextUrl.searchParams.get("userId") || admin.id;
   const achievements = await AchievementService.getAllAchievements();
   const progress = await AchievementService.getUserAchievementProgress(userId);
   const stats = await AchievementService.getUserStats(userId);

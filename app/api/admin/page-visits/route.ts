@@ -1,13 +1,13 @@
 // app/api/admin/page-visits/route.ts
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   try {
-    const session = await getSession();
-    if (!session || session.role !== "ADMIN") {
+    const admin = await getAllowedAdminUser();
+    if (!admin) {
       return Response.json({ error: "Доступ запрещен" }, { status: 403 });
     }
 

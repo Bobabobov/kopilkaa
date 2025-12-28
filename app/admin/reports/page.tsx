@@ -1,13 +1,13 @@
 // app/admin/reports/page.tsx
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 import AdminReportsClient from "./AdminReportsClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminReportsPage() {
-  const session = await getSession();
-  if (!session || session.role !== "ADMIN") {
+  const admin = await getAllowedAdminUser();
+  if (!admin) {
     redirect("/");
   }
   return <AdminReportsClient />;

@@ -1,10 +1,9 @@
 // app/applications/page.tsx
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import { msToHuman } from "@/lib/time";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { usePageTimeTracking } from "@/lib/usePageTimeTracking";
 import ProgressBar from "@/components/applications/ProgressBar";
@@ -33,11 +32,6 @@ const SubmitSection = dynamic(() => import("@/components/applications/SubmitSect
   loading: () => <div className="h-16 bg-[#004643]/30 animate-pulse rounded-2xl" />
 });
 
-const ApplicationPreview = dynamic(() => import("@/components/applications/ApplicationPreview"), {
-  ssr: false,
-  loading: () => <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
-});
-
 type LocalImage = { file: File; url: string };
 
 // Ключ для сохранения в localStorage
@@ -57,7 +51,7 @@ const LIMITS = {
 
 export default function ApplicationsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ id: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; email?: string | null } | null>(null);
 
   // Отслеживание времени на странице
   usePageTimeTracking({
@@ -74,11 +68,11 @@ export default function ApplicationsPage() {
   const [photos, setPhotos] = useState<LocalImage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [left, setLeft] = useState<number | null>(null); // для лимита 24ч
   const [submitted, setSubmitted] = useState(false); // для экрана успеха
-  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const amountInputRef = useRef<HTMLInputElement | null>(null);
 
   // Восстановление данных при загрузке страницы
   useEffect(() => {
@@ -100,12 +94,28 @@ export default function ApplicationsPage() {
   // Сохранение данных при изменении
   useEffect(() => {
     const data = { title, summary, story, amount, payment };
-    try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-    } catch (error) {
-      console.log('Ошибка при сохранении данных:', error);
-    }
+    const t = window.setTimeout(() => {
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+      } catch (error) {
+        console.log("Ошибка при сохранении данных:", error);
+      }
+    }, 250);
+    return () => window.clearTimeout(t);
   }, [title, summary, story, amount, payment]);
+
+  const getCurrentPathWithQuery = () => {
+    try {
+      return window.location.pathname + window.location.search;
+    } catch {
+      return "/applications";
+    }
+  };
+
+  const pushAuth = (mode: "auth" | "signup") => {
+    const next = encodeURIComponent(getCurrentPathWithQuery());
+    router.push(`/?modal=auth${mode === "signup" ? "/signup" : ""}&next=${next}`);
+  };
 
   // Проверка авторизации
   useEffect(() => {
@@ -113,51 +123,73 @@ export default function ApplicationsPage() {
       .then((r) => r.json())
       .then((d) => {
         if (!d.user) {
-          router.push("/?modal=auth/signup");
+          pushAuth("signup");
           return;
         }
         setUser(d.user);
       })
-      .catch(() => router.push("/?modal=auth/signup"))
+      .catch(() => pushAuth("signup"))
       .finally(() => setLoadingAuth(false));
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-
-  const onPickFiles = (files: FileList | null) => {
-    if (!files) return;
-    const arr = Array.from(files);
-    const rest = Math.max(0, LIMITS.maxPhotos - photos.length);
-    const toAdd = arr.slice(0, rest);
-    const mapped = toAdd.map((f) => ({ file: f, url: URL.createObjectURL(f) }));
-    setPhotos((p) => [...p, ...mapped]);
+  const formatAmountRu = (digits: string) => {
+    if (!digits) return "";
+    const n = Number(digits);
+    if (!Number.isFinite(n)) return digits;
+    return n.toLocaleString("ru-RU");
   };
 
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    onPickFiles(e.dataTransfer.files);
+  const countDigits = (s: string) => (s.match(/\d/g) || []).length;
+
+  const caretPosForDigitIndex = (formatted: string, digitIndex: number) => {
+    if (digitIndex <= 0) return 0;
+    let seen = 0;
+    for (let i = 0; i < formatted.length; i++) {
+      if (/\d/.test(formatted[i])) {
+        seen++;
+        if (seen >= digitIndex) return i + 1;
+      }
+    }
+    return formatted.length;
   };
 
-  const removeAt = (i: number) =>
-    setPhotos((p) => p.filter((_, idx) => idx !== i));
-  const move = (i: number, dir: -1 | 1) => {
-    setPhotos((p) => {
-      const arr = [...p];
-      const j = i + dir;
-      if (j < 0 || j >= arr.length) return arr;
-      const tmp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = tmp;
-      return arr;
+  const handleAmountInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const caret = e.target.selectionStart ?? raw.length;
+    const digitsBeforeCaret = countDigits(raw.slice(0, caret));
+    const nextDigits = raw.replace(/[^\d]/g, "");
+
+    setAmount(nextDigits);
+
+    requestAnimationFrame(() => {
+      const el = amountInputRef.current;
+      if (!el) return;
+      const nextFormatted = formatAmountRu(nextDigits);
+      const safeDigitsBefore = Math.min(digitsBeforeCaret, countDigits(nextFormatted));
+      const nextCaret = caretPosForDigitIndex(nextFormatted, safeDigitsBefore);
+      try {
+        el.setSelectionRange(nextCaret, nextCaret);
+      } catch {
+        // ignore
+      }
     });
   };
+
+  const storyTextLen = useMemo(() => {
+    if (!story) return 0;
+    const div = document.createElement("div");
+    div.innerHTML = story;
+    return (div.textContent || div.innerText || "").replace(/\s/g, "").length;
+  }, [story]);
 
   const valid =
     title.length > 0 &&
     title.length <= LIMITS.titleMax &&
     summary.length > 0 &&
     summary.length <= LIMITS.summaryMax &&
-    story.length >= LIMITS.storyMin &&
-    story.length <= LIMITS.storyMax &&
+    storyTextLen >= LIMITS.storyMin &&
+    storyTextLen <= LIMITS.storyMax &&
     amount.length > 0 &&
     parseInt(amount) >= LIMITS.amountMin &&
     parseInt(amount) <= LIMITS.amountMax &&
@@ -209,12 +241,11 @@ export default function ApplicationsPage() {
 
   const submit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    setMsg(null);
     setErr(null);
 
     // Дополнительная проверка авторизации при отправке
     if (!user) {
-      router.push("/?modal=auth/signup");
+      pushAuth("signup");
       return;
     }
 
@@ -241,7 +272,7 @@ export default function ApplicationsPage() {
       const d = await r.json();
       if (r.status === 401) {
         // Если сессия истекла во время заполнения формы
-        router.push("/?modal=auth");
+        pushAuth("auth");
         return;
       }
       if (r.status === 429 && d?.leftMs) {
@@ -464,12 +495,20 @@ export default function ApplicationsPage() {
                     type="input"
                     label="Сумма запроса"
                     icon="DollarSign"
-                    value={amount}
-                    onChange={setAmount}
+                    value={formatAmountRu(amount)}
+                    onChange={() => {}}
                     placeholder="Укажите сумму в рублях..."
                     hint="Сумма в рублях (от 1 до 1 000 000 рублей)"
                     minLength={LIMITS.amountMin}
                     maxLength={7}
+                    inputProps={{
+                      type: "tel",
+                      inputMode: "numeric",
+                      pattern: "[0-9]*",
+                      autoComplete: "off",
+                      ref: amountInputRef,
+                      onChange: handleAmountInputChange,
+                    }}
                     delay={0.4}
                     required={true}
                   />
@@ -503,7 +542,6 @@ export default function ApplicationsPage() {
                   submitting={submitting}
                   uploading={uploading}
                   left={left}
-                  msg={msg}
                   err={err}
                   onSubmit={submit}
                 />

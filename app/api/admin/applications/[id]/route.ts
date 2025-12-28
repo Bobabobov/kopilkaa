@@ -2,17 +2,18 @@
 export const runtime = "nodejs"; // чтобы работало с nodemailer на Node
 
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { publish } from "@/lib/sse";
 import { sendStatusEmail } from "@/lib/email";
 import { AchievementService } from "@/lib/achievements/service";
+import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
 ) {
-  const s = await getSession();
-  if (!s || s.role !== "ADMIN")
+  const admin = await getAllowedAdminUser();
+  if (!admin)
     return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {
@@ -25,7 +26,12 @@ export async function GET(
     });
 
     if (!item) return Response.json({ error: "Not found" }, { status: 404 });
-    return Response.json({ item });
+    return Response.json({
+      item: {
+        ...item,
+        story: sanitizeApplicationStoryHtml(item.story),
+      },
+    });
   } catch (error) {
     return Response.json({ error: "Server error" }, { status: 500 });
   }
@@ -35,8 +41,8 @@ export async function PATCH(
   req: Request,
   { params }: { params: { id: string } },
 ) {
-  const s = await getSession();
-  if (!s || s.role !== "ADMIN")
+  const admin = await getAllowedAdminUser();
+  if (!admin)
     return Response.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json().catch(() => ({}));
@@ -97,8 +103,8 @@ export async function DELETE(
   req: Request,
   { params }: { params: { id: string } },
 ) {
-  const s = await getSession();
-  if (!s || s.role !== "ADMIN")
+  const admin = await getAllowedAdminUser();
+  if (!admin)
     return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {

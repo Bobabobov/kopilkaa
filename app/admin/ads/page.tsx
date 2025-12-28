@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 import AdsManagementClient from "./AdsManagementClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
   // Серверная проверка: доступ только для админа
-  const s = await getSession();
-  if (!s || s.role !== "ADMIN") {
+  const admin = await getAllowedAdminUser();
+  if (!admin) {
     redirect("/");
   }
 

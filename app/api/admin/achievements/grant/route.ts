@@ -1,13 +1,13 @@
 // app/api/admin/achievements/grant/route.ts
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getAllowedAdminUser } from '@/lib/adminAccess';
 import { prisma } from '@/lib/db';
 
 // POST /api/admin/achievements/grant - выдать достижение пользователю
 export async function POST(request: Request) {
   try {
-    const session = await getSession();
-    if (!session?.uid || session.role !== 'ADMIN') {
+    const admin = await getAllowedAdminUser();
+    if (!admin) {
       return NextResponse.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
 
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
         userId: userId,
         achievementId: achievementId,
         unlockedAt: new Date(),
-        grantedBy: session.uid, // ID админа, который выдал достижение
+        grantedBy: admin.id, // ID админа, который выдал достижение
       },
     });
 

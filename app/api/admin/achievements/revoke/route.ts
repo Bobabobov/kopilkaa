@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 
 // POST /api/admin/achievements/revoke - отозвать достижение у пользователя
 export async function POST(request: Request) {
   try {
-    const session = await getSession();
-    if (!session?.uid || session.role !== "ADMIN") {
+    const admin = await getAllowedAdminUser();
+    if (!admin) {
       return NextResponse.json({ error: "Доступ запрещён" }, { status: 403 });
     }
 

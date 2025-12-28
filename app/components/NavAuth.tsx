@@ -47,20 +47,28 @@ export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps)
       signal: controller.signal,
     })
       .then((r) => {
-        if (!r.ok) {
-          throw new Error(`HTTP error! status: ${r.status}`);
-        }
+        // 401 — это нормально, просто не авторизован
+        if (r.status === 401) return null;
+        if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
         return r.json();
       })
       .then((d) => {
         if (!cancelled) {
+          if (!d) {
+            setUser(null);
+            notifyAuthChange(false);
+            return;
+          }
           setUser(d.user);
-          notifyAuthChange(true);
+          notifyAuthChange(!!d.user);
         }
       })
       .catch((error) => {
         if (!cancelled && error.name !== 'AbortError') {
-          console.error("Error fetching user:", error);
+          // В проде не спамим консолью, 401/сетевые мелочи не критичны.
+          if (process.env.NODE_ENV !== "production") {
+            console.error("Error fetching user:", error);
+          }
         }
         if (!cancelled) {
           setUser(null);

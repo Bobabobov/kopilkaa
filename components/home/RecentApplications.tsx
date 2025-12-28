@@ -28,11 +28,15 @@ export default function RecentApplications() {
         const response = await fetch("/api/applications/recent?limit=3");
         if (response.ok) {
           const data = await response.json();
-          console.log("Recent applications data:", data);
+          if (process.env.NODE_ENV !== "production") {
+            console.log("Recent applications data:", data);
+          }
           setApplications(data.applications || []);
         }
       } catch (error) {
-        console.error("Error fetching recent applications:", error);
+        if (process.env.NODE_ENV !== "production") {
+          console.error("Error fetching recent applications:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -135,7 +139,9 @@ export default function RecentApplications() {
                         alt={app.user ? (app.user.name || "User") : "User"}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          console.log("Avatar load error:", app.user?.avatar);
+                          if (process.env.NODE_ENV !== "production") {
+                            console.log("Avatar load error:", app.user?.avatar);
+                          }
                           e.currentTarget.src = "/default-avatar.png";
                         }}
                       />

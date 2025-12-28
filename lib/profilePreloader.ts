@@ -28,7 +28,10 @@ class ProfilePreloader {
     try {
       await this.preloadPromise;
     } catch (error) {
-      console.error("Profile preload failed:", error);
+      // В проде не засоряем консоль: отсутствие авторизации/сетевые мелочи ожидаемы.
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Profile preload failed:", error);
+      }
     } finally {
       this.isPreloading = false;
     }
@@ -45,9 +48,22 @@ class ProfilePreloader {
       });
 
       if (!response.ok) {
+        // 401 — просто не авторизован. Это не ошибка и не повод фоллбэчить/логировать.
+        if (response.status === 401) {
+          return {
+            user: null,
+            friends: [],
+            receivedRequests: [],
+            achievements: [],
+            stats: {},
+            notifications: [],
+          };
+        }
         // Если новый API недоступен, используем fallback
         if (response.status === 404 || response.status === 500) {
-          console.warn("Dashboard API not available for preload, using fallback");
+          if (process.env.NODE_ENV !== "production") {
+            console.warn("Dashboard API not available for preload, using fallback");
+          }
           return this.fetchProfileDataFallback();
         }
         throw new Error(`Profile preload failed: ${response.status}`);
@@ -56,7 +72,9 @@ class ProfilePreloader {
       return response.json();
     } catch (error) {
       // При любой ошибке пытаемся использовать fallback
-      console.warn("Profile preload failed, trying fallback:", error);
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("Profile preload failed, trying fallback:", error);
+      }
       return this.fetchProfileDataFallback();
     }
   }
@@ -68,6 +86,18 @@ class ProfilePreloader {
         fetch("/api/profile/me", { cache: "no-store" }),
         fetch("/api/profile/stats", { cache: "no-store" }).catch(() => null),
       ]);
+
+      // 401 — не авторизован, возвращаем пустые данные без ошибок
+      if (userResponse.status === 401) {
+        return {
+          user: null,
+          friends: [],
+          receivedRequests: [],
+          achievements: [],
+          stats: {},
+          notifications: [],
+        };
+      }
 
       const userData = userResponse.ok ? await userResponse.json() : null;
       const statsData = statsResponse?.ok ? await statsResponse.json() : {};
@@ -81,7 +111,9 @@ class ProfilePreloader {
         notifications: [],
       };
     } catch (error) {
-      console.error("Fallback preload also failed:", error);
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Fallback preload also failed:", error);
+      }
       throw error;
     }
   }

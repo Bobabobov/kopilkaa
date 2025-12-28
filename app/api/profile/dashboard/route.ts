@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { createHash } from "crypto";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { getSupportBadgeForUser } from "@/lib/supportBadges";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -201,6 +202,10 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Бейдж поддержки (разовая / подписка)
+    const supportBadge = await getSupportBadgeForUser(userId);
+    const userWithBadges = { ...(user as any), supportBadge };
+
     // Подсчитываем статистику
     const stats = {
       totalApplications: applications.length,
@@ -250,6 +255,7 @@ export async function GET(request: NextRequest) {
         avatarFrame: user.avatarFrame ?? "",
         hideEmail: Boolean(user.hideEmail),
         lastSeen: user.lastSeen ? new Date(user.lastSeen).getTime() : 0,
+        supportBadge: supportBadge ?? "",
       },
       stats,
       latest: {
@@ -269,7 +275,7 @@ export async function GET(request: NextRequest) {
     }
 
     const response = NextResponse.json({
-      user,
+      user: userWithBadges,
       friends,
       receivedRequests: receivedRequestsData.map((req: any) => ({
         ...req,

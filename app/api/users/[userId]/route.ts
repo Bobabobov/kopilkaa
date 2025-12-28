@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { getSupportBadgeForUser } from "@/lib/supportBadges";
 
 export async function GET(
   request: Request,
@@ -46,14 +47,13 @@ export async function GET(
       );
     }
 
-    console.log("User data from DB:", {
-      id: user.id,
-      isBanned: user.isBanned,
-      bannedUntil: user.bannedUntil?.toISOString(),
-      bannedReason: user.bannedReason,
-    });
+    const supportBadge = await getSupportBadgeForUser(user.id);
+    const safeUser = sanitizeEmailForViewer(
+      { ...(user as any), supportBadge },
+      session.uid,
+    );
 
-    return NextResponse.json({ user: sanitizeEmailForViewer(user as any, session.uid) });
+    return NextResponse.json({ user: safeUser });
   } catch (error) {
     console.error("Get user error:", error);
     return NextResponse.json(

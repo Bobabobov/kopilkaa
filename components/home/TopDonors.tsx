@@ -85,7 +85,7 @@ export default function TopDonors() {
     }
   };
 
-  // Разделяем главного героя и остальных для более «вау»-эффекта
+  // Разделяем главного героя и остальных
   const topDonor = donors[0];
   const otherDonors = donors.slice(1, 3);
 

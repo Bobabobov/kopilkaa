@@ -31,17 +31,17 @@ export async function POST(request: NextRequest) {
     const shopId = process.env.YOOKASSA_SHOP_ID;
     const secretKey = process.env.YOOKASSA_SECRET_KEY;
 
-    if (!shopId || !secretKey) {
-      console.error("YOOKASSA_SHOP_ID или YOOKASSA_SECRET_KEY не настроены в .env.local");
-      return NextResponse.json(
-        { success: false, error: "Платёжная система не настроена" },
-        { status: 500 }
-      );
-    }
-
     // Получаем информацию о пользователе (если авторизован)
     const session = await getSession();
     const userId = session?.uid || null;
+
+    if (!shopId || !secretKey) {
+      console.error("YOOKASSA_SHOP_ID или YOOKASSA_SECRET_KEY не настроены в .env.local");
+      return NextResponse.json({
+        success: false,
+        error: "Платёжная система не настроена",
+      }, { status: 500 });
+    }
 
     // Создаём уникальный ID для платежа
     const paymentId = `kopilka_${Date.now()}_${Math.random().toString(36).substring(7)}`;

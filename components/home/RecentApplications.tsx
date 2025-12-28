@@ -76,7 +76,7 @@ export default function RecentApplications() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: "#fffffe" }}>
-            Истории успеха
+            Истории людей
           </h2>
           <p className="text-xl" style={{ color: "#abd1c6" }}>
             Люди, которым уже помогли
@@ -177,7 +177,7 @@ export default function RecentApplications() {
               color: "#abd1c6",
             }}
           >
-            Смотреть все заявки
+            Смотреть все истории
             <LucideIcons.ArrowRight size="sm" />
           </Link>
         </motion.div>

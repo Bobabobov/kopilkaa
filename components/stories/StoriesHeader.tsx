@@ -24,7 +24,7 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
             className="text-4xl sm:text-5xl md:text-6xl font-bold"
             style={{ color: "#fffffe" }}
           >
-            Истории Помощи
+            Истории платформы
           </h1>
         </div>
 
@@ -32,11 +32,10 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
           className="text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto px-4"
           style={{ color: "#abd1c6" }}
         >
-          Читайте вдохновляющие истории людей, которые получили помощь через
-          нашу платформу.
+          Здесь публикуются истории пользователей, по которым платформа приняла решение о финансовой поддержке.
           <span className="font-medium" style={{ color: "#f9bc60" }}>
             {" "}
-            Каждая история — это надежда
+            Каждая история — это пример того, как работает «Копилка»
           </span>
         </p>
       </div>

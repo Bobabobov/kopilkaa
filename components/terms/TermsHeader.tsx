@@ -36,7 +36,6 @@ export default function TermsHeader() {
         className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-[#abd1c6]/80"
       >
         <span>Версия: 1.0</span>
-        <span className="hidden sm:inline">•</span>
         <span>Дата вступления в силу: 25.09.2025</span>
       </motion.div>
     </motion.div>

@@ -30,9 +30,9 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           className="text-5xl md:text-7xl font-bold mb-6"
           style={{ color: "#fffffe" }}
         >
-          Расскажи историю
+          Нужны деньги и неоткуда взять?
           <br />
-          <span style={{ color: "#f9bc60" }}>получи деньги</span>
+          <span style={{ color: "#f9bc60" }}>Расскажите свою историю</span>
         </h1>
 
         {/* Описание */}
@@ -40,7 +40,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           className="text-xl md:text-2xl mb-8 leading-relaxed"
           style={{ color: "#abd1c6" }}
         >
-          Экспериментальная платформа житейских историй. Рассказывай, играй, участвуй в стримах. Без гарантий, без обещаний — только честность.
+          Копилка — платформа, которая самостоятельно оказывает финансовую поддержку пользователям
         </p>
 
         {/* Кнопки действий */}
@@ -105,7 +105,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
             className="mt-4 text-base" 
             style={{ color: "#abd1c6" }}
           >
-            Поддержи эксперимент и попади в рейтинг легенд
+            В знак благодарности поддержавшие могут быть отмечены в рейтинге сообщества "Герои"
           </motion.p>
         </motion.div>
 
@@ -139,7 +139,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           <AdSection variant="feed" />
         </div>
 
-        {/* Рекламный блок (бывший боковой) — теперь под кнопками на главной
+        {/* Рекламный блок
             Показываем только на средних и больших экранах */}
         <div className="mb-10 hidden md:flex justify-center">
           <div className="w-full" style={{ maxWidth: '900px' }}>
@@ -155,7 +155,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
         {/* Статистика платформы */}
         <div className="max-w-2xl mx-auto animate-fade-in-up">
           <h2 className="text-3xl font-bold mb-8" style={{ color: "#fffffe" }}>
-            Статистика эксперимента
+            Статистика платформы
           </h2>
 
           {/* Основная сумма */}

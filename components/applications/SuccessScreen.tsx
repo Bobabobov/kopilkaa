@@ -71,7 +71,7 @@ export default function SuccessScreen({
         className="mb-8 sm:mb-10 max-w-2xl mx-auto px-4"
       >
         <p className="text-base sm:text-lg md:text-xl text-[#abd1c6] leading-relaxed mb-3">
-          Спасибо за вашу заявку! Мы получили её и передали на модерацию.
+          Спасибо за вашу заявку!
         </p>
         <motion.p
           initial={{ opacity: 0 }}
@@ -85,7 +85,7 @@ export default function SuccessScreen({
           >
             🔔
           </motion.span>
-          Вы получите уведомление о результате в течение 24 часов.
+          Вы получите уведомление о результате в личном кабинете!
         </motion.p>
       </motion.div>
 
@@ -122,7 +122,7 @@ export default function SuccessScreen({
               Модерация
             </h3>
             <p className="text-xs sm:text-sm text-center text-[#abd1c6] leading-relaxed">
-              Ваша заявка проверяется модераторами
+              Ваша заявка проверяется.
             </p>
           </div>
         </motion.div>
@@ -154,7 +154,7 @@ export default function SuccessScreen({
               Уведомления
             </h3>
             <p className="text-xs sm:text-sm text-center text-[#abd1c6] leading-relaxed">
-              Мы сообщим о результате на email
+              Мы сообщим о результате.
             </p>
           </div>
         </motion.div>

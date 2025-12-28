@@ -42,7 +42,7 @@ export default function TipsSidebar({
               size="sm"
               className="text-green-500 mt-0.5 flex-shrink-0"
             />
-            <span>Добавьте фотографии для лучшего понимания</span>
+            <span>При необходимости вы можете приложить фотографии для пояснения ситуации</span>
           </div>
           <div className="flex items-start gap-3">
             <LucideIcons.CheckCircle

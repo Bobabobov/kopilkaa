@@ -8,15 +8,14 @@ export default function HeroesHero() {
       <div className="text-center max-w-4xl mx-auto">
         {/* Заголовок */}
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 text-[#fffffe] leading-tight">
-          Наши
+          Пользователи
           <br />
-          <span className="text-[#f9bc60]">топ‑донатеры</span>
+          <span className="text-[#f9bc60]">Поддержавшие проект</span>
         </h1>
 
         {/* Описание */}
         <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 leading-relaxed text-[#abd1c6] px-2">
-          Пользователи, которые задонатили проекту больше всех и помогли выйти в свет
-          десяткам историй.
+          Которые внесли вклад в развитие платформы «Копилка» и её работу.
         </p>
 
         {/* CTA */}

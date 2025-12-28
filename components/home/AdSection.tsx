@@ -21,7 +21,7 @@ interface Advertisement {
 interface AdSectionProps {
   /** 
    * sidebar – компактный блок для боковой колонки (десктоп)
-   * feed – карточка внутри ленты (мобильный вариант в стиле vc.ru)
+   * feed – карточка внутри ленты
    */
   variant?: "sidebar" | "feed";
 }
@@ -92,7 +92,7 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
   
   const displayAd = ad || defaultAd;
 
-  // Вариант карточки в ленте — лёгкая светлая карточка в стиле vc.ru (МОБИЛЬНАЯ ВЕРСИЯ)
+  // Вариант карточки в ленте — лёгкая светлая карточка
   if (variant === "feed") {
     // Используем мобильные данные, если они указаны, иначе fallback на десктопные
     const mobileImageUrl = (ad?.config?.sidebarMobileImageUrl && ad.config.sidebarMobileImageUrl.trim() !== "")

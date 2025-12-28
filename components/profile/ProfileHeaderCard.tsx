@@ -32,6 +32,7 @@ type User = {
   approvedApplications?: number;
   friendsCount?: number;
   donationsCount?: number;
+  supportBadge?: "supporter" | "subscriber" | null;
 };
 
 type FriendshipStatus = "none" | "requested" | "incoming" | "friends";
@@ -424,6 +425,18 @@ export default function ProfileHeaderCard({
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">
                       <LucideIcons.Shield className="w-3 h-3" />
                       <span className="hidden xs:inline">ADMIN</span>
+                    </span>
+                  )}
+                  {user.supportBadge === "subscriber" && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold text-white border border-emerald-300/40 bg-gradient-to-r from-emerald-500/70 to-green-500/60 shadow-[0_10px_30px_rgba(16,185,129,0.18)]">
+                      <LucideIcons.Crown className="w-3.5 h-3.5 text-emerald-100" />
+                      Подписка
+                    </span>
+                  )}
+                  {user.supportBadge === "supporter" && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold text-white border border-pink-300/35 bg-gradient-to-r from-pink-500/55 to-rose-500/45 shadow-[0_10px_30px_rgba(244,63,94,0.14)]">
+                      <LucideIcons.Heart className="w-3.5 h-3.5 text-pink-100" />
+                      Поддержал проект
                     </span>
                   )}
                   {/* Статус онлайн/оффлайн */}

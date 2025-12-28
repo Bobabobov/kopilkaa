@@ -66,6 +66,8 @@ export function middleware(req: NextRequest) {
   // Применяем rate limiting к чувствительным API роутам (anti-spam)
   // NOTE: это in-memory лимит (VPS). Для нескольких инстансов нужен Redis.
   const path = req.nextUrl.pathname;
+  const modal = req.nextUrl.searchParams.get("modal") || "";
+  const isAuthModal = modal === "auth" || modal.startsWith("auth/");
   const isPost = req.method === "POST";
   const isAuthApi = path.startsWith("/api/auth/");
   const isUploadsApi = path === "/api/uploads";
@@ -132,7 +134,8 @@ export function middleware(req: NextRequest) {
         "default-src 'self'",
         // По умолчанию НЕ разрешаем 'unsafe-eval' (это сильно ослабляет защиту).
         // Для /tower-blocks он нужен из-за внешних скриптов игры.
-        isTowerBlocks
+        // Для auth-модалки он нужен из-за Telegram widget (внутри использует eval).
+        isTowerBlocks || isAuthModal
           ? "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://codepen.io https://cdnjs.cloudflare.com https://telegram.org https://accounts.google.com"
           : "script-src 'self' 'unsafe-inline' https://telegram.org https://accounts.google.com",
         "style-src 'self' 'unsafe-inline' https://accounts.google.com", // Tailwind/Google OAuth
@@ -141,7 +144,8 @@ export function middleware(req: NextRequest) {
         // Разрешаем загрузку видео с внешних источников
         "media-src 'self' blob: data: https:",
         // Разрешаем запросы к Telegram OAuth и Google OAuth (для виджета входа)
-        "connect-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com",
+        // Google Identity Services иногда делает запросы на play.google.com/log (телеметрия).
+        "connect-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com https://play.google.com",
         // Разрешаем встраивать iframe Telegram OAuth и Google OAuth
         "frame-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com",
         "frame-ancestors 'self'",

@@ -31,10 +31,6 @@ export async function GET(request: Request) {
       .map((a) => a.userId)
       .filter((id): id is string => typeof id === "string" && id.length > 0);
 
-    const aggregatesWithUser = aggregates.filter(
-      (a): a is (typeof aggregates)[number] & { userId: string } =>
-        typeof a.userId === "string" && a.userId.length > 0,
-    );
     if (!userIds.length) {
       return NextResponse.json(
         {
@@ -84,8 +80,10 @@ export async function GET(request: Request) {
 
     const byId = new Map(users.map((u) => [u.id, u]));
 
-    const heroesRawAll = aggregatesWithUser
+    const heroesRawAll = aggregates
       .map((agg) => {
+        // Prisma groupBy может вернуть userId = null (анонимные донаты)
+        if (!agg.userId) return null;
         const user = byId.get(agg.userId);
         if (!user) return null;
 

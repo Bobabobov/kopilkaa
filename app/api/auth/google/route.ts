@@ -6,7 +6,6 @@ import { checkUserBan } from "@/lib/ban-check";
 import { OAuth2Client } from "google-auth-library";
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
-const googleClient = new OAuth2Client(googleClientId);
 
 interface GoogleAuthData {
   credential: string; // Google ID token
@@ -31,9 +30,12 @@ export async function POST(req: NextRequest) {
     if (!googleClientId) {
       return NextResponse.json(
         { success: false, error: "Google OAuth не настроен (GOOGLE_CLIENT_ID)" },
-        { status: 500 },
+        // 503 = сервис не готов (а не “внутренняя ошибка кода”)
+        { status: 503 },
       );
     }
+
+    const googleClient = new OAuth2Client(googleClientId);
 
     // ВАЖНО: токен Google нужно именно ВЕРИФИЦИРОВАТЬ (подпись/issuer/audience),
     // а не просто "декодировать".

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { createHash } from "crypto";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -160,6 +162,7 @@ export async function GET(request: NextRequest) {
               name: true,
               email: true,
               avatar: true,
+              hideEmail: true,
             },
           },
           application: {
@@ -189,10 +192,10 @@ export async function GET(request: NextRequest) {
           totalAmountRequested: 0,
           approvedAmount: 0,
           friendsCount: 0,
-          receivedRequestsCount: 0,
+          pendingFriendRequests: 0,
           achievementsCount: 0,
-          gamesPlayed: 0,
-          bestScore: 0,
+          gameAttempts: 0,
+          bestGameScore: 0,
         },
         notifications: [],
       });
@@ -222,24 +225,58 @@ export async function GET(request: NextRequest) {
       createdAt: friendship.createdAt,
       requesterId: friendship.requesterId,
       receiverId: friendship.receiverId,
-      requester: friendship.requester,
-      receiver: friendship.receiver,
+      requester: sanitizeEmailForViewer(friendship.requester as any, userId),
+      receiver: sanitizeEmailForViewer(friendship.receiver as any, userId),
     }));
 
     // Форматируем уведомления 
     const formattedNotifications = notifications.map(like => ({
       id: like.id,
       type: 'like',
-      user: like.user,
+      user: sanitizeEmailForViewer(like.user as any, userId),
       application: like.application,
       createdAt: like.createdAt,
       timestamp: getTimeAgo(like.createdAt),
     }));
 
+    // Стабильный ETag: зависит от реально важных кусочков данных (а не от Date.now()).
+    // Это нужно, чтобы браузер/клиент могли получать 304 Not Modified и не грузить всё заново.
+    const etagPayload = {
+      userId,
+      user: {
+        name: user.name ?? "",
+        avatar: user.avatar ?? "",
+        headerTheme: user.headerTheme ?? "",
+        avatarFrame: user.avatarFrame ?? "",
+        hideEmail: Boolean(user.hideEmail),
+        lastSeen: user.lastSeen ? new Date(user.lastSeen).getTime() : 0,
+      },
+      stats,
+      latest: {
+        friend: friendsData[0]?.createdAt ? new Date(friendsData[0].createdAt).getTime() : 0,
+        request: receivedRequestsData[0]?.createdAt ? new Date(receivedRequestsData[0].createdAt).getTime() : 0,
+        achievement: achievements[0]?.unlockedAt ? new Date(achievements[0].unlockedAt).getTime() : 0,
+        notification: notifications[0]?.createdAt ? new Date(notifications[0].createdAt).getTime() : 0,
+      },
+    };
+    const etag = `"${createHash("sha1").update(JSON.stringify(etagPayload)).digest("hex")}"`;
+    const ifNoneMatch = request.headers.get("if-none-match");
+    if (ifNoneMatch && ifNoneMatch === etag) {
+      const notModified = new NextResponse(null, { status: 304 });
+      notModified.headers.set("Cache-Control", "private, max-age=30, stale-while-revalidate=60");
+      notModified.headers.set("ETag", etag);
+      return notModified;
+    }
+
     const response = NextResponse.json({
       user,
       friends,
-      receivedRequests: receivedRequestsData,
+      receivedRequests: receivedRequestsData.map((req: any) => ({
+        ...req,
+        requester: req.requester
+          ? sanitizeEmailForViewer(req.requester as any, userId)
+          : req.requester,
+      })),
       achievements: achievements.map(ua => ({
         id: ua.id,
         unlockedAt: ua.unlockedAt,
@@ -253,7 +290,7 @@ export async function GET(request: NextRequest) {
 
     // Добавляем заголовки кэширования
     response.headers.set("Cache-Control", "private, max-age=30, stale-while-revalidate=60");
-    response.headers.set("ETag", `profile-${userId}-${Date.now()}`);
+    response.headers.set("ETag", etag);
 
     return response;
   } catch (error) {

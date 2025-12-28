@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import AdsPlacementsSection from "./components/AdsPlacementsSection";
 import AdsRequestsSection from "./components/AdsRequestsSection";
 
@@ -20,7 +19,6 @@ export default function AdsManagementClient() {
 
   return (
     <div className="min-h-screen pt-20 sm:pt-24 pb-8 px-4 sm:px-6 relative">
-      <UniversalBackground />
       <div className="relative z-10 max-w-7xl mx-auto">
         {/* Заголовок с градиентом */}
         <motion.div

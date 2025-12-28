@@ -12,7 +12,6 @@ import dynamicComponent from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProfileLoading from "@/components/profile/sections/ProfileLoading";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useProfileDashboard } from "@/lib/useProfileDashboard";
 
@@ -220,24 +219,7 @@ function ProfilePageContent() {
     }
   };
 
-  // Обработчик события для открытия модального окна настроек
-  useEffect(() => {
-    const handleOpenSettingsModal = () => {
-      setIsSettingsModalOpen(true);
-    };
-
-    window.addEventListener("open-settings-modal", handleOpenSettingsModal);
-    return () =>
-      window.removeEventListener(
-        "open-settings-modal",
-        handleOpenSettingsModal,
-      );
-  }, []);
-
-  // Закрываем модальное окно при загрузке страницы (если оно было открыто)
-  useEffect(() => {
-    setIsSettingsModalOpen(false);
-  }, []);
+  // Глобальное событие открытия настроек убрано — открываем настройки только через onOpenSettings.
 
   // Перенаправляем на страницу друзей, если пришёл friendsTab
   useEffect(() => {
@@ -280,7 +262,6 @@ function ProfilePageContent() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <UniversalBackground />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -310,7 +291,6 @@ function ProfilePageContent() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <UniversalBackground />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -326,7 +306,7 @@ function ProfilePageContent() {
             Войдите в аккаунт, чтобы просмотреть свой профиль
           </p>
           <a
-            href="/login"
+            href="/?modal=auth/signup&next=/profile"
             className="inline-flex items-center gap-2 px-8 py-4 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] font-bold rounded-full transition-all duration-300"
           >
             <LucideIcons.ArrowRight size="sm" />
@@ -344,7 +324,6 @@ function ProfilePageContent() {
       aria-label="Профиль пользователя"
     >
       {/* Универсальный фон */}
-      <UniversalBackground />
 
       {/* Main Content */}
       <div className="relative z-10 w-full px-2 xs:px-3 sm:px-4 md:px-5 lg:px-6 pt-3 xs:pt-4 sm:pt-6 md:pt-8 lg:pt-10 pb-6 xs:pb-8 sm:pb-10 md:pb-12">

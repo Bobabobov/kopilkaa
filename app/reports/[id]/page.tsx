@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { BugReport } from "@/app/reports/page";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
@@ -117,7 +116,6 @@ export default function BugReportDetailPage() {
   if (loading || loadingReport) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        <UniversalBackground />
         <div className="container-p mx-auto pt-8 pb-8 relative z-10">
           <div className="text-center">Загрузка...</div>
         </div>
@@ -134,7 +132,6 @@ export default function BugReportDetailPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <UniversalBackground />
 
       {/* Декоративные элементы */}
       <div className="fixed inset-0 pointer-events-none z-0">

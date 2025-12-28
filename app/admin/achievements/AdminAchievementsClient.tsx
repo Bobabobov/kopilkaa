@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Achievement } from "@/lib/achievements/types";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { AchievementCard } from "@/components/achievements";
 import GrantAchievementModal from "./components/GrantAchievementModal";
 import RevokeAchievementModal from "./components/RevokeAchievementModal";
@@ -72,7 +71,6 @@ export default function AdminAchievementsClient() {
 
   return (
     <div className="min-h-screen">
-      <UniversalBackground />
 
       <div className="relative z-10">
         {/* Заголовок */}

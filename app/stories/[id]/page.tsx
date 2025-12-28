@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import {
   StoryHeader,
   StoryContent,
@@ -264,7 +263,6 @@ export default function StoryPage() {
   if (loading) {
     return (
       <div className="min-h-screen">
-        <UniversalBackground />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div
@@ -281,7 +279,6 @@ export default function StoryPage() {
   if (error) {
     return (
       <div className="min-h-screen">
-        <UniversalBackground />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="text-6xl mb-4">⚠️</div>
@@ -310,7 +307,6 @@ export default function StoryPage() {
   if (!story) {
     return (
       <div className="min-h-screen">
-        <UniversalBackground />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="text-6xl mb-4">📖</div>
@@ -338,7 +334,6 @@ export default function StoryPage() {
 
   return (
     <div className="min-h-screen">
-      <UniversalBackground />
       <div className="relative z-10">
         {/* Навигация */}
         <StoryNavigation />

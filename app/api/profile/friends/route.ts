@@ -2,6 +2,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
 
 export async function GET(request: Request) {
   const session = await getSession();
@@ -81,7 +82,17 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ friendships });
+    const safe = friendships.map((f: any) => ({
+      ...f,
+      requester: f.requester
+        ? sanitizeEmailForViewer(f.requester as any, session.uid)
+        : f.requester,
+      receiver: f.receiver
+        ? sanitizeEmailForViewer(f.receiver as any, session.uid)
+        : f.receiver,
+    }));
+
+    return NextResponse.json({ friendships: safe });
   } catch (error) {
     console.error("Get friendships error:", error);
     return NextResponse.json(
@@ -249,7 +260,17 @@ export async function POST(request: Request) {
     });
 
     console.log("Successfully created friendship:", friendship.id);
-    return NextResponse.json({ friendship });
+    return NextResponse.json({
+      friendship: {
+        ...friendship,
+        requester: friendship.requester
+          ? sanitizeEmailForViewer(friendship.requester as any, session.uid)
+          : friendship.requester,
+        receiver: friendship.receiver
+          ? sanitizeEmailForViewer(friendship.receiver as any, session.uid)
+          : friendship.receiver,
+      },
+    });
   } catch (error) {
     console.error("Create friendship error:", error);
     console.error(

@@ -186,6 +186,7 @@ export default function AvatarUpload({
           type="file"
           accept="image/jpeg,image/png,image/gif,image/webp"
           onChange={handleFileSelect}
+          data-avatar-file-input="true"
           className="hidden"
         />
       </motion.div>

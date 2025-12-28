@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { AdminHeader } from "../components/AdminHeader";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
 import Link from "next/link";
@@ -109,7 +108,6 @@ export default function AdminUsersClient() {
 
   return (
     <div className="min-h-screen relative">
-      <UniversalBackground />
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">

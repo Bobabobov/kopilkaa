@@ -9,7 +9,6 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { usePageTimeTracking } from "@/lib/usePageTimeTracking";
 import ProgressBar from "@/components/applications/ProgressBar";
 import FormField from "@/components/ui/FormField";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import MotivationalMessages from "@/components/applications/MotivationalMessages";
 import RichTextEditor from "@/components/applications/RichTextEditor";
 
@@ -292,8 +291,6 @@ export default function ApplicationsPage() {
   if (submitted) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        <UniversalBackground />
-        
         <div className="container-p mx-auto pt-0 sm:pt-1 pb-8 relative z-10">
           <SuccessScreen onNewApplication={() => setSubmitted(false)} />
         </div>
@@ -303,10 +300,6 @@ export default function ApplicationsPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Фон */}
-      <UniversalBackground />
-
-
       <PageHeader />
 
       {/* Main Content */}

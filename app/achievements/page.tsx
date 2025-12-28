@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { AchievementCard } from "@/components/achievements/AchievementCard";
 import { AchievementProgress, AchievementRarity, RARITY_NAMES, RARITY_COLORS } from "@/lib/achievements/types";
 
@@ -143,7 +142,6 @@ export default function AchievementsPage() {
 
   return (
     <div className="min-h-screen relative">
-      <UniversalBackground />
 
       <div className="relative z-10 container mx-auto px-4 py-10 space-y-8">
         {/* Hero */}

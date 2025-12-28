@@ -374,7 +374,9 @@ export default function ProfileHeaderCard({
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
-                          const fileInput = document.querySelector('input[type="file"][accept*="image"]') as HTMLInputElement;
+                          const fileInput = document.querySelector(
+                            'input[data-avatar-file-input="true"]',
+                          ) as HTMLInputElement | null;
                           if (fileInput) fileInput.click();
                         }}
                         className="flex items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-200"
@@ -508,7 +510,6 @@ export default function ProfileHeaderCard({
                               whileHover={{ scale: 1.02, x: 2 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => {
-                                window.dispatchEvent(new CustomEvent("open-settings-modal"));
                                 onOpenSettings?.();
                                 setIsActionsMenuOpen(false);
                               }}
@@ -547,15 +548,14 @@ export default function ProfileHeaderCard({
                               whileHover={{ scale: 1.02, x: 2 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => {
-                                if (confirm("Вы уверены, что хотите удалить свой профиль?")) {
-                                  // Логика удаления
-                                }
                                 setIsActionsMenuOpen(false);
                               }}
-                              className="w-full inline-flex items-center gap-2.5 rounded-lg px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-500/20 transition-all duration-200"
+                              disabled
+                              title="Скоро"
+                              className="w-full inline-flex items-center gap-2.5 rounded-lg px-4 py-2 text-sm font-medium text-red-400/60 bg-transparent opacity-60 cursor-not-allowed"
                             >
                               <LucideIcons.Trash size="sm" className="text-red-400" />
-                              Удалить
+                              Удалить (скоро)
                             </motion.button>
                           </motion.div>
                         </AnimatePresence>,

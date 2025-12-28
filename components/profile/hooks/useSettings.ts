@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 
 type User = {
   id: string;
@@ -97,8 +96,6 @@ export function useSettings(): UseSettingsReturn {
     title: "",
     message: "",
   });
-
-  const { showToast } = useBeautifulToast();
 
   // Показ локальных уведомлений
   const showLocalNotification = useCallback(

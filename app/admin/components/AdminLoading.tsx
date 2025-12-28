@@ -1,13 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 
 export default function AdminLoading() {
   return (
     <div className="min-h-screen">
-      <UniversalBackground />
-      
       <div className="relative z-10">
         {/* Заголовок */}
         <div className="container mx-auto px-4 pt-24 pb-8">

@@ -1,12 +1,10 @@
 // components/heroes/HeroesLoading.tsx
 "use client";
 import { motion } from "framer-motion";
-import PixelBackground from "@/components/ui/PixelBackground";
 
 export default function HeroesLoading() {
   return (
     <div className="min-h-screen">
-      <PixelBackground />
       <div className="relative z-10">
         {/* Загрузка Hero секции */}
         <div className="min-h-screen flex items-center justify-center px-4 py-16">

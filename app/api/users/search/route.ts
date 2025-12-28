@@ -2,6 +2,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
 
 export const dynamic = 'force-dynamic';
 
@@ -36,8 +37,9 @@ export async function GET(request: Request) {
         { name: { contains: lowerQuery } },
         { name: { contains: upperQuery } },
         { name: { contains: capitalizedQuery } },
-        { email: { contains: query } },
-        { email: { contains: lowerQuery } },
+        // По email ищем только по тем, кто разрешил показывать email
+        { email: { contains: query }, hideEmail: false },
+        { email: { contains: lowerQuery }, hideEmail: false },
       ];
     }
 
@@ -77,7 +79,7 @@ export async function GET(request: Request) {
         });
 
         return {
-          ...user,
+          ...sanitizeEmailForViewer(user as any, session.uid),
           friendshipStatus: friendship?.status,
           friendshipId: friendship?.id,
           isRequester: friendship?.requesterId === session.uid,

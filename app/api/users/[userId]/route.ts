@@ -2,6 +2,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
 
 export async function GET(
   request: Request,
@@ -52,7 +53,7 @@ export async function GET(
       bannedReason: user.bannedReason,
     });
 
-    return NextResponse.json({ user });
+    return NextResponse.json({ user: sanitizeEmailForViewer(user as any, session.uid) });
   } catch (error) {
     console.error("Get user error:", error);
     return NextResponse.json(

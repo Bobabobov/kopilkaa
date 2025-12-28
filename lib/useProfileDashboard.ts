@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 
 interface User {
   id: string;
-  email: string;
+  email: string | null;
   role: "USER" | "ADMIN";
   name?: string | null;
   avatar?: string | null;
@@ -88,13 +88,17 @@ interface UseProfileDashboardReturn {
 }
 
 // Кэш для данных профиля
-const profileCache = new Map<string, { data: ProfileDashboardData; timestamp: number }>();
+const profileCache = new Map<
+  string,
+  { data: ProfileDashboardData; timestamp: number; etag?: string | null }
+>();
 const CACHE_DURATION = 30 * 1000; // 30 секунд
 
 export function useProfileDashboard(): UseProfileDashboardReturn {
   const [data, setData] = useState<ProfileDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userCacheKey, setUserCacheKey] = useState<string | null>(null);
 
   // Очищаем кэш при инициализации хука для предотвращения устаревших данных
   const [isInitialized, setIsInitialized] = useState(false);
@@ -102,10 +106,10 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
   const fetchData = useCallback(async () => {
     try {
       setError(null);
-      
-      // Проверяем кэш
-      const cacheKey = "profile-dashboard";
-      const cached = profileCache.get(cacheKey);
+
+      // Проверяем кэш (только если уже знаем userId текущего пользователя)
+      const cacheKey = userCacheKey;
+      const cached = cacheKey ? profileCache.get(cacheKey) : undefined;
       const now = Date.now();
       
       if (cached && (now - cached.timestamp) < CACHE_DURATION) {
@@ -120,10 +124,29 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          ...(cached?.etag ? { "If-None-Match": cached.etag } : {}),
         },
         // Отключаем кэширование браузера для актуальных данных
         cache: "no-store",
       });
+
+      // Не авторизован — это НЕ ошибка для UI профиля, просто показываем экран входа.
+      if (response.status === 401) {
+        setData(null);
+        setUserCacheKey(null);
+        setError(null);
+        return;
+      }
+
+      // 304 — используем кэш
+      if (response.status === 304 && cached) {
+        profileCache.set(cacheKey as string, {
+          ...cached,
+          timestamp: now,
+        });
+        setData(cached.data);
+        return;
+      }
 
       if (!response.ok) {
         // Если новый API не работает, fallback на старый подход
@@ -136,12 +159,20 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       }
 
       const profileData = await response.json();
+
+      const nextUserId = profileData?.user?.id as string | undefined;
+      const nextCacheKey = nextUserId ? `profile-dashboard:${nextUserId}` : null;
+      const etag = response.headers.get("etag");
+      if (nextCacheKey) setUserCacheKey(nextCacheKey);
       
       // Сохраняем в кэш
-      profileCache.set(cacheKey, {
-        data: profileData,
-        timestamp: now,
-      });
+      if (nextCacheKey) {
+        profileCache.set(nextCacheKey, {
+          data: profileData,
+          timestamp: now,
+          etag,
+        });
+      }
       
       setData(profileData);
     } catch (err) {
@@ -157,7 +188,7 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [userCacheKey]);
 
   // Fallback функция для совместимости со старым API
   const fetchDataFallback = useCallback(async () => {
@@ -201,23 +232,6 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
   }, [fetchData, isInitialized]);
 
   return { data, loading, error, refetch };
-}
-
-// Хук для кэширования отдельных секций данных
-export function useProfileSection<T>(
-  sectionKey: keyof ProfileDashboardData,
-  defaultValue: T
-): T {
-  const [sectionData, setSectionData] = useState<T>(defaultValue);
-
-  useEffect(() => {
-    const cached = profileCache.get("profile-dashboard");
-    if (cached?.data?.[sectionKey]) {
-      setSectionData(cached.data[sectionKey] as T);
-    }
-  }, [sectionKey]);
-
-  return sectionData;
 }
 
 // Утилита для инвалидации кэша

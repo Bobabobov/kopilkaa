@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import SupportHero from "@/components/support/SupportHero";
 import SupportToggle from "@/components/support/SupportToggle";
 import SubscriptionPlans from "@/components/support/SubscriptionPlans";
@@ -56,7 +55,6 @@ export default function SupportPage() {
 
   return (
     <div className="min-h-screen">
-      <UniversalBackground />
       <div className="relative z-10">
         <SupportHero />
 

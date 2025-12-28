@@ -1,13 +1,11 @@
 "use client";
 
 import { AdvertisingContact } from "@/components/advertising";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import Link from "next/link";
 
 export default function AdvertisingPage() {
   return (
     <div className="min-h-screen pb-20 relative">
-      <UniversalBackground />
       {/* Герой секция */}
       <div className="py-32 px-4 relative z-10">
         <div className="container mx-auto max-w-5xl">

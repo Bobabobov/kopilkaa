@@ -13,7 +13,6 @@ import { DeleteModal } from "./components/DeleteModal";
 import { AdminLoadingIndicator } from "./components/AdminLoadingIndicator";
 import { AdminEndMessage } from "./components/AdminEndMessage";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { useAdminApplications } from "./hooks/useAdminApplications";
 import { useAdminActions } from "./hooks/useAdminActions";
 
@@ -114,7 +113,6 @@ export default function AdminClient() {
 
   return (
     <div className="min-h-screen relative">
-      <UniversalBackground />
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">

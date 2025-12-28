@@ -14,7 +14,6 @@ import MutualFriends from "./widgets/MutualFriends";
 import ProfileHeaderCard from "@/components/profile/ProfileHeaderCard";
 import ReportUserModal from "./modals/ReportUserModal";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 
 type User = {
   id: string;
@@ -311,7 +310,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   if (isCurrentlyBanned) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        <UniversalBackground />
         <div className="w-full px-6 pt-32 pb-8">
           <div className="max-w-2xl mx-auto">
             <motion.div
@@ -404,7 +402,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   return (
     <div className="min-h-screen relative overflow-hidden" role="main" aria-label="Профиль пользователя">
       {/* Универсальный фон */}
-      <UniversalBackground />
 
       {/* Main Content */}
       <div className="w-full px-3 sm:px-4 md:px-6 pt-0 sm:pt-8 md:pt-10 pb-8 sm:pb-10 md:pb-12 relative z-10">

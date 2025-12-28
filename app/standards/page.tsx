@@ -1,6 +1,5 @@
 "use client";
 
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { StandardsHero } from './components/StandardsHero';
 import { StandardsQuickNav } from "./components/StandardsQuickNav";
 import { TelegramBotCard } from './components/TelegramBotCard';
@@ -11,7 +10,6 @@ import { ActionButtons } from './components/ActionButtons';
 export default function StandardsPage() {
   return (
     <div className="min-h-screen relative">
-      <UniversalBackground />
       <div className="relative z-10">
         <StandardsHero />
         

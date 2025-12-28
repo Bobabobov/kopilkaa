@@ -1,6 +1,5 @@
 "use client";
 
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import NotFoundDecorations from "./components/NotFoundDecorations";
 import NotFoundHero from "./components/NotFoundHero";
 import NotFoundContent from "./components/NotFoundContent";
@@ -9,7 +8,6 @@ import NotFoundActions from "./components/NotFoundActions";
 export default function NotFound() {
   return (
     <div className="min-h-screen w-full relative overflow-hidden">
-      <UniversalBackground />
       <NotFoundDecorations />
 
       <div className="relative z-10 w-full">

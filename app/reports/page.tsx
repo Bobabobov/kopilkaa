@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import BugReportForm from "@/components/reports/BugReportForm";
 import BugReportList from "@/components/reports/BugReportList";
 import BugReportFilters from "@/components/reports/BugReportFilters";
@@ -232,7 +231,6 @@ export default function ReportsPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        <UniversalBackground />
         <div className="container-p mx-auto pt-12 pb-12 relative z-10 text-center text-[#abd1c6]">
           Проверяем доступ...
         </div>
@@ -243,7 +241,6 @@ export default function ReportsPage() {
   if (authError) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        <UniversalBackground />
         <div className="container-p mx-auto max-w-3xl relative z-10 px-4 pt-12 pb-12">
           <div className="rounded-2xl border border-[#e16162]/40 bg-[#001e1d]/40 p-6 text-center space-y-4">
             <div className="text-lg font-semibold text-[#e16162]">Нет доступа</div>
@@ -274,7 +271,6 @@ export default function ReportsPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <UniversalBackground />
 
       {/* Декоративные элементы */}
       <div className="fixed inset-0 pointer-events-none z-0">

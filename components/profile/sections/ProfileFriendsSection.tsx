@@ -72,18 +72,37 @@ export default function ProfileFriendsSection() {
   const fetchFriends = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       // Получаем ID текущего пользователя
       const meRes = await fetch("/api/profile/me", { cache: "no-store" });
       if (meRes.ok) {
         const meData = await meRes.json();
         setCurrentUserId(meData.user.id);
+      } else if (meRes.status === 401) {
+        setError("Требуется авторизация");
+        setFriends([]);
+        setReceivedRequests([]);
+        setSentRequests([]);
+        return;
       }
 
       const [friendsRes, receivedRes, sentRes] = await Promise.all([
-        fetch("/api/profile/friends?type=friends"),
-        fetch("/api/profile/friends?type=received"),
-        fetch("/api/profile/friends?type=sent"),
+        fetch("/api/profile/friends?type=friends", { cache: "no-store" }),
+        fetch("/api/profile/friends?type=received", { cache: "no-store" }),
+        fetch("/api/profile/friends?type=sent", { cache: "no-store" }),
       ]);
+
+      if (
+        friendsRes.status === 401 ||
+        receivedRes.status === 401 ||
+        sentRes.status === 401
+      ) {
+        setError("Требуется авторизация");
+        setFriends([]);
+        setReceivedRequests([]);
+        setSentRequests([]);
+        return;
+      }
 
       if (friendsRes.ok) {
         const friendsData = await friendsRes.json();
@@ -94,14 +113,15 @@ export default function ProfileFriendsSection() {
         const receivedData = await receivedRes.json();
         const newRequests = receivedData.friendships || [];
         setReceivedRequests(newRequests);
-      if (sentRes.ok) {
-        const sentData = await sentRes.json();
-        setSentRequests(sentData.friendships || []);
-      }
 
         // Загружаем последнюю прочитанную заявку из localStorage
         const savedLastRead = localStorage.getItem("lastReadFriendRequestId");
         setLastReadRequestId(savedLastRead);
+      }
+
+      if (sentRes.ok) {
+        const sentData = await sentRes.json();
+        setSentRequests(sentData.friendships || []);
       }
     } catch (err) {
       console.error("Error fetching friends:", err);
@@ -315,7 +335,7 @@ export default function ProfileFriendsSection() {
                       {/* Информация */}
                       <div className="flex-1 min-w-0">
                         <p className="text-[#fffffe] font-medium text-xs xs:text-sm truncate">
-                          {friend.name || friend.email.split("@")[0]}
+                          {friend.name || (friend.email ? friend.email.split("@")[0] : "Пользователь")}
                         </p>
                         <p className="text-[#abd1c6] text-[10px] xs:text-xs mt-0.5">
                           {status.text}

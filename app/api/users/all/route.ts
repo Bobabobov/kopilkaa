@@ -2,6 +2,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +26,9 @@ export async function GET() {
 
     return NextResponse.json({
       total: users.length,
-      users: users.filter((u: any) => u.id !== session.uid), // Исключаем текущего пользователя
+      users: users
+        .filter((u: any) => u.id !== session.uid) // Исключаем текущего пользователя
+        .map((u: any) => sanitizeEmailForViewer(u, session.uid)),
     });
   } catch (error) {
     console.error("Get all users error:", error);

@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import HeroesHero from "@/components/heroes/HeroesHero";
 import HeroesContent from "@/components/heroes/HeroesContent";
 import HeroesLoading from "@/components/heroes/HeroesLoading";
@@ -52,7 +51,6 @@ export default function HeroesPage() {
 
   return (
     <div className="min-h-screen">
-      <UniversalBackground />
       <div className="relative z-10">
         <HeroesHero />
         <HeroesContent heroes={heroes} error={error} onRetry={fetchHeroes} />

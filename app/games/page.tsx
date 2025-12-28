@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import GamesLoading from "./components/GamesLoading";
 
 export default function GamesPage() {
@@ -46,7 +45,6 @@ export default function GamesPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <UniversalBackground />
 
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-10 sm:pt-12 pb-12 sm:pb-16 relative z-10">
         <div className="max-w-4xl mx-auto flex flex-col items-center justify-center min-h-[70vh]">

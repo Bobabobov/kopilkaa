@@ -18,6 +18,35 @@
     overflow-x: hidden;
   }
 
+  /* Анимация "дыхания" для общего фонового изображения */
+  @keyframes universalBackgroundBreath {
+    0%,
+    100% {
+      transform: scale(1) translate(0, 0);
+    }
+    25% {
+      transform: scale(1.015) translate(8px, -6px);
+    }
+    50% {
+      transform: scale(1.03) translate(0, -12px);
+    }
+    75% {
+      transform: scale(1.015) translate(-8px, -6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .universal-background-animated {
+      animation: none !important;
+      transform: scale(1) translate(0, 0) !important;
+    }
+  }
+
+  .universal-background-animated {
+    animation: universalBackgroundBreath 60s ease-in-out infinite;
+    will-change: transform;
+  }
+
   /* CSS переменные для высот Header и TopBanner */
   :root {
     --top-banner-height: 0px;

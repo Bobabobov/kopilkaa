@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 
 export default function BannedPage() {
   const router = useRouter();
@@ -42,7 +41,6 @@ export default function BannedPage() {
   if (loading) {
     return (
       <div className="min-h-screen relative overflow-hidden">
-        <UniversalBackground />
         <div className="flex items-center justify-center min-h-screen">
           <LucideIcons.Loader2 className="animate-spin text-[#abd1c6] text-4xl" />
         </div>
@@ -58,8 +56,6 @@ export default function BannedPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <UniversalBackground />
-      
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

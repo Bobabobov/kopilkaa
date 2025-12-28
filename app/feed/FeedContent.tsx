@@ -4,7 +4,6 @@ import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { useNotifications } from "@/components/notifications/hooks/useNotifications";
 import { Notification } from "@/components/notifications/types";
 import { isNotificationUnread } from "@/components/notifications/utils";
@@ -123,7 +122,6 @@ export default function FeedContent() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <UniversalBackground />
 
       {/* Декоративные элементы фона */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">

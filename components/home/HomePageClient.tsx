@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import HeroSection from "./HeroSection";
 import TopDonorsInline from "./TopDonorsInline";
 
@@ -35,7 +34,6 @@ interface HomePageClientProps {
 export default function HomePageClient({ initialStats }: HomePageClientProps) {
   return (
     <div className="min-h-screen">
-      <UniversalBackground />
       <div className="relative z-10">
         <HeroSection stats={initialStats} loading={false} />
         <TopDonorsInline />

@@ -8,7 +8,6 @@ import {
   StoriesLoading,
   StoriesEmptyState,
 } from "@/components/stories";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { useStories } from "@/hooks/useStories";
 
 export default function StoriesPage() {
@@ -53,9 +52,6 @@ export default function StoriesPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Фон */}
-      <UniversalBackground />
-
       {/* Header */}
       <StoriesHeader query={query} onQueryChange={setQuery} />
 

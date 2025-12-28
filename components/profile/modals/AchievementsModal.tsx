@@ -172,13 +172,19 @@ export default function AchievementsModal({ isOpen, onClose }: AchievementsModal
     };
 
     if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
+
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+        document.body.style.overflow = originalOverflow;
+      };
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      // Если модалка уже закрыта — ничего не ломаем.
     };
   }, [isOpen, onClose]);
 

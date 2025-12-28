@@ -2,6 +2,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
 
 export const dynamic = 'force-dynamic';
 
@@ -55,6 +56,7 @@ export async function GET() {
             name: true,
             email: true,
             avatar: true,
+            hideEmail: true,
           },
         },
         application: {
@@ -80,12 +82,17 @@ export async function GET() {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 10)
       .forEach((like) => {
+        const safeUser = sanitizeEmailForViewer(like.user, userId);
+        const safeName =
+          safeUser.name ||
+          (safeUser.email ? safeUser.email.split("@")[0] : "Пользователь");
+
         notifications.push({
           id: `like_${like.userId}_${like.applicationId}`,
           type: "like",
           title: "Новый лайк",
-          message: `${like.user.name || (like.user.email ? like.user.email.split("@")[0] : "Пользователь")} лайкнул вашу историю "${like.application.title}"`,
-          avatar: like.user.avatar,
+          message: `${safeName} лайкнул вашу историю "${like.application.title}"`,
+          avatar: safeUser.avatar,
           createdAt: like.createdAt,
           timestamp: formatTimeAgo(new Date(like.createdAt)),
           isRead: false,
@@ -139,14 +146,16 @@ export async function GET() {
             name: true,
             email: true,
             avatar: true,
+            hideEmail: true,
           },
         },
       },
     }).catch(() => []);
 
     pendingFriendRequests.forEach((request) => {
-      const requester = request.requester;
-      const displayName = requester.name || (requester.email ? requester.email.split("@")[0] : "Пользователь");
+      const requester = sanitizeEmailForViewer(request.requester as any, userId);
+      const displayName =
+        requester.name || (requester.email ? requester.email.split("@")[0] : "Пользователь");
 
       notifications.push({
         id: `friend_request_${request.id}`,

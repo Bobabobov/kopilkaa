@@ -3,7 +3,6 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { useReports } from "./hooks/useReports";
 import { useUserActions } from "./hooks/useUserActions";
 import ReportFilters from "./components/ReportFilters";
@@ -35,7 +34,6 @@ export default function AdminReportsClient() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <UniversalBackground />
 
       <div className="w-full px-6 pt-32 pb-8 relative z-10">
         <div className="max-w-7xl mx-auto">

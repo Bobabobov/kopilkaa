@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 
 interface StatsData {
   applications: {
@@ -60,9 +59,6 @@ export default function StatsPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Универсальный фон */}
-      <UniversalBackground />
-
       {/* Header */}
       <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-white/20 dark:border-gray-700/20">
         <div className="w-full px-6 py-8">

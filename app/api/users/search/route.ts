@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { getSupportBadgesForUsers } from "@/lib/supportBadges";
 
 export const dynamic = 'force-dynamic';
 
@@ -61,6 +62,8 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
+    const badgeMap = await getSupportBadgesForUsers(users.map((u) => u.id));
+
     // Получаем информацию о заявках в друзья для каждого пользователя
     const usersWithFriendshipStatus = await Promise.all(
       users.map(async (user) => {
@@ -79,7 +82,10 @@ export async function GET(request: Request) {
         });
 
         return {
-          ...sanitizeEmailForViewer(user as any, session.uid),
+          ...sanitizeEmailForViewer(
+            { ...(user as any), supportBadge: badgeMap[user.id] ?? null },
+            session.uid,
+          ),
           friendshipStatus: friendship?.status,
           friendshipId: friendship?.id,
           isRequester: friendship?.requesterId === session.uid,

@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { getSupportBadgesForUsers } from "@/lib/supportBadges";
 
 export const dynamic = 'force-dynamic';
 
@@ -24,11 +25,17 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
+    const visibleUsers = users.filter((u: any) => u.id !== session.uid);
+    const badgeMap = await getSupportBadgesForUsers(visibleUsers.map((u: any) => u.id));
+
     return NextResponse.json({
       total: users.length,
-      users: users
-        .filter((u: any) => u.id !== session.uid) // Исключаем текущего пользователя
-        .map((u: any) => sanitizeEmailForViewer(u, session.uid)),
+      users: visibleUsers.map((u: any) =>
+        sanitizeEmailForViewer(
+          { ...u, supportBadge: badgeMap[u.id] ?? null },
+          session.uid,
+        ),
+      ),
     });
   } catch (error) {
     console.error("Get all users error:", error);

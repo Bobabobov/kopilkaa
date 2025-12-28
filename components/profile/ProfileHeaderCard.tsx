@@ -320,7 +320,16 @@ export default function ProfileHeaderCard({
       backgroundSize: "cover",
       backgroundPosition: "center",
     } as React.CSSProperties;
-  }, [backgroundColor, headerBackground, theme.background]);
+  }, [
+    backgroundColor,
+    headerBackground,
+    currentHeaderTheme,
+    theme.background,
+    // важно: при смене "картинка -> картинка" theme.background не меняется,
+    // поэтому добавляем конкретные значения темы в deps
+    (theme as any).image,
+    (theme as any).gradient,
+  ]);
 
   return (
     <motion.div
@@ -447,11 +456,11 @@ export default function ProfileHeaderCard({
                       }`}
                     />
                     <span className="text-sm text-white/90">
-                      {status.status === "online" 
-                        ? status.text 
-                        : isOwner 
-                          ? `Был ${status.text}` 
-                          : "был(а)"}
+                      {status.status === "online"
+                        ? status.text
+                        : status.text.startsWith("Никогда")
+                          ? status.text
+                          : `Был(а) ${status.text}`}
                     </span>
                   </div>
                 </div>

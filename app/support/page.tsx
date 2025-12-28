@@ -58,10 +58,7 @@ export default function SupportPage() {
       <div className="relative z-10">
         <SupportHero />
 
-        <SupportToggle
-          isSubscription={isSubscription}
-          onToggle={setIsSubscription}
-        />
+        <SupportToggle isSubscription={isSubscription} onToggle={setIsSubscription} />
 
         {isSubscription ? (
           <SubscriptionPlans
@@ -78,7 +75,6 @@ export default function SupportPage() {
         )}
 
         <SupportBenefits />
-        
         <SupportFAQ />
       </div>
     </div>

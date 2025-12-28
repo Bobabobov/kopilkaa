@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { createHash } from "crypto";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getSupportBadgeForUser } from "@/lib/supportBadges";
+import { getSupportBadgeForUser, getSupportBadgesForUsers } from "@/lib/supportBadges";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -206,6 +206,16 @@ export async function GET(request: NextRequest) {
     const supportBadge = await getSupportBadgeForUser(userId);
     const userWithBadges = { ...(user as any), supportBadge };
 
+    // Бейджи для списков (друзья/заявки/уведомления)
+    const listUserIds = Array.from(
+      new Set<string>([
+        ...friendsData.flatMap((f: any) => [f.requesterId, f.receiverId]),
+        ...receivedRequestsData.map((r: any) => r?.requesterId).filter(Boolean),
+        ...notifications.map((n: any) => n?.userId).filter(Boolean),
+      ]),
+    );
+    const listBadgeMap = await getSupportBadgesForUsers(listUserIds);
+
     // Подсчитываем статистику
     const stats = {
       totalApplications: applications.length,
@@ -230,15 +240,30 @@ export async function GET(request: NextRequest) {
       createdAt: friendship.createdAt,
       requesterId: friendship.requesterId,
       receiverId: friendship.receiverId,
-      requester: sanitizeEmailForViewer(friendship.requester as any, userId),
-      receiver: sanitizeEmailForViewer(friendship.receiver as any, userId),
+      requester: sanitizeEmailForViewer(
+        {
+          ...(friendship.requester as any),
+          supportBadge: listBadgeMap[friendship.requesterId] ?? null,
+        },
+        userId,
+      ),
+      receiver: sanitizeEmailForViewer(
+        {
+          ...(friendship.receiver as any),
+          supportBadge: listBadgeMap[friendship.receiverId] ?? null,
+        },
+        userId,
+      ),
     }));
 
     // Форматируем уведомления 
     const formattedNotifications = notifications.map(like => ({
       id: like.id,
       type: 'like',
-      user: sanitizeEmailForViewer(like.user as any, userId),
+      user: sanitizeEmailForViewer(
+        { ...(like.user as any), supportBadge: listBadgeMap[like.userId] ?? null },
+        userId,
+      ),
       application: like.application,
       createdAt: like.createdAt,
       timestamp: getTimeAgo(like.createdAt),
@@ -280,7 +305,13 @@ export async function GET(request: NextRequest) {
       receivedRequests: receivedRequestsData.map((req: any) => ({
         ...req,
         requester: req.requester
-          ? sanitizeEmailForViewer(req.requester as any, userId)
+          ? sanitizeEmailForViewer(
+              {
+                ...(req.requester as any),
+                supportBadge: listBadgeMap[req.requesterId] ?? null,
+              },
+              userId,
+            )
           : req.requester,
       })),
       achievements: achievements.map(ua => ({

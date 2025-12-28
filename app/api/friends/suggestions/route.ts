@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { getSupportBadgesForUsers } from "@/lib/supportBadges";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +41,7 @@ export async function GET(request: Request) {
         id: true,
         name: true,
         email: true,
+        hideEmail: true,
         avatar: true,
         lastSeen: true,
       },
@@ -46,7 +49,15 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ users });
+    const badgeMap = await getSupportBadgesForUsers(users.map((u) => u.id));
+    const safeUsers = users.map((u: any) =>
+      sanitizeEmailForViewer(
+        { ...u, supportBadge: badgeMap[u.id] ?? null },
+        session.uid,
+      ),
+    );
+
+    return NextResponse.json({ users: safeUsers });
   } catch (error) {
     console.error("GET /api/friends/suggestions error:", error);
     return NextResponse.json(

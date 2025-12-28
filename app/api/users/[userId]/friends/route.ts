@@ -1,6 +1,9 @@
 // app/api/users/[userId]/friends/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/auth";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { getSupportBadgesForUsers } from "@/lib/supportBadges";
 
 interface RouteParams {
   params: {
@@ -19,6 +22,9 @@ export async function GET(_req: Request, { params }: RouteParams) {
   }
 
   try {
+    const session = await getSession();
+    const viewerId = session?.uid ?? "";
+
     const friendships = await prisma.friendship.findMany({
       where: {
         status: "ACCEPTED",
@@ -36,12 +42,21 @@ export async function GET(_req: Request, { params }: RouteParams) {
         id: friend.id,
         name: friend.name,
         email: friend.email,
+        hideEmail: friend.hideEmail,
         avatar: friend.avatar,
         lastSeen: friend.lastSeen,
       };
     });
 
-    return NextResponse.json({ success: true, friends });
+    const badgeMap = await getSupportBadgesForUsers(friends.map((f) => f.id));
+    const safeFriends = friends.map((u: any) =>
+      sanitizeEmailForViewer(
+        { ...u, supportBadge: badgeMap[u.id] ?? null },
+        viewerId,
+      ),
+    );
+
+    return NextResponse.json({ success: true, friends: safeFriends });
   } catch (error) {
     console.error("Error fetching user friends:", error);
     return NextResponse.json(

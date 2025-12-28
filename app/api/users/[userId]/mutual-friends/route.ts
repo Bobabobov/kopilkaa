@@ -1,6 +1,8 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { getSupportBadgesForUsers } from "@/lib/supportBadges";
 
 export async function GET(
   _request: Request,
@@ -61,6 +63,7 @@ export async function GET(
         id: true,
         name: true,
         email: true,
+        hideEmail: true,
         avatar: true,
         lastSeen: true,
       },
@@ -68,7 +71,15 @@ export async function GET(
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ users });
+    const badgeMap = await getSupportBadgesForUsers(users.map((u) => u.id));
+    const safeUsers = users.map((u: any) =>
+      sanitizeEmailForViewer(
+        { ...u, supportBadge: badgeMap[u.id] ?? null },
+        session.uid,
+      ),
+    );
+
+    return NextResponse.json({ users: safeUsers });
   } catch (error) {
     console.error("Mutual friends error:", error);
     return NextResponse.json(

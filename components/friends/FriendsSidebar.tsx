@@ -13,7 +13,14 @@ const mockActivity = [
 
 export function FriendsSidebar() {
   const [suggestions, setSuggestions] = useState<
-    { id: string; name?: string | null; email?: string; avatar?: string | null; mutual?: string }[]
+    {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      avatar?: string | null;
+      mutual?: string;
+      supportBadge?: "supporter" | "subscriber" | null;
+    }[]
   >([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [sending, setSending] = useState<Set<string>>(new Set());
@@ -34,6 +41,7 @@ export function FriendsSidebar() {
           email: u.email,
           avatar: u.avatar,
           mutual: u.mutualFriends ? `${u.mutualFriends} общих друзей` : undefined,
+          supportBadge: u.supportBadge ?? null,
         })),
       );
     } finally {
@@ -117,37 +125,64 @@ export function FriendsSidebar() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ delay: idx * 0.05, duration: 0.2 }}
                   whileHover={{ scale: 1.02 }}
-                  className="p-3 rounded-xl border border-[#abd1c6]/15 bg-[#001e1d]/40 shadow-sm hover:bg-white/5 transition-colors"
+                  className="p-3 rounded-2xl border border-[#abd1c6]/15 bg-gradient-to-br from-[#001e1d]/55 to-[#001e1d]/25 shadow-sm hover:shadow-md hover:bg-white/5 hover:border-[#f9bc60]/30 transition-colors"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-[#004643] flex items-center justify-center flex-shrink-0">
+                  <div className="grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-3 min-w-0">
+                    <Link
+                      href={`/profile/${person.id}`}
+                      className="block w-10 h-10 rounded-full bg-[#004643] overflow-hidden ring-1 ring-white/10 hover:ring-[#f9bc60]/40 transition flex-shrink-0"
+                      title="Открыть профиль"
+                      prefetch={false}
+                    >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={person.avatar || "/default-avatar.png"}
                         alt=""
-                        className="w-full h-full rounded-full object-cover"
+                        className="w-full h-full object-cover"
                         onError={(e) => {
                           e.currentTarget.src = "/default-avatar.png";
                         }}
                       />
-                    </div>
+                    </Link>
+
                     <Link
                       href={`/profile/${person.id}`}
-                      className="flex-1 min-w-0"
+                      className="min-w-0 group"
                       title="Открыть профиль"
+                      prefetch={false}
                     >
-                      <p className="text-[#fffffe] font-semibold truncate hover:underline">
+                      <p
+                        className="text-[#fffffe] font-semibold leading-tight min-w-0 truncate group-hover:underline"
+                        title={person.name || person.email || "Пользователь"}
+                      >
                         {person.name || person.email || "Пользователь"}
                       </p>
-                      <p className="text-xs text-[#abd1c6] truncate">
-                        {person.mutual || "Общие интересы"}
-                      </p>
+
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5 min-w-0">
+                        <span className="text-xs text-[#abd1c6] min-w-0 truncate">
+                          {person.mutual || "Общие интересы"}
+                        </span>
+
+                        {person.supportBadge === "subscriber" && (
+                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-white border border-emerald-300/40 bg-emerald-500/25 flex-shrink-0">
+                            <LucideIcons.Crown size="xs" className="text-emerald-200" />
+                            Подписка
+                          </span>
+                        )}
+                        {person.supportBadge === "supporter" && (
+                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-white border border-pink-300/35 bg-pink-500/20 flex-shrink-0">
+                            <LucideIcons.Heart size="xs" className="text-pink-200" />
+                            Поддержал
+                          </span>
+                        )}
+                      </div>
                     </Link>
+
                     <button
                       type="button"
                       onClick={() => handleAdd(person.id)}
                       disabled={isSending || isSent}
-                      className={`px-2.5 py-1.5 rounded-xl text-sm font-semibold transition-colors ${
+                      className={`px-3 py-1.5 rounded-xl text-sm font-semibold transition-colors flex-shrink-0 ${
                         isSent
                           ? "bg-[#10B981]/20 text-[#10B981] cursor-default"
                           : "bg-[#f9bc60]/80 hover:bg-[#f9bc60] text-[#001e1d]"

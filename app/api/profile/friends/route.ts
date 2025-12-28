@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { getSupportBadgesForUsers } from "@/lib/supportBadges";
 
 export async function GET(request: Request) {
   const session = await getSession();
@@ -82,13 +83,23 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
+    const badgeMap = await getSupportBadgesForUsers(
+      friendships.flatMap((f: any) => [f.requesterId, f.receiverId]),
+    );
+
     const safe = friendships.map((f: any) => ({
       ...f,
       requester: f.requester
-        ? sanitizeEmailForViewer(f.requester as any, session.uid)
+        ? sanitizeEmailForViewer(
+            { ...(f.requester as any), supportBadge: badgeMap[f.requesterId] ?? null },
+            session.uid,
+          )
         : f.requester,
       receiver: f.receiver
-        ? sanitizeEmailForViewer(f.receiver as any, session.uid)
+        ? sanitizeEmailForViewer(
+            { ...(f.receiver as any), supportBadge: badgeMap[f.receiverId] ?? null },
+            session.uid,
+          )
         : f.receiver,
     }));
 
@@ -260,14 +271,30 @@ export async function POST(request: Request) {
     });
 
     console.log("Successfully created friendship:", friendship.id);
+    const badgeMap = await getSupportBadgesForUsers([
+      friendship.requesterId,
+      friendship.receiverId,
+    ]);
     return NextResponse.json({
       friendship: {
         ...friendship,
         requester: friendship.requester
-          ? sanitizeEmailForViewer(friendship.requester as any, session.uid)
+          ? sanitizeEmailForViewer(
+              {
+                ...(friendship.requester as any),
+                supportBadge: badgeMap[friendship.requesterId] ?? null,
+              },
+              session.uid,
+            )
           : friendship.requester,
         receiver: friendship.receiver
-          ? sanitizeEmailForViewer(friendship.receiver as any, session.uid)
+          ? sanitizeEmailForViewer(
+              {
+                ...(friendship.receiver as any),
+                supportBadge: badgeMap[friendship.receiverId] ?? null,
+              },
+              session.uid,
+            )
           : friendship.receiver,
       },
     });

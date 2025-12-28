@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface FriendsSearchProps {
   searchQuery: string;
@@ -69,9 +70,26 @@ export function FriendsSearch({
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-[#fffffe] font-medium group-hover:underline truncate">
-                    {user.name || user.email.split("@")[0]}
-                  </p>
+                  <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                    <p
+                      className="text-[#fffffe] font-medium group-hover:underline min-w-0 flex-1 truncate"
+                      title={user.name || (user.email ? user.email.split("@")[0] : "Пользователь")}
+                    >
+                      {user.name || (user.email ? user.email.split("@")[0] : "Пользователь")}
+                    </p>
+                    {user.supportBadge === "subscriber" && (
+                      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-white border border-emerald-300/40 bg-emerald-500/25 flex-shrink-0">
+                        <LucideIcons.Crown size="xs" className="text-emerald-200" />
+                        Подписка
+                      </span>
+                    )}
+                    {user.supportBadge === "supporter" && (
+                      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-white border border-pink-300/35 bg-pink-500/20 flex-shrink-0">
+                        <LucideIcons.Heart size="xs" className="text-pink-200" />
+                        Поддержал
+                      </span>
+                    )}
+                  </div>
                   <p className="text-[#abd1c6] text-sm">
                     {getUserStatus(user.lastSeen ?? null).text}
                   </p>

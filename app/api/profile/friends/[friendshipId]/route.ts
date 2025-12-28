@@ -2,6 +2,8 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { getSupportBadgesForUsers } from "@/lib/supportBadges";
 
 export async function PATCH(
   request: Request,
@@ -46,6 +48,8 @@ export async function PATCH(
             id: true,
             name: true,
             email: true,
+            hideEmail: true,
+            avatar: true,
             createdAt: true,
             vkLink: true,
             telegramLink: true,
@@ -57,6 +61,8 @@ export async function PATCH(
             id: true,
             name: true,
             email: true,
+            hideEmail: true,
+            avatar: true,
             createdAt: true,
             vkLink: true,
             telegramLink: true,
@@ -66,7 +72,33 @@ export async function PATCH(
       },
     });
 
-    return NextResponse.json({ friendship: updatedFriendship });
+    const badgeMap = await getSupportBadgesForUsers([
+      updatedFriendship.requesterId,
+      updatedFriendship.receiverId,
+    ]);
+    const safe = {
+      ...updatedFriendship,
+      requester: updatedFriendship.requester
+        ? sanitizeEmailForViewer(
+            {
+              ...(updatedFriendship.requester as any),
+              supportBadge: badgeMap[updatedFriendship.requesterId] ?? null,
+            },
+            session.uid,
+          )
+        : updatedFriendship.requester,
+      receiver: updatedFriendship.receiver
+        ? sanitizeEmailForViewer(
+            {
+              ...(updatedFriendship.receiver as any),
+              supportBadge: badgeMap[updatedFriendship.receiverId] ?? null,
+            },
+            session.uid,
+          )
+        : updatedFriendship.receiver,
+    };
+
+    return NextResponse.json({ friendship: safe });
   } catch (error) {
     console.error("Update friendship error:", error);
     return NextResponse.json(

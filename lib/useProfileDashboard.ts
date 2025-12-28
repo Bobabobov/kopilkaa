@@ -238,26 +238,3 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
 export function invalidateProfileCache(): void {
   profileCache.clear();
 }
-
-// Утилита для предзагрузки данных
-export async function prefetchProfileData(): Promise<void> {
-  try {
-    const response = await fetch("/api/profile/dashboard", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      profileCache.set("profile-dashboard", {
-        data,
-        timestamp: Date.now(),
-      });
-    }
-  } catch (error) {
-    console.error("Error prefetching profile data:", error);
-  }
-}

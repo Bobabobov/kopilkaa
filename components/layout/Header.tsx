@@ -184,8 +184,9 @@ export default function Header() {
               <NavAuth />
             </div>
             
-            {/* HeaderMobileButton - виден только на мобильных */}
-            <div className="sm:hidden">
+            {/* Мобильные кнопки: donate + burger */}
+            <div className="sm:hidden flex items-center gap-2">
+              <DonateButton variant="mobileHeader" />
               <HeaderMobileButton
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 isOpen={mobileMenuOpen}
@@ -235,7 +236,6 @@ export default function Header() {
                 <div className="pt-3 border-t border-white/15">
                   <div className="px-2 sm:px-4 space-y-3">
                     <NavAuth isMobile onLinkClick={() => setMobileMenuOpen(false)} />
-                    <DonateButton isMobile={true} onLinkClick={() => setMobileMenuOpen(false)} />
                   </div>
                 </div>
               </div>

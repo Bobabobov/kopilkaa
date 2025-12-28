@@ -5,7 +5,7 @@
 // не пытался предрендерить /profile статически при билде.
 export const dynamic = "force-dynamic";
 
-import { useEffect, useState, Suspense } from "react";
+import { useCallback, useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 // Переименовываем импорт, чтобы не конфликтовал с export const dynamic
 import dynamicComponent from "next/dynamic";
@@ -208,16 +208,21 @@ function ProfilePageContent() {
   const totalUserApplications = profileData?.stats?.totalApplications ?? 0;
   const hasCreatedApplications = totalUserApplications > 0;
 
-  const handleThemeChange = (newTheme: string | null) => {
-    // Оптимистичное обновление - обновляем UI сразу
-    if (profileData?.user) {
-      const updatedData = {
-        ...profileData,
-        user: { ...profileData.user, headerTheme: newTheme }
-      };
-      // Локальное обновление произойдет через refetch после API вызова
-    }
-  };
+  // Важно: useProfileDashboard кэширует данные до 30 секунд.
+  // После изменения темы/аватара хотим увидеть результат сразу — делаем refetch.
+  const handleThemeChange = useCallback(
+    async (_newTheme: string | null) => {
+      await refetch();
+    },
+    [refetch],
+  );
+
+  const handleAvatarChange = useCallback(
+    async (_avatarUrl: string | null) => {
+      await refetch();
+    },
+    [refetch],
+  );
 
   // Глобальное событие открытия настроек убрано — открываем настройки только через onOpenSettings.
 
@@ -337,6 +342,7 @@ function ProfilePageContent() {
               onThemeChange={handleThemeChange}
               onBackgroundChange={() => setIsSettingsModalOpen(false)}
               onOpenSettings={() => setIsSettingsModalOpen(true)}
+              onAvatarChange={handleAvatarChange}
             />
           </div>
 

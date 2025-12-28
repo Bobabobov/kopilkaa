@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import HeaderNavigation from "./HeaderNavigation";
 import NavAuth from "@/app/components/NavAuth";
-import DonateButton from "./DonateButton";
 
 export default function HeaderMobileMenu() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -78,7 +77,6 @@ export default function HeaderMobileMenu() {
               <div className="pt-2 border-t border-white/20 dark:border-white/10">
                 <div className="px-4 space-y-3">
                   <NavAuth isMobile />
-                  <DonateButton isMobile />
                 </div>
               </div>
             </div>

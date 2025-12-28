@@ -13,6 +13,7 @@ import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { getHeaderTheme } from "@/lib/header-customization";
 import { getOverlayOpacity, getSecondaryTextColorForBackground, getTextColorForBackground } from "@/lib/color-utils";
+import { getSafeExternalUrl } from "@/lib/safeExternalUrl";
 
 type User = {
   id: string;
@@ -68,7 +69,11 @@ const getUserStatus = (lastSeen: string | null) => {
 };
 
 function SocialLinks({ user }: { user: User }) {
-  if (!user.vkLink && !user.telegramLink && !user.youtubeLink) return null;
+  const vk = getSafeExternalUrl(user.vkLink);
+  const tg = getSafeExternalUrl(user.telegramLink);
+  const yt = getSafeExternalUrl(user.youtubeLink);
+
+  if (!vk && !tg && !yt) return null;
 
   return (
     <motion.div
@@ -77,9 +82,9 @@ function SocialLinks({ user }: { user: User }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
     >
-      {user.vkLink && (
+      {vk && (
         <motion.a
-          href={user.vkLink}
+          href={vk}
           target="_blank"
           rel="noopener noreferrer"
           className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
@@ -89,9 +94,9 @@ function SocialLinks({ user }: { user: User }) {
           <VKIcon className="w-5 h-5" />
         </motion.a>
       )}
-      {user.telegramLink && (
+      {tg && (
         <motion.a
-          href={user.telegramLink}
+          href={tg}
           target="_blank"
           rel="noopener noreferrer"
           className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
@@ -101,9 +106,9 @@ function SocialLinks({ user }: { user: User }) {
           <TelegramIcon className="w-5 h-5" />
         </motion.a>
       )}
-      {user.youtubeLink && (
+      {yt && (
         <motion.a
-          href={user.youtubeLink}
+          href={yt}
           target="_blank"
           rel="noopener noreferrer"
           className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"

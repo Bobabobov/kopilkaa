@@ -1,7 +1,7 @@
 // app/api/auth/telegram/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSession, setSession } from "@/lib/auth";
+import { getSession, attachSessionToResponse } from "@/lib/auth";
 import { verifyTelegramAuth, TelegramAuthData } from "@/lib/telegramAuth";
 import { checkUserBan } from "@/lib/ban-check";
 
@@ -191,9 +191,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await setSession({ uid: user.id, role: (user.role as any) || "USER" });
-
-    return NextResponse.json({
+    const res = NextResponse.json({
       success: true,
       mode: "login",
       user: {
@@ -202,6 +200,8 @@ export async function POST(req: NextRequest) {
         telegramUsername: user.telegramUsername,
       },
     });
+    attachSessionToResponse(res, { uid: user.id, role: (user.role as any) || "USER" }, req);
+    return res;
   } catch (error: any) {
     console.error("Error in /api/auth/telegram:", error);
     const message =

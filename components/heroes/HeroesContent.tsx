@@ -14,7 +14,7 @@ interface Hero {
   totalDonated: number;
   donationCount: number;
   rank: number;
-  joinedAt: Date;
+  joinedAt: string;
   isSubscriber: boolean;
   vkLink?: string | null;
   telegramLink?: string | null;
@@ -22,17 +22,46 @@ interface Hero {
 }
 
 interface HeroesContentProps {
+  topThree: Hero[];
   heroes: Hero[];
+  listTotal: number;
+  stats: {
+    totalHeroes: number;
+    totalDonated: number;
+    subscribersCount: number;
+    averageDonation: number;
+  };
+  sortBy: "total" | "count" | "date";
+  onSortChange: (sort: "total" | "count" | "date") => void;
+  searchTerm: string;
+  onSearchChange: (term: string) => void;
+  hasMore: boolean;
+  loadingMore: boolean;
+  observerTargetRef: React.RefObject<HTMLDivElement | null>;
   error?: string | null;
   onRetry?: () => void;
 }
 
-export default function HeroesContent({ heroes, error, onRetry }: HeroesContentProps) {
+export default function HeroesContent({
+  topThree,
+  heroes,
+  listTotal,
+  stats,
+  sortBy,
+  onSortChange,
+  searchTerm,
+  onSearchChange,
+  hasMore,
+  loadingMore,
+  observerTargetRef,
+  error,
+  onRetry,
+}: HeroesContentProps) {
   if (error) {
     return <HeroesErrorState error={error} onRetry={onRetry} />;
   }
 
-  if (heroes.length === 0) {
+  if (stats.totalHeroes === 0) {
     return <HeroesEmptyState />;
   }
 
@@ -65,7 +94,7 @@ export default function HeroesContent({ heroes, error, onRetry }: HeroesContentP
           transition={{ duration: 0.6 }}
           className="mb-8 sm:mb-10 md:mb-12"
         >
-          <HeroesGridStats heroes={heroes} />
+          <HeroesGridStats stats={stats} />
         </motion.div>
 
         {/* Список героев */}
@@ -75,7 +104,18 @@ export default function HeroesContent({ heroes, error, onRetry }: HeroesContentP
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <HeroesGrid heroes={heroes} />
+          <HeroesGrid
+            heroes={heroes}
+            topThree={topThree}
+            total={listTotal}
+            searchTerm={searchTerm}
+            onSearchChange={onSearchChange}
+            sortBy={sortBy}
+            onSortChange={onSortChange}
+            hasMore={hasMore}
+            loadingMore={loadingMore}
+            observerTargetRef={observerTargetRef}
+          />
         </motion.div>
         
       </div>

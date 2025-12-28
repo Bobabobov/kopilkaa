@@ -1,10 +1,15 @@
 // app/api/stories/route.ts
 import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/auth";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   try {
+    const session = await getSession();
+    const viewerId = session?.uid || null;
+
     const { searchParams } = new URL(req.url);
     const page = Math.max(1, Number(searchParams.get("page") || 1));
     const limit = Math.min(
@@ -20,7 +25,8 @@ export async function GET(req: Request) {
         { summary: { contains: q } },
         { story: { contains: q } },
         { user: { name: { contains: q } } },
-        { user: { email: { contains: q } } },
+        // Поиск по email — только если пользователь разрешил показывать email
+        { user: { email: { contains: q }, hideEmail: false } },
       ];
     }
 
@@ -55,18 +61,38 @@ export async function GET(req: Request) {
       prisma.application.count({ where }).catch(() => 0),
     ]);
 
+    // userLiked батчем (без N+1)
+    let likedSet: Set<string> | null = null;
+    if (viewerId && items.length) {
+      const likes = await prisma.storyLike.findMany({
+        where: {
+          userId: viewerId,
+          applicationId: { in: items.map((i: any) => i.id) },
+        },
+        select: { applicationId: true },
+      }).catch(() => []);
+      likedSet = new Set(likes.map((l) => l.applicationId));
+    }
+
+    const safeItems = items.map((it: any) => ({
+      ...it,
+      user: it.user ? sanitizeEmailForViewer(it.user, viewerId || "") : it.user,
+      userLiked: likedSet ? likedSet.has(it.id) : false,
+    }));
+
     const responseData = {
       page,
       limit,
       total,
       pages: Math.ceil(total / limit),
-      items,
+      items: safeItems,
     };
 
     return new Response(JSON.stringify(responseData), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
+        "Cache-Control": "no-store",
       },
     });
   } catch (error) {
@@ -81,6 +107,7 @@ export async function GET(req: Request) {
       status: 200,
       headers: {
         "Content-Type": "application/json",
+        "Cache-Control": "no-store",
       },
     });
   }

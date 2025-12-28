@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
+import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,12 @@ export async function PUT(
 
     const finalPlacement: string = placement || "home_sidebar";
     const finalIsActive: boolean = !!isActive;
+    const safeContent = typeof content === "string" ? sanitizeApplicationStoryHtml(content) : content;
+    const safeConfig =
+      config && typeof config === "object" ? { ...(config as any) } : config;
+    if (safeConfig && typeof (safeConfig as any).storyText === "string") {
+      (safeConfig as any).storyText = sanitizeApplicationStoryHtml((safeConfig as any).storyText);
+    }
 
     // Гарантируем "один активный баннер на слот" для home_banner:
     // если этот баннер становится активным home_banner — деактивируем остальные активные home_banner.
@@ -45,18 +52,24 @@ export async function PUT(
         where: { id },
         data: {
           title,
-          content,
+          content: safeContent,
           imageUrl,
           linkUrl,
           expiresAt: expiresAt ? new Date(expiresAt) : null,
           isActive: finalIsActive,
           placement: finalPlacement,
-          config: config || null,
+          config: safeConfig || null,
         },
       });
     });
 
-    return NextResponse.json({ ad });
+    return NextResponse.json({
+      ad: {
+        ...ad,
+        config: safeConfig || null,
+        content: typeof ad.content === "string" ? sanitizeApplicationStoryHtml(ad.content) : ad.content,
+      },
+    });
   } catch (error) {
     console.error("Error updating ad:", error);
     return NextResponse.json(

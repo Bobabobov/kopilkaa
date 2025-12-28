@@ -1,7 +1,7 @@
 // app/api/auth/phone/verify/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { setSession } from "@/lib/auth";
+import { attachSessionToResponse } from "@/lib/auth";
 
 function normalizePhone(raw: string): string | null {
   const digits = raw.replace(/[^\d]+/g, "");
@@ -79,9 +79,9 @@ export async function POST(req: NextRequest) {
       data: { phoneVerified: true },
     });
 
-    await setSession({ uid: user.id, role: (user.role as any) || "USER" });
-
-    return NextResponse.json({ success: true });
+    const res = NextResponse.json({ success: true });
+    attachSessionToResponse(res, { uid: user.id, role: (user.role as any) || "USER" }, req);
+    return res;
   } catch (error) {
     console.error("Error in /api/auth/phone/verify:", error);
     return NextResponse.json(

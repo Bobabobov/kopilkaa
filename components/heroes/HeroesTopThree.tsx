@@ -12,7 +12,7 @@ interface Hero {
   totalDonated: number;
   donationCount: number;
   rank: number;
-  joinedAt: Date;
+  joinedAt: string;
   isSubscriber: boolean;
   vkLink?: string | null;
   telegramLink?: string | null;
@@ -27,6 +27,13 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
   const topThree = heroes.filter(hero => hero.rank <= 3).sort((a, b) => a.rank - b.rank);
 
   if (topThree.length === 0) return null;
+
+  const openExternal = (raw?: string | null) => {
+    if (!raw) return;
+    const v = raw.trim();
+    if (!/^https?:\/\//i.test(v) && !/^tg:\/\//i.test(v)) return;
+    window.open(v, "_blank", "noopener,noreferrer");
+  };
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -103,7 +110,7 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        window.open(topThree[1].vkLink!, "_blank", "noopener,noreferrer");
+                        openExternal(topThree[1].vkLink);
                       }}
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#4c75a3]/60 text-[#4c75a3] text-xs font-semibold bg-[#4c75a3]/10 hover:bg-[#4c75a3]/20 transition-colors"
                     >
@@ -117,7 +124,7 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        window.open(topThree[1].telegramLink!, "_blank", "noopener,noreferrer");
+                        openExternal(topThree[1].telegramLink);
                       }}
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#229ED9]/60 text-[#229ED9] text-xs font-semibold bg-[#229ED9]/10 hover:bg-[#229ED9]/20 transition-colors"
                     >
@@ -131,7 +138,7 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        window.open(topThree[1].youtubeLink!, "_blank", "noopener,noreferrer");
+                        openExternal(topThree[1].youtubeLink);
                       }}
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#ff4f45]/60 text-[#ff4f45] text-xs font-semibold bg-[#ff4f45]/10 hover:bg-[#ff4f45]/20 transition-colors"
                     >
@@ -186,7 +193,7 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        window.open(topThree[0].vkLink!, "_blank", "noopener,noreferrer");
+                        openExternal(topThree[0].vkLink);
                       }}
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#4c75a3]/60 text-[#4c75a3] text-xs font-semibold bg-[#4c75a3]/10 hover:bg-[#4c75a3]/20 transition-colors"
                     >
@@ -200,7 +207,7 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        window.open(topThree[0].telegramLink!, "_blank", "noopener,noreferrer");
+                        openExternal(topThree[0].telegramLink);
                       }}
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#229ED9]/60 text-[#229ED9] text-xs font-semibold bg-[#229ED9]/10 hover:bg-[#229ED9]/20 transition-colors"
                     >
@@ -214,7 +221,7 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        window.open(topThree[0].youtubeLink!, "_blank", "noopener,noreferrer");
+                        openExternal(topThree[0].youtubeLink);
                       }}
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#ff4f45]/60 text-[#ff4f45] text-xs font-semibold bg-[#ff4f45]/10 hover:bg-[#ff4f45]/20 transition-colors"
                     >
@@ -269,7 +276,7 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        window.open(topThree[2].vkLink!, "_blank", "noopener,noreferrer");
+                        openExternal(topThree[2].vkLink);
                       }}
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#4c75a3]/60 text-[#4c75a3] text-xs font-semibold bg-[#4c75a3]/10 hover:bg-[#4c75a3]/20 transition-colors"
                     >
@@ -283,7 +290,7 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        window.open(topThree[2].telegramLink!, "_blank", "noopener,noreferrer");
+                        openExternal(topThree[2].telegramLink);
                       }}
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#229ED9]/60 text-[#229ED9] text-xs font-semibold bg-[#229ED9]/10 hover:bg-[#229ED9]/20 transition-colors"
                     >
@@ -297,7 +304,7 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        window.open(topThree[2].youtubeLink!, "_blank", "noopener,noreferrer");
+                        openExternal(topThree[2].youtubeLink);
                       }}
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#ff4f45]/60 text-[#ff4f45] text-xs font-semibold bg-[#ff4f45]/10 hover:bg-[#ff4f45]/20 transition-colors"
                     >

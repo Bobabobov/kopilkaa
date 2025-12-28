@@ -1,7 +1,9 @@
 // app/api/auth/logout/route.ts
-import { clearSession } from "@/lib/auth";
+import { NextResponse } from "next/server";
+import { attachClearSessionToResponse } from "@/lib/auth";
 
 export async function POST() {
-  await clearSession();
-  return Response.json({ ok: true });
+  const res = NextResponse.json({ ok: true });
+  attachClearSessionToResponse(res);
+  return res;
 }

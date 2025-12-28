@@ -5,6 +5,9 @@ class ProfilePreloader {
   private static instance: ProfilePreloader;
   private preloadPromise: Promise<any> | null = null;
   private isPreloading = false;
+  private initialized = false;
+  private resourcesPreloaded = false;
+  private boundListener: ((e: Event) => void) | null = null;
 
   static getInstance(): ProfilePreloader {
     if (!ProfilePreloader.instance) {
@@ -86,23 +89,28 @@ class ProfilePreloader {
   // Предзагрузка при наведении на ссылку профиля
   setupLinkPreloading(): void {
     if (typeof window === "undefined") return;
+    if (this.boundListener) return;
 
-    const profileLinks = document.querySelectorAll('a[href="/profile"], a[href^="/profile/"]');
-    
-    profileLinks.forEach((link) => {
-      link.addEventListener("mouseenter", () => {
-        this.preloadProfileData();
-      });
+    // Делегирование событий: один обработчик на документ вместо навешивания на каждую ссылку.
+    this.boundListener = (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const link = target.closest?.('a[href="/profile"], a[href^="/profile/"]') as
+        | HTMLAnchorElement
+        | null;
+      if (!link) return;
+      this.preloadProfileData();
+    };
 
-      link.addEventListener("focus", () => {
-        this.preloadProfileData();
-      });
-    });
+    document.addEventListener("mouseover", this.boundListener, { passive: true });
+    document.addEventListener("focusin", this.boundListener);
   }
 
   // Предзагрузка критических ресурсов
   preloadCriticalResources(): void {
     if (typeof window === "undefined") return;
+    if (this.resourcesPreloaded) return;
+    this.resourcesPreloaded = true;
 
     // Предзагружаем компоненты профиля
     import("@/components/profile/ProfileHeaderCard");
@@ -124,6 +132,11 @@ export const profilePreloader = ProfilePreloader.getInstance();
 // Автоматическая настройка предзагрузки
 export function setupProfilePreloading(): void {
   if (typeof window === "undefined") return;
+  if (process.env.NODE_ENV !== "production") return;
+
+  // Гарантируем, что инициализация выполняется один раз
+  if ((profilePreloader as any).initialized) return;
+  (profilePreloader as any).initialized = true;
 
   // Настраиваем предзагрузку ссылок
   profilePreloader.setupLinkPreloading();

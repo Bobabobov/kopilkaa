@@ -1,8 +1,12 @@
 // app/api/auth/google/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSession, setSession } from "@/lib/auth";
+import { getSession, attachSessionToResponse } from "@/lib/auth";
 import { checkUserBan } from "@/lib/ban-check";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClient = new OAuth2Client(googleClientId);
 
 interface GoogleAuthData {
   credential: string; // Google ID token
@@ -10,27 +14,6 @@ interface GoogleAuthData {
   name: string;
   picture?: string;
   sub: string; // Google user ID
-}
-
-// Функция для декодирования JWT токена с поддержкой UTF-8
-function decodeJWT(token: string): any {
-  try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-      Buffer.from(base64, "base64")
-        .toString("binary")
-        .split("")
-        .map((c) => {
-          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-        })
-        .join("")
-    );
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error("Ошибка декодирования JWT:", error);
-    throw new Error("Не удалось декодировать JWT токен");
-  }
 }
 
 export async function POST(req: NextRequest) {
@@ -45,22 +28,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Декодируем JWT токен на сервере для правильной обработки UTF-8
-    let payload: any;
-    try {
-      payload = decodeJWT(googleData.credential);
-    } catch (error) {
+    if (!googleClientId) {
       return NextResponse.json(
-        { success: false, error: "Ошибка декодирования токена Google" },
-        { status: 400 },
+        { success: false, error: "Google OAuth не настроен (GOOGLE_CLIENT_ID)" },
+        { status: 500 },
       );
     }
 
-    // Используем данные из токена или из переданных данных (для обратной совместимости)
-    const googleId = payload.sub || (googleData as any).sub;
-    const googleEmail = (payload.email || (googleData as any).email || "").toLowerCase().trim();
-    const googleName = payload.name || (googleData as any).name || null;
-    const googlePicture = payload.picture || (googleData as any).picture || null;
+    // ВАЖНО: токен Google нужно именно ВЕРИФИЦИРОВАТЬ (подпись/issuer/audience),
+    // а не просто "декодировать".
+    const ticket = await googleClient.verifyIdToken({
+      idToken: googleData.credential,
+      audience: googleClientId,
+    });
+    const payload = ticket.getPayload();
+
+    const googleId = payload?.sub || "";
+    const googleEmail = (payload?.email || "").toLowerCase().trim();
+    const googleName = payload?.name || null;
+    const googlePicture = payload?.picture || null;
 
     if (!googleId || !googleEmail) {
       return NextResponse.json(
@@ -233,9 +219,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await setSession({ uid: user.id, role: (user.role as any) || "USER" });
-
-    return NextResponse.json({
+    const res = NextResponse.json({
       success: true,
       mode: "login",
       user: {
@@ -244,6 +228,8 @@ export async function POST(req: NextRequest) {
         googleEmail: user.googleEmail,
       },
     });
+    attachSessionToResponse(res, { uid: user.id, role: (user.role as any) || "USER" }, req);
+    return res;
   } catch (error: any) {
     console.error("Error in /api/auth/google:", error);
     const message =

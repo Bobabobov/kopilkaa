@@ -15,56 +15,34 @@ interface Story {
   user?: {
     id: string;
     name: string | null;
-    email: string;
+    email: string | null;
     avatar: string | null;
+    hideEmail?: boolean;
   };
   _count?: {
     likes: number;
   };
+  userLiked?: boolean;
 }
 
 interface StoryCardProps {
   story: Story;
   index: number;
   animate?: boolean; // Опциональный проп для управления анимацией
+  isAuthenticated: boolean;
 }
 
-export function StoryCard({ story, index, animate = true }: StoryCardProps) {
+export function StoryCard({ story, index, animate = true, isAuthenticated }: StoryCardProps) {
   const router = useRouter();
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(!!story.userLiked);
   const [likesCount, setLikesCount] = useState(story._count?.likes || 0);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLiking, setIsLiking] = useState(false);
   
   const authorName =
-    story.user?.name || story.user?.email?.split("@")[0] || "Неизвестный автор";
+    story.user?.name ||
+    (story.user?.email ? story.user.email.split("@")[0] : null) ||
+    "Неизвестный автор";
   const mainImage = story.images?.[0]?.url || "/stories-preview.jpg";
-
-  // Проверяем авторизацию и статус лайка
-  useEffect(() => {
-    const checkAuthAndLike = async () => {
-      try {
-        const authResponse = await fetch("/api/profile/me", { cache: "no-store" });
-        const isAuth = authResponse.ok;
-        setIsAuthenticated(isAuth);
-
-        if (isAuth) {
-          // Проверяем, лайкнул ли пользователь эту историю
-          const likesResponse = await fetch(`/api/stories/${story.id}/likes`, { cache: "no-store" });
-          if (likesResponse.ok) {
-            const likesData = await likesResponse.json();
-            setLiked(likesData.userLiked || false);
-            setLikesCount(likesData.count || 0);
-          }
-        }
-      } catch (error) {
-        console.error("Error checking auth/like:", error);
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuthAndLike();
-  }, [story.id]);
 
   const handleCardClick = () => {
     router.push(`/stories/${story.id}`);
@@ -85,7 +63,8 @@ export function StoryCard({ story, index, animate = true }: StoryCardProps) {
 
     // Проверяем авторизацию
     if (!isAuthenticated) {
-      router.push("/?modal=auth/signup");
+      const next = encodeURIComponent(window.location.pathname + window.location.search);
+      router.push(`/?modal=auth/signup&next=${next}`);
       return;
     }
 
@@ -101,7 +80,8 @@ export function StoryCard({ story, index, animate = true }: StoryCardProps) {
 
       if (!response.ok) {
         if (response.status === 401) {
-          router.push("/?modal=auth/signup");
+          const next = encodeURIComponent(window.location.pathname + window.location.search);
+          router.push(`/?modal=auth/signup&next=${next}`);
           return;
         }
         const errorData = await response.json();

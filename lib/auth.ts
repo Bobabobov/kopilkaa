@@ -1,40 +1,35 @@
 // lib/auth.ts
 import crypto from "crypto";
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 type Role = "USER" | "ADMIN";
 export type SessionPayload = { uid: string; role: Role; exp: number };
 
-const enc = (obj: any) => {
-  if (typeof window !== "undefined") {
-    // В браузере используем btoa
-    return btoa(JSON.stringify(obj))
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=/g, "");
-  }
-  return Buffer.from(JSON.stringify(obj)).toString("base64url");
-};
-
-const dec = (s: string) => {
-  if (typeof window !== "undefined") {
-    // В браузере используем atob
-    const base64 = s.replace(/-/g, "+").replace(/_/g, "/");
-    const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-    return JSON.parse(atob(padded));
-  }
-  return JSON.parse(Buffer.from(s, "base64url").toString());
-};
-const hmac = (data: string, secret: string) => {
-  if (typeof window !== "undefined") {
-    // В браузере используем Web Crypto API
-    throw new Error("HMAC not available in browser context");
-  }
-  return crypto.createHmac("sha256", secret).update(data).digest("base64url");
-};
-
 const COOKIE_NAME = "kopilka_session";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 дней
+
+const enc = (obj: any) =>
+  Buffer.from(JSON.stringify(obj)).toString("base64url");
+
+const dec = (s: string) =>
+  JSON.parse(Buffer.from(s, "base64url").toString());
+
+const hmac = (data: string, secret: string) =>
+  crypto.createHmac("sha256", secret).update(data).digest("base64url");
+
+function getIsHttpsFromReq(req?: Request) {
+  if (process.env.NODE_ENV !== "production") return false;
+  if (!req) return true; // в проде обычно https, но для надёжности лучше передавать req
+
+  const xfProto = req.headers.get("x-forwarded-proto");
+  if (xfProto) return xfProto.toLowerCase().includes("https");
+
+  const referer = req.headers.get("referer");
+  if (referer) return referer.toLowerCase().startsWith("https://");
+
+  return true;
+}
 
 export function signSession(
   payload: Omit<SessionPayload, "exp">,
@@ -47,8 +42,8 @@ export function signSession(
   };
   const p1 = enc(header);
   const p2 = enc(body);
-  const sig = hmac(p1 + "." + p2, secret);
-  return [p1, p2, sig].join(".");
+  const sig = hmac(`${p1}.${p2}`, secret);
+  return `${p1}.${p2}.${sig}`;
 }
 
 export function verifySession(
@@ -58,30 +53,17 @@ export function verifySession(
   try {
     if (!token) return null;
 
-    // В браузере не можем проверить подпись, поэтому просто декодируем
-    if (typeof window !== "undefined") {
-      const [p1, p2, sig] = token.split(".");
-      if (!p1 || !p2 || !sig) return null;
-
-      const payload: SessionPayload = dec(p2);
-      if (payload.exp < Math.floor(Date.now() / 1000)) return null;
-
-      return payload;
-    }
-
     const [p1, p2, sig] = token.split(".");
     if (!p1 || !p2 || !sig) return null;
 
-    const expect = hmac(p1 + "." + p2, secret);
-    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expect)))
-      return null;
+    const expect = hmac(`${p1}.${p2}`, secret);
+    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expect))) return null;
 
     const payload: SessionPayload = dec(p2);
     if (payload.exp < Math.floor(Date.now() / 1000)) return null;
 
     return payload;
-  } catch (error) {
-    console.error("Error verifying session:", error);
+  } catch {
     return null;
   }
 }
@@ -89,28 +71,45 @@ export function verifySession(
 export async function getSession(): Promise<SessionPayload | null> {
   try {
     const cookieStore = await cookies();
-    if (!cookieStore) {
-      return null;
-    }
     const token = cookieStore.get(COOKIE_NAME)?.value;
-    const session = verifySession(token);
-    return session;
-  } catch (error) {
-    // Игнорируем ошибки, связанные с cookies в неправильном контексте
+    return verifySession(token);
+  } catch {
     return null;
   }
 }
 
+// Правильный способ для API routes: ставим cookie на NextResponse
+export function attachSessionToResponse(
+  res: NextResponse,
+  payload: Omit<SessionPayload, "exp">,
+  req?: Request,
+) {
+  const token = signSession(payload);
+  const secure = getIsHttpsFromReq(req);
+  res.cookies.set(COOKIE_NAME, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure,
+    path: "/",
+    maxAge: MAX_AGE,
+  });
+  return res;
+}
+
+export function attachClearSessionToResponse(res: NextResponse) {
+  res.cookies.set(COOKIE_NAME, "", {
+    httpOnly: true,
+    expires: new Date(0),
+    path: "/",
+  });
+  return res;
+}
+
+// Legacy: оставляем для совместимости, но для API лучше использовать attachSessionToResponse.
 export async function setSession(payload: Omit<SessionPayload, "exp">) {
   try {
     const token = signSession(payload);
     const cookieStore = await cookies();
-    
-    if (!cookieStore) {
-      console.warn("Cookie store is not available");
-      return;
-    }
-
     cookieStore.set(COOKIE_NAME, token, {
       httpOnly: true,
       sameSite: "lax",
@@ -118,28 +117,20 @@ export async function setSession(payload: Omit<SessionPayload, "exp">) {
       path: "/",
       maxAge: MAX_AGE,
     });
-  } catch (error) {
-    // Игнорируем ошибки, связанные с cookies в неправильном контексте
-    console.error("Error setting session:", error);
+  } catch {
+    // ignore
   }
 }
 
 export async function clearSession() {
   try {
     const cookieStore = await cookies();
-    
-    if (!cookieStore) {
-      console.warn("Cookie store is not available");
-      return;
-    }
-    
     cookieStore.set(COOKIE_NAME, "", {
       httpOnly: true,
       expires: new Date(0),
       path: "/",
     });
-  } catch (error) {
-    // Игнорируем ошибки, связанные с cookies в неправильном контексте
-    console.error("Error clearing session:", error);
+  } catch {
+    // ignore
   }
 }

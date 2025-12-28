@@ -3,6 +3,10 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
+function isValidStoryId(id: string) {
+  return /^[a-zA-Z0-9_-]+$/.test(id);
+}
+
 export async function POST(
   request: Request,
   { params }: { params: { id: string } },
@@ -16,9 +20,14 @@ export async function POST(
     const storyId = params.id;
     const userId = session.uid;
 
+    if (!isValidStoryId(storyId)) {
+      return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
+    }
+
     // Проверяем, что история существует
-    const story = await prisma.application.findUnique({
+    const story = await prisma.application.findFirst({
       where: { id: storyId, status: "APPROVED" },
+      select: { id: true },
     });
 
     if (!story) {
@@ -73,6 +82,10 @@ export async function DELETE(
   try {
     const storyId = params.id;
     const userId = session.uid;
+
+    if (!isValidStoryId(storyId)) {
+      return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
+    }
 
     // Удаляем лайк
     const deletedLike = await prisma.storyLike.deleteMany({

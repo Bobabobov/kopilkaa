@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   StoriesHeader,
   StoryCard,
@@ -11,6 +11,7 @@ import {
 import { useStories } from "@/hooks/useStories";
 
 export default function StoriesPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const {
     stories,
     loading,
@@ -22,6 +23,13 @@ export default function StoriesPage() {
     observerTargetRef,
     isInitialLoad,
   } = useStories();
+
+  // Проверяем авторизацию один раз (без N+1 на карточки)
+  useEffect(() => {
+    fetch("/api/profile/me", { cache: "no-store" })
+      .then((r) => setIsAuthenticated(r.ok))
+      .catch(() => setIsAuthenticated(false));
+  }, []);
 
   // Intersection Observer для бесконечной прокрутки
   useEffect(() => {
@@ -84,6 +92,7 @@ export default function StoriesPage() {
                     story={story}
                     index={index + 1}
                     animate={shouldAnimate}
+                    isAuthenticated={isAuthenticated}
                   />
                 ))}
               </div>

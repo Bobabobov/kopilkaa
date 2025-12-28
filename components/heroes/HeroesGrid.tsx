@@ -1,6 +1,6 @@
 // components/heroes/HeroesGrid.tsx
 "use client";
-import { useState, useMemo } from "react";
+import React from "react";
 import Link from "next/link";
 import HeroesFilters from "./HeroesFilters";
 import HeroesTopThree from "./HeroesTopThree";
@@ -15,7 +15,7 @@ interface Hero {
   totalDonated: number;
   donationCount: number;
   rank: number;
-  joinedAt: Date;
+  joinedAt: string;
   isSubscriber: boolean;
   vkLink?: string | null;
   telegramLink?: string | null;
@@ -24,38 +24,29 @@ interface Hero {
 
 interface HeroesGridProps {
   heroes: Hero[];
+  topThree: Hero[];
+  total: number;
+  searchTerm: string;
+  onSearchChange: (term: string) => void;
+  sortBy: "total" | "count" | "date";
+  onSortChange: (sort: "total" | "count" | "date") => void;
+  hasMore: boolean;
+  loadingMore: boolean;
+  observerTargetRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export default function HeroesGrid({ heroes }: HeroesGridProps) {
-  const [sortBy, setSortBy] = useState<"total" | "count" | "date">("total");
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const filteredAndSortedHeroes = useMemo(() => {
-    let filtered = [...heroes];
-
-    // Поиск по имени
-    if (searchTerm) {
-      filtered = filtered.filter(hero =>
-        hero.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Сортировка
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "total":
-          return b.totalDonated - a.totalDonated;
-        case "count":
-          return b.donationCount - a.donationCount;
-        case "date":
-          return new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [heroes, searchTerm, sortBy]);
+export default function HeroesGrid({
+  heroes,
+  topThree,
+  total,
+  searchTerm,
+  onSearchChange,
+  sortBy,
+  onSortChange,
+  hasMore,
+  loadingMore,
+  observerTargetRef,
+}: HeroesGridProps) {
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("ru-RU", {
@@ -63,6 +54,14 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
       month: "long",
       year: "numeric",
     }).format(new Date(date));
+  };
+
+  const openExternal = (raw?: string | null) => {
+    if (!raw) return;
+    // API уже санитизирует, но на всякий — запретим javascript:
+    const v = raw.trim();
+    if (!/^https?:\/\//i.test(v) && !/^tg:\/\//i.test(v)) return;
+    window.open(v, "_blank", "noopener,noreferrer");
   };
 
   const getRankIcon = (rank: number) => {
@@ -96,13 +95,13 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
       {/* Фильтры */}
       <HeroesFilters
         searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
+        onSearchChange={onSearchChange}
         sortBy={sortBy}
-        onSortChange={setSortBy}
+        onSortChange={onSortChange}
       />
 
       {/* Топ-3 */}
-      <HeroesTopThree heroes={heroes} />
+      <HeroesTopThree heroes={topThree} />
 
       {/* Заголовок с результатами */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-2">
@@ -110,12 +109,12 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
           Все донатеры
         </h3>
         <div className="text-xs sm:text-sm md:text-base text-[#abd1c6]">
-          Показано {filteredAndSortedHeroes.length} из {heroes.length}
+          Показано {heroes.length} из {total}
         </div>
       </div>
 
       {/* Сетка героев */}
-      {filteredAndSortedHeroes.length === 0 ? (
+      {heroes.length === 0 ? (
         <div className="text-center py-8 sm:py-12">
           <p className="text-sm sm:text-base" style={{ color: "#abd1c6" }}>
             Ничего не найдено
@@ -123,7 +122,7 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-          {filteredAndSortedHeroes.map((hero) => {
+          {heroes.map((hero) => {
             const hasSocialLinks =
               !!hero.vkLink || !!hero.telegramLink || !!hero.youtubeLink;
 
@@ -174,7 +173,7 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                       {hero.name}
                     </h3>
                     <p className="text-xs sm:text-sm truncate" style={{ color: "#abd1c6" }}>
-                      С {formatDate(hero.joinedAt)}
+                      С {formatDate(new Date(hero.joinedAt))}
                     </p>
                   </div>
                 </div>
@@ -230,7 +229,7 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                         onClick={(event) => {
                           event.preventDefault();
                           event.stopPropagation();
-                          window.open(hero.vkLink!, "_blank", "noopener,noreferrer");
+                          openExternal(hero.vkLink);
                         }}
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-[#4c75a3]/60 text-[#4c75a3] text-xs font-semibold bg-[#4c75a3]/10 hover:bg-[#4c75a3]/20 transition-colors"
                       >
@@ -244,7 +243,7 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                         onClick={(event) => {
                           event.preventDefault();
                           event.stopPropagation();
-                          window.open(hero.telegramLink!, "_blank", "noopener,noreferrer");
+                          openExternal(hero.telegramLink);
                         }}
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-[#229ED9]/60 text-[#229ED9] text-xs font-semibold bg-[#229ED9]/10 hover:bg-[#229ED9]/20 transition-colors"
                       >
@@ -258,7 +257,7 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                         onClick={(event) => {
                           event.preventDefault();
                           event.stopPropagation();
-                          window.open(hero.youtubeLink!, "_blank", "noopener,noreferrer");
+                          openExternal(hero.youtubeLink);
                         }}
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-[#ff4f45]/60 text-[#ff4f45] text-xs font-semibold bg-[#ff4f45]/10 hover:bg-[#ff4f45]/20 transition-colors"
                       >
@@ -269,8 +268,19 @@ export default function HeroesGrid({ heroes }: HeroesGridProps) {
                 </div>
               </div>
             </Link>
-          )})}
+          );
+          })}
         </div>
+      )}
+
+      {/* Lazy load */}
+      {loadingMore && (
+        <div className="flex justify-center items-center py-10">
+          <div className="w-10 h-10 border-4 border-[#abd1c6] border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+      {hasMore && !loadingMore && (
+        <div ref={observerTargetRef} className="h-16" />
       )}
     </div>
   );

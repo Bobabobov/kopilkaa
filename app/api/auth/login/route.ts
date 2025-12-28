@@ -1,6 +1,7 @@
 // app/api/auth/login/route.ts
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { setSession } from "@/lib/auth";
+import { attachSessionToResponse } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 import { AchievementService } from "@/lib/achievements/service";
 import { checkUserBan } from "@/lib/ban-check";
@@ -9,11 +10,9 @@ export async function POST(req: Request) {
   try {
     const { identifier, password } = await req.json();
     const rawIdentifier = String(identifier ?? "").trim();
-    console.log("Login attempt for identifier:", rawIdentifier);
 
     if (!rawIdentifier || !password) {
-      console.log("Missing identifier or password");
-      return Response.json(
+      return NextResponse.json(
         { error: "Введите логин/email и пароль" },
         { status: 400 },
       );
@@ -30,8 +29,7 @@ export async function POST(req: Request) {
         : { username: lookupValue },
     });
     if (!user) {
-      console.log("User not found:", rawIdentifier);
-      return Response.json(
+      return NextResponse.json(
         { error: "Такого пользователя не существует" },
         { status: 404 },
       );
@@ -39,8 +37,7 @@ export async function POST(req: Request) {
 
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) {
-      console.log("Invalid password for user:", rawIdentifier);
-      return Response.json({ error: "Неверный пароль" }, { status: 401 });
+      return NextResponse.json({ error: "Неверный пароль" }, { status: 401 });
     }
 
     // Проверяем блокировку пользователя
@@ -51,7 +48,7 @@ export async function POST(req: Request) {
         ? ` до ${banStatus.bannedUntil.toLocaleDateString("ru-RU")}`
         : " навсегда";
       
-      return Response.json(
+      return NextResponse.json(
         { 
           error: "Ваш аккаунт заблокирован", 
           banInfo: {
@@ -64,9 +61,6 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("Login successful for user:", user.id);
-    await setSession({ uid: user.id, role: user.role as any });
-
     // Проверяем и выдаём достижения при входе (в фоне)
     AchievementService.checkAndGrantAutomaticAchievements(user.id)
       .then((granted) => {
@@ -78,7 +72,7 @@ export async function POST(req: Request) {
         console.error("Error checking achievements on login:", error);
       });
 
-    return Response.json({
+    const res = NextResponse.json({
       ok: true,
       user: {
         id: user.id,
@@ -87,8 +81,10 @@ export async function POST(req: Request) {
         name: user.name,
       },
     });
+    attachSessionToResponse(res, { uid: user.id, role: user.role as any }, req);
+    return res;
   } catch (error) {
     console.error("Login error:", error);
-    return Response.json({ error: "Ошибка входа" }, { status: 500 });
+    return NextResponse.json({ error: "Ошибка входа" }, { status: 500 });
   }
 }

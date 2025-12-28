@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
+import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
 export async function GET() {
   try {
@@ -14,7 +15,20 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ ads });
+    const safeAds = ads.map((ad: any) => {
+      const safeConfig =
+        ad?.config && typeof ad.config === "object" ? { ...(ad.config as any) } : null;
+      if (safeConfig && typeof safeConfig.storyText === "string") {
+        safeConfig.storyText = sanitizeApplicationStoryHtml(safeConfig.storyText);
+      }
+      return {
+        ...ad,
+        config: safeConfig,
+        content: typeof ad.content === "string" ? sanitizeApplicationStoryHtml(ad.content) : ad.content,
+      };
+    });
+
+    return NextResponse.json({ ads: safeAds });
   } catch (error) {
     console.error("Error fetching ads:", error);
     return NextResponse.json(
@@ -44,6 +58,12 @@ export async function POST(request: NextRequest) {
 
     const finalPlacement: string = placement || "home_sidebar";
     const finalIsActive: boolean = isActive ?? true;
+    const safeContent = typeof content === "string" ? sanitizeApplicationStoryHtml(content) : content;
+    const safeConfig =
+      config && typeof config === "object" ? { ...(config as any) } : config;
+    if (safeConfig && typeof (safeConfig as any).storyText === "string") {
+      (safeConfig as any).storyText = sanitizeApplicationStoryHtml((safeConfig as any).storyText);
+    }
 
     // Гарантируем "один активный баннер на слот" для home_banner:
     // при создании активного home_banner деактивируем предыдущие активные записи этого же placement.
@@ -58,18 +78,24 @@ export async function POST(request: NextRequest) {
       return tx.advertisement.create({
         data: {
           title,
-          content,
+          content: safeContent,
           imageUrl,
           linkUrl,
           expiresAt: expiresAt ? new Date(expiresAt) : null,
           isActive: finalIsActive,
           placement: finalPlacement,
-          config: config || null,
+          config: safeConfig || null,
         },
       });
     });
 
-    return NextResponse.json({ ad });
+    return NextResponse.json({
+      ad: {
+        ...ad,
+        config: safeConfig || null,
+        content: typeof ad.content === "string" ? sanitizeApplicationStoryHtml(ad.content) : ad.content,
+      },
+    });
   } catch (error) {
     console.error("Error creating ad:", error);
     return NextResponse.json(

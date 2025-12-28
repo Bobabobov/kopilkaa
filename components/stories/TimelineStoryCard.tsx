@@ -117,7 +117,7 @@ export function TimelineStoryCard({ story, index }: TimelineStoryCardProps) {
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {story.user.name ||
-                      (!story.user.hideEmail
+                      (!story.user.hideEmail && story.user.email
                         ? story.user.email.split("@")[0]
                         : "Пользователь")}
                   </p>

@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
-import { setSession } from "@/lib/auth";
+import { attachSessionToResponse } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -111,11 +111,9 @@ export async function POST(req: Request) {
     }
 
     // Сразу логиним (httpOnly-cookie через твой lib/auth.ts)
-    await setSession({ uid: user.id, role: user.role as "USER" | "ADMIN" });
-
     // Система достижений отключена
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       {
         ok: true,
         user: { id: user.id, email: user.email },
@@ -123,6 +121,8 @@ export async function POST(req: Request) {
       },
       { status: 201 },
     );
+    attachSessionToResponse(res, { uid: user.id, role: user.role as "USER" | "ADMIN" }, req);
+    return res;
   } catch (err: any) {
     if (err?.code === "P2002")
       return bad("Этот email уже зарегистрирован", 409);

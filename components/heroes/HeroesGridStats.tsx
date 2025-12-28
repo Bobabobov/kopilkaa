@@ -3,24 +3,19 @@
 
 interface Hero {
   id: string;
-  name: string;
-  avatar?: string;
-  totalDonated: number;
-  donationCount: number;
-  rank: number;
-  joinedAt: Date;
-  isSubscriber: boolean;
 }
 
 interface HeroesGridStatsProps {
-  heroes: Hero[];
+  stats: {
+    totalHeroes: number;
+    totalDonated: number;
+    subscribersCount: number;
+    averageDonation: number;
+  };
 }
 
-export default function HeroesGridStats({ heroes }: HeroesGridStatsProps) {
-  const totalHeroes = heroes.length;
-  const totalDonated = heroes.reduce((sum, hero) => sum + hero.totalDonated, 0);
-  const subscribersCount = heroes.filter(hero => hero.isSubscriber).length;
-  const averageDonation = totalHeroes > 0 ? Math.round(totalDonated / totalHeroes) : 0;
+export default function HeroesGridStats({ stats }: HeroesGridStatsProps) {
+  const { totalHeroes, totalDonated, subscribersCount, averageDonation } = stats;
 
   const statsData = [
     {

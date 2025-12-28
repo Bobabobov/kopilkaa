@@ -31,9 +31,31 @@ function rateLimit(ip: string, limit: number = 5, windowMs: number = 60000) {
   return true;
 }
 
+function pruneRateLimitStore(maxEntries: number = 5000) {
+  // Простая защита от бесконечного роста Map (актуально для VPS/long-running)
+  if (rateLimitStore.size <= maxEntries) return;
+  const now = Date.now();
+  for (const [k, v] of rateLimitStore.entries()) {
+    if (now > v.resetTime) rateLimitStore.delete(k);
+    if (rateLimitStore.size <= maxEntries) return;
+  }
+  // Если всё ещё много — удаляем “самые первые” по порядку итерации
+  const overflow = rateLimitStore.size - maxEntries;
+  if (overflow > 0) {
+    let i = 0;
+    for (const k of rateLimitStore.keys()) {
+      rateLimitStore.delete(k);
+      i++;
+      if (i >= overflow) break;
+    }
+  }
+}
+
 // Основной middleware
 export function middleware(req: NextRequest) {
   const realIP = getRealIP(req);
+  pruneRateLimitStore();
+  const isProd = process.env.NODE_ENV === "production";
 
   // Проверяем на подозрительную активность
   if (detectSuspiciousActivity(req)) {
@@ -41,52 +63,93 @@ export function middleware(req: NextRequest) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
-  // Применяем rate limiting к API auth роутам
-  if (req.nextUrl.pathname.startsWith("/api/auth/")) {
-    if (!rateLimit(realIP, 5, 60000)) {
-      // 5 запросов в минуту
-      logSecurityEvent(
-        req,
-        "rate_limit",
-        `Rate limit exceeded for IP: ${realIP}`,
-      );
-      return new NextResponse(
-        JSON.stringify({ error: "Too many requests. Please try again later." }),
-        {
-          status: 429,
-          headers: {
-            "Content-Type": "application/json",
-            "Retry-After": "60",
-          },
+  // Применяем rate limiting к чувствительным API роутам (anti-spam)
+  // NOTE: это in-memory лимит (VPS). Для нескольких инстансов нужен Redis.
+  const path = req.nextUrl.pathname;
+  const isPost = req.method === "POST";
+  const isAuthApi = path.startsWith("/api/auth/");
+  const isUploadsApi = path === "/api/uploads";
+  const isApplicationsApi = path === "/api/applications";
+  const isStoryLikeApi = /^\/api\/stories\/[^/]+\/like$/.test(path);
+  const isHeroesApi = path === "/api/heroes";
+
+  let limit: number | null = null;
+  let windowMs: number | null = null;
+  let retryAfterSec: number | null = null;
+
+  if (isAuthApi) {
+    // 5 запросов/мин на IP
+    limit = 5;
+    windowMs = 60_000;
+    retryAfterSec = 60;
+  } else if (isPost && isUploadsApi) {
+    // Загрузка файлов: 20 запросов/5 минут на IP
+    limit = 20;
+    windowMs = 5 * 60_000;
+    retryAfterSec = 5 * 60;
+  } else if (isPost && isApplicationsApi) {
+    // Создание заявки: 5 запросов/час на IP (дополнительно к 1/24ч на пользователя в API)
+    limit = 5;
+    windowMs = 60 * 60_000;
+    retryAfterSec = 60 * 60;
+  } else if ((req.method === "POST" || req.method === "DELETE") && isStoryLikeApi) {
+    // Лайки: ограничение на частые клики/ботов
+    limit = 60;
+    windowMs = 60_000;
+    retryAfterSec = 60;
+  } else if (req.method === "GET" && isHeroesApi) {
+    // Публичный список — лёгкая защита от скрейпинга
+    limit = 300;
+    windowMs = 60_000;
+    retryAfterSec = 60;
+  }
+
+  if (limit && windowMs && retryAfterSec) {
+    if (!rateLimit(realIP, limit, windowMs)) {
+      logSecurityEvent(req, "rate_limit", `Rate limit exceeded for IP: ${realIP}`);
+      return new NextResponse(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "Retry-After": String(retryAfterSec),
         },
-      );
+      });
     }
   }
 
   // Создаем ответ с заголовками безопасности
   const response = NextResponse.next();
 
+  const isTowerBlocks = path.startsWith("/tower-blocks");
+
   // Content Security Policy
-  response.headers.set(
-    "Content-Security-Policy",
-    [
-      "default-src 'self'",
-      // Разрешаем внешние скрипты для игр, Telegram-виджета и Google OAuth
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://codepen.io https://cdnjs.cloudflare.com https://telegram.org https://accounts.google.com",
-      "style-src 'self' 'unsafe-inline' https://accounts.google.com", // TailwindCSS требует unsafe-inline, Google OAuth требует стили
-      "img-src 'self' data: blob: https:",
-      "font-src 'self' data:",
-      // Разрешаем загрузку видео с внешних источников
-      "media-src 'self' blob: data: https:",
-      // Разрешаем запросы к Telegram OAuth и Google OAuth (для виджета входа)
-      "connect-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com",
-      // Разрешаем встраивать iframe Telegram OAuth и Google OAuth
-      "frame-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com",
-      "frame-ancestors 'self'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join("; "),
-  );
+  // В DEV Next.js использует eval (webpack/HMR), поэтому строгий CSP ломает сайт.
+  // В PROD CSP включаем и держим строгим.
+  if (isProd) {
+    response.headers.set(
+      "Content-Security-Policy",
+      [
+        "default-src 'self'",
+        // По умолчанию НЕ разрешаем 'unsafe-eval' (это сильно ослабляет защиту).
+        // Для /tower-blocks он нужен из-за внешних скриптов игры.
+        isTowerBlocks
+          ? "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://codepen.io https://cdnjs.cloudflare.com https://telegram.org https://accounts.google.com"
+          : "script-src 'self' 'unsafe-inline' https://telegram.org https://accounts.google.com",
+        "style-src 'self' 'unsafe-inline' https://accounts.google.com", // Tailwind/Google OAuth
+        "img-src 'self' data: blob: https:",
+        "font-src 'self' data:",
+        // Разрешаем загрузку видео с внешних источников
+        "media-src 'self' blob: data: https:",
+        // Разрешаем запросы к Telegram OAuth и Google OAuth (для виджета входа)
+        "connect-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com",
+        // Разрешаем встраивать iframe Telegram OAuth и Google OAuth
+        "frame-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com",
+        "frame-ancestors 'self'",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ].join("; "),
+    );
+  }
 
   // Другие заголовки безопасности
   response.headers.set("X-Content-Type-Options", "nosniff");
@@ -97,7 +160,7 @@ export function middleware(req: NextRequest) {
   );
 
   // HSTS (только для HTTPS)
-  if (req.nextUrl.protocol === "https:") {
+  if (isProd && req.nextUrl.protocol === "https:") {
     response.headers.set(
       "Strict-Transport-Security",
       "max-age=31536000; includeSubDomains",
@@ -118,5 +181,11 @@ export const config = {
      * - favicon.ico (иконка сайта)
      */
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    // Включаем middleware для чувствительных API (rate limit + security checks)
+    "/api/auth/:path*",
+    "/api/uploads",
+    "/api/applications",
+    "/api/stories/:path*",
+    "/api/heroes",
   ],
 };

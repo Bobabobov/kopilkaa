@@ -4,30 +4,11 @@ import { setupProfilePreloading } from "@/lib/profilePreloader";
 
 export default function ProfilePreloadInitializer() {
   useEffect(() => {
-    // Инициализируем предзагрузку профиля только на клиенте
+    // В DEV Next.js Fast Refresh может спамить предупреждениями из-за динамических импортов/observer'ов.
+    // Предзагрузку включаем только в PROD (для реальных пользователей).
+    if (process.env.NODE_ENV !== "production") return;
+
     setupProfilePreloading();
-
-    // Добавляем обработчик для предзагрузки при навигации
-    const handleRouteChange = () => {
-      // Переинициализируем предзагрузку для новых ссылок
-      setTimeout(() => {
-        setupProfilePreloading();
-      }, 100);
-    };
-
-    // Слушаем изменения в DOM для новых ссылок
-    const observer = new MutationObserver(() => {
-      handleRouteChange();
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      observer.disconnect();
-    };
   }, []);
 
   return null; // Этот компонент ничего не рендерит

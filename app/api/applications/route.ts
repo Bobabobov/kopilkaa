@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     return Response.json({ error: "Требуется вход" }, { status: 401 });
 
   try {
-    const { title, summary, story, amount, payment, images } =
+    const { title, summary, story, amount, payment, images, hpCompany, clientMeta } =
       (await req.json()) as {
         title: string;
         summary: string;
@@ -24,13 +24,34 @@ export async function POST(req: Request) {
         amount: string;
         payment: string;
         images: string[];
+        hpCompany?: string;
+        clientMeta?: { filledMs?: number | null };
       };
+
+    // Anti-spam (no captcha): honeypot + "too fast submit"
+    if (typeof hpCompany === "string" && hpCompany.trim().length > 0) {
+      return Response.json({ error: "Spam detected" }, { status: 400 });
+    }
+
+    const filledMs = clientMeta?.filledMs;
+    const isAdmin = session.role === "ADMIN";
+    if (
+      !isAdmin &&
+      typeof filledMs === "number" &&
+      Number.isFinite(filledMs) &&
+      filledMs >= 0 &&
+      filledMs < 2500
+    ) {
+      return Response.json(
+        { error: "Слишком быстро. Попробуйте заполнить форму вручную.", retryAfterMs: 5000 },
+        { status: 429 },
+      );
+    }
 
     const sanitizedStory = sanitizeApplicationStoryHtml(story);
     const storyTextLen = getPlainTextLenFromHtml(sanitizedStory);
 
     // Валидация длин (расширенные лимиты для администратора)
-    const isAdmin = session.role === "ADMIN";
     const titleMax = isAdmin ? 100 : 40;
     const summaryMax = isAdmin ? 300 : 140;
     const storyMax = isAdmin ? 10000 : 3000;

@@ -45,6 +45,11 @@ export default function StoryPage() {
   const [likesCount, setLikesCount] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
+  const pushAuth = (mode: "auth" | "signup") => {
+    const next = encodeURIComponent(window.location.pathname + window.location.search);
+    router.push(`/?modal=auth${mode === "signup" ? "/signup" : ""}&next=${next}`);
+  };
+
   const loadAdStory = async () => {
     try {
       setLoading(true);
@@ -168,25 +173,20 @@ export default function StoryPage() {
         return;
       }
 
-      // Проверяем валидность ID - проверяем на любые недопустимые символы
-      const hasInvalidChars = /[^a-zA-Z0-9]/.test(id);
-
-      if (hasInvalidChars) {
+      // Валидация ID (без модификации входных данных)
+      if (!/^[a-zA-Z0-9_-]+$/.test(id)) {
         setError("Неправильный формат ID истории");
         setLoading(false);
         return;
       }
 
-      // Очищаем ID от любых недопустимых символов
-      const cleanId = id.replace(/[^a-zA-Z0-9]/g, "");
-
-      loadStory(cleanId);
+      loadStory(id);
     }
   }, [params.id]);
 
   const checkAuth = async () => {
     try {
-      const response = await fetch("/api/profile/me");
+      const response = await fetch("/api/profile/me", { cache: "no-store" });
       setIsAuthenticated(response.ok);
     } catch (error) {
       setIsAuthenticated(false);
@@ -223,8 +223,7 @@ export default function StoryPage() {
 
     // Проверяем авторизацию
     if (!isAuthenticated) {
-      alert("Войдите в систему, чтобы ставить лайки");
-      router.push("/login");
+      pushAuth("signup");
       return;
     }
 
@@ -238,12 +237,11 @@ export default function StoryPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
         if (response.status === 401) {
-          alert("Войдите в систему, чтобы ставить лайки");
-          router.push("/login");
+          pushAuth("signup");
           return;
         }
+        const errorData = await response.json();
         console.error("Ошибка лайка:", errorData.message);
         return;
       }

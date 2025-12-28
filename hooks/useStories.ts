@@ -10,12 +10,14 @@ export interface Story {
   user: {
     id: string;
     name: string | null;
-    email: string;
+    email: string | null;
     avatar: string | null;
+    hideEmail?: boolean;
   };
   _count: {
     likes: number;
   };
+  userLiked?: boolean;
 }
 
 interface StoriesResponse {

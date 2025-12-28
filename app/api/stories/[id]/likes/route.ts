@@ -1,6 +1,11 @@
 // app/api/stories/[id]/likes/route.ts
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
+
+function isValidStoryId(id: string) {
+  return /^[a-zA-Z0-9_-]+$/.test(id);
+}
 
 export async function GET(
   _: Request,
@@ -9,6 +14,10 @@ export async function GET(
   const session = await getSession();
 
   try {
+    if (!isValidStoryId(id)) {
+      return Response.json({ error: "Invalid ID format" }, { status: 400 });
+    }
+
     // Проверяем, существует ли история
     const story = await prisma.application.findFirst({
       where: { id, status: "APPROVED" },
@@ -50,6 +59,7 @@ export async function GET(
               email: true,
               avatar: true,
               avatarFrame: true,
+              hideEmail: true,
             },
           },
         },
@@ -62,7 +72,7 @@ export async function GET(
       userLiked,
       likes: likes.map((like) => ({
         id: like.id,
-        user: like.user,
+        user: like.user ? sanitizeEmailForViewer(like.user, session?.uid || "") : like.user,
         createdAt: like.createdAt,
       })),
     });

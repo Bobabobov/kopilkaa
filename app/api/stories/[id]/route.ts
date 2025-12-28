@@ -1,6 +1,8 @@
 // app/api/stories/[id]/route.ts
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
 export async function GET(
   request: Request,
@@ -14,18 +16,12 @@ export async function GET(
     // Игнорируем ошибки декодирования
   }
 
-  // Валидация ID - не должен содержать недопустимые символы
-  const hasInvalidChars = /[^a-zA-Z0-9]/.test(decodedId);
-
-  if (hasInvalidChars) {
+  // Валидация ID (не модифицируем входные данные)
+  // Разрешаем a-zA-Z0-9_- (на будущее/совместимость)
+  if (!/^[a-zA-Z0-9_-]+$/.test(decodedId)) {
     return Response.json({ error: "Invalid ID format" }, { status: 400 });
   }
-
-  // Очищаем ID от любых недопустимых символов
-  const cleanId = decodedId.replace(/[^a-zA-Z0-9]/g, "");
-
-  // Используем очищенный ID для поиска
-  const finalId = cleanId;
+  const finalId = decodedId;
 
   const session = await getSession();
 
@@ -63,7 +59,7 @@ export async function GET(
 
   // Проверяем, лайкнул ли текущий пользователь
   let userLiked = false;
-  if (session) {
+  if (session?.uid) {
     const userLike = await prisma.storyLike.findFirst({
       where: {
         applicationId: finalId,
@@ -75,6 +71,8 @@ export async function GET(
 
   return Response.json({
     ...story,
+    story: sanitizeApplicationStoryHtml(story.story || ""),
+    user: story.user ? sanitizeEmailForViewer(story.user as any, session?.uid || "") : story.user,
     userLiked,
   }, {
     headers: {

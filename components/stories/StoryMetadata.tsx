@@ -8,7 +8,7 @@ interface StoryMetadataProps {
   story: {
     user?: {
       name: string | null;
-      email: string;
+      email: string | null;
     };
     story?: string;
     createdAt?: string;
@@ -29,7 +29,9 @@ export default function StoryMetadata({
   isAd = false,
 }: StoryMetadataProps) {
   const authorName =
-    story.user?.name || story.user?.email?.split("@")[0] || "Неизвестный автор";
+    story.user?.name ||
+    (story.user?.email ? story.user.email.split("@")[0] : null) ||
+    "Неизвестный автор";
   const readTime = Math.ceil((story.story?.length || 0) / 200);
 
   return (

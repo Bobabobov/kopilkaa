@@ -74,6 +74,10 @@ export default function ApplicationsPage() {
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Anti-spam: honeypot + "too fast submit" heuristic
+  const [hpCompany, setHpCompany] = useState(""); // должно быть пустым (скрытое поле для ботов)
+  const formStartedAtRef = useRef<number | null>(null);
+
   // Восстановление данных при загрузке страницы
   useEffect(() => {
     try {
@@ -257,6 +261,10 @@ export default function ApplicationsPage() {
     try {
       setSubmitting(true);
       const urls = await uploadAll();
+      const filledMs =
+        formStartedAtRef.current != null
+          ? Math.max(0, Date.now() - formStartedAtRef.current)
+          : null;
       const r = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -267,6 +275,8 @@ export default function ApplicationsPage() {
           amount,
           payment,
           images: urls,
+          hpCompany,
+          clientMeta: { filledMs },
         }),
       });
       const d = await r.json();
@@ -426,7 +436,32 @@ export default function ApplicationsPage() {
               className="space-y-6 sm:space-y-8"
             >
 
-              <form className="grid gap-6" onSubmit={submit}>
+              <form
+                className="grid gap-6"
+                onSubmit={submit}
+                onFocusCapture={() => {
+                  if (formStartedAtRef.current == null) {
+                    formStartedAtRef.current = Date.now();
+                  }
+                }}
+              >
+                {/* Honeypot (anti-spam): bots often fill hidden fields */}
+                <div
+                  aria-hidden="true"
+                  className="fixed left-[-10000px] top-auto w-px h-px overflow-hidden"
+                >
+                  <label>
+                    Company
+                    <input
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={hpCompany}
+                      onChange={(e) => setHpCompany(e.target.value)}
+                    />
+                  </label>
+                </div>
+
                 <ProgressBar
                   title={title}
                   summary={summary}
@@ -504,7 +539,6 @@ export default function ApplicationsPage() {
                     inputProps={{
                       type: "tel",
                       inputMode: "numeric",
-                      pattern: "[0-9]*",
                       autoComplete: "off",
                       ref: amountInputRef,
                       onChange: handleAmountInputChange,

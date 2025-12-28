@@ -27,11 +27,14 @@ export async function GET(request: Request) {
 
     // Важно: groupBy вернёт запись и для userId = null (анонимные донаты).
     // Если передать null в `id: { in: [...] }`, Prisma может упасть, и мы получим пустой список героев.
+    const userIds = aggregates
+      .map((a) => a.userId)
+      .filter((id): id is string => typeof id === "string" && id.length > 0);
+
     const aggregatesWithUser = aggregates.filter(
       (a): a is (typeof aggregates)[number] & { userId: string } =>
         typeof a.userId === "string" && a.userId.length > 0,
     );
-    const userIds: string[] = aggregatesWithUser.map((a) => a.userId);
     if (!userIds.length) {
       return NextResponse.json(
         {

@@ -114,13 +114,18 @@ export function middleware(req: NextRequest) {
   if (limit && windowMs && retryAfterSec) {
     if (!rateLimit(realIP, limit, windowMs)) {
       logSecurityEvent(req, "rate_limit", `Rate limit exceeded for IP: ${realIP}`);
-      return new NextResponse(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+      return new NextResponse(
+        JSON.stringify({
+          error: "Слишком много запросов. Попробуйте позже.",
+        }),
+        {
         status: 429,
         headers: {
           "Content-Type": "application/json",
           "Retry-After": String(retryAfterSec),
         },
-      });
+        },
+      );
     }
   }
 

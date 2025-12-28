@@ -11,6 +11,121 @@ import {
 } from './types';
 
 export class AchievementService {
+  private static getAchievementKey(a: Achievement): string {
+    const anyA: any = a as any;
+    return String(anyA.slug || a.name || "")
+      .trim()
+      .toLowerCase();
+  }
+
+  private static parseFirstInt(text: string | null | undefined): number | null {
+    if (!text) return null;
+    const m = String(text).match(/(\d{1,6})/);
+    if (!m) return null;
+    const n = Number(m[1]);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  /**
+   * target = "сколько нужно сделать", чтобы получить ачивку.
+   * Важно: НЕ путать с maxCount в БД (исторически оно использовалось по-разному).
+   * Мы вычисляем target из slug/имени/описания, чтобы новые пользователи
+   * не получали пачку достижений из‑за target=1 по умолчанию.
+   */
+  private static getTargetForAchievement(
+    achievement: Achievement,
+    eligibleNormals: Achievement[],
+  ): number {
+    const key = this.getAchievementKey(achievement);
+    const name = String(achievement.name || "").toLowerCase();
+    const desc = String(achievement.description || "").toLowerCase();
+
+    // META (Легенда) — получить все eligible NORMAL
+    if ((achievement.kind ?? "NORMAL") === "META" || key === "legend" || name.includes("легенда")) {
+      return Math.max(eligibleNormals.length, 1);
+    }
+
+    // Пытаемся вытащить число из описания (5 заявок, 10 друзей, 30 дней, 100 слов, 50 лайков, 100 очков и т.д.)
+    const n = this.parseFirstInt(desc);
+    if (n != null && n > 0) return n;
+
+    // Без чисел — обычно “первое действие”
+    return 1;
+  }
+
+  private static getMetricForAchievement(achievement: Achievement, userStats: any): number {
+    const key = this.getAchievementKey(achievement);
+    const name = String(achievement.name || "").toLowerCase();
+    const desc = String(achievement.description || "").toLowerCase();
+
+    // First 100 / первопроходец
+    if (key === "first100" || name.includes("первопроход")) {
+      return userStats.isFirst100 ? 1 : 0;
+    }
+
+    // Легенда обрабатывается отдельно (META)
+    if (key === "legend" || name.includes("легенда")) {
+      return userStats._unlockedEligibleCount || 0;
+    }
+
+    // Одобренная заявка
+    if (key === "approved_application" || name.includes("одобрен")) {
+      return userStats.applicationsApproved ?? 0;
+    }
+
+    // “Вдохновение” — лайки на одной истории (получено 10+ лайков на одну историю)
+    if (key === "inspiration_10_likes_on_one_story" || (desc.includes("истор") && desc.includes("лайк"))) {
+      return userStats.likesReceivedMaxOnOneStory ?? 0;
+    }
+
+    // Лайки, которые пользователь поставил
+    if (desc.includes("лайк")) {
+      return userStats.likesGiven ?? 0;
+    }
+
+    // Друзья
+    if (desc.includes("друз")) {
+      return userStats.friendsCount ?? 0;
+    }
+
+    // Заявки
+    if (desc.includes("заявк")) {
+      return userStats.applicationsCreated ?? 0;
+    }
+
+    // Стрик (дни подряд)
+    if (desc.includes("дн") && desc.includes("подряд")) {
+      return userStats.loginStreakDays ?? 0;
+    }
+
+    // Текст/слова
+    if (desc.includes("слов")) {
+      return userStats.maxStoryWords ?? 0;
+    }
+
+    // Leaf Flight score
+    if (key.startsWith("leaf_flight") || desc.includes("leaf flight") || desc.includes("очк")) {
+      return userStats.bestScoreLeafFlight ?? 0;
+    }
+
+    // “Первый рекорд” — факт наличия любой записи игры
+    if (key === "first_record" || desc.includes("рекорд")) {
+      return userStats.hasAnyGameRecord ? 1 : 0;
+    }
+
+    // “Сыграйте X раз” — число сыгранных игр
+    if (desc.includes("сыгра") && desc.includes("игр")) {
+      return userStats.gamesPlayed ?? 0;
+    }
+
+    // “Благодарность” — пока не считаем автоматически (чтобы не раздавать ошибочно)
+    if (key === "gratitude" || name.includes("благодар")) {
+      return 0;
+    }
+
+    // Fallback: безопасно 0, чтобы ничего случайно не “раздать”.
+    return 0;
+  }
   // Получить все активные достижения
   static async getAllAchievements() {
     return await prisma.achievement.findMany({
@@ -185,11 +300,12 @@ export class AchievementService {
     eligibleNormals: Achievement[],
     userAchievement?: UserAchievement
   ): AchievementProgress {
-    const slug = (achievement as any).slug?.toLowerCase() || "";
-    // META: от количества полученных eligible NORMAL
-    if ((achievement.kind ?? 'NORMAL') === 'META') {
+    const key = this.getAchievementKey(achievement);
+
+    // META: получить все eligible NORMAL
+    if ((achievement.kind ?? 'NORMAL') === 'META' || key === "legend" || String(achievement.name || "").toLowerCase().includes("легенда")) {
+      const target = this.getTargetForAchievement(achievement, eligibleNormals);
       const unlockedEligible = userStats._unlockedEligibleCount || 0;
-      const target = Math.max(eligibleNormals.length, 1);
       const progress = isUnlocked ? target : unlockedEligible;
       return {
         achievement,
@@ -203,60 +319,10 @@ export class AchievementService {
       };
     }
 
-    // NORMAL
-    const maxProgress = Math.max(achievement.maxCount || 1, 1);
-    let metric = 0;
-
-    // slug-специфичные правила
-    if (slug === "inspiration_10_likes_on_one_story") {
-      metric = userStats.likesReceivedMaxOnOneStory ?? 0;
-    } else if (slug === "leaf_flight_100_score" || slug === "leaf_flight_master") {
-      metric = userStats.bestScoreLeafFlight ?? 0;
-    } else if (slug === "storyteller_100_words" || slug === "word_master_500_words") {
-      metric = userStats.maxStoryWords ?? 0;
-    } else if (slug === "gratitude" || slug === "approved_application") {
-      // помощь/одобрение: считаем только APPROVED
-      metric = userStats.applicationsApproved ?? 0;
-    } else {
-      switch (achievement.type) {
-        case 'STREAK':
-          metric = userStats.loginStreakDays ?? 0;
-          break;
-        case 'APPLICATIONS':
-          metric = userStats.applicationsCreated ?? 0;
-          break;
-        case 'SOCIAL':
-          metric = userStats.friendsCount ?? 0;
-          break;
-        case 'COMMUNITY':
-          metric = userStats.likesGiven ?? 0;
-          break;
-        case 'CREATIVITY':
-          metric = userStats.maxStoryWords ?? 0;
-          break;
-        case 'GAMES': {
-          const score = userStats.bestScoreLeafFlight ?? 0;
-          const plays = userStats.gamesPlayed ?? 0;
-          metric = Math.max(score, plays);
-          break;
-        }
-        case 'SPECIAL': {
-          if (userStats.isFirst100) {
-            metric = 1;
-          } else if (userStats.hasAnyGameRecord) {
-            metric = 1;
-          } else if ((userStats.applicationsApproved ?? 0) > 0) {
-            metric = 1;
-          } else {
-            metric = 0;
-          }
-          break;
-        }
-        default:
-          metric = 0;
-      }
-    }
-
+    // NORMAL: считаем target и метрику “безопасно”
+    const target = this.getTargetForAchievement(achievement, eligibleNormals);
+    const metric = this.getMetricForAchievement(achievement, userStats);
+    const maxProgress = Math.max(target, 1);
     const progress = Math.min(metric, maxProgress);
     return {
       achievement,

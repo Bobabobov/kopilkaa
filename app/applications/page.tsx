@@ -49,6 +49,13 @@ const LIMITS = {
   maxPhotos: 5,
 };
 
+// Upload limits (должны соответствовать бэку /api/uploads)
+const UPLOAD_LIMITS = {
+  maxFileBytes: 5 * 1024 * 1024, // 5MB на файл
+  // Суммарный лимит на запрос (защита от 413 на прокси/Nginx и просто от слишком тяжёлых заявок)
+  maxTotalBytes: 10 * 1024 * 1024, // 10MB на все фото вместе
+};
+
 export default function ApplicationsPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ id: string; email?: string | null } | null>(null);
@@ -219,6 +226,7 @@ export default function ApplicationsPage() {
     setUploading(true);
     try {
       const fd = new FormData();
+      const filesToUpload: File[] = [];
 
       photos.forEach((item) => {
         let file: File;
@@ -231,13 +239,43 @@ export default function ApplicationsPage() {
           return;
         }
 
-        fd.append("files", file);
+        filesToUpload.push(file);
       });
 
+      // Клиентская проверка лимитов, чтобы не упираться в 413 и не ловить "Unexpected token <"
+      const tooBig = filesToUpload.find((f) => f.size > UPLOAD_LIMITS.maxFileBytes);
+      if (tooBig) {
+        throw new Error(
+          `Файл "${tooBig.name}" слишком большой. Максимум: 5 МБ на фото.`,
+        );
+      }
+      const totalBytes = filesToUpload.reduce((sum, f) => sum + f.size, 0);
+      if (totalBytes > UPLOAD_LIMITS.maxTotalBytes) {
+        const mb = (UPLOAD_LIMITS.maxTotalBytes / (1024 * 1024)).toFixed(0);
+        throw new Error(
+          `Слишком большой общий размер фото. Максимум: ${mb} МБ на все фото вместе. Уменьшите/замените фото.`,
+        );
+      }
+
+      filesToUpload.forEach((file) => fd.append("files", file));
+
       const r = await fetch("/api/uploads", { method: "POST", body: fd });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d?.error || "Ошибка загрузки");
-      return (d.files as { url: string }[]).map((f) => f.url);
+      const contentType = r.headers.get("content-type") || "";
+
+      // 413 часто приходит от прокси/Nginx (HTML-страница), поэтому json() ломается
+      if (r.status === 413) {
+        throw new Error(
+          "Фото слишком большие для загрузки. Уменьшите размер фото и попробуйте снова.",
+        );
+      }
+
+      const d =
+        contentType.includes("application/json") ? await r.json().catch(() => null) : null;
+      if (!r.ok) {
+        const serverMsg = d?.error || d?.message;
+        throw new Error(serverMsg || "Ошибка загрузки фото");
+      }
+      return ((d?.files as { url: string }[]) || []).map((f) => f.url);
     } finally {
       setUploading(false);
     }

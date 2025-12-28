@@ -132,12 +132,13 @@ export function middleware(req: NextRequest) {
       "Content-Security-Policy",
       [
         "default-src 'self'",
-        // По умолчанию НЕ разрешаем 'unsafe-eval' (это сильно ослабляет защиту).
-        // Для /tower-blocks он нужен из-за внешних скриптов игры.
-        // Для auth-модалки он нужен из-за Telegram widget (внутри использует eval).
-        isTowerBlocks || isAuthModal
+        // Telegram widget и Google Identity Services могут использовать eval внутри своих библиотек.
+        // Важно: CSP применяется к документу при первой загрузке. Модалка открывается без перезагрузки,
+        // поэтому нельзя “включать unsafe-eval только когда ?modal=auth”.
+        // Держим unsafe-eval включенным в PROD, но ограничиваем источники скриптов.
+        isTowerBlocks
           ? "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://codepen.io https://cdnjs.cloudflare.com https://telegram.org https://accounts.google.com"
-          : "script-src 'self' 'unsafe-inline' https://telegram.org https://accounts.google.com",
+          : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://telegram.org https://accounts.google.com",
         "style-src 'self' 'unsafe-inline' https://accounts.google.com", // Tailwind/Google OAuth
         "img-src 'self' data: blob: https:",
         "font-src 'self' data:",

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-// Кэшируем статистику на 5 секунд через Next.js revalidate
-export const revalidate = 5;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
   try {
@@ -77,7 +77,16 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    return NextResponse.json({ stats });
+    return NextResponse.json(
+      { stats },
+      {
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      },
+    );
   } catch (error) {
     console.error("Error fetching stats:", error);
     // Возвращаем пустую статистику вместо ошибки

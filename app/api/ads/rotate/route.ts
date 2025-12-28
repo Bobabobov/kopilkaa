@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   try {
     // Получаем все активные рекламы, которые не истекли
@@ -26,7 +29,16 @@ export async function GET() {
 
     const selectedAd = activeAds[adIndex];
 
-    return NextResponse.json({ ad: selectedAd });
+    return NextResponse.json(
+      { ad: selectedAd },
+      {
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      },
+    );
   } catch (error) {
     console.error("Error rotating ads:", error);
     return NextResponse.json(

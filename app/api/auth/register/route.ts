@@ -41,8 +41,8 @@ export async function POST(req: Request) {
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))
       return bad("Некорректный email");
-    if (password.length < 8 || password.length > 72)
-      return bad("Пароль должен быть 8–72 символа");
+    if (password.length < 8 || password.length > 30)
+      return bad("Пароль должен быть 8–30 символов");
     if (!usernameRaw)
       return bad("Придумайте логин");
     if (!usernamePattern.test(usernameRaw))

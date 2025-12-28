@@ -70,6 +70,9 @@ export function middleware(req: NextRequest) {
   const isAuthModal = modal === "auth" || modal.startsWith("auth/");
   const isPost = req.method === "POST";
   const isAuthApi = path.startsWith("/api/auth/");
+  const isAuthRegister = path === "/api/auth/register";
+  const isAuthLogin = path === "/api/auth/login";
+  const isAuthPhone = path.startsWith("/api/auth/phone/");
   const isUploadsApi = path === "/api/uploads";
   const isApplicationsApi = path === "/api/applications";
   const isStoryLikeApi = /^\/api\/stories\/[^/]+\/like$/.test(path);
@@ -80,8 +83,10 @@ export function middleware(req: NextRequest) {
   let retryAfterSec: number | null = null;
 
   if (isAuthApi) {
-    // 5 запросов/мин на IP
-    limit = 5;
+    // Auth API: делаем лимит мягче для обычных пользователей.
+    // Регистрация/вход: 10 запросов/мин на IP
+    // Остальные auth-эндпоинты (telegram/google/logout/check): 30 запросов/мин на IP
+    limit = (isPost && (isAuthRegister || isAuthLogin || isAuthPhone)) ? 10 : 30;
     windowMs = 60_000;
     retryAfterSec = 60;
   } else if (isPost && isUploadsApi) {

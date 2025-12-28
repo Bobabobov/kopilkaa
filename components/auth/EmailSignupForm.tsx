@@ -35,8 +35,8 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
 
     if (!password.trim()) {
       errors.password = "Введите пароль";
-    } else if (password.length < 8 || password.length > 72) {
-      errors.password = "Пароль должен быть 8-72 символа";
+    } else if (password.length < 8 || password.length > 30) {
+      errors.password = "Пароль должен быть 8-30 символов";
     }
 
     setValidationErrors(errors);
@@ -91,6 +91,7 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
             }`}
             style={{ color: "#fffffe" }}
             type="text"
+            maxLength={20}
             value={name}
             onChange={(e) => {
               setName(e.target.value);
@@ -133,6 +134,7 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
             }`}
             style={{ color: "#fffffe" }}
             type="email"
+            maxLength={20}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -175,6 +177,7 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
             }`}
             style={{ color: "#fffffe" }}
             type="password"
+            maxLength={30}
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);

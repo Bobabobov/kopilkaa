@@ -20,6 +20,20 @@ export default function AuthModalRoot() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  async function safeReadJson(res: Response): Promise<any> {
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
+  function getRetryAfterSeconds(res: Response, fallbackSec: number): number {
+    const raw = res.headers.get("Retry-After");
+    const n = raw ? Number(raw) : NaN;
+    return Number.isFinite(n) && n > 0 ? n : fallbackSec;
+  }
+
   // Блокируем скролл когда модалка открыта
   useEffect(() => {
     if (isAuthModal) {
@@ -149,10 +163,16 @@ export default function AuthModalRoot() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ identifier, password }),
       });
-      const data = await r.json();
+      if (r.status === 429) {
+        const waitSec = getRetryAfterSeconds(r, 60);
+        setError(`Слишком много попыток. Подождите ${waitSec} сек и попробуйте снова.`);
+        return;
+      }
+
+      const data = await safeReadJson(r);
 
       if (!r.ok) {
-        setError(data?.error || data?.message || "Ошибка входа");
+        setError(data?.message || data?.error || "Ошибка входа");
         return;
       }
 
@@ -187,10 +207,17 @@ export default function AuthModalRoot() {
           name: name.trim() || null,
         }),
       });
-      const data = await r.json();
+      if (r.status === 429) {
+        const waitSec = getRetryAfterSeconds(r, 60);
+        setError(`Слишком много попыток. Подождите ${waitSec} сек и попробуйте снова.`);
+        return;
+      }
+
+      const data = await safeReadJson(r);
 
       if (!r.ok) {
-        setError(data?.message || "Ошибка регистрации");
+        // 409 = почта/логин уже заняты. Показываем точное сообщение с бэка.
+        setError(data?.message || data?.error || "Ошибка регистрации");
         return;
       }
 

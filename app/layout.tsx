@@ -74,9 +74,51 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Копилка",
+    description: "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
+    url: siteUrl,
+    logo: `${siteUrl}/logo.png`,
+    sameAs: [
+      "https://t.me/kkopilka",
+      "https://kick.com/koponline",
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "Поддержка",
+      email: "support@kopilka-online.ru",
+    },
+  };
+
+  const websiteStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Копилка",
+    url: siteUrl,
+    description: "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteUrl}/stories?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <html lang="ru" suppressHydrationWarning className="dark">
       <body className={inter.className} suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteStructuredData) }}
+        />
         <BeautifulNotificationsProvider>
           <ProfilePreloadInitializer />
           <BanCheck>

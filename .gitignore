@@ -71,6 +71,7 @@ config/secrets.*
 *.secret
 *.conf
 *.config
+*.tsbuildinfo
 
 # Build artifacts
 *.tsbuildinfo

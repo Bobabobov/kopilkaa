@@ -98,7 +98,7 @@ export default function SupportHero() {
             style={{ color: "#abd1c6" }}
           >
             Это платная цифровая услуга: разовая оплата и бессрочное размещение вашего профиля в разделе{" "}
-            <span className="text-[#f9bc60] font-semibold">/heroes</span>.
+            <span className="text-[#f9bc60] font-semibold">Герои проекта</span>.
             {" "}
             Профиль отображается публично и участвует в рейтинге активности.
           </p>

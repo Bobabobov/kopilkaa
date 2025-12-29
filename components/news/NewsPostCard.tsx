@@ -115,7 +115,7 @@ export function NewsPostCard({ item }: { item: NewsItem }) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.author?.avatar || "/default-avatar.png"}
-                  alt=""
+                  alt={`Аватар ${authorName}`}
                   className="w-6 h-6 rounded-full object-cover border border-white/15"
                   onError={(e) => {
                     e.currentTarget.src = "/default-avatar.png";

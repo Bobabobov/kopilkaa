@@ -69,7 +69,7 @@ export function NewsMediaGallery({ media }: { media: NewsMedia[] }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={m.url}
-                alt=""
+                alt={`Фото к новости`}
                 className="w-full h-full max-h-[420px] object-cover"
                 loading="lazy"
               />

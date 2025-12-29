@@ -130,7 +130,7 @@ export function NewsLightbox({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={currentImage}
-                alt=""
+                alt={`Изображение ${currentIndex + 1} из ${images.length}`}
                 className="max-w-full max-h-full object-contain select-none"
                 draggable={false}
                 style={{

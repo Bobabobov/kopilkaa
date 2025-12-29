@@ -21,7 +21,7 @@ export default function OneTimeSupport({
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const [resultError, setResultError] = useState<string | null>(null);
 
-  const handleSupport = async () => {
+  const handlePurchase = async () => {
     const amountNumber = parseInt(customAmount || "0", 10);
     if (!amountNumber || amountNumber <= 0) return;
 
@@ -35,20 +35,24 @@ export default function OneTimeSupport({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: amountNumber,
+          // В API сейчас допустимы только существующие типы (fallback -> SUPPORT),
+          // поэтому "SERVICE" выражаем через comment.
           type: "SUPPORT",
-          comment: "one_time_support_test",
+          comment: "heroes_placement",
         }),
       });
 
       const data = await response.json().catch(() => null);
       if (!response.ok || !data?.success) {
-        throw new Error(data?.error || "Не удалось сохранить поддержку");
+        throw new Error(data?.error || "Не удалось оформить оплату услуги");
       }
 
-      setResultMessage("Тестовая разовая поддержка сохранена. Копилка и топ‑донатеры обновятся.");
+      setResultMessage(
+        "Оплата принята. Ваш профиль будет размещён в разделе «Герои» и будет участвовать в рейтинге.",
+      );
     } catch (error) {
-      console.error("One-time support test error:", error);
-      setResultError("Не получилось сохранить поддержку. Попробуйте ещё раз.");
+      console.error("Heroes placement purchase error:", error);
+      setResultError("Не получилось оформить оплату услуги. Попробуйте ещё раз.");
     } finally {
       setLoading(false);
     }
@@ -64,23 +68,23 @@ export default function OneTimeSupport({
           transition={{ duration: 0.5 }}
           className="text-center mb-6 sm:mb-8"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#e16162]/10 border border-[#e16162]/30 mb-3">
-            <LucideIcons.Zap className="w-4 h-4 text-[#e16162]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f9bc60]/10 border border-[#f9bc60]/30 mb-3">
+            <LucideIcons.Trophy className="w-4 h-4 text-[#f9bc60]" />
             <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#e16162" }}>
-              Разовая
+              Цифровая услуга
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-semibold mb-2 sm:mb-3" style={{ color: "#fffffe" }}>
-            Поддержка
+            Размещение в разделе «Герои»
           </h2>
           <p className="text-sm sm:text-base max-w-xl mx-auto px-2 leading-relaxed" style={{ color: "#abd1c6" }}>
-            Помоги проекту один раз любой удобной суммой
+            Разовая оплата без подписки. Профиль размещается публично и участвует в рейтинге.
           </p>
         </motion.div>
 
         <div className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/15 rounded-xl sm:rounded-2xl p-5 sm:p-6">
           <h3 className="text-lg sm:text-xl font-semibold mb-5 sm:mb-6 text-center" style={{ color: "#abd1c6" }}>
-            Выберите сумму
+            Выберите сумму оплаты услуги
           </h3>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5 sm:mb-6">
@@ -98,11 +102,11 @@ export default function OneTimeSupport({
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onAmountChange(amount.toString())}
                   className={`py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-base transition-all duration-200 relative overflow-hidden ${
-                    isSelected ? "shadow-lg ring-2 ring-[#e16162]/50" : "hover:border-[#abd1c6]/40"
+                    isSelected ? "shadow-lg ring-2 ring-[#f9bc60]/50" : "hover:border-[#abd1c6]/40"
                   } ${isLarge ? "md:col-span-1" : ""}`}
                   style={{
-                    backgroundColor: isSelected ? "#e16162" : "transparent",
-                    color: isSelected ? "#fffffe" : "#abd1c6",
+                    backgroundColor: isSelected ? "#f9bc60" : "transparent",
+                    color: isSelected ? "#001e1d" : "#abd1c6",
                     border: isSelected ? "none" : "1px solid #abd1c6/20",
                   }}
                 >
@@ -113,7 +117,7 @@ export default function OneTimeSupport({
                       transition={{ type: "spring", stiffness: 200, damping: 15 }}
                       className="absolute top-2 right-2"
                     >
-                      <LucideIcons.CheckCircle className="w-4 h-4 text-[#fffffe]" />
+                      <LucideIcons.CheckCircle className="w-4 h-4 text-[#001e1d]" />
                     </motion.div>
                   )}
                   <div className="relative z-10">
@@ -121,7 +125,7 @@ export default function OneTimeSupport({
                       ₽{amount.toLocaleString()}
                     </div>
                     {isLarge && (
-                      <div className="text-xs opacity-70 font-normal mt-1">Спасибо!</div>
+                      <div className="text-xs opacity-70 font-normal mt-1">Размещение</div>
                     )}
                   </div>
                 </motion.button>
@@ -167,26 +171,26 @@ export default function OneTimeSupport({
             className="w-full py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
             style={{
               background: customAmount && parseInt(customAmount) > 0 
-                ? "linear-gradient(135deg, #e16162 0%, #c94a4a 100%)" 
+                ? "linear-gradient(135deg, #f9bc60 0%, #e8a545 100%)" 
                 : "#004643",
-              color: customAmount && parseInt(customAmount) > 0 ? "#fffffe" : "#abd1c6",
+              color: customAmount && parseInt(customAmount) > 0 ? "#001e1d" : "#abd1c6",
               border: customAmount && parseInt(customAmount) > 0 ? "none" : "1px solid #abd1c6/20",
             }}
-            onClick={handleSupport}
+            onClick={handlePurchase}
           >
-            <LucideIcons.Heart className="w-5 h-5 sm:w-6 sm:h-6 inline mr-2" />
+            <LucideIcons.Trophy className="w-5 h-5 sm:w-6 sm:h-6 inline mr-2" />
             <span className="hidden sm:inline">
               {loading
-                ? "Сохраняем поддержку..."
+                ? "Оформляем..."
                 : customAmount && parseInt(customAmount) > 0
-                  ? `Поддержать на ₽${parseInt(customAmount).toLocaleString()} (тест)`
-                  : "Введите сумму поддержки"}
+                  ? `Оплатить размещение на ₽${parseInt(customAmount).toLocaleString()}`
+                  : "Введите сумму"}
             </span>
             <span className="sm:hidden">
               {loading
-                ? "Сохраняем..."
+                ? "Оформляем..."
                 : customAmount && parseInt(customAmount) > 0
-                  ? `Поддержать ₽${parseInt(customAmount).toLocaleString()}`
+                  ? `Оплатить ₽${parseInt(customAmount).toLocaleString()}`
                   : "Введите сумму"}
             </span>
           </motion.button>
@@ -224,11 +228,10 @@ export default function OneTimeSupport({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm sm:text-base font-semibold text-[#fffffe]">
-                  Пусть ваша поддержка работает и на ваши соцсети
+                  Привяжите соцсети — они будут видны в «Героях»
                 </p>
                 <p className="text-xs sm:text-sm text-[#ffd499] mt-1">
-                  Привяжите VK, Telegram или YouTube — ссылки появятся рядом с вами в списках донаторов. 
-                  Их увидят все пользователи проекта, это живой приток людей в ваши соцсети.
+                  VK, Telegram или YouTube будут отображаться рядом с вашим профилем на странице героев.
                 </p>
               </div>
               <div className="flex-shrink-0">

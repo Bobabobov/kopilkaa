@@ -5,22 +5,28 @@ import Link from "next/link";
 
 const benefits = [
   {
-    icon: "Users",
-    title: "Помогаешь людям",
-    description: "Твои деньги напрямую идут на поддержку авторов историй",
+    icon: "Trophy",
+    title: "Публичное размещение профиля",
+    description: "Ваш профиль отображается в разделе «Герои» и доступен всем посетителям.",
     color: "#f9bc60",
   },
   {
-    icon: "Zap",
-    title: "Пополняешь копилку",
-    description: "Увеличиваешь общий фонд, из которого поддерживают авторов историй",
+    icon: "Share",
+    title: "Социальные ссылки рядом с вами",
+    description: "Привязанные VK/Telegram/YouTube отображаются в «Героях» как часть профиля.",
     color: "#abd1c6",
   },
   {
-    icon: "Heart",
-    title: "Честная благодарность",
-    description: "Получаешь искреннее спасибо и упоминание среди поддержавших",
+    icon: "BarChart3",
+    title: "Участие в рейтинге",
+    description: "Вы участвуете в рейтинге активности, включая топ‑3 по сумме оплат услуги.",
     color: "#e16162",
+  },
+  {
+    icon: "Infinity",
+    title: "Бессрочно, без подписок",
+    description: "Разовая оплата. Никаких автоматических списаний и продлений.",
+    color: "#f9bc60",
   },
 ];
 
@@ -36,14 +42,14 @@ export default function SupportBenefits() {
           className="text-center mb-8 sm:mb-10"
         >
           <h3 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 sm:mb-4" style={{ color: "#fffffe" }}>
-            🤝 Зачем поддерживать?
+            ✨ Почему это полезно
           </h3>
           <p className="text-sm sm:text-base max-w-2xl mx-auto px-2" style={{ color: "#abd1c6" }}>
-            Простые и честные причины поддержать работу платформы.
+            Что меняется после оплаты размещения в разделе «Герои».
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-6 sm:mb-8">
           {benefits.map((benefit, index) => {
             const Icon = LucideIcons[benefit.icon as keyof typeof LucideIcons];
             return (
@@ -84,7 +90,7 @@ export default function SupportBenefits() {
           })}
         </div>
 
-        {/* Блок про героев */}
+        {/* CTA на героев */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -108,20 +114,20 @@ export default function SupportBenefits() {
           </motion.div>
 
           <h4 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 sm:mb-4" style={{ color: "#fffffe" }}>
-            Стань героем проекта
+            Посмотрите, как выглядит размещение
           </h4>
           
           <p className="text-base sm:text-lg mb-5 sm:mb-6 max-w-2xl mx-auto leading-relaxed px-2" style={{ color: "#abd1c6" }}>
-            Помоги проекту — и твоё имя появится на странице{" "}
+            Откройте страницу{" "}
             <Link 
               href="/heroes" 
               className="font-semibold hover:underline transition-all"
               style={{ color: "#f9bc60" }}
             >
-              Героев проекта
+              «Героев»
             </Link>
             {" "}
-            вместе с другими людьми, которые поддержали развитие платформы.
+            и посмотрите список участников, топ‑3 и отображение профилей.
           </p>
 
           <Link
@@ -129,8 +135,8 @@ export default function SupportBenefits() {
             className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-[#f9bc60] text-[#001e1d] font-semibold rounded-full hover:bg-[#e8a545] transition-all duration-300 hover:scale-105 shadow-lg text-sm sm:text-base"
           >
             <LucideIcons.Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="hidden xs:inline">Посмотреть героев проекта</span>
-            <span className="xs:hidden">Герои проекта</span>
+            <span className="hidden xs:inline">Перейти в «Герои»</span>
+            <span className="xs:hidden">«Герои»</span>
             <LucideIcons.ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </Link>
         </motion.div>
@@ -143,19 +149,16 @@ export default function SupportBenefits() {
           className="text-center bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/20 rounded-2xl sm:rounded-3xl p-6 sm:p-7 md:p-8"
         >
           <p className="text-sm sm:text-base md:text-lg mb-4 sm:mb-5 md:mb-6 px-2" style={{ color: "#abd1c6" }}>
-            Не готов поддержать? Это абсолютно нормально! 
-            <br className="hidden sm:block" />
-            <span className="sm:hidden"> </span>
-            Просто продолжай читать истории и участвовать в жизни проекта.
+            Хотите сначала заполнить профиль и соцсети? Это поможет вашему публичному размещению.
           </p>
           
           <Link
-            href="/stories"
+            href="/profile?settings=socials"
             className="inline-flex items-center text-sm sm:text-base md:text-lg font-semibold hover:scale-105 transition-transform duration-300"
             style={{ color: "#f9bc60" }}
           >
-            <LucideIcons.ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-            Вернуться к историям
+            <LucideIcons.User className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+            Перейти к настройкам профиля
           </Link>
         </motion.div>
       </div>

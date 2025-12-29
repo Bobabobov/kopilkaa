@@ -2,16 +2,12 @@
 
 import { useEffect, useState } from "react";
 import SupportHero from "@/components/support/SupportHero";
-import SupportToggle from "@/components/support/SupportToggle";
-import SubscriptionPlans from "@/components/support/SubscriptionPlans";
 import OneTimeSupport from "@/components/support/OneTimeSupport";
 import SupportBenefits from "@/components/support/SupportBenefits";
-import SupportFAQ from "@/components/support/SupportFAQ";
+import WhatYouGet from "@/components/support/WhatYouGet";
 
 export default function SupportPage() {
-  const [subscriptionAmount, setSubscriptionAmount] = useState("");
   const [customAmount, setCustomAmount] = useState("");
-  const [isSubscription, setIsSubscription] = useState(true);
   const [hasSocialLinks, setHasSocialLinks] = useState<boolean | null>(null);
 
   // Проверяем, есть ли у пользователя привязанные соцсети
@@ -58,24 +54,27 @@ export default function SupportPage() {
       <div className="relative z-10">
         <SupportHero />
 
-        <SupportToggle isSubscription={isSubscription} onToggle={setIsSubscription} />
-
-        {isSubscription ? (
-          <SubscriptionPlans
-            customAmount={subscriptionAmount}
-            onAmountChange={setSubscriptionAmount}
-            showSocialPrompt={showSocialPrompt}
-          />
-        ) : (
-          <OneTimeSupport
-            customAmount={customAmount}
-            onAmountChange={setCustomAmount}
-            showSocialPrompt={showSocialPrompt}
-          />
-        )}
+        <OneTimeSupport
+          customAmount={customAmount}
+          onAmountChange={setCustomAmount}
+          showSocialPrompt={showSocialPrompt}
+        />
 
         <SupportBenefits />
-        <SupportFAQ />
+        <WhatYouGet />
+
+        {/* Юридическая информация */}
+        <section className="py-6 sm:py-8 px-3 sm:px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-[#004643]/18 backdrop-blur-sm border border-[#abd1c6]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-5">
+              <p className="text-xs sm:text-sm leading-relaxed text-[#abd1c6]/90">
+                Оплата является оплатой цифровых услуг платформы. Оплата не является пожертвованием,
+                благотворительностью или переводом средств другим пользователям. Все решения о работе
+                сервиса принимаются администрацией платформы.
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );

@@ -88,22 +88,19 @@ export default function SupportHero() {
             transition={{ duration: 3, repeat: Infinity }}
             style={{ color: "#fffffe" }}
           >
-            💫 Поддержите проект
+            🏆 Размещение в «Героях»
             <br />
-            <span style={{ color: "#f9bc60" }}>«Копилка»</span>
+            <span style={{ color: "#f9bc60" }}>платформы «Копилка»</span>
           </motion.h1>
           
           <p
             className="text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto px-2"
             style={{ color: "#abd1c6" }}
           >
-            Если вам близка идея проекта, вы можете добровольно поддержать работу платформы и её развитие.
+            Это платная цифровая услуга: разовая оплата и бессрочное размещение вашего профиля в разделе{" "}
+            <span className="text-[#f9bc60] font-semibold">/heroes</span>.
             {" "}
-            Поддержка помогает «Копилке» существовать, развиваться и самостоятельно принимать решения о финансовой поддержке пользователей.
-            {" "}
-            <span className="text-[#f9bc60] font-medium">
-              Вы можете привязать свои социальные сети — в этом случае они будут отображаться рядом с вашим именем в разделе благодарности.
-            </span>
+            Профиль отображается публично и участвует в рейтинге активности.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-4xl mx-auto">
@@ -114,7 +111,7 @@ export default function SupportHero() {
               <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: "#f9bc60" }}>
                 {loading ? "0" : <AnimatedNumber value={stats.approved} />}
               </div>
-              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Поддержано историй</div>
+              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Одобрено историй</div>
             </motion.div>
             
             <motion.div
@@ -124,7 +121,7 @@ export default function SupportHero() {
               <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: "#f9bc60" }}>
                 {loading ? "0" : <AnimatedNumber value={stats.supporters} />}
               </div>
-              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Активных донатеров</div>
+              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Участников в «Героях»</div>
             </motion.div>
 
             <motion.div
@@ -139,7 +136,7 @@ export default function SupportHero() {
                   </span>
                 )}
               </div>
-              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Баланс копилки</div>
+              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Баланс платформы</div>
             </motion.div>
           </div>
         </motion.div>

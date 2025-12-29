@@ -12,6 +12,7 @@ export function AdminHeader() {
     { href: "/admin/users", label: "Пользователи" },
     { href: "/admin/achievements", label: "Достижения" },
     { href: "/admin/ads", label: "Реклама" },
+    { href: "/admin/news", label: "Новости" },
     { href: "/admin/reports", label: "Жалобы" },
   ];
 

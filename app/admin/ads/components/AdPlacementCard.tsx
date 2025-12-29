@@ -69,6 +69,14 @@ export default function AdPlacementCard({
         .ad-content-html [style*="text-align: right"] {
           text-align: right;
         }
+        .ad-content-html a {
+          color: #3b82f6;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+        .ad-content-html a:hover {
+          color: #60a5fa;
+        }
       `}</style>
       <motion.div
         initial={{ opacity: 0, y: 20 }}

@@ -387,6 +387,11 @@ export const LucideIcons = {
     <RefreshCw className={`${sizeClasses[size]} ${className}`} />
   ),
 
+  // alias для совместимости (часто используют имя из lucide-react напрямую)
+  RefreshCw: ({ className = "", size = "md" }: IconProps) => (
+    <RefreshCw className={`${sizeClasses[size]} ${className}`} />
+  ),
+
   Save: ({ className = "", size = "md" }: IconProps) => (
     <Save className={`${sizeClasses[size]} ${className}`} />
   ),

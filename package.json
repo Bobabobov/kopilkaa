@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
+    "@tiptap/extension-link": "^3.14.0",
     "@tiptap/extension-placeholder": "^3.14.0",
     "@tiptap/extension-text-align": "^3.14.0",
     "@tiptap/extension-underline": "^3.14.0",
@@ -23,13 +24,13 @@
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "framer-motion": "^11.2.12",
+    "google-auth-library": "^9.15.1",
     "lucide-react": "^0.469.0",
     "next": "^14.2.33",
     "nodemailer": "^7.0.11",
     "prisma": "^6.16.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "google-auth-library": "^9.15.1",
     "sanitize-html": "^2.17.0",
     "tailwindcss": "^3.4.10"
   },

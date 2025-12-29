@@ -461,8 +461,8 @@ export default function ProfileHeaderCard({
                       }`}
                     />
                     <span className="text-sm text-white/90">
-                      {status.status === "online"
-                        ? status.text
+                      {status.status === "online" 
+                        ? status.text 
                         : status.text.startsWith("Никогда")
                           ? status.text
                           : `Был(а) ${status.text}`}

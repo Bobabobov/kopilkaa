@@ -112,7 +112,7 @@ export default function DonateButton({
             style={{
               background:
                 "radial-gradient(120% 90% at 10% 10%, rgba(249,188,96,0.25), transparent 50%), radial-gradient(120% 90% at 90% 0%, rgba(171,209,198,0.18), transparent 45%)",
-            }}
+          }}
           />
           <span
             aria-hidden
@@ -129,7 +129,7 @@ export default function DonateButton({
               transition={{ type: "spring", stiffness: 500, damping: 22 }}
               className="text-[#f9bc60]"
             >
-              <LucideIcons.Heart size="sm" />
+            <LucideIcons.Heart size="sm" />
             </motion.span>
             <span className="text-[#fffffe]">Помочь проекту</span>
           </span>
@@ -141,7 +141,7 @@ export default function DonateButton({
   return (
     <Link href="/support" onClick={onLinkClick} className="block">
       <motion.span
-        whileHover={{
+        whileHover={{ 
           scale: 1.04,
           y: -1,
           boxShadow: "0 18px 44px -26px rgba(249, 188, 96, 0.75)",
@@ -167,7 +167,7 @@ export default function DonateButton({
           style={{
             background:
               "radial-gradient(120% 90% at 10% 10%, rgba(249,188,96,0.22), transparent 55%), radial-gradient(120% 90% at 90% 0%, rgba(171,209,198,0.14), transparent 50%)",
-          }}
+        }}
         />
         {/* subtle shine */}
         <span
@@ -185,7 +185,7 @@ export default function DonateButton({
             transition={{ type: "spring", stiffness: 500, damping: 22 }}
             className="text-[#f9bc60]"
           >
-            <LucideIcons.Heart size="sm" />
+          <LucideIcons.Heart size="sm" />
           </motion.span>
           <span className="text-[#fffffe]">Поддержать</span>
         </span>

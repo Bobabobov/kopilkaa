@@ -560,6 +560,7 @@ export default function ApplicationsPage() {
                     minLength={LIMITS.storyMin}
                     maxLength={LIMITS.storyMax}
                     rows={8}
+                    allowLinks={false}
                   />
                 </div>
 

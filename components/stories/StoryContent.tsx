@@ -40,6 +40,16 @@ export default function StoryContent({ content, isAd = false }: StoryContentProp
             dangerouslySetInnerHTML={{ __html: content }}
           />
         </div>
+        <style jsx global>{`
+          .prose a {
+            color: #3b82f6;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+          }
+          .prose a:hover {
+            color: #60a5fa;
+          }
+        `}</style>
       </div>
     </div>
   );

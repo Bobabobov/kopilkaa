@@ -7,6 +7,7 @@ import type { Route } from "next";
 
 const links: { href: Route; label: string }[] = [
   { href: "/", label: "Главная" },
+  { href: "/news", label: "Новости" },
   { href: "/stories", label: "Истории" },
   { href: "/applications", label: "Заявка" },
   { href: "/reports", label: "Баги" },

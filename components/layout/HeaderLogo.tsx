@@ -12,10 +12,10 @@ export default function HeaderLogo() {
         style={{ color: "#fffffe" }}
       >
         <Image
-          src="/buldog.png"
+          src="/logo.png"
           alt="Копилка"
-          width={40}
-          height={40}
+          width={100}
+          height={100}
           className="rounded-lg"
         />
         <span className="hidden sm:inline">Копилка</span>

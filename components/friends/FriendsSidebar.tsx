@@ -155,8 +155,8 @@ export function FriendsSidebar() {
                         className="text-[#fffffe] font-semibold leading-tight min-w-0 truncate group-hover:underline"
                         title={person.name || person.email || "Пользователь"}
                       >
-                        {person.name || person.email || "Пользователь"}
-                      </p>
+                          {person.name || person.email || "Пользователь"}
+                        </p>
 
                       <div className="mt-1 flex flex-wrap items-center gap-1.5 min-w-0">
                         <span className="text-xs text-[#abd1c6] min-w-0 truncate">

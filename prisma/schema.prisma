@@ -33,48 +33,50 @@ enum AchievementType {
 }
 
 model User {
-  id               String    @id @default(cuid())
-  email            String?   @unique
-  username         String?   @unique
-  passwordHash     String
-  name             String?
-  avatar           String?
-  phone            String?   @unique
-  phoneVerified    Boolean   @default(false)
-  telegramId       String?   @unique
-  telegramUsername String?
-  googleId         String?   @unique
-  googleEmail      String?
-  vkLink           String?
-  telegramLink     String?
-  youtubeLink      String?
-  headerTheme      String?   @default("default")
+  id                  String    @id @default(cuid())
+  email               String?   @unique
+  username            String?   @unique
+  passwordHash        String
+  name                String?
+  avatar              String?
+  phone               String?   @unique
+  phoneVerified       Boolean   @default(false)
+  telegramId          String?   @unique
+  telegramUsername    String?
+  googleId            String?   @unique
+  googleEmail         String?
+  vkLink              String?
+  telegramLink        String?
+  youtubeLink         String?
+  headerTheme         String?   @default("default")
   headerDominantColor String? // Доминантный цвет из обложки
-  avatarFrame      String?   @default("none")
-  customFrameData  String? // JSON данные пользовательских рамок
-  hideEmail        Boolean   @default(true) // Скрывать email в профиле по умолчанию
-  role             String    @default("USER")
-  createdAt        DateTime  @default(now())
-  lastSeen         DateTime  @default(now())
-  lastCommentAt    DateTime? // Время последнего комментария для кулдауна
+  avatarFrame         String?   @default("none")
+  customFrameData     String? // JSON данные пользовательских рамок
+  hideEmail           Boolean   @default(true) // Скрывать email в профиле по умолчанию
+  role                String    @default("USER")
+  createdAt           DateTime  @default(now())
+  lastSeen            DateTime  @default(now())
+  lastCommentAt       DateTime? // Время последнего комментария для кулдауна
 
-  applications        Application[]
-  gameRecords         GameRecord[]
-  userTree            UserTree?
-  userAchievements    UserAchievement[]
-  friendshipsSent     Friendship[]      @relation("FriendshipRequester")
-  friendshipsReceived Friendship[]      @relation("FriendshipReceiver")
-  pageVisits          PageVisit[]
-  storyLikes          StoryLike[]
-  reportsSent         UserReport[]      @relation("ReportReporter")
-  reportsReceived     UserReport[]      @relation("ReportReported")
-  bugReports          BugReport[]       @relation("BugReportAuthor")
-  bugReportLikes      BugReportLike[]   @relation("BugReportLikes")
-  donations           Donation[]
-  phoneLoginCodes     PhoneLoginCode[]
-  isBanned            Boolean           @default(false)
-  bannedUntil         DateTime?
-  bannedReason        String?
+  applications         Application[]
+  gameRecords          GameRecord[]
+  userTree             UserTree?
+  userAchievements     UserAchievement[]
+  friendshipsSent      Friendship[]          @relation("FriendshipRequester")
+  friendshipsReceived  Friendship[]          @relation("FriendshipReceiver")
+  pageVisits           PageVisit[]
+  storyLikes           StoryLike[]
+  reportsSent          UserReport[]          @relation("ReportReporter")
+  reportsReceived      UserReport[]          @relation("ReportReported")
+  bugReports           BugReport[]           @relation("BugReportAuthor")
+  bugReportLikes       BugReportLike[]       @relation("BugReportLikes")
+  donations            Donation[]
+  phoneLoginCodes      PhoneLoginCode[]
+  projectNewsPosts     ProjectNewsPost[]
+  projectNewsReactions ProjectNewsReaction[]
+  isBanned             Boolean               @default(false)
+  bannedUntil          DateTime?
+  bannedReason         String?
 }
 
 model Application {
@@ -295,6 +297,76 @@ model StoryLike {
   @@index([createdAt])
 }
 
+enum ProjectNewsMediaType {
+  IMAGE
+  VIDEO
+}
+
+enum ProjectNewsReactionType {
+  LIKE
+  DISLIKE
+}
+
+enum ProjectNewsBadge {
+  UPDATE
+  PLANS
+  THOUGHTS
+  IMPORTANT
+}
+
+model ProjectNewsPost {
+  id       String @id @default(cuid())
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  title       String?
+  badge       ProjectNewsBadge?
+  content     String
+  isPublished Boolean           @default(true)
+
+  likesCount    Int @default(0)
+  dislikesCount Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  media     ProjectNewsMedia[]
+  reactions ProjectNewsReaction[]
+
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([isPublished])
+}
+
+model ProjectNewsMedia {
+  id     String               @id @default(cuid())
+  postId String
+  post   ProjectNewsPost      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  url    String
+  type   ProjectNewsMediaType
+  sort   Int                  @default(0)
+
+  @@index([postId])
+  @@index([sort])
+}
+
+model ProjectNewsReaction {
+  id     String          @id @default(cuid())
+  postId String
+  post   ProjectNewsPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type      ProjectNewsReactionType
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@index([type])
+}
+
 model Advertisement {
   id        String    @id @default(cuid())
   title     String
@@ -316,22 +388,22 @@ model Advertisement {
 
 // Модель для заявок на размещение рекламы
 model AdRequest {
-  id                String   @id @default(cuid())
-  companyName       String // Название компании/проекта
-  email             String // Контактный email
-  telegram          String? // Telegram username
-  website           String? // Ссылка на сайт/товар
-  format            String // Формат размещения (banner, post, telegram)
-  duration          Int // Срок в днях
-  bannerUrl         String? // URL загруженного баннера (deprecated, используем imageUrls)
-  imageUrls         Json? // Массив URL изображений (до 5 штук)
-  mobileBannerUrls  Json? // Массив URL изображений для мобильного баннера (только для format=banner, до 5 штук)
-  comment           String? // Комментарий от рекламодателя
-  status            String   @default("new") // new, processing, approved, rejected
-  adminComment      String? // Комментарий администратора
-  processedBy       String? // ID администратора, обработавшего заявку
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String   @id @default(cuid())
+  companyName      String // Название компании/проекта
+  email            String // Контактный email
+  telegram         String? // Telegram username
+  website          String? // Ссылка на сайт/товар
+  format           String // Формат размещения (banner, post, telegram)
+  duration         Int // Срок в днях
+  bannerUrl        String? // URL загруженного баннера (deprecated, используем imageUrls)
+  imageUrls        Json? // Массив URL изображений (до 5 штук)
+  mobileBannerUrls Json? // Массив URL изображений для мобильного баннера (только для format=banner, до 5 штук)
+  comment          String? // Комментарий от рекламодателя
+  status           String   @default("new") // new, processing, approved, rejected
+  adminComment     String? // Комментарий администратора
+  processedBy      String? // ID администратора, обработавшего заявку
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([status])
   @@index([createdAt])

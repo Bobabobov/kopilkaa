@@ -17,6 +17,7 @@ export default function HeaderLogo() {
           width={100}
           height={100}
           className="rounded-lg"
+          style={{ width: "auto", height: "auto" }}
         />
         <span className="hidden sm:inline">Копилка</span>
       </Link>

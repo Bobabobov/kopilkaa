@@ -28,9 +28,6 @@ export default function RecentApplications() {
         const response = await fetch("/api/applications/recent?limit=3");
         if (response.ok) {
           const data = await response.json();
-          if (process.env.NODE_ENV !== "production") {
-            console.log("Recent applications data:", data);
-          }
           setApplications(data.applications || []);
         }
       } catch (error) {

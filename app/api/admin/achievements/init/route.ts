@@ -4,6 +4,17 @@ import { getAllowedAdminUser } from '@/lib/adminAccess';
 import { prisma } from '@/lib/db';
 import { DEFAULT_ACHIEVEMENTS } from '@/lib/achievements/config';
 
+const LEGACY_RENAMES_BY_SLUG: Record<string, string[]> = {
+  // renamed achievements (oldName -> new slug/name)
+  applications_5: ["Помощник"],
+  applications_10: ["Активный участник"],
+  ratings_5: ["Помощник сообщества"],
+  ratings_25: ["Ангел-хранитель"],
+  ratings_100: ["Герой сообщества"],
+  ratings_50: ["Сердце сообщества"],
+  heroes_custom: ["Благодарность"],
+};
+
 // POST /api/admin/achievements/init - инициализировать базовые достижения
 export async function POST(request: Request) {
   try {
@@ -13,31 +24,61 @@ export async function POST(request: Request) {
     }
 
     let createdCount = 0;
+    let updatedCount = 0;
     let skippedCount = 0;
 
     for (const achievementData of DEFAULT_ACHIEVEMENTS) {
-      // Проверяем, существует ли уже такое достижение
-      const existing = await prisma.achievement.findFirst({
-        where: {
-          name: achievementData.name,
-          type: achievementData.type,
-        },
-      });
+      const slug = (achievementData as any).slug ?? null;
+
+      // 1) Prefer slug (stable id)
+      const bySlug = slug ? await prisma.achievement.findUnique({ where: { slug } }) : null;
+
+      // 2) Fallback for old records without slug: match by name+type, then "migrate" by setting slug
+      const byNameType =
+        !bySlug
+          ? await prisma.achievement.findFirst({
+              where: {
+                name: achievementData.name,
+                type: achievementData.type,
+              },
+            })
+          : null;
+
+      // 3) Legacy renames: if we changed "name"/"type", migrate old record by known legacy names
+      const legacyNames = slug ? LEGACY_RENAMES_BY_SLUG[slug] : undefined;
+      const byLegacyName =
+        !bySlug && !byNameType && legacyNames?.length
+          ? await prisma.achievement.findFirst({
+              where: {
+                name: { in: legacyNames },
+              },
+            })
+          : null;
+
+      const existing = bySlug ?? byNameType ?? byLegacyName;
 
       if (existing) {
-        skippedCount++;
+        await prisma.achievement.update({
+          where: { id: existing.id },
+          data: {
+            ...achievementData,
+            slug: slug || existing.slug,
+            validFrom: (achievementData as any).validFrom || null,
+            validTo: (achievementData as any).validTo || null,
+          } as any,
+        });
+        updatedCount++;
         continue;
       }
 
-      // Создаём новое достижение
       await prisma.achievement.create({
         data: {
           ...achievementData,
-          validFrom: achievementData.validFrom || null,
-          validTo: achievementData.validTo || null,
-        },
+          slug,
+          validFrom: (achievementData as any).validFrom || null,
+          validTo: (achievementData as any).validTo || null,
+        } as any,
       });
-
       createdCount++;
     }
 
@@ -45,10 +86,11 @@ export async function POST(request: Request) {
       success: true,
       data: {
         createdCount,
+        updatedCount,
         skippedCount,
-        totalProcessed: createdCount + skippedCount,
+        totalProcessed: createdCount + updatedCount + skippedCount,
       },
-      message: `Создано ${createdCount} новых достижений, пропущено ${skippedCount} существующих`,
+      message: `Создано ${createdCount}, обновлено ${updatedCount}, пропущено ${skippedCount}`,
     });
   } catch (error) {
     console.error('Error initializing achievements:', error);

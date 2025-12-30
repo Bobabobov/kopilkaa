@@ -13,7 +13,7 @@ const motivationalQuotes = [
     gradient: "from-[#f9bc60] to-[#e8a545]",
   },
   {
-    text: "Вместе мы сильнее! Ваша поддержка меняет жизни",
+    text: "Вместе мы сильнее! Участие делает проект заметнее",
     author: "Команда Копилки",
     icon: "Heart",
     color: "#e16162",
@@ -27,14 +27,14 @@ const motivationalQuotes = [
     gradient: "from-[#abd1c6] to-[#94a1b2]",
   },
   {
-    text: "Каждое пожертвование — это семя надежды",
+    text: "Каждая оплата размещения — это вклад в развитие сервиса",
     author: "Неизвестный",
     icon: "Coins",
     color: "#f9bc60",
     gradient: "from-[#f9bc60] to-[#e8a545]",
   },
   {
-    text: "Вы не просто помогаете — вы создаёте будущее",
+    text: "Вы не просто участвуете — вы создаёте будущее проекта",
     author: "Команда Копилки",
     icon: "Rocket",
     color: "#e16162",
@@ -48,7 +48,7 @@ const motivationalQuotes = [
     gradient: "from-[#f9bc60] to-[#e8a545]",
   },
   {
-    text: "Когда мы помогаем другим, мы помогаем себе",
+    text: "Когда мы развиваем сервис, выигрывают все",
     author: "Неизвестный",
     icon: "Users",
     color: "#abd1c6",

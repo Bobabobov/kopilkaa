@@ -5,6 +5,7 @@ import { Achievement } from './types';
 export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updatedAt'>[] = [
   // === ЗАЯВКИ ===
   {
+    slug: "applications_first",
     name: 'Первые шаги',
     description: 'Создайте свою первую заявку',
     icon: 'FileText',
@@ -15,9 +16,10 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
-    name: 'Помощник',
+    slug: "applications_5",
+    name: 'Автор',
     description: 'Создайте 5 заявок',
-    icon: 'Users',
+    icon: 'Edit3',
     rarity: AchievementRarity.RARE,
     type: 'APPLICATIONS',
     isExclusive: false,
@@ -25,7 +27,8 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
-    name: 'Активный участник',
+    slug: "applications_10",
+    name: 'Постоянный автор',
     description: 'Создайте 10 заявок',
     icon: 'Star',
     rarity: AchievementRarity.EPIC,
@@ -35,6 +38,7 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
+    slug: "approved_application",
     name: 'Одобренная заявка',
     description: 'Получите одобрение первой заявки',
     icon: 'CheckCircle',
@@ -47,6 +51,7 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
 
   // === ИГРЫ ===
   {
+    slug: "first_record",
     name: 'Первый рекорд',
     description: 'Установите рекорд в любой игре',
     icon: 'Gamepad2',
@@ -57,6 +62,7 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
+    slug: "leaf_flight_100",
     name: 'Мастер полёта',
     description: 'Наберите 100+ очков в Leaf Flight',
     icon: 'Zap',
@@ -67,6 +73,7 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
+    slug: "tower_blocks_15",
     name: 'Чемпион башни',
     description: 'Постройте башню высотой 15+ блоков',
     icon: 'Building2',
@@ -77,6 +84,7 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
+    slug: "games_played_50",
     name: 'Игроман',
     description: 'Сыграйте в игры 50 раз',
     icon: 'Target',
@@ -89,9 +97,10 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
 
   // === СОЦИАЛЬНЫЕ ===
   {
+    slug: "friends_first",
     name: 'Первый друг',
     description: 'Добавьте первого друга',
-    icon: 'Heart',
+    icon: 'Users',
     rarity: 'COMMON',
     type: AchievementType.SOCIAL,
     isExclusive: false,
@@ -99,6 +108,7 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
+    slug: "friends_10",
     name: 'Социальная бабочка',
     description: 'Добавьте 10 друзей',
     icon: 'Users',
@@ -109,10 +119,33 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
-    name: 'Сердце сообщества',
-    description: 'Поставьте 50 лайков историям',
-    icon: 'Heart',
+    slug: "ratings_50",
+    name: 'Активный участник',
+    description: 'Поставьте 50 оценок историям',
+    icon: 'ThumbsUp',
     rarity: AchievementRarity.EPIC,
+    type: AchievementType.COMMUNITY,
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    slug: "profile_avatar",
+    name: "Профиль оформлен",
+    description: "Добавьте аватар профиля",
+    icon: "Image",
+    rarity: AchievementRarity.COMMON,
+    type: AchievementType.SOCIAL,
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    slug: "profile_socials",
+    name: "Социальные ссылки",
+    description: "Добавьте хотя бы одну социальную ссылку в профиль",
+    icon: "ExternalLink",
+    rarity: AchievementRarity.RARE,
     type: AchievementType.SOCIAL,
     isExclusive: false,
     maxCount: 1,
@@ -121,9 +154,10 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
 
   // === СЕРИИ ===
   {
+    slug: "streak_3",
     name: 'Начало пути',
     description: 'Входите на сайт 3 дня подряд',
-    icon: 'Flame',
+    icon: 'Activity',
     rarity: 'COMMON',
     type: AchievementType.STREAK,
     isExclusive: false,
@@ -131,9 +165,10 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
+    slug: "streak_7",
     name: 'Привычка',
     description: 'Входите на сайт 7 дней подряд',
-    icon: 'Flame',
+    icon: 'Activity',
     rarity: AchievementRarity.RARE,
     type: AchievementType.STREAK,
     isExclusive: false,
@@ -141,9 +176,10 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
+    slug: "streak_30",
     name: 'Преданность',
     description: 'Входите на сайт 30 дней подряд',
-    icon: 'Flame',
+    icon: 'Activity',
     rarity: AchievementRarity.LEGENDARY,
     type: AchievementType.STREAK,
     isExclusive: false,
@@ -153,9 +189,10 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
 
   // === СООБЩЕСТВО ===
   {
-    name: 'Помощник сообщества',
-    description: 'Помогите 5 людям (лайкните их истории)',
-    icon: 'Heart',
+    slug: "ratings_5",
+    name: 'Оценщик',
+    description: 'Поставьте 5 оценок историям',
+    icon: 'ThumbsUp',
     rarity: AchievementRarity.RARE,
     type: AchievementType.COMMUNITY,
     isExclusive: false,
@@ -163,8 +200,9 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
-    name: 'Ангел-хранитель',
-    description: 'Помогите 25 людям',
+    slug: "ratings_25",
+    name: 'Постоянный участник',
+    description: 'Поставьте 25 оценок историям',
     icon: 'Shield',
     rarity: AchievementRarity.EPIC,
     type: AchievementType.COMMUNITY,
@@ -173,8 +211,9 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
-    name: 'Герой сообщества',
-    description: 'Помогите 100 людям',
+    slug: "ratings_100",
+    name: 'Лидер активности',
+    description: 'Поставьте 100 оценок историям',
     icon: 'Star',
     rarity: AchievementRarity.LEGENDARY,
     type: AchievementType.COMMUNITY,
@@ -185,6 +224,7 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
 
   // === ТВОРЧЕСТВО ===
   {
+    slug: "story_100_words",
     name: 'Рассказчик',
     description: 'Напишите историю длиннее 100 слов',
     icon: 'FileText',
@@ -195,6 +235,7 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
+    slug: "story_500_words",
     name: 'Мастер слова',
     description: 'Напишите историю длиннее 500 слов',
     icon: 'Edit3',
@@ -205,6 +246,7 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
+    slug: "inspiration_10_likes_on_one_story",
     name: 'Вдохновение',
     description: 'Ваша история получила 10+ лайков',
     icon: 'Star',
@@ -217,6 +259,7 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
 
   // === ОСОБЫЕ ===
   {
+    slug: "first100",
     name: 'Первопроходец',
     description: 'Стали одним из первых 100 пользователей',
     icon: 'Rocket',
@@ -227,6 +270,8 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
+    slug: "legend",
+    kind: "META",
     name: 'Легенда',
     description: 'Получите все остальные достижения',
     icon: 'Crown',
@@ -237,12 +282,81 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
     isActive: true,
   },
   {
-    name: 'Благодарность',
-    description: 'Получили помощь от сообщества',
-    icon: 'Heart',
+    slug: "heroes_custom",
+    name: 'Уникальный статус',
+    description: 'Выдаётся вручную администрацией',
+    icon: 'Award',
     rarity: AchievementRarity.RARE,
     type: AchievementType.SPECIAL,
     isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+
+  // === ГЕРОИ (оплата размещения) ===
+  {
+    slug: "heroes_observer",
+    name: "Наблюдатель",
+    description: "Оплатите размещение в «Героях» на 100 ₽",
+    icon: "Eye",
+    rarity: AchievementRarity.COMMON,
+    type: AchievementType.SPECIAL,
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    slug: "heroes_member",
+    name: "Участник",
+    description: "Оплатите размещение в «Героях» на 300 ₽",
+    icon: "Users",
+    rarity: AchievementRarity.RARE,
+    type: AchievementType.SPECIAL,
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    slug: "heroes_active",
+    name: "Активный",
+    description: "Оплатите размещение в «Героях» на 500 ₽",
+    icon: "Shield",
+    rarity: AchievementRarity.EPIC,
+    type: AchievementType.SPECIAL,
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    slug: "heroes_hero",
+    name: "Герой",
+    description: "Оплатите размещение в «Героях» на 1000 ₽",
+    icon: "Star",
+    rarity: AchievementRarity.LEGENDARY,
+    type: AchievementType.SPECIAL,
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    slug: "heroes_honor",
+    name: "Почётный герой",
+    description: "Оплатите размещение в «Героях» на 2000 ₽",
+    icon: "Medal",
+    rarity: AchievementRarity.LEGENDARY,
+    type: AchievementType.SPECIAL,
+    isExclusive: false,
+    maxCount: 1,
+    isActive: true,
+  },
+  {
+    slug: "heroes_legend",
+    name: "Легенда «Героев»",
+    description: "Оплатите размещение в «Героях» на 5000 ₽",
+    icon: "Crown",
+    rarity: AchievementRarity.EXCLUSIVE,
+    type: AchievementType.SPECIAL,
+    isExclusive: true,
     maxCount: 1,
     isActive: true,
   },
@@ -251,9 +365,10 @@ export const DEFAULT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updat
 // Достижения для специальных событий
 export const EVENT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updatedAt'>[] = [
   {
+    slug: "event_newyear_hero",
     name: 'Новогодний герой',
     description: 'Активны в новогодние праздники',
-    icon: 'Snowflake',
+    icon: 'Star',
     rarity: AchievementRarity.LEGENDARY,
     type: AchievementType.SPECIAL,
     isExclusive: true,
@@ -263,9 +378,10 @@ export const EVENT_ACHIEVEMENTS: Omit<Achievement, 'id' | 'createdAt' | 'updated
     validTo: new Date('2025-01-07'),
   },
   {
+    slug: "event_spring_flower",
     name: 'Весенний цветок',
     description: 'Присоединились весной 2024',
-    icon: 'Flower',
+    icon: 'Palette',
     rarity: AchievementRarity.EPIC,
     type: AchievementType.SPECIAL,
     isExclusive: true,

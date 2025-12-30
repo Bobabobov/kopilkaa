@@ -86,13 +86,13 @@ export const ACHIEVEMENT_CATEGORIES: AchievementCategory[] = [
     type: 'STREAK',
     name: 'Серии',
     description: 'Достижения за ежедневную активность',
-    icon: 'Flame',
+    icon: 'Activity',
     color: '#e16162',
   },
   {
     type: 'APPLICATIONS',
     name: 'Заявки',
-    description: 'Достижения за создание и помощь',
+    description: 'Достижения за создание и развитие историй',
     icon: 'FileText',
     color: '#abd1c6',
   },
@@ -120,8 +120,8 @@ export const ACHIEVEMENT_CATEGORIES: AchievementCategory[] = [
   {
     type: 'COMMUNITY',
     name: 'Сообщество',
-    description: 'Достижения за помощь другим',
-    icon: 'Heart',
+    description: 'Достижения за активность и участие',
+    icon: 'ThumbsUp',
     color: '#f9bc60',
   },
   {

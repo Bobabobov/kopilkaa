@@ -13,7 +13,8 @@ interface Hero {
   donationCount: number;
   rank: number;
   joinedAt: string;
-  isSubscriber: boolean;
+  hasExtendedPlacement?: boolean;
+  isSubscriber?: boolean; // backward-compatible
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;
@@ -64,8 +65,11 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
   return (
     <div className="mb-8 sm:mb-10 md:mb-12">
       <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 text-center px-4" style={{ color: "#fffffe" }}>
-        🏆 Топ донатеры
+        🏆 Топ-3 по сумме оплат
       </h3>
+      <p className="text-center text-xs sm:text-sm text-[#abd1c6] -mt-2 mb-4 sm:mb-6 px-4">
+        Лидеры раздела «Герои»
+      </p>
       
       <div className="flex flex-col sm:flex-row justify-center items-stretch sm:items-end gap-4 sm:gap-5 md:gap-6 max-w-4xl mx-auto px-2">
         {/* 2-е место */}

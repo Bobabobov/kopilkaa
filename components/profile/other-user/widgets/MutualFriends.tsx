@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import OtherUserFriendsModal from "../OtherUserFriendsModal";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { HeroBadge } from "@/components/ui/HeroBadge";
+import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 type UserLite = {
   id: string;
@@ -13,7 +15,7 @@ type UserLite = {
   email: string | null;
   avatar?: string | null;
   lastSeen?: string | null;
-  supportBadge?: "supporter" | "subscriber" | null;
+  heroBadge?: HeroBadgeType | null;
 };
 
 interface MutualFriendsProps {
@@ -173,18 +175,7 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
                   <p className="truncate text-xs font-semibold text-[#fffffe]">
                     {u.name || (u.email ? u.email.split("@")[0] : "Пользователь")}
                   </p>
-                  {u.supportBadge === "subscriber" && (
-                    <span className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold text-white border border-emerald-300/40 bg-emerald-500/20 flex-shrink-0">
-                      <LucideIcons.Crown size="xs" className="text-emerald-200" />
-                      Подписка
-                    </span>
-                  )}
-                  {u.supportBadge === "supporter" && (
-                    <span className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold text-white border border-pink-300/35 bg-pink-500/15 flex-shrink-0">
-                      <LucideIcons.Heart size="xs" className="text-pink-200" />
-                      Поддержал
-                    </span>
-                  )}
+                  <HeroBadge badge={u.heroBadge} size="xs" />
                   {getUserStatus(u.lastSeen || null).status === "online" && (
                     <div className="w-2 h-2 bg-[#10B981] rounded-full flex-shrink-0" />
                   )}

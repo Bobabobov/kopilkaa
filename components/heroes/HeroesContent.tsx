@@ -15,7 +15,8 @@ interface Hero {
   donationCount: number;
   rank: number;
   joinedAt: string;
-  isSubscriber: boolean;
+  hasExtendedPlacement?: boolean;
+  isSubscriber?: boolean; // backward-compatible
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;

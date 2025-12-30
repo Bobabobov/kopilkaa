@@ -32,6 +32,14 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const formatServiceLabel = (comment?: string | null) => {
+    if (!comment) return null;
+    const v = comment.trim();
+    if (!v) return null;
+    if (v === "heroes_placement") return "Размещение в «Героях»";
+    return v;
+  };
+
   useEffect(() => {
     const fetchDonations = async () => {
       try {
@@ -57,11 +65,12 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
   }, [userId]);
 
   const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat("ru-RU", {
-      style: "currency",
-      currency: "RUB",
-      minimumFractionDigits: 0,
-    }).format(amount);
+    const n = new Intl.NumberFormat("ru-RU", {
+      maximumFractionDigits: 0,
+    })
+      .format(amount)
+      .replace(/\u00A0/g, " ");
+    return `${n} ₽`;
   };
 
   const formatDate = (dateString: string) => {
@@ -126,20 +135,20 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
         <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <LucideIcons.Heart className="text-[#f9bc60]" size="sm" />
+              <LucideIcons.CreditCard className="text-[#f9bc60]" size="sm" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Пожертвования</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Оплаты</h3>
             </div>
           </div>
         </div>
         <div className="p-4 sm:p-5 md:p-6 text-center py-8 sm:py-10">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#abd1c6]/10 rounded-3xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-            <LucideIcons.Heart className="text-[#abd1c6]" size="xl" />
+            <LucideIcons.CreditCard className="text-[#abd1c6]" size="xl" />
           </div>
-          <p className="text-sm sm:text-base text-[#abd1c6] font-medium mb-1">Пока нет пожертвований</p>
+          <p className="text-sm sm:text-base text-[#abd1c6] font-medium mb-1">Пока нет оплат</p>
           <p className="text-xs sm:text-sm text-[#abd1c6]/60 px-4">
-            Пользователь ещё не поддержал ни одну заявку
+            Пользователь ещё не оплачивал размещение профиля в «Героях»
           </p>
         </div>
       </motion.div>
@@ -169,11 +178,11 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
                 repeatDelay: 2
               }}
             >
-              <LucideIcons.Heart className="text-[#001e1d]" size="sm" />
+                <LucideIcons.CreditCard className="text-[#001e1d]" size="sm" />
             </motion.div>
             <div className="min-w-0">
               <h3 className="text-base sm:text-lg font-bold text-[#fffffe] truncate bg-gradient-to-r from-[#fffffe] to-[#f9bc60] bg-clip-text text-transparent">
-                Пожертвования
+                Оплаты
               </h3>
               <p className="text-[10px] sm:text-xs text-[#abd1c6] mt-0.5 font-medium">
                 Всего: <span className="text-[#f9bc60] font-bold">{formatAmount(data.stats.totalDonated)}</span>
@@ -189,7 +198,7 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
             <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-[#f9bc60] to-[#e8a545] bg-clip-text text-transparent">
               {data.stats.donationsCount}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">пожертвований</div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">платежей</div>
           </motion.div>
         </div>
       </div>
@@ -204,10 +213,13 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
             transition={{ delay: 0.1 }}
             whileHover={{ scale: 1.05 }}
           >
-            <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-[#f9bc60] to-[#e8a545] bg-clip-text text-transparent mb-2">
+            <div
+              className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-br from-[#f9bc60] to-[#e8a545] bg-clip-text text-transparent mb-2 truncate max-w-full tabular-nums"
+              title={formatAmount(data.stats.totalDonated)}
+            >
               {formatAmount(data.stats.totalDonated)}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">Всего пожертвовано</div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">Всего оплачено</div>
           </motion.div>
           <motion.div 
             className="text-center p-4 sm:p-5 bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20 shadow-lg hover:shadow-xl transition-all"
@@ -224,7 +236,7 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
         </div>
       </div>
 
-      {/* Список пожертвований */}
+      {/* Список платежей */}
       {data.donations.length > 0 && (
         <div className="p-4 sm:p-5 md:p-6 space-y-2 sm:space-y-3">
           {data.donations.slice(0, 3).map((donation, index) => (
@@ -241,15 +253,15 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
                   className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#f9bc60]/30 to-[#e8a545]/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md"
                   whileHover={{ rotate: 15, scale: 1.1 }}
                 >
-                  <LucideIcons.Heart className="text-[#f9bc60]" size="sm" />
+                  <LucideIcons.CreditCard className="text-[#f9bc60]" size="sm" />
                 </motion.div>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm sm:text-base font-semibold text-[#fffffe]">
                     {formatAmount(donation.amount)}
                   </div>
-                  {donation.comment && (
+                  {formatServiceLabel(donation.comment) && (
                     <div className="text-xs sm:text-sm text-[#abd1c6] truncate mt-0.5">
-                      {donation.comment}
+                      {formatServiceLabel(donation.comment)}
                     </div>
                   )}
                   <div className="text-[10px] sm:text-xs text-[#abd1c6]/60 mt-1">

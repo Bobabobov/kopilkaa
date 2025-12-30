@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { HeroBadge } from "@/components/ui/HeroBadge";
 
 interface FriendsListProps {
   type: "friends" | "sent" | "received";
@@ -116,18 +117,7 @@ export function FriendsList({
                   >
                     {user.name || (user.email ? user.email.split("@")[0] : "Пользователь")}
                   </p>
-                    {user.supportBadge === "subscriber" && (
-                      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-white border border-emerald-300/40 bg-emerald-500/25 flex-shrink-0">
-                        <LucideIcons.Crown size="xs" className="text-emerald-200" />
-                        Подписка
-                      </span>
-                    )}
-                    {user.supportBadge === "supporter" && (
-                      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-white border border-pink-300/35 bg-pink-500/20 flex-shrink-0">
-                        <LucideIcons.Heart size="xs" className="text-pink-200" />
-                        Поддержал
-                      </span>
-                    )}
+                    <HeroBadge badge={user.heroBadge ?? null} size="xs" />
                   {isAccepted && (
                     <LucideIcons.CheckCircle2
                       size="sm"

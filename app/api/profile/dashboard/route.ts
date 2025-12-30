@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { createHash } from "crypto";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getSupportBadgeForUser, getSupportBadgesForUsers } from "@/lib/supportBadges";
+import { getHeroBadgeForUser, getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -202,9 +202,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Бейдж поддержки (разовая / подписка)
-    const supportBadge = await getSupportBadgeForUser(userId);
-    const userWithBadges = { ...(user as any), supportBadge };
+    // Бейдж статуса размещения в «Героях» (оплата цифровой услуги)
+    const heroBadge = await getHeroBadgeForUser(userId);
+    const userWithBadges = { ...(user as any), heroBadge };
 
     // Бейджи для списков (друзья/заявки/уведомления)
     const listUserIds = Array.from(
@@ -214,7 +214,7 @@ export async function GET(request: NextRequest) {
         ...notifications.map((n: any) => n?.userId).filter(Boolean),
       ]),
     );
-    const listBadgeMap = await getSupportBadgesForUsers(listUserIds);
+    const listBadgeMap = await getHeroBadgesForUsers(listUserIds);
 
     // Подсчитываем статистику
     const stats = {
@@ -243,14 +243,14 @@ export async function GET(request: NextRequest) {
       requester: sanitizeEmailForViewer(
         {
           ...(friendship.requester as any),
-          supportBadge: listBadgeMap[friendship.requesterId] ?? null,
+          heroBadge: listBadgeMap[friendship.requesterId] ?? null,
         },
         userId,
       ),
       receiver: sanitizeEmailForViewer(
         {
           ...(friendship.receiver as any),
-          supportBadge: listBadgeMap[friendship.receiverId] ?? null,
+          heroBadge: listBadgeMap[friendship.receiverId] ?? null,
         },
         userId,
       ),
@@ -261,7 +261,7 @@ export async function GET(request: NextRequest) {
       id: like.id,
       type: 'like',
       user: sanitizeEmailForViewer(
-        { ...(like.user as any), supportBadge: listBadgeMap[like.userId] ?? null },
+        { ...(like.user as any), heroBadge: listBadgeMap[like.userId] ?? null },
         userId,
       ),
       application: like.application,
@@ -280,7 +280,7 @@ export async function GET(request: NextRequest) {
         avatarFrame: user.avatarFrame ?? "",
         hideEmail: Boolean(user.hideEmail),
         lastSeen: user.lastSeen ? new Date(user.lastSeen).getTime() : 0,
-        supportBadge: supportBadge ?? "",
+        heroBadge: heroBadge ?? "",
       },
       stats,
       latest: {
@@ -308,7 +308,7 @@ export async function GET(request: NextRequest) {
           ? sanitizeEmailForViewer(
               {
                 ...(req.requester as any),
-                supportBadge: listBadgeMap[req.requesterId] ?? null,
+                  heroBadge: listBadgeMap[req.requesterId] ?? null,
               },
               userId,
             )

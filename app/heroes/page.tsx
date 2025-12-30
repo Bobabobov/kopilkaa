@@ -14,7 +14,10 @@ interface Hero {
   donationCount: number;
   rank: number;
   joinedAt: string;
-  isSubscriber: boolean;
+  // Новая семантика: “расширенное размещение” (>= 3 оплат размещения)
+  hasExtendedPlacement?: boolean;
+  // Backward-compatible: раньше было “подписчик” (семантика изменена, но поле может прилетать из старого кэша)
+  isSubscriber?: boolean;
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;

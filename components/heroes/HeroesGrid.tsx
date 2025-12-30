@@ -16,7 +16,8 @@ interface Hero {
   donationCount: number;
   rank: number;
   joinedAt: string;
-  isSubscriber: boolean;
+  hasExtendedPlacement?: boolean;
+  isSubscriber?: boolean; // backward-compatible
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;
@@ -106,7 +107,7 @@ export default function HeroesGrid({
       {/* Заголовок с результатами */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-2">
         <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#fffffe]">
-          Все донатеры
+          Все профили
         </h3>
         <div className="text-xs sm:text-sm md:text-base text-[#abd1c6]">
           Показано {heroes.length} из {total}
@@ -146,12 +147,12 @@ export default function HeroesGrid({
                       #{hero.rank}
                     </span>
                   </div>
-                  {hero.isSubscriber && (
+                  {(hero.hasExtendedPlacement ?? hero.isSubscriber) && (
                     <span className="text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full whitespace-nowrap flex-shrink-0" style={{ 
                       backgroundColor: "rgba(249, 188, 96, 0.2)", 
                       color: "#f9bc60" 
                     }}>
-                      Подписчик
+                      Активный участник
                     </span>
                   )}
                 </div>
@@ -197,7 +198,7 @@ export default function HeroesGrid({
                       ₽{hero.totalDonated.toLocaleString()}
                     </p>
                     <p className="text-xs sm:text-sm" style={{ color: "#abd1c6" }}>
-                      Поддержал
+                      Оплатил размещение
                     </p>
                   </div>
                   <div 
@@ -217,7 +218,7 @@ export default function HeroesGrid({
                       {hero.donationCount}
                     </p>
                     <p className="text-xs sm:text-sm" style={{ color: "#abd1c6" }}>
-                      Донатов
+                      Платежей
                     </p>
                   </div>
                 </div>

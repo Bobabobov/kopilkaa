@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getSupportBadgesForUsers } from "@/lib/supportBadges";
+import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export async function GET(request: Request) {
   const session = await getSession();
@@ -83,7 +83,7 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
-    const badgeMap = await getSupportBadgesForUsers(
+    const badgeMap = await getHeroBadgesForUsers(
       friendships.flatMap((f: any) => [f.requesterId, f.receiverId]),
     );
 
@@ -91,13 +91,13 @@ export async function GET(request: Request) {
       ...f,
       requester: f.requester
         ? sanitizeEmailForViewer(
-            { ...(f.requester as any), supportBadge: badgeMap[f.requesterId] ?? null },
+            { ...(f.requester as any), heroBadge: badgeMap[f.requesterId] ?? null },
             session.uid,
           )
         : f.requester,
       receiver: f.receiver
         ? sanitizeEmailForViewer(
-            { ...(f.receiver as any), supportBadge: badgeMap[f.receiverId] ?? null },
+            { ...(f.receiver as any), heroBadge: badgeMap[f.receiverId] ?? null },
             session.uid,
           )
         : f.receiver,
@@ -271,7 +271,7 @@ export async function POST(request: Request) {
     });
 
     console.log("Successfully created friendship:", friendship.id);
-    const badgeMap = await getSupportBadgesForUsers([
+    const badgeMap = await getHeroBadgesForUsers([
       friendship.requesterId,
       friendship.receiverId,
     ]);
@@ -282,7 +282,7 @@ export async function POST(request: Request) {
           ? sanitizeEmailForViewer(
               {
                 ...(friendship.requester as any),
-                supportBadge: badgeMap[friendship.requesterId] ?? null,
+                heroBadge: badgeMap[friendship.requesterId] ?? null,
               },
               session.uid,
             )
@@ -291,7 +291,7 @@ export async function POST(request: Request) {
           ? sanitizeEmailForViewer(
               {
                 ...(friendship.receiver as any),
-                supportBadge: badgeMap[friendship.receiverId] ?? null,
+                heroBadge: badgeMap[friendship.receiverId] ?? null,
               },
               session.uid,
             )

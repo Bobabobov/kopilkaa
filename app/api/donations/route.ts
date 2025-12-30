@@ -2,8 +2,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { AchievementService } from "@/lib/achievements/service";
 
-// Создать «виртуальный» донат (тестовый режим)
+// Создать запись оплаты (цифровая услуга / тестовый режим)
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
@@ -29,11 +30,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Автоматически проверяем/выдаём достижения после оплаты (важно для /heroes статусов)
+    if (session?.uid && type === "SUPPORT") {
+      try {
+        await AchievementService.checkAndGrantAutomaticAchievements(session.uid);
+      } catch {
+        // не блокируем ответ по оплате из‑за достижений
+      }
+    }
+
     return NextResponse.json({ success: true, donation });
   } catch (error) {
     console.error("Error creating donation:", error);
     return NextResponse.json(
-      { success: false, error: "Ошибка создания доната" },
+      { success: false, error: "Ошибка создания платежа" },
       { status: 500 },
     );
   }

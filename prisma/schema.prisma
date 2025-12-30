@@ -52,6 +52,9 @@ model User {
   headerDominantColor String? // Доминантный цвет из обложки
   avatarFrame         String?   @default("none")
   customFrameData     String? // JSON данные пользовательских рамок
+  // Ручной override для уникального HERO_BADGE (используется только для оплат > 5000).
+  // Примеры значений: "custom" (или любое непустое значение как флаг).
+  heroBadgeOverride   String?
   hideEmail           Boolean   @default(true) // Скрывать email в профиле по умолчанию
   role                String    @default("USER")
   createdAt           DateTime  @default(now())

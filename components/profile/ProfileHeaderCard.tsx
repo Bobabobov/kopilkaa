@@ -8,12 +8,14 @@ import AvatarUpload from "./AvatarUpload";
 import HeaderCustomization from "./HeaderCustomization";
 import ApplicationsModal from "./modals/ApplicationsModal";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { HeroBadge } from "@/components/ui/HeroBadge";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { getHeaderTheme } from "@/lib/header-customization";
 import { getOverlayOpacity, getSecondaryTextColorForBackground, getTextColorForBackground } from "@/lib/color-utils";
 import { getSafeExternalUrl } from "@/lib/safeExternalUrl";
+import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 type User = {
   id: string;
@@ -33,7 +35,7 @@ type User = {
   approvedApplications?: number;
   friendsCount?: number;
   donationsCount?: number;
-  supportBadge?: "supporter" | "subscriber" | null;
+  heroBadge?: HeroBadgeType | null;
 };
 
 type FriendshipStatus = "none" | "requested" | "incoming" | "friends";
@@ -441,18 +443,8 @@ export default function ProfileHeaderCard({
                       <span className="hidden xs:inline">ADMIN</span>
                     </span>
                   )}
-                  {user.supportBadge === "subscriber" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold text-white border border-emerald-300/40 bg-gradient-to-r from-emerald-500/70 to-green-500/60 shadow-[0_10px_30px_rgba(16,185,129,0.18)]">
-                      <LucideIcons.Crown className="w-3.5 h-3.5 text-emerald-100" />
-                      Подписка
-                    </span>
-                  )}
-                  {user.supportBadge === "supporter" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold text-white border border-pink-300/35 bg-gradient-to-r from-pink-500/55 to-rose-500/45 shadow-[0_10px_30px_rgba(244,63,94,0.14)]">
-                      <LucideIcons.Heart className="w-3.5 h-3.5 text-pink-100" />
-                      Поддержал проект
-                    </span>
-                  )}
+                  {/* Статус оплаченного размещения в разделе «Герои» (без текста, читается по форме/иконке) */}
+                  <HeroBadge badge={user.heroBadge} size="sm" />
                   {/* Статус онлайн/оффлайн */}
                   <div className="flex items-center gap-1.5">
                     <span
@@ -502,8 +494,8 @@ export default function ProfileHeaderCard({
                           className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 text-sm font-medium text-white transition-all duration-200 whitespace-nowrap"
                         >
                           <LucideIcons.Heart size="sm" />
-                          <span className="hidden xs:inline">Поддержать проект</span>
-                          <span className="xs:hidden">Поддержать</span>
+                          <span className="hidden xs:inline">Стать героем</span>
+                          <span className="xs:hidden">Герой</span>
                         </Link>
                       </motion.div>
                       {hasSocialLinks && <SocialLinks user={user} />}
@@ -597,8 +589,8 @@ export default function ProfileHeaderCard({
                         className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 text-sm font-medium text-white transition-all duration-200 whitespace-nowrap"
                       >
                         <LucideIcons.Heart size="sm" />
-                        <span className="hidden xs:inline">Поддержать проект</span>
-                        <span className="xs:hidden">Поддержать</span>
+                        <span className="hidden xs:inline">Стать героем</span>
+                        <span className="xs:hidden">Герой</span>
                       </Link>
                       {friendActionBlock()}
                       <button

@@ -20,6 +20,13 @@ export default function ProfileRecentActivity() {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const formatRub = (amount: number) => {
+    const n = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 })
+      .format(amount)
+      .replace(/\u00A0/g, " ");
+    return `${n} ₽`;
+  };
+
   useEffect(() => {
     const fetchActivity = async () => {
       try {
@@ -57,19 +64,21 @@ export default function ProfileRecentActivity() {
           }
         }
 
-        // Обрабатываем пожертвования
+        // Обрабатываем оплаты (цифровая услуга размещения в «Героях»)
         if (donationsRes?.ok) {
           const donationsData = await donationsRes.json();
           if (donationsData.donations) {
             donationsData.donations.slice(0, 2).forEach((donation: any) => {
+              const raw = typeof donation.comment === "string" ? donation.comment.trim() : "";
+              const serviceLabel = raw === "heroes_placement" ? "Размещение в «Героях»" : raw;
               activitiesList.push({
                 id: `donation-${donation.id}`,
                 type: "donation",
-                title: `Пожертвование ${donation.amount}₽`,
-                description: donation.comment || "Поддержка проекта",
+                title: `Оплата ${formatRub(Number(donation.amount) || 0)}`,
+                description: serviceLabel || "Оплата цифровой услуги",
                 date: donation.createdAt,
-                icon: "Heart",
-                color: "#e16162",
+                icon: "CreditCard",
+                color: "#f9bc60",
               });
             });
           }

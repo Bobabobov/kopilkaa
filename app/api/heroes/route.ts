@@ -14,7 +14,8 @@ export async function GET(request: Request) {
     const q = (searchParams.get("q") || "").trim().toLowerCase();
     const sortBy = (searchParams.get("sortBy") || "total") as "total" | "count" | "date";
 
-    // Агрегируем донаты в БД (не тянем все donations в память)
+    // Агрегируем оплаты услуги размещения в разделе «Герои» (DonationType.SUPPORT)
+    // ВАЖНО: это оплата цифровой услуги размещения профиля (не благотворительность).
     const aggregates = await prisma.donation
       .groupBy({
         by: ["userId"],
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
       })
       .catch(() => []);
 
-    // Важно: groupBy вернёт запись и для userId = null (анонимные донаты).
+    // Важно: groupBy вернёт запись и для userId = null (анонимные оплаты).
     // Если передать null в `id: { in: [...] }`, Prisma может упасть, и мы получим пустой список героев.
     const userIds = aggregates
       .map((a) => a.userId)
@@ -49,7 +50,7 @@ export async function GET(request: Request) {
             subscribersCount: 0,
             averageDonation: 0,
           },
-          message: "Пока нет героев проекта. Стань первым, кто поддержит историю!",
+          message: "Пока нет размещённых профилей в разделе «Герои». Разместите свой профиль первым.",
         },
         {
           headers: {
@@ -82,13 +83,13 @@ export async function GET(request: Request) {
 
     const heroesRawAll = aggregates
       .map((agg) => {
-        // Prisma groupBy может вернуть userId = null (анонимные донаты)
+        // Prisma groupBy может вернуть userId = null (анонимные оплаты)
         if (!agg.userId) return null;
         const user = byId.get(agg.userId);
         if (!user) return null;
 
-        const totalDonated = agg._sum.amount || 0;
-        const donationCount = agg._count._all || 0;
+        const totalPaid = agg._sum.amount || 0;
+        const paymentsCount = agg._count._all || 0;
 
         const fallbackName =
           !user.hideEmail && user.email ? user.email.split("@")[0] : "Пользователь";
@@ -97,10 +98,13 @@ export async function GET(request: Request) {
           id: user.id,
           name: user.name || fallbackName,
           avatar: user.avatar,
-          totalDonated,
-          donationCount,
+          totalDonated: totalPaid, // backward-compatible field name
+          donationCount: paymentsCount, // backward-compatible field name
           joinedAt: user.createdAt,
-          isSubscriber: donationCount >= 3,
+          // Раньше это называлось isSubscriber. Теперь это нейтральное “расширенное размещение”.
+          // Логику оставляем прежней (>= 3 оплат), меняем только смысл.
+          hasExtendedPlacement: paymentsCount >= 3,
+          isSubscriber: paymentsCount >= 3, // backward-compatible alias (семантика изменена)
           vkLink: getSafeExternalUrl(user.vkLink),
           telegramLink: getSafeExternalUrl(user.telegramLink),
           youtubeLink: getSafeExternalUrl(user.youtubeLink),
@@ -122,7 +126,9 @@ export async function GET(request: Request) {
 
     const totalHeroes = heroesAll.length;
     const totalDonated = heroesAll.reduce((sum, h) => sum + (h.totalDonated || 0), 0);
-    const subscribersCount = heroesAll.filter((h) => h.isSubscriber).length;
+    const activeParticipantsCount = heroesAll.filter(
+      (h) => !!h.hasExtendedPlacement || !!h.isSubscriber,
+    ).length;
     const averageDonation = totalHeroes > 0 ? Math.round(totalDonated / totalHeroes) : 0;
 
     // Top 3 всегда по totalDonated
@@ -176,12 +182,12 @@ export async function GET(request: Request) {
         stats: {
           totalHeroes,
           totalDonated,
-          subscribersCount,
+          subscribersCount: activeParticipantsCount, // backward-compatible field name
           averageDonation,
         },
         message:
           totalHeroes === 0
-            ? "Пока нет героев проекта. Стань первым, кто поддержит историю!"
+            ? "Пока нет размещённых профилей в разделе «Герои». Разместите свой профиль первым."
             : null,
       },
       {
@@ -212,7 +218,7 @@ export async function GET(request: Request) {
           subscribersCount: 0,
           averageDonation: 0,
         },
-        message: "Пока нет героев проекта. Стань первым, кто поддержит историю!",
+        message: "Пока нет размещённых профилей в разделе «Герои». Разместите свой профиль первым.",
       },
       {
         headers: {

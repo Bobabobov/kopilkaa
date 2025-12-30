@@ -28,6 +28,14 @@ export default function ProfileDonations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const formatServiceLabel = (comment?: string | null) => {
+    if (!comment) return null;
+    const v = comment.trim();
+    if (!v) return null;
+    if (v === "heroes_placement") return "Размещение в «Героях»";
+    return v;
+  };
+
   useEffect(() => {
     const fetchDonations = async () => {
       try {
@@ -53,11 +61,14 @@ export default function ProfileDonations() {
   }, []);
 
   const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat("ru-RU", {
-      style: "currency",
-      currency: "RUB",
-      minimumFractionDigits: 0,
-    }).format(amount);
+    // В Intl для валюты часто используются неразрывные пробелы (NBSP), из‑за чего сумма может "вылезать".
+    // Форматируем число отдельно и добавляем знак рубля вручную, заменяя NBSP -> обычный пробел.
+    const n = new Intl.NumberFormat("ru-RU", {
+      maximumFractionDigits: 0,
+    })
+      .format(amount)
+      .replace(/\u00A0/g, " ");
+    return `${n} ₽`;
   };
 
   const formatDate = (dateString: string) => {
@@ -122,20 +133,20 @@ export default function ProfileDonations() {
         <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <LucideIcons.Heart className="text-[#f9bc60]" size="sm" />
+              <LucideIcons.CreditCard className="text-[#f9bc60]" size="sm" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Мои пожертвования</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Мои оплаты</h3>
             </div>
           </div>
         </div>
         <div className="p-4 sm:p-5 md:p-6 text-center py-8 sm:py-10">
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#abd1c6]/10 rounded-3xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-            <LucideIcons.Heart className="text-[#abd1c6]" size="xl" />
+            <LucideIcons.CreditCard className="text-[#abd1c6]" size="xl" />
           </div>
-          <p className="text-sm sm:text-base text-[#abd1c6] font-medium mb-1">Пока нет пожертвований</p>
+          <p className="text-sm sm:text-base text-[#abd1c6] font-medium mb-1">Пока нет оплат</p>
           <p className="text-xs sm:text-sm text-[#abd1c6]/60 px-4">
-            Ваша поддержка помогает другим людям
+            После оплаты размещения профиля в «Героях» здесь появится история платежей
           </p>
         </div>
       </motion.div>
@@ -150,10 +161,10 @@ export default function ProfileDonations() {
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <LucideIcons.Heart className="text-[#f9bc60]" size="sm" />
+              <LucideIcons.CreditCard className="text-[#f9bc60]" size="sm" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Мои пожертвования</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Мои оплаты</h3>
               <p className="text-[10px] sm:text-xs text-[#abd1c6] mt-0.5">
                 Всего: {formatAmount(data.stats.totalDonated)}
               </p>
@@ -163,7 +174,7 @@ export default function ProfileDonations() {
             <div className="text-lg sm:text-xl font-bold text-[#f9bc60]">
               {data.stats.donationsCount}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">пожертвований</div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6]">платежей</div>
           </div>
         </div>
       </div>
@@ -172,10 +183,13 @@ export default function ProfileDonations() {
       <div className="p-4 xs:p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10 bg-[#001e1d]/20">
         <div className="grid grid-cols-2 gap-2.5 xs:gap-3 sm:gap-4">
           <div className="text-center p-2.5 xs:p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10">
-            <div className="text-lg xs:text-xl sm:text-2xl font-bold text-[#f9bc60] mb-0.5 xs:mb-1">
+            <div
+              className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold text-[#f9bc60] mb-0.5 xs:mb-1 truncate max-w-full tabular-nums"
+              title={formatAmount(data.stats.totalDonated)}
+            >
               {formatAmount(data.stats.totalDonated)}
             </div>
-            <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6] leading-tight">Всего пожертвовано</div>
+            <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6] leading-tight">Всего оплачено</div>
           </div>
           <div className="text-center p-2.5 xs:p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10">
             <div className="text-lg xs:text-xl sm:text-2xl font-bold text-[#abd1c6] mb-0.5 xs:mb-1">
@@ -186,7 +200,7 @@ export default function ProfileDonations() {
         </div>
       </div>
 
-      {/* Список пожертвований */}
+      {/* Список платежей */}
       {data.donations.length > 0 && (
         <div className="p-4 xs:p-4 sm:p-5 md:p-6 space-y-2 xs:space-y-2.5 sm:space-y-3">
           {data.donations.slice(0, 3).map((donation, index) => (
@@ -199,15 +213,15 @@ export default function ProfileDonations() {
             >
               <div className="flex items-center gap-2 xs:gap-3 min-w-0 flex-1">
                 <div className="w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <LucideIcons.Heart className="text-[#f9bc60]" size="sm" />
+                  <LucideIcons.CreditCard className="text-[#f9bc60]" size="sm" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-xs xs:text-sm sm:text-base font-semibold text-[#fffffe]">
                     {formatAmount(donation.amount)}
                   </div>
-                  {donation.comment && (
+                  {formatServiceLabel(donation.comment) && (
                     <div className="text-[10px] xs:text-xs sm:text-sm text-[#abd1c6] truncate mt-0.5">
-                      {donation.comment}
+                      {formatServiceLabel(donation.comment)}
                     </div>
                   )}
                   <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6]/60 mt-0.5 xs:mt-1">

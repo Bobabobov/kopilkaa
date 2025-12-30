@@ -58,6 +58,18 @@ export class AchievementService {
     const name = String(achievement.name || "").toLowerCase();
     const desc = String(achievement.description || "").toLowerCase();
 
+    // === HEROES / paid placement (Donation.type = SUPPORT) ===
+    // Tier achievements use max single payment amount as metric.
+    if (key.startsWith("heroes_") && key !== "heroes_custom") {
+      return userStats.heroMaxPayment ?? 0;
+    }
+    // Manual only: custom isn't auto-granted.
+    if (key === "heroes_custom") return 0;
+
+    // Profile completion
+    if (key === "profile_avatar") return userStats.hasAvatar ? 1 : 0;
+    if (key === "profile_socials") return userStats.hasSocialLinks ? 1 : 0;
+
     // First 100 / первопроходец
     if (key === "first100" || name.includes("первопроход")) {
       return userStats.isFirst100 ? 1 : 0;
@@ -78,8 +90,8 @@ export class AchievementService {
       return userStats.likesReceivedMaxOnOneStory ?? 0;
     }
 
-    // Лайки, которые пользователь поставил
-    if (desc.includes("лайк")) {
+    // Лайки/оценки, которые пользователь поставил
+    if (desc.includes("лайк") || desc.includes("оцен")) {
       return userStats.likesGiven ?? 0;
     }
 
@@ -160,6 +172,10 @@ export class AchievementService {
       select: {
         id: true,
         createdAt: true,
+        avatar: true,
+        vkLink: true,
+        telegramLink: true,
+        youtubeLink: true,
       },
     });
     if (!user) return null;
@@ -276,6 +292,26 @@ export class AchievementService {
       isFirst100 = false;
     }
 
+    // heroes placement payments (DonationType.SUPPORT == paid digital placement)
+    let heroMaxPayment = 0;
+    let heroTotalPaid = 0;
+    let heroPaymentsCount = 0;
+    try {
+      const agg = await prisma.donation.aggregate({
+        where: { userId, type: "SUPPORT" },
+        _max: { amount: true },
+        _sum: { amount: true },
+        _count: { _all: true },
+      });
+      heroMaxPayment = agg._max.amount ?? 0;
+      heroTotalPaid = agg._sum.amount ?? 0;
+      heroPaymentsCount = agg._count._all ?? 0;
+    } catch {
+      heroMaxPayment = 0;
+      heroTotalPaid = 0;
+      heroPaymentsCount = 0;
+    }
+
     return {
       loginStreakDays,
       applicationsCreated,
@@ -288,6 +324,11 @@ export class AchievementService {
       hasAnyGameRecord,
       maxStoryWords,
       isFirst100,
+      hasAvatar: Boolean(user.avatar),
+      hasSocialLinks: Boolean(user.vkLink || user.telegramLink || user.youtubeLink),
+      heroMaxPayment,
+      heroTotalPaid,
+      heroPaymentsCount,
       _unlockedEligibleCount: 0, // заполнится позже
     };
   }

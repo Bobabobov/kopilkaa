@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { HeroBadge } from "@/components/ui/HeroBadge";
+import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 const mockActivity = [
   { id: "a1", text: "asdasdasd стал вашим другом", time: "3 дня назад", icon: "UserPlus" },
@@ -19,7 +21,7 @@ export function FriendsSidebar() {
       email?: string | null;
       avatar?: string | null;
       mutual?: string;
-      supportBadge?: "supporter" | "subscriber" | null;
+      heroBadge?: HeroBadgeType | null;
     }[]
   >([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
@@ -41,7 +43,7 @@ export function FriendsSidebar() {
           email: u.email,
           avatar: u.avatar,
           mutual: u.mutualFriends ? `${u.mutualFriends} общих друзей` : undefined,
-          supportBadge: u.supportBadge ?? null,
+          heroBadge: u.heroBadge ?? null,
         })),
       );
     } finally {
@@ -163,18 +165,7 @@ export function FriendsSidebar() {
                           {person.mutual || "Общие интересы"}
                         </span>
 
-                        {person.supportBadge === "subscriber" && (
-                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-white border border-emerald-300/40 bg-emerald-500/25 flex-shrink-0">
-                            <LucideIcons.Crown size="xs" className="text-emerald-200" />
-                            Подписка
-                          </span>
-                        )}
-                        {person.supportBadge === "supporter" && (
-                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold text-white border border-pink-300/35 bg-pink-500/20 flex-shrink-0">
-                            <LucideIcons.Heart size="xs" className="text-pink-200" />
-                            Поддержал
-                          </span>
-                        )}
+                        <HeroBadge badge={person.heroBadge} size="xs" />
                       </div>
                     </Link>
 

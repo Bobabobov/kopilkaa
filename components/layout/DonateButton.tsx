@@ -45,7 +45,7 @@ export default function DonateButton({
 
   if (resolvedVariant === "mobileHeader") {
     return (
-      <Link href="/support" onClick={onLinkClick} className="block" aria-label="Поддержать проект">
+      <Link href="/support" onClick={onLinkClick} className="block" aria-label="Стать героем">
         <motion.span
           whileHover={{ scale: 1.05, y: -1 }}
           whileTap={{ scale: 0.97 }}
@@ -55,7 +55,7 @@ export default function DonateButton({
             boxShadow: { duration: 4, repeat: Infinity, ease: "easeInOut" },
           }}
           className={`${baseClass} w-10 h-10`}
-          title="Поддержать проект"
+          title="Стать героем"
           style={{
             backgroundImage:
               "linear-gradient(135deg, rgba(249, 188, 96, 0.16), rgba(249, 188, 96, 0.05))",
@@ -80,7 +80,7 @@ export default function DonateButton({
           >
             <LucideIcons.Heart size="sm" />
           </motion.span>
-          <span className="sr-only">Поддержать проект</span>
+          <span className="sr-only">Стать героем</span>
         </motion.span>
       </Link>
     );
@@ -131,7 +131,7 @@ export default function DonateButton({
             >
             <LucideIcons.Heart size="sm" />
             </motion.span>
-            <span className="text-[#fffffe]">Помочь проекту</span>
+            <span className="text-[#fffffe]">Стать героем</span>
           </span>
         </motion.span>
       </Link>
@@ -187,7 +187,7 @@ export default function DonateButton({
           >
           <LucideIcons.Heart size="sm" />
           </motion.span>
-          <span className="text-[#fffffe]">Поддержать</span>
+          <span className="text-[#fffffe]">Стать героем</span>
         </span>
       </motion.span>
     </Link>

@@ -200,7 +200,7 @@ export default function TopDonors() {
                         {topDonor.name}
                       </p>
                       <p className="mt-1 text-sm font-semibold text-[#f9bc60]">
-                        Поддержал(а): ₽{topDonor.amount}
+                        Оплатил(а): ₽{topDonor.amount}
                       </p>
 
                       <div className="mt-2 flex items-center gap-2">

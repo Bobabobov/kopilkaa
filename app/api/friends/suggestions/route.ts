@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getSupportBadgesForUsers } from "@/lib/supportBadges";
+import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export const dynamic = "force-dynamic";
 
@@ -49,10 +49,10 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
-    const badgeMap = await getSupportBadgesForUsers(users.map((u) => u.id));
+    const badgeMap = await getHeroBadgesForUsers(users.map((u) => u.id));
     const safeUsers = users.map((u: any) =>
       sanitizeEmailForViewer(
-        { ...u, supportBadge: badgeMap[u.id] ?? null },
+        { ...u, heroBadge: badgeMap[u.id] ?? null },
         session.uid,
       ),
     );

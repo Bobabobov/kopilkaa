@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getSupportBadgesForUsers } from "@/lib/supportBadges";
+import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export const dynamic = 'force-dynamic';
 
@@ -26,13 +26,13 @@ export async function GET() {
     });
 
     const visibleUsers = users.filter((u: any) => u.id !== session.uid);
-    const badgeMap = await getSupportBadgesForUsers(visibleUsers.map((u: any) => u.id));
+    const badgeMap = await getHeroBadgesForUsers(visibleUsers.map((u: any) => u.id));
 
     return NextResponse.json({
       total: users.length,
       users: visibleUsers.map((u: any) =>
         sanitizeEmailForViewer(
-          { ...u, supportBadge: badgeMap[u.id] ?? null },
+          { ...u, heroBadge: badgeMap[u.id] ?? null },
           session.uid,
         ),
       ),

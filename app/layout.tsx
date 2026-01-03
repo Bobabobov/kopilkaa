@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
+import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -9,6 +10,7 @@ import { BeautifulNotificationsProvider } from "@/components/ui/BeautifulNotific
 import ProfilePreloadInitializer from "@/components/performance/ProfilePreloadInitializer";
 import BanCheck from "@/components/auth/BanCheck";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
+import MetrikaSpaTracker from "@/components/analytics/MetrikaSpaTracker";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -119,12 +121,48 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteStructuredData) }}
         />
+        <Script
+          id="yandex-metrika"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(m,e,t,r,i,k,a){
+     m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+     m[i].l=1*new Date();
+     for (var j = 0; j < document.scripts.length; j++) {
+       if (document.scripts[j].src === r) { return; }
+     }
+     k=e.createElement(t),a=e.getElementsByTagName(t)[0],
+     k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+   })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106107046', 'ym');
+
+   ym(106107046, 'init', {
+     ssr:true,
+     webvisor:true,
+     clickmap:true,
+     ecommerce:"dataLayer",
+     accurateTrackBounce:true,
+     trackLinks:true
+   });`,
+          }}
+        />
+        <Suspense fallback={null}>
+          <MetrikaSpaTracker />
+        </Suspense>
         <BeautifulNotificationsProvider>
           <ProfilePreloadInitializer />
           <BanCheck>
             <ProtectedLayout>{children}</ProtectedLayout>
           </BanCheck>
         </BeautifulNotificationsProvider>
+        <noscript>
+          <div>
+            <img
+              src="https://mc.yandex.ru/watch/106107046"
+              style={{ position: "absolute", left: "-9999px" }}
+              alt=""
+            />
+          </div>
+        </noscript>
       </body>
     </html>
   );

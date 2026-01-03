@@ -152,7 +152,7 @@ export default function HeroesGrid({
                   onClick={() => onSortChange("total")}
                   className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[#c7d4d0] hover:bg-white/10 hover:border-white/20 transition-colors text-sm font-semibold"
                 >
-                  Сортировать по сумме
+                  Сортировать по объёму поддержки
                 </button>
               )}
             </div>
@@ -195,7 +195,7 @@ export default function HeroesGrid({
                   {(hero.hasExtendedPlacement ?? hero.isSubscriber) && (
                     <span className="inline-flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full whitespace-nowrap flex-shrink-0 border border-[#f9bc60]/30 bg-[#f9bc60]/10 text-[#f9bc60]">
                       <LucideIcons.Star size="sm" />
-                      Активный участник
+                      Активный герой
                     </span>
                   )}
                 </div>
@@ -242,7 +242,7 @@ export default function HeroesGrid({
                       {formatRub(hero.totalDonated)}
                     </p>
                     <p className="text-xs sm:text-sm text-[#abd1c6]">
-                      Сумма оплат
+                      Общий вклад
                     </p>
                   </div>
                   <div 
@@ -254,7 +254,7 @@ export default function HeroesGrid({
                       {hero.donationCount}
                     </p>
                     <p className="text-xs sm:text-sm text-[#abd1c6]">
-                      Платежи
+                      Поддержки
                     </p>
                   </div>
                 </div>

@@ -26,25 +26,25 @@ export default function HeroesGridStats({ stats }: HeroesGridStatsProps) {
 
   const statsData = [
     {
-      label: "Размещённых профилей",
+      label: "Участников проекта",
       value: totalHeroes,
       color: "#f9bc60",
       icon: "Users",
     },
     {
-      label: "Общий объём оплат",
+      label: "Общий объём поддержки",
       value: formatRub(totalDonated),
       color: "#abd1c6",
       icon: "CreditCard",
     },
     {
-      label: "Активные участники",
+      label: "Активно поддержавшие",
       value: subscribersCount,
       color: "#e16162",
-      icon: "Sparkles",
+      icon: "Heart",
     },
     {
-      label: "Средний платёж",
+      label: "Средний вклад",
       value: formatRub(averageDonation),
       color: "#f9bc60",
       icon: "TrendingUp",

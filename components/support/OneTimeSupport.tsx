@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
@@ -8,6 +8,7 @@ interface OneTimeSupportProps {
   customAmount: string;
   onAmountChange: (amount: string) => void;
   showSocialPrompt?: boolean;
+  goalSlot?: ReactNode;
 }
 
 const predefinedAmounts = [100, 300, 500, 1000, 2000, 5000];
@@ -16,6 +17,7 @@ export default function OneTimeSupport({
   customAmount,
   onAmountChange,
   showSocialPrompt,
+  goalSlot,
 }: OneTimeSupportProps) {
   const [loading, setLoading] = useState(false);
   const [resultMessage, setResultMessage] = useState<string | null>(null);
@@ -35,24 +37,23 @@ export default function OneTimeSupport({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: amountNumber,
-          // В API сейчас допустимы только существующие типы (fallback -> SUPPORT),
-          // поэтому "SERVICE" выражаем через comment.
+          // Сохраняем тип как SUPPORT (существующая бизнес-логика/данные).
           type: "SUPPORT",
-          comment: "heroes_placement",
+          comment: "project_support",
         }),
       });
 
       const data = await response.json().catch(() => null);
       if (!response.ok || !data?.success) {
-        throw new Error(data?.error || "Не удалось оформить оплату услуги");
+        throw new Error(data?.error || "Не удалось отправить поддержку");
       }
 
       setResultMessage(
-        "Оплата принята. Ваш профиль будет размещён в разделе «Герои» и будет участвовать в рейтинге.",
+        "Спасибо за поддержку проекта «Копилка». Вы помогаете платформе продолжать работу и оказывать помощь.",
       );
     } catch (error) {
-      console.error("Heroes placement purchase error:", error);
-      setResultError("Не получилось оформить оплату услуги. Попробуйте ещё раз.");
+      console.error("Project support error:", error);
+      setResultError("Не получилось отправить поддержку. Попробуйте ещё раз.");
     } finally {
       setLoading(false);
     }
@@ -71,21 +72,24 @@ export default function OneTimeSupport({
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f9bc60]/10 border border-[#f9bc60]/30 mb-3">
             <LucideIcons.Trophy className="w-4 h-4 text-[#f9bc60]" />
             <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#e16162" }}>
-              Цифровая услуга
+              Добровольная поддержка
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-semibold mb-2 sm:mb-3" style={{ color: "#fffffe" }}>
-            Размещение в разделе «Герои»
+            Выберите сумму поддержки проекта
           </h2>
           <p className="text-sm sm:text-base max-w-xl mx-auto px-2 leading-relaxed" style={{ color: "#abd1c6" }}>
-            Разовая оплата без подписки. Профиль размещается публично и участвует в рейтинге.
+            Любая сумма — это вклад в развитие платформы и помощь тем, кому она действительно нужна.
           </p>
         </motion.div>
 
         <div className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/15 rounded-xl sm:rounded-2xl p-5 sm:p-6">
           <h3 className="text-lg sm:text-xl font-semibold mb-5 sm:mb-6 text-center" style={{ color: "#abd1c6" }}>
-            Выберите сумму оплаты услуги
+            Выберите сумму поддержки
           </h3>
+
+          {/* DonationAlerts goal widget (optional slot) */}
+          {goalSlot ? <div className="mb-5 sm:mb-6">{goalSlot}</div> : null}
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5 sm:mb-6">
             {predefinedAmounts.map((amount, index) => {
@@ -125,7 +129,7 @@ export default function OneTimeSupport({
                       ₽{amount.toLocaleString()}
                     </div>
                     {isLarge && (
-                      <div className="text-xs opacity-70 font-normal mt-1">Размещение</div>
+                      <div className="text-xs opacity-70 font-normal mt-1">Вклад</div>
                     )}
                   </div>
                 </motion.button>
@@ -183,14 +187,14 @@ export default function OneTimeSupport({
               {loading
                 ? "Оформляем..."
                 : customAmount && parseInt(customAmount) > 0
-                  ? `Оплатить размещение на ₽${parseInt(customAmount).toLocaleString()}`
+                  ? `💚 Поддержать проект на ₽${parseInt(customAmount).toLocaleString()}`
                   : "Введите сумму"}
             </span>
             <span className="sm:hidden">
               {loading
                 ? "Оформляем..."
                 : customAmount && parseInt(customAmount) > 0
-                  ? `Оплатить ₽${parseInt(customAmount).toLocaleString()}`
+                  ? `💚 Поддержать на ₽${parseInt(customAmount).toLocaleString()}`
                   : "Введите сумму"}
             </span>
           </motion.button>
@@ -228,10 +232,10 @@ export default function OneTimeSupport({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm sm:text-base font-semibold text-[#fffffe]">
-                  Привяжите соцсети — они будут видны в «Героях»
+                  Привяжите соцсети — они будут видны в «Героях проекта»
                 </p>
                 <p className="text-xs sm:text-sm text-[#ffd499] mt-1">
-                  VK, Telegram или YouTube будут отображаться рядом с вашим профилем на странице героев.
+                  VK, Telegram или YouTube будут отображаться рядом с вашим профилем в разделе «Герои проекта».
                 </p>
               </div>
               <div className="flex-shrink-0">

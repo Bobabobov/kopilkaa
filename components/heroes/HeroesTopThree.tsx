@@ -75,13 +75,13 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
     <div className="mb-8 sm:mb-10 md:mb-12">
       <div className="flex items-start justify-between gap-4 mb-4 sm:mb-5">
         <div>
-          <div className="text-xs text-[#94a1b2]">Лидеры</div>
+          <div className="text-xs text-[#94a1b2]">Благодарность</div>
           <div className="text-xl sm:text-2xl md:text-3xl font-bold text-[#fffffe] inline-flex items-center gap-2">
             <LucideIcons.Trophy size="sm" className="text-[#f9bc60]" />
-            Топ-3 по сумме оплат
+            Самые активные герои проекта
           </div>
         </div>
-        <div className="hidden sm:block text-sm text-[#abd1c6]">Лидеры раздела «Герои»</div>
+        <div className="hidden sm:block text-sm text-[#abd1c6]">Спасибо за вклад в развитие сообщества</div>
       </div>
       
       <div className="flex flex-col sm:flex-row justify-center items-stretch sm:items-end gap-4 sm:gap-5 md:gap-6 max-w-4xl mx-auto px-2">

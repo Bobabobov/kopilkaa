@@ -6,26 +6,26 @@ import Link from "next/link";
 const benefits = [
   {
     icon: "Trophy",
-    title: "Публичное размещение профиля",
-    description: "Ваш профиль отображается в разделе «Герои» и доступен всем посетителям.",
+    title: "Проект без инвесторов и рекламы",
+    description: "«Копилка» развивается за счёт поддержки сообщества — без инвесторов и навязчивой рекламы.",
     color: "#f9bc60",
   },
   {
     icon: "Share",
-    title: "Социальные ссылки рядом с вами",
-    description: "Привязанные VK/Telegram/YouTube отображаются в «Героях» как часть профиля.",
+    title: "Поддержка помогает реальным людям",
+    description: "Проект самостоятельно распределяет средства между одобренными заявками и поддерживает работу платформы.",
     color: "#abd1c6",
   },
   {
     icon: "BarChart3",
-    title: "Участие в рейтинге",
-    description: "Вы участвуете в рейтинге активности, включая топ‑3 по сумме оплат услуги.",
+    title: "Прозрачность и публичность",
+    description: "Истории и активность проекта видны публично — это помогает сообществу доверять платформе.",
     color: "#e16162",
   },
   {
     icon: "Infinity",
-    title: "Бессрочно, без подписок",
-    description: "Разовая оплата. Никаких автоматических списаний и продлений.",
+    title: "Поддержка — это участие, а не покупка",
+    description: "Никаких обещаний выгоды. Это добровольный вклад в развитие проекта и помощь тем, кому она нужна.",
     color: "#f9bc60",
   },
 ];
@@ -42,10 +42,10 @@ export default function SupportBenefits() {
           className="text-center mb-8 sm:mb-10"
         >
           <h3 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 sm:mb-4" style={{ color: "#fffffe" }}>
-            ✨ Почему это полезно
+            ✨ Почему люди поддерживают «Копилку»
           </h3>
           <p className="text-sm sm:text-base max-w-2xl mx-auto px-2" style={{ color: "#abd1c6" }}>
-            Что меняется после оплаты размещения в разделе «Герои».
+            Коротко о том, почему поддержка важна для проекта и сообщества.
           </p>
         </motion.div>
 
@@ -114,20 +114,20 @@ export default function SupportBenefits() {
           </motion.div>
 
           <h4 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 sm:mb-4" style={{ color: "#fffffe" }}>
-            Посмотрите, как выглядит размещение
+            Посмотрите «Героев проекта»
           </h4>
           
           <p className="text-base sm:text-lg mb-5 sm:mb-6 max-w-2xl mx-auto leading-relaxed px-2" style={{ color: "#abd1c6" }}>
-            Откройте страницу{" "}
+            Это публичная витрина благодарности пользователям, которые поддержали развитие платформы. Откройте страницу{" "}
             <Link 
               href="/heroes" 
               className="font-semibold hover:underline transition-all"
               style={{ color: "#f9bc60" }}
             >
-              «Героев»
+              «Герои проекта»
             </Link>
             {" "}
-            и посмотрите список участников, топ‑3 и отображение профилей.
+            и посмотрите список участников, бейджи и активность сообщества.
           </p>
 
           <Link
@@ -149,7 +149,7 @@ export default function SupportBenefits() {
           className="text-center bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/20 rounded-2xl sm:rounded-3xl p-6 sm:p-7 md:p-8"
         >
           <p className="text-sm sm:text-base md:text-lg mb-4 sm:mb-5 md:mb-6 px-2" style={{ color: "#abd1c6" }}>
-            Хотите сначала заполнить профиль и соцсети? Это поможет вашему публичному размещению.
+            Хотите добавить соцсети и оформить профиль? Они могут отображаться рядом с вами в «Героях проекта».
           </p>
           
           <Link

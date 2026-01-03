@@ -16,9 +16,9 @@ export default function HeroesFilters({
   onSortChange,
 }: HeroesFiltersProps) {
   const sortOptions = [
-    { key: "total", label: "По сумме оплат" },
-    { key: "count", label: "По количеству оплат" },
-    { key: "date", label: "По дате размещения" },
+    { key: "total", label: "По объёму поддержки" },
+    { key: "count", label: "По активности" },
+    { key: "date", label: "По дате участия" },
   ];
 
   return (

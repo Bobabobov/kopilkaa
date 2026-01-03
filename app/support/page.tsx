@@ -6,6 +6,7 @@ import OneTimeSupport from "@/components/support/OneTimeSupport";
 import SupportBenefits from "@/components/support/SupportBenefits";
 import WhatYouGet from "@/components/support/WhatYouGet";
 import HeroBadgesShowcase from "@/components/support/HeroBadgesShowcase";
+import DonateGoal from "@/app/support/_components/DonateGoal";
 
 export default function SupportPage() {
   const [customAmount, setCustomAmount] = useState("");
@@ -59,6 +60,7 @@ export default function SupportPage() {
           customAmount={customAmount}
           onAmountChange={setCustomAmount}
           showSocialPrompt={showSocialPrompt}
+          goalSlot={<DonateGoal />}
         />
 
         <HeroBadgesShowcase />
@@ -70,9 +72,9 @@ export default function SupportPage() {
           <div className="max-w-4xl mx-auto">
             <div className="bg-[#004643]/18 backdrop-blur-sm border border-[#abd1c6]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-5">
               <p className="text-xs sm:text-sm leading-relaxed text-[#abd1c6]/90">
-                Оплата является оплатой цифровых услуг платформы. Оплата не является пожертвованием,
-                благотворительностью или переводом средств другим пользователям. Все решения о работе
-                сервиса принимаются администрацией платформы.
+                Поддержка проекта является добровольной. Она не является инвестицией, пожертвованием конкретным лицам,
+                оплатой услуг, рекламой или финансовым продуктом. Платформа «Копилка» самостоятельно принимает решения
+                о распределении средств.
               </p>
             </div>
           </div>

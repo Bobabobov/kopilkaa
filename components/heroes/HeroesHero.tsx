@@ -26,22 +26,22 @@ export default function HeroesHero() {
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-10 items-center">
             <div className="text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/8 text-[#abd1c6] text-sm border border-white/10">
-                Публичная витрина
+                Сообщество и благодарность
               </div>
 
               <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-bold text-[#fffffe] leading-tight">
                 Герои проекта
-                <span className="block text-[#f9bc60]">публичные профили раздела</span>
+                <span className="block text-[#f9bc60]">публичная витрина поддержки</span>
               </h1>
 
               <p className="mt-4 text-base sm:text-lg md:text-xl leading-relaxed text-[#abd1c6] max-w-2xl">
-                Здесь отображаются пользователи, которые оплатили цифровую услугу размещения профиля
-                в разделе «Герои».
+                Здесь отображаются пользователи, которые <strong className="text-[#fffffe]">добровольно поддержали</strong> развитие платформы.
+                Это форма благодарности и признания участия в проекте.
               </p>
 
               <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs sm:text-sm text-[#abd1c6]/90 leading-relaxed max-w-2xl">
-                Размещение профиля в разделе “Герои” является платной цифровой услугой. Оплата не является
-                пожертвованием, благотворительностью или переводом средств другим пользователям.
+                Участие в разделе «Герои проекта» — знак благодарности со стороны платформы.
+                Поддержка не является финансовой услугой и не предполагает получения вознаграждения или иной выгоды.
               </div>
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
@@ -49,13 +49,13 @@ export default function HeroesHero() {
                   href="/support"
                   className="inline-flex items-center justify-center px-6 sm:px-8 py-3 text-sm sm:text-base font-semibold rounded-full bg-[#f9bc60] text-[#001e1d] hover:bg-[#e8a545] transition-colors"
                 >
-                  Разместиться в разделе “Герои”
+                  Поддержать проект
                 </Link>
                 <a
                   href="#heroes-list"
                   className="inline-flex items-center justify-center px-6 sm:px-8 py-3 text-sm sm:text-base font-semibold rounded-full border border-white/15 bg-white/5 text-[#fffffe] hover:bg-white/10 transition-colors"
                 >
-                  Смотреть рейтинг
+                  Посмотреть героев
                 </a>
               </div>
             </div>
@@ -65,17 +65,17 @@ export default function HeroesHero() {
               <div className="relative rounded-[26px] border border-white/10 bg-white/5 p-6 shadow-[0_18px_50px_rgba(0,0,0,0.35)]">
                 <div className="text-sm text-[#94a1b2]">Быстрый переход</div>
                 <div className="mt-2 text-xl font-semibold text-[#fffffe]">
-                  Оплата → профиль → участие в рейтинге
+                  Поддержка → профиль → «Герои проекта»
                 </div>
                 <div className="mt-3 text-sm text-[#abd1c6] leading-relaxed">
-                  Привяжите соцсети на странице оплаты — они отображаются в карточке профиля в «Героях».
+                  Хотите, чтобы в карточке были соцсети? Добавьте их в профиле — они будут видны в разделе «Герои».
                 </div>
                 <div className="mt-5 flex gap-2">
                   <Link
                     href="/support"
                     className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[#c7d4d0] hover:border-white/20 hover:bg-white/10 transition-colors text-sm font-semibold"
                   >
-                    Страница услуги
+                    Поддержать
                   </Link>
                   <Link
                     href="/"

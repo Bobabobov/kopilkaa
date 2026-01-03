@@ -88,19 +88,24 @@ export default function SupportHero() {
             transition={{ duration: 3, repeat: Infinity }}
             style={{ color: "#fffffe" }}
           >
-            🏆 Размещение в «Героях»
+            💚 Поддержка проекта «Копилка»
             <br />
-            <span style={{ color: "#f9bc60" }}>платформы «Копилка»</span>
+            <span style={{ color: "#f9bc60" }}>добровольно и без обязательств</span>
           </motion.h1>
           
           <p
             className="text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto px-2"
             style={{ color: "#abd1c6" }}
           >
-            Это платная цифровая услуга: разовая оплата и бессрочное размещение вашего профиля в разделе{" "}
-            <span className="text-[#f9bc60] font-semibold">Герои проекта</span>.
-            {" "}
-            Профиль отображается публично и участвует в рейтинге активности.
+            «Копилка» — независимая платформа, которая благодаря поддержке пользователей помогает людям в сложных жизненных ситуациях.
+            Проект самостоятельно распределяет средства между одобренными заявками.
+          </p>
+          <p
+            className="text-sm sm:text-base mb-7 sm:mb-9 leading-relaxed max-w-2xl mx-auto px-2"
+            style={{ color: "#abd1c6" }}
+          >
+            Поддержка добровольная. Это не инвестиция и не финансовая услуга. Средства направляются на работу платформы и формирование
+            фонда помощи. В знак благодарности ваш профиль может быть публично отображён в разделе «Герои проекта».
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-4xl mx-auto">
@@ -111,7 +116,7 @@ export default function SupportHero() {
               <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: "#f9bc60" }}>
                 {loading ? "0" : <AnimatedNumber value={stats.approved} />}
               </div>
-              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Одобрено историй</div>
+              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Одобрено заявок</div>
             </motion.div>
             
             <motion.div
@@ -121,7 +126,7 @@ export default function SupportHero() {
               <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: "#f9bc60" }}>
                 {loading ? "0" : <AnimatedNumber value={stats.supporters} />}
               </div>
-              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Участников в «Героях»</div>
+              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Поддержали проект</div>
             </motion.div>
 
             <motion.div
@@ -136,7 +141,7 @@ export default function SupportHero() {
                   </span>
                 )}
               </div>
-              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Баланс платформы</div>
+              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Баланс проекта</div>
             </motion.div>
           </div>
         </motion.div>

@@ -30,9 +30,8 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           className="text-5xl md:text-7xl font-bold mb-6"
           style={{ color: "#fffffe" }}
         >
-          Нужны деньги и неоткуда взять?
-          <br />
-          <span style={{ color: "#f9bc60" }}>Расскажите свою историю</span>
+          Расскажи свою историю —{" "}
+          <span style={{ color: "#f9bc60" }}>получи возможность получить деньги</span>
         </h1>
 
         {/* Описание */}

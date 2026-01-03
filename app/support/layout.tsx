@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru").replace(/\/$/, "");
+const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka-online.ru/").replace(/\/$/, "");
 
 export const metadata: Metadata = {
   title: "Поддержать проект",

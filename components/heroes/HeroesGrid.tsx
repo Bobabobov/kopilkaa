@@ -194,7 +194,7 @@ export default function HeroesGrid({
                   </div>
                   {(hero.hasExtendedPlacement ?? hero.isSubscriber) && (
                     <span className="inline-flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full whitespace-nowrap flex-shrink-0 border border-[#f9bc60]/30 bg-[#f9bc60]/10 text-[#f9bc60]">
-                      <LucideIcons.Sparkles size="sm" />
+                      <LucideIcons.Star size="sm" />
                       Активный участник
                     </span>
                   )}

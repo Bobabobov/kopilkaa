@@ -14,28 +14,31 @@ type Stats = {
 const getStats = cache(async (): Promise<Stats> => {
   try {
     // Получаем статистику напрямую из БД (быстрее чем через API)
-    const [applicationsStats, totalUsers, donations] = await Promise.all([
+    const [applicationsStats, totalUsers, donationSums] = await Promise.all([
       prisma.application.groupBy({
         by: ["status"],
         _count: { status: true },
       }).catch(() => []),
       prisma.user.count().catch(() => 0),
-      prisma.donation.findMany({
-        select: { type: true, amount: true },
-      }).catch(() => []),
+      prisma.donation
+        .groupBy({
+          by: ["type"],
+          _sum: { amount: true },
+        })
+        .catch(() => []),
     ]);
 
-    const totalSupport = donations
-      .filter((d) => d.type === "SUPPORT")
-      .reduce((sum, d) => sum + d.amount, 0);
+    const sumByType = new Map<string, number>();
+    donationSums.forEach((row: any) => {
+      const t = String(row?.type ?? "");
+      const v = Number(row?._sum?.amount ?? 0);
+      if (!t) return;
+      sumByType.set(t, v);
+    });
 
-    const totalPayout = donations
-      .filter((d) => d.type === "PAYOUT")
-      .reduce((sum, d) => sum + d.amount, 0);
-
-    const totalAdjust = donations
-      .filter((d) => d.type === "ADJUST")
-      .reduce((sum, d) => sum + d.amount, 0);
+    const totalSupport = sumByType.get("SUPPORT") ?? 0;
+    const totalPayout = sumByType.get("PAYOUT") ?? 0;
+    const totalAdjust = sumByType.get("ADJUST") ?? 0;
 
     const balance = totalSupport - totalPayout + totalAdjust;
 

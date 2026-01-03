@@ -1,59 +1,77 @@
 // app/api/top-donors/route.ts
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { getSafeExternalUrl } from "@/lib/safeExternalUrl";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
   try {
-    // Берём только реальные донаты из таблицы Donation (type = SUPPORT)
-    const usersWithDonations = await prisma.user
-      .findMany({
-        where: {
-          donations: {
-            some: {
-              type: "SUPPORT",
-            },
+    // Топ считаем агрегацией в БД (не грузим все донаты/пользователей целиком)
+    const aggregates = await prisma.donation
+      .groupBy({
+        by: ["userId"],
+        where: { type: "SUPPORT" },
+        _sum: { amount: true },
+        orderBy: { _sum: { amount: "desc" } },
+      })
+      .catch(() => []);
+
+    const topAggs = aggregates
+      .filter((a: any) => typeof a.userId === "string" && a.userId.length > 0)
+      .slice(0, 3) as { userId: string; _sum: { amount: number | null } }[];
+
+    if (!topAggs.length) {
+      return NextResponse.json(
+        { success: true, donors: [] },
+        {
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
           },
         },
+      );
+    }
+
+    const userIds = topAggs.map((a) => a.userId);
+    const users = await prisma.user
+      .findMany({
+        where: { id: { in: userIds } },
         select: {
           id: true,
           name: true,
           email: true,
+          hideEmail: true,
           avatar: true,
           vkLink: true,
           telegramLink: true,
           youtubeLink: true,
-          donations: {
-            where: { type: "SUPPORT" },
-            select: { amount: true },
-          },
         },
       })
       .catch(() => []);
+    const byId = new Map(users.map((u) => [u.id, u]));
 
-    // Считаем сумму донатов по каждому пользователю
-    const donors = usersWithDonations
-      .map((user) => {
-        const totalAmount = user.donations.reduce(
-          (sum, d) => sum + d.amount,
-          0,
-        );
+    const donors = topAggs
+      .map((agg) => {
+        const user = byId.get(agg.userId);
+        if (!user) return null;
+        const totalAmount = agg._sum.amount ?? 0;
+        const fallbackName =
+          !user.hideEmail && user.email ? user.email.split("@")[0] : "Пользователь";
         return {
           id: user.id,
-          name: user.name || (user.email ? user.email.split("@")[0] : "Пользователь"),
-          email: user.email,
+          name: user.name || fallbackName,
+          email: user.email || "",
           avatar: user.avatar,
-          vkLink: user.vkLink,
-          telegramLink: user.telegramLink,
-          youtubeLink: user.youtubeLink,
+          vkLink: getSafeExternalUrl(user.vkLink),
+          telegramLink: getSafeExternalUrl(user.telegramLink),
+          youtubeLink: getSafeExternalUrl(user.youtubeLink),
           totalAmount,
         };
       })
-      .filter((donor) => donor.totalAmount > 0)
-      .sort((a, b) => b.totalAmount - a.totalAmount)
-      .slice(0, 3);
+      .filter(Boolean) as any[];
 
     return NextResponse.json(
       {

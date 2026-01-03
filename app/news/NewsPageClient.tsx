@@ -44,15 +44,23 @@ function getPostWord(count: number): string {
   return "постов";
 }
 
-export default function NewsPageClient() {
-  const [items, setItems] = useState<NewsItem[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function NewsPageClient({
+  initialItems = [],
+  initialNextCursor = null,
+  initialLastUpdatedAt = null,
+}: {
+  initialItems?: NewsItem[];
+  initialNextCursor?: string | null;
+  initialLastUpdatedAt?: string | null;
+}) {
+  const [items, setItems] = useState<NewsItem[]>(() => initialItems);
+  const [nextCursor, setNextCursor] = useState<string | null>(() => initialNextCursor);
+  const [loading, setLoading] = useState(() => initialItems.length === 0);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<NewsSort>("new");
-  const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(initialLastUpdatedAt);
 
   const fetchPage = useCallback(async (cursor?: string | null) => {
     const url = new URL("/api/news", window.location.origin);
@@ -97,8 +105,9 @@ export default function NewsPageClient() {
   }, [fetchPage, nextCursor, loadingMore]);
 
   useEffect(() => {
+    if (initialItems.length > 0) return;
     load();
-  }, [load]);
+  }, [load, initialItems.length]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

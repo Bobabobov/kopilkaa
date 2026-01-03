@@ -62,7 +62,7 @@ export async function GET(request: Request) {
       );
     }
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       {
         items: page.map((p) => ({
           id: p.id,
@@ -79,14 +79,21 @@ export async function GET(request: Request) {
         })),
         nextCursor,
       },
-      {
-        headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      },
     );
+
+    // Кэширование:
+    // - для авторизованных response персонализирован (myReaction), поэтому private/no-store
+    // - для неавторизованных можно кэшировать коротко, чтобы разгрузить БД
+    res.headers.set("Vary", "Cookie");
+    if (session?.uid) {
+      res.headers.set("Cache-Control", "private, no-store, must-revalidate");
+      res.headers.set("Pragma", "no-cache");
+      res.headers.set("Expires", "0");
+    } else {
+      res.headers.set("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
+    }
+
+    return res;
   } catch (error) {
     console.error("GET /api/news error:", error);
     return NextResponse.json({ error: "Ошибка загрузки новостей" }, { status: 500 });

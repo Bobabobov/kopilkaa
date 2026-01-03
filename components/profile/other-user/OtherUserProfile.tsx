@@ -18,6 +18,7 @@ import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 type User = {
   id: string;
   email: string | null;
+  username?: string | null;
   role: "USER" | "ADMIN";
   name?: string | null;
   createdAt: string;
@@ -52,6 +53,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [resolvedUserId, setResolvedUserId] = useState<string | null>(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
 
@@ -86,7 +88,8 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   useEffect(() => {
     const handleOpenReportModal = (event: Event) => {
       const customEvent = event as CustomEvent<{ userId: string }>;
-      if (customEvent.detail?.userId === userId) {
+      const targetId = resolvedUserId || user?.id || null;
+      if (targetId && customEvent.detail?.userId === targetId) {
         setIsReportModalOpen(true);
       }
     };
@@ -95,10 +98,11 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     return () => {
       window.removeEventListener("open-report-user-modal", handleOpenReportModal);
     };
-  }, [userId]);
+  }, [resolvedUserId, user?.id]);
 
   const fetchFriendshipStatus = useCallback(async () => {
     try {
+      if (!resolvedUserId) return;
       const friendshipResponse = await fetch(`/api/profile/friends?type=all`, {
         cache: "no-store",
       });
@@ -106,14 +110,14 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
         const friendshipData = await friendshipResponse.json();
         const userFriendship = friendshipData.friendships.find(
           (f: Friendship) =>
-            f.requesterId === userId || f.receiverId === userId,
+            f.requesterId === resolvedUserId || f.receiverId === resolvedUserId,
         );
         setFriendship(userFriendship || null);
       }
     } catch (error) {
       console.error("Load friendship data error:", error);
     }
-  }, [userId]);
+  }, [resolvedUserId]);
 
   // Загрузка данных пользователя
   useEffect(() => {
@@ -130,6 +134,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
         if (userResponse.ok) {
           const userData = await userResponse.json();
           setUser(userData.user);
+          setResolvedUserId(userData?.user?.id ?? null);
         } else if (userResponse.status === 404) {
           // Пользователь не найден (возможно удален)
           setUser(null);
@@ -138,9 +143,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
           console.error("User not found");
           return;
         }
-
-        // Загружаем статус дружбы
-        await fetchFriendshipStatus();
       } catch (error) {
         console.error("Load user data error:", error);
       } finally {
@@ -149,15 +151,22 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     };
 
     loadUserData();
-  }, [isAuthenticated, userId, fetchFriendshipStatus]);
+  }, [isAuthenticated, userId]);
+
+  // Загружаем статус дружбы после того, как знаем реальный userId
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    if (!resolvedUserId) return;
+    fetchFriendshipStatus();
+  }, [isAuthenticated, resolvedUserId, fetchFriendshipStatus]);
 
   // Проверка, является ли пользователь владельцем профиля
   useEffect(() => {
-    if (currentUserId && userId && currentUserId === userId) {
+    if (currentUserId && resolvedUserId && currentUserId === resolvedUserId) {
       // Перенаправляем на собственный профиль
       router.push("/profile");
     }
-  }, [currentUserId, userId, router]);
+  }, [currentUserId, resolvedUserId, router]);
 
   const sendFriendRequest = async () => {
     if (!user) return;
@@ -439,21 +448,21 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
 
           {/* Общие друзья (если есть) */}
           <div className="mb-4 sm:mb-6">
-            <MutualFriends userId={userId} />
+            <MutualFriends userId={resolvedUserId || user.id} />
           </div>
 
           {/* Основной контент */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 md:gap-6">
             {/* Левая колонка */}
             <section className="lg:col-span-7 space-y-4 sm:space-y-5 md:space-y-6">
-              <OtherUserPersonalStats userId={userId} />
-              <OtherUserAchievements userId={userId} />
+              <OtherUserPersonalStats userId={resolvedUserId || user.id} />
+              <OtherUserAchievements userId={resolvedUserId || user.id} />
             </section>
 
             {/* Правая колонка */}
             <aside className="lg:col-span-5 space-y-4 sm:space-y-5 md:space-y-6">
-              <OtherUserDonations userId={userId} />
-              <OtherUserActivity userId={userId} />
+              <OtherUserDonations userId={resolvedUserId || user.id} />
+              <OtherUserActivity userId={resolvedUserId || user.id} />
             </aside>
           </div>
         </div>
@@ -466,7 +475,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
       <ReportUserModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
-        userId={userId}
+        userId={resolvedUserId || user.id}
         userName={user.name}
       />
     </div>

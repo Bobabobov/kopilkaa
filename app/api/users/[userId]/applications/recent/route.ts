@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
 export async function GET(
   request: Request,
@@ -12,7 +13,11 @@ export async function GET(
       return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
     }
 
-    const { userId: otherUserId } = await params;
+    const { userId: identifier } = await params;
+    const otherUserId = await resolveUserIdFromIdentifier(identifier);
+    if (!otherUserId) {
+      return NextResponse.json({ message: "Пользователь не найден" }, { status: 404 });
+    }
 
     // Получаем только первые 3 одобренные заявки
     const apps = await prisma.application.findMany({

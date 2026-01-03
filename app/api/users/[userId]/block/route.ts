@@ -2,6 +2,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
 export async function POST(
   request: Request,
@@ -13,8 +14,16 @@ export async function POST(
   }
 
   try {
-    const { userId } = await params;
-    console.log("=== POST /api/users/[userId]/block ===", { userId });
+    const { userId: identifier } = await params;
+    console.log("=== POST /api/users/[userId]/block ===", { userId: identifier });
+
+    const userId = await resolveUserIdFromIdentifier(identifier);
+    if (!userId) {
+      return NextResponse.json(
+        { message: "Пользователь не найден" },
+        { status: 404 },
+      );
+    }
 
     if (!userId || userId === session.uid) {
       return NextResponse.json(
@@ -23,18 +32,7 @@ export async function POST(
       );
     }
 
-    // Проверяем, существует ли пользователь
-    const targetUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true },
-    });
-
-    if (!targetUser) {
-      return NextResponse.json(
-        { message: "Пользователь не найден" },
-        { status: 404 },
-      );
-    }
+    // resolveUserIdFromIdentifier уже проверил существование пользователя
 
     // Ищем существующую связь между пользователями
     const existingFriendship = await prisma.friendship.findFirst({

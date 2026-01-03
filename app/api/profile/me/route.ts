@@ -5,6 +5,42 @@ import { checkUserBan } from "@/lib/ban-check";
 
 type SocialLinkType = "vk" | "telegram" | "youtube";
 
+function normalizeUsername(raw: string): string {
+  return raw.trim().replace(/^@+/, "").toLowerCase();
+}
+
+function validateUsernameOrThrow(raw: string): string {
+  const normalized = normalizeUsername(raw);
+  const usernamePattern = /^[\p{L}\p{N}._-]{3,20}$/u;
+  if (!normalized) {
+    throw new Error("Придумайте логин");
+  }
+  if (!usernamePattern.test(normalized)) {
+    throw new Error("Логин может содержать 3-20 символов: буквы, цифры, ._-");
+  }
+  if (!/^[\p{L}\p{N}]/u.test(normalized) || !/[\p{L}\p{N}]$/u.test(normalized)) {
+    throw new Error("Логин должен начинаться и заканчиваться буквой или цифрой");
+  }
+  const reserved = new Set([
+    "me",
+    "admin",
+    "api",
+    "support",
+    "heroes",
+    "terms",
+    "login",
+    "register",
+    "settings",
+    "friends",
+    "reports",
+    "applications",
+  ]);
+  if (reserved.has(normalized)) {
+    throw new Error("Этот логин зарезервирован");
+  }
+  return normalized;
+}
+
 function sanitizeSocialLink(value: unknown, type: SocialLinkType): string | null {
   if (value === null) {
     return null;
@@ -127,6 +163,7 @@ export async function GET() {
       select: {
         id: true,
         email: true,
+        username: true,
         role: true,
         createdAt: true,
         name: true,
@@ -203,7 +240,7 @@ export async function PATCH(req: Request) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const { name, email, hideEmail, vkLink, telegramLink, youtubeLink } = body;
+    const { username, name, email, hideEmail, vkLink, telegramLink, youtubeLink } = body;
 
     // Валидация
     if (name !== undefined && (typeof name !== "string" || name.length > 100)) {
@@ -249,6 +286,36 @@ export async function PATCH(req: Request) {
     }
 
     const updateData: Record<string, any> = {};
+    if (username !== undefined) {
+      if (typeof username !== "string") {
+        return Response.json({ error: "Логин должен быть строкой" }, { status: 400 });
+      }
+      let normalizedUsername: string;
+      try {
+        normalizedUsername = validateUsernameOrThrow(username);
+      } catch (error) {
+        return Response.json(
+          { error: error instanceof Error ? error.message : "Некорректный логин" },
+          { status: 400 },
+        );
+      }
+
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          username: normalizedUsername,
+          id: { not: session.uid },
+        },
+        select: { id: true },
+      });
+      if (existingUser) {
+        return Response.json(
+          { error: "Этот логин уже занят" },
+          { status: 409 },
+        );
+      }
+
+      updateData.username = normalizedUsername;
+    }
     if (name !== undefined) {
       updateData.name = name.trim() || null;
     }
@@ -311,6 +378,7 @@ export async function PATCH(req: Request) {
       select: {
         id: true,
         email: true,
+        username: true,
         role: true,
         createdAt: true,
         name: true,

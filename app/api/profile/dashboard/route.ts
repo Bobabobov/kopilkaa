@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           email: true,
+          username: true,
           role: true,
           name: true,
           avatar: true,
@@ -60,6 +61,7 @@ export async function GET(request: NextRequest) {
           requester: {
             select: {
               id: true,
+              username: true,
               name: true,
               email: true,
               avatar: true,
@@ -76,6 +78,7 @@ export async function GET(request: NextRequest) {
           receiver: {
             select: {
               id: true,
+              username: true,
               name: true,
               email: true,
               avatar: true,
@@ -103,6 +106,7 @@ export async function GET(request: NextRequest) {
           requester: {
             select: {
               id: true,
+              username: true,
               name: true,
               email: true,
               avatar: true,
@@ -160,6 +164,7 @@ export async function GET(request: NextRequest) {
           user: {
             select: {
               id: true,
+              username: true,
               name: true,
               email: true,
               avatar: true,
@@ -275,6 +280,7 @@ export async function GET(request: NextRequest) {
       userId,
       user: {
         name: user.name ?? "",
+        username: user.username ?? "",
         avatar: user.avatar ?? "",
         headerTheme: user.headerTheme ?? "",
         avatarFrame: user.avatarFrame ?? "",

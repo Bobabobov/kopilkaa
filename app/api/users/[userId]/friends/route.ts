@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { getHeroBadgesForUsers } from "@/lib/heroBadges";
+import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
 interface RouteParams {
   params: {
@@ -12,9 +13,9 @@ interface RouteParams {
 }
 
 export async function GET(_req: Request, { params }: RouteParams) {
-  const { userId } = params;
+  const { userId: identifier } = params;
 
-  if (!userId) {
+  if (!identifier) {
     return NextResponse.json(
       { error: "Не указан идентификатор пользователя" },
       { status: 400 },
@@ -24,6 +25,11 @@ export async function GET(_req: Request, { params }: RouteParams) {
   try {
     const session = await getSession();
     const viewerId = session?.uid ?? "";
+
+    const userId = await resolveUserIdFromIdentifier(identifier);
+    if (!userId) {
+      return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
+    }
 
     const friendships = await prisma.friendship.findMany({
       where: {

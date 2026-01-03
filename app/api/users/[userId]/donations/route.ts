@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -16,11 +17,15 @@ export async function GET(
     }
 
     const { userId } = await params;
+    const resolvedUserId = await resolveUserIdFromIdentifier(userId);
+    if (!resolvedUserId) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     // Получаем пожертвования пользователя
     const donations = await prisma.donation.findMany({
       where: {
-        userId: userId,
+        userId: resolvedUserId,
         type: "SUPPORT", // Только входящие пожертвования
       },
       orderBy: {
@@ -32,7 +37,7 @@ export async function GET(
     // Получаем общую статистику (все пожертвования пользователя)
     const allDonations = await prisma.donation.findMany({
       where: {
-        userId: userId,
+        userId: resolvedUserId,
         type: "SUPPORT",
       },
       select: {

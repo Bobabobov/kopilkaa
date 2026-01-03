@@ -63,22 +63,35 @@ export async function GET(request: Request) {
       );
     }
 
-    const users = await prisma.user
-      .findMany({
-        where: { id: { in: userIds } },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          hideEmail: true,
-          avatar: true,
-          createdAt: true,
-          vkLink: true,
-          telegramLink: true,
-          youtubeLink: true,
-        },
-      })
-      .catch(() => []);
+    const userSelect = {
+      id: true,
+      name: true,
+      email: true,
+      hideEmail: true,
+      avatar: true,
+      createdAt: true,
+      vkLink: true,
+      telegramLink: true,
+      youtubeLink: true,
+    } as const;
+
+    // ВАЖНО: hideFromHeroes добавлен позже миграцией. Если на окружении миграция ещё не применена,
+    // Prisma упадёт на where: { hideFromHeroes: false }. Чтобы /heroes не становилась пустой,
+    // делаем fallback запрос без фильтра.
+    let users: any[] = [];
+    try {
+      users = await prisma.user.findMany({
+        where: { id: { in: userIds }, hideFromHeroes: false },
+        select: userSelect,
+      });
+    } catch {
+      users = await prisma.user
+        .findMany({
+          where: { id: { in: userIds } },
+          select: userSelect,
+        })
+        .catch(() => []);
+    }
 
     const heroBadges = await getHeroBadgesForUsers(userIds);
 

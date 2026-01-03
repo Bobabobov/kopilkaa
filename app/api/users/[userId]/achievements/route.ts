@@ -1,6 +1,7 @@
 // app/api/users/[userId]/achievements/route.ts
 import { NextResponse } from "next/server";
 import { AchievementService } from "@/lib/achievements/service";
+import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
 interface RouteParams {
   params: {
@@ -11,12 +12,20 @@ interface RouteParams {
 // Получить достижения и статистику достижений произвольного пользователя
 export async function GET(_req: Request, { params }: RouteParams) {
   try {
-    const userId = params.userId;
+    const identifier = params.userId;
 
-    if (!userId) {
+    if (!identifier) {
       return NextResponse.json(
         { error: "Не указан идентификатор пользователя" },
         { status: 400 },
+      );
+    }
+
+    const userId = await resolveUserIdFromIdentifier(identifier);
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Пользователь не найден" },
+        { status: 404 },
       );
     }
 

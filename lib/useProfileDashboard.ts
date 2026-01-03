@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 interface User {
   id: string;
   email: string | null;
+  username?: string | null;
   role: "USER" | "ADMIN";
   name?: string | null;
   avatar?: string | null;
@@ -59,6 +60,7 @@ interface Notification {
   type: string;
   user: {
     id: string;
+    username?: string | null;
     name?: string | null;
     email: string;
     avatar?: string | null;

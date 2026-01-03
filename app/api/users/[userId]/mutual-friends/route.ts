@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { getHeroBadgesForUsers } from "@/lib/heroBadges";
+import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
 export async function GET(
   _request: Request,
@@ -14,14 +15,19 @@ export async function GET(
       return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
     }
 
-    const otherUserId = params.userId;
+    const otherUserIdParam = params.userId;
     const me = session.uid;
 
-    if (!otherUserId || otherUserId === "me") {
+    if (!otherUserIdParam || otherUserIdParam === "me") {
       return NextResponse.json(
         { message: "Некорректный ID пользователя" },
         { status: 400 },
       );
+    }
+
+    const otherUserId = await resolveUserIdFromIdentifier(otherUserIdParam);
+    if (!otherUserId) {
+      return NextResponse.json({ message: "Пользователь не найден" }, { status: 404 });
     }
 
     // Друзья текущего пользователя

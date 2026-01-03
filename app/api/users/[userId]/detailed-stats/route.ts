@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -15,7 +16,11 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { userId } = await params;
+    const { userId: identifier } = await params;
+    const userId = await resolveUserIdFromIdentifier(identifier);
+    if (!userId) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     // Инициализируем переменные с безопасными значениями по умолчанию
     let applications: any[] = [];

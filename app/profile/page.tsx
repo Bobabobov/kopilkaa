@@ -176,6 +176,7 @@ const SettingsModal = dynamicComponent(
 type User = {
   id: string;
   email: string;
+  username?: string | null;
   role: "USER" | "ADMIN";
   name?: string | null;
   createdAt: string;

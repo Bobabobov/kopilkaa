@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 type User = {
   id: string;
   email: string;
+  username?: string | null;
   role: "USER" | "ADMIN";
   name?: string | null;
   createdAt: string;
@@ -47,6 +48,7 @@ interface UseSettingsReturn {
 
   // Действия
   loadUser: () => Promise<void>;
+  handleUsernameChange: (newUsername: string) => Promise<void>;
   handleNameChange: (newName: string) => Promise<void>;
   handleEmailChange: (newEmail: string) => Promise<void>;
   handleEmailVisibilityChange: (hideEmail: boolean) => Promise<void>;
@@ -160,6 +162,45 @@ export function useSettings(): UseSettingsReturn {
           "error",
           "Ошибка",
           "Произошла ошибка при обновлении имени",
+        );
+      } finally {
+        setSaving(false);
+      }
+    },
+    [showLocalNotification],
+  );
+
+  // Изменение username
+  const handleUsernameChange = useCallback(
+    async (newUsername: string) => {
+      try {
+        setSaving(true);
+        const response = await fetch("/api/profile/me", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: newUsername }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+          showLocalNotification("success", "Успешно!", "Логин обновлён");
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          showLocalNotification(
+            "error",
+            "Ошибка",
+            errorData.error || errorData.message || "Не удалось обновить логин",
+          );
+        }
+      } catch (error) {
+        console.error("Error updating username:", error);
+        showLocalNotification(
+          "error",
+          "Ошибка",
+          "Произошла ошибка при обновлении логина",
         );
       } finally {
         setSaving(false);
@@ -578,6 +619,7 @@ export function useSettings(): UseSettingsReturn {
 
     // Действия
     loadUser,
+    handleUsernameChange,
     handleNameChange,
     handleEmailChange,
     handleEmailVisibilityChange,

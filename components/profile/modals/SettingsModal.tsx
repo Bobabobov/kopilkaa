@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSettings } from "../hooks/useSettings";
-import { EmailEditor, NameEditor, EmailVisibilityToggle, SocialLinkEditor } from "../settings/ProfileEditors";
+import { EmailEditor, NameEditor, UsernameEditor, EmailVisibilityToggle, SocialLinkEditor } from "../settings/ProfileEditors";
 import {
   SettingsLoading,
   SettingsUnauthorized,
@@ -13,6 +13,7 @@ import {
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
+import { getPublicProfilePath } from "@/lib/profileUrl";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -44,6 +45,42 @@ function ReadOnlyField({ label, value }: { label: string; value: string }) {
   );
 }
 
+function CopyField({
+  label,
+  value,
+  copyValue,
+  onCopy,
+  disabled,
+}: {
+  label: string;
+  value: string;
+  copyValue: string;
+  onCopy: (text: string) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">
+        {label}
+      </label>
+      <div className="flex items-center gap-2">
+        <div className="flex-1 px-4 py-3 bg-[#001e1d]/20 rounded-xl text-[#abd1c6] border border-[#abd1c6]/20 overflow-hidden">
+          <span className="text-[#fffffe] break-all">{value}</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => onCopy(copyValue)}
+          disabled={disabled}
+          className="px-4 py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors inline-flex items-center gap-2"
+        >
+          <LucideIcons.Copy size="sm" />
+          <span className="hidden sm:inline">Скопировать</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [mounted, setMounted] = useState(false);
   const { ToastComponent } = useBeautifulToast();
@@ -64,13 +101,24 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     localNotification,
 
     // Действия
+    handleUsernameChange,
     handleNameChange,
     handleEmailChange,
     handleEmailVisibilityChange,
     handleSocialLinkChange,
     handleAvatarUpload,
     handleAvatarDelete,
+    showLocalNotification,
   } = useSettings();
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      showLocalNotification("success", "Скопировано", "Данные скопированы в буфер обмена");
+    } catch {
+      showLocalNotification("error", "Ошибка", "Не удалось скопировать");
+    }
+  };
 
   // Монтирование для Portal
   useEffect(() => {
@@ -366,6 +414,15 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   />
                 </SettingsSection>
 
+                {/* Логин */}
+                <SettingsSection title="Логин">
+                  <UsernameEditor
+                    currentUsername={user.username ?? null}
+                    onSave={handleUsernameChange}
+                    disabled={saving}
+                  />
+                </SettingsSection>
+
                 {/* Email */}
                 <SettingsSection title="Email">
                   <EmailEditor
@@ -411,6 +468,33 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   />
                 </div>
               </SettingsSection>
+
+              {/* ID профиля */}
+              <CopyField
+                label="Технический ID"
+                value={user.id}
+                copyValue={user.id}
+                onCopy={handleCopy}
+                disabled={saving}
+              />
+
+              {/* Ссылка на профиль */}
+              {(() => {
+                const path = getPublicProfilePath(user);
+                const url =
+                  typeof window !== "undefined" && window.location?.origin
+                    ? `${window.location.origin}${path}`
+                    : `https://kopilka-online.ru${path}`;
+                return (
+              <CopyField
+                label="Ссылка на профиль"
+                value={url}
+                copyValue={url}
+                onCopy={handleCopy}
+                disabled={saving}
+              />
+                );
+              })()}
 
                 {/* Дата регистрации */}
                 <ReadOnlyField

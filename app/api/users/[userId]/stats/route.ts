@@ -2,6 +2,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
 export const dynamic = 'force-dynamic';
 
@@ -15,18 +16,10 @@ export async function GET(
   }
 
   try {
-    const { userId } = await params;
-    
-    // Проверяем, что пользователь существует
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "Пользователь не найден" },
-        { status: 404 },
-      );
+    const { userId: identifier } = await params;
+    const userId = await resolveUserIdFromIdentifier(identifier);
+    if (!userId) {
+      return NextResponse.json({ message: "Пользователь не найден" }, { status: 404 });
     }
 
     // Получаем статистику пользователя

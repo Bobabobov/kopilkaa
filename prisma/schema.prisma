@@ -55,6 +55,8 @@ model User {
   // Ручной override для уникального HERO_BADGE (используется только для оплат > 5000).
   // Примеры значений: "custom" (или любое непустое значение как флаг).
   heroBadgeOverride   String?
+  // Если true — пользователь скрыт из витрины /heroes (история поддержек не удаляется).
+  hideFromHeroes      Boolean   @default(false)
   hideEmail           Boolean   @default(true) // Скрывать email в профиле по умолчанию
   role                String    @default("USER")
   createdAt           DateTime  @default(now())

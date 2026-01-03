@@ -6,7 +6,6 @@ import OneTimeSupport from "@/components/support/OneTimeSupport";
 import SupportBenefits from "@/components/support/SupportBenefits";
 import WhatYouGet from "@/components/support/WhatYouGet";
 import HeroBadgesShowcase from "@/components/support/HeroBadgesShowcase";
-import DonateGoal from "@/app/support/_components/DonateGoal";
 
 export default function SupportPage() {
   const [customAmount, setCustomAmount] = useState("");
@@ -60,7 +59,6 @@ export default function SupportPage() {
           customAmount={customAmount}
           onAmountChange={setCustomAmount}
           showSocialPrompt={showSocialPrompt}
-          goalSlot={<DonateGoal />}
         />
 
         <HeroBadgesShowcase />

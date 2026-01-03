@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { getHeroBadgeForUser } from "@/lib/heroBadges";
+import { isUsernameIdentifier } from "@/lib/userResolve";
 
 export async function GET(
   request: Request,
@@ -15,30 +16,43 @@ export async function GET(
   }
 
   try {
-    const { userId } = await params;
-    console.log("=== GET /api/users/[userId] ===", { userId });
-    
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        avatar: true,
-        headerTheme: true,
-        avatarFrame: true,
-        hideEmail: true,
-        vkLink: true,
-        telegramLink: true,
-        youtubeLink: true,
-        lastSeen: true,
-        createdAt: true,
-        role: true,
-        isBanned: true,
-        bannedUntil: true,
-        bannedReason: true,
-      },
-    });
+    const { userId: identifier } = await params;
+    console.log("=== GET /api/users/[userId] ===", { userId: identifier });
+
+    const normalized = String(identifier ?? "").trim();
+    if (!normalized) {
+      return NextResponse.json({ message: "Пользователь не найден" }, { status: 404 });
+    }
+
+    const baseSelect = {
+      id: true,
+      username: true,
+      email: true,
+      name: true,
+      avatar: true,
+      headerTheme: true,
+      avatarFrame: true,
+      hideEmail: true,
+      vkLink: true,
+      telegramLink: true,
+      youtubeLink: true,
+      lastSeen: true,
+      createdAt: true,
+      role: true,
+      isBanned: true,
+      bannedUntil: true,
+      bannedReason: true,
+    } as const;
+
+    const user = isUsernameIdentifier(normalized)
+      ? await prisma.user.findUnique({
+          where: { username: normalized.slice(1).trim().toLowerCase() },
+          select: baseSelect,
+        })
+      : await prisma.user.findUnique({
+          where: { id: normalized },
+          select: baseSelect,
+        });
 
     if (!user) {
       return NextResponse.json(

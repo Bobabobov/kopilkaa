@@ -1,14 +1,16 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import Image from "next/image";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 
 interface OneTimeSupportProps {
   customAmount: string;
   onAmountChange: (amount: string) => void;
   showSocialPrompt?: boolean;
-  goalSlot?: ReactNode;
 }
 
 const predefinedAmounts = [100, 300, 500, 1000, 2000, 5000];
@@ -17,47 +19,257 @@ export default function OneTimeSupport({
   customAmount,
   onAmountChange,
   showSocialPrompt,
-  goalSlot,
 }: OneTimeSupportProps) {
-  const [loading, setLoading] = useState(false);
-  const [resultMessage, setResultMessage] = useState<string | null>(null);
-  const [resultError, setResultError] = useState<string | null>(null);
+  const amountNumber = parseInt(customAmount || "0", 10);
+  const hasAmount = !!amountNumber && amountNumber > 0;
+  const [isPreSupportOpen, setIsPreSupportOpen] = useState(false);
+  const [profile, setProfile] = useState<{ username: string | null; isAuthed: boolean } | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  const handlePurchase = async () => {
-    const amountNumber = parseInt(customAmount || "0", 10);
-    if (!amountNumber || amountNumber <= 0) return;
+  const dalinkUrl = "https://dalink.to/kopilkaonline";
+  const suggestedTag = useMemo(
+    () => (profile?.username ? `@${profile.username}` : "@username"),
+    [profile?.username],
+  );
 
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isPreSupportOpen) return;
+
+    // soft scroll lock: lock background but allow scrolling inside modal
+    const scrollY = window.scrollY;
+    const originalOverflow = document.body.style.overflow;
+    const originalPosition = document.body.style.position;
+    const originalTop = document.body.style.top;
+    const originalWidth = document.body.style.width;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+    document.documentElement.style.overflow = "hidden";
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsPreSupportOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = originalOverflow;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.width = originalWidth;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [isPreSupportOpen]);
+
+  async function ensureProfileLoaded() {
+    if (profile !== null || isLoadingProfile) return;
     try {
-      setLoading(true);
-      setResultMessage(null);
-      setResultError(null);
-
-      const response = await fetch("/api/donations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: amountNumber,
-          // Сохраняем тип как SUPPORT (существующая бизнес-логика/данные).
-          type: "SUPPORT",
-          comment: "project_support",
-        }),
-      });
-
-      const data = await response.json().catch(() => null);
-      if (!response.ok || !data?.success) {
-        throw new Error(data?.error || "Не удалось отправить поддержку");
+      setIsLoadingProfile(true);
+      const res = await fetch("/api/profile/me", { cache: "no-store" });
+      if (!res.ok) {
+        setProfile({ username: null, isAuthed: false });
+        return;
       }
-
-      setResultMessage(
-        "Спасибо за поддержку проекта «Копилка». Вы помогаете платформе продолжать работу и оказывать помощь.",
-      );
-    } catch (error) {
-      console.error("Project support error:", error);
-      setResultError("Не получилось отправить поддержку. Попробуйте ещё раз.");
+      const data = await res.json().catch(() => null);
+      const username = (data?.user?.username as string | null | undefined) ?? null;
+      setProfile({ username, isAuthed: true });
     } finally {
-      setLoading(false);
+      setIsLoadingProfile(false);
     }
-  };
+  }
+
+  async function copyText(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // ignore
+    }
+  }
+
+  function closePreSupport() {
+    setIsPreSupportOpen(false);
+  }
+
+  const preSupportModal = isPreSupportOpen ? (
+    <div
+      className="fixed inset-0 z-[999] bg-black/55 backdrop-blur-sm flex items-center justify-center p-4"
+      role="presentation"
+      onMouseDown={(e) => {
+        // Закрываем по клику по фону (вне карточки)
+        if (e.target === e.currentTarget) setIsPreSupportOpen(false);
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pre-support-title"
+        aria-describedby="pre-support-desc"
+        className="w-full max-w-lg rounded-3xl border border-[#abd1c6]/20 bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] shadow-2xl overflow-hidden"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+          <div className="p-5 sm:p-6 border-b border-white/10 flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h3 id="pre-support-title" className="text-xl sm:text-2xl font-bold text-[#fffffe]">
+                Перед поддержкой
+              </h3>
+              <p id="pre-support-desc" className="mt-2 text-sm text-[#abd1c6] leading-relaxed">
+                Хотите попасть в «Герои» — укажите свой логин в сообщении к поддержке.
+                Сейчас это работает <span className="text-[#f9bc60] font-semibold">вручную</span>, скоро сделаем{" "}
+                <span className="text-[#f9bc60] font-semibold">автоматически</span>.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsPreSupportOpen(false)}
+              className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-2xl flex items-center justify-center transition-colors flex-shrink-0 border border-white/10"
+              aria-label="Закрыть"
+            >
+              <LucideIcons.X size="sm" className="text-[#fffffe]" />
+            </button>
+          </div>
+
+          <div className="p-5 sm:p-6 space-y-4">
+            {/* Auth / Heroes logic */}
+            {profile?.isAuthed === false ? (
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="text-sm font-semibold text-[#fffffe]">Важно</div>
+                <p className="mt-2 text-sm text-[#abd1c6] leading-relaxed">
+                  Если вы поддержите проект{" "}
+                  <span className="text-[#f9bc60] font-semibold">без регистрации</span>, мы{" "}
+                  <span className="text-[#f9bc60] font-semibold">не сможем</span> добавить вас в «Герои»
+                  (нам не к чему привязать поддержку).
+                </p>
+
+                <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:items-stretch">
+                  <a
+                    href={buildAuthModalUrl({
+                      pathname: "/support",
+                      search: typeof window !== "undefined" ? window.location.search : "",
+                      modal: "auth/signup",
+                    })}
+                    className="sm:flex-1 px-4 py-2.5 rounded-2xl bg-transparent hover:bg-white/5 text-[#fffffe] text-sm font-medium transition-colors inline-flex items-center justify-center gap-2 border border-white/15"
+                  >
+                    <LucideIcons.UserPlus size="sm" />
+                    Войти / зарегистрироваться
+                  </a>
+
+                  <a
+                    href={dalinkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closePreSupport}
+                    className="sm:flex-1 px-4 py-2.5 rounded-2xl bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 shadow-lg shadow-black/10"
+                  >
+                    <LucideIcons.ExternalLink size="sm" />
+                    Поддержать без регистрации
+                  </a>
+                </div>
+              </div>
+            ) : profile?.isAuthed === true && profile.username ? (
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="text-sm font-semibold text-[#fffffe]">Логин для сообщения</div>
+                <p className="mt-2 text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
+                  В сообщении к поддержке укажите этот логин — так мы добавим вас в «Герои» вручную (пока), позже сделаем автоматически.
+                </p>
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
+                  <div className="flex-1 px-4 py-3 bg-[#001e1d]/30 rounded-xl text-[#fffffe] border border-[#abd1c6]/15 break-all">
+                    {suggestedTag}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => copyText(suggestedTag)}
+                    className="px-4 py-2.5 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] text-sm font-semibold rounded-2xl transition-colors inline-flex items-center justify-center gap-2 shadow-lg shadow-black/10"
+                  >
+                    <LucideIcons.Copy size="sm" />
+                    Скопировать
+                  </button>
+                </div>
+
+                <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:items-stretch">
+                  <a
+                    href={dalinkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closePreSupport}
+                    className="sm:flex-1 px-4 py-2.5 rounded-2xl bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 shadow-lg shadow-black/10"
+                  >
+                    <LucideIcons.ExternalLink size="sm" />
+                    Перейти к поддержке
+                  </a>
+                  <a
+                    href={dalinkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closePreSupport}
+                    className="sm:flex-1 px-4 py-2.5 rounded-2xl bg-transparent hover:bg-white/5 text-[#fffffe] text-sm font-medium transition-colors inline-flex items-center justify-center gap-2 border border-white/15"
+                  >
+                    Без упоминания
+                  </a>
+                </div>
+              </div>
+            ) : profile?.isAuthed === true ? (
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="text-sm font-semibold text-[#fffffe]">Логин ещё не задан</div>
+                <p className="mt-2 text-sm text-[#abd1c6] leading-relaxed">
+                  Чтобы мы могли добавить вас в «Герои», задайте логин в профиле (будет ссылка вида{" "}
+                  <span className="text-[#f9bc60] font-semibold">/profile/@логин</span>).
+                </p>
+                <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:items-stretch">
+                  <a
+                    href="/profile?settings=username"
+                    className="sm:flex-1 px-4 py-2.5 rounded-2xl bg-transparent hover:bg-white/5 text-[#fffffe] text-sm font-medium transition-colors inline-flex items-center justify-center gap-2 border border-white/15"
+                  >
+                    <LucideIcons.Settings size="sm" />
+                    Задать логин
+                  </a>
+                  <a
+                    href={dalinkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closePreSupport}
+                    className="sm:flex-1 px-4 py-2.5 rounded-2xl bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 shadow-lg shadow-black/10"
+                  >
+                    <LucideIcons.ExternalLink size="sm" />
+                    Перейти к поддержке
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="text-sm font-semibold text-[#fffffe]">Проверяем статус аккаунта…</div>
+                <p className="mt-2 text-sm text-[#abd1c6]">
+                  Если вы не авторизованы, можно поддержать проект без регистрации — но тогда мы не сможем добавить вас в «Герои».
+                </p>
+                <div className="mt-4">
+                  <a
+                    href={dalinkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closePreSupport}
+                    className="px-4 py-2.5 rounded-2xl bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 w-full shadow-lg shadow-black/10"
+                  >
+                    <LucideIcons.ExternalLink size="sm" />
+                    Поддержать
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* actions are inside the blocks above */}
+          </div>
+        </div>
+    </div>
+  ) : null;
 
   return (
     <section className="py-6 sm:py-8 px-3 sm:px-4">
@@ -88,8 +300,57 @@ export default function OneTimeSupport({
             Выберите сумму поддержки
           </h3>
 
-          {/* DonationAlerts goal widget (optional slot) */}
-          {goalSlot ? <div className="mb-5 sm:mb-6">{goalSlot}</div> : null}
+          {/* Dalink block */}
+          <div className="mb-6 sm:mb-7">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_180px] gap-4 md:gap-5 items-center">
+                <div className="min-w-0">
+                  <div className="text-sm sm:text-base font-semibold text-[#fffffe]">
+                    Поддержать проект
+                  </div>
+                  <div className="mt-1 text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
+                    Нажмите кнопку или отсканируйте QR‑код — откроется страница поддержки.
+                    {hasAmount ? (
+                      <span className="block mt-1">
+                        Вы выбрали: <span className="text-[#f9bc60] font-semibold">₽{amountNumber.toLocaleString()}</span>
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <a
+                    href={dalinkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsPreSupportOpen(true);
+                      ensureProfileLoaded();
+                    }}
+                    className="inline-flex items-center justify-center gap-2 mt-4 px-6 py-3 rounded-full bg-[#f9bc60] text-[#001e1d] font-semibold hover:bg-[#e8a545] transition-all duration-200 hover:scale-[1.02] shadow-lg"
+                  >
+                    <LucideIcons.Heart className="w-5 h-5" />
+                    <span>Поддержать</span>
+                    <LucideIcons.ExternalLink className="w-4 h-4" />
+                  </a>
+                </div>
+
+                <div className="flex justify-center md:justify-end">
+                  <div className="rounded-2xl border border-white/10 bg-[#001e1d]/30 p-3 overflow-hidden">
+                    <Image
+                      src="/dalink-qr-code.png"
+                      alt="QR-код: поддержать проект"
+                      width={160}
+                      height={160}
+                      className="w-40 h-40 object-contain"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pre-support modal */}
+          {mounted && preSupportModal ? createPortal(preSupportModal, document.body) : null}
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5 sm:mb-6">
             {predefinedAmounts.map((amount, index) => {
@@ -165,51 +426,6 @@ export default function OneTimeSupport({
               </div>
             </motion.div>
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            disabled={
-              loading || !customAmount || parseInt(customAmount || "0", 10) <= 0
-            }
-            className="w-full py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-            style={{
-              background: customAmount && parseInt(customAmount) > 0 
-                ? "linear-gradient(135deg, #f9bc60 0%, #e8a545 100%)" 
-                : "#004643",
-              color: customAmount && parseInt(customAmount) > 0 ? "#001e1d" : "#abd1c6",
-              border: customAmount && parseInt(customAmount) > 0 ? "none" : "1px solid #abd1c6/20",
-            }}
-            onClick={handlePurchase}
-          >
-            <LucideIcons.Trophy className="w-5 h-5 sm:w-6 sm:h-6 inline mr-2" />
-            <span className="hidden sm:inline">
-              {loading
-                ? "Оформляем..."
-                : customAmount && parseInt(customAmount) > 0
-                  ? `💚 Поддержать проект на ₽${parseInt(customAmount).toLocaleString()}`
-                  : "Введите сумму"}
-            </span>
-            <span className="sm:hidden">
-              {loading
-                ? "Оформляем..."
-                : customAmount && parseInt(customAmount) > 0
-                  ? `💚 Поддержать на ₽${parseInt(customAmount).toLocaleString()}`
-                  : "Введите сумму"}
-            </span>
-          </motion.button>
-
-          {(resultMessage || resultError) && (
-            <div
-              className={`mt-4 rounded-xl sm:rounded-2xl border px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm ${
-                resultError
-                  ? "border-red-500/50 bg-red-500/10 text-red-200"
-                  : "border-emerald-500/50 bg-emerald-500/10 text-emerald-200"
-              }`}
-            >
-              {resultError || resultMessage}
-            </div>
-          )}
 
           {showSocialPrompt && (
             <motion.div

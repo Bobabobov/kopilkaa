@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 
 type Reaction = "LIKE" | "DISLIKE" | null;
 
@@ -36,7 +37,11 @@ export function NewsReactions({
       });
       const d = await r.json().catch(() => null);
       if (r.status === 401) {
-        window.location.href = "/?modal=auth&next=/news";
+        window.location.href = buildAuthModalUrl({
+          pathname: window.location.pathname,
+          search: window.location.search,
+          modal: "auth",
+        });
         return;
       }
       if (!r.ok) {

@@ -57,6 +57,8 @@ interface UseSettingsReturn {
     link: string,
   ) => Promise<void>;
   handleAvatarChange: (avatarUrl: string | null) => void;
+  handleAvatarUpload: (file: File) => Promise<void>;
+  handleAvatarDelete: () => Promise<void>;
   handlePasswordChange: (
     oldPassword: string,
     newPassword: string,
@@ -350,6 +352,63 @@ export function useSettings(): UseSettingsReturn {
     [user],
   );
 
+  // Загрузка аватарки (multipart)
+  const handleAvatarUpload = useCallback(
+    async (file: File) => {
+      try {
+        setSaving(true);
+        const form = new FormData();
+        form.append("avatar", file);
+
+        const response = await fetch("/api/profile/avatar", {
+          method: "POST",
+          body: form,
+        });
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.ok) {
+          showLocalNotification(
+            "error",
+            "Ошибка",
+            data?.error || "Не удалось загрузить аватарку",
+          );
+          return;
+        }
+        const avatarUrl = data.avatar as string;
+        if (user) setUser({ ...user, avatar: avatarUrl });
+        showLocalNotification("success", "Успешно!", "Аватарка обновлена");
+      } catch (error) {
+        console.error("Error uploading avatar:", error);
+        showLocalNotification("error", "Ошибка", "Произошла ошибка при загрузке аватарки");
+      } finally {
+        setSaving(false);
+      }
+    },
+    [showLocalNotification, user],
+  );
+
+  const handleAvatarDelete = useCallback(async () => {
+    try {
+      setSaving(true);
+      const response = await fetch("/api/profile/avatar", { method: "DELETE" });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.ok) {
+        showLocalNotification(
+          "error",
+          "Ошибка",
+          data?.error || "Не удалось удалить аватарку",
+        );
+        return;
+      }
+      if (user) setUser({ ...user, avatar: null });
+      showLocalNotification("success", "Успешно!", "Аватарка удалена");
+    } catch (error) {
+      console.error("Error deleting avatar:", error);
+      showLocalNotification("error", "Ошибка", "Произошла ошибка при удалении аватарки");
+    } finally {
+      setSaving(false);
+    }
+  }, [showLocalNotification, user]);
+
 
   // Изменение пароля
   const handlePasswordChange = async (
@@ -525,6 +584,8 @@ export function useSettings(): UseSettingsReturn {
     handlePhoneChange,
     handleSocialLinkChange,
     handleAvatarChange,
+    handleAvatarUpload,
+    handleAvatarDelete,
     handlePasswordChange,
     handlePasswordSubmit,
     cancelPasswordChange,

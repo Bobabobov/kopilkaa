@@ -1,7 +1,7 @@
 // components/profile/SettingsModal.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSettings } from "../hooks/useSettings";
@@ -47,6 +47,9 @@ function ReadOnlyField({ label, value }: { label: string; value: string }) {
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [mounted, setMounted] = useState(false);
   const { ToastComponent } = useBeautifulToast();
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const lastActiveElementRef = useRef<HTMLElement | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
   
   // Автоскрытие скроллбаров
   useAutoHideScrollbar();
@@ -65,7 +68,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     handleEmailChange,
     handleEmailVisibilityChange,
     handleSocialLinkChange,
-    handlePhoneChange,
+    handleAvatarUpload,
+    handleAvatarDelete,
   } = useSettings();
 
   // Монтирование для Portal
@@ -83,11 +87,19 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       }
     };
 
-    // Сохраняем текущую прокрутку
+    // Блокируем прокрутку фона (без запрета wheel внутри модалки)
+    const scrollY = window.scrollY;
     const originalOverflow = document.body.style.overflow;
+    const originalPosition = document.body.style.position;
+    const originalTop = document.body.style.top;
+    const originalWidth = document.body.style.width;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
 
-    // Блокируем прокрутку
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+    document.documentElement.style.overflow = "hidden";
 
     document.addEventListener("keydown", handleKeyDown);
 
@@ -96,8 +108,83 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
       // Восстанавливаем прокрутку
       document.body.style.overflow = originalOverflow;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.width = originalWidth;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen, onClose]);
+
+  // Accessibility: focus trap + restore focus
+  useEffect(() => {
+    if (!isOpen) return;
+    lastActiveElementRef.current = document.activeElement as HTMLElement | null;
+
+    const dialog = dialogRef.current;
+    const getFocusable = () => {
+      if (!dialog) return [] as HTMLElement[];
+      const nodes = dialog.querySelectorAll<HTMLElement>(
+        [
+          "a[href]",
+          "button:not([disabled])",
+          "textarea:not([disabled])",
+          "input:not([disabled])",
+          "select:not([disabled])",
+          "[tabindex]:not([tabindex='-1'])",
+        ].join(","),
+      );
+      return Array.from(nodes).filter((el) => {
+        const style = window.getComputedStyle(el);
+        const hidden =
+          style.display === "none" ||
+          style.visibility === "hidden" ||
+          el.getAttribute("aria-hidden") === "true";
+        return !hidden;
+      });
+    };
+
+    const focusables = getFocusable();
+    const initial = focusables[0] || dialog;
+    if (initial) setTimeout(() => initial.focus(), 0);
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      if (!dialog) return;
+      const focusables = getFocusable();
+      if (focusables.length === 0) {
+        e.preventDefault();
+        dialog.focus();
+        return;
+      }
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      const inside = !!active && dialog.contains(active);
+
+      if (e.shiftKey) {
+        if (!inside || active === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (!inside || active === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      try {
+        lastActiveElementRef.current?.focus?.();
+      } catch {
+        // ignore
+      }
+    };
+  }, [isOpen]);
 
   if (!isOpen || !mounted) return null;
 
@@ -125,6 +212,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             boxShadow: '0 0 0 1px rgba(171, 209, 198, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.25)'
           }}
           onClick={(e) => e.stopPropagation()}
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="profile-settings-title"
+          aria-describedby="profile-settings-desc"
+          tabIndex={-1}
         >
           {/* Заголовок */}
           <div className="p-6 border-b border-[#abd1c6]/20 flex-shrink-0">
@@ -134,10 +227,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   <LucideIcons.Settings size="lg" className="text-[#001e1d]" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-[#fffffe]">
+                  <h2 id="profile-settings-title" className="text-2xl font-bold text-[#fffffe]">
                     Настройки профиля
                   </h2>
-                  <p className="text-[#abd1c6]">
+                  <p id="profile-settings-desc" className="text-[#abd1c6]">
                     Управление вашим аккаунтом
                   </p>
                 </div>
@@ -145,6 +238,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               <button
                 onClick={onClose}
                 className="w-10 h-10 bg-[#abd1c6]/20 hover:bg-[#abd1c6]/30 rounded-xl flex items-center justify-center transition-colors"
+                aria-label="Закрыть настройки"
               >
                 <LucideIcons.X size="sm" className="text-[#fffffe]" />
               </button>
@@ -159,17 +253,18 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="mx-4 sm:mx-6 mb-4 p-3 sm:p-4 rounded-xl shadow-lg"
-                style={{
-                  background:
-                    "linear-gradient(to right, #abd1c6/20, #f9bc60/20)",
-                  borderColor: "#abd1c6",
-                }}
+                className={`mx-4 sm:mx-6 mb-4 p-3 sm:p-4 rounded-xl shadow-lg border ${
+                  localNotification.type === "success"
+                    ? "bg-emerald-500/15 border-emerald-400/30"
+                    : localNotification.type === "error"
+                      ? "bg-red-500/15 border-red-400/30"
+                      : "bg-[#f9bc60]/15 border-[#f9bc60]/30"
+                }`}
               >
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div
                     className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: "#f9bc60" }}
+                    style={{ backgroundColor: localNotification.type === "error" ? "#e16162" : "#f9bc60" }}
                   >
                     <span className="text-white text-xs sm:text-sm">
                       {localNotification.type === "success"
@@ -180,10 +275,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-sm sm:text-base break-words" style={{ color: "#001e1d" }}>
+                    <div className="font-semibold text-sm sm:text-base break-words text-[#fffffe]">
                       {localNotification.title}
                     </div>
-                    <div className="text-xs sm:text-sm break-words" style={{ color: "#abd1c6" }}>
+                    <div className="text-xs sm:text-sm break-words text-[#abd1c6]">
                       {localNotification.message}
                     </div>
                   </div>
@@ -193,7 +288,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </AnimatePresence>
 
           {/* Контент */}
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="flex-1 p-6 overflow-y-auto overscroll-contain">
             {loading ? (
               <SettingsLoading />
             ) : !user ? (
@@ -201,21 +296,64 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             ) : (
               <div className="space-y-8">
                 {/* Аватарка */}
-                <div className="flex items-center space-x-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 bg-[#004643] rounded-full flex items-center justify-center">
-                      <span className="text-[#f9bc60] text-2xl font-bold">
-                        {(user.name || user.email)[0].toUpperCase()}
-                      </span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-full border border-white/10 bg-[#001e1d]/30 overflow-hidden flex items-center justify-center">
+                      {user.avatar ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={user.avatar}
+                          alt="Аватар"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-[#f9bc60] text-2xl font-bold">
+                          {(user.name || user.email)[0].toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-lg font-semibold text-[#fffffe] mb-1">
+                        Аватарка
+                      </h3>
+                      <p className="text-[#abd1c6] text-sm">
+                        PNG/JPG/WEBP, до 5 МБ
+                      </p>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-[#fffffe] mb-2">
-                      Аватарка
-                    </h3>
-                    <p className="text-[#abd1c6]">
-                      Загрузите изображение для вашего профиля
-                    </p>
+                  <div className="flex flex-wrap gap-2 sm:ml-auto">
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        await handleAvatarUpload(file);
+                        // allow re-upload same file
+                        e.currentTarget.value = "";
+                      }}
+                      disabled={saving}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={saving}
+                      className="px-4 py-2 rounded-xl bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold transition-colors"
+                    >
+                      {user.avatar ? "Заменить" : "Загрузить"}
+                    </button>
+                    {user.avatar && (
+                      <button
+                        type="button"
+                        onClick={handleAvatarDelete}
+                        disabled={saving}
+                        className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:bg-[#6B7280] text-[#fffffe] font-semibold border border-white/10 transition-colors"
+                      >
+                        Удалить
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -243,36 +381,6 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   onToggle={handleEmailVisibilityChange}
                   disabled={saving}
                 />
-
-                {/* Телефон */}
-                <SettingsSection title="Телефон">
-                  <div className="space-y-2">
-                    <label className="text-xs text-[#abd1c6]">
-                      Укажите номер телефона, чтобы входить по коду из SMS (сейчас — тестовый режим, код показывается на экране).
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="tel"
-                        defaultValue={user.phone || ""}
-                        placeholder="+7 900 000-00-00"
-                        className="flex-1 px-4 py-3 border border-[#abd1c6]/30 rounded-xl bg-[#001e1d]/20 text-[#fffffe] focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent"
-                        onBlur={(e) => {
-                          const value = e.target.value.trim();
-                          if (value && value !== (user.phone || "")) {
-                            handlePhoneChange(value);
-                          }
-                        }}
-                        disabled={saving}
-                      />
-                      {user.phoneVerified && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#10B981]/50 bg-[#004643] text-[11px] font-semibold text-[#a7f3d0] shadow-sm">
-                          <LucideIcons.CheckCircle size="xs" className="text-[#6EE7B7]" />
-                          <span>Подтверждён</span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </SettingsSection>
 
               {/* Социальные сети */}
               <SettingsSection title="Социальные сети">
@@ -325,12 +433,6 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   </div>
                 </SettingsSection>
 
-                {/* Управление данными */}
-                <SettingsSection title="Управление данными">
-                  <div className="p-4 bg-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20">
-                    <p className="text-[#abd1c6]">Экспорт данных временно недоступен</p>
-                  </div>
-                </SettingsSection>
               </div>
             )}
           </div>

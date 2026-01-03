@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findFirst({
       where: { phone: normalized },
+      select: { id: true },
     });
 
     if (!user) {

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import BugReportForm from "@/components/reports/BugReportForm";
 import BugReportList from "@/components/reports/BugReportList";
 import BugReportFilters from "@/components/reports/BugReportFilters";
@@ -247,7 +248,15 @@ export default function ReportsPage() {
             <p className="text-[#abd1c6]">{authError}</p>
             <div className="flex items-center justify-center gap-3">
               <button
-                onClick={() => router.push("/?modal=auth")}
+                onClick={() =>
+                  router.push(
+                    buildAuthModalUrl({
+                      pathname: window.location.pathname,
+                      search: window.location.search,
+                      modal: "auth",
+                    })
+                  )
+                }
                 className="px-4 py-2 rounded-lg bg-[#f9bc60] text-[#001e1d] font-semibold"
               >
                 Войти/зарегистрироваться

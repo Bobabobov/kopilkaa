@@ -3,6 +3,8 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 
 interface OtherUserLoadingStatesProps {
   state: "checking" | "unauthorized" | "loading" | "not-found";
@@ -11,6 +13,12 @@ interface OtherUserLoadingStatesProps {
 export default function OtherUserLoadingStates({
   state,
 }: OtherUserLoadingStatesProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
+  const loginHref = buildAuthModalUrl({ pathname, search, modal: "auth" });
+  const signupHref = buildAuthModalUrl({ pathname, search, modal: "auth/signup" });
+
   const getContent = () => {
     switch (state) {
       case "checking":
@@ -28,12 +36,12 @@ export default function OtherUserLoadingStates({
             "Войдите в аккаунт или зарегистрируйтесь, чтобы просмотреть профили",
           buttons: [
             {
-              href: "/?modal=auth",
+              href: loginHref,
               text: "Войти в аккаунт",
               variant: "primary",
             },
             {
-              href: "/?modal=auth/signup",
+              href: signupHref,
               text: "Зарегистрироваться",
               variant: "secondary",
             },

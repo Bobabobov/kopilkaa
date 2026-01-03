@@ -107,6 +107,16 @@ export async function POST(req: NextRequest) {
             ],
           }
         : { telegramId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        role: true,
+        name: true,
+        avatar: true,
+        telegramId: true,
+        telegramUsername: true,
+      },
     });
 
     // Если пользователя ещё нет — автоматически регистрируем его
@@ -152,6 +162,16 @@ export async function POST(req: NextRequest) {
 
       user = await prisma.user.create({
         data: createData,
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          role: true,
+          name: true,
+          avatar: true,
+          telegramId: true,
+          telegramUsername: true,
+        },
       });
     } else {
       // Пользователь с таким Telegram уже есть — обновляем при необходимости
@@ -170,6 +190,16 @@ export async function POST(req: NextRequest) {
         user = await prisma.user.update({
           where: { id: user.id },
           data: updateData,
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            role: true,
+            name: true,
+            avatar: true,
+            telegramId: true,
+            telegramUsername: true,
+          },
         });
       }
     }

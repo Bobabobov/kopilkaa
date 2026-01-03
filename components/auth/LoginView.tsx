@@ -6,6 +6,8 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { TelegramWidget } from "./TelegramWidget";
 import { GoogleButton } from "./GoogleButton";
 import { EmailLoginForm } from "./EmailLoginForm";
+import { usePathname, useSearchParams } from "next/navigation";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 
 interface LoginViewProps {
   showEmailForm: boolean;
@@ -26,6 +28,11 @@ export function LoginView({
   busy,
   error,
 }: LoginViewProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
+  const emailHref = buildAuthModalUrl({ pathname, search, modal: "auth/login/email" });
+
   return (
     <>
       {!showEmailForm && (
@@ -62,7 +69,7 @@ export function LoginView({
             whileTap={{ scale: 0.98 }}
           >
             <Link
-              href="/?modal=auth/login/email"
+              href={emailHref}
               className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] hover:from-[#374151] hover:to-[#4b5563] text-[#abd1c6] flex items-center justify-center gap-2.5 transition-all shadow-lg border border-[#1f2937]/50 relative z-10 block"
             >
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#f9bc60]/5 to-transparent opacity-0 hover:opacity-100 transition-opacity" />

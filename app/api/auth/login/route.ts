@@ -27,6 +27,14 @@ export async function POST(req: Request) {
       where: lookupField === "email"
         ? { email: lookupValue }
         : { username: lookupValue },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        passwordHash: true,
+        role: true,
+        name: true,
+      },
     });
     if (!user) {
       return NextResponse.json(

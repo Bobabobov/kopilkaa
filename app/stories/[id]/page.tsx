@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import {
   StoryHeader,
   StoryContent,
@@ -46,8 +47,12 @@ export default function StoryPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   const pushAuth = (mode: "auth" | "signup") => {
-    const next = encodeURIComponent(window.location.pathname + window.location.search);
-    router.push(`/?modal=auth${mode === "signup" ? "/signup" : ""}&next=${next}`);
+    const href = buildAuthModalUrl({
+      pathname: window.location.pathname,
+      search: window.location.search,
+      modal: mode === "signup" ? "auth/signup" : "auth",
+    });
+    router.push(href);
   };
 
   const loadAdStory = async () => {

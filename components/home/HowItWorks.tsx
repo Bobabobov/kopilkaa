@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 
 const steps = [
   {
@@ -65,7 +66,11 @@ export default function HowItWorks() {
       window.location.href = "/applications";
     } else {
       // Если не авторизован, открываем модалку входа/регистрации
-      window.location.href = "/?modal=auth/signup";
+      window.location.href = buildAuthModalUrl({
+        pathname: window.location.pathname,
+        search: window.location.search,
+        modal: "auth/signup",
+      });
     }
   };
 

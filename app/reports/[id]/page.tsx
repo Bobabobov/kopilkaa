@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { BugReport } from "@/app/reports/page";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   OPEN: {
@@ -45,12 +46,26 @@ export default function BugReportDetailPage() {
       .then((r) => r.json())
       .then((d) => {
         if (!d.user) {
-          router.push("/?modal=auth");
+          router.push(
+            buildAuthModalUrl({
+              pathname: window.location.pathname,
+              search: window.location.search,
+              modal: "auth",
+            })
+          );
           return;
         }
         setUser(d.user);
       })
-      .catch(() => router.push("/?modal=auth"))
+      .catch(() =>
+        router.push(
+          buildAuthModalUrl({
+            pathname: window.location.pathname,
+            search: window.location.search,
+            modal: "auth",
+          })
+        )
+      )
       .finally(() => setLoading(false));
   }, [router]);
 

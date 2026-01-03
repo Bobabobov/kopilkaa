@@ -1,16 +1,17 @@
 // components/heroes/HeroesContent.tsx
 "use client";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import HeroesGridStats from "./HeroesGridStats";
 import HeroesGrid from "./HeroesGrid";
 import HeroesEmptyState from "./HeroesEmptyState";
 import HeroesErrorState from "./HeroesErrorState";
+import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 interface Hero {
   id: string;
   name: string;
   avatar?: string;
+  heroBadge?: HeroBadgeType | null;
   totalDonated: number;
   donationCount: number;
   rank: number;
@@ -67,43 +68,35 @@ export default function HeroesContent({
   }
 
   return (
-    <div className="py-8 sm:py-10 md:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Картинка */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.5 }}
-          className="mb-8 sm:mb-10 md:mb-12 text-center"
-        >
-          <Image
-            src="/hero.png"
-            alt="Герои"
-            width={400}
-            height={400}
-            className="w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto"
-            loading="lazy"
-          />
-        </motion.div>
-        
+    <div id="heroes-list" className="pb-14 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10 md:space-y-12">
         {/* Статистика */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-8 sm:mb-10 md:mb-12"
+          transition={{ duration: 0.5 }}
+          className="rounded-[28px] border border-white/10 bg-white/5/60 backdrop-blur-xl p-5 sm:p-6 md:p-7 shadow-[0_18px_48px_rgba(0,0,0,0.28)]"
         >
+          <div className="flex items-center justify-between gap-4 mb-4 sm:mb-5">
+            <div>
+              <div className="text-xs text-[#94a1b2]">Сводка раздела</div>
+              <div className="text-xl sm:text-2xl font-bold text-[#fffffe]">Статистика</div>
+            </div>
+            <div className="hidden sm:block text-sm text-[#abd1c6]">
+              Данные обновляются при загрузке списка
+            </div>
+          </div>
           <HeroesGridStats stats={stats} />
         </motion.div>
 
         {/* Список героев */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.55, delay: 0.05 }}
+          className="rounded-[28px] border border-white/10 bg-white/5/60 backdrop-blur-xl p-5 sm:p-6 md:p-7 shadow-[0_18px_48px_rgba(0,0,0,0.28)]"
         >
           <HeroesGrid
             heroes={heroes}
@@ -118,7 +111,6 @@ export default function HeroesContent({
             observerTargetRef={observerTargetRef}
           />
         </motion.div>
-        
       </div>
     </div>
   );

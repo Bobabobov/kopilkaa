@@ -9,6 +9,6 @@ export async function GET(req: Request) {
       { ok: false, error: "email required" },
       { status: 400 },
     );
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
   return Response.json({ exists: !!existing });
 }

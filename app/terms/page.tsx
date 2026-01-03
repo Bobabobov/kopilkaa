@@ -13,9 +13,10 @@ export default function TermsPage() {
           <div className="mb-8 pb-6 border-b border-white/10">
             <div className="text-sm text-[#abd1c6] space-y-1">
               <p className="font-semibold text-[#fffffe] mb-2">Реквизиты владельца сервиса:</p>
-              <p>ФИО: Стулов Федор Федорович</p>
+              <p>ФИО: Стулов Фёдор Фёдорович</p>
               <p>ИНН: 245607255602</p>
               <p>Статус: Самозанятый (НПД)</p>
+              <p>Адрес: г. Екатеринбург</p>
               <p>Email: support@kopilka-online.ru</p>
             </div>
           </div>

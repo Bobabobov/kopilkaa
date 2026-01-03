@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 
 interface Story {
   id: string;
@@ -63,8 +64,13 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
 
     // Проверяем авторизацию
     if (!isAuthenticated) {
-      const next = encodeURIComponent(window.location.pathname + window.location.search);
-      router.push(`/?modal=auth/signup&next=${next}`);
+      router.push(
+        buildAuthModalUrl({
+          pathname: window.location.pathname,
+          search: window.location.search,
+          modal: "auth/signup",
+        })
+      );
       return;
     }
 
@@ -80,8 +86,13 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
 
       if (!response.ok) {
         if (response.status === 401) {
-          const next = encodeURIComponent(window.location.pathname + window.location.search);
-          router.push(`/?modal=auth/signup&next=${next}`);
+          router.push(
+            buildAuthModalUrl({
+              pathname: window.location.pathname,
+              search: window.location.search,
+              modal: "auth/signup",
+            })
+          );
           return;
         }
         const errorData = await response.json();

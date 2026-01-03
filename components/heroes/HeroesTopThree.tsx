@@ -4,11 +4,15 @@ import Link from "next/link";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
+import { LucideIcons } from "@/components/ui/LucideIcons";
+import { HeroBadge } from "@/components/ui/HeroBadge";
+import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 interface Hero {
   id: string;
   name: string;
   avatar?: string;
+  heroBadge?: HeroBadgeType | null;
   totalDonated: number;
   donationCount: number;
   rank: number;
@@ -62,29 +66,37 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
     }
   };
 
+  const formatRub = (n: number) => {
+    const s = new Intl.NumberFormat("ru-RU").format(Math.round(n || 0));
+    return `${s.replace(/\u00A0/g, " ")} ₽`;
+  };
+
   return (
     <div className="mb-8 sm:mb-10 md:mb-12">
-      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 text-center px-4" style={{ color: "#fffffe" }}>
-        🏆 Топ-3 по сумме оплат
-      </h3>
-      <p className="text-center text-xs sm:text-sm text-[#abd1c6] -mt-2 mb-4 sm:mb-6 px-4">
-        Лидеры раздела «Герои»
-      </p>
+      <div className="flex items-start justify-between gap-4 mb-4 sm:mb-5">
+        <div>
+          <div className="text-xs text-[#94a1b2]">Лидеры</div>
+          <div className="text-xl sm:text-2xl md:text-3xl font-bold text-[#fffffe] inline-flex items-center gap-2">
+            <LucideIcons.Trophy size="sm" className="text-[#f9bc60]" />
+            Топ-3 по сумме оплат
+          </div>
+        </div>
+        <div className="hidden sm:block text-sm text-[#abd1c6]">Лидеры раздела «Герои»</div>
+      </div>
       
       <div className="flex flex-col sm:flex-row justify-center items-stretch sm:items-end gap-4 sm:gap-5 md:gap-6 max-w-4xl mx-auto px-2">
         {/* 2-е место */}
         {topThree[1] && (
           <Link
             href={`/profile/${topThree[1].id}`}
-            className="order-2 sm:order-1 flex-1 max-w-full sm:max-w-[280px]"
+            className="order-2 sm:order-1 flex-1 max-w-full sm:max-w-[280px] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 rounded-2xl"
           >
             <div 
-              className="p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl backdrop-blur-sm border-2 transition-colors cursor-pointer text-center h-full flex flex-col"
+              className="group relative p-4 sm:p-5 md:p-6 rounded-2xl border-2 transition-all cursor-pointer text-center h-full flex flex-col bg-gradient-to-b from-white/6 to-white/3 hover:-translate-y-1 shadow-[0_18px_48px_rgba(0,0,0,0.28)]"
               style={{
-                backgroundColor: "rgba(0, 70, 67, 0.6)",
                 borderColor: getRankColor(2),
-                boxShadow: `0 0 15px ${getRankColor(2)}30`,
-                minHeight: "240px"
+                boxShadow: `0 0 22px ${getRankColor(2)}22`,
+                minHeight: "240px",
               }}
             >
               <div className="text-2xl sm:text-3xl mb-2">{getRankIcon(2)}</div>
@@ -101,11 +113,14 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               <h4 className="text-base sm:text-lg font-bold mb-2 break-words" style={{ color: "#fffffe" }}>
                 {topThree[1].name}
               </h4>
+              <div className="flex justify-center mb-2">
+                <HeroBadge badge={topThree[1].heroBadge ?? null} size="md" />
+              </div>
               <p
                 className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 break-words"
                 style={{ color: getRankColor(2) }}
               >
-                ₽{topThree[1].totalDonated.toLocaleString()}
+                {formatRub(topThree[1].totalDonated)}
               </p>
               <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto">
                   {topThree[1].vkLink && (
@@ -159,15 +174,14 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
         {topThree[0] && (
           <Link
             href={`/profile/${topThree[0].id}`}
-            className="order-1 sm:order-2 flex-1 max-w-full sm:max-w-[300px]"
+            className="order-1 sm:order-2 flex-1 max-w-full sm:max-w-[300px] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 rounded-2xl"
           >
             <div 
-              className="p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl backdrop-blur-sm border-2 transition-colors cursor-pointer text-center h-full flex flex-col"
+              className="group relative p-4 sm:p-5 md:p-6 rounded-2xl border-2 transition-all cursor-pointer text-center h-full flex flex-col bg-gradient-to-b from-white/7 to-white/3 hover:-translate-y-1 shadow-[0_22px_58px_rgba(0,0,0,0.35)]"
               style={{
-                backgroundColor: "rgba(0, 70, 67, 0.6)",
                 borderColor: getRankColor(1),
-                boxShadow: `0 0 25px ${getRankColor(1)}40`,
-                minHeight: "260px"
+                boxShadow: `0 0 30px ${getRankColor(1)}2e`,
+                minHeight: "260px",
               }}
             >
               <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{getRankIcon(1)}</div>
@@ -184,11 +198,14 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               <h4 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 break-words" style={{ color: "#fffffe" }}>
                 {topThree[0].name}
               </h4>
+              <div className="flex justify-center mb-2">
+                <HeroBadge badge={topThree[0].heroBadge ?? null} size="md" />
+              </div>
               <p
                 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 break-words"
                 style={{ color: getRankColor(1) }}
               >
-                ₽{topThree[0].totalDonated.toLocaleString()}
+                {formatRub(topThree[0].totalDonated)}
               </p>
               <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto">
                   {topThree[0].vkLink && (
@@ -242,15 +259,14 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
         {topThree[2] && (
           <Link
             href={`/profile/${topThree[2].id}`}
-            className="order-3 flex-1 max-w-full sm:max-w-[280px]"
+            className="order-3 flex-1 max-w-full sm:max-w-[280px] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 rounded-2xl"
           >
             <div 
-              className="p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl backdrop-blur-sm border-2 transition-colors cursor-pointer text-center h-full flex flex-col"
+              className="group relative p-4 sm:p-5 md:p-6 rounded-2xl border-2 transition-all cursor-pointer text-center h-full flex flex-col bg-gradient-to-b from-white/6 to-white/3 hover:-translate-y-1 shadow-[0_18px_48px_rgba(0,0,0,0.28)]"
               style={{
-                backgroundColor: "rgba(0, 70, 67, 0.6)",
                 borderColor: getRankColor(3),
-                boxShadow: `0 0 15px ${getRankColor(3)}30`,
-                minHeight: "240px"
+                boxShadow: `0 0 22px ${getRankColor(3)}22`,
+                minHeight: "240px",
               }}
             >
               <div className="text-2xl sm:text-3xl mb-2">{getRankIcon(3)}</div>
@@ -267,11 +283,14 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               <h4 className="text-base sm:text-lg font-bold mb-2 break-words" style={{ color: "#fffffe" }}>
                 {topThree[2].name}
               </h4>
+              <div className="flex justify-center mb-2">
+                <HeroBadge badge={topThree[2].heroBadge ?? null} size="md" />
+              </div>
               <p
                 className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 break-words"
                 style={{ color: getRankColor(3) }}
               >
-                ₽{topThree[2].totalDonated.toLocaleString()}
+                {formatRub(topThree[2].totalDonated)}
               </p>
               <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto">
                   {topThree[2].vkLink && (

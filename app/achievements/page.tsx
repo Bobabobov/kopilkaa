@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AchievementCard } from "@/components/achievements/AchievementCard";
 import { AchievementProgress, AchievementRarity, RARITY_NAMES, RARITY_COLORS } from "@/lib/achievements/types";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 
 interface ApiResponse {
   success?: boolean;
@@ -341,7 +342,13 @@ export default function AchievementsPage() {
             </p>
             <div className="flex gap-3">
               <button
-                onClick={() => (window.location.href = "/?modal=auth")}
+                onClick={() =>
+                  (window.location.href = buildAuthModalUrl({
+                    pathname: window.location.pathname,
+                    search: window.location.search,
+                    modal: "auth",
+                  }))
+                }
                 className="px-4 py-2 rounded-xl bg-[#f9bc60] text-[#001e1d] font-semibold hover:bg-[#e8a545] transition-colors"
               >
                 Войти

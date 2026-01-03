@@ -10,6 +10,7 @@ export default function AuthModalRoot() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const modal = searchParams.get("modal");
+  const nextParam = searchParams.get("next");
 
   const isAuthModal = modal === "auth" || 
                       modal === "auth/signup" || 
@@ -19,6 +20,25 @@ export default function AuthModalRoot() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function getSafeNext(nextValue: string | null): string | null {
+    if (!nextValue) return null;
+    let decoded = nextValue;
+    try {
+      decoded = decodeURIComponent(nextValue);
+    } catch {
+      // keep raw
+    }
+    const v = String(decoded).trim();
+    // Allow only internal navigation to prevent open-redirect issues
+    if (!v.startsWith("/")) return null;
+    if (v.startsWith("//")) return null;
+    if (v.includes("://")) return null;
+    if (v.includes("\n") || v.includes("\r")) return null;
+    return v;
+  }
+
+  const safeNext = getSafeNext(nextParam);
 
   async function safeReadJson(res: Response): Promise<any> {
     try {
@@ -81,7 +101,7 @@ export default function AuthModalRoot() {
         if (response.ok) {
           const data = await response.json();
           if (data.user) {
-            router.replace("/profile");
+            router.replace(safeNext || "/profile");
             return;
           }
         }
@@ -117,7 +137,7 @@ export default function AuthModalRoot() {
         return;
       }
 
-      window.location.href = "/profile";
+      window.location.href = safeNext || "/profile";
     } catch (error: any) {
       console.error("Telegram login error:", error);
       setError(error?.message || "Ошибка входа через Telegram");
@@ -144,7 +164,7 @@ export default function AuthModalRoot() {
         return;
       }
 
-      window.location.href = "/profile";
+      window.location.href = safeNext || "/profile";
     } catch (error: any) {
       console.error("Google login error:", error);
       setError(error?.message || "Ошибка входа через Google");
@@ -177,7 +197,7 @@ export default function AuthModalRoot() {
       }
 
       if (data.ok) {
-        window.location.href = "/profile";
+        window.location.href = safeNext || "/profile";
       }
     } catch (error: any) {
       console.error("Login error:", error);
@@ -222,7 +242,7 @@ export default function AuthModalRoot() {
       }
 
       if (data.ok) {
-        window.location.href = "/profile";
+        window.location.href = safeNext || "/profile";
       }
     } catch (error: any) {
       console.error("Register error:", error);

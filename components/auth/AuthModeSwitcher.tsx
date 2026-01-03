@@ -2,12 +2,20 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { usePathname, useSearchParams } from "next/navigation";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 
 interface AuthModeSwitcherProps {
   isSignup: boolean;
 }
 
 export function AuthModeSwitcher({ isSignup }: AuthModeSwitcherProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
+  const loginHref = buildAuthModalUrl({ pathname, search, modal: "auth" });
+  const signupHref = buildAuthModalUrl({ pathname, search, modal: "auth/signup" });
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -19,7 +27,7 @@ export function AuthModeSwitcher({ isSignup }: AuthModeSwitcherProps) {
         <p className="text-sm" style={{ color: "#6b7280" }}>
           Уже есть аккаунт?{" "}
           <Link
-            href="/?modal=auth"
+            href={loginHref}
             className="font-semibold hover:underline transition-all hover:text-[#f9bc60] relative group"
             style={{ color: "#f9bc60" }}
           >
@@ -31,7 +39,7 @@ export function AuthModeSwitcher({ isSignup }: AuthModeSwitcherProps) {
         <p className="text-sm" style={{ color: "#6b7280" }}>
           Нет аккаунта?{" "}
           <Link
-            href="/?modal=auth/signup"
+            href={signupHref}
             className="font-semibold hover:underline transition-all hover:text-[#f9bc60] relative group"
             style={{ color: "#f9bc60" }}
           >

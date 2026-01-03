@@ -3,7 +3,8 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 
 type User = {
   id: string;
@@ -12,8 +13,7 @@ type User = {
   name?: string | null;
 } | null;
 
-// Маршрут авторизации (используем модальное окно с параметром ?modal=auth)
-const LOGIN = "/?modal=auth" as Route;
+// Маршрут авторизации (используем модальное окно с параметром ?modal=auth) — на текущем URL
 
 interface NavAuthProps {
   isMobile?: boolean;
@@ -24,6 +24,10 @@ export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps)
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
+  const loginHref = buildAuthModalUrl({ pathname, search, modal: "auth" }) as Route;
 
   const notifyAuthChange = (isAuth: boolean) => {
     if (typeof window !== "undefined") {
@@ -116,7 +120,7 @@ export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps)
   if (!user) {
     return (
       <Link
-        href={LOGIN}
+        href={loginHref}
         onClick={onLinkClick}
         className={
           isMobile

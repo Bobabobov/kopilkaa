@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
@@ -35,16 +36,128 @@ export function AuthModal({
   const modal = searchParams.get("modal");
   const showEmailForm = modal === "auth/login/email" || modal === "auth/signup/email";
   const isSignup = mode === "signup";
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const lastActiveElementRef = useRef<HTMLElement | null>(null);
+
+  const getSafeNext = (nextValue: string | null): string | null => {
+    if (!nextValue) return null;
+    let decoded = nextValue;
+    try {
+      decoded = decodeURIComponent(nextValue);
+    } catch {
+      // keep raw
+    }
+    const v = String(decoded).trim();
+    if (!v.startsWith("/")) return null;
+    if (v.startsWith("//")) return null;
+    if (v.includes("://")) return null;
+    if (v.includes("\n") || v.includes("\r")) return null;
+    return v;
+  };
 
   const closeModal = () => {
+    const safeNext = getSafeNext(searchParams.get("next"));
+    if (safeNext) {
+      router.replace(safeNext);
+      return;
+    }
+
     const params = new URLSearchParams(searchParams.toString());
     params.delete("modal");
+    params.delete("next");
     const pathname = typeof window !== "undefined" ? window.location.pathname : "/";
     const nextUrl = params.toString() 
       ? `${pathname}?${params.toString()}`
       : pathname;
     router.replace(nextUrl);
   };
+
+  // UX: закрытие по Escape
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeModal();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // Accessibility: focus trap inside dialog + restore focus on unmount
+  useEffect(() => {
+    lastActiveElementRef.current = document.activeElement as HTMLElement | null;
+
+    const dialog = dialogRef.current;
+    const getFocusable = () => {
+      if (!dialog) return [] as HTMLElement[];
+      const nodes = dialog.querySelectorAll<HTMLElement>(
+        [
+          "a[href]",
+          "button:not([disabled])",
+          "textarea:not([disabled])",
+          "input:not([disabled])",
+          "select:not([disabled])",
+          "[tabindex]:not([tabindex='-1'])",
+        ].join(",")
+      );
+      return Array.from(nodes).filter((el) => {
+        const style = window.getComputedStyle(el);
+        const hidden =
+          style.display === "none" ||
+          style.visibility === "hidden" ||
+          el.getAttribute("aria-hidden") === "true";
+        return !hidden;
+      });
+    };
+
+    // initial focus
+    const focusables = getFocusable();
+    const initial = focusables[0] || dialog;
+    if (initial) {
+      // wait a tick for motion layout
+      setTimeout(() => initial.focus(), 0);
+    }
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const focusables = getFocusable();
+      if (!dialog) return;
+
+      if (focusables.length === 0) {
+        e.preventDefault();
+        dialog.focus();
+        return;
+      }
+
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      const inside = !!active && dialog.contains(active);
+
+      if (e.shiftKey) {
+        if (!inside || active === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (!inside || active === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      // restore focus back to the trigger if still in DOM
+      try {
+        lastActiveElementRef.current?.focus?.();
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
 
   return (
     <AnimatePresence>
@@ -67,6 +180,12 @@ export function AuthModal({
             mass: 0.8
           }}
           onClick={(e) => e.stopPropagation()}
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="auth-modal-title"
+          aria-describedby="auth-modal-desc"
+          tabIndex={-1}
           className="relative w-full max-w-[520px] rounded-3xl bg-[#001e1d] border border-[#1f2937]/50 shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Декоративные элементы */}
@@ -101,6 +220,7 @@ export function AuthModal({
               <LucideIcons.User size="lg" className="text-[#001e1d] relative z-10" />
             </motion.div>
             <motion.h1
+              id="auth-modal-title"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -109,6 +229,7 @@ export function AuthModal({
               {isSignup ? "Регистрация" : "Вход в аккаунт"}
             </motion.h1>
             <motion.p
+              id="auth-modal-desc"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}

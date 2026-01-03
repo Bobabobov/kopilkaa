@@ -311,7 +311,7 @@ function ProfilePageContent() {
             Войдите в аккаунт, чтобы просмотреть свой профиль
           </p>
           <a
-            href="/?modal=auth/signup&next=/profile"
+            href="/profile?modal=auth/signup"
             className="inline-flex items-center gap-2 px-8 py-4 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] font-bold rounded-full transition-all duration-300"
           >
             <LucideIcons.ArrowRight size="sm" />

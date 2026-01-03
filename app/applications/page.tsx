@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import { usePageTimeTracking } from "@/lib/usePageTimeTracking";
 import ProgressBar from "@/components/applications/ProgressBar";
 import FormField from "@/components/ui/FormField";
@@ -124,8 +125,12 @@ export default function ApplicationsPage() {
   };
 
   const pushAuth = (mode: "auth" | "signup") => {
-    const next = encodeURIComponent(getCurrentPathWithQuery());
-    router.push(`/?modal=auth${mode === "signup" ? "/signup" : ""}&next=${next}`);
+    const href = buildAuthModalUrl({
+      pathname: window.location.pathname,
+      search: window.location.search,
+      modal: mode === "signup" ? "auth/signup" : "auth",
+    });
+    router.push(href);
   };
 
   // Проверка авторизации

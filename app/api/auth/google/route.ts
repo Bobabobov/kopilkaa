@@ -136,6 +136,16 @@ export async function POST(req: NextRequest) {
           { email: googleEmail },
         ],
       },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        role: true,
+        name: true,
+        avatar: true,
+        googleId: true,
+        googleEmail: true,
+      },
     });
 
     // Если пользователя ещё нет — автоматически регистрируем его
@@ -173,6 +183,16 @@ export async function POST(req: NextRequest) {
 
       user = await prisma.user.create({
         data: createData,
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          role: true,
+          name: true,
+          avatar: true,
+          googleId: true,
+          googleEmail: true,
+        },
       });
     } else {
       // Пользователь с таким email уже есть — обновляем Google данные
@@ -200,6 +220,16 @@ export async function POST(req: NextRequest) {
         user = await prisma.user.update({
           where: { id: user.id },
           data: updateData,
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            role: true,
+            name: true,
+            avatar: true,
+            googleId: true,
+            googleEmail: true,
+          },
         });
       }
     }

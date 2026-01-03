@@ -49,32 +49,34 @@ export function EmailEditor({ currentEmail, onSave, disabled }: EmailEditorProps
   if (isEditing) {
     return (
       <div className="space-y-2">
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="email"
             value={value}
             onChange={handleChange}
-            className={`flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent bg-[#001e1d]/20 text-[#fffffe] ${
+            className={`w-full sm:flex-1 px-3 py-2.5 sm:px-4 sm:py-3 border rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent bg-[#001e1d]/20 text-[#fffffe] ${
               !isValid ? "border-red-500" : "border-[#abd1c6]/30"
             }`}
             placeholder="Введите ваш email"
             disabled={disabled}
             autoFocus
           />
-          <button
-            onClick={handleSave}
-            disabled={disabled || !value.trim() || !isValid || value.trim() === currentEmail}
-            className="px-4 py-3 bg-[#10B981] hover:bg-[#059669] disabled:bg-[#6B7280] text-white font-semibold rounded-xl transition-colors"
-          >
-            ✓
-          </button>
-          <button
-            onClick={handleCancel}
-            disabled={disabled}
-            className="px-4 py-3 bg-[#6B7280] hover:bg-[#4B5563] text-white font-semibold rounded-xl transition-colors"
-          >
-            ✗
-          </button>
+          <div className="flex gap-2 sm:gap-2">
+            <button
+              onClick={handleSave}
+              disabled={disabled || !value.trim() || !isValid || value.trim() === currentEmail}
+              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#10B981] hover:bg-[#059669] disabled:bg-[#6B7280] text-white font-semibold rounded-xl transition-colors"
+            >
+              ✓
+            </button>
+            <button
+              onClick={handleCancel}
+              disabled={disabled}
+              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#6B7280] hover:bg-[#4B5563] text-white font-semibold rounded-xl transition-colors"
+            >
+              ✗
+            </button>
+          </div>
         </div>
         {!isValid && (
           <p className="text-xs text-red-400">Введите корректный email адрес</p>
@@ -84,14 +86,14 @@ export function EmailEditor({ currentEmail, onSave, disabled }: EmailEditorProps
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 px-4 py-3 bg-[#001e1d]/20 rounded-xl text-[#fffffe]">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+      <div className="flex-1 px-3 py-2.5 sm:px-4 sm:py-3 bg-[#001e1d]/20 rounded-xl text-[#fffffe]">
         {currentEmail}
       </div>
       <button
         onClick={() => setIsEditing(true)}
         disabled={disabled}
-        className="px-4 py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors"
+        className="w-full sm:w-auto px-4 py-2.5 sm:py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors"
       >
         Изменить
       </button>
@@ -127,43 +129,45 @@ export function NameEditor({ currentName, onSave, disabled }: NameEditorProps) {
 
   if (isEditing) {
     return (
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <input
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="flex-1 px-4 py-3 border border-[#abd1c6]/30 rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent bg-[#001e1d]/20 text-[#fffffe]"
+          className="w-full sm:flex-1 px-3 py-2.5 sm:px-4 sm:py-3 border border-[#abd1c6]/30 rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent bg-[#001e1d]/20 text-[#fffffe]"
           placeholder="Введите ваше имя"
           disabled={disabled}
           autoFocus
         />
-        <button
-          onClick={handleSave}
-          disabled={disabled || !value.trim() || value.trim() === currentName}
-          className="px-4 py-3 bg-[#10B981] hover:bg-[#059669] disabled:bg-[#6B7280] text-white font-semibold rounded-xl transition-colors"
-        >
-          ✓
-        </button>
-        <button
-          onClick={handleCancel}
-          disabled={disabled}
-          className="px-4 py-3 bg-[#6B7280] hover:bg-[#4B5563] text-white font-semibold rounded-xl transition-colors"
-        >
-          ✗
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleSave}
+            disabled={disabled || !value.trim() || value.trim() === currentName}
+            className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#10B981] hover:bg-[#059669] disabled:bg-[#6B7280] text-white font-semibold rounded-xl transition-colors"
+          >
+            ✓
+          </button>
+          <button
+            onClick={handleCancel}
+            disabled={disabled}
+            className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#6B7280] hover:bg-[#4B5563] text-white font-semibold rounded-xl transition-colors"
+          >
+            ✗
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 px-4 py-3 bg-[#001e1d]/20 rounded-xl text-[#fffffe]">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+      <div className="flex-1 px-3 py-2.5 sm:px-4 sm:py-3 bg-[#001e1d]/20 rounded-xl text-[#fffffe]">
         {currentName || "Не указано"}
       </div>
       <button
         onClick={() => setIsEditing(true)}
         disabled={disabled}
-        className="px-4 py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors"
+        className="w-full sm:w-auto px-4 py-2.5 sm:py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors"
       >
         Изменить
       </button>
@@ -222,7 +226,7 @@ export function UsernameEditor({ currentUsername, onSave, disabled }: UsernameEd
   if (isEditing) {
     return (
       <div className="space-y-2">
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
             value={value}
@@ -230,27 +234,29 @@ export function UsernameEditor({ currentUsername, onSave, disabled }: UsernameEd
               setValue(e.target.value);
               setError(validate(e.target.value));
             }}
-            className={`flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent bg-[#001e1d]/20 text-[#fffffe] ${
+            className={`w-full sm:flex-1 px-3 py-2.5 sm:px-4 sm:py-3 border rounded-xl focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent bg-[#001e1d]/20 text-[#fffffe] ${
               error ? "border-red-500" : "border-[#abd1c6]/30"
             }`}
             placeholder="@username"
             disabled={disabled}
             autoFocus
           />
-          <button
-            onClick={handleSave}
-            disabled={disabled || !!error || !value.trim()}
-            className="px-4 py-3 bg-[#10B981] hover:bg-[#059669] disabled:bg-[#6B7280] text-white font-semibold rounded-xl transition-colors"
-          >
-            ✓
-          </button>
-          <button
-            onClick={handleCancel}
-            disabled={disabled}
-            className="px-4 py-3 bg-[#6B7280] hover:bg-[#4B5563] text-white font-semibold rounded-xl transition-colors"
-          >
-            ✗
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSave}
+              disabled={disabled || !!error || !value.trim()}
+              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#10B981] hover:bg-[#059669] disabled:bg-[#6B7280] text-white font-semibold rounded-xl transition-colors"
+            >
+              ✓
+            </button>
+            <button
+              onClick={handleCancel}
+              disabled={disabled}
+              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#6B7280] hover:bg-[#4B5563] text-white font-semibold rounded-xl transition-colors"
+            >
+              ✗
+            </button>
+          </div>
         </div>
         <p className="text-xs text-[#abd1c6]/80">
           Это ваш публичный логин. Ссылка на профиль будет выглядеть как{" "}
@@ -262,8 +268,8 @@ export function UsernameEditor({ currentUsername, onSave, disabled }: UsernameEd
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 px-4 py-3 bg-[#001e1d]/20 rounded-xl text-[#fffffe] border border-[#abd1c6]/20">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+      <div className="flex-1 px-3 py-2.5 sm:px-4 sm:py-3 bg-[#001e1d]/20 rounded-xl text-[#fffffe] border border-[#abd1c6]/20">
         {currentUsername ? `@${currentUsername}` : <span className="text-[#abd1c6]">Не задан</span>}
       </div>
       <button
@@ -272,7 +278,7 @@ export function UsernameEditor({ currentUsername, onSave, disabled }: UsernameEd
           setError(null);
         }}
         disabled={disabled}
-        className="px-4 py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors"
+        className="w-full sm:w-auto px-4 py-2.5 sm:py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors"
       >
         {currentUsername ? "Изменить" : "Задать"}
       </button>
@@ -288,7 +294,7 @@ interface EmailVisibilityToggleProps extends BaseEditorProps {
 
 export function EmailVisibilityToggle({ hideEmail, onToggle, disabled }: EmailVisibilityToggleProps) {
   return (
-    <div className="flex items-center justify-between p-4 bg-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20">
       <div>
         <h4 className="text-sm font-medium text-[#fffffe] mb-1">Видимость email</h4>
         <p className="text-xs text-[#abd1c6]">
@@ -437,36 +443,38 @@ export function SocialLinkEditor({
         <label className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">
           {label}
         </label>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={placeholder}
             disabled={disabled}
-            className={`flex-1 px-4 py-3 border rounded-xl bg-[#001e1d]/20 text-[#fffffe] focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent ${
+            className={`w-full sm:flex-1 px-3 py-2.5 sm:px-4 sm:py-3 border rounded-xl bg-[#001e1d]/20 text-[#fffffe] focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent ${
               error ? "border-red-500" : "border-[#abd1c6]/30"
             }`}
             autoFocus
           />
-          <button
-            onClick={handleSave}
-            disabled={disabled}
-            className="px-4 py-3 bg-[#10B981] hover:bg-[#059669] disabled:bg-[#6B7280] text-white font-semibold rounded-xl transition-colors"
-          >
-            ✓
-          </button>
-          <button
-            onClick={() => {
-              setInputValue(value || "");
-              setError(null);
-              setIsEditing(false);
-            }}
-            disabled={disabled}
-            className="px-4 py-3 bg-[#6B7280] hover:bg-[#4B5563] text-white font-semibold rounded-xl transition-colors"
-          >
-            ✗
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSave}
+              disabled={disabled}
+              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#10B981] hover:bg-[#059669] disabled:bg-[#6B7280] text-white font-semibold rounded-xl transition-colors"
+            >
+              ✓
+            </button>
+            <button
+              onClick={() => {
+                setInputValue(value || "");
+                setError(null);
+                setIsEditing(false);
+              }}
+              disabled={disabled}
+              className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#6B7280] hover:bg-[#4B5563] text-white font-semibold rounded-xl transition-colors"
+            >
+              ✗
+            </button>
+          </div>
         </div>
         <p className="text-xs text-[#abd1c6]/80">
           {type === "vk"
@@ -485,8 +493,8 @@ export function SocialLinkEditor({
       <label className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">
         {label}
       </label>
-      <div className="flex items-center gap-2">
-        <div className="flex-1 px-4 py-3 bg-[#001e1d]/20 rounded-xl text-sm text-[#fffffe] border border-[#abd1c6]/20 overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        <div className="flex-1 px-3 py-2.5 sm:px-4 sm:py-3 bg-[#001e1d]/20 rounded-xl text-sm text-[#fffffe] border border-[#abd1c6]/20 overflow-hidden">
           {value ? (
             <a
               href={value}
@@ -506,7 +514,7 @@ export function SocialLinkEditor({
             setError(null);
           }}
           disabled={disabled}
-          className="px-4 py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors"
+          className="w-full sm:w-auto px-4 py-2.5 sm:py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors"
         >
           {value ? "Изменить" : "Добавить"}
         </button>
@@ -514,7 +522,7 @@ export function SocialLinkEditor({
           <button
             onClick={() => onSave("")}
             disabled={disabled}
-            className="px-4 py-3 bg-transparent border border-[#abd1c6]/40 text-[#abd1c6] rounded-xl hover:border-[#abd1c6] transition-colors"
+            className="w-full sm:w-auto px-4 py-2.5 sm:py-3 bg-transparent border border-[#abd1c6]/40 text-[#abd1c6] rounded-xl hover:border-[#abd1c6] transition-colors"
           >
             Очистить
           </button>

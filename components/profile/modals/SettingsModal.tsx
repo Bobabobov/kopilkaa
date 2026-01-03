@@ -38,7 +38,7 @@ function ReadOnlyField({ label, value }: { label: string; value: string }) {
       <label className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">
         {label}
       </label>
-      <div className="px-4 py-3 bg-[#001e1d]/20 rounded-xl text-[#abd1c6] border border-[#abd1c6]/20">
+      <div className="px-3 py-2.5 sm:px-4 sm:py-3 bg-[#001e1d]/20 rounded-xl text-[#abd1c6] border border-[#abd1c6]/20">
         {value}
       </div>
     </div>
@@ -63,18 +63,19 @@ function CopyField({
       <label className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">
         {label}
       </label>
-      <div className="flex items-center gap-2">
-        <div className="flex-1 px-4 py-3 bg-[#001e1d]/20 rounded-xl text-[#abd1c6] border border-[#abd1c6]/20 overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        <div className="flex-1 px-3 py-2.5 sm:px-4 sm:py-3 bg-[#001e1d]/20 rounded-xl text-[#abd1c6] border border-[#abd1c6]/20 overflow-hidden">
           <span className="text-[#fffffe] break-all">{value}</span>
         </div>
         <button
           type="button"
           onClick={() => onCopy(copyValue)}
           disabled={disabled}
-          className="px-4 py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors inline-flex items-center gap-2"
+          className="w-full sm:w-auto shrink-0 px-3 py-2.5 sm:px-4 sm:py-3 bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-2"
         >
           <LucideIcons.Copy size="sm" />
           <span className="hidden sm:inline">Скопировать</span>
+          <span className="sm:hidden">Копировать</span>
         </button>
       </div>
     </div>
@@ -243,7 +244,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/60 backdrop-blur-md z-[999] flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-[999] flex items-end sm:items-center justify-center p-2 sm:p-4"
         onClick={onClose}
       >
         <motion.div
@@ -252,7 +253,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="rounded-3xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] mx-4 flex flex-col custom-scrollbar"
+          className="rounded-2xl sm:rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92dvh] sm:max-h-[85vh] overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] mx-2 sm:mx-4 flex flex-col custom-scrollbar"
           style={{
             border: '1px solid transparent',
             background: 'linear-gradient(to right, #004643, #001e1d) border-box, linear-gradient(135deg, #004643, #001e1d) padding-box',
@@ -268,14 +269,14 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           tabIndex={-1}
         >
           {/* Заголовок */}
-          <div className="p-6 border-b border-[#abd1c6]/20 flex-shrink-0">
+          <div className="p-4 sm:p-6 border-b border-[#abd1c6]/20 flex-shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[#f9bc60] rounded-2xl flex items-center justify-center">
-                  <LucideIcons.Settings size="lg" className="text-[#001e1d]" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#f9bc60] rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <LucideIcons.Settings size="md" className="text-[#001e1d]" />
                 </div>
                 <div>
-                  <h2 id="profile-settings-title" className="text-2xl font-bold text-[#fffffe]">
+                  <h2 id="profile-settings-title" className="text-xl sm:text-2xl font-bold text-[#fffffe]">
                     Настройки профиля
                   </h2>
                   <p id="profile-settings-desc" className="text-[#abd1c6]">
@@ -336,13 +337,13 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           </AnimatePresence>
 
           {/* Контент */}
-          <div className="flex-1 p-6 overflow-y-auto overscroll-contain">
+          <div className="flex-1 p-4 sm:p-6 overflow-y-auto overscroll-contain">
             {loading ? (
               <SettingsLoading />
             ) : !user ? (
               <SettingsUnauthorized />
             ) : (
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 {/* Аватарка */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-5">
                   <div className="flex items-center gap-4">

@@ -11,6 +11,7 @@ export function AdminHeader() {
     { href: "/admin", label: "Заявки" },
     { href: "/admin/users", label: "Пользователи" },
     { href: "/admin/heroes", label: "Герои" },
+    { href: "/admin/balance", label: "Баланс" },
     { href: "/admin/achievements", label: "Достижения" },
     { href: "/admin/ads", label: "Реклама" },
     { href: "/admin/news", label: "Новости" },

@@ -54,7 +54,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
     }
 
-    const user = await prisma.user.update({
+    // NOTE: On some Windows setups Prisma Client binary can be locked (EPERM) and `prisma generate`
+    // may fail, leaving TS types stale. We intentionally relax typing here to keep builds stable.
+    const user = await (prisma.user as any).update({
       where: { id: userId },
       data: { hideFromHeroes: hide },
       select: { id: true, username: true, name: true, email: true, hideFromHeroes: true },

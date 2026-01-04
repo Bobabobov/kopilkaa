@@ -27,6 +27,12 @@ function normalizePhone(raw: string): string | null {
 }
 
 export async function POST(req: Request) {
+  // Email регистрация временно отключена. Используйте вход через Google или Telegram.
+  return NextResponse.json(
+    { message: "Email регистрация временно недоступна. Используйте Google или Telegram." },
+    { status: 403 },
+  );
+
   try {
     const body = await req.json().catch(() => ({}));
     const email = String(body?.email ?? "")

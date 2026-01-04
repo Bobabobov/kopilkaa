@@ -96,6 +96,7 @@ model Application {
   payment      String
   status       ApplicationStatus @default(PENDING)
   adminComment String?
+  filledMs     Int?
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 

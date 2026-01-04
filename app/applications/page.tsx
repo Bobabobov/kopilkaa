@@ -43,8 +43,8 @@ const LIMITS = {
   summaryMax: 140,
   storyMin: 10,
   storyMax: 3000,
-  amountMin: 1,
-  amountMax: 1000000,
+  amountMin: 50,
+  amountMax: 5000,
   paymentMin: 10,
   paymentMax: 200,
   maxPhotos: 5,
@@ -175,13 +175,17 @@ export default function ApplicationsPage() {
     const caret = e.target.selectionStart ?? raw.length;
     const digitsBeforeCaret = countDigits(raw.slice(0, caret));
     const nextDigits = raw.replace(/[^\d]/g, "");
+    const clampedDigits =
+      nextDigits.length === 0
+        ? ""
+        : Math.min(parseInt(nextDigits, 10), LIMITS.amountMax).toString();
 
-    setAmount(nextDigits);
+    setAmount(clampedDigits);
 
     requestAnimationFrame(() => {
       const el = amountInputRef.current;
       if (!el) return;
-      const nextFormatted = formatAmountRu(nextDigits);
+      const nextFormatted = formatAmountRu(clampedDigits);
       const safeDigitsBefore = Math.min(digitsBeforeCaret, countDigits(nextFormatted));
       const nextCaret = caretPosForDigitIndex(nextFormatted, safeDigitsBefore);
       try {
@@ -328,9 +332,15 @@ export default function ApplicationsPage() {
         pushAuth("auth");
         return;
       }
-      if (r.status === 429 && d?.leftMs) {
-        setLeft(d.leftMs);
-        throw new Error("Лимит: 1 заявка в 24 часа");
+      if (r.status === 429) {
+        if (d?.leftMs) {
+          setLeft(d.leftMs);
+          throw new Error("Лимит: 1 заявка в 24 часа");
+        }
+        if (d?.error) {
+          throw new Error(d.error);
+        }
+        throw new Error("Превышен лимит. Попробуйте позже.");
       }
       if (!r.ok) throw new Error(d?.error || "Ошибка отправки");
 
@@ -556,7 +566,7 @@ export default function ApplicationsPage() {
                     Подробная история *
                   </label>
                   <p className="text-xs text-[#abd1c6]/70 mb-3">
-                    Подробное описание ситуации (минимум 10, максимум 3000 символов). Используйте кнопки для форматирования текста.
+                    Подробное описание ситуации (минимум 10, максимум 3000 символов). Используйте кнопки для форматирования текста. Вставка запрещена: введите текст вручную.
                   </p>
                   <RichTextEditor
                     value={story}
@@ -577,7 +587,7 @@ export default function ApplicationsPage() {
                     value={formatAmountRu(amount)}
                     onChange={() => {}}
                     placeholder="Укажите сумму в рублях..."
-                    hint="Сумма в рублях (от 1 до 1 000 000 рублей)"
+                    hint="Сумма в рублях (от 50 до 5 000 рублей)"
                     minLength={LIMITS.amountMin}
                     maxLength={7}
                     inputProps={{

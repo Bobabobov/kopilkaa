@@ -176,6 +176,7 @@ export default function AdminApplicationPage({
               amount={item.amount}
               userEmail={item.user.email}
               summary={item.summary}
+              filledMs={item.filledMs}
               onCopyEmail={handleCopyEmail}
             />
 

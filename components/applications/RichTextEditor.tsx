@@ -31,6 +31,7 @@ export default function RichTextEditor({
 }: RichTextEditorProps) {
   const [linkUrl, setLinkUrl] = useState("");
   const [showLinkInput, setShowLinkInput] = useState(false);
+  const [pasteBlocked, setPasteBlocked] = useState(false);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -65,6 +66,18 @@ export default function RichTextEditor({
         class: "prose prose-sm max-w-none focus:outline-none",
         style: "min-height: " + rows * 1.75 + "rem;",
       },
+      handlePaste: () => {
+        // Запрещаем вставку — только ручной ввод
+        setPasteBlocked(true);
+        if (typeof window !== "undefined") {
+          try {
+            window.getSelection()?.removeAllRanges();
+          } catch {
+            // ignore
+          }
+        }
+        return true;
+      },
     },
   });
 
@@ -91,6 +104,11 @@ export default function RichTextEditor({
 
   return (
     <div className={`space-y-2 w-full max-w-full overflow-hidden ${className}`}>
+      {pasteBlocked && (
+        <div className="text-[12px] text-[#e16162]">
+          Вставка запрещена: введите текст вручную.
+        </div>
+      )}
       {/* Панель инструментов */}
       <div className="flex flex-wrap gap-2 p-3 bg-[#001e1d]/40 rounded-xl border border-[#abd1c6]/20 w-full max-w-full">
         {/* Жирный */}

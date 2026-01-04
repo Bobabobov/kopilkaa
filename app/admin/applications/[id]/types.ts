@@ -10,6 +10,7 @@ export type ApplicationItem = {
   payment: string;
   status: ApplicationStatus;
   adminComment: string | null;
+  filledMs?: number | null;
   createdAt: string;
   user: { email: string; id: string };
   images: { url: string; sort: number }[];

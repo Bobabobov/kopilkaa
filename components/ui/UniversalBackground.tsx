@@ -9,7 +9,7 @@ export default function UniversalBackground() {
         className="fixed inset-0 -z-10 overflow-hidden pointer-events-none"
         aria-hidden="true"
       >
-        {/* Фоновое изображение */}
+        {/* Фоновое изображение из public/fon5.png */}
         <Image
           src="/fon5.png"
           alt=""

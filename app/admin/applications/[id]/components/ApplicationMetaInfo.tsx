@@ -7,6 +7,7 @@ interface ApplicationMetaInfoProps {
   userEmail: string;
   summary: string;
   onCopyEmail: (email: string) => void;
+  filledMs?: number | null;
 }
 
 export default function ApplicationMetaInfo({
@@ -14,7 +15,17 @@ export default function ApplicationMetaInfo({
   userEmail,
   summary,
   onCopyEmail,
+  filledMs,
 }: ApplicationMetaInfoProps) {
+  const formattedTime = (() => {
+    if (typeof filledMs !== "number" || !Number.isFinite(filledMs)) return null;
+    const totalSec = Math.max(0, Math.round(filledMs / 1000));
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    if (min === 0) return `${sec} c`;
+    return `${min} мин ${sec.toString().padStart(2, "0")} c`;
+  })();
+
   return (
     <>
       {/* Сумма, автор и краткое описание */}
@@ -25,7 +36,10 @@ export default function ApplicationMetaInfo({
         className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"
       >
         {/* Сумма запроса */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#f9bc60]/20 to-[#f9bc60]/10 rounded-xl border border-[#f9bc60]/30">
+        <div
+          className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-4 py-3 rounded-xl border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)]"
+          style={{ backgroundColor: "#0b1615", borderColor: "rgba(249,188,96,0.25)" }}
+        >
           <span className="font-bold text-xl sm:text-2xl" style={{ color: "#f9bc60" }}>
             ₽{amount.toLocaleString()}
           </span>
@@ -35,7 +49,10 @@ export default function ApplicationMetaInfo({
         </div>
 
         {/* Автор */}
-        <div className="flex items-center gap-2 text-sm bg-[#001e1d]/40 rounded-xl p-3 sm:p-4 border border-[#abd1c6]/10">
+        <div
+          className="flex items-center gap-2 text-sm rounded-xl p-3 sm:p-4 border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)]"
+          style={{ backgroundColor: "#0b1615", borderColor: "rgba(171,209,198,0.2)" }}
+        >
           <svg
             className="w-4 h-4 flex-shrink-0"
             fill="none"
@@ -81,6 +98,21 @@ export default function ApplicationMetaInfo({
             </svg>
           </button>
         </div>
+
+        {/* Время заполнения */}
+        {formattedTime && (
+          <div
+            className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-4 py-3 rounded-xl border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)]"
+            style={{ backgroundColor: "#0b1615", borderColor: "rgba(171,209,198,0.2)" }}
+          >
+            <span className="font-semibold text-lg sm:text-xl" style={{ color: "#abd1c6" }}>
+              {formattedTime}
+            </span>
+            <span className="text-xs sm:text-sm font-medium" style={{ color: "#94a1b2" }}>
+              Время заполнения формы
+            </span>
+          </div>
+        )}
       </motion.div>
 
       {/* Краткое описание */}
@@ -90,7 +122,10 @@ export default function ApplicationMetaInfo({
         transition={{ duration: 0.5, delay: 0.4 }}
         className="mb-6"
       >
-        <div className="text-base sm:text-lg break-words leading-relaxed bg-[#001e1d]/40 rounded-xl p-4 sm:p-6 border border-[#abd1c6]/10" style={{ color: "#fffffe" }}>
+        <div
+          className="text-base sm:text-lg break-words leading-relaxed rounded-xl p-4 sm:p-6 border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)]"
+          style={{ backgroundColor: "#0b1615", borderColor: "rgba(171,209,198,0.2)", color: "#e8f2ef" }}
+        >
           {summary}
         </div>
       </motion.div>

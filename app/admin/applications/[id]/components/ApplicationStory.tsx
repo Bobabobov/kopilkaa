@@ -31,26 +31,26 @@ export default function ApplicationStory({ story }: ApplicationStoryProps) {
         История
       </h3>
       <div 
-        className="break-words text-sm sm:text-base leading-relaxed rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border prose prose-sm sm:prose-base max-w-none"
+        className="break-words text-[15px] sm:text-base lg:text-[17px] leading-8 sm:leading-8 lg:leading-9 rounded-xl sm:rounded-2xl p-5 sm:p-7 lg:p-9 border prose prose-sm sm:prose-base max-w-none shadow-[0_18px_48px_-30px_rgba(0,0,0,0.9)]"
         style={{ 
-          backgroundColor: "#001e1d",
-          borderColor: "#abd1c6/20",
-          color: "#fffffe"
+          backgroundColor: "#0e1f1d",
+          borderColor: "rgba(171, 209, 198, 0.35)",
+          color: "#f8fbfa"
         }}
         dangerouslySetInnerHTML={{ __html: story }}
       />
       <style jsx global>{`
         .prose {
-          color: #fffffe !important;
+          color: #f8fbfa !important;
         }
         .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-          color: #fffffe !important;
+          color: #f8fbfa !important;
         }
         .prose strong {
-          color: #fffffe !important;
+          color: #f8fbfa !important;
         }
         .prose ul, .prose ol {
-          color: #fffffe !important;
+          color: #f8fbfa !important;
         }
         .prose a {
           color: #f9bc60 !important;

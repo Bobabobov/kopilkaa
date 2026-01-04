@@ -60,12 +60,15 @@ export default function ApplicationPaymentDetails({
           <span className="label-closed">Показать реквизиты</span>
           <span className="label-open">Скрыть реквизиты</span>
         </summary>
-        <div className="open-only rounded-xl bg-[#001e1d]/60 border border-[#abd1c6]/20 relative group p-4 sm:p-6">
+        <div
+          className="open-only rounded-xl border relative group p-4 sm:p-6 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.7)]"
+          style={{ backgroundColor: "#0b1615", borderColor: "rgba(171,209,198,0.25)" }}
+        >
           <div className="break-all text-anywhere pr-12 sm:pr-16">
             <span className="font-medium text-sm sm:text-base" style={{ color: "#abd1c6" }}>
               Реквизиты:{" "}
             </span>
-            <span className="select-all text-sm sm:text-base" style={{ color: "#fffffe" }}>
+            <span className="select-all text-sm sm:text-base" style={{ color: "#e8f2ef" }}>
               {payment}
             </span>
           </div>

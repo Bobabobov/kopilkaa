@@ -21,7 +21,7 @@ export default function ApplicationFooter({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.9 }}
       className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t"
-      style={{ borderColor: "#abd1c6/20" }}
+      style={{ borderColor: "rgba(171,209,198,0.2)" }}
     >
       <div className="flex items-center gap-2 text-xs sm:text-sm" style={{ color: "#abd1c6" }}>
         <svg

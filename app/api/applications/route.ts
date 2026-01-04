@@ -9,11 +9,19 @@ import {
 } from "@/lib/applications/sanitize";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const WHITELIST_EMAILS = ["bobov097@gmail.com"];
 
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session)
     return Response.json({ error: "Требуется вход" }, { status: 401 });
+
+  const requester = await prisma.user.findUnique({
+    where: { id: session.uid },
+    select: { email: true },
+  });
+  const isWhitelisted =
+    requester?.email && WHITELIST_EMAILS.includes(requester.email.toLowerCase());
 
   try {
     const { title, summary, story, amount, payment, images, hpCompany, clientMeta } =
@@ -34,16 +42,25 @@ export async function POST(req: Request) {
     }
 
     const filledMs = clientMeta?.filledMs;
+    const clampedFilledMs =
+      typeof filledMs === "number" && Number.isFinite(filledMs) && filledMs >= 0
+        ? Math.min(Math.round(filledMs), 24 * 60 * 60 * 1000) // до 24 часов
+        : null;
     const isAdmin = session.role === "ADMIN";
     if (
       !isAdmin &&
+      !isWhitelisted &&
       typeof filledMs === "number" &&
       Number.isFinite(filledMs) &&
       filledMs >= 0 &&
       filledMs < 2500
     ) {
       return Response.json(
-        { error: "Слишком быстро. Попробуйте заполнить форму вручную.", retryAfterMs: 5000 },
+        {
+          error:
+            "Слишком быстро заполнено (менее 3 секунд). Заполните форму вручную и отправьте ещё раз.",
+          retryAfterMs: 5000,
+        },
         { status: 429 },
       );
     }
@@ -98,7 +115,7 @@ export async function POST(req: Request) {
     }
 
     // Лимит раз в 24 часа (только для обычных пользователей)
-    if (session.role !== "ADMIN") {
+    if (session.role !== "ADMIN" && !isWhitelisted) {
       const last = await prisma.application.findFirst({
         where: { userId: session.uid },
         orderBy: { createdAt: "desc" },
@@ -127,6 +144,7 @@ export async function POST(req: Request) {
           story: sanitizedStory,
           amount: parseInt(amount),
           payment,
+          filledMs: clampedFilledMs,
         },
         select: { id: true },
       });

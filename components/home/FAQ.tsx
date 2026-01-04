@@ -62,7 +62,7 @@ export default function FAQ() {
   };
 
   return (
-    <section className="py-20 px-4" id="faq">
+    <section className="py-24 px-4" id="faq">
       <div className="max-w-4xl mx-auto">
         {/* Заголовок секции */}
         <motion.div
@@ -96,7 +96,7 @@ export default function FAQ() {
               >
                 <button
                   onClick={() => toggleFAQ(index)}
-                  className="w-full text-left bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
+                  className="w-full text-left bg-white/[0.04] backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
                 >
                   <div className="flex items-start gap-4">
                     {/* Иконка */}
@@ -161,7 +161,7 @@ export default function FAQ() {
           className="text-center mt-12"
         >
           <p className="text-lg mb-4" style={{ color: "#abd1c6" }}>
-            Готовы попробовать свою удачу?
+            Готовы рассказать свою историю?
           </p>
           <a
             href="/applications"

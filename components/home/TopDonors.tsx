@@ -8,6 +8,7 @@ import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
+import Image from "next/image";
 
 interface Donor {
   id: string;
@@ -179,13 +180,14 @@ export default function TopDonors() {
                   <div className="relative flex items-center gap-4">
                     <div className="relative flex-shrink-0">
                       <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-[#f9bc60] shadow-md shadow-[#f9bc60]/40">
-                        <img
+                        <Image
                           src={topDonor.avatar || "/default-avatar.png"}
                           alt={topDonor.name}
+                          width={56}
+                          height={56}
+                          sizes="56px"
+                          quality={70}
                           className="h-full w-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = "/default-avatar.png";
-                          }}
                         />
                       </div>
                       {getRankIcon(1)}
@@ -308,13 +310,14 @@ export default function TopDonors() {
                                 isSecond ? "h-11 w-11" : "h-10 w-10"
                               }`}
                             >
-                              <img
+                              <Image
                                 src={donor.avatar || "/default-avatar.png"}
                                 alt={donor.name}
+                                width={isSecond ? 44 : 40}
+                                height={isSecond ? 44 : 40}
+                                sizes={isSecond ? "44px" : "40px"}
+                                quality={70}
                                 className="h-full w-full object-cover"
-                                onError={(e) => {
-                                  e.currentTarget.src = "/default-avatar.png";
-                                }}
                               />
                             </div>
                             <div className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#001e1d] border border-[#f9bc60]/80 text-[9px] text-[#f9bc60] shadow-sm">

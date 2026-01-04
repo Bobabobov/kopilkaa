@@ -24,7 +24,7 @@ export default function UniversalBackground() {
         {/* Затемняющий overlay */}
         <div
           className="absolute inset-0"
-          style={{ backgroundColor: "rgba(0, 70, 67, 0.35)" }}
+          style={{ backgroundColor: "rgba(0, 70, 67, 0.26)" }}
         />
       </div>
     </>

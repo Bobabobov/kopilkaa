@@ -66,7 +66,7 @@ export default function RecentApplications() {
   }
 
   return (
-    <section className="py-20 px-4" id="recent-applications">
+    <section className="py-24 px-4" id="recent-applications">
       <div className="max-w-6xl mx-auto">
         {/* Заголовок секции */}
         <motion.div
@@ -85,7 +85,7 @@ export default function RecentApplications() {
         </motion.div>
 
         {/* Сетка заявок */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
           {applications.map((app, index) => (
             <motion.div
               key={app.id}
@@ -96,7 +96,7 @@ export default function RecentApplications() {
             >
               <Link
                 href={`/stories/${app.id}`}
-                className="block bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105 h-full"
+                className="block bg-white/[0.04] backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-[1.02] h-full"
               >
                 {/* Изображение */}
                 <div className="relative h-48 overflow-hidden bg-gray-800">

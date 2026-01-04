@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useBulldog } from "@/lib/useBulldog";
 import AdSection from "./AdSection";
 import DonateButton from "@/components/donate/DonateButton";
 import TelegramChannel from "./TelegramChannel";
@@ -20,26 +19,21 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ stats, loading }: HeroSectionProps) {
-  const { state, handleClick, getMessage } = useBulldog();
-
   return (
-    <div className="flex items-start justify-center px-4 pt-8 pb-8 relative">
-      <div className="text-center max-w-4xl mx-auto">
+    <section className="relative px-4 pt-12 pb-14 sm:pt-16 sm:pb-16">
+      <div className="mx-auto max-w-6xl">
+        <div className="text-center max-w-4xl mx-auto">
         {/* Основной заголовок */}
         <h1
-          className="text-5xl md:text-7xl font-bold mb-6"
-          style={{ color: "#fffffe" }}
+          className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-5 text-[#fffffe]"
         >
           Расскажи свою историю —{" "}
-          <span style={{ color: "#f9bc60" }}>получи возможность получить деньги</span>
+          <span className="text-[#f9bc60]">получи шанс на поддержку</span>
         </h1>
 
         {/* Описание */}
-        <p
-          className="text-xl md:text-2xl mb-8 leading-relaxed"
-          style={{ color: "#abd1c6" }}
-        >
-          Копилка — платформа, которая самостоятельно оказывает финансовую поддержку пользователям
+        <p className="text-lg sm:text-xl md:text-2xl mb-9 leading-relaxed text-[#abd1c6]">
+          «Копилка» — независимая платформа: мы читаем истории и принимаем решения самостоятельно.
         </p>
 
         {/* Кнопки действий */}
@@ -47,115 +41,56 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-center mb-12 space-y-4"
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="text-center mb-10"
         >
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/support" className="inline-block">
-              <motion.span
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                animate={{ 
-                  boxShadow: [
-                    "0 0 20px rgba(249, 188, 96, 0.3)",
-                    "0 0 30px rgba(249, 188, 96, 0.6)", 
-                    "0 0 20px rgba(249, 188, 96, 0.3)"
-                  ] 
-                }}
-                transition={{ 
-                  boxShadow: { 
-                    duration: 2, 
-                    repeat: Infinity, 
-                    ease: "easeInOut" 
-                  } 
-                }}
-                className="inline-flex items-center justify-center px-12 py-4 text-xl font-bold rounded-2xl border-2 transition-all duration-300"
-                style={{
-                  background: "linear-gradient(135deg, rgba(249, 188, 96, 0.1) 0%, rgba(249, 188, 96, 0.2) 100%)",
-                  borderColor: "#f9bc60",
-                  color: "#f9bc60",
-                  backdropFilter: "blur(10px)",
-                }}
-              >
-                <motion.span
-                  animate={{ 
-                    textShadow: [
-                      "0 0 10px rgba(249, 188, 96, 0.5)",
-                      "0 0 20px rgba(249, 188, 96, 0.8)",
-                      "0 0 10px rgba(249, 188, 96, 0.5)"
-                    ]
-                  }}
-                  transition={{ 
-                    duration: 2.5, 
-                    repeat: Infinity, 
-                    ease: "easeInOut" 
-                  }}
-                >
-                  💫 Стань частью истории
-                </motion.span>
-              </motion.span>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center">
+            <Link
+              href="/applications"
+              className="inline-flex items-center justify-center px-10 py-4 text-lg sm:text-xl font-black rounded-2xl transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d]"
+            >
+              Рассказать историю
             </Link>
-            <DonateButton variant="large" />
+            <DonateButton variant="large" className="w-full sm:w-auto" />
           </div>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="mt-4 text-base" 
-            style={{ color: "#abd1c6" }}
-          >
-            В знак благодарности поддержавшие могут быть отмечены в рейтинге сообщества "Герои"
-          </motion.p>
+          <div className="mt-4 flex flex-col sm:flex-row gap-2 items-center justify-center text-sm sm:text-base text-[#abd1c6]">
+            <Link href="/stories" className="underline underline-offset-4 hover:text-[#fffffe] transition-colors">
+              Смотреть истории →
+            </Link>
+            <span className="hidden sm:inline text-[#abd1c6]/60">•</span>
+            <a href="#how-it-works" className="underline underline-offset-4 hover:text-[#fffffe] transition-colors">
+              Как это работает
+            </a>
+          </div>
+          <p className="mt-4 text-sm text-[#94a1b2] max-w-2xl mx-auto leading-relaxed">
+            Решение не гарантировано. Мы стараемся помогать честно и по возможности.
+          </p>
         </motion.div>
 
-        {/* Кнопки */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <Link
-            href="/applications"
-            className="px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-105"
-            style={{
-              backgroundColor: "#f9bc60",
-              color: "#001e1d",
-            }}
-          >
-            Рассказать историю
-          </Link>
-
-          <Link
-            href="/stories"
-            className="px-8 py-4 text-lg font-semibold rounded-lg border-2 transition-all duration-200 hover:scale-105"
-            style={{
-              borderColor: "#abd1c6",
-              color: "#abd1c6",
-            }}
-          >
-            Смотреть истории
-          </Link>
-        </div>
-
         {/* Рекламная карточка для мобильных — между кнопками и Telegram каналом */}
-        <div className="mb-10 md:hidden">
+        <div className="mb-12 md:hidden">
           <AdSection variant="feed" />
         </div>
 
         {/* Рекламный блок
             Показываем только на средних и больших экранах */}
-        <div className="mb-10 hidden md:flex justify-center">
+        <div className="mb-12 hidden md:flex justify-center">
           <div className="w-full" style={{ maxWidth: '900px' }}>
             <AdSection variant="sidebar" />
           </div>
         </div>
 
         {/* Telegram канал */}
-        <div className="mb-10">
+        <div className="mb-12">
           <TelegramChannel />
         </div>
 
         {/* Статистика платформы */}
-        <div className="max-w-2xl mx-auto animate-fade-in-up">
-          <h2 className="text-3xl font-bold mb-8" style={{ color: "#fffffe" }}>
-            Статистика платформы
-          </h2>
+        <div className="max-w-3xl mx-auto">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-7 sm:p-10">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-[#fffffe]">
+              Статистика
+            </h2>
 
           {/* Основная сумма */}
           <motion.div
@@ -183,7 +118,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           </motion.div>
 
           {/* Компактная статистика */}
-          <div className="grid grid-cols-3 gap-6 max-w-md mx-auto">
+          <div className="grid grid-cols-3 gap-4 sm:gap-6 max-w-md mx-auto">
             <motion.div
               className="text-center"
               initial={{ opacity: 0, y: 20 }}
@@ -238,9 +173,10 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
               </div>
             </motion.div>
           </div>
+          </div>
         </div>
-
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -75,7 +75,7 @@ export default function HowItWorks() {
   };
 
   return (
-    <section className="py-20 px-4" id="how-it-works">
+    <section className="py-24 px-4" id="how-it-works">
       <div className="max-w-6xl mx-auto">
         {/* Заголовок секции */}
         <motion.div
@@ -86,10 +86,10 @@ export default function HowItWorks() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: "#fffffe" }}>
-            💡 Как это работает?
+            Как это работает
           </h2>
           <p className="text-xl md:text-2xl font-semibold mb-2" style={{ color: "#abd1c6" }}>
-            Четыре простых шага.
+            4 шага — коротко и по делу.
           </p>
         </motion.div>
 
@@ -119,7 +119,7 @@ export default function HowItWorks() {
                 )}
 
                 {/* Карточка шага */}
-                <div className="relative bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105 h-full group overflow-hidden">
+                <div className="relative bg-white/[0.04] backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-[1.02] h-full group overflow-hidden">
                   {/* Фоновая декорация */}
                   <div 
                     className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity"
@@ -213,7 +213,7 @@ export default function HowItWorks() {
             }}
           >
             <span>
-              {loading ? "Загрузка..." : isAuthenticated ? "Рассказать историю" : "Попробовать удачу"}
+              {loading ? "Загрузка..." : "Рассказать историю"}
             </span>
             {!loading && (
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

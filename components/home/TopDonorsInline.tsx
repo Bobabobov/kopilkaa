@@ -8,6 +8,7 @@ import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
+import Image from "next/image";
 
 interface Donor {
   id: string;
@@ -86,7 +87,7 @@ export default function TopDonorsInline() {
       : null;
 
   return (
-    <section className="pt-6 pb-16 px-4">
+    <section className="pt-10 pb-20 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Заголовок секции */}
         <div className="text-center mb-10">
@@ -138,7 +139,7 @@ export default function TopDonorsInline() {
           <div className="pointer-events-none absolute -left-10 top-0 h-32 w-32 rounded-full bg-[#f9bc60]/10 blur-3xl" />
           <div className="pointer-events-none absolute -right-10 bottom-0 h-32 w-32 rounded-full bg-[#e16162]/12 blur-3xl" />
 
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
           {donors.map((donor, index) => {
             const numericAmount = parseInt(donor.amount.replace(/\D/g, ""), 10);
             const formattedAmount = Number.isNaN(numericAmount)
@@ -175,7 +176,7 @@ export default function TopDonorsInline() {
                 className="block h-full"
               >
                 <div
-                  className={`rounded-2xl overflow-hidden border ${cardBorder} bg-[#001e1d]/90 shadow-xl shadow-black/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl h-full`}
+                  className={`rounded-2xl overflow-hidden border ${cardBorder} bg-[#001e1d]/90 shadow-lg shadow-black/35 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl h-full`}
                 >
                 <div className="p-6 flex flex-col h-full">
                   {/* Верхняя часть: место + имя + аватар */}
@@ -189,13 +190,13 @@ export default function TopDonorsInline() {
                         }`}
                       >
                         <div className="w-full h-full rounded-full overflow-hidden bg-[#004643]">
-                        <img
+                        <Image
                           src={donor.avatar || "/default-avatar.png"}
                           alt={donor.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = "/default-avatar.png";
-                          }}
+                          fill
+                          sizes="48px"
+                          quality={70}
+                          className="object-cover"
                         />
                       </div>
                       </div>

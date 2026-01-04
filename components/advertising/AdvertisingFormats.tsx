@@ -5,7 +5,7 @@ const formats = [
     id: "top-banner",
     name: "Большой баннер наверху",
     why: "Видят все без исключения",
-    price: "3000₽",
+    price: "Договорная цена",
     time: "неделя",
     reality: "План: выйти на ~5000 показов в день по мере роста проекта",
   },
@@ -13,7 +13,7 @@ const formats = [
     id: "side",
     name: "Блок сбоку на главной",
     why: "Постоянно на виду",
-    price: "1500₽",
+    price: "Договорная цена",
     time: "неделя",
     reality: "Особенно заметен на старте, пока рекламодателей немного",
   },
@@ -21,7 +21,7 @@ const formats = [
     id: "story",
     name: "Рекламная история",
     why: "Отдельная история в разделе /stories на неделю (можно продлить по договорённости)",
-    price: "2000₽",
+    price: "Договорная цена",
     time: "неделя",
     reality:
       "Вы получаете свой блок в списке историй и отдельную страницу с подробным текстом и фотографиями — честный рассказ о вас, без приукрашивания и фейковых цифр.",
@@ -30,7 +30,7 @@ const formats = [
     id: "tg",
     name: "Пост в нашем Telegram",
     why: "Прямо в руки подписчикам",
-    price: "1000₽",
+    price: "Договорная цена",
     time: "один раз",
     reality: "Живой Telegram‑канал, аудитория растёт",
   },
@@ -41,8 +41,10 @@ export function AdvertisingFormats() {
     <section id="formats" className="py-24 px-4 border-t border-[#abd1c6]/10">
       <div className="container mx-auto max-w-6xl">
         <div className="mb-16">
-          <h2 className="text-5xl font-bold text-[#fffffe] mb-4">Что можно купить</h2>
-          <p className="text-xl text-[#abd1c6]">Четыре варианта. Выбирайте любой.</p>
+          <h2 className="text-5xl font-bold text-[#fffffe] mb-4">Форматы размещения</h2>
+          <p className="text-xl text-[#abd1c6]">
+            4 варианта под разные задачи. Цена — договорная, поможем выбрать.
+          </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -60,7 +62,7 @@ export function AdvertisingFormats() {
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-[#f9bc60]">{format.price}</div>
-                  <div className="text-[#abd1c6] text-sm">{format.time}</div>
+                  <div className="text-[#abd1c6] text-sm">Срок: {format.time}</div>
                 </div>
               </div>
 

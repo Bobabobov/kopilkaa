@@ -1,5 +1,6 @@
 // app/api/applications/recent/route.ts
 import { prisma } from "@/lib/db";
+import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 // Явно указываем, что роут динамический (использует request.url)
 export const dynamic = 'force-dynamic';
@@ -48,9 +49,15 @@ export async function GET(req: Request) {
       },
     }).catch(() => []);
 
+    const userIds = applications.map((a) => a.user?.id).filter(Boolean) as string[];
+    const badgeMap = await getHeroBadgesForUsers(userIds);
+
     return Response.json({
       success: true,
-      applications: applications,
+      applications: applications.map((a: any) => ({
+        ...a,
+        user: a.user ? { ...(a.user as any), heroBadge: badgeMap[a.user.id] ?? null } : a.user,
+      })),
     });
   } catch (error) {
     console.error("Ошибка при получении последних заявок:", error);

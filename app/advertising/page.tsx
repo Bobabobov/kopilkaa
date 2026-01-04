@@ -1,7 +1,6 @@
 "use client";
 
 import { AdvertisingContact } from "@/components/advertising";
-import Link from "next/link";
 
 export default function AdvertisingPage() {
   return (
@@ -33,8 +32,8 @@ export default function AdvertisingPage() {
             <div className="flex items-start gap-4 group">
               <div className="text-[#f9bc60] text-2xl font-bold mt-1">02</div>
               <div>
-                <div className="text-[#fffffe] text-xl font-medium mb-1">Дешевле, чем кажется</div>
-                <div className="text-[#abd1c6]">От 1000 рублей за неделю. Меньше, чем стоит обед в кафе</div>
+                <div className="text-[#fffffe] text-xl font-medium mb-1">Условия — гибкие</div>
+                <div className="text-[#abd1c6]">Цена обсуждается индивидуально — подберём формат и срок под вашу задачу</div>
               </div>
             </div>
 
@@ -59,7 +58,7 @@ export default function AdvertisingPage() {
               href="#formats"
               className="inline-block bg-[#abd1c6] text-[#001e1d] px-10 py-5 text-lg font-medium hover:bg-[#d0e3dd] transition-colors rounded-xl"
             >
-              Посмотреть цены
+              Посмотреть форматы
             </a>
             <a
               href="/standards"
@@ -75,8 +74,10 @@ export default function AdvertisingPage() {
       <section id="formats" className="py-24 px-4 relative z-10">
         <div className="container mx-auto max-w-6xl">
           <div className="mb-16">
-            <h2 className="text-5xl font-bold text-[#fffffe] mb-4">Что можно купить</h2>
-            <p className="text-xl text-[#abd1c6]">Четыре варианта. Выбирайте любой.</p>
+            <h2 className="text-5xl font-bold text-[#fffffe] mb-4">Форматы размещения</h2>
+            <p className="text-xl text-[#abd1c6]">
+              4 варианта под разные задачи. Цена — договорная, поможем выбрать.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
@@ -90,14 +91,19 @@ export default function AdvertisingPage() {
                 Видят все без исключения
               </p>
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-[#f9bc60]">3000₽</span>
-                <span className="text-lg text-[#abd1c6]/80">/ неделя</span>
+                <span className="text-4xl md:text-5xl font-bold text-[#f9bc60]">Договорная цена</span>
               </div>
+              <div className="text-sm text-[#abd1c6]/80 mb-6">Срок: неделя</div>
               <p className="text-sm md:text-base text-[#abd1c6] mb-8 leading-relaxed">
                 План: выйти на ~5000 показов в день по мере роста проекта
               </p>
               <a
-                href="#contact?format=banner"
+                href="#contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.hash = "#contact?format=banner";
+                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+                }}
                 className="inline-flex items-center gap-2 bg-[#f9bc60] text-[#001e1d] px-6 py-3.5 font-semibold hover:bg-[#e8a545] hover:scale-105 transition-all rounded-xl shadow-lg shadow-[#f9bc60]/20"
               >
                 Хочу это →
@@ -114,14 +120,19 @@ export default function AdvertisingPage() {
                 Постоянно на виду
               </p>
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-[#f9bc60]">1500₽</span>
-                <span className="text-lg text-[#abd1c6]/80">/ неделя</span>
+                <span className="text-4xl md:text-5xl font-bold text-[#f9bc60]">Договорная цена</span>
               </div>
+              <div className="text-sm text-[#abd1c6]/80 mb-6">Срок: неделя</div>
               <p className="text-sm md:text-base text-[#abd1c6] mb-8 leading-relaxed">
                 Особенно заметен на старте, пока рекламодателей немного
               </p>
               <a
-                href="#contact?format=side"
+                href="#contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.hash = "#contact?format=side";
+                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+                }}
                 className="inline-flex items-center gap-2 bg-[#f9bc60] text-[#001e1d] px-6 py-3.5 font-semibold hover:bg-[#e8a545] hover:scale-105 transition-all rounded-xl shadow-lg shadow-[#f9bc60]/20"
               >
                 Хочу это →
@@ -138,14 +149,19 @@ export default function AdvertisingPage() {
                 Отдельная история в разделе /stories на неделю (можно продлить по договорённости)
               </p>
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-[#f9bc60]">2000₽</span>
-                <span className="text-lg text-[#abd1c6]/80">/ неделя</span>
+                <span className="text-4xl md:text-5xl font-bold text-[#f9bc60]">Договорная цена</span>
               </div>
+              <div className="text-sm text-[#abd1c6]/80 mb-6">Срок: неделя</div>
               <p className="text-sm md:text-base text-[#abd1c6] mb-8 leading-relaxed">
                 Вы получаете свой блок в списке историй и отдельную страницу с подробным текстом и фотографиями — честный рассказ о вас, без приукрашивания и фейковых цифр.
               </p>
               <a
-                href="#contact?format=story"
+                href="#contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.hash = "#contact?format=story";
+                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+                }}
                 className="inline-flex items-center gap-2 bg-[#f9bc60] text-[#001e1d] px-6 py-3.5 font-semibold hover:bg-[#e8a545] hover:scale-105 transition-all rounded-xl shadow-lg shadow-[#f9bc60]/20"
               >
                 Хочу это →
@@ -162,14 +178,19 @@ export default function AdvertisingPage() {
                 Прямо в руки подписчикам
               </p>
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-5xl font-bold text-[#f9bc60]">1000₽</span>
-                <span className="text-lg text-[#abd1c6]/80">/ один раз</span>
+                <span className="text-4xl md:text-5xl font-bold text-[#f9bc60]">Договорная цена</span>
               </div>
+              <div className="text-sm text-[#abd1c6]/80 mb-6">Срок: один раз</div>
               <p className="text-sm md:text-base text-[#abd1c6] mb-8 leading-relaxed">
                 Живой Telegram‑канал, аудитория растёт
               </p>
               <a
-                href="#contact?format=tg"
+                href="#contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.hash = "#contact?format=tg";
+                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+                }}
                 className="inline-flex items-center gap-2 bg-[#f9bc60] text-[#001e1d] px-6 py-3.5 font-semibold hover:bg-[#e8a545] hover:scale-105 transition-all rounded-xl shadow-lg shadow-[#f9bc60]/20"
               >
                 Хочу это →

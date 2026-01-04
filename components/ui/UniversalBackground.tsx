@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 export default function UniversalBackground() {
   return (
     <>
@@ -8,12 +10,15 @@ export default function UniversalBackground() {
         aria-hidden="true"
       >
         {/* Фоновое изображение */}
-        <img
+        <Image
           src="/fon5.png"
           alt=""
+          fill
+          sizes="100vw"
+          quality={45}
+          // Не делаем priority: пусть LCP выбирается по контенту/баннеру, а фон догружается легче.
+          className="universal-background-animated absolute inset-0 object-cover md:object-center object-[center_top] md:scale-100 scale-110"
           draggable={false}
-          decoding="async"
-          className="universal-background-animated absolute inset-0 w-full h-full object-cover md:object-center object-[center_top] md:scale-100 scale-110"
         />
 
         {/* Затемняющий overlay */}

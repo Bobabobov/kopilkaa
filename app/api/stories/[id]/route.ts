@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
+import { getHeroBadgeForUser } from "@/lib/heroBadges";
 
 export async function GET(
   request: Request,
@@ -57,6 +58,8 @@ export async function GET(
     return Response.json({ error: "Not found" }, { status: 404 });
   }
 
+  const heroBadge = story.user?.id ? await getHeroBadgeForUser(story.user.id) : null;
+
   // Проверяем, лайкнул ли текущий пользователь
   let userLiked = false;
   if (session?.uid) {
@@ -72,7 +75,9 @@ export async function GET(
   return Response.json({
     ...story,
     story: sanitizeApplicationStoryHtml(story.story || ""),
-    user: story.user ? sanitizeEmailForViewer(story.user as any, session?.uid || "") : story.user,
+    user: story.user
+      ? { ...(sanitizeEmailForViewer(story.user as any, session?.uid || "") as any), heroBadge }
+      : story.user,
     userLiked,
   }, {
     headers: {

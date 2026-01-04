@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { HeroBadge } from "@/components/ui/HeroBadge";
+import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
+import Image from "next/image";
 
 interface Application {
   id: string;
@@ -12,9 +15,10 @@ interface Application {
   createdAt: string;
   images: Array<{ url: string }>;
   user: {
+    id: string;
     name: string | null;
-    email: string;
     avatar: string | null;
+    heroBadge?: HeroBadgeType | null;
   };
 }
 
@@ -96,10 +100,15 @@ export default function RecentApplications() {
               >
                 {/* Изображение */}
                 <div className="relative h-48 overflow-hidden bg-gray-800">
-                  <img
-                    src={app.images && app.images.length > 0 ? app.images[0].url : "/stories-preview.jpg"}
+                  <Image
+                    src={
+                      app.images && app.images.length > 0 ? app.images[0].url : "/stories-preview.jpg"
+                    }
                     alt={app.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    quality={70}
+                    className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 </div>
@@ -131,22 +140,23 @@ export default function RecentApplications() {
                   {/* Автор */}
                   <div className="flex items-center gap-3 pt-4 border-t border-white/10">
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
-                      <img
+                      <Image
                         src={app.user && app.user.avatar ? app.user.avatar : "/default-avatar.png"}
                         alt={app.user ? (app.user.name || "User") : "User"}
+                        width={40}
+                        height={40}
+                        sizes="40px"
+                        quality={70}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          if (process.env.NODE_ENV !== "production") {
-                            console.log("Avatar load error:", app.user?.avatar);
-                          }
-                          e.currentTarget.src = "/default-avatar.png";
-                        }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate" style={{ color: "#fffffe" }}>
-                        {app.user ? (app.user.name || "Аноним") : "Аноним"}
-                      </p>
+                      <div className="flex items-center gap-2 flex-wrap min-w-0">
+                        <p className="text-sm font-medium truncate min-w-0" style={{ color: "#fffffe" }}>
+                          {app.user ? (app.user.name || "Аноним") : "Аноним"}
+                        </p>
+                        {app.user?.heroBadge && <HeroBadge badge={app.user.heroBadge} size="xs" />}
+                      </div>
                       <p className="text-xs" style={{ color: "#abd1c6" }}>
                         {new Date(app.createdAt).toLocaleDateString("ru-RU")}
                       </p>

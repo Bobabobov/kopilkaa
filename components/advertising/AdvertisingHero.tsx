@@ -29,8 +29,8 @@ export function AdvertisingHero() {
           <div className="flex items-start gap-4 group">
             <div className="text-[#f9bc60] text-2xl font-bold mt-1">02</div>
             <div>
-              <div className="text-[#fffffe] text-xl font-medium mb-1">Дешевле, чем кажется</div>
-              <div className="text-[#abd1c6]">От 1000 рублей за неделю. Меньше, чем стоит обед в кафе</div>
+              <div className="text-[#fffffe] text-xl font-medium mb-1">Условия — гибкие</div>
+              <div className="text-[#abd1c6]">Цена обсуждается индивидуально — подберём формат и срок под вашу задачу</div>
             </div>
           </div>
 
@@ -55,7 +55,7 @@ export function AdvertisingHero() {
             href="#formats"
             className="inline-block border-2 border-[#abd1c6]/30 text-[#fffffe] px-10 py-5 text-lg font-medium hover:border-[#f9bc60] hover:text-[#f9bc60] transition-colors"
           >
-            Посмотреть цены
+            Посмотреть форматы
           </a>
         </div>
       </div>

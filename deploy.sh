@@ -41,9 +41,14 @@ echo "🔨 Собираем проект..."
 npm run build
 
 echo "🔄 Перезапускаем приложение..."
-pm2 restart kopilka --update-env
+if pm2 describe kopilka >/dev/null 2>&1; then
+  pm2 restart kopilka --update-env
+else
+  echo "ℹ️  PM2 процесс kopilka не найден — создаём заново..."
+  pm2 start npm --name kopilka -- start --update-env
+fi
 
 echo "✅ Деплой завершен!"
 echo "📊 Статус приложения:"
-pm2 status kopilka
+pm2 status kopilka || pm2 status
 

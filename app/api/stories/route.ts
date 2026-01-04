@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export const dynamic = 'force-dynamic';
 
@@ -80,12 +81,20 @@ export async function GET(req: Request) {
       userLiked: likedSet ? likedSet.has(it.id) : false,
     }));
 
+    const userIds = safeItems.map((it: any) => it.user?.id).filter(Boolean) as string[];
+    const badgeMap = await getHeroBadgesForUsers(userIds);
+
+    const withBadges = safeItems.map((it: any) => ({
+      ...it,
+      user: it.user ? { ...(it.user as any), heroBadge: badgeMap[it.user.id] ?? null } : it.user,
+    }));
+
     const responseData = {
       page,
       limit,
       total,
       pages: Math.ceil(total / limit),
-      items: safeItems,
+      items: withBadges,
     };
 
     return new Response(JSON.stringify(responseData), {

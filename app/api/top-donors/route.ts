@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { getSafeExternalUrl } from "@/lib/safeExternalUrl";
+import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -36,6 +37,7 @@ export async function GET() {
     }
 
     const userIds = topAggs.map((a) => a.userId);
+    const heroBadges = await getHeroBadgesForUsers(userIds);
     const users = await prisma.user
       .findMany({
         where: { id: { in: userIds } },
@@ -68,6 +70,7 @@ export async function GET() {
           vkLink: getSafeExternalUrl(user.vkLink),
           telegramLink: getSafeExternalUrl(user.telegramLink),
           youtubeLink: getSafeExternalUrl(user.youtubeLink),
+          heroBadge: heroBadges[user.id] ?? null,
           totalAmount,
         };
       })

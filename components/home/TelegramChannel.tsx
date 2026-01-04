@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function TelegramChannel() {
   return (
@@ -19,8 +20,15 @@ export default function TelegramChannel() {
           rel="noopener noreferrer"
           className="block transition-opacity duration-200 hover:opacity-90 w-full sm:w-[280px]"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/buttontg.png" alt="Подписывайся на Telegram канал @kkopilka" className="w-full h-auto rounded-2xl" />
+          <Image
+            src="/buttontg.png"
+            alt="Подписывайся на Telegram канал @kkopilka"
+            width={560}
+            height={315}
+            sizes="(min-width: 640px) 280px, 100vw"
+            quality={80}
+            className="w-full h-auto rounded-2xl"
+          />
         </Link>
         <Link
           href="https://kick.com/koponline"
@@ -28,8 +36,15 @@ export default function TelegramChannel() {
           rel="noopener noreferrer"
           className="block transition-opacity duration-200 hover:opacity-90 w-full sm:w-[280px]"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/buttonkick.png" alt="Подписывайся на Kick стрим koponline" className="w-full h-auto rounded-2xl" />
+          <Image
+            src="/buttonkick.png"
+            alt="Подписывайся на Kick стрим koponline"
+            width={560}
+            height={315}
+            sizes="(min-width: 640px) 280px, 100vw"
+            quality={80}
+            className="w-full h-auto rounded-2xl"
+          />
         </Link>
       </div>
     </motion.div>

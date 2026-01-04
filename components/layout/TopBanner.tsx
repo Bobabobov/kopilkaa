@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import Image from "next/image";
 
 interface TopBannerProps {
   content?: string;
@@ -319,12 +320,29 @@ export default function TopBanner({
       ) : (
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
           <div className="w-full h-full max-w-[1400px]">
-            <img
-              src={creativeUrl || undefined}
-              alt=""
-              className="w-full h-full object-contain object-center"
-              draggable={false}
-            />
+            {creativeUrl && creativeUrl.startsWith("/") ? (
+              <div className="relative w-full h-full">
+                <Image
+                  src={creativeUrl}
+                  alt=""
+                  fill
+                  // Баннер — почти всегда LCP на главной, просим загрузить приоритетно.
+                  priority
+                  sizes="(min-width: 768px) 1400px, 100vw"
+                  quality={70}
+                  className="object-contain object-center"
+                  draggable={false}
+                />
+              </div>
+            ) : (
+              // Внешние креативы не всегда разрешены в remotePatterns → оставляем обычный img.
+              <img
+                src={creativeUrl || undefined}
+                alt=""
+                className="w-full h-full object-contain object-center"
+                draggable={false}
+              />
+            )}
           </div>
         </div>
       )}

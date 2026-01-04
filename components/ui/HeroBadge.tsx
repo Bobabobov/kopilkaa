@@ -6,14 +6,12 @@ import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 type HeroBadgeSize = "xs" | "sm" | "md";
 
-const sizeMap: Record<
-  HeroBadgeSize,
-  { wrap: string; icon: "xs" | "sm" | "md"; text: string; textShort: string }
-> = {
-  xs: { wrap: "h-5 px-2", icon: "xs", text: "Наблюдатель", textShort: "Набл." },
-  sm: { wrap: "h-6 px-2.5", icon: "xs", text: "Наблюдатель", textShort: "Набл." },
-  md: { wrap: "h-7 px-3", icon: "sm", text: "Наблюдатель", textShort: "Набл." },
-};
+const sizeMap: Record<HeroBadgeSize, { wrap: string; icon: "xs" | "sm" | "md"; text: string }> =
+  {
+    xs: { wrap: "h-5 px-2", icon: "xs", text: "text-[11px]" },
+    sm: { wrap: "h-6 px-2.5", icon: "xs", text: "text-xs" },
+    md: { wrap: "h-7 px-3", icon: "sm", text: "text-sm" },
+  };
 
 export function HeroBadge({
   badge,
@@ -27,17 +25,15 @@ export function HeroBadge({
   if (!badge) return null;
 
   const reduceMotion = useReducedMotion();
-  const { wrap, icon } = sizeMap[size];
+  const { wrap, icon, text } = sizeMap[size];
 
   const common =
     "relative inline-flex items-center justify-center select-none flex-shrink-0 " +
     "ring-1 ring-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.25)]";
 
-  const Label = ({ full, short }: { full: string; short: string }) => (
-    <span className="ml-1 whitespace-nowrap leading-none">
-      <span className="hidden sm:inline">{full}</span>
-      <span className="sm:hidden">{short}</span>
-    </span>
+  // На мобилках показываем полный текст (без сокращений), но делаем его компактнее по размеру.
+  const Label = ({ full }: { full: string; short: string }) => (
+    <span className={`ml-1 whitespace-nowrap leading-none ${text}`}>{full}</span>
   );
 
   const Base = motion.span;

@@ -6,6 +6,8 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
+import { HeroBadge } from "@/components/ui/HeroBadge";
+import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 interface Donor {
   id: string;
@@ -18,6 +20,7 @@ interface Donor {
   amount: string;
   position: number;
   isTop: boolean;
+  heroBadge?: HeroBadgeType | null;
 }
 
 export default function TopDonors() {
@@ -326,6 +329,11 @@ export default function TopDonors() {
                             >
                               {donor.name}
                             </p>
+                            {donor.heroBadge && (
+                              <div className="mt-1">
+                                <HeroBadge badge={donor.heroBadge} size="xs" />
+                              </div>
+                            )}
                             <p
                               className={`font-semibold text-[#f9bc60] ${
                                 isSecond ? "text-sm" : "text-[11px]"

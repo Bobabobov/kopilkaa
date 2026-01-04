@@ -470,10 +470,10 @@ export function AdvertisingContact() {
               style={{ paddingRight: '3rem' }}
             >
               <option value="" className="bg-[#001e1d] text-[#abd1c6]">Выберите формат</option>
-              <option value="banner" className="bg-[#001e1d] text-[#fffffe]">Большой баннер наверху (3000₽)</option>
-              <option value="side" className="bg-[#001e1d] text-[#fffffe]">Блок сбоку (1500₽)</option>
-              <option value="story" className="bg-[#001e1d] text-[#fffffe]">Рекламная история (2000₽)</option>
-              <option value="tg" className="bg-[#001e1d] text-[#fffffe]">Telegram пост (1000₽)</option>
+              <option value="banner" className="bg-[#001e1d] text-[#fffffe]">Большой баннер наверху — Договорная цена</option>
+              <option value="side" className="bg-[#001e1d] text-[#fffffe]">Блок сбоку — Договорная цена</option>
+              <option value="story" className="bg-[#001e1d] text-[#fffffe]">Рекламная история — Договорная цена</option>
+              <option value="tg" className="bg-[#001e1d] text-[#fffffe]">Telegram пост — Договорная цена</option>
               <option value="other" className="bg-[#001e1d] text-[#fffffe]">Не знаю, помогите выбрать</option>
             </select>
             {errors.format && (

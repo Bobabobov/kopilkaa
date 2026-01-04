@@ -6,6 +6,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
+import { HeroBadge } from "@/components/ui/HeroBadge";
+import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
+import Image from "next/image";
 
 interface Story {
   id: string;
@@ -19,6 +22,7 @@ interface Story {
     email: string | null;
     avatar: string | null;
     hideEmail?: boolean;
+    heroBadge?: HeroBadgeType | null;
   };
   _count?: {
     likes: number;
@@ -132,13 +136,13 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
       {/* Изображение */}
       <div className="relative mb-5 rounded-t-3xl overflow-hidden flex-shrink-0 shadow-xl group-hover:shadow-2xl transition-all duration-700">
         <div className="relative w-full h-56 overflow-hidden">
-          <img
+          <Image
             src={mainImage}
             alt={story.title}
-            loading="lazy"
-            width={800}
-            height={320}
-            className="w-full h-full object-cover group-hover:scale-115 transition-transform duration-1000 ease-out"
+            fill
+            sizes="(min-width: 1024px) 33vw, 100vw"
+            quality={70}
+            className="object-cover group-hover:scale-115 transition-transform duration-1000 ease-out"
           />
           {/* Градиентный overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/40 group-hover:via-black/10 transition-all duration-700"></div>
@@ -195,9 +199,13 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="relative flex-shrink-0">
-                  <img
+                  <Image
                     src={story.user.avatar || "/default-avatar.png"}
                     alt={authorName}
+                    width={28}
+                    height={28}
+                    sizes="28px"
+                    quality={70}
                     className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60 group-hover/author:border-[#f9bc60] transition-all duration-300 shadow-sm"
                   />
                   <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-[#f9bc60]/30 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-300 blur-sm"></div>
@@ -205,17 +213,23 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
                 <span className="text-sm font-bold text-[#001e1d] group-hover/author:text-[#004643] transition-colors duration-300 whitespace-nowrap">
                   {authorName}
                 </span>
+                {story.user?.heroBadge && <HeroBadge badge={story.user.heroBadge} size="xs" />}
               </Link>
             ) : (
               <div className="flex items-center gap-2 bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 flex-shrink-0">
-                <img
+                <Image
                   src={story.user?.avatar || "/default-avatar.png"}
                   alt={authorName}
+                  width={28}
+                  height={28}
+                  sizes="28px"
+                  quality={70}
                   className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60"
                 />
                 <span className="text-sm font-bold text-[#001e1d] whitespace-nowrap">
                   {authorName}
                 </span>
+                {story.user?.heroBadge && <HeroBadge badge={story.user.heroBadge} size="xs" />}
               </div>
             )}
             

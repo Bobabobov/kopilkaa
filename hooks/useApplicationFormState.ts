@@ -62,27 +62,39 @@ export function useApplicationFormState() {
   const formStartKey = useMemo(() => `${FORM_START_KEY_BASE}:${storageSuffix}`, [storageSuffix]);
 
   useEffect(() => {
+    const getLoc = () => {
+      if (typeof window === "undefined") {
+        return { pathname: "/applications", search: "" };
+      }
+      return { pathname: window.location.pathname, search: window.location.search };
+    };
+
+    const maybeRedirectToAuth = () => {
+      const { pathname, search } = getLoc();
+      const params = new URLSearchParams(search);
+      const modalParam = params.get("modal") || "";
+      const isAuthModal = modalParam.startsWith("auth");
+      if (isAuthModal) return;
+
+      const href = buildAuthModalUrl({
+        pathname,
+        search,
+        modal: "auth/signup",
+      });
+      window.location.href = href;
+    };
+
     fetch("/api/profile/me", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => {
         if (!d.user) {
-          const href = buildAuthModalUrl({
-            pathname: typeof window !== "undefined" ? window.location.pathname : "/applications",
-            search: typeof window !== "undefined" ? window.location.search : "",
-            modal: "auth/signup",
-          });
-          window.location.href = href;
+          maybeRedirectToAuth();
           return;
         }
         setUser(d.user);
       })
       .catch(() => {
-        const href = buildAuthModalUrl({
-          pathname: typeof window !== "undefined" ? window.location.pathname : "/applications",
-          search: typeof window !== "undefined" ? window.location.search : "",
-          modal: "auth/signup",
-        });
-        window.location.href = href;
+        maybeRedirectToAuth();
       })
       .finally(() => setLoadingAuth(false));
   }, []);

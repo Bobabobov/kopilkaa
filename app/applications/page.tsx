@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import TrustLevelsInfo from "@/components/applications/TrustLevelsInfo";
 import ApplicationsTips from "@/components/applications/ApplicationsTips";
 import ApplicationsForm from "@/components/applications/ApplicationsForm";
-import { useApplicationFormState } from "@/hooks/useApplicationFormState";
+import { useApplicationFormState, LIMITS } from "@/hooks/useApplicationFormState";
 import TrustIntroModal from "@/components/applications/TrustIntroModal";
 import { getTrustLabel } from "@/lib/trustLevel";
 
@@ -159,13 +159,14 @@ export default function ApplicationsPage() {
               filledFields={filledFields}
               totalFields={totalFields}
               limits={{
-                titleMax: 40,
-                summaryMax: 140,
-                storyMin: 10,
-                storyMax: 3000,
-                amountMin: 50,
-                paymentMin: 10,
-                paymentMax: 200,
+                titleMax: LIMITS.titleMax,
+                summaryMax: LIMITS.summaryMax,
+                storyMin: LIMITS.storyMin,
+                storyMax: LIMITS.storyMax,
+                amountMin: LIMITS.amountMin,
+                paymentMin: LIMITS.paymentMin,
+                paymentMax: LIMITS.paymentMax,
+                maxPhotos: LIMITS.maxPhotos,
               }}
               amountInputRef={amountInputRef}
               trustAcknowledged={trustAcknowledged}

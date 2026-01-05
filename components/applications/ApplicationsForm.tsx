@@ -44,6 +44,7 @@ type Props = {
     amountMin: number;
     paymentMin: number;
     paymentMax: number;
+    maxPhotos: number;
   };
   amountInputRef: React.RefObject<HTMLInputElement | null>;
   trustAcknowledged: boolean;

@@ -1,16 +1,25 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
-const DEFAULT_ADMIN_EMAIL = "bobov097@gmail.com";
-
 export type AllowedAdminUser = {
   id: string;
   email: string;
 };
 
+function getAllowedEmails(): string[] {
+  const raw = process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || "";
+  return raw
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 export async function getAllowedAdminUser(): Promise<AllowedAdminUser | null> {
   const session = await getSession();
   if (!session?.uid) return null;
+
+  const allowedEmails = getAllowedEmails();
+  if (!allowedEmails.length) return null;
 
   const user = await prisma.user.findUnique({
     where: { id: session.uid },
@@ -19,8 +28,7 @@ export async function getAllowedAdminUser(): Promise<AllowedAdminUser | null> {
 
   if (!user?.email) return null;
 
-  const allowed = (process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL).toLowerCase();
-  if (user.email.toLowerCase() !== allowed) return null;
+  if (!allowedEmails.includes(user.email.toLowerCase())) return null;
 
   return { id: user.id, email: user.email };
 }

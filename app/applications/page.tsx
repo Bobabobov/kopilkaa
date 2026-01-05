@@ -1,22 +1,16 @@
 // app/applications/page.tsx
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import { usePageTimeTracking } from "@/lib/usePageTimeTracking";
-import ProgressBar from "@/components/applications/ProgressBar";
-import FormField from "@/components/ui/FormField";
-import MotivationalMessages from "@/components/applications/MotivationalMessages";
-import RichTextEditor from "@/components/applications/RichTextEditor";
-
-// Lazy load heavy components
-const PhotoUpload = dynamic(() => import("@/components/applications/PhotoUpload"), {
-  ssr: false,
-  loading: () => <div className="h-32 bg-[#004643]/30 animate-pulse rounded-2xl" />
-});
+import { cn } from "@/lib/utils";
+import TrustLevelsInfo from "@/components/applications/TrustLevelsInfo";
+import ApplicationsTips from "@/components/applications/ApplicationsTips";
+import ApplicationsForm from "@/components/applications/ApplicationsForm";
+import { useApplicationFormState } from "@/hooks/useApplicationFormState";
+import TrustIntroModal from "@/components/applications/TrustIntroModal";
+import { getTrustLabel } from "@/lib/trustLevel";
 
 const SuccessScreen = dynamic(() => import("@/components/applications/SuccessScreen"), {
   ssr: false,
@@ -28,339 +22,57 @@ const PageHeader = dynamic(() => import("@/components/applications/PageHeader"),
   loading: () => <div className="h-24 bg-[#004643]/30 animate-pulse rounded-2xl" />
 });
 
-const SubmitSection = dynamic(() => import("@/components/applications/SubmitSection"), {
-  ssr: false,
-  loading: () => <div className="h-16 bg-[#004643]/30 animate-pulse rounded-2xl" />
-});
-
-type LocalImage = { file: File; url: string };
-
-// Ключ для сохранения в localStorage
-const SAVE_KEY = 'application_form_data';
-
-const LIMITS = {
-  titleMax: 40,
-  summaryMax: 140,
-  storyMin: 10,
-  storyMax: 3000,
-  amountMin: 50,
-  amountMax: 5000,
-  paymentMin: 10,
-  paymentMax: 200,
-  maxPhotos: 5,
-};
-
-// Upload limits (должны соответствовать бэку /api/uploads)
-const UPLOAD_LIMITS = {
-  maxFileBytes: 5 * 1024 * 1024, // 5MB на файл
-  // Суммарный лимит на запрос (защита от 413 на прокси/Nginx и просто от слишком тяжёлых заявок)
-  maxTotalBytes: 10 * 1024 * 1024, // 10MB на все фото вместе
-};
-
 export default function ApplicationsPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<{ id: string; email?: string | null } | null>(null);
+  usePageTimeTracking({ page: "/applications", enabled: true, sendInterval: 30000 });
 
-  // Отслеживание времени на странице
-  usePageTimeTracking({
-    page: "/applications",
-    enabled: true,
-    sendInterval: 30000, // отправляем каждые 30 секунд
-  });
-  const [loadingAuth, setLoadingAuth] = useState(true);
-  const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
-  const [story, setStory] = useState("");
-  const [amount, setAmount] = useState("");
-  const [payment, setPayment] = useState("");
-  const [photos, setPhotos] = useState<LocalImage[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-  const [left, setLeft] = useState<number | null>(null); // для лимита 24ч
-  const [submitted, setSubmitted] = useState(false); // для экрана успеха
+  const state = useApplicationFormState();
+  const {
+    user,
+    loadingAuth,
+    title,
+    setTitle,
+    summary,
+    setSummary,
+    story,
+    setStory,
+    amountFormatted,
+    handleAmountInputChange,
+    payment,
+    setPayment,
+    photos,
+    setPhotos,
+    uploading,
+    submitting,
+    err,
+    left,
+    submitted,
+    trustAcknowledged,
+    setTrustAcknowledged,
+    policiesAccepted,
+    setPoliciesAccepted,
+    ackError,
+    introOpen,
+    setIntroOpen,
+    introChecked,
+    setIntroChecked,
+    trustLimits,
+    trustLevel,
+    trustHint,
+    amountInputRef,
+    hpCompany,
+    setHpCompany,
+    progressPercentage,
+    filledFields,
+    totalFields,
+    valid,
+    exceedsTrustLimit,
+    submit,
+    setSubmitted,
+  } = state;
 
-  const amountInputRef = useRef<HTMLInputElement | null>(null);
+  const { introAckKey } = state;
 
-  // Anti-spam: honeypot + "too fast submit" heuristic
-  const [hpCompany, setHpCompany] = useState(""); // должно быть пустым (скрытое поле для ботов)
-  const formStartedAtRef = useRef<number | null>(null);
-
-  // Восстановление данных при загрузке страницы
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(SAVE_KEY);
-      if (saved) {
-        const data = JSON.parse(saved);
-        if (data.title) setTitle(data.title);
-        if (data.summary) setSummary(data.summary);
-        if (data.story) setStory(data.story);
-        if (data.amount) setAmount(data.amount);
-        if (data.payment) setPayment(data.payment);
-      }
-    } catch (error) {
-      console.log('Ошибка при восстановлении данных:', error);
-    }
-  }, []);
-
-  // Сохранение данных при изменении
-  useEffect(() => {
-    const data = { title, summary, story, amount, payment };
-    const t = window.setTimeout(() => {
-      try {
-        localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-      } catch (error) {
-        console.log("Ошибка при сохранении данных:", error);
-      }
-    }, 250);
-    return () => window.clearTimeout(t);
-  }, [title, summary, story, amount, payment]);
-
-  const getCurrentPathWithQuery = () => {
-    try {
-      return window.location.pathname + window.location.search;
-    } catch {
-      return "/applications";
-    }
-  };
-
-  const pushAuth = (mode: "auth" | "signup") => {
-    const href = buildAuthModalUrl({
-      pathname: window.location.pathname,
-      search: window.location.search,
-      modal: mode === "signup" ? "auth/signup" : "auth",
-    });
-    router.push(href);
-  };
-
-  // Проверка авторизации
-  useEffect(() => {
-    fetch("/api/profile/me", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((d) => {
-        if (!d.user) {
-          pushAuth("signup");
-          return;
-        }
-        setUser(d.user);
-      })
-      .catch(() => pushAuth("signup"))
-      .finally(() => setLoadingAuth(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const formatAmountRu = (digits: string) => {
-    if (!digits) return "";
-    const n = Number(digits);
-    if (!Number.isFinite(n)) return digits;
-    return n.toLocaleString("ru-RU");
-  };
-
-  const countDigits = (s: string) => (s.match(/\d/g) || []).length;
-
-  const caretPosForDigitIndex = (formatted: string, digitIndex: number) => {
-    if (digitIndex <= 0) return 0;
-    let seen = 0;
-    for (let i = 0; i < formatted.length; i++) {
-      if (/\d/.test(formatted[i])) {
-        seen++;
-        if (seen >= digitIndex) return i + 1;
-      }
-    }
-    return formatted.length;
-  };
-
-  const handleAmountInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    const caret = e.target.selectionStart ?? raw.length;
-    const digitsBeforeCaret = countDigits(raw.slice(0, caret));
-    const nextDigits = raw.replace(/[^\d]/g, "");
-    const clampedDigits =
-      nextDigits.length === 0
-        ? ""
-        : Math.min(parseInt(nextDigits, 10), LIMITS.amountMax).toString();
-
-    setAmount(clampedDigits);
-
-    requestAnimationFrame(() => {
-      const el = amountInputRef.current;
-      if (!el) return;
-      const nextFormatted = formatAmountRu(clampedDigits);
-      const safeDigitsBefore = Math.min(digitsBeforeCaret, countDigits(nextFormatted));
-      const nextCaret = caretPosForDigitIndex(nextFormatted, safeDigitsBefore);
-      try {
-        el.setSelectionRange(nextCaret, nextCaret);
-      } catch {
-        // ignore
-      }
-    });
-  };
-
-  const storyTextLen = useMemo(() => {
-    if (!story) return 0;
-    const div = document.createElement("div");
-    div.innerHTML = story;
-    return (div.textContent || div.innerText || "").replace(/\s/g, "").length;
-  }, [story]);
-
-  const valid =
-    title.length > 0 &&
-    title.length <= LIMITS.titleMax &&
-    summary.length > 0 &&
-    summary.length <= LIMITS.summaryMax &&
-    storyTextLen >= LIMITS.storyMin &&
-    storyTextLen <= LIMITS.storyMax &&
-    amount.length > 0 &&
-    parseInt(amount) >= LIMITS.amountMin &&
-    parseInt(amount) <= LIMITS.amountMax &&
-    payment.length >= LIMITS.paymentMin &&
-    payment.length <= LIMITS.paymentMax &&
-    photos.length <= LIMITS.maxPhotos;
-
-  // Подсчет заполненных полей для мотивационных сообщений
-  const getCharCount = (text: string) => text.replace(/\s/g, "").length;
-  const filledFields = [
-    getCharCount(title) > 0,
-    getCharCount(summary) > 0,
-    getCharCount(story) >= LIMITS.storyMin,
-    amount.length > 0 && parseInt(amount) >= LIMITS.amountMin,
-    getCharCount(payment) >= LIMITS.paymentMin,
-    photos.length > 0,
-  ].filter(Boolean).length;
-  const totalFields = 6;
-  const progressPercentage = Math.round((filledFields / totalFields) * 100);
-
-  const uploadAll = async (): Promise<string[]> => {
-    if (!photos.length) return [];
-    setUploading(true);
-    try {
-      const fd = new FormData();
-      const filesToUpload: File[] = [];
-
-      photos.forEach((item) => {
-        let file: File;
-
-        if (item instanceof File) {
-          file = item;
-        } else if (item && item.file instanceof File) {
-          file = item.file;
-        } else {
-          return;
-        }
-
-        filesToUpload.push(file);
-      });
-
-      // Клиентская проверка лимитов, чтобы не упираться в 413 и не ловить "Unexpected token <"
-      const tooBig = filesToUpload.find((f) => f.size > UPLOAD_LIMITS.maxFileBytes);
-      if (tooBig) {
-        throw new Error(
-          `Файл "${tooBig.name}" слишком большой. Максимум: 5 МБ на фото.`,
-        );
-      }
-      const totalBytes = filesToUpload.reduce((sum, f) => sum + f.size, 0);
-      if (totalBytes > UPLOAD_LIMITS.maxTotalBytes) {
-        const mb = (UPLOAD_LIMITS.maxTotalBytes / (1024 * 1024)).toFixed(0);
-        throw new Error(
-          `Слишком большой общий размер фото. Максимум: ${mb} МБ на все фото вместе. Уменьшите/замените фото.`,
-        );
-      }
-
-      filesToUpload.forEach((file) => fd.append("files", file));
-
-      const r = await fetch("/api/uploads", { method: "POST", body: fd });
-      const contentType = r.headers.get("content-type") || "";
-
-      // 413 часто приходит от прокси/Nginx (HTML-страница), поэтому json() ломается
-      if (r.status === 413) {
-        throw new Error(
-          "Фото слишком большие для загрузки. Уменьшите размер фото и попробуйте снова.",
-        );
-      }
-
-      const d =
-        contentType.includes("application/json") ? await r.json().catch(() => null) : null;
-      if (!r.ok) {
-        const serverMsg = d?.error || d?.message;
-        throw new Error(serverMsg || "Ошибка загрузки фото");
-      }
-      return ((d?.files as { url: string }[]) || []).map((f) => f.url);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const submit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setErr(null);
-
-    // Дополнительная проверка авторизации при отправке
-    if (!user) {
-      pushAuth("signup");
-      return;
-    }
-
-    if (!valid) {
-      setErr("Проверьте поля — есть ошибки/лимиты");
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      const urls = await uploadAll();
-      const filledMs =
-        formStartedAtRef.current != null
-          ? Math.max(0, Date.now() - formStartedAtRef.current)
-          : null;
-      const r = await fetch("/api/applications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          summary,
-          story,
-          amount,
-          payment,
-          images: urls,
-          hpCompany,
-          clientMeta: { filledMs },
-        }),
-      });
-      const d = await r.json();
-      if (r.status === 401) {
-        // Если сессия истекла во время заполнения формы
-        pushAuth("auth");
-        return;
-      }
-      if (r.status === 429) {
-        if (d?.leftMs) {
-          setLeft(d.leftMs);
-          throw new Error("Лимит: 1 заявка в 24 часа");
-        }
-        if (d?.error) {
-          throw new Error(d.error);
-        }
-        throw new Error("Превышен лимит. Попробуйте позже.");
-      }
-      if (!r.ok) throw new Error(d?.error || "Ошибка отправки");
-
-      // Успех
-      setSubmitted(true);
-      // Очищаем форму при успешной отправке
-      setPhotos([]);
-      setTitle("");
-      setSummary("");
-      setStory("");
-      setAmount("");
-      setPayment("");
-      // Очищаем сохраненные данные
-      localStorage.removeItem(SAVE_KEY);
-    } catch (e: any) {
-      setErr(e.message || "Ошибка");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  // Остальная логика вынесена в useApplicationFormState
 
   // Показываем загрузку пока проверяем авторизацию
   if (loadingAuth) {
@@ -394,251 +106,84 @@ export default function ApplicationsPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <TrustIntroModal
+        open={introOpen}
+        checked={introChecked}
+        onCheckedChange={setIntroChecked}
+        onConfirm={() => {
+          setIntroOpen(false);
+          sessionStorage.setItem(introAckKey, "true");
+          localStorage.setItem(introAckKey, "true");
+        }}
+      />
+
       <PageHeader />
 
-      {/* Main Content */}
-      <div className="container-p mx-auto max-w-7xl relative z-10 px-3 sm:px-4">
+      <div
+        className={cn(
+          "container-p mx-auto max-w-7xl relative z-10 px-3 sm:px-4",
+          introOpen ? "pointer-events-none select-none opacity-60" : "",
+        )}
+      >
         <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
-          {/* Left Sidebar with Tips */}
           <div className="xl:col-span-1 order-2 lg:order-1">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="lg:sticky lg:top-8 space-y-6"
-            >
-              {/* Улучшенная секция с советами */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="relative overflow-hidden backdrop-blur-sm rounded-2xl p-6 border border-[#abd1c6]/30 bg-gradient-to-br from-[#004643]/60 to-[#001e1d]/40 shadow-xl"
-              >
-                {/* Декоративные элементы */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#f9bc60]/10 rounded-full blur-2xl"></div>
-                <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-[#e16162]/10 rounded-full blur-xl"></div>
-                
-                <div className="relative z-10">
-                  <motion.h3 
-                    className="flex items-center gap-3 text-xl font-bold mb-6"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    <motion.div
-                      className="w-10 h-10 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center shadow-lg shadow-[#f9bc60]/30"
-                      animate={{ 
-                        rotate: [0, 10, -10, 0],
-                        scale: [1, 1.1, 1]
-                      }}
-                      transition={{ 
-                        duration: 3,
-                        repeat: Infinity,
-                        repeatDelay: 2
-                      }}
-                    >
-                      <LucideIcons.Lightbulb className="text-[#001e1d]" size="sm" />
-                    </motion.div>
-                    <span className="bg-gradient-to-r from-[#fffffe] to-[#abd1c6] bg-clip-text text-transparent">
-                      Советы
-                    </span>
-                  </motion.h3>
-                  
-                  <div className="space-y-4">
-                    {[
-                      { icon: LucideIcons.Target, text: "Будьте конкретными в описании ситуации", color: "#10B981" },
-                      { icon: LucideIcons.Image, text: "Приложите фотографии для подтверждения", color: "#3B82F6" },
-                      { icon: LucideIcons.DollarSign, text: "Укажите точную сумму, которая нужна", color: "#F59E0B" },
-                      { icon: LucideIcons.FileText, text: "Опишите, как планируете использовать средства", color: "#8B5CF6" },
-                    ].map((tip, index) => {
-                      const IconComponent = tip.icon;
-                      return (
-                        <motion.div
-                          key={index}
-                          className="flex items-start gap-3 p-3 rounded-xl bg-[#001e1d]/30 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 transition-all hover:shadow-lg hover:shadow-[#f9bc60]/20"
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.6 + index * 0.1 }}
-                          whileHover={{ scale: 1.02, x: 5 }}
-                        >
-                          <motion.div
-                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md"
-                            style={{ backgroundColor: `${tip.color}20`, color: tip.color }}
-                            whileHover={{ rotate: 15, scale: 1.1 }}
-                          >
-                            <IconComponent size="xs" />
-                          </motion.div>
-                          <span className="text-sm text-[#abd1c6] font-medium pt-1">
-                            {tip.text}
-                          </span>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
+            <ApplicationsTips />
           </div>
 
-          {/* Main Form */}
           <div className="xl:col-span-3 order-1 lg:order-2">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="space-y-6 sm:space-y-8"
-            >
+            <TrustLevelsInfo />
 
-              <form
-                className="grid gap-6"
-                onSubmit={submit}
-                onFocusCapture={() => {
-                  if (formStartedAtRef.current == null) {
-                    formStartedAtRef.current = Date.now();
-                  }
-                }}
-              >
-                {/* Honeypot (anti-spam): bots often fill hidden fields */}
-                <div
-                  aria-hidden="true"
-                  className="fixed left-[-10000px] top-auto w-px h-px overflow-hidden"
-                >
-                  <label>
-                    Company
-                    <input
-                      type="text"
-                      tabIndex={-1}
-                      autoComplete="off"
-                      value={hpCompany}
-                      onChange={(e) => setHpCompany(e.target.value)}
-                    />
-                  </label>
-                </div>
-
-                <ProgressBar
-                  title={title}
-                  summary={summary}
-                  story={story}
-                  amount={amount}
-                  payment={payment}
-                  photos={photos}
-                />
-
-                {/* Мотивационные сообщения */}
-                <MotivationalMessages
-                  progress={progressPercentage}
-                  filledFields={filledFields}
-                  totalFields={totalFields}
-                />
-
-                <div>
-                  <FormField
-                    type="input"
-                    label="Заголовок"
-                    icon="Home"
-                    value={title}
-                    onChange={setTitle}
-                    placeholder="Краткое описание вашей ситуации..."
-                    hint="Краткий заголовок, который привлечет внимание (макс. 40 символов)"
-                    maxLength={LIMITS.titleMax}
-                    delay={0.1}
-                    required={true}
-                  />
-                </div>
-
-                <div>
-                  <FormField
-                    type="input"
-                    label="Краткое описание"
-                    icon="MessageCircle"
-                    value={summary}
-                    onChange={setSummary}
-                    placeholder="Основная суть вашей просьбы..."
-                    hint="Краткое описание, которое будет видно в списке заявок (макс. 140 символов)"
-                    maxLength={LIMITS.summaryMax}
-                    delay={0.2}
-                    required={true}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: "#abd1c6" }}>
-                    Подробная история *
-                  </label>
-                  <p className="text-xs text-[#abd1c6]/70 mb-3">
-                    Подробное описание ситуации (минимум 10, максимум 3000 символов). Используйте кнопки для форматирования текста. Вставка запрещена: введите текст вручную.
+            <ApplicationsForm
+              title={title}
+              setTitle={setTitle}
+              summary={summary}
+              setSummary={setSummary}
+              story={story}
+              setStory={setStory}
+              amountFormatted={amountFormatted}
+              handleAmountInputChange={handleAmountInputChange}
+              trustHint={trustHint}
+              trustLimitsMax={trustLimits.max}
+              payment={payment}
+              setPayment={setPayment}
+              photos={photos}
+              setPhotos={setPhotos}
+              uploading={uploading}
+              submitting={submitting}
+              left={left}
+              err={err}
+              submit={submit}
+              hpCompany={hpCompany}
+              setHpCompany={setHpCompany}
+              progressPercentage={progressPercentage}
+              filledFields={filledFields}
+              totalFields={totalFields}
+              limits={{
+                titleMax: 40,
+                summaryMax: 140,
+                storyMin: 10,
+                storyMax: 3000,
+                amountMin: 50,
+                paymentMin: 10,
+                paymentMax: 200,
+              }}
+              amountInputRef={amountInputRef}
+              trustAcknowledged={trustAcknowledged}
+              setTrustAcknowledged={setTrustAcknowledged}
+              policiesAccepted={policiesAccepted}
+              setPoliciesAccepted={setPoliciesAccepted}
+              ackError={ackError}
+              trustSupportNotice={
+                exceedsTrustLimit ? (
+                  <p className="mt-1 text-xs text-[#94a1b2]">
+                    Максимальная сумма для вашего уровня — {trustLimits.max.toLocaleString("ru-RU")} ₽
                   </p>
-                  <RichTextEditor
-                    value={story}
-                    onChange={setStory}
-                    placeholder="Расскажите подробно о вашей ситуации, что привело к необходимости помощи, как планируете использовать средства..."
-                    minLength={LIMITS.storyMin}
-                    maxLength={LIMITS.storyMax}
-                    rows={8}
-                    allowLinks={false}
-                  />
-                </div>
-
-                <div>
-                  <FormField
-                    type="input"
-                    label="Сумма запроса"
-                    icon="DollarSign"
-                    value={formatAmountRu(amount)}
-                    onChange={() => {}}
-                    placeholder="Укажите сумму в рублях..."
-                    hint="Сумма в рублях (от 50 до 5 000 рублей)"
-                    minLength={LIMITS.amountMin}
-                    maxLength={7}
-                    inputProps={{
-                      type: "tel",
-                      inputMode: "numeric",
-                      autoComplete: "off",
-                      ref: amountInputRef,
-                      onChange: handleAmountInputChange,
-                    }}
-                    delay={0.4}
-                    required={true}
-                  />
-                </div>
-
-                <div>
-                  <FormField
-                    type="textarea"
-                    label="Реквизиты для получения помощи"
-                    icon="CreditCard"
-                    value={payment}
-                    onChange={setPayment}
-                    placeholder="Банковские реквизиты, номер карты или другие способы получения средств"
-                    hint="Реквизиты для перевода средств (минимум 10, максимум 200 символов)"
-                    minLength={LIMITS.paymentMin}
-                    maxLength={LIMITS.paymentMax}
-                    compact={true}
-                    delay={0.5}
-                    required={true}
-                  />
-                </div>
-
-                <PhotoUpload
-                  photos={photos}
-                  onPhotosChange={setPhotos}
-                  maxPhotos={LIMITS.maxPhotos}
-                  delay={0.5}
-                />
-
-                <SubmitSection
-                  submitting={submitting}
-                  uploading={uploading}
-                  left={left}
-                  err={err}
-                  onSubmit={submit}
-                />
-              </form>
-            </motion.div>
+                ) : null
+              }
+            />
           </div>
         </div>
       </div>
-
     </div>
   );
 }

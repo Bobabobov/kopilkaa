@@ -22,7 +22,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
   return (
     <section className="relative px-4 pt-12 pb-14 sm:pt-16 sm:pb-16">
       <div className="mx-auto max-w-6xl">
-        <div className="text-center max-w-4xl mx-auto">
+      <div className="text-center max-w-4xl mx-auto">
         {/* Основной заголовок */}
         <h1
           className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-5 text-[#fffffe]"
@@ -90,7 +90,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           <div className="rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-sm p-7 sm:p-10">
             <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-[#fffffe]">
               Статистика
-            </h2>
+          </h2>
 
           {/* Основная сумма */}
           <motion.div
@@ -173,7 +173,7 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
               </div>
             </motion.div>
           </div>
-          </div>
+        </div>
         </div>
         </div>
       </div>

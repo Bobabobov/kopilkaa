@@ -11,7 +11,7 @@ const sizeMap: Record<HeroBadgeSize, { wrap: string; icon: "xs" | "sm" | "md"; t
     xs: { wrap: "h-5 px-2", icon: "xs", text: "text-[11px]" },
     sm: { wrap: "h-6 px-2.5", icon: "xs", text: "text-xs" },
     md: { wrap: "h-7 px-3", icon: "sm", text: "text-sm" },
-  };
+};
 
 export function HeroBadge({
   badge,

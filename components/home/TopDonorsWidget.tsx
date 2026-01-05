@@ -106,8 +106,8 @@ export default function TopDonorsWidget() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2 min-w-0">
                         <p className="truncate text-[13px] font-semibold min-w-0">
-                          {donor.name}
-                        </p>
+                        {donor.name}
+                      </p>
                         {donor.heroBadge && <HeroBadge badge={donor.heroBadge} size="xs" />}
                       </div>
                       <p className="text-[11px] font-semibold text-[#f9bc60]">

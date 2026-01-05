@@ -153,8 +153,8 @@ export default function RecentApplications() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap min-w-0">
                         <p className="text-sm font-medium truncate min-w-0" style={{ color: "#fffffe" }}>
-                          {app.user ? (app.user.name || "Аноним") : "Аноним"}
-                        </p>
+                        {app.user ? (app.user.name || "Аноним") : "Аноним"}
+                      </p>
                         {app.user?.heroBadge && <HeroBadge badge={app.user.heroBadge} size="xs" />}
                       </div>
                       <p className="text-xs" style={{ color: "#abd1c6" }}>

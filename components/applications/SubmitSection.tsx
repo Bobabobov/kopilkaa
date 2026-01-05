@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { msToHuman } from "@/lib/time";
+import { cn } from "@/lib/utils";
 
 interface SubmitSectionProps {
   submitting: boolean;
@@ -31,7 +32,14 @@ export default function SubmitSection({
         whileTap={{ scale: 0.98 }}
         type="submit"
         disabled={submitting || uploading}
-        className="relative w-full px-8 py-4 bg-gradient-to-r from-[#f9bc60] via-[#e8a545] to-[#f9bc60] hover:from-[#e8a545] hover:via-[#f9bc60] hover:to-[#e8a545] disabled:from-gray-400 disabled:to-gray-500 text-[#001e1d] font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-[#f9bc60]/40 disabled:shadow-none disabled:cursor-not-allowed overflow-hidden group"
+        className={cn(
+          "relative w-full px-8 py-4 bg-gradient-to-r from-[#f9bc60] via-[#e8a545] to-[#f9bc60]",
+          "hover:from-[#e8a545] hover:via-[#f9bc60] hover:to-[#e8a545]",
+          "text-[#001e1d] font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-[#f9bc60]/40 overflow-hidden group",
+          "disabled:cursor-not-allowed disabled:opacity-90",
+          "disabled:bg-gradient-to-r disabled:from-[#8b969f] disabled:via-[#9aa3ab] disabled:to-[#8b969f]",
+          "disabled:text-[#0f1f1c] disabled:shadow-[0_0_0_1px_rgba(249,188,96,0.28)] disabled:border disabled:border-[#f9bc60]/30",
+        )}
       >
         {/* Анимированный фон */}
         <motion.span
@@ -73,7 +81,6 @@ export default function SubmitSection({
           )}
         </span>
       </motion.button>
-
       {left !== null && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

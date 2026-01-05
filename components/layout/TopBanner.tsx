@@ -336,12 +336,12 @@ export default function TopBanner({
               </div>
             ) : (
               // Внешние креативы не всегда разрешены в remotePatterns → оставляем обычный img.
-              <img
-                src={creativeUrl || undefined}
-                alt=""
-                className="w-full h-full object-contain object-center"
-                draggable={false}
-              />
+            <img
+              src={creativeUrl || undefined}
+              alt=""
+              className="w-full h-full object-contain object-center"
+              draggable={false}
+            />
             )}
           </div>
         </div>

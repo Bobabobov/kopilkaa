@@ -11,9 +11,11 @@ import { motion } from "framer-motion";
 import dynamicComponent from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import TrustLevelCard from "@/components/profile/TrustLevelCard";
 import ProfileLoading from "@/components/profile/sections/ProfileLoading";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useProfileDashboard } from "@/lib/useProfileDashboard";
+import { getTrustLevelFromApprovedCount, getTrustLimits, getTrustLabel } from "@/lib/trustLevel";
 
 // Ленивая загрузка компонентов для улучшения производительности
 const ProfileHeaderCard = dynamicComponent(
@@ -207,7 +209,16 @@ function ProfilePageContent() {
 
   const user = profileData?.user || null;
   const totalUserApplications = profileData?.stats?.totalApplications ?? 0;
+  const approvedApplications = profileData?.stats?.approvedApplications ?? 0;
   const hasCreatedApplications = totalUserApplications > 0;
+  const trustLevel = getTrustLevelFromApprovedCount(approvedApplications);
+  const trustLimits = getTrustLimits(trustLevel);
+  const trustStatus: "new" | "verified" | "trusted" =
+    trustLevel === "TRUSTED" ? "trusted" : trustLevel === "VERIFIED" ? "verified" : "new";
+  const trustSupportText =
+    trustLevel === "NEW"
+      ? `от ${trustLimits.min} до ${trustLimits.max} ₽`
+      : `до ${trustLimits.max.toLocaleString("ru-RU")} ₽`;
 
   // Важно: useProfileDashboard кэширует данные до 30 секунд.
   // После изменения темы/аватара хотим увидеть результат сразу — делаем refetch.
@@ -356,6 +367,7 @@ function ProfilePageContent() {
             </section>
 
             <aside className="space-y-4 xs:space-y-5 sm:space-y-6 md:space-y-6">
+              <TrustLevelCard status={trustStatus} supportText={trustSupportText} />
               <ProfileFriendsSection />
               <ProfileAchievements />
               <ProfileDonations />

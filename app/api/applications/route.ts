@@ -7,6 +7,7 @@ import {
   getPlainTextLenFromHtml,
   sanitizeApplicationStoryHtml,
 } from "@/lib/applications/sanitize";
+import { getTrustLevelFromApprovedCount, getTrustLimits } from "@/lib/trustLevel";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WHITELIST_EMAILS = ["bobov097@gmail.com"];
@@ -24,17 +25,27 @@ export async function POST(req: Request) {
     requester?.email && WHITELIST_EMAILS.includes(requester.email.toLowerCase());
 
   try {
-    const { title, summary, story, amount, payment, images, hpCompany, clientMeta } =
-      (await req.json()) as {
-        title: string;
-        summary: string;
-        story: string;
-        amount: string;
-        payment: string;
-        images: string[];
-        hpCompany?: string;
-        clientMeta?: { filledMs?: number | null };
-      };
+    const {
+      title,
+      summary,
+      story,
+      amount,
+      payment,
+      images,
+      hpCompany,
+      clientMeta,
+      acknowledgedRules,
+    } = (await req.json()) as {
+      title: string;
+      summary: string;
+      story: string;
+      amount: string;
+      payment: string;
+      images: string[];
+      hpCompany?: string;
+      clientMeta?: { filledMs?: number | null };
+      acknowledgedRules?: boolean;
+    };
 
     // Anti-spam (no captcha): honeypot + "too fast submit"
     if (typeof hpCompany === "string" && hpCompany.trim().length > 0) {
@@ -65,6 +76,13 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!acknowledgedRules) {
+      return Response.json(
+        { error: "Необходимо подтвердить понимание условий" },
+        { status: 400 },
+      );
+    }
+
     const sanitizedStory = sanitizeApplicationStoryHtml(story);
     const storyTextLen = getPlainTextLenFromHtml(sanitizedStory);
 
@@ -90,12 +108,8 @@ export async function POST(req: Request) {
         { error: `История ${storyMin}–${storyMax} символов` },
         { status: 400 },
       );
-    if (
-      !amount ||
-      isNaN(parseInt(amount)) ||
-      parseInt(amount) < 1 ||
-      parseInt(amount) > 1000000
-    )
+    const amountNumber = parseInt(amount);
+    if (!amount || isNaN(amountNumber) || amountNumber < 1 || amountNumber > 1000000)
       return Response.json(
         { error: `Сумма должна быть от 1 до 1 000 000 рублей` },
         { status: 400 },
@@ -133,6 +147,21 @@ export async function POST(req: Request) {
       }
     }
 
+    // Проверка уровня доверия и допустимой суммы (кроме администраторов и вайтлиста)
+    if (session.role !== "ADMIN" && !isWhitelisted) {
+      const approvedCount = await prisma.application.count({
+        where: { userId: session.uid, status: "APPROVED" },
+      });
+      const trustLevel = getTrustLevelFromApprovedCount(approvedCount);
+      const limits = getTrustLimits(trustLevel);
+      if (amountNumber < limits.min || amountNumber > limits.max) {
+        return Response.json(
+          { error: "Превышена максимальная сумма для вашего уровня доверия" },
+          { status: 400 },
+        );
+      }
+    }
+
     // Используем транзакцию для атомарности
     const result = await prisma.$transaction(async (tx) => {
       // Создаём заявку
@@ -142,7 +171,7 @@ export async function POST(req: Request) {
           title,
           summary,
           story: sanitizedStory,
-          amount: parseInt(amount),
+          amount: amountNumber,
           payment,
           filledMs: clampedFilledMs,
         },

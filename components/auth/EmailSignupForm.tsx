@@ -134,7 +134,7 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
             }`}
             style={{ color: "#fffffe" }}
             type="email"
-            maxLength={20}
+            maxLength={254}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);

@@ -42,20 +42,12 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
   const [liked, setLiked] = useState(!!story.userLiked);
   const [likesCount, setLikesCount] = useState(story._count?.likes || 0);
   const [isLiking, setIsLiking] = useState(false);
-  const DEFAULT_AVATAR = "/default-avatar.png";
-  const DEFAULT_IMAGE = "/stories-preview.jpg";
-
-  const handleImgError = (fallback: string) => (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.currentTarget;
-    if (target.src.includes(fallback)) return;
-    target.src = fallback;
-  };
 
   const authorName =
     story.user?.name ||
     (story.user?.email ? story.user.email.split("@")[0] : null) ||
     "Неизвестный автор";
-  const mainImage = story.images?.[0]?.url || DEFAULT_IMAGE;
+  const mainImage = story.images?.[0]?.url || "/stories-preview.jpg";
 
   const handleCardClick = () => {
     router.push(`/stories/${story.id}`);
@@ -149,7 +141,9 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
             alt={story.title}
             loading="lazy"
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-            onError={handleImgError(DEFAULT_IMAGE)}
+            onError={(e) => {
+              e.currentTarget.src = "/stories-preview.jpg";
+            }}
           />
           {/* Градиентный overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/40 group-hover:via-black/10 transition-all duration-700"></div>
@@ -207,11 +201,13 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
               >
                 <div className="relative flex-shrink-0">
                   <img
-                    src={story.user.avatar || DEFAULT_AVATAR}
+                    src={story.user.avatar || "/default-avatar.png"}
                     alt={authorName}
                     loading="lazy"
                     className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60 group-hover/author:border-[#f9bc60] transition-all duration-300 shadow-sm"
-                    onError={handleImgError(DEFAULT_AVATAR)}
+                    onError={(e) => {
+                      e.currentTarget.src = "/default-avatar.png";
+                    }}
                   />
                   <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-[#f9bc60]/30 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-300 blur-sm"></div>
                 </div>
@@ -223,11 +219,13 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
             ) : (
               <div className="flex items-center gap-2 bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 flex-shrink-0">
                 <img
-                  src={story.user?.avatar || DEFAULT_AVATAR}
+                  src={story.user?.avatar || "/default-avatar.png"}
                   alt={authorName}
                   loading="lazy"
                   className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60"
-                  onError={handleImgError(DEFAULT_AVATAR)}
+                  onError={(e) => {
+                    e.currentTarget.src = "/default-avatar.png";
+                  }}
                 />
                 <span className="text-sm font-bold text-[#001e1d] whitespace-nowrap">
                   {authorName}

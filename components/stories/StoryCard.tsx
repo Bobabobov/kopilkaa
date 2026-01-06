@@ -8,7 +8,6 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-import Image from "next/image";
 
 interface Story {
   id: string;
@@ -37,17 +36,26 @@ interface StoryCardProps {
   isAuthenticated: boolean;
 }
 
+// Карточка истории в списке /stories с картинкой, автором и лайками
 export function StoryCard({ story, index, animate = true, isAuthenticated }: StoryCardProps) {
   const router = useRouter();
   const [liked, setLiked] = useState(!!story.userLiked);
   const [likesCount, setLikesCount] = useState(story._count?.likes || 0);
   const [isLiking, setIsLiking] = useState(false);
-  
+  const DEFAULT_AVATAR = "/default-avatar.png";
+  const DEFAULT_IMAGE = "/stories-preview.jpg";
+
+  const handleImgError = (fallback: string) => (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    if (target.src.includes(fallback)) return;
+    target.src = fallback;
+  };
+
   const authorName =
     story.user?.name ||
     (story.user?.email ? story.user.email.split("@")[0] : null) ||
     "Неизвестный автор";
-  const mainImage = story.images?.[0]?.url || "/stories-preview.jpg";
+  const mainImage = story.images?.[0]?.url || DEFAULT_IMAGE;
 
   const handleCardClick = () => {
     router.push(`/stories/${story.id}`);
@@ -136,13 +144,12 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
       {/* Изображение */}
       <div className="relative mb-5 rounded-t-3xl overflow-hidden flex-shrink-0 shadow-xl group-hover:shadow-2xl transition-all duration-700">
         <div className="relative w-full h-56 overflow-hidden">
-          <Image
+          <img
             src={mainImage}
             alt={story.title}
-            fill
-            sizes="(min-width: 1024px) 33vw, 100vw"
-            quality={70}
-            className="object-cover group-hover:scale-115 transition-transform duration-1000 ease-out"
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+            onError={handleImgError(DEFAULT_IMAGE)}
           />
           {/* Градиентный overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/40 group-hover:via-black/10 transition-all duration-700"></div>
@@ -199,14 +206,12 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="relative flex-shrink-0">
-                  <Image
-                    src={story.user.avatar || "/default-avatar.png"}
+                  <img
+                    src={story.user.avatar || DEFAULT_AVATAR}
                     alt={authorName}
-                    width={28}
-                    height={28}
-                    sizes="28px"
-                    quality={70}
+                    loading="lazy"
                     className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60 group-hover/author:border-[#f9bc60] transition-all duration-300 shadow-sm"
+                    onError={handleImgError(DEFAULT_AVATAR)}
                   />
                   <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-[#f9bc60]/30 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-300 blur-sm"></div>
                 </div>
@@ -217,14 +222,12 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
               </Link>
             ) : (
               <div className="flex items-center gap-2 bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 flex-shrink-0">
-                <Image
-                  src={story.user?.avatar || "/default-avatar.png"}
+                <img
+                  src={story.user?.avatar || DEFAULT_AVATAR}
                   alt={authorName}
-                  width={28}
-                  height={28}
-                  sizes="28px"
-                  quality={70}
+                  loading="lazy"
                   className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60"
+                  onError={handleImgError(DEFAULT_AVATAR)}
                 />
                 <span className="text-sm font-bold text-[#001e1d] whitespace-nowrap">
                   {authorName}

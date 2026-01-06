@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSession, attachSessionToResponse } from "@/lib/auth";
 import { checkUserBan } from "@/lib/ban-check";
 import { OAuth2Client } from "google-auth-library";
+import { saveRemoteImageAsAvatar } from "@/lib/uploads/saveRemoteImage";
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 
@@ -14,6 +15,8 @@ interface GoogleAuthData {
   picture?: string;
   sub: string; // Google user ID
 }
+
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -97,9 +100,16 @@ export async function POST(req: NextRequest) {
         select: { name: true, avatar: true },
       });
 
-      // Если Google прислал аватар — сохраняем его как аватар профиля
-      if (googlePicture && existingUser && !existingUser.avatar) {
-        updateData.avatar = googlePicture;
+      // Если Google прислал аватар — пробуем сохранить локально
+      // Сохраняем, если аватар пустой или это внешний googleusercontent (нестабильный)
+      if (googlePicture && existingUser) {
+        const needAvatar =
+          !existingUser.avatar ||
+          existingUser.avatar.includes("googleusercontent.com");
+        if (needAvatar) {
+          const saved = await saveRemoteImageAsAvatar(googlePicture, googleId);
+          updateData.avatar = saved || googlePicture;
+        }
       }
 
       // Обновляем имя, если его нет
@@ -178,7 +188,8 @@ export async function POST(req: NextRequest) {
 
       // Сохраняем аватар из Google, если есть
       if (googlePicture) {
-        createData.avatar = googlePicture;
+        const saved = await saveRemoteImageAsAvatar(googlePicture, googleId);
+        createData.avatar = saved || googlePicture;
       }
 
       user = await prisma.user.create({
@@ -208,8 +219,13 @@ export async function POST(req: NextRequest) {
         updateData.email = googleEmail;
       }
 
-      if (googlePicture && !user.avatar) {
-        updateData.avatar = googlePicture;
+      if (googlePicture) {
+        const needAvatar =
+          !user.avatar || user.avatar.includes("googleusercontent.com");
+        if (needAvatar) {
+          const saved = await saveRemoteImageAsAvatar(googlePicture, googleId);
+          updateData.avatar = saved || googlePicture;
+        }
       }
 
       if (googleName && !user.name) {

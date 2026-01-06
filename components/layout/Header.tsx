@@ -120,10 +120,10 @@ export default function Header() {
     updateMenuTop();
   }, [mobileMenuOpen]);
 
-  // Закрываем мобильное меню при изменении размера экрана (lg+)
+  // Закрываем мобильное меню при изменении размера экрана (>=1200px)
   useEffect(() => {
     const handleResize = () => {
-      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+      const isDesktop = window.matchMedia("(min-width: 1200px)").matches;
       if (isDesktop) {
         setMobileMenuOpen(false);
       }
@@ -165,8 +165,8 @@ export default function Header() {
           </div>
 
           {/* Центр: навигация (абсолютно по центру) */}
-          <div className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2">
-            <HeaderNavigation />
+          <div className="hidden min-[1200px]:flex absolute left-1/2 transform -translate-x-1/2 max-w-[100vw]">
+            <HeaderNavigation className="flex-wrap justify-center gap-2 px-2 max-w-[1100px]" />
           </div>
 
           {/* Правая часть: кнопки (flex-shrink-0, без ml-auto) */}
@@ -184,8 +184,8 @@ export default function Header() {
               <NavAuth />
             </div>
             
-            {/* Мобильные кнопки: donate + burger */}
-            <div className="sm:hidden flex items-center gap-2">
+            {/* Мобильные/планшетные кнопки: donate + burger (до 1200px) */}
+            <div className="min-[1200px]:hidden flex items-center gap-2">
               <DonateButton variant="mobileHeader" />
               <HeaderMobileButton
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -202,7 +202,7 @@ export default function Header() {
           <>
             {/* Подложка для затемнения */}
             <motion.div
-              className="fixed inset-0 z-30 lg:hidden bg-black/40"
+              className="fixed inset-0 z-30 min-[1200px]:hidden bg-black/40"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -215,7 +215,7 @@ export default function Header() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.2 }}
-              className="lg:hidden fixed left-0 right-0 z-40 border-t backdrop-blur-sm shadow-2xl rounded-b-3xl"
+              className="min-[1200px]:hidden fixed left-0 right-0 z-40 border-t backdrop-blur-sm shadow-2xl rounded-b-3xl"
               style={{ 
                 backgroundColor: "#004643", 
                 borderColor: "#abd1c6",

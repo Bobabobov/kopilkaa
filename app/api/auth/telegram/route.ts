@@ -4,6 +4,9 @@ import { prisma } from "@/lib/db";
 import { getSession, attachSessionToResponse } from "@/lib/auth";
 import { verifyTelegramAuth, TelegramAuthData } from "@/lib/telegramAuth";
 import { checkUserBan } from "@/lib/ban-check";
+import { saveRemoteImageAsAvatar } from "@/lib/uploads/saveRemoteImage";
+
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -65,7 +68,8 @@ export async function POST(req: NextRequest) {
 
       // Если Телеграм прислал аватар — сохраняем его как аватар профиля
       if (telegramPhoto) {
-        updateData.avatar = telegramPhoto;
+        const saved = await saveRemoteImageAsAvatar(telegramPhoto, telegramId);
+        updateData.avatar = saved || telegramPhoto;
       }
 
       // Автоматически добавляем публичную ссылку на Telegram-профиль
@@ -152,7 +156,8 @@ export async function POST(req: NextRequest) {
 
       // Сохраняем аватар из Telegram, если есть
       if (telegramPhoto) {
-        createData.avatar = telegramPhoto;
+        const saved = await saveRemoteImageAsAvatar(telegramPhoto, telegramId);
+        createData.avatar = saved || telegramPhoto;
       }
 
       // Автоматически выставляем публичную ссылку на Telegram

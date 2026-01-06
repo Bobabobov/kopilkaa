@@ -45,7 +45,7 @@ export default function HeaderNavigation({
           prefetch={true}
           onClick={onLinkClick}
           className={cn(
-            "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 drop-shadow-md",
+            "px-3 sm:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 drop-shadow-md",
             isActive(l.href) ? "shadow-lg" : "hover:shadow-md",
           )}
           style={{

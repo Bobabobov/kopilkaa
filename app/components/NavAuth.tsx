@@ -11,6 +11,7 @@ type User = {
   email: string;
   role: "USER" | "ADMIN";
   name?: string | null;
+  isAdminAllowed?: boolean;
 } | null;
 
 // Маршрут авторизации (используем модальное окно с параметром ?modal=auth) — на текущем URL
@@ -63,7 +64,11 @@ export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps)
             notifyAuthChange(false);
             return;
           }
-          setUser(d.user);
+          setUser(
+            d.user
+              ? { ...d.user, isAdminAllowed: Boolean(d.isAdminAllowed) }
+              : null,
+          );
           notifyAuthChange(!!d.user);
         }
       })
@@ -167,7 +172,7 @@ export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps)
         <span className="hidden sm:inline">Личный кабинет</span>
         <span className="sm:hidden">Профиль</span>
       </Link>
-      {user.role === "ADMIN" && (
+      {user.isAdminAllowed && (
         <Link
           href="/admin"
           onClick={onLinkClick}

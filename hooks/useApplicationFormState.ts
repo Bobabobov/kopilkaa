@@ -126,7 +126,9 @@ export function useApplicationFormState() {
       if (savedStart && !Number.isNaN(Number(savedStart))) {
         formStartedAtRef.current = Number(savedStart);
       } else {
-        formStartedAtRef.current = null;
+        // если нет сохранённого времени старта — считаем началом текущий момент
+        formStartedAtRef.current = Date.now();
+        localStorage.setItem(formStartKey, String(formStartedAtRef.current));
       }
 
       setTrustAcknowledged(trustAck === "true");

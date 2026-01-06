@@ -2,6 +2,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { checkUserBan } from "@/lib/ban-check";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
 
 type SocialLinkType = "vk" | "telegram" | "youtube";
 
@@ -217,8 +218,11 @@ export async function GET() {
           }
         : user;
 
+    // Флаг допуска в админку рассчитываем по той же логике, что и на серверных маршрутах
+    const allowedAdmin = await getAllowedAdminUser();
+
     return Response.json(
-      { user: normalizedUser },
+      { user: normalizedUser, isAdminAllowed: Boolean(allowedAdmin) },
       {
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",

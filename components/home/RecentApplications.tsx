@@ -5,7 +5,6 @@ import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-import Image from "next/image";
 
 interface Application {
   id: string;
@@ -22,6 +21,7 @@ interface Application {
   };
 }
 
+// Показывает на главной последние одобренные заявки с обложкой и автором
 export default function RecentApplications() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,15 +100,16 @@ export default function RecentApplications() {
               >
                 {/* Изображение */}
                 <div className="relative h-48 overflow-hidden bg-gray-800">
-                  <Image
+                  <img
                     src={
                       app.images && app.images.length > 0 ? app.images[0].url : "/stories-preview.jpg"
                     }
                     alt={app.title}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 100vw"
-                    quality={70}
-                    className="object-cover"
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "/stories-preview.jpg";
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 </div>
@@ -140,14 +141,14 @@ export default function RecentApplications() {
                   {/* Автор */}
                   <div className="flex items-center gap-3 pt-4 border-t border-white/10">
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
-                      <Image
+                      <img
                         src={app.user && app.user.avatar ? app.user.avatar : "/default-avatar.png"}
                         alt={app.user ? (app.user.name || "User") : "User"}
-                        width={40}
-                        height={40}
-                        sizes="40px"
-                        quality={70}
+                        loading="lazy"
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = "/default-avatar.png";
+                        }}
                       />
                     </div>
                     <div className="flex-1 min-w-0">

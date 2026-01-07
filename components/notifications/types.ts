@@ -5,6 +5,7 @@ export interface Notification {
   type: "like" | "achievement" | "system" | "application_status" | "friend_request";
   title: string;
   message: string;
+  adminComment?: string | null;
   avatar?: string | null;
   timestamp: string;
   createdAt: string;

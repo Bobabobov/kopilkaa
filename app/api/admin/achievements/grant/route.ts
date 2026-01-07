@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { getAllowedAdminUser } from '@/lib/adminAccess';
 import { prisma } from '@/lib/db';
 
+const IS_PROD = process.env.NODE_ENV === "production";
+
 // POST /api/admin/achievements/grant - выдать достижение пользователю
 export async function POST(request: Request) {
   try {
@@ -12,7 +14,6 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    console.log('Grant achievement request body:', body);
     const { achievementId, userId } = body;
 
     if (!achievementId || !userId) {

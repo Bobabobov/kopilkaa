@@ -2,21 +2,17 @@
 import { NextResponse } from 'next/server';
 import { getAllowedAdminUser } from '@/lib/adminAccess';
 import { prisma } from '@/lib/db';
-import { DEFAULT_ACHIEVEMENTS } from '@/lib/achievements/config';
+
+const IS_PROD = process.env.NODE_ENV === "production";
 
 // GET /api/admin/achievements - получить все достижения для админа
 export async function GET() {
   try {
-    console.log('=== GET /api/admin/achievements ===');
     const admin = await getAllowedAdminUser();
-    console.log('Admin:', admin);
     
     if (!admin) {
-      console.log('Access denied - no session or not admin');
       return NextResponse.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
-    
-    console.log('Access granted, fetching achievements...');
 
     const achievements = await prisma.achievement.findMany({
       orderBy: [
@@ -25,17 +21,16 @@ export async function GET() {
         { createdAt: 'desc' },
       ],
     });
-    
-    console.log('Found achievements:', achievements.length);
-    console.log('First achievement:', achievements[0]);
 
     return NextResponse.json({
       success: true,
       data: achievements,
     });
   } catch (error) {
-    console.error('Error fetching achievements for admin:', error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    if (!IS_PROD) {
+      console.error('Error fetching achievements for admin:', error);
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    }
     return NextResponse.json(
       { error: 'Ошибка получения достижений' },
       { status: 500 }

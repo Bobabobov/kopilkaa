@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { AdminHeader } from "../components/AdminHeader";
 import { LucideIcons } from "@/components/ui/LucideIcons";
@@ -21,40 +21,86 @@ interface User {
 export default function AdminUsersClient() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const { showToast } = useBeautifulToast();
   const { confirm } = useBeautifulNotifications();
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    loadUsers();
-  }, []);
+    loadUsers(1, true);
+  }, [searchQuery]);
 
-  const loadUsers = async () => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore && hasMore && !loading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1, rootMargin: "100px" }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [loadingMore, hasMore, loading]);
+
+  const loadUsers = async (page: number = 1, reset: boolean = false) => {
     try {
-      setLoading(true);
-      const response = await fetch("/api/admin/users");
+      if (reset) {
+        setLoading(true);
+        setUsers([]);
+        setCurrentPage(1);
+      } else {
+        setLoadingMore(true);
+      }
+
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: "20",
+        ...(searchQuery && { q: searchQuery }),
+      });
+
+      const response = await fetch(`/api/admin/users?${params}`);
       if (!response.ok) {
         throw new Error("Ошибка загрузки пользователей");
       }
       const data = await response.json();
       if (data.success) {
-        setUsers(data.data || []);
+        const newUsers = data.data || [];
+        if (reset) {
+          setUsers(newUsers);
+        } else {
+          setUsers((prev) => [...prev, ...newUsers]);
+        }
+        setHasMore(page < (data.pages || 1));
+        setCurrentPage(page + 1);
       }
     } catch (error) {
       console.error("Failed to load users:", error);
       showToast("error", "Ошибка", "Не удалось загрузить список пользователей");
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  const filteredUsers = users.filter((user) => {
-    const query = searchQuery.toLowerCase();
-    const name = (user.name || "").toLowerCase();
-    const email = (user.email || "").toLowerCase();
-    return name.includes(query) || email.includes(query);
-  });
+  const loadMore = () => {
+    if (!loadingMore && hasMore) {
+      loadUsers(currentPage, false);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("ru-RU", {
@@ -125,7 +171,7 @@ export default function AdminUsersClient() {
                   👥 Все пользователи
                 </h2>
                 <p className="text-[#abd1c6] text-sm sm:text-base">
-                  Всего пользователей: {users.length}
+                  Загружено: {users.length} {hasMore && "(ещё загружается...)"}
                 </p>
               </div>
 
@@ -148,7 +194,7 @@ export default function AdminUsersClient() {
               <div className="inline-block w-8 h-8 border-4 border-[#f9bc60] border-t-transparent rounded-full animate-spin" />
               <p className="mt-4 text-[#abd1c6]">Загрузка пользователей...</p>
             </div>
-          ) : filteredUsers.length === 0 ? (
+          ) : users.length === 0 ? (
             <div className="text-center py-12">
               <LucideIcons.Users className="w-16 h-16 mx-auto mb-4 text-[#abd1c6]/50" />
               <p className="text-[#abd1c6]">
@@ -156,8 +202,9 @@ export default function AdminUsersClient() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredUsers.map((user, index) => (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {users.map((user, index) => (
                 <motion.div
                   key={user.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -233,7 +280,28 @@ export default function AdminUsersClient() {
                   </div>
                 </motion.div>
               ))}
-            </div>
+              </div>
+
+              {/* Индикатор загрузки */}
+              {loadingMore && (
+                <div className="text-center py-8">
+                  <div className="inline-block w-6 h-6 border-3 border-[#f9bc60] border-t-transparent rounded-full animate-spin" />
+                  <p className="mt-2 text-[#abd1c6] text-sm">Загрузка...</p>
+                </div>
+              )}
+
+              {/* Невидимый элемент для отслеживания скролла */}
+              {hasMore && !loadingMore && (
+                <div ref={observerTarget} className="h-20" />
+              )}
+
+              {/* Сообщение о конце списка */}
+              {!hasMore && users.length > 0 && (
+                <div className="text-center py-8">
+                  <p className="text-[#abd1c6] text-sm">Все пользователи загружены</p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

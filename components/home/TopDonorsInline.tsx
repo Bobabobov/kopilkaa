@@ -57,8 +57,8 @@ export default function TopDonorsInline() {
       <section className="pt-6 pb-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-white/20 border-t-white/80" />
-            <p className="mt-4 text-sm" style={{ color: "#abd1c6" }}>
+            <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-[#2f7a67]/10 border-t-[#2f7a67]" />
+            <p className="mt-4 text-sm" style={{ color: "#3f5a52" }}>
               Загружаем топ‑донатёров...
             </p>
           </div>
@@ -135,10 +135,6 @@ export default function TopDonorsInline() {
         {/* Сетка донатёров в стиле карточек, как «Истории успеха», но с более
             аккуратным, «виджетным» оформлением и акцентом на 1–3 места */}
         <div className="relative">
-          {/* мягкие подсветки на фоне */}
-          <div className="pointer-events-none absolute -left-10 top-0 h-32 w-32 rounded-full bg-[#f9bc60]/10 blur-3xl" />
-          <div className="pointer-events-none absolute -right-10 bottom-0 h-32 w-32 rounded-full bg-[#e16162]/12 blur-3xl" />
-
           <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
           {donors.map((donor, index) => {
             const numericAmount = parseInt(donor.amount.replace(/\D/g, ""), 10);
@@ -219,7 +215,7 @@ export default function TopDonorsInline() {
                       >
                         {donor.name}
                       </p>
-                      <p className="text-[11px] font-medium text-[#f9bc60]">
+                      <p className="text-[11px] font-medium" style={{ color: "#f9bc60" }}>
                         {placeLabel}
                       </p>
                       {donor.heroBadge && (
@@ -238,9 +234,6 @@ export default function TopDonorsInline() {
                         style={{ color: "#ffffff", fontWeight: 900 }}
                       >{` руб`}</span>
                     </span>
-                    <p className="mt-1 text-xs" style={{ color: "#abd1c6" }}>
-                      Сумма поддержки
-                    </p>
                   </div>
 
                   {/* Соцсети донатера / сообщение, если их нет */}
@@ -322,7 +315,7 @@ export default function TopDonorsInline() {
             href="/support"
             className="inline-flex items-center gap-2 px-8 py-3 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105"
             style={{
-              backgroundColor: "#f9bc60",
+              background: "linear-gradient(135deg, #f9bc60 0%, #e8a545 100%)",
               color: "#001e1d",
             }}
           >
@@ -330,7 +323,7 @@ export default function TopDonorsInline() {
             Стать героем
           </Link>
           <Link
-            href="/support"
+            href="/heroes"
             className="inline-flex items-center gap-2 px-8 py-3 text-base font-semibold rounded-xl border-2 transition-all duration-300 hover:scale-105"
             style={{
               borderColor: "#abd1c6",

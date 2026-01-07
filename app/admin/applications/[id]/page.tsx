@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import UniversalBackground from "@/components/ui/UniversalBackground";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
+import UniversalBackground from "@/components/ui/UniversalBackground";
 import ApplicationHeader from "./components/ApplicationHeader";
 import ApplicationTitle from "./components/ApplicationTitle";
 import ApplicationMetaInfo from "./components/ApplicationMetaInfo";

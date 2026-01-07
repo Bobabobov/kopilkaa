@@ -18,56 +18,52 @@ export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
 
-  // Проверяем авторизацию (не блокируем навигацию)
+  // Авторизация:
+  // - основной источник: событие "auth-status-change" (его диспатчит NavAuth)
+  // - fallback: если событие долго не приходит (например, NavAuth не смонтирован на мобилке),
+  //   делаем лёгкий запрос /api/profile/me
   useEffect(() => {
     let cancelled = false;
-    
-    const checkAuth = async () => {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1000);
-        
-        const response = await fetch("/api/profile/me", {
-          signal: controller.signal,
-          cache: "no-store",
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!cancelled) {
-          const isAuth = response.ok;
-          setIsAuthenticated(isAuth);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setIsAuthenticated(false);
-        }
-      } finally {
-        if (!cancelled) {
-          setAuthLoading(false);
-        }
-      }
-    };
+    let resolvedByEvent = false;
 
-    checkAuth();
-    
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Слушаем глобальные изменения статуса авторизации
-  useEffect(() => {
     const handleAuthChange = (event: Event) => {
       const detail = (event as CustomEvent<{ isAuthenticated?: boolean }>).detail;
       if (typeof detail?.isAuthenticated === "boolean") {
+        resolvedByEvent = true;
         setIsAuthenticated(detail.isAuthenticated);
         setAuthLoading(false);
       }
     };
 
     window.addEventListener("auth-status-change", handleAuthChange);
+
+    const fallbackTimer = setTimeout(() => {
+      if (cancelled || resolvedByEvent) return;
+
+      (async () => {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+          const response = await fetch("/api/profile/me", {
+            signal: controller.signal,
+            cache: "no-store",
+          });
+
+          clearTimeout(timeoutId);
+          if (cancelled) return;
+          setIsAuthenticated(response.ok);
+        } catch {
+          if (!cancelled) setIsAuthenticated(false);
+        } finally {
+          if (!cancelled) setAuthLoading(false);
+        }
+      })();
+    }, 600);
+
     return () => {
+      cancelled = true;
+      clearTimeout(fallbackTimer);
       window.removeEventListener("auth-status-change", handleAuthChange);
     };
   }, []);
@@ -78,10 +74,11 @@ export default function Header() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const handleScroll = () => {
-      // Используем CSS media query через matchMedia вместо window.innerWidth
+    let rafId = 0;
+
+    const updateTop = () => {
+      rafId = 0;
       const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-      
       if (!isDesktop) return;
 
       const scrollY = window.scrollY;
@@ -91,18 +88,24 @@ export default function Header() {
       const bannerHeight = Number.parseFloat(cssValue || "0") || 0;
       const hideProgress =
         bannerHeight > 0 ? Math.min(scrollY / bannerHeight, 1) : 1;
-      
+
       if (headerRef.current) {
         const newTop = bannerHeight * (1 - hideProgress);
         headerRef.current.style.top = `${newTop}px`;
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(updateTop);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    updateTop();
+
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
     };
   }, []);
 

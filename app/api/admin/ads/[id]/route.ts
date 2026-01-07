@@ -83,6 +83,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
+  const IS_PROD = process.env.NODE_ENV === "production";
   try {
     const admin = await getAllowedAdminUser();
     if (!admin) {
@@ -93,7 +94,7 @@ export async function DELETE(
     const resolvedParams = await Promise.resolve(params);
     const id = resolvedParams.id;
 
-    console.log("Deleting ad with id:", id);
+    if (!IS_PROD) console.log("Deleting ad with id:", id);
 
     // Проверяем существование записи перед удалением
     const existingAd = await prisma.advertisement.findUnique({
@@ -101,7 +102,7 @@ export async function DELETE(
     });
 
     if (!existingAd) {
-      console.log("Advertisement not found:", id);
+      if (!IS_PROD) console.log("Advertisement not found:", id);
       return NextResponse.json(
         { error: "Advertisement not found" },
         { status: 404 }
@@ -113,7 +114,7 @@ export async function DELETE(
       where: { id },
     });
 
-    console.log("Advertisement deleted successfully:", id);
+    if (!IS_PROD) console.log("Advertisement deleted successfully:", id);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

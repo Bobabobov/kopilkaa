@@ -3,9 +3,11 @@ import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
+const IS_PROD = process.env.NODE_ENV === "production";
+
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ userId: string }> },
+  { params }: { params: { userId: string } },
 ) {
   const admin = await getAllowedAdminUser();
   if (!admin) {
@@ -13,8 +15,10 @@ export async function DELETE(
   }
 
   try {
-    const { userId } = await params;
-    console.log("=== DELETE /api/admin/users/[userId]/delete ===", { userId });
+    const { userId } = params;
+    if (!IS_PROD) {
+      console.log("=== DELETE /api/admin/users/[userId]/delete ===", { userId });
+    }
 
     const user = await prisma.user.findUnique({
       where: { id: userId },

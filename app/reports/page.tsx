@@ -30,7 +30,6 @@ export interface BugReport {
 }
 
 const PAGE_SIZE = 20;
-const ADMIN_EMAILS = ["bobov097@gmail.com"];
 const STATUS_PRESETS = [
   { value: "all", label: "Все" },
   { value: "OPEN", label: "Открытые" },
@@ -43,6 +42,7 @@ export default function ReportsPage() {
   const router = useRouter();
 
   const [user, setUser] = useState<{ id: string; email?: string; role?: string } | null>(null);
+  const [isAdminAllowed, setIsAdminAllowed] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -56,11 +56,8 @@ export default function ReportsPage() {
 
   const isAdmin = useMemo(() => {
     const roleIsAdmin = user?.role ? user.role.toUpperCase() === "ADMIN" : false;
-    const emailIsAdmin = user?.email
-      ? ADMIN_EMAILS.includes(user.email.toLowerCase())
-      : false;
-    return roleIsAdmin || emailIsAdmin;
-  }, [user?.role, user?.email]);
+    return roleIsAdmin || isAdminAllowed;
+  }, [user?.role, isAdminAllowed]);
 
   const formatReport = (r: any): BugReport => ({
     id: r.id,
@@ -97,6 +94,7 @@ export default function ReportsPage() {
           setAuthError("Не удалось загрузить профиль");
         }
         setUser(null);
+        setIsAdminAllowed(false);
         return;
       }
 
@@ -104,10 +102,12 @@ export default function ReportsPage() {
       if (!data?.user) {
         setAuthError("Нужно войти или зарегистрироваться");
         setUser(null);
+        setIsAdminAllowed(false);
           return;
         }
 
       setUser(data.user);
+      setIsAdminAllowed(Boolean(data?.isAdminAllowed));
     } catch (err: any) {
       if (err?.name === "AbortError") {
         setAuthError("Сервер долго не отвечает. Попробуйте обновить страницу.");
@@ -115,6 +115,7 @@ export default function ReportsPage() {
         setAuthError("Не удалось загрузить профиль");
       }
       setUser(null);
+      setIsAdminAllowed(false);
     } finally {
       clearTimeout(timer);
       setAuthLoading(false);

@@ -10,7 +10,14 @@ import {
 import { getTrustLevelFromApprovedCount, getTrustLimits } from "@/lib/trustLevel";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const WHITELIST_EMAILS = ["bobov097@gmail.com"];
+
+function getWhitelistEmails(): string[] {
+  const raw = process.env.WHITELIST_EMAILS || "";
+  return raw
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+}
 
 export async function POST(req: Request) {
   const session = await getSession();
@@ -21,8 +28,9 @@ export async function POST(req: Request) {
     where: { id: session.uid },
     select: { email: true },
   });
+  const whitelistEmails = getWhitelistEmails();
   const isWhitelisted =
-    requester?.email && WHITELIST_EMAILS.includes(requester.email.toLowerCase());
+    requester?.email && whitelistEmails.includes(requester.email.toLowerCase());
 
   try {
     const {

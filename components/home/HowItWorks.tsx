@@ -221,15 +221,6 @@ export default function HowItWorks() {
               </svg>
             )}
           </button>
-          <p className="mt-6 text-base md:text-lg font-semibold max-w-2xl mx-auto" style={{ color: "#abd1c6" }}>
-            Расскажите свою ситуацию
-          </p>
-          <p className="mt-2 text-sm md:text-base font-medium" style={{ color: "#abd1c6" }}>
-            Мы принимаем решения самостоятельно и осознанно
-          </p>
-          <p className="mt-3 text-sm max-w-2xl mx-auto leading-relaxed" style={{ color: "#94a1b2" }}>
-            История помогает нам понять, можем ли мы оказать финансовую поддержку. Решение не гарантировано и не является обязательством.
-          </p>
         </motion.div>
       </div>
     </section>

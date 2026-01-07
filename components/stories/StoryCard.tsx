@@ -42,7 +42,7 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
   const [liked, setLiked] = useState(!!story.userLiked);
   const [likesCount, setLikesCount] = useState(story._count?.likes || 0);
   const [isLiking, setIsLiking] = useState(false);
-
+  
   const authorName =
     story.user?.name ||
     (story.user?.email ? story.user.email.split("@")[0] : null) ||

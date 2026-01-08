@@ -17,7 +17,7 @@ import {
 interface ProfileLayoutProps {
   user: {
     id: string;
-    email: string;
+    email: string | null;
     username?: string | null;
     role: "USER" | "ADMIN";
     name?: string | null;

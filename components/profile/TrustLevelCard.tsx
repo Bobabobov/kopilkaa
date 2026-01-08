@@ -15,6 +15,9 @@ type Props = {
   progressValue?: number | null;
   progressCurrent?: number | null;
   progressTotal?: number | null;
+  titleOverride?: string;
+  descriptionOverride?: string;
+  extraOverride?: string | null;
 };
 
 const STATUS_CONFIG: Record<
@@ -131,11 +134,19 @@ export function TrustLevelCard({
   progressValue,
   progressCurrent,
   progressTotal,
+  titleOverride,
+  descriptionOverride,
+  extraOverride,
 }: Props) {
   const config = STATUS_CONFIG[status];
   const Icon = config.icon;
   const support = supportText || config.limit;
-  const text = TRUST_TEXTS[status];
+  const baseText = TRUST_TEXTS[status];
+  const text = {
+    title: titleOverride || baseText.title,
+    description: descriptionOverride || baseText.description,
+    extra: extraOverride === undefined ? baseText.extra : extraOverride,
+  };
   const progressPercent =
     progressValue === null || progressValue === undefined
       ? null

@@ -14,6 +14,13 @@ import MutualFriends from "./widgets/MutualFriends";
 import ProfileHeaderCard from "@/components/profile/ProfileHeaderCard";
 import ReportUserModal from "./modals/ReportUserModal";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
+import TrustLevelCard from "@/components/profile/TrustLevelCard";
+import {
+  getNextLevelRequirement,
+  getTrustLevelFromApprovedCount,
+  getTrustLimits,
+  type TrustLevel,
+} from "@/lib/trustLevel";
 
 type User = {
   id: string;
@@ -56,6 +63,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   const [resolvedUserId, setResolvedUserId] = useState<string | null>(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
+  const [approvedApplications, setApprovedApplications] = useState<number | null>(null);
 
   const emitFriendEvents = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -152,6 +160,27 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
 
     loadUserData();
   }, [isAuthenticated, userId]);
+
+  // Загружаем количество одобренных заявок для расчёта уровня доверия
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const targetId = resolvedUserId || userId;
+    if (!targetId) return;
+
+    fetch(`/api/users/${targetId}/detailed-stats`, { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const approved = data?.detailedStats?.applications?.approved;
+        if (typeof approved === "number" && approved >= 0) {
+          setApprovedApplications(approved);
+        } else {
+          setApprovedApplications(0);
+        }
+      })
+      .catch(() => {
+        setApprovedApplications(0);
+      });
+  }, [isAuthenticated, resolvedUserId, userId]);
 
   // Загружаем статус дружбы после того, как знаем реальный userId
   useEffect(() => {
@@ -408,6 +437,28 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
       ? "requested"
       : "incoming";
 
+  const trustDerived = (() => {
+    const approved = approvedApplications ?? 0;
+    const trustLevel: TrustLevel = getTrustLevelFromApprovedCount(approved);
+    const limits = getTrustLimits(trustLevel);
+    const trustStatus = trustLevel.toLowerCase() as Lowercase<TrustLevel>;
+    const supportText = `от ${limits.min.toLocaleString("ru-RU")} до ${limits.max.toLocaleString("ru-RU")} ₽`;
+    const nextReq = getNextLevelRequirement(trustLevel);
+    const progressValue = nextReq === null ? null : Math.min(1, Math.max(0, approved / nextReq));
+    const progressCurrent = nextReq === null ? null : Math.min(approved, nextReq);
+    const progressTotal = nextReq === null ? null : nextReq;
+    const progressText =
+      nextReq === null
+        ? null
+        : (() => {
+            const remaining = Math.max(0, nextReq - approved);
+            const ending = remaining === 1 ? "ая" : "ые";
+            const noun = remaining === 1 ? "заявка" : "заявки";
+            return `До следующего уровня — ${remaining} одобренн${ending} ${noun}`;
+          })();
+    return { trustStatus, supportText, progressText, progressValue, progressCurrent, progressTotal };
+  })();
+
   return (
     <div className="min-h-screen relative overflow-hidden" role="main" aria-label="Профиль пользователя">
       {/* Универсальный фон */}
@@ -455,6 +506,17 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 md:gap-6">
             {/* Левая колонка */}
             <section className="lg:col-span-7 space-y-4 sm:space-y-5 md:space-y-6">
+              <TrustLevelCard
+                status={trustDerived.trustStatus}
+                supportText={trustDerived.supportText}
+                progressText={trustDerived.progressText}
+                progressValue={trustDerived.progressValue}
+                progressCurrent={trustDerived.progressCurrent}
+                progressTotal={trustDerived.progressTotal}
+                titleOverride="Уровень доверия участника"
+                descriptionOverride="Расчёт по одобренным заявкам этого профиля"
+                extraOverride="Показывает доступный диапазон поддержки для этого участника"
+              />
               <OtherUserPersonalStats userId={resolvedUserId || user.id} />
               <OtherUserAchievements userId={resolvedUserId || user.id} />
             </section>

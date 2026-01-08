@@ -3,6 +3,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import {
+  getTrustLabel,
+  getTrustLevelFromApprovedCount,
+  getTrustLimits,
+} from "@/lib/trustLevel";
 
 interface DetailedStats {
   applications: {
@@ -240,7 +245,7 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
         {activeTab === 'overview' && (
           <div className="space-y-4 sm:space-y-5 md:space-y-6">
             {/* Key Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
               {[
                 {
                   label: 'Всего заявок',
@@ -265,6 +270,16 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
                   value: stats.achievements.total,
                   icon: LucideIcons.Award,
                   color: '#F59E0B'
+                },
+                {
+                  label: 'Уровень доверия',
+                  value: getTrustLabel(getTrustLevelFromApprovedCount(stats.applications.approved)),
+                  subLabel: (() => {
+                    const limits = getTrustLimits(getTrustLevelFromApprovedCount(stats.applications.approved));
+                    return `от ${limits.min.toLocaleString('ru-RU')} до ${limits.max.toLocaleString('ru-RU')} ₽`;
+                  })(),
+                  icon: LucideIcons.Shield,
+                  color: '#22A699'
                 }
               ].map((metric, index) => {
                 const IconComponent = metric.icon;
@@ -292,6 +307,11 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
                         <p className="text-[10px] sm:text-xs text-[#abd1c6] leading-tight whitespace-normal mt-0.5">
                           {metric.label}
                         </p>
+                        {metric.subLabel && (
+                          <p className="text-[10px] sm:text-xs text-[#8fb7aa] leading-tight whitespace-normal mt-0.5">
+                            {metric.subLabel}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </motion.div>

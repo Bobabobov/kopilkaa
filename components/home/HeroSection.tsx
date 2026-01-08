@@ -47,7 +47,12 @@ export default function HeroSection({ stats, loading }: HeroSectionProps) {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center">
             <Link
               href="/applications"
-              className="inline-flex items-center justify-center px-10 py-4 text-lg sm:text-xl font-black rounded-2xl transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d]"
+              className="inline-flex items-center gap-3 px-8 py-4 text-lg sm:text-xl font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl shadow-lg"
+              style={{
+                background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+                color: "#001e1d",
+                boxShadow: "0 10px 40px rgba(249, 188, 96, 0.3)",
+              }}
             >
               Рассказать историю
             </Link>

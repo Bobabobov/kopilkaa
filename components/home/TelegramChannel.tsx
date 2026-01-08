@@ -18,7 +18,7 @@ export default function TelegramChannel() {
           href="https://t.me/kkopilka"
           target="_blank"
           rel="noopener noreferrer"
-          className="block transition-opacity duration-200 hover:opacity-90 w-full sm:w-[280px]"
+          className="group relative block w-full sm:w-[280px] rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
         >
           <Image
             src="/buttontg.png"
@@ -26,15 +26,19 @@ export default function TelegramChannel() {
             width={560}
             height={315}
             sizes="(min-width: 640px) 280px, 100vw"
-            quality={80}
-            className="w-full h-auto rounded-2xl"
+            quality={90}
+            className="w-full h-auto rounded-2xl transition-transform duration-300 group-hover:brightness-110"
+            unoptimized
           />
+          {/* Overlay при hover */}
+          <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all duration-300 rounded-2xl pointer-events-none" />
         </Link>
+        
         <Link
           href="https://kick.com/koponline"
           target="_blank"
           rel="noopener noreferrer"
-          className="block transition-opacity duration-200 hover:opacity-90 w-full sm:w-[280px]"
+          className="group relative block w-full sm:w-[280px] rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
         >
           <Image
             src="/buttonkick.png"
@@ -42,9 +46,12 @@ export default function TelegramChannel() {
             width={560}
             height={315}
             sizes="(min-width: 640px) 280px, 100vw"
-            quality={80}
-            className="w-full h-auto rounded-2xl"
+            quality={90}
+            className="w-full h-auto rounded-2xl transition-transform duration-300 group-hover:brightness-110"
+            unoptimized
           />
+          {/* Overlay при hover */}
+          <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all duration-300 rounded-2xl pointer-events-none" />
         </Link>
       </div>
     </motion.div>

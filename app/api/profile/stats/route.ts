@@ -12,20 +12,22 @@ export async function GET() {
     const userId = session.uid;
 
     // Получаем статистику заявок с обработкой ошибок
-    const applications = await prisma.application.findMany({
-      where: { userId },
-      select: {
-        status: true,
-        amount: true,
-      },
-    }).catch(() => []);
+    const applications = await prisma.application
+      .findMany({
+        where: { userId },
+        select: {
+          status: true,
+          amount: true,
+        },
+      })
+      .catch(() => []);
 
     const totalApplications = applications.length;
-    const approvedApplications = applications.filter(
-      (app) => app.status === "APPROVED",
-    ).length;
+    const approvedApplications = applications.filter(app => app.status === "APPROVED").length;
+    const pendingApplications = applications.filter(app => app.status === "PENDING").length;
+    const rejectedApplications = applications.filter(app => app.status === "REJECTED").length;
     const totalAmount = applications
-      .filter((app) => app.status === "APPROVED")
+      .filter(app => app.status === "APPROVED")
       .reduce((sum, app) => sum + app.amount, 0);
 
     // Получаем количество друзей с обработкой ошибок
@@ -59,9 +61,9 @@ export async function GET() {
     // Получаем детальную статистику заявок
     const applicationsStats = {
       total: totalApplications,
-      pending: applications.filter((app) => app.status === "PENDING").length,
+      pending: pendingApplications,
       approved: approvedApplications,
-      rejected: applications.filter((app) => app.status === "REJECTED").length,
+      rejected: rejectedApplications,
     };
 
     // Вычисляем дни с регистрации с обработкой ошибок
@@ -84,6 +86,11 @@ export async function GET() {
     const stats = {
       applications: applicationsStats,
       user: userStats,
+      totalApplications,
+      approvedApplications,
+      pendingApplications,
+      rejectedApplications,
+      approvedAmount: totalAmount,
     };
 
     return Response.json(stats);

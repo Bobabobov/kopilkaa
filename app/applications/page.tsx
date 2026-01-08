@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import TrustLevelsInfo from "@/components/applications/TrustLevelsInfo";
 import ApplicationsTips from "@/components/applications/ApplicationsTips";
 import ApplicationsForm from "@/components/applications/ApplicationsForm";
-import { useApplicationFormState, LIMITS } from "@/hooks/useApplicationFormState";
+import { useApplicationFormState, LIMITS } from "@/hooks/applications/useApplicationFormState";
 import TrustIntroModal from "@/components/applications/TrustIntroModal";
 import { getTrustLabel } from "@/lib/trustLevel";
 

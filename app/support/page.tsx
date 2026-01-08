@@ -11,7 +11,7 @@ export default function SupportPage() {
   const [customAmount, setCustomAmount] = useState("");
   const [hasSocialLinks, setHasSocialLinks] = useState<boolean | null>(null);
 
-  // Проверяем, есть ли у пользователя привязанные соцсети
+  // Проверочка соц. сетей
   useEffect(() => {
     let isCancelled = false;
 
@@ -65,7 +65,7 @@ export default function SupportPage() {
         <SupportBenefits />
         <WhatYouGet />
 
-        {/* Юридическая информация */}
+        {/* Юр.ИНФО */}
         <section className="py-6 sm:py-8 px-3 sm:px-4">
           <div className="max-w-4xl mx-auto">
             <div className="bg-[#004643]/18 backdrop-blur-sm border border-[#abd1c6]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-5">

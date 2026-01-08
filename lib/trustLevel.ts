@@ -1,26 +1,72 @@
-export type TrustLevel = "NEW" | "VERIFIED" | "TRUSTED";
+export type TrustLevel =
+  | "LEVEL_1"
+  | "LEVEL_2"
+  | "LEVEL_3"
+  | "LEVEL_4"
+  | "LEVEL_5"
+  | "LEVEL_6";
+
+const TRUST_LEVELS_ORDER: TrustLevel[] = [
+  "LEVEL_1",
+  "LEVEL_2",
+  "LEVEL_3",
+  "LEVEL_4",
+  "LEVEL_5",
+  "LEVEL_6",
+];
+
+const TRUST_LIMITS: Record<TrustLevel, { min: number; max: number }> = {
+  LEVEL_1: { min: 50, max: 150 },
+  LEVEL_2: { min: 50, max: 300 },
+  LEVEL_3: { min: 50, max: 700 },
+  LEVEL_4: { min: 50, max: 1500 },
+  LEVEL_5: { min: 50, max: 3000 },
+  LEVEL_6: { min: 50, max: 5000 },
+};
 
 export function getTrustLevelFromApprovedCount(approvedCount: number): TrustLevel {
-  const count = Math.max(0, Number.isFinite(approvedCount) ? approvedCount : 0);
-  if (count >= 2) return "TRUSTED";
-  if (count >= 1) return "VERIFIED";
-  return "NEW";
+  const safeCount = Math.max(0, Number.isFinite(approvedCount) ? Math.floor(approvedCount) : 0);
+  const levelIndex = Math.min(Math.floor(safeCount / 3), TRUST_LEVELS_ORDER.length - 1);
+  return TRUST_LEVELS_ORDER[levelIndex];
 }
 
 export function getTrustLimits(level: TrustLevel): { min: number; max: number } {
-  if (level === "TRUSTED") return { min: 50, max: 5000 };
-  if (level === "VERIFIED") return { min: 50, max: 1500 };
-  return { min: 50, max: 300 };
+  return TRUST_LIMITS[level];
+}
+
+export function getNextLevelRequirement(level: TrustLevel): number | null {
+  switch (level) {
+    case "LEVEL_1":
+      return 3;
+    case "LEVEL_2":
+      return 6;
+    case "LEVEL_3":
+      return 9;
+    case "LEVEL_4":
+      return 12;
+    case "LEVEL_5":
+      return 15;
+    case "LEVEL_6":
+    default:
+      return null;
+  }
 }
 
 export function getTrustLabel(level: TrustLevel): string {
   switch (level) {
-    case "TRUSTED":
-      return "Доверенный участник";
-    case "VERIFIED":
-      return "Проверенный участник";
+    case "LEVEL_6":
+      return "Уровень 6";
+    case "LEVEL_5":
+      return "Уровень 5";
+    case "LEVEL_4":
+      return "Уровень 4";
+    case "LEVEL_3":
+      return "Уровень 3";
+    case "LEVEL_2":
+      return "Уровень 2";
+    case "LEVEL_1":
     default:
-      return "Новый участник";
+      return "Уровень 1";
   }
 }
 

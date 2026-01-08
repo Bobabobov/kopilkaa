@@ -1,13 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { LucideIcons } from "@/components/ui/LucideIcons";
-import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import BugReportForm from "@/components/reports/BugReportForm";
 import BugReportList from "@/components/reports/BugReportList";
 import BugReportFilters from "@/components/reports/BugReportFilters";
+import ReportsHeader from "@/components/reports/ReportsHeader";
+import ReportsTips from "@/components/reports/ReportsTips";
+import ReportsError from "@/components/reports/ReportsError";
+import ReportsAuthError from "@/components/reports/ReportsAuthError";
+import { useReportsAuth } from "@/hooks/reports/useReportsAuth";
+import { useReports } from "@/hooks/reports/useReports";
 
 export interface BugReport {
   id: string;
@@ -29,137 +32,30 @@ export interface BugReport {
   dislikesCount: number;
 }
 
-const PAGE_SIZE = 20;
-const STATUS_PRESETS = [
-  { value: "all", label: "Все" },
-  { value: "OPEN", label: "Открытые" },
-  { value: "IN_PROGRESS", label: "В работе" },
-  { value: "RESOLVED", label: "Решённые" },
-  { value: "CLOSED", label: "Закрытые" },
-];
-
 export default function ReportsPage() {
-  const router = useRouter();
-
-  const [user, setUser] = useState<{ id: string; email?: string; role?: string } | null>(null);
-  const [isAdminAllowed, setIsAdminAllowed] = useState(false);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [authError, setAuthError] = useState<string | null>(null);
-
-  const [reports, setReports] = useState<BugReport[]>([]);
-  const [loadingReports, setLoadingReports] = useState(true);
-  const [reportsError, setReportsError] = useState<string | null>(null);
-
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
 
+  const { user, isAdminAllowed, loading: authLoading, error: authError, loadUser } = useReportsAuth();
   const isAdmin = useMemo(() => {
     const roleIsAdmin = user?.role ? user.role.toUpperCase() === "ADMIN" : false;
     return roleIsAdmin || isAdminAllowed;
   }, [user?.role, isAdminAllowed]);
 
-  const formatReport = (r: any): BugReport => ({
-    id: r.id,
-    title: r.title,
-    description: r.description,
-    category: r.category,
-    status: r.status,
-    adminComment: r.adminComment,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
-    user: r.user,
-    images: r.images || [],
-    likesCount: r.likesCount ?? 0,
-    dislikesCount: r.dislikesCount ?? 0,
+  const {
+    reports,
+    loading: loadingReports,
+    error: reportsError,
+    totalPages,
+    loadReports,
+    updateStatus,
+    deleteReport,
+    addReport,
+  } = useReports({
+    userId: user?.id || null,
+    statusFilter,
+    page,
   });
-
-  const loadUser = useCallback(async () => {
-    setAuthLoading(true);
-    setAuthError(null);
-
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 5000);
-
-    try {
-      const res = await fetch("/api/profile/me", {
-        cache: "no-store",
-        signal: controller.signal,
-      });
-
-      if (!res.ok) {
-        if (res.status === 401) {
-          setAuthError("Нужно войти или зарегистрироваться");
-        } else {
-          setAuthError("Не удалось загрузить профиль");
-        }
-        setUser(null);
-        setIsAdminAllowed(false);
-        return;
-      }
-
-      const data = await res.json();
-      if (!data?.user) {
-        setAuthError("Нужно войти или зарегистрироваться");
-        setUser(null);
-        setIsAdminAllowed(false);
-          return;
-        }
-
-      setUser(data.user);
-      setIsAdminAllowed(Boolean(data?.isAdminAllowed));
-    } catch (err: any) {
-      if (err?.name === "AbortError") {
-        setAuthError("Сервер долго не отвечает. Попробуйте обновить страницу.");
-      } else {
-        setAuthError("Не удалось загрузить профиль");
-      }
-      setUser(null);
-      setIsAdminAllowed(false);
-    } finally {
-      clearTimeout(timer);
-      setAuthLoading(false);
-    }
-  }, []);
-
-  const loadReports = useCallback(
-    async (nextPage = page, keepLoading = true) => {
-    if (!user) return;
-      if (keepLoading) setLoadingReports(true);
-      setReportsError(null);
-
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 8000);
-
-      try {
-        const res = await fetch(
-          `/api/bug-reports?status=${statusFilter}&page=${nextPage}&limit=${PAGE_SIZE}`,
-          { cache: "no-store", signal: controller.signal }
-        );
-
-        if (!res.ok) {
-          const text = await res.text().catch(() => "");
-          throw new Error(text || `Ошибка загрузки (${res.status})`);
-        }
-
-        const data = await res.json();
-        setReports((data.reports || []).map(formatReport));
-        setTotalPages(data.pagination?.totalPages || 1);
-      } catch (err: any) {
-        if (err?.name === "AbortError") {
-          setReportsError("Сервер долго не отвечает. Попробуйте позже.");
-        } else {
-          setReportsError(err?.message || "Не удалось загрузить список");
-        }
-        setReports([]);
-        setTotalPages(1);
-      } finally {
-        clearTimeout(timer);
-        setLoadingReports(false);
-      }
-    },
-    [user, statusFilter, page]
-  );
 
   useEffect(() => {
     loadUser();
@@ -178,56 +74,10 @@ export default function ReportsPage() {
 
   const handleReportCreated = (newReport?: any) => {
     if (newReport) {
-      const formatted = formatReport(newReport);
-      setReports((prev) => [formatted, ...prev]);
+      addReport(newReport);
       setPage(1);
     }
     loadReports(1, false);
-  };
-
-  const handleStatusUpdate = async (reportId: string, newStatus: string) => {
-    if (!isAdmin) return;
-
-    setReports((prev) =>
-      prev.map((r) => (r.id === reportId ? { ...r, status: newStatus } : r))
-    );
-
-    try {
-      const res = await fetch(`/api/admin/bug-reports/${reportId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`Статус не обновлён (${res.status})`);
-      }
-    } catch (err) {
-      console.error("Update status error:", err);
-      // Откатываем
-      setReports((prev) =>
-        prev.map((r) =>
-          r.id === reportId ? { ...r, status: r.status } : r
-        )
-      );
-    }
-  };
-
-  const handleDeleteReport = async (reportId: string) => {
-    if (!isAdmin) return;
-    setReports((prev) => prev.filter((r) => r.id !== reportId));
-    try {
-      const res = await fetch(`/api/admin/bug-reports/${reportId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) {
-        throw new Error(`Не удалось удалить (${res.status})`);
-      }
-    } catch (err) {
-      console.error("Delete report error:", err);
-      // При ошибке перезагружаем список
-      loadReports(page);
-    }
   };
 
   if (authLoading) {
@@ -241,38 +91,7 @@ export default function ReportsPage() {
   }
 
   if (authError) {
-    return (
-      <div className="min-h-screen relative overflow-hidden">
-        <div className="container-p mx-auto max-w-3xl relative z-10 px-4 pt-12 pb-12">
-          <div className="rounded-2xl border border-[#e16162]/40 bg-[#001e1d]/40 p-6 text-center space-y-4">
-            <div className="text-lg font-semibold text-[#e16162]">Нет доступа</div>
-            <p className="text-[#abd1c6]">{authError}</p>
-            <div className="flex items-center justify-center gap-3">
-              <button
-                onClick={() =>
-                  router.push(
-                    buildAuthModalUrl({
-                      pathname: window.location.pathname,
-                      search: window.location.search,
-                      modal: "auth",
-                    })
-                  )
-                }
-                className="px-4 py-2 rounded-lg bg-[#f9bc60] text-[#001e1d] font-semibold"
-              >
-                Войти/зарегистрироваться
-              </button>
-              <button
-                onClick={loadUser}
-                className="px-4 py-2 rounded-lg border border-[#abd1c6]/40 text-[#abd1c6]"
-              >
-                Повторить
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <ReportsAuthError error={authError} onRetry={loadUser} />;
   }
 
   if (!user) {
@@ -289,67 +108,8 @@ export default function ReportsPage() {
       </div>
 
       <div className="container-p mx-auto max-w-7xl relative z-10 px-4 pt-8 pb-12 space-y-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center space-y-4"
-        >
-          <div className="inline-flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56">
-            <img 
-              src="/kopibag.png" 
-              alt="Баг-репорты" 
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[#fffffe] via-[#abd1c6] to-[#e16162] bg-clip-text text-transparent">
-            Баг-репорты
-          </h1>
-          <p className="text-lg text-[#abd1c6] max-w-2xl mx-auto">
-            Копилка — молодой проект: баги, уязвимости или любые дыры безопасности сразу пишите сюда, мы быстро разберёмся.
-          </p>
-        </motion.div>
-
-        {/* Подсказки */}
-        <div className="rounded-2xl border border-[#abd1c6]/30 bg-gradient-to-br from-[#002d2b]/70 to-[#001614]/70 p-5 shadow-lg space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f9bc60] to-[#e16162] flex items-center justify-center shadow-md">
-              <LucideIcons.Lightbulb className="text-[#001e1d]" size="sm" />
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-[#f9bc60]">
-                Как написать полезный баг-репорт
-              </div>
-              <div className="text-xs text-[#abd1c6]/80">
-                Коротко, по шагам и с фактами — так мы решим быстрее.
-              </div>
-            </div>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-3 text-xs text-[#abd1c6]">
-            <div className="space-y-2">
-              <div className="flex items-start gap-2">
-                <span className="mt-0.5 text-[#f9bc60]">•</span>
-                <span><span className="text-[#f9bc60]">Заголовок:</span> что именно не так.</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="mt-0.5 text-[#f9bc60]">•</span>
-                <span><span className="text-[#f9bc60]">Шаги и ожидание:</span> что сделали, что хотели получить, что получили.</span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-start gap-2">
-                <span className="mt-0.5 text-[#f9bc60]">•</span>
-                <span><span className="text-[#f9bc60]">Доказательства:</span> скриншоты, ссылки, короткое видео.</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="mt-0.5 text-[#f9bc60]">•</span>
-                <span><span className="text-[#f9bc60]">Безопасность:</span> опишите, как воспроизвести уязвимость (без лишних деталей наружу).</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ReportsHeader />
+        <ReportsTips />
 
         {/* Форма + список */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -365,33 +125,25 @@ export default function ReportsPage() {
           </div>
 
           <div className="lg:col-span-2 space-y-4">
-              <BugReportFilters
-                statusFilter={statusFilter}
-                onStatusChange={setStatusFilter}
+            <BugReportFilters
+              statusFilter={statusFilter}
+              onStatusChange={setStatusFilter}
             />
 
             {reportsError && (
-              <div className="rounded-xl border border-[#e16162]/40 bg-[#001e1d]/40 p-4 text-[#e16162] flex items-center justify-between">
-                <span>{reportsError}</span>
-                <button
-                  onClick={() => loadReports(page)}
-                  className="px-3 py-2 text-sm rounded-lg bg-[#f9bc60] text-[#001e1d] font-semibold"
-                >
-                  Обновить
-                </button>
-              </div>
+              <ReportsError error={reportsError} onRetry={() => loadReports(page)} />
             )}
 
-              <BugReportList
-                reports={reports}
-                loading={loadingReports}
-                page={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
+            <BugReportList
+              reports={reports}
+              loading={loadingReports}
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
               isAdmin={isAdmin}
-              onStatusUpdate={handleStatusUpdate}
-              onDeleteReport={handleDeleteReport}
-              />
+              onStatusUpdate={updateStatus}
+              onDeleteReport={deleteReport}
+            />
           </div>
         </div>
       </div>

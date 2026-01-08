@@ -94,11 +94,6 @@ export function middleware(req: NextRequest) {
     limit = 20;
     windowMs = 5 * 60_000;
     retryAfterSec = 5 * 60;
-  } else if (isPost && isApplicationsApi) {
-    // Создание заявки: 5 запросов/час на IP (дополнительно к 1/24ч на пользователя в API)
-    limit = 5;
-    windowMs = 60 * 60_000;
-    retryAfterSec = 60 * 60;
   } else if ((req.method === "POST" || req.method === "DELETE") && isStoryLikeApi) {
     // Лайки: ограничение на частые клики/ботов
     limit = 60;
@@ -116,14 +111,15 @@ export function middleware(req: NextRequest) {
       logSecurityEvent(req, "rate_limit", `Rate limit exceeded for IP: ${realIP}`);
       return new NextResponse(
         JSON.stringify({
-          error: "Слишком много запросов. Попробуйте позже.",
+          error: "Лимит: не более 5 отправок заявки в час с одного IP. Подождите и попробуйте позже.",
+          retryAfterSec,
         }),
         {
-        status: 429,
-        headers: {
-          "Content-Type": "application/json",
-          "Retry-After": String(retryAfterSec),
-        },
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(retryAfterSec),
+          },
         },
       );
     }
@@ -131,8 +127,6 @@ export function middleware(req: NextRequest) {
 
   // Создаем ответ с заголовками безопасности
   const response = NextResponse.next();
-
-  const isTowerBlocks = path.startsWith("/tower-blocks");
 
   // Content Security Policy
   // В DEV Next.js использует eval (webpack/HMR), поэтому строгий CSP ломает сайт.
@@ -144,12 +138,10 @@ export function middleware(req: NextRequest) {
         "default-src 'self'",
         // Важно: CSP применяется при загрузке документа.
         // Если модалка авторизации открывается без перезагрузки страницы,
-        // то “включить unsafe-eval только для ?modal=auth” не сработает — заголовки уже получены.
+        // то "включить unsafe-eval только для ?modal=auth" не сработает — заголовки уже получены.
         // Telegram widget внутри использует eval, поэтому держим unsafe-eval включенным в PROD,
         // но максимально ограничиваем источники скриптов.
-        isTowerBlocks
-           ? "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://codepen.io https://cdnjs.cloudflare.com https://telegram.org https://accounts.google.com https://mc.yandex.ru https://mc.yandex.com"
-           : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://telegram.org https://accounts.google.com https://mc.yandex.ru https://mc.yandex.com",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://telegram.org https://accounts.google.com https://mc.yandex.ru https://mc.yandex.com",
         "style-src 'self' 'unsafe-inline' https://accounts.google.com", // Tailwind/Google OAuth
         "img-src 'self' data: blob: https:",
         "font-src 'self' data:",

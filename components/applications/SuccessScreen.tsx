@@ -77,15 +77,10 @@ export default function SuccessScreen({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="text-base sm:text-lg md:text-xl text-[#f9bc60] font-semibold flex items-center justify-center gap-2"
+          className="text-base sm:text-lg md:text-xl text-[#d7e9e0] font-semibold flex items-center justify-center gap-2"
         >
-          <motion.span
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            🔔
-          </motion.span>
-          Вы получите уведомление о результате в личном кабинете!
+          <LucideIcons.Bell size="md" className="text-[#d7e9e0]" />
+          Вы получите уведомление о результате в личном кабинете
         </motion.p>
       </motion.div>
 
@@ -173,20 +168,20 @@ export default function SuccessScreen({
           <div className="relative z-10">
             <motion.div
               whileHover={{ scale: 1.15 }}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-red-500/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#abd1c6]/15 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300"
             >
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
-                <LucideIcons.Clock size="lg" className="text-red-400" />
+                <LucideIcons.Clock size="lg" className="text-[#d7e9e0]" />
               </motion.div>
             </motion.div>
-            <h3 className="font-bold text-[#fffffe] mb-2 text-center text-base sm:text-lg group-hover:text-red-400 transition-colors duration-300">
+            <h3 className="font-bold text-[#fffffe] mb-2 text-center text-base sm:text-lg group-hover:text-[#abd1c6] transition-colors duration-300">
               Следующая заявка
             </h3>
-            <p className="text-xs sm:text-sm text-center text-[#abd1c6] leading-relaxed">
-              Следующую заявку можно подать только через 24 часа
+            <p className="text-xs sm:text-sm text-center text-[#c8ddd6] leading-relaxed">
+              Новую заявку можно подать через 24 часа — это помогает сохранять честность и порядок
             </p>
           </div>
         </motion.div>
@@ -198,7 +193,7 @@ export default function SuccessScreen({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.75 }}
             whileHover={{ y: -5 }}
-            className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#abd1c6]/20 hover:border-red-400/40 hover:shadow-3xl transition-all duration-500 group cursor-pointer"
+            className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 hover:shadow-3xl transition-all duration-500 group cursor-pointer"
           >
             <div className="absolute inset-0 overflow-hidden">
               <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-red-500/15 to-[#abd1c6]/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>

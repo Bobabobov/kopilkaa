@@ -127,7 +127,7 @@ export default function StoryPage() {
       console.error("Error loading stories ad:", error);
     }
 
-    // Фолбэк — старый захардкоженный текст, если в админке нет активной истории
+    // Текс если нет активной рекламы
     const fallbackStory: Story = {
       id: "ad",
       title: "Как работает реклама в историях",
@@ -166,7 +166,7 @@ export default function StoryPage() {
   };
 
   useEffect(() => {
-    // Проверяем авторизацию
+    // ПроверОЧКа регистрации
     checkAuth();
     
     if (params.id) {
@@ -226,7 +226,7 @@ export default function StoryPage() {
   const handleLike = async () => {
     if (!story) return;
 
-    // Проверяем авторизацию
+    // ПроверОЧка авторизации
     if (!isAuthenticated) {
       pushAuth("signup");
       return;

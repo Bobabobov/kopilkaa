@@ -206,12 +206,35 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
     const userData = await userResponse.json();
     const statsData = statsResponse?.ok ? await statsResponse.json() : {};
 
+    const normalizedStats = (() => {
+      const applications = statsData?.applications || {};
+      const totalApplications =
+        statsData?.totalApplications ?? applications.total ?? applications.totalApplications ?? 0;
+      const approvedApplications =
+        statsData?.approvedApplications ?? applications.approved ?? applications.approvedApplications ?? 0;
+      const pendingApplications =
+        statsData?.pendingApplications ?? applications.pending ?? applications.pendingApplications ?? 0;
+      const rejectedApplications =
+        statsData?.rejectedApplications ?? applications.rejected ?? applications.rejectedApplications ?? 0;
+      const approvedAmount = statsData?.approvedAmount ?? 0;
+
+      return {
+        ...statsData,
+        applications,
+        totalApplications,
+        approvedApplications,
+        pendingApplications,
+        rejectedApplications,
+        approvedAmount,
+      };
+    })();
+
     const fallbackData = {
       user: userData.user,
       friends: [],
       receivedRequests: [],
       achievements: [],
-      stats: statsData || {},
+      stats: normalizedStats || {},
       notifications: [],
     };
 

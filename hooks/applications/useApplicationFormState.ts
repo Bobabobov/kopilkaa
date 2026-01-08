@@ -51,6 +51,8 @@ export function useApplicationFormState() {
   const [introChecked, setIntroChecked] = useState(false);
   const [approvedCount, setApprovedCount] = useState<number | null>(null);
   const isAdmin = user?.role === "ADMIN";
+  const [rewardedPassed, setRewardedPassed] = useState(false);
+  const [rewardedLoading, setRewardedLoading] = useState(false);
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
   const [hpCompany, setHpCompany] = useState("");
@@ -368,30 +370,38 @@ export function useApplicationFormState() {
     }
   };
 
-  const submit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setErr(null);
-
+  const preValidate = (): boolean => {
     if (!user) {
       const href = buildAuthModalUrl({
         pathname: typeof window !== "undefined" ? window.location.pathname : "/applications",
         search: typeof window !== "undefined" ? window.location.search : "",
         modal: "auth/signup",
       });
-      window.location.href = href;
-      return;
+      if (typeof window !== "undefined") {
+        window.location.href = href;
+      }
+      return false;
     }
 
     if (!trustAcknowledged || !policiesAccepted) {
       setAckError(true);
-      return;
+      return false;
     }
     setAckError(false);
 
     if (!valid) {
       setErr("Проверьте поля — есть ошибки/лимиты");
-      return;
+      return false;
     }
+
+    return true;
+  };
+
+  const submit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setErr(null);
+
+    if (!preValidate()) return;
 
     try {
       setSubmitting(true);
@@ -450,6 +460,7 @@ export function useApplicationFormState() {
       setTrustAcknowledged(false);
       setPoliciesAccepted(false);
       setAckError(false);
+      setRewardedPassed(false);
       localStorage.removeItem(saveKey);
       sessionStorage.removeItem(trustAckKey);
       sessionStorage.removeItem(policyAckKey);
@@ -458,6 +469,38 @@ export function useApplicationFormState() {
       setErr(e.message || "Ошибка");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const triggerRewarded = () => {
+    if (typeof window === "undefined") return;
+    if (!preValidate()) return;
+
+    const ya: any = (window as any).Ya;
+    const advManager = ya?.Context?.AdvManager;
+    if (!advManager?.render) {
+      setErr("Реклама недоступна. Попробуйте позже.");
+      return;
+    }
+
+    try {
+      setRewardedLoading(true);
+      advManager.render({
+        blockId: "R-A-18382388-1",
+        type: "rewarded",
+        platform: advManager.getPlatform(),
+        onRewarded: (isRewarded: boolean) => {
+          setRewardedLoading(false);
+          if (isRewarded) {
+            setRewardedPassed(true);
+            submit();
+          }
+        },
+      });
+    } catch (error) {
+      console.error("Rewarded render error:", error);
+      setRewardedLoading(false);
+      setErr("Не удалось показать рекламу. Попробуйте позже.");
     }
   };
 
@@ -482,6 +525,8 @@ export function useApplicationFormState() {
     setPhotos,
     uploading,
     submitting,
+    rewardedPassed,
+    rewardedLoading,
     err,
     left,
     submitted,
@@ -508,6 +553,7 @@ export function useApplicationFormState() {
     valid,
     exceedsTrustLimit,
     submit,
+    triggerRewarded,
     formStartedAtRef,
     formStartKey,
     handleAmountInputChange,

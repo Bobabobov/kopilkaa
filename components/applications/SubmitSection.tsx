@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 interface SubmitSectionProps {
   submitting: boolean;
   uploading: boolean;
+  rewardedLoading: boolean;
+  rewardedPassed: boolean;
   left: number | null;
   err: string | null;
   onSubmit: (e: React.FormEvent) => void;
@@ -16,6 +18,8 @@ interface SubmitSectionProps {
 export default function SubmitSection({
   submitting,
   uploading,
+  rewardedLoading,
+  rewardedPassed,
   left,
   err,
   onSubmit,
@@ -30,8 +34,9 @@ export default function SubmitSection({
       <motion.button
         whileHover={{ scale: 1.02, y: -2 }}
         whileTap={{ scale: 0.98 }}
-        type="submit"
-        disabled={submitting || uploading}
+        type="button"
+        disabled={submitting || uploading || rewardedLoading}
+        onClick={onSubmit}
         className={cn(
           "relative w-full px-8 py-4 bg-gradient-to-r from-[#f9bc60] via-[#e8a545] to-[#f9bc60]",
           "hover:from-[#e8a545] hover:via-[#f9bc60] hover:to-[#e8a545]",
@@ -68,6 +73,16 @@ export default function SubmitSection({
               </motion.span>
               <span>Загрузка фото...</span>
             </>
+          ) : rewardedLoading ? (
+            <>
+              <motion.span
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                <LucideIcons.Refresh size="sm" />
+              </motion.span>
+              <span>Готовим рекламу...</span>
+            </>
           ) : (
             <>
               <motion.span
@@ -76,7 +91,9 @@ export default function SubmitSection({
               >
                 <LucideIcons.Send size="sm" />
               </motion.span>
-              <span>Отправить заявку</span>
+              <span>
+                {rewardedPassed ? "Отправить заявку" : "Посмотреть рекламу и отправить заявку"}
+              </span>
             </>
           )}
         </span>

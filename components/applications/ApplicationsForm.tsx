@@ -31,6 +31,9 @@ type Props = {
   left: number | null;
   err: string | null;
   submit: (e?: FormEvent) => Promise<void>;
+  triggerRewarded: () => void;
+  rewardedPassed: boolean;
+  rewardedLoading: boolean;
   hpCompany: string;
   setHpCompany: (v: string) => void;
   progressPercentage: number;
@@ -76,6 +79,9 @@ export function ApplicationsForm(props: Props) {
     left,
     err,
     submit,
+  triggerRewarded,
+  rewardedPassed,
+  rewardedLoading,
     hpCompany,
     setHpCompany,
     progressPercentage,
@@ -100,7 +106,14 @@ export function ApplicationsForm(props: Props) {
     >
       <form
         className="grid gap-6"
-        onSubmit={submit}
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (rewardedPassed) {
+            submit(e);
+          } else {
+            triggerRewarded();
+          }
+        }}
         onFocusCapture={() => {
           if (!trustAcknowledged && !policiesAccepted) return;
         }}
@@ -153,7 +166,7 @@ export function ApplicationsForm(props: Props) {
           icon="MessageCircle"
           value={summary}
           onChange={setSummary}
-          placeholder="Основная суть вашей просьбы..."
+          placeholder="Основная суть вашей просьбы, а ниже подробное описание"
           hint={`Краткое описание, видно в списке заявок (макс. ${limits.summaryMax} символов)`}
           maxLength={limits.summaryMax}
           delay={0.2}
@@ -235,9 +248,18 @@ export function ApplicationsForm(props: Props) {
         <SubmitSection
           submitting={submitting}
           uploading={uploading}
+          rewardedLoading={rewardedLoading}
+          rewardedPassed={rewardedPassed}
           left={left}
           err={err}
-          onSubmit={submit}
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (rewardedPassed) {
+              submit(e);
+            } else {
+              triggerRewarded();
+            }
+          }}
         />
       </form>
     </motion.div>

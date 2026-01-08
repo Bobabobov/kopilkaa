@@ -34,6 +34,7 @@ type Props = {
   triggerRewarded: () => void;
   rewardedPassed: boolean;
   rewardedLoading: boolean;
+  rewardedUnavailable: boolean;
   hpCompany: string;
   setHpCompany: (v: string) => void;
   progressPercentage: number;
@@ -82,6 +83,7 @@ export function ApplicationsForm(props: Props) {
   triggerRewarded,
   rewardedPassed,
   rewardedLoading,
+  rewardedUnavailable,
     hpCompany,
     setHpCompany,
     progressPercentage,
@@ -250,6 +252,7 @@ export function ApplicationsForm(props: Props) {
           uploading={uploading}
           rewardedLoading={rewardedLoading}
           rewardedPassed={rewardedPassed}
+          rewardedUnavailable={rewardedUnavailable}
           left={left}
           err={err}
           onSubmit={(e) => {
@@ -259,6 +262,10 @@ export function ApplicationsForm(props: Props) {
             } else {
               triggerRewarded();
             }
+          }}
+          onFallbackSubmit={(e) => {
+            e.preventDefault();
+            submit(e);
           }}
         />
       </form>

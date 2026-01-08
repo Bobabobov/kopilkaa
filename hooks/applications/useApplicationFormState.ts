@@ -53,6 +53,7 @@ export function useApplicationFormState() {
   const isAdmin = user?.role === "ADMIN";
   const [rewardedPassed, setRewardedPassed] = useState(false);
   const [rewardedLoading, setRewardedLoading] = useState(false);
+  const [rewardedUnavailable, setRewardedUnavailable] = useState(false);
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
   const [hpCompany, setHpCompany] = useState("");
@@ -402,6 +403,10 @@ export function useApplicationFormState() {
     setErr(null);
 
     if (!preValidate()) return;
+    if (!rewardedPassed && rewardedUnavailable) {
+      // Разрешаем отправку без рекламы, если она недоступна
+      setRewardedUnavailable(true);
+    }
 
     try {
       setSubmitting(true);
@@ -461,6 +466,7 @@ export function useApplicationFormState() {
       setPoliciesAccepted(false);
       setAckError(false);
       setRewardedPassed(false);
+      setRewardedUnavailable(false);
       localStorage.removeItem(saveKey);
       sessionStorage.removeItem(trustAckKey);
       sessionStorage.removeItem(policyAckKey);
@@ -476,9 +482,12 @@ export function useApplicationFormState() {
     if (typeof window === "undefined") return;
     if (!preValidate()) return;
 
+    setRewardedUnavailable(false);
     const ya: any = (window as any).Ya;
     const advManager = ya?.Context?.AdvManager;
     if (!advManager?.render) {
+      setRewardedLoading(false);
+      setRewardedUnavailable(true);
       setErr("Реклама недоступна. Попробуйте позже.");
       return;
     }
@@ -494,12 +503,15 @@ export function useApplicationFormState() {
           if (isRewarded) {
             setRewardedPassed(true);
             submit();
+          } else {
+            setRewardedUnavailable(true);
           }
         },
       });
     } catch (error) {
       console.error("Rewarded render error:", error);
       setRewardedLoading(false);
+      setRewardedUnavailable(true);
       setErr("Не удалось показать рекламу. Попробуйте позже.");
     }
   };
@@ -527,6 +539,7 @@ export function useApplicationFormState() {
     submitting,
     rewardedPassed,
     rewardedLoading,
+  rewardedUnavailable,
     err,
     left,
     submitted,

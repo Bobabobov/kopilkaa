@@ -60,6 +60,7 @@ export default function ApplicationsPage() {
     trustHint,
     rewardedPassed,
     rewardedLoading,
+    rewardedUnavailable,
     triggerRewarded,
     amountInputRef,
     hpCompany,
@@ -149,6 +150,7 @@ export default function ApplicationsPage() {
               trustLimitsMax={trustLimits.max}
               rewardedPassed={rewardedPassed}
               rewardedLoading={rewardedLoading}
+              rewardedUnavailable={rewardedUnavailable}
               triggerRewarded={triggerRewarded}
               payment={payment}
               setPayment={setPayment}

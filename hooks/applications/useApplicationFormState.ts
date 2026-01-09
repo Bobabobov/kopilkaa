@@ -499,11 +499,23 @@ export function useApplicationFormState() {
       try {
         if (!ya?.Context?.AdvManager?.render) return false;
         setRewardedLoading(true);
+        let settled = false;
+        const failSafe = () => {
+          if (settled) return;
+          settled = true;
+          setRewardedLoading(false);
+          setRewardedUnavailable(true);
+          setErr("Реклама недоступна. Попробуйте позже.");
+        };
+        const timeoutId = setTimeout(failSafe, 4500);
         ya.Context.AdvManager.render({
           blockId,
           type: "rewarded",
           platform,
           onRewarded: (isRewarded: boolean) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timeoutId);
             setRewardedLoading(false);
             if (isRewarded) {
               setRewardedPassed(true);

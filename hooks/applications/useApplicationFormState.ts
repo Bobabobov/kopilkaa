@@ -494,10 +494,13 @@ export function useApplicationFormState() {
 
     try {
       setRewardedLoading(true);
+      const platform = typeof advManager.getPlatform === "function" ? advManager.getPlatform() : "desktop";
+      const blockId = platform === "touch" ? "R-A-18382388-2" : "R-A-18382388-1";
+
       advManager.render({
-        blockId: "R-A-18382388-1",
+        blockId,
         type: "rewarded",
-        platform: advManager.getPlatform(),
+        platform,
         onRewarded: (isRewarded: boolean) => {
           setRewardedLoading(false);
           if (isRewarded) {

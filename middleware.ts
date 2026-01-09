@@ -141,10 +141,10 @@ export function middleware(req: NextRequest) {
         // то "включить unsafe-eval только для ?modal=auth" не сработает — заголовки уже получены.
         // Telegram widget внутри использует eval, поэтому держим unsafe-eval включенным в PROD,
         // но максимально ограничиваем источники скриптов.
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://telegram.org https://accounts.google.com https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://an.yandex.ru",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://telegram.org https://accounts.google.com https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://an.yandex.ru https://yastatic.net",
         "style-src 'self' 'unsafe-inline' https://accounts.google.com", // Tailwind/Google OAuth
         "img-src 'self' data: blob: https:",
-        "font-src 'self' data:",
+        "font-src 'self' data: https://yastatic.net",
         // Разрешаем загрузку видео с внешних источников
         "media-src 'self' blob: data: https:",
         // Разрешаем запросы к Telegram OAuth и Google OAuth (для виджета входа)

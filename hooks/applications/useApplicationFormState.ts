@@ -485,37 +485,66 @@ export function useApplicationFormState() {
     setRewardedUnavailable(false);
     const ya: any = (window as any).Ya;
     const advManager = ya?.Context?.AdvManager;
-    if (!advManager?.render) {
+    const platform = typeof advManager?.getPlatform === "function" ? advManager.getPlatform() : "desktop";
+    const blockId = platform === "touch" ? "R-A-18382388-2" : "R-A-18382388-1";
+
+    const renderRewarded = () => {
+      try {
+        if (!ya?.Context?.AdvManager?.render) return false;
+        setRewardedLoading(true);
+        ya.Context.AdvManager.render({
+          blockId,
+          type: "rewarded",
+          platform,
+          onRewarded: (isRewarded: boolean) => {
+            setRewardedLoading(false);
+            if (isRewarded) {
+              setRewardedPassed(true);
+              submit();
+            } else {
+              setRewardedUnavailable(true);
+            }
+          },
+        });
+        return true;
+      } catch (error) {
+        console.error("Rewarded render error:", error);
+        setRewardedLoading(false);
+        setRewardedUnavailable(true);
+        setErr("Не удалось показать рекламу. Попробуйте позже.");
+        return false;
+      }
+    };
+
+    // Прямая попытка, если AdvManager уже готов
+    if (renderRewarded()) return;
+
+    // Если скрипт еще не успел инициализироваться — пробуем через очередь yaContextCb
+    const ctxCb = (window as any).yaContextCb;
+    if (Array.isArray(ctxCb)) {
+      setRewardedLoading(true);
+      let handled = false;
+      const onReady = () => {
+        if (handled) return;
+        handled = renderRewarded();
+        if (!handled) {
+          setRewardedLoading(false);
+          setRewardedUnavailable(true);
+          setErr("Реклама недоступна. Попробуйте позже.");
+        }
+      };
+      ctxCb.push(onReady);
+      // Фолбэк, если даже после очереди не отрисовалось
+      setTimeout(() => {
+        if (handled) return;
+        setRewardedLoading(false);
+        setRewardedUnavailable(true);
+        setErr("Реклама недоступна. Попробуйте позже.");
+      }, 3000);
+    } else {
       setRewardedLoading(false);
       setRewardedUnavailable(true);
       setErr("Реклама недоступна. Попробуйте позже.");
-      return;
-    }
-
-    try {
-      setRewardedLoading(true);
-      const platform = typeof advManager.getPlatform === "function" ? advManager.getPlatform() : "desktop";
-      const blockId = platform === "touch" ? "R-A-18382388-2" : "R-A-18382388-1";
-
-      advManager.render({
-        blockId,
-        type: "rewarded",
-        platform,
-        onRewarded: (isRewarded: boolean) => {
-          setRewardedLoading(false);
-          if (isRewarded) {
-            setRewardedPassed(true);
-            submit();
-          } else {
-            setRewardedUnavailable(true);
-          }
-        },
-      });
-    } catch (error) {
-      console.error("Rewarded render error:", error);
-      setRewardedLoading(false);
-      setRewardedUnavailable(true);
-      setErr("Не удалось показать рекламу. Попробуйте позже.");
     }
   };
 

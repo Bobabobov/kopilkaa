@@ -182,7 +182,9 @@ export function TrustLevelsInfo() {
               <div className="mt-3 space-y-2">
                 <div className="text-sm text-[#cfded6]">
                   Доступная поддержка:{" "}
-                  <span className="font-semibold text-[#f0c878]">{level.support}</span>
+                  <span className="font-semibold text-[#f0c878] whitespace-nowrap">
+                    {level.support}
+                  </span>
                 </div>
                 <div className="text-sm text-[#b5c9c1]">
                   Как получить: {level.obtain}

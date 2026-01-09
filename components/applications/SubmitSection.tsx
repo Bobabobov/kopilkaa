@@ -102,6 +102,14 @@ export default function SubmitSection({
           )}
         </span>
       </motion.button>
+
+      {!rewardedPassed && (
+        <p className="text-center text-xs text-[#94a1b2] leading-relaxed">
+          В режиме инкогнито или с блокировщиками реклама может не загрузиться. Если не появляется —
+          отключите блокировку или используйте кнопку отправки без рекламы.
+        </p>
+      )}
+
       {rewardedUnavailable && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

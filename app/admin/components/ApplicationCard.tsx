@@ -79,7 +79,7 @@ export default function ApplicationCard({
 
         <ApplicationCardSummary summary={it.summary} />
 
-        <ApplicationCardPayment payment={it.payment} />
+        <ApplicationCardPayment payment={it.payment} bankName={it.bankName} />
 
         <ApplicationCardStory story={it.story} />
 

@@ -105,6 +105,20 @@ export default function AdminClient() {
     };
   }, [loadingMore, hasMore, loading, loadMore]);
 
+  // Восстанавливаем скролл после возврата со страницы заявки
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (loading) return;
+    const saved = sessionStorage.getItem("admin-scroll");
+    if (saved) {
+      const y = parseInt(saved, 10);
+      if (Number.isFinite(y)) {
+        window.scrollTo({ top: y, behavior: "auto" });
+      }
+      sessionStorage.removeItem("admin-scroll");
+    }
+  }, [loading]);
+
 
   // Показываем загрузку при первой загрузке
   if (loading && items.length === 0) {

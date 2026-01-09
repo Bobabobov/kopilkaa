@@ -4,13 +4,28 @@ import { motion } from "framer-motion";
 
 interface ApplicationPaymentDetailsProps {
   payment: string;
+  bankName?: string;
   onCopyError: (message: string) => void;
+}
+
+function splitPayment(raw: string, bankName?: string) {
+  if (bankName) return { bankName, payment: raw };
+  const lines = (raw || "").split(/\n/);
+  const first = lines[0] || "";
+  if (/^банк:/i.test(first)) {
+    const derivedBank = first.replace(/^банк:\s*/i, "").trim();
+    const rest = lines.slice(1).join("\n").trim();
+    return { bankName: derivedBank || undefined, payment: rest || raw };
+  }
+  return { bankName: undefined, payment: raw };
 }
 
 export default function ApplicationPaymentDetails({
   payment,
+  bankName,
   onCopyError,
 }: ApplicationPaymentDetailsProps) {
+  const parsed = splitPayment(payment, bankName);
   const handleCopy = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     navigator.clipboard
@@ -64,14 +79,26 @@ export default function ApplicationPaymentDetails({
           className="open-only rounded-xl border relative group p-4 sm:p-6 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.7)]"
           style={{ backgroundColor: "#0b1615", borderColor: "rgba(171,209,198,0.25)" }}
         >
-          <div className="break-all text-anywhere pr-12 sm:pr-16">
-            <span className="font-medium text-sm sm:text-base" style={{ color: "#abd1c6" }}>
-              Реквизиты:{" "}
-            </span>
-            <span className="select-all text-sm sm:text-base" style={{ color: "#e8f2ef" }}>
-              {payment}
-            </span>
-          </div>
+          <dl className="space-y-2 break-all text-anywhere pr-12 sm:pr-16">
+            {parsed.bankName && (
+              <div>
+                <dt className="font-medium text-sm sm:text-base" style={{ color: "#abd1c6" }}>
+                  Банк
+                </dt>
+                <dd className="select-all text-sm sm:text-base" style={{ color: "#e8f2ef" }}>
+                  {parsed.bankName}
+                </dd>
+              </div>
+            )}
+            <div>
+              <dt className="font-medium text-sm sm:text-base" style={{ color: "#abd1c6" }}>
+                Реквизиты
+              </dt>
+              <dd className="select-all text-sm sm:text-base" style={{ color: "#e8f2ef" }}>
+                {parsed.payment || "Не указаны"}
+              </dd>
+            </div>
+          </dl>
           <button
             onClick={handleCopy}
             className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center gap-1 px-2 sm:px-3 py-1 rounded-lg text-xs bg-[#004643] border border-[#f9bc60]/30 hover:border-[#f9bc60] backdrop-blur-sm shadow-sm"

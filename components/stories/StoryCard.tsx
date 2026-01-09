@@ -50,7 +50,10 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
   const mainImage = story.images?.[0]?.url || "/stories-preview.jpg";
 
   const handleCardClick = () => {
-    router.push(`/stories/${story.id}`);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("stories-scroll", String(window.scrollY));
+    }
+    router.push(`/stories/${story.id}`, { scroll: false });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

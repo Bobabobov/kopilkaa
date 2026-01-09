@@ -1,6 +1,7 @@
 // app/admin/components/ApplicationCardHeader.tsx
 "use client";
 import Link from "next/link";
+import { useCallback } from "react";
 import { getAvatarFrame } from "@/lib/header-customization";
 import type { ApplicationItem } from "../types";
 
@@ -16,17 +17,23 @@ export default function ApplicationCardHeader({
   onToggleEmail,
 }: ApplicationCardHeaderProps) {
   const shownEmails = visibleEmails;
+  const rememberScroll = useCallback(() => {
+    if (typeof window === "undefined") return;
+    sessionStorage.setItem("admin-scroll", String(window.scrollY));
+  }, []);
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4 sm:mb-6">
       <div className="min-w-0 flex-1 basis-0">
-        <a
+        <Link
           href={`/admin/applications/${it.id}`}
+          scroll={false}
+          onClick={rememberScroll}
           className="text-base sm:text-lg md:text-xl font-black clamp-2 break-words max-w-full text-[#fffffe] hover:text-[#f9bc60] hover:underline transition-colors cursor-pointer"
           title="Открыть полную заявку"
         >
           {it.title}
-        </a>
+        </Link>
 
         {/* Сумма запроса - выделенная */}
         <div className="mt-3 mb-2">

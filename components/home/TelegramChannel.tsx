@@ -15,7 +15,7 @@ export default function TelegramChannel() {
     >
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
         <Link
-          href="https://t.me/kkopilka"
+          href="https://t.me/+mhQEjSa6H341NTZi"
           target="_blank"
           rel="noopener noreferrer"
           className="group relative block w-full sm:w-[280px] rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"

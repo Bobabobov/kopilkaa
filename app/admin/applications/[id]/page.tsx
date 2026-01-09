@@ -182,6 +182,7 @@ export default function AdminApplicationPage({
 
             <ApplicationPaymentDetails
               payment={item.payment}
+              bankName={item.bankName || undefined}
               onCopyError={handleCopyError}
             />
 

@@ -24,6 +24,8 @@ type Props = {
   trustLimitsMax: number;
   payment: string;
   setPayment: (v: string) => void;
+  bankName: string;
+  setBankName: (v: string) => void;
   photos: LocalImage[];
   setPhotos: (v: LocalImage[]) => void;
   uploading: boolean;
@@ -73,6 +75,8 @@ export function ApplicationsForm(props: Props) {
     trustLimitsMax,
     payment,
     setPayment,
+  bankName,
+  setBankName,
     photos,
     setPhotos,
     uploading,
@@ -216,13 +220,26 @@ export function ApplicationsForm(props: Props) {
         />
 
         <FormField
+          type="input"
+          label="Банк"
+          icon="Banknote"
+          value={bankName}
+          onChange={setBankName}
+          placeholder="Название банка (например, Тинькофф, Сбер)"
+          hint="Укажите банк получателя отдельно от реквизитов."
+          maxLength={80}
+          delay={0.45}
+          required={true}
+        />
+
+        <FormField
           type="textarea"
           label="Реквизиты для получения помощи"
           icon="CreditCard"
           value={payment}
           onChange={setPayment}
           placeholder="Банковские реквизиты, номер карты или другие способы получения средств"
-          hint={`Реквизиты для перевода средств (минимум ${limits.paymentMin}, максимум ${limits.paymentMax} символов)`}
+          hint={`⚠️ Переводы на карты Visa/Mastercard недоступны — используйте МИР/СБП/счёт. Реквизиты для перевода средств (минимум ${limits.paymentMin}, максимум ${limits.paymentMax} символов).`}
           minLength={limits.paymentMin}
           maxLength={limits.paymentMax}
           compact={true}

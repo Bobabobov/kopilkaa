@@ -38,6 +38,7 @@ export function useApplicationFormState() {
   const [story, setStory] = useState("");
   const [amount, setAmount] = useState("");
   const [payment, setPayment] = useState("");
+  const [bankName, setBankName] = useState("");
   const [photos, setPhotos] = useState<LocalImage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -51,9 +52,11 @@ export function useApplicationFormState() {
   const [introChecked, setIntroChecked] = useState(false);
   const [approvedCount, setApprovedCount] = useState<number | null>(null);
   const isAdmin = user?.role === "ADMIN";
-  const [rewardedPassed, setRewardedPassed] = useState(false);
+  // TEMP for local dev: авто-разрешение без рекламы вне production (убрать перед продом)
+  const isProdEnv = process.env.NODE_ENV === "production";
+  const [rewardedPassed, setRewardedPassed] = useState(!isProdEnv);
   const [rewardedLoading, setRewardedLoading] = useState(false);
-  const [rewardedUnavailable, setRewardedUnavailable] = useState(false);
+  const [rewardedUnavailable, setRewardedUnavailable] = useState(!isProdEnv);
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
   const [hpCompany, setHpCompany] = useState("");
@@ -120,12 +123,14 @@ export function useApplicationFormState() {
         setStory(data.story ?? "");
         setAmount(data.amount ?? "");
         setPayment(data.payment ?? "");
+        setBankName(data.bankName ?? "");
       } else {
         setTitle("");
         setSummary("");
         setStory("");
         setAmount("");
         setPayment("");
+        setBankName("");
       }
 
       if (savedStart && !Number.isNaN(Number(savedStart))) {
@@ -152,7 +157,7 @@ export function useApplicationFormState() {
   }, [saveKey, trustAckKey, policyAckKey, introAckKey, formStartKey, loadingAuth]);
 
   useEffect(() => {
-    const data = { title, summary, story, amount, payment };
+    const data = { title, summary, story, amount, payment, bankName };
     const t = window.setTimeout(() => {
       try {
         localStorage.setItem(saveKey, JSON.stringify(data));
@@ -251,6 +256,7 @@ export function useApplicationFormState() {
     amountInt >= LIMITS.amountMin &&
     (isAdmin || amountInt <= LIMITS.amountMax) &&
     withinTrustRange &&
+    bankName.trim().length > 0 &&
     payment.length >= LIMITS.paymentMin &&
     (isAdmin || payment.length <= LIMITS.paymentMax) &&
     photos.length <= LIMITS.maxPhotos;
@@ -261,10 +267,11 @@ export function useApplicationFormState() {
     getCharCount(summary) > 0,
     getCharCount(story) >= LIMITS.storyMin,
     amount.length > 0 && amountInt >= LIMITS.amountMin,
+    getCharCount(bankName) > 0,
     getCharCount(payment) >= LIMITS.paymentMin,
     photos.length > 0,
   ].filter(Boolean).length;
-  const totalFields = 6;
+  const totalFields = 7;
   const progressPercentage = Math.round((filledFields / totalFields) * 100);
 
   const formatAmountRu = (digits: string) => {
@@ -418,6 +425,7 @@ export function useApplicationFormState() {
         formStartedAtRef.current != null
           ? Math.max(0, Date.now() - formStartedAtRef.current)
           : null;
+      const paymentPayload = bankName ? `Банк: ${bankName}\n${payment}` : payment;
       const r = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -426,7 +434,7 @@ export function useApplicationFormState() {
           summary,
           story,
           amount,
-          payment,
+          payment: paymentPayload,
           images: urls,
           hpCompany,
           acknowledgedRules: trustAcknowledged && policiesAccepted,
@@ -462,6 +470,7 @@ export function useApplicationFormState() {
       setStory("");
       setAmount("");
       setPayment("");
+      setBankName("");
       setTrustAcknowledged(false);
       setPoliciesAccepted(false);
       setAckError(false);
@@ -565,6 +574,8 @@ export function useApplicationFormState() {
     amountFormatted,
     payment,
     setPayment,
+    bankName,
+    setBankName,
     photos,
     setPhotos,
     uploading,

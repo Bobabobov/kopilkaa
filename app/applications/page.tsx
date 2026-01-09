@@ -40,6 +40,8 @@ export default function ApplicationsPage() {
     handleAmountInputChange,
     payment,
     setPayment,
+    bankName,
+    setBankName,
     photos,
     setPhotos,
     uploading,
@@ -173,6 +175,8 @@ window.yaContextCb.push(() => {
               triggerRewarded={triggerRewarded}
               payment={payment}
               setPayment={setPayment}
+              bankName={bankName}
+              setBankName={setBankName}
               photos={photos}
               setPhotos={setPhotos}
               uploading={uploading}

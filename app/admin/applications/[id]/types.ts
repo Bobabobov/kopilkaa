@@ -8,6 +8,7 @@ export type ApplicationItem = {
   story: string;
   amount: number;
   payment: string;
+  bankName?: string | null;
   status: ApplicationStatus;
   adminComment: string | null;
   filledMs?: number | null;

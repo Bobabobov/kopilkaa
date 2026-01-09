@@ -4,11 +4,26 @@ import type { ApplicationItem } from "../types";
 
 interface ApplicationsListItemPaymentProps {
   payment: string;
+  bankName?: string | null;
+}
+
+function splitPayment(raw: string, bankName?: string | null) {
+  if (bankName) return { bankName, payment: raw };
+  const lines = (raw || "").split(/\n/);
+  const first = lines[0] || "";
+  if (/^банк:/i.test(first)) {
+    const derivedBank = first.replace(/^банк:\s*/i, "").trim();
+    const rest = lines.slice(1).join("\n").trim();
+    return { bankName: derivedBank || undefined, payment: rest || raw };
+  }
+  return { bankName: undefined, payment: raw };
 }
 
 export default function ApplicationsListItemPayment({
   payment,
+  bankName,
 }: ApplicationsListItemPaymentProps) {
+  const parsed = splitPayment(payment, bankName);
   const handleCopy = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     navigator.clipboard
@@ -61,9 +76,15 @@ export default function ApplicationsListItemPayment({
           <span className="text-blue-600 dark:text-blue-400 font-medium">
             Реквизиты:{" "}
           </span>
-          <span className="select-all text-gray-900 dark:text-white">
-            {payment}
-          </span>
+          <div className="select-all text-gray-900 dark:text-white space-y-1">
+            {parsed.bankName && (
+              <div>
+                <span className="text-blue-500 dark:text-blue-300 font-semibold">Банк: </span>
+                {parsed.bankName}
+              </div>
+            )}
+            <div>{parsed.payment || "Не указаны"}</div>
+          </div>
         </div>
         <button
           onClick={handleCopy}

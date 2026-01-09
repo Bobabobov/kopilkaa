@@ -9,9 +9,11 @@ import {
   StoriesEmptyState,
 } from "@/components/stories";
 import { useStories } from "@/hooks/stories/useStories";
+import { useRef } from "react";
 
 export default function StoriesPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const restoredRef = useRef(false);
   const {
     stories,
     loading,
@@ -53,6 +55,23 @@ export default function StoriesPage() {
       }
     };
   }, [loadingMore, hasMore, loading, loadNextPage, observerTargetRef]);
+
+  // Восстановление скролла после возврата из истории
+  useEffect(() => {
+    if (restoredRef.current) return;
+    if (loading) return;
+    if (!stories.length) return;
+    if (typeof window === "undefined") return;
+    const saved = sessionStorage.getItem("stories-scroll");
+    if (saved) {
+      const y = parseInt(saved, 10);
+      if (Number.isFinite(y)) {
+        window.scrollTo({ top: y, behavior: "auto" });
+      }
+      sessionStorage.removeItem("stories-scroll");
+    }
+    restoredRef.current = true;
+  }, [loading, stories.length]);
 
   const hasQuery = query.trim().length > 0;
   // Анимируем карточки только при первой загрузке (не при подгрузке следующих страниц)

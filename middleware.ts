@@ -141,7 +141,7 @@ export function middleware(req: NextRequest) {
         // то "включить unsafe-eval только для ?modal=auth" не сработает — заголовки уже получены.
         // Telegram widget внутри использует eval, поэтому держим unsafe-eval включенным в PROD,
         // но максимально ограничиваем источники скриптов.
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://telegram.org https://accounts.google.com https://mc.yandex.ru https://mc.yandex.com",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://telegram.org https://accounts.google.com https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://an.yandex.ru",
         "style-src 'self' 'unsafe-inline' https://accounts.google.com", // Tailwind/Google OAuth
         "img-src 'self' data: blob: https:",
         "font-src 'self' data:",
@@ -149,9 +149,9 @@ export function middleware(req: NextRequest) {
         "media-src 'self' blob: data: https:",
         // Разрешаем запросы к Telegram OAuth и Google OAuth (для виджета входа)
         // Google Identity Services иногда делает запросы на play.google.com/log (телеметрия).
-        "connect-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com https://play.google.com https://mc.yandex.ru https://mc.yandex.com wss://mc.yandex.ru wss://mc.yandex.com",
+        "connect-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com https://play.google.com https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://an.yandex.ru wss://mc.yandex.ru wss://mc.yandex.com",
         // Разрешаем встраивать iframe Telegram OAuth и Google OAuth
-        "frame-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com",
+        "frame-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com https://yandex.ru https://an.yandex.ru",
         "frame-ancestors 'self'",
         "base-uri 'self'",
         "form-action 'self'",

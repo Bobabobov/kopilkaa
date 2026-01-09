@@ -52,11 +52,9 @@ export function useApplicationFormState() {
   const [introChecked, setIntroChecked] = useState(false);
   const [approvedCount, setApprovedCount] = useState<number | null>(null);
   const isAdmin = user?.role === "ADMIN";
-  // TEMP for local dev: авто-разрешение без рекламы вне production (убрать перед продом)
-  const isProdEnv = process.env.NODE_ENV === "production";
-  const [rewardedPassed, setRewardedPassed] = useState(!isProdEnv);
+  const [rewardedPassed, setRewardedPassed] = useState(false);
   const [rewardedLoading, setRewardedLoading] = useState(false);
-  const [rewardedUnavailable, setRewardedUnavailable] = useState(!isProdEnv);
+  const [rewardedUnavailable, setRewardedUnavailable] = useState(false);
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
   const [hpCompany, setHpCompany] = useState("");

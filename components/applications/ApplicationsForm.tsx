@@ -222,7 +222,7 @@ export function ApplicationsForm(props: Props) {
         <FormField
           type="input"
           label="Банк"
-          icon="Banknote"
+          icon="CreditCard"
           value={bankName}
           onChange={setBankName}
           placeholder="Название банка (например, Тинькофф, Сбер)"

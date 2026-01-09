@@ -11,6 +11,7 @@ import ApplicationsForm from "@/components/applications/ApplicationsForm";
 import { useApplicationFormState, LIMITS } from "@/hooks/applications/useApplicationFormState";
 import TrustIntroModal from "@/components/applications/TrustIntroModal";
 import { getTrustLabel } from "@/lib/trustLevel";
+import Script from "next/script";
 
 const SuccessScreen = dynamic(() => import("@/components/applications/SuccessScreen"), {
   ssr: false,
@@ -110,6 +111,24 @@ export default function ApplicationsPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      {/* Yandex.RTB rewarded блок как в инструкции (desktop) */}
+      <Script
+        id="ya-rtb-rewarded-desktop-inline"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+window.yaContextCb = window.yaContextCb || [];
+window.yaContextCb.push(() => {
+  Ya.Context.AdvManager.render({
+    "blockId": "R-A-18382388-1",
+    "type": "rewarded",
+    "platform": "desktop"
+  });
+});
+          `,
+        }}
+      />
+
       <TrustIntroModal
         open={introOpen}
         checked={introChecked}

@@ -109,17 +109,18 @@ const SilkPlane = forwardRef<any, { uniforms: SilkUniforms }>(function SilkPlane
     }
   });
 
-  // @ts-expect-error - react-three/fiber JSX elements are valid at runtime
   return (
-    <mesh ref={ref}>
-      <planeGeometry args={[1, 1, 1, 1]} />
-      <shaderMaterial
-        uniforms={uniforms}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-      />
-    </mesh>
-  ) as any;
+    React.createElement(
+      "mesh",
+      { ref },
+      React.createElement("planeGeometry", { args: [1, 1, 1, 1] }),
+      React.createElement("shaderMaterial", {
+        uniforms,
+        vertexShader,
+        fragmentShader,
+      })
+    ) as any
+  );
 });
 SilkPlane.displayName = "SilkPlane";
 

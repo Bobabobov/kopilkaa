@@ -36,12 +36,24 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
       <TopBanner />
       <Header />
       <main className="flex-1 container-p mx-auto">{children}</main>
-      <YandexRTBAd
-        blockId="R-A-18382388-3"
-        type="floorAd"
-        platform="touch"
-        className="w-full py-4"
-      />
+      {/* Реклама для мобильных устройств (touch) */}
+      <div className="md:hidden">
+        <YandexRTBAd
+          blockId="R-A-18382388-3"
+          type="floorAd"
+          platform="touch"
+          className="w-full py-4"
+        />
+      </div>
+      {/* Реклама для десктопов */}
+      <div className="hidden md:block">
+        <YandexRTBAd
+          blockId="R-A-18382388-4"
+          type="floorAd"
+          platform="desktop"
+          className="w-full py-4"
+        />
+      </div>
       <Footer />
       <ScrollToTop />
       <Suspense fallback={null}>

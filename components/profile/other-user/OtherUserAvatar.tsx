@@ -8,6 +8,7 @@ export interface OtherUserBasic {
   id: string;
   email: string | null;
   name?: string | null;
+  createdAt: string;
   avatar?: string | null;
   avatarFrame?: string | null;
   hideEmail?: boolean;

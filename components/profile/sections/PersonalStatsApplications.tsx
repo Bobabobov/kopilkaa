@@ -17,7 +17,7 @@ export function PersonalStatsApplications({ vm }: PersonalStatsApplicationsProps
         <PersonalStatCard
           label="Сумма заявок"
           value={stats.applications.totalAmount.toLocaleString("ru-RU")}
-          icon="Wallet"
+          icon="DollarSign"
           color="#f97316"
         />
         <PersonalStatCard

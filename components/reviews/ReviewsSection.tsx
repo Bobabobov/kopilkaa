@@ -11,6 +11,7 @@ export function ReviewsSection() {
   const {
     loading,
     reviews,
+    submitting,
     canReview,
     approvedApplications,
     viewerReview,
@@ -84,6 +85,7 @@ export function ReviewsSection() {
           canReview={canReview}
           approvedApplications={approvedApplications}
           viewerReview={viewerReview}
+          submitting={submitting}
           onSubmit={submitReview}
         />
       )}

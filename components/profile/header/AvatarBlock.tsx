@@ -35,7 +35,7 @@ export function AvatarBlock({
           <AvatarUpload
             currentAvatar={currentAvatar}
             userName={user.name || (!user.hideEmail && user.email ? user.email : "Пользователь")}
-            onAvatarChange={onAvatarChange}
+            onAvatarChange={onAvatarChange || (() => {})}
           />
         </div>
         <div className="mt-3 flex gap-2">

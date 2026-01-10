@@ -305,7 +305,7 @@ export async function POST(req: NextRequest) {
       return created;
     });
 
-    const mapped = (await mapReviews([result], session.uid))[0] ?? null;
+    const mapped = (await mapReviews([result], viewerId))[0] ?? null;
 
     return NextResponse.json({ review: mapped }, { status: 200 });
   } catch (error) {

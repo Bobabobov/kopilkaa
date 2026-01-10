@@ -153,14 +153,19 @@ export default function Header() {
 
       <header
         ref={headerRef}
-        className="fixed left-0 right-0 z-50 backdrop-blur-sm border-b shadow-lg header-component"
+        className="fixed left-0 right-0 z-50 backdrop-blur-md border-b border-[#abd1c6]/15 shadow-lg bg-[#001e1d]/82 header-component overflow-hidden"
         style={{ 
-          backgroundColor: "#004643", 
-          borderColor: "#abd1c6",
           top: "var(--top-banner-height)",
           height: "var(--header-height)"
         }}
       >
+        {/* Две размытые подсветки в углах (ослабленные) */}
+        <div className="pointer-events-none absolute top-0 right-0 w-36 h-36 bg-gradient-to-br from-[#f9bc60]/10 to-transparent rounded-full blur-[52px]"></div>
+        <div className="pointer-events-none absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#e16162]/10 to-transparent rounded-full blur-[52px]"></div>
+
+        {/* Тонкая светящаяся линия сверху (мягче) */}
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#f9bc60]/45 to-transparent shadow-[0_0_8px_rgba(249,188,96,0.35)]"></div>
+
         <div className="container-p mx-auto flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 h-full relative">
           {/* Левая часть: логотип (flex-shrink-0) */}
           <div className="flex-shrink-0">
@@ -218,15 +223,17 @@ export default function Header() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.2 }}
-              className="min-[1200px]:hidden fixed left-0 right-0 z-40 border-t backdrop-blur-sm shadow-2xl rounded-b-3xl"
+              className="min-[1200px]:hidden fixed left-0 right-0 z-40 border-t border-[#abd1c6]/15 backdrop-blur-md shadow-2xl rounded-b-3xl bg-[#001e1d]/88 overflow-hidden"
               style={{ 
-                backgroundColor: "#004643", 
-                borderColor: "#abd1c6",
                 top: `${menuTop}px`,
                 maxHeight: `calc(100vh - ${menuTop + 12}px)`,
               }}
             >
-              <div className="container-p py-4 space-y-3 overflow-y-auto">
+              {/* Подсветки для мобильного меню (ослабленные) */}
+              <div className="pointer-events-none absolute top-0 right-0 w-36 h-36 bg-gradient-to-br from-[#f9bc60]/10 to-transparent rounded-full blur-[52px]"></div>
+              <div className="pointer-events-none absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#e16162]/10 to-transparent rounded-full blur-[52px]"></div>
+
+              <div className="container-p py-4 space-y-3 overflow-y-auto relative z-10">
                 {/* Навигационные ссылки */}
                 <div className="space-y-2">
                   <HeaderNavigation

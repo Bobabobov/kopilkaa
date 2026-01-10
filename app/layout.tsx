@@ -11,6 +11,7 @@ import ProfilePreloadInitializer from "@/components/performance/ProfilePreloadIn
 import BanCheck from "@/components/auth/BanCheck";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import MetrikaSpaTracker from "@/components/analytics/MetrikaSpaTracker";
+import GlobalClickSpark from "@/components/ui/GlobalClickSpark";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -163,6 +164,7 @@ export default function RootLayout({
           <MetrikaSpaTracker />
         </Suspense>
         <BeautifulNotificationsProvider>
+          <GlobalClickSpark />
           <ProfilePreloadInitializer />
           <BanCheck>
             <ProtectedLayout>{children}</ProtectedLayout>

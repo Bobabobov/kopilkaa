@@ -93,7 +93,7 @@ async function mapReviews(raw: any[], viewerId: string | null) {
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession();
-    const viewerId = session?.uid || null;
+    const viewerId = session?.uid ? String(session.uid) : null;
 
     const url = new URL(req.url);
     const page = Math.max(1, Number(url.searchParams.get("page") || 1));
@@ -128,9 +128,11 @@ export async function GET(req: NextRequest) {
       }).catch(() => []),
       prisma.review.count().catch(() => 0),
       viewerId
-        ? prisma.application.count({
-            where: { userId: viewerId, status: "APPROVED" },
-          })
+        ? prisma.application
+            .count({
+              where: { userId: viewerId, status: "APPROVED" },
+            })
+            .catch(() => 0)
         : 0,
       viewerId
         ? prisma.review.findUnique({
@@ -159,8 +161,8 @@ export async function GET(req: NextRequest) {
         : null,
     ]);
 
-    const mappedItems = await mapReviews(items, viewerId);
-    const mappedViewerReview = viewerReviewRaw ? (await mapReviews([viewerReviewRaw], viewerId))[0] : null;
+  const mappedItems = await mapReviews(items, viewerId);
+  const mappedViewerReview = viewerReviewRaw ? (await mapReviews([viewerReviewRaw], viewerId))[0] : null;
 
     return NextResponse.json({
       page,
@@ -192,7 +194,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
-  if (!session?.uid) {
+  const viewerId = session?.uid ? String(session.uid) : null;
+  if (!viewerId) {
     return NextResponse.json({ error: "Требуется авторизация" }, { status: 401 });
   }
 
@@ -212,9 +215,11 @@ export async function POST(req: NextRequest) {
     }
     const sanitizedImages = images.map((u) => String(u)).filter(Boolean);
 
-    const approvedCount = await prisma.application.count({
-      where: { userId: session.uid, status: "APPROVED" },
-    });
+    const approvedCount = await prisma.application
+      .count({
+        where: { userId: viewerId, status: "APPROVED" },
+      })
+      .catch(() => 0);
     if (approvedCount <= 0) {
       return NextResponse.json(
         { error: "Оставлять отзыв могут только пользователи с одобренной заявкой" },
@@ -223,7 +228,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await prisma.$transaction(async (tx) => {
-      const existing = await tx.review.findUnique({ where: { userId: session.uid } });
+      const existing = await tx.review.findUnique({ where: { userId: viewerId } });
 
       if (existing) {
         await tx.reviewImage.deleteMany({ where: { reviewId: existing.id } });
@@ -261,7 +266,7 @@ export async function POST(req: NextRequest) {
 
       const created = await tx.review.create({
         data: {
-          userId: session.uid,
+          userId: viewerId,
           content,
           images: {
             create: sanitizedImages.map((url, idx) => ({ url, sort: idx })),

@@ -94,10 +94,7 @@ void main() {
 }
 `;
 
-const SilkPlane = forwardRef<
-  Mesh<PlaneGeometry, ShaderMaterial> | null,
-  { uniforms: SilkUniforms }
->(function SilkPlane({ uniforms }, ref) {
+const SilkPlane = forwardRef<any, { uniforms: SilkUniforms }>(function SilkPlane({ uniforms }, ref) {
   const { viewport } = useThree();
 
   useLayoutEffect(() => {

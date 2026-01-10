@@ -225,7 +225,7 @@ export default function LightPillar({
       fragmentShader,
       uniforms: {
         uTime: { value: 0 },
-        uResolution: { value: new THREE.Vector2(width, height) },
+        uResolution: { value: new (THREE as any).Vector2(width, height) },
         uMouse: { value: mouseRef.current },
         uTopColor: { value: parseColor(topColor) },
         uBottomColor: { value: parseColor(bottomColor) },
@@ -245,7 +245,7 @@ export default function LightPillar({
 
     const geometry = new (THREE as any).PlaneGeometry(2, 2);
     geometryRef.current = geometry;
-    const mesh = new THREE.Mesh(geometry, material);
+    const mesh = new (THREE as any).Mesh(geometry, material);
     scene.add(mesh);
 
     // Mouse interaction - throttled for performance

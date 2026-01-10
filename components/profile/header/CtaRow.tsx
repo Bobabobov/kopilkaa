@@ -7,10 +7,16 @@ import { FriendActions, type FriendshipStatus } from "./FriendActions";
 import { OwnerActionsMenu } from "./OwnerActionsMenu";
 import { GuestActionsMenu } from "./GuestActionsMenu";
 
+type SocialUser = {
+  vkLink?: string | null;
+  telegramLink?: string | null;
+  youtubeLink?: string | null;
+};
+
 interface CtaRowProps {
   isOwner: boolean;
   hasSocialLinks: boolean;
-  user: { id: string };
+  user: { id: string } & SocialUser;
   friendshipStatus: FriendshipStatus;
   onSendRequest?: () => Promise<void> | void;
   onAcceptIncoming?: () => Promise<void> | void;

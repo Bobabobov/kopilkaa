@@ -2,7 +2,7 @@ import { useEffect, useState, type RefObject } from "react";
 
 interface UseFloatingMenuOptions {
   isOpen: boolean;
-  anchorRef: RefObject<HTMLElement>;
+  anchorRef: RefObject<HTMLElement | null>;
   menuSelector?: string; // css селектор контейнера меню (для клика внутри)
   onClose: () => void;
   offset?: number;

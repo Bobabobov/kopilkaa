@@ -85,13 +85,13 @@ export default function ProfileHeaderCard({
   const theme = useMemo(() => getHeaderTheme(currentHeaderTheme || "default"), [currentHeaderTheme]);
   const ownerMenuStyle = useFloatingMenu({
     isOpen: isActionsMenuOpen,
-    anchorRef: actionsButtonRef,
+    anchorRef: actionsButtonRef as React.RefObject<HTMLElement | null>,
     menuSelector: '[data-menu="actions"]',
     onClose: () => setIsActionsMenuOpen(false),
   });
   const guestMenuStyle = useFloatingMenu({
     isOpen: isGuestActionsOpen,
-    anchorRef: guestActionsButtonRef,
+    anchorRef: guestActionsButtonRef as React.RefObject<HTMLElement | null>,
     menuSelector: '[data-menu="guest"]',
     onClose: () => setIsGuestActionsOpen(false),
   });

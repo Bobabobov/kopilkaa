@@ -27,7 +27,7 @@ export function PersonalStatsSocial({ vm }: PersonalStatsSocialProps) {
       <PersonalStatCard
         label="Дней активности"
         value={stats.activity.daysActive}
-        icon="Flame"
+        icon="Activity"
         color="#f59e0b"
         hint="Счётчик активных дней"
       />

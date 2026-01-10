@@ -35,18 +35,22 @@ echo "🧬 Генерируем Prisma Client..."
 npx prisma generate
 
 echo "🧹 Чистим кеш Next.js..."
-rm -rf .next .turbo || true
+rm -rf .next .turbo node_modules/.cache || true
 
 echo "🔨 Собираем проект..."
 npm run build
 
+echo "🔄 Останавливаем приложение перед перезапуском..."
+pm2 stop kopilka || true
+sleep 2
+
 echo "🔄 Перезапускаем приложение..."
 if pm2 describe kopilka >/dev/null 2>&1; then
-  pm2 restart kopilka --update-env
-else
-  echo "ℹ️  PM2 процесс kopilka не найден — создаём заново..."
-  pm2 start npm --name kopilka -- start --update-env
+  pm2 delete kopilka || true
 fi
+
+pm2 start npm --name kopilka -- start
+pm2 save || true
 
 echo "✅ Деплой завершен!"
 echo "📊 Статус приложения:"

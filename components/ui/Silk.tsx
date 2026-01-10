@@ -9,13 +9,13 @@ import {
   useLayoutEffect,
   type MutableRefObject,
 } from "react";
-import { Color, type Mesh, type ShaderMaterial, type PlaneGeometry } from "three";
+import * as THREE from "three";
 
 type SilkUniforms = {
   uSpeed: { value: number };
   uScale: { value: number };
   uNoiseIntensity: { value: number };
-  uColor: { value: Color };
+  uColor: { value: any };
   uRotation: { value: number };
   uTime: { value: number };
 };
@@ -132,15 +132,14 @@ export default function Silk({
   noiseIntensity = 1.5,
   rotation = 0,
 }: SilkProps) {
-  const meshRef: MutableRefObject<Mesh<PlaneGeometry, ShaderMaterial> | null> =
-    useRef(null);
+  const meshRef: MutableRefObject<any> = useRef(null);
 
   const uniforms = useMemo<SilkUniforms>(
     () => ({
       uSpeed: { value: speed },
       uScale: { value: scale },
       uNoiseIntensity: { value: noiseIntensity },
-      uColor: { value: new Color(...hexToNormalizedRGB(color)) },
+      uColor: { value: new (THREE as any).Color(...hexToNormalizedRGB(color)) },
       uRotation: { value: rotation },
       uTime: { value: 0 },
     }),

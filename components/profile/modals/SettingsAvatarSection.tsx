@@ -1,17 +1,14 @@
-import { useRef } from "react";
 import type { SettingsUser } from "../hooks/useSettings";
 
 interface SettingsAvatarSectionProps {
   user: SettingsUser;
   saving: boolean;
-  avatarInputRef: React.RefObject<HTMLInputElement>;
+  avatarInputRef: React.RefObject<HTMLInputElement | null>;
   onUpload: (file: File) => Promise<void>;
   onDelete: () => Promise<void>;
 }
 
 export function SettingsAvatarSection({ user, saving, avatarInputRef, onUpload, onDelete }: SettingsAvatarSectionProps) {
-  const localInputRef = useRef<HTMLInputElement | null>(null);
-  const inputRef = avatarInputRef ?? localInputRef;
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-5">
@@ -31,7 +28,7 @@ export function SettingsAvatarSection({ user, saving, avatarInputRef, onUpload, 
       </div>
       <div className="flex flex-wrap gap-2 sm:ml-auto">
         <input
-          ref={inputRef}
+          ref={avatarInputRef as React.RefObject<HTMLInputElement>}
           type="file"
           accept="image/*"
           className="hidden"
@@ -45,7 +42,7 @@ export function SettingsAvatarSection({ user, saving, avatarInputRef, onUpload, 
         />
         <button
           type="button"
-          onClick={() => inputRef.current?.click()}
+          onClick={() => avatarInputRef.current?.click()}
           disabled={saving}
           className="px-4 py-2 rounded-xl bg-[#f9bc60] hover:bg-[#e8a545] disabled:bg-[#6B7280] text-[#001e1d] font-semibold transition-colors"
         >

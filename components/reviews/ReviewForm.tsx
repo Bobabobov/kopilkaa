@@ -111,58 +111,110 @@ export function ReviewForm({
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <label className="text-sm font-medium text-[#abd1c6]">Фото (до 5)</label>
-            <label className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#f9bc60]/90 to-[#f9bc60]/80 hover:from-[#f9bc60] hover:to-[#f9bc60] px-4 py-2 text-xs sm:text-sm font-semibold text-[#001e1d] border border-[#f9bc60]/60 cursor-pointer hover:border-[#f9bc60] hover:shadow-lg hover:shadow-[#f9bc60]/30 transition-all hover:-translate-y-0.5 active:translate-y-0">
-              <LucideIcons.Image size="xs" className="text-[#001e1d]" />
-              Добавить
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={handleSelectFiles}
-              />
-            </label>
-          </div>
-
-          {(existingUrls.length > 0 || previews.length > 0) && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {existingUrls.map((url, idx) => (
-                <div
-                  key={`existing-${url}-${idx}`}
-                  className="relative overflow-hidden rounded-xl border border-[#abd1c6]/40 bg-[#001e1d]/50 group"
-                >
-                  <img src={url} alt={`Фото ${idx + 1}`} className="w-full h-28 object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveExisting(idx)}
-                    className="absolute top-1.5 right-1.5 inline-flex items-center justify-center rounded-full bg-black/60 text-white/90 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label="Удалить фото"
-                  >
-                    <LucideIcons.X size="xs" />
-                  </button>
+        <div className="space-y-3 rounded-2xl border-2 border-dashed border-[#f9bc60]/40 bg-[#001e1d]/40 p-4 sm:p-5 hover:border-[#f9bc60]/60 hover:bg-[#001e1d]/50 transition-all relative overflow-hidden">
+          {/* Подсветка */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/5 via-transparent to-transparent pointer-events-none" />
+          
+          <div className="relative z-10 space-y-3">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border border-[#f9bc60]/40 flex items-center justify-center">
+                  <LucideIcons.Image className="w-4 h-4 text-[#f9bc60]" />
                 </div>
-              ))}
-              {previews.map((url, idx) => (
-                <div
-                  key={`new-${url}-${idx}`}
-                  className="relative overflow-hidden rounded-xl border border-[#abd1c6]/40 bg-[#001e1d]/50 group"
-                >
-                  <img src={url} alt={`Фото ${idx + 1}`} className="w-full h-28 object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveFile(idx)}
-                    className="absolute top-1.5 right-1.5 inline-flex items-center justify-center rounded-full bg-black/60 text-white/90 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label="Удалить фото"
-                  >
-                    <LucideIcons.X size="xs" />
-                  </button>
+                <div>
+                  <label className="text-sm sm:text-base font-semibold text-[#fffffe] block">Прикрепить фотографии</label>
+                  <p className="text-xs text-[#abd1c6]/80">Можно добавить до 5 фото к вашему отзыву</p>
                 </div>
-              ))}
+              </div>
+              <label className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#f9bc60] to-[#f9bc60]/90 hover:from-[#f9bc60] hover:to-[#f9bc60] px-5 py-2.5 text-sm font-semibold text-[#001e1d] border border-[#f9bc60] cursor-pointer hover:shadow-xl hover:shadow-[#f9bc60]/40 transition-all hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap">
+                <LucideIcons.Image size="sm" className="text-[#001e1d]" />
+                <LucideIcons.Plus size="xs" className="text-[#001e1d] -ml-1" />
+                <span>Добавить фото</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleSelectFiles}
+                />
+              </label>
             </div>
-          )}
+
+            {(existingUrls.length > 0 || previews.length > 0) ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-2">
+                {existingUrls.map((url, idx) => (
+                  <div
+                    key={`existing-${url}-${idx}`}
+                    className="relative overflow-hidden rounded-xl border-2 border-[#f9bc60]/40 bg-[#001e1d]/70 group hover:border-[#f9bc60]/70 transition-all"
+                  >
+                    <img src={url} alt={`Фото ${idx + 1}`} className="w-full h-32 sm:h-36 object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveExisting(idx)}
+                      className="absolute top-2 right-2 inline-flex items-center justify-center rounded-full bg-red-500/90 hover:bg-red-500 text-white p-1.5 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-lg"
+                      aria-label="Удалить фото"
+                    >
+                      <LucideIcons.X className="w-3.5 h-3.5" />
+                    </button>
+                    <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2 py-1">
+                        <p className="text-xs text-white font-medium">Фото {idx + 1}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {previews.map((url, idx) => (
+                  <div
+                    key={`new-${url}-${idx}`}
+                    className="relative overflow-hidden rounded-xl border-2 border-[#f9bc60]/40 bg-[#001e1d]/70 group hover:border-[#f9bc60]/70 transition-all"
+                  >
+                    <img src={url} alt={`Фото ${existingUrls.length + idx + 1}`} className="w-full h-32 sm:h-36 object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFile(idx)}
+                      className="absolute top-2 right-2 inline-flex items-center justify-center rounded-full bg-red-500/90 hover:bg-red-500 text-white p-1.5 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-lg"
+                      aria-label="Удалить фото"
+                    >
+                      <LucideIcons.X className="w-3.5 h-3.5" />
+                    </button>
+                    <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2 py-1">
+                        <p className="text-xs text-white font-medium">Фото {existingUrls.length + idx + 1}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 px-4 text-center border-2 border-dashed border-[#f9bc60]/30 rounded-xl bg-[#001e1d]/30">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center mb-3">
+                  <LucideIcons.Image className="w-8 h-8 text-[#f9bc60]" />
+                </div>
+                <p className="text-sm text-[#abd1c6] mb-1">Фотографии не добавлены</p>
+                <p className="text-xs text-[#94a1b2]">Нажмите на кнопку выше, чтобы добавить до 5 фотографий</p>
+              </div>
+            )}
+
+            {(existingUrls.length > 0 || previews.length > 0) && (
+              <div className="flex items-center justify-between text-xs text-[#94a1b2] pt-1 border-t border-[#abd1c6]/20">
+                <span>Добавлено фотографий: {existingUrls.length + previews.length} из 5</span>
+                {existingUrls.length + previews.length < 5 && (
+                  <label className="text-[#f9bc60] hover:text-[#f9bc60]/80 cursor-pointer underline">
+                    Добавить ещё
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleSelectFiles}
+                    />
+                  </label>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

@@ -9,6 +9,7 @@ import {
   getTrustLimits,
   type TrustLevel,
 } from "@/lib/trustLevel";
+import { ApplicationStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,7 @@ async function mapReviews(raw: any[], viewerId: string | null) {
         by: ["userId"],
         where: {
           userId: { in: userIds },
-          status: { in: ["APPROVED", "approved"] as any },
+          status: ApplicationStatus.APPROVED,
         },
         _count: { _all: true },
       })
@@ -135,10 +136,13 @@ export async function GET(req: NextRequest) {
             .count({
               where: {
                 userId: viewerId,
-                status: { in: ["APPROVED", "approved"] as any },
+                status: ApplicationStatus.APPROVED,
               },
             })
-            .catch(() => 0)
+            .catch((err) => {
+              console.error("[reviews] Error counting approved apps:", err);
+              return 0;
+            })
         : 0,
       viewerId
         ? prisma.review.findUnique({
@@ -225,7 +229,7 @@ export async function POST(req: NextRequest) {
       .count({
         where: {
           userId: viewerId,
-          status: { in: ["APPROVED", "approved"] as any },
+          status: ApplicationStatus.APPROVED,
         },
       })
       .catch(() => 0);

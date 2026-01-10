@@ -9,6 +9,7 @@ import {
   getTrustLimits,
   type TrustLevel,
 } from "@/lib/trustLevel";
+import { ApplicationStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -76,7 +77,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     }
 
     const approvedCount = await prisma.application.count({
-      where: { userId: review.userId, status: "APPROVED" },
+      where: { userId: review.userId, status: ApplicationStatus.APPROVED },
     });
     const trust = buildTrustSnapshot(approvedCount);
     const heroBadge = review.user ? (await getHeroBadgesForUsers([review.user.id]))[review.user.id] ?? null : null;
@@ -101,5 +102,45 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   } catch (error) {
     console.error("Error fetching review by id:", error);
     return NextResponse.json({ error: "Ошибка загрузки" }, { status: 500 });
+  }
+}
+
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const session = await getSession();
+    const viewerId = session?.uid ? String(session.uid) : null;
+    
+    if (!viewerId) {
+      return NextResponse.json({ error: "Требуется авторизация" }, { status: 401 });
+    }
+
+    const reviewId = params.id;
+    if (!reviewId) {
+      return NextResponse.json({ error: "id required" }, { status: 400 });
+    }
+
+    // Проверяем, что отзыв существует и принадлежит текущему пользователю
+    const review = await prisma.review.findUnique({
+      where: { id: reviewId },
+      select: { id: true, userId: true },
+    });
+
+    if (!review) {
+      return NextResponse.json({ error: "Отзыв не найден" }, { status: 404 });
+    }
+
+    if (review.userId !== viewerId) {
+      return NextResponse.json({ error: "Нет доступа" }, { status: 403 });
+    }
+
+    // Удаляем отзыв (изображения удалятся каскадно из-за onDelete: Cascade)
+    await prisma.review.delete({
+      where: { id: reviewId },
+    });
+
+    return NextResponse.json({ success: true, message: "Отзыв удалён" }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting review:", error);
+    return NextResponse.json({ error: "Не удалось удалить отзыв" }, { status: 500 });
   }
 }

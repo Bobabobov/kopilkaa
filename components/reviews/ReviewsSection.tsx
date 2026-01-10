@@ -17,6 +17,7 @@ export function ReviewsSection() {
     viewerReview,
     refresh,
     submitReview,
+    deleteReview,
     ToastComponent,
   } = useReviews();
 
@@ -53,15 +54,38 @@ export function ReviewsSection() {
       {viewerReview ? (
         <div className="max-w-6xl mx-auto rounded-3xl border border-white/10 bg-white/6 backdrop-blur-xl p-5 sm:p-6 text-white shadow-[0_20px_50px_-28px_rgba(0,0,0,0.55)]">
           <div className="flex items-start gap-4">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#f9bc60] to-[#e16162] flex items-center justify-center text-white shadow-lg">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#f9bc60] to-[#e16162] flex items-center justify-center text-white shadow-lg flex-shrink-0">
               <LucideIcons.CheckCircle size="sm" />
             </div>
-            <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.08em] text-white/70">Отзыв уже оставлен</p>
-              <h2 className="text-lg sm:text-xl font-semibold text-white">Спасибо за ваш отзыв</h2>
-              <p className="text-sm text-white/80">
-                Вы можете прочитать свой отзыв в списке ниже. Повторная отправка не требуется.
-              </p>
+            <div className="space-y-3 flex-1 min-w-0">
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-[0.08em] text-white/70">Отзыв уже оставлен</p>
+                <h2 className="text-lg sm:text-xl font-semibold text-white">Спасибо за ваш отзыв</h2>
+                <p className="text-sm text-white/80">
+                  Вы можете прочитать свой отзыв в списке ниже или удалить его и написать новый.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  if (confirm("Вы уверены, что хотите удалить свой отзыв? После удаления вы сможете написать новый.")) {
+                    deleteReview(viewerReview.id);
+                  }
+                }}
+                disabled={submitting}
+                className="inline-flex items-center gap-2 rounded-xl border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500/60 text-red-300 hover:text-red-200 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {submitting ? (
+                  <>
+                    <LucideIcons.Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
+                    <span>Удаление...</span>
+                  </>
+                ) : (
+                  <>
+                    <LucideIcons.Trash2 size="xs" />
+                    <span>Удалить отзыв</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

@@ -153,6 +153,47 @@ export function useReviews() {
     [submitting],
   );
 
+  const deleteReview = useCallback(
+    async (reviewId: string) => {
+      if (submitting) return;
+      
+      setSubmitting(true);
+      try {
+        const res = await fetch(`/api/reviews/${reviewId}`, {
+          method: "DELETE",
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          throw new Error(json?.error || "Не удалось удалить отзыв");
+        }
+
+        showToastRef.current?.("success", "Готово", "Отзыв удалён");
+
+        // Обновляем данные: удаляем отзыв из списка и очищаем viewerReview
+        setData((prev) => {
+          if (!prev) return prev;
+          const canReviewAfterDelete = prev.viewer.approvedApplications > 0;
+          return {
+            ...prev,
+            total: Math.max(0, prev.total - 1),
+            items: prev.items.filter((r) => r.id !== reviewId),
+            viewer: {
+              ...prev.viewer,
+              review: null,
+              canReview: canReviewAfterDelete,
+            },
+          };
+        });
+      } catch (error: any) {
+        console.error("Delete review error", error);
+        showToastRef.current?.("error", "Ошибка", error?.message || "Не удалось удалить отзыв");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [submitting],
+  );
+
   const viewerReview = useMemo(() => data?.viewer?.review ?? null, [data]);
 
   return {
@@ -164,6 +205,7 @@ export function useReviews() {
     viewerReview,
     refresh: fetchReviews,
     submitReview,
+    deleteReview,
     ToastComponent,
   };
 }

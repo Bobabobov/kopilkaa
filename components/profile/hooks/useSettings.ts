@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-type User = {
+export type SettingsUser = {
   id: string;
   email: string;
   username?: string | null;
@@ -19,8 +19,9 @@ type User = {
   youtubeLink?: string | null;
   lastSeen?: string;
 };
+type User = SettingsUser;
 
-interface UseSettingsReturn {
+export interface UseSettingsReturn {
   // Состояние
   user: User | null;
   loading: boolean;

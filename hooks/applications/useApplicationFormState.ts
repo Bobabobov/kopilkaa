@@ -384,7 +384,7 @@ export function useApplicationFormState() {
         modal: "auth/signup",
       });
       if (typeof window !== "undefined") {
-        window.location.href = href;
+      window.location.href = href;
       }
       return false;
     }

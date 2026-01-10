@@ -10,6 +10,7 @@ import { Suspense } from "react";
 import AuthModalRoot from "@/components/auth/AuthModalRoot";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import ApplicationStatusModalGate from "@/components/notifications/ApplicationStatusModalGate";
+import YandexRTBAd from "@/components/advertising/YandexRTBAd";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -35,6 +36,12 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
       <TopBanner />
       <Header />
       <main className="flex-1 container-p mx-auto">{children}</main>
+      <YandexRTBAd
+        blockId="R-A-18382388-3"
+        type="floorAd"
+        platform="touch"
+        className="w-full py-4"
+      />
       <Footer />
       <ScrollToTop />
       <Suspense fallback={null}>

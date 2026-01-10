@@ -15,12 +15,10 @@ import ProfileHeaderCard from "@/components/profile/ProfileHeaderCard";
 import ReportUserModal from "./modals/ReportUserModal";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import TrustLevelCard from "@/components/profile/TrustLevelCard";
-import {
-  getNextLevelRequirement,
-  getTrustLevelFromApprovedCount,
-  getTrustLimits,
-  type TrustLevel,
-} from "@/lib/trustLevel";
+import { BannedNotice, isUserCurrentlyBanned } from "./BannedNotice";
+import { useOtherUserFriendship } from "./hooks/useOtherUserFriendship";
+import { useOtherUserData } from "./hooks/useOtherUserData";
+import { useOtherUserTrust } from "./hooks/useOtherUserTrust";
 
 type User = {
   id: string;
@@ -42,28 +40,14 @@ type User = {
   bannedReason?: string | null;
 };
 
-type Friendship = {
-  id: string;
-  status: "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED";
-  requesterId: string;
-  receiverId: string;
-};
-
 interface OtherUserProfileProps {
   userId: string;
 }
 
 export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [friendship, setFriendship] = useState<Friendship | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [resolvedUserId, setResolvedUserId] = useState<string | null>(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
-  const [approvedApplications, setApprovedApplications] = useState<number | null>(null);
 
   const emitFriendEvents = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -72,25 +56,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     }
   }, []);
 
-  // Проверка авторизации
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch("/api/profile/me", { cache: "no-store" });
-        if (response.ok) {
-          const data = await response.json();
-          setIsAuthenticated(true);
-          setCurrentUserId(data.user.id);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
+  const { user, loading, isAuthenticated, currentUserId, resolvedUserId } = useOtherUserData({ userId });
 
   // Обработчик события для открытия модального окна жалобы
   useEffect(() => {
@@ -108,86 +74,28 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     };
   }, [resolvedUserId, user?.id]);
 
-  const fetchFriendshipStatus = useCallback(async () => {
-    try {
-      if (!resolvedUserId) return;
-      const friendshipResponse = await fetch(`/api/profile/friends?type=all`, {
-        cache: "no-store",
-      });
-      if (friendshipResponse.ok) {
-        const friendshipData = await friendshipResponse.json();
-        const userFriendship = friendshipData.friendships.find(
-          (f: Friendship) =>
-            f.requesterId === resolvedUserId || f.receiverId === resolvedUserId,
-        );
-        setFriendship(userFriendship || null);
-      }
-    } catch (error) {
-      console.error("Load friendship data error:", error);
-    }
-  }, [resolvedUserId]);
+  const { approvedApplications, trustDerived } = useOtherUserTrust({
+    isAuthenticated,
+    resolvedUserId,
+    fallbackUserId: userId,
+  });
 
-  // Загрузка данных пользователя
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const loadUserData = async () => {
-      try {
-        setLoading(true);
-
-        // Загружаем данные пользователя
-        const userResponse = await fetch(`/api/users/${userId}`, {
-          cache: "no-store", // Не кешируем, чтобы всегда получать актуальные данные
-        });
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          setUser(userData.user);
-          setResolvedUserId(userData?.user?.id ?? null);
-        } else if (userResponse.status === 404) {
-          // Пользователь не найден (возможно удален)
-          setUser(null);
-          return;
-        } else {
-          console.error("User not found");
-          return;
-        }
-      } catch (error) {
-        console.error("Load user data error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUserData();
-  }, [isAuthenticated, userId]);
-
-  // Загружаем количество одобренных заявок для расчёта уровня доверия
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    const targetId = resolvedUserId || userId;
-    if (!targetId) return;
-
-    fetch(`/api/users/${targetId}/detailed-stats`, { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        const approved = data?.detailedStats?.applications?.approved;
-        if (typeof approved === "number" && approved >= 0) {
-          setApprovedApplications(approved);
-        } else {
-          setApprovedApplications(0);
-        }
-      })
-      .catch(() => {
-        setApprovedApplications(0);
-      });
-  }, [isAuthenticated, resolvedUserId, userId]);
-
-  // Загружаем статус дружбы после того, как знаем реальный userId
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    if (!resolvedUserId) return;
-    fetchFriendshipStatus();
-  }, [isAuthenticated, resolvedUserId, fetchFriendshipStatus]);
+  const {
+    friendship,
+    friendshipStatus,
+    fetchFriendshipStatus,
+    sendFriendRequest,
+    acceptFriendRequest,
+    declineFriendRequest,
+    handleRemoveFriend,
+  } = useOtherUserFriendship({
+    resolvedUserId,
+    isAuthenticated,
+    currentUserId,
+    user,
+    emitFriendEvents,
+    showToast: showToast as (type: any, title: string, message?: string, duration?: number) => void,
+  });
 
   // Проверка, является ли пользователь владельцем профиля
   useEffect(() => {
@@ -196,116 +104,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
       router.push("/profile");
     }
   }, [currentUserId, resolvedUserId, router]);
-
-  const sendFriendRequest = async () => {
-    if (!user) return;
-
-    if (!isAuthenticated) {
-      showToast(
-        "warning",
-        "Требуется авторизация",
-        "Необходимо войти в аккаунт для добавления в друзья",
-      );
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/profile/friends", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ receiverId: user.id }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setFriendship(data.friendship);
-        emitFriendEvents();
-        showToast(
-          "success",
-          "Заявка отправлена!",
-          "Заявка в друзья успешно отправлена",
-        );
-      } else {
-        showToast(
-          "error",
-          "Ошибка отправки",
-          data.message || "Не удалось отправить заявку в друзья",
-        );
-      }
-    } catch (error) {
-      console.error("Friend request error:", error);
-      showToast(
-        "error",
-        "Ошибка отправки",
-        "Не удалось отправить заявку в друзья",
-      );
-    }
-  };
-
-  const acceptFriendRequest = async () => {
-    if (!friendship) return;
-
-    try {
-      const response = await fetch(`/api/profile/friends/${friendship.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "ACCEPTED" }),
-      });
-
-      if (response.ok) {
-        await fetchFriendshipStatus();
-        emitFriendEvents();
-        showToast(
-          "success",
-          "Заявка принята!",
-          "Пользователь добавлен в друзья",
-        );
-      } else {
-        showToast(
-          "error",
-          "Ошибка принятия",
-          "Не удалось принять заявку в друзья",
-        );
-      }
-    } catch (error) {
-      showToast(
-        "error",
-        "Ошибка принятия",
-        "Не удалось принять заявку в друзья",
-      );
-    }
-  };
-
-  const declineFriendRequest = async () => {
-    if (!friendship) return;
-
-    try {
-      const response = await fetch(`/api/profile/friends/${friendship.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "DECLINED" }),
-      });
-
-      if (response.ok) {
-        await fetchFriendshipStatus();
-        emitFriendEvents();
-        showToast("info", "Заявка отклонена", "Заявка в друзья отклонена");
-      } else {
-        showToast(
-          "error",
-          "Ошибка отклонения",
-          "Не удалось отклонить заявку в друзья",
-        );
-      }
-    } catch (error) {
-      showToast(
-        "error",
-        "Ошибка отклонения",
-        "Не удалось отклонить заявку в друзья",
-      );
-    }
-  };
 
   // Загрузка проверки авторизации
   if (isAuthenticated === null) {
@@ -325,139 +123,9 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     return <OtherUserLoadingStates state="not-found" />;
   }
 
-  // Проверяем, заблокирован ли пользователь
-  // Учитываем, что если bannedUntil истёк, пользователь не заблокирован
-  const isBanned = user.isBanned === true; // Явная проверка на true
-  const bannedUntil = user.bannedUntil ? new Date(user.bannedUntil) : null;
-  
-  // Пользователь действительно заблокирован только если:
-  // 1. isBanned = true
-  // 2. И либо нет даты окончания (заблокирован навсегда), либо дата еще не прошла
-  const isCurrentlyBanned = isBanned && (
-    !bannedUntil || // Заблокирован навсегда
-    bannedUntil > new Date() // Заблокирован временно, но срок еще не истёк
-  );
-  
-  // Пользователь заблокирован навсегда
-  const isBannedPermanent = isBanned && !bannedUntil;
-  
-  // Пользователь заблокирован временно
-  const isBannedTemporary = isBanned && bannedUntil && bannedUntil > new Date();
-
-  // Если пользователь действительно заблокирован, показываем только сообщение
-  if (isCurrentlyBanned) {
-    return (
-      <div className="min-h-screen relative overflow-hidden">
-        <div className="w-full px-6 pt-32 pb-8">
-          <div className="max-w-2xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-red-500/20 border-2 border-red-500/50 rounded-2xl p-8"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-red-500/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-6 h-6 text-red-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                    />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-red-400 mb-3">
-                    Чечик в бане
-                  </h3>
-                  {isBannedPermanent ? (
-                    <p className="text-[#abd1c6] text-base">
-                      Этот аккаунт заблокирован навсегда.
-                    </p>
-                  ) : (
-                    <p className="text-[#abd1c6] text-base">
-                      Этот аккаунт заблокирован до{" "}
-                      {bannedUntil?.toLocaleDateString("ru-RU", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}{" "}
-                      г. в{" "}
-                      {bannedUntil?.toLocaleTimeString("ru-RU", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                      .
-                    </p>
-                  )}
-                  {user.bannedReason && (
-                    <p className="text-[#abd1c6] text-base mt-3">
-                      Причина: {user.bannedReason}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-        <ToastComponent />
-      </div>
-    );
+  if (isUserCurrentlyBanned(user)) {
+    return <BannedNotice user={user} ToastComponent={ToastComponent} />;
   }
-
-  const handleRemoveFriend = async () => {
-    if (!friendship?.id) return;
-    try {
-      const response = await fetch(`/api/profile/friends/${friendship.id}`, {
-        method: "DELETE",
-      });
-      if (response.ok) {
-        await fetchFriendshipStatus();
-        emitFriendEvents();
-        showToast("success", "Пользователь удалён из друзей");
-      } else {
-        showToast("error", "Ошибка", "Не удалось удалить из друзей");
-      }
-    } catch (error) {
-      showToast("error", "Ошибка", "Не удалось удалить из друзей");
-    }
-  };
-
-  const friendshipStatus: "none" | "requested" | "incoming" | "friends" =
-    !friendship
-      ? "none"
-      : friendship.status === "ACCEPTED"
-      ? "friends"
-      : friendship.requesterId === currentUserId
-      ? "requested"
-      : "incoming";
-
-  const trustDerived = (() => {
-    const approved = approvedApplications ?? 0;
-    const trustLevel: TrustLevel = getTrustLevelFromApprovedCount(approved);
-    const limits = getTrustLimits(trustLevel);
-    const trustStatus = trustLevel.toLowerCase() as Lowercase<TrustLevel>;
-    const supportText = `от ${limits.min.toLocaleString("ru-RU")} до ${limits.max.toLocaleString("ru-RU")} ₽`;
-    const nextReq = getNextLevelRequirement(trustLevel);
-    const progressValue = nextReq === null ? null : Math.min(1, Math.max(0, approved / nextReq));
-    const progressCurrent = nextReq === null ? null : Math.min(approved, nextReq);
-    const progressTotal = nextReq === null ? null : nextReq;
-    const progressText =
-      nextReq === null
-        ? null
-        : (() => {
-            const remaining = Math.max(0, nextReq - approved);
-            const ending = remaining === 1 ? "ая" : "ые";
-            const noun = remaining === 1 ? "заявка" : "заявки";
-            return `До следующего уровня — ${remaining} одобренн${ending} ${noun}`;
-          })();
-    return { trustStatus, supportText, progressText, progressValue, progressCurrent, progressTotal };
-  })();
 
   return (
     <div className="min-h-screen relative overflow-hidden" role="main" aria-label="Профиль пользователя">

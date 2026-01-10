@@ -1,167 +1,21 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
-
-interface AchievementData {
-  id: string;
-  achievement: {
-    id: string;
-    name: string;
-    description: string;
-    icon: string;
-    rarity: string;
-    type: string;
-    isExclusive: boolean;
-  };
-  unlockedAt: string;
-}
-
-interface AchievementStats {
-  unlockedAchievements: number;
-  totalAchievements: number;
-  completionPercentage: number;
-}
+import { AchievementCard } from "./AchievementCard";
+import { AchievementsHeader } from "./AchievementsHeader";
+import { AchievementsStats } from "./AchievementsStats";
+import { useAchievementsData } from "./hooks/useAchievementsData";
+import { getAchievementIcon, getRarityColor, getRarityName } from "./achievementUtils";
 
 interface AchievementsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// Функция для получения иконки по типу и названию достижения
-const getAchievementIcon = (type: string, name: string) => {
-  // Сначала проверяем по названию для более специфичных иконок
-  const nameLower = name.toLowerCase();
-  
-  if (nameLower.includes('первые шаги') || nameLower.includes('первая')) {
-    return LucideIcons.Star;
-  }
-  if (nameLower.includes('помощник') || nameLower.includes('помощь')) {
-    return LucideIcons.Users;
-  }
-  if (nameLower.includes('одобрен') || nameLower.includes('одобрение')) {
-    return LucideIcons.CheckCircle;
-  }
-  if (nameLower.includes('активный') || nameLower.includes('активность')) {
-    return LucideIcons.Zap;
-  }
-  if (nameLower.includes('эксперт') || nameLower.includes('мастер')) {
-    return LucideIcons.Star;
-  }
-  if (nameLower.includes('друг') || nameLower.includes('дружба')) {
-    return LucideIcons.Users;
-  }
-  if (nameLower.includes('игра') || nameLower.includes('игр')) {
-    return LucideIcons.Star;
-  }
-  if (nameLower.includes('серия') || nameLower.includes('серий')) {
-    return LucideIcons.Zap;
-  }
-  if (nameLower.includes('творч') || nameLower.includes('креатив')) {
-    return LucideIcons.Palette;
-  }
-  if (nameLower.includes('сообществ') || nameLower.includes('коммун')) {
-    return LucideIcons.Heart;
-  }
-  
-  // Если не найдено по названию, используем тип
-  switch (type) {
-    case 'APPLICATIONS':
-      return LucideIcons.FileText;
-    case 'GAMES':
-      return LucideIcons.Star;
-    case 'SOCIAL':
-      return LucideIcons.Users;
-    case 'STREAK':
-      return LucideIcons.Zap;
-    case 'SPECIAL':
-      return LucideIcons.Star;
-    case 'COMMUNITY':
-      return LucideIcons.Heart;
-    case 'CREATIVITY':
-      return LucideIcons.Palette;
-    default:
-      return LucideIcons.Trophy;
-  }
-};
-
-// Функция для получения цвета по редкости
-const getRarityColor = (rarity: string) => {
-  switch (rarity) {
-    case 'COMMON':
-      return '#94a1b2';
-    case 'RARE':
-      return '#abd1c6';
-    case 'EPIC':
-      return '#e16162';
-    case 'LEGENDARY':
-      return '#f9bc60';
-    case 'EXCLUSIVE':
-      return '#ff6b6b';
-    default:
-      return '#abd1c6';
-  }
-};
-
-// Функция для получения русского названия редкости
-const getRarityName = (rarity: string) => {
-  switch (rarity) {
-    case 'COMMON':
-      return 'Обычное';
-    case 'RARE':
-      return 'Редкое';
-    case 'EPIC':
-      return 'Эпическое';
-    case 'LEGENDARY':
-      return 'Легендарное';
-    case 'EXCLUSIVE':
-      return 'Эксклюзивное';
-    default:
-      return 'Неизвестное';
-  }
-};
-
-interface AchievementProgress {
-  achievement: any;
-  progress: number;
-  maxProgress: number;
-  isUnlocked: boolean;
-  unlockedAt?: string;
-  progressPercentage: number;
-}
-
 export default function AchievementsModal({ isOpen, onClose }: AchievementsModalProps) {
-  const [achievements, setAchievements] = useState<AchievementData[]>([]);
-  const [allAchievements, setAllAchievements] = useState<AchievementProgress[]>([]);
-  const [stats, setStats] = useState<AchievementStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-  
-  // Автоскрытие скроллбаров
-  useAutoHideScrollbar();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (isOpen && mounted) {
-      fetch("/api/achievements/user")
-        .then((r) => r.json())
-        .then((data) => {
-          if (data && data.success) {
-            setAchievements(data.data.achievements || []);
-            setAllAchievements(data.data.progress || []);
-            setStats(data.data.stats || null);
-          }
-        })
-        .catch(() => setError("Ошибка загрузки достижений"))
-        .finally(() => setLoading(false));
-    }
-  }, [isOpen, mounted]);
+  const { achievements, allAchievements, stats, loading, error, mounted } = useAchievementsData(isOpen);
 
   // Закрытие по Escape
   useEffect(() => {
@@ -216,58 +70,15 @@ export default function AchievementsModal({ isOpen, onClose }: AchievementsModal
           onClick={(e) => e.stopPropagation()}
         >
           {/* Заголовок */}
-          <div className="p-6 border-b border-[#abd1c6]/20 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[#f9bc60] rounded-2xl flex items-center justify-center">
-                  <LucideIcons.Trophy size="lg" className="text-[#001e1d]" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-[#fffffe]">
-                    Все достижения
-                  </h2>
-                  <p className="text-[#abd1c6]">
-                    {achievements.length}{" "}
-                    {achievements.length === 1
-                      ? "достижение"
-                      : achievements.length < 5
-                        ? "достижения"
-                        : "достижений"}
-                    {stats && (
-                      <span className="ml-2">
-                        • {stats.unlockedAchievements} из {stats.totalAchievements} получено
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-10 h-10 bg-[#abd1c6]/20 hover:bg-[#abd1c6]/30 rounded-xl flex items-center justify-center transition-colors"
-              >
-                <LucideIcons.X size="sm" className="text-[#fffffe]" />
-              </button>
-            </div>
-          </div>
+          <AchievementsHeader count={achievements.length} stats={stats} onClose={onClose} />
 
           {/* Статистика */}
           {stats && (
-            <div className="px-6 py-4 border-b border-[#abd1c6]/20 bg-[#abd1c6]/5">
-              <div className="grid grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-[#f9bc60] mb-1">{stats.unlockedAchievements}</div>
-                  <div className="text-sm text-[#abd1c6]">Получено</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-[#abd1c6] mb-1">{stats.totalAchievements}</div>
-                  <div className="text-sm text-[#abd1c6]">Всего</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-[#e16162] mb-1">{Math.round(stats.completionPercentage)}%</div>
-                  <div className="text-sm text-[#abd1c6]">Прогресс</div>
-                </div>
-              </div>
-            </div>
+            <AchievementsStats
+              unlocked={stats.unlockedAchievements}
+              total={stats.totalAchievements}
+              completion={stats.completionPercentage}
+            />
           )}
 
           {/* Контент */}
@@ -297,106 +108,9 @@ export default function AchievementsModal({ isOpen, onClose }: AchievementsModal
               </div>
             ) : (
               <div className="space-y-3">
-                {allAchievements.map((progressItem, index) => {
-                  const achievement = progressItem.achievement;
-                  const isUnlocked = progressItem.isUnlocked;
-                  const IconComponent = getAchievementIcon(achievement.type, achievement.name) || LucideIcons.Star;
-                  const rarityColor = getRarityColor(achievement.rarity);
-                  const rarityName = getRarityName(achievement.rarity);
-                  
-                  return (
-                    <motion.div
-                      key={achievement.id}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        delay: 0.02 * index,
-                        duration: 0.5,
-                        ease: [0.16, 1, 0.3, 1],
-                      }}
-                      className={`rounded-xl p-4 border transition-all duration-300 ${
-                        isUnlocked 
-                          ? 'bg-gradient-to-r from-[#001e1d]/60 to-[#001e1d]/40 border-[#f9bc60]/30' 
-                          : 'bg-[#001e1d]/20 border-[#abd1c6]/10 opacity-60'
-                      }`}
-                      style={{
-                        boxShadow: isUnlocked 
-                          ? '0 0 0 1px rgba(249, 188, 96, 0.2), 0 4px 6px -1px rgba(0, 0, 0, 0.1)' 
-                          : 'none'
-                      }}
-                    >
-                      <div className="flex items-start gap-4">
-                        {/* Иконка достижения */}
-                        <div 
-                          className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                            isUnlocked ? 'shadow-lg' : 'opacity-40'
-                          }`}
-                          style={{ 
-                            backgroundColor: isUnlocked ? rarityColor + '20' : '#abd1c6/20',
-                            color: isUnlocked ? rarityColor : '#abd1c6'
-                          }}
-                        >
-                          <IconComponent 
-                            size="lg" 
-                            className="text-current"
-                          />
-                        </div>
-                        
-                        {/* Информация о достижении */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className={`text-base font-bold ${
-                              isUnlocked ? 'text-[#fffffe]' : 'text-[#abd1c6]/60'
-                            }`}>
-                              {achievement.name}
-                            </h3>
-                            {isUnlocked && (
-                              <span 
-                                className="text-xs px-3 py-1 rounded-full font-medium"
-                                style={{
-                                  backgroundColor: rarityColor + '20',
-                                  color: rarityColor
-                                }}
-                              >
-                                {rarityName}
-                              </span>
-                            )}
-                          </div>
-                          <p className={`text-sm mb-2 ${
-                            isUnlocked ? 'text-[#abd1c6]' : 'text-[#abd1c6]/40'
-                          }`}>
-                            {achievement.description}
-                          </p>
-                          {isUnlocked && progressItem.unlockedAt && (
-                            <p className="text-xs text-[#94a1b2]">
-                              Получено: {new Date(progressItem.unlockedAt).toLocaleDateString('ru-RU', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              })}
-                            </p>
-                          )}
-                          {!isUnlocked && (
-                            <p className="text-xs text-[#f9bc60]/60 italic">
-                              Заблокировано
-                            </p>
-                          )}
-                        </div>
-                        
-                        {/* Галочка или замок */}
-                        {isUnlocked ? (
-                          <div className="w-8 h-8 bg-[#f9bc60]/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <LucideIcons.Check className="text-[#f9bc60]" size="sm" />
-                          </div>
-                        ) : (
-                          <div className="w-8 h-8 bg-[#abd1c6]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <LucideIcons.Lock className="text-[#abd1c6]/40" size="sm" />
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                {allAchievements.map((progressItem, index) => (
+                  <AchievementCard key={progressItem.achievement.id} progressItem={progressItem} index={index} />
+                ))}
               </div>
             )}
           </div>

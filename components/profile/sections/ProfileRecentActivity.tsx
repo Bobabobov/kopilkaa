@@ -1,125 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import Link from "next/link";
-
-interface ActivityItem {
-  id: string;
-  type: "application" | "donation" | "achievement" | "friend";
-  title: string;
-  description: string;
-  date: string;
-  link?: string;
-  icon: keyof typeof LucideIcons;
-  color: string;
-}
+import { useRecentActivity } from "../hooks/useRecentActivity";
+import { RecentActivityItem } from "./RecentActivityItem";
 
 export default function ProfileRecentActivity() {
-  const [activities, setActivities] = useState<ActivityItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const formatRub = (amount: number) => {
-    const n = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 })
-      .format(amount)
-      .replace(/\u00A0/g, " ");
-    return `${n} ₽`;
-  };
-
-  useEffect(() => {
-    const fetchActivity = async () => {
-      try {
-        // Получаем данные из разных источников
-        const [applicationsRes, donationsRes, achievementsRes] = await Promise.all([
-          fetch("/api/applications/mine?limit=3", { cache: "no-store" }).catch(() => null),
-          fetch("/api/profile/donations", { cache: "no-store" }).catch(() => null),
-          fetch("/api/achievements/user", { cache: "no-store" }).catch(() => null),
-        ]);
-
-        const activitiesList: ActivityItem[] = [];
-
-        // Обрабатываем заявки
-        if (applicationsRes?.ok) {
-          const appsData = await applicationsRes.json();
-          if (appsData.applications) {
-            appsData.applications.slice(0, 2).forEach((app: any) => {
-              const statusText =
-                app.status === "APPROVED"
-                  ? "одобрена"
-                  : app.status === "PENDING"
-                    ? "на рассмотрении"
-                    : "отклонена";
-              activitiesList.push({
-                id: `app-${app.id}`,
-                type: "application",
-                title: app.title || "Заявка",
-                description: `Заявка ${statusText}`,
-                date: app.createdAt || app.updatedAt,
-                link: `/applications/${app.id}`,
-                icon: "FileText",
-                color: "#f9bc60",
-              });
-            });
-          }
-        }
-
-        // Обрабатываем оплаты (цифровая услуга размещения в «Героях»)
-        if (donationsRes?.ok) {
-          const donationsData = await donationsRes.json();
-          if (donationsData.donations) {
-            donationsData.donations.slice(0, 2).forEach((donation: any) => {
-              const raw = typeof donation.comment === "string" ? donation.comment.trim() : "";
-              const serviceLabel = raw === "heroes_placement" ? "Размещение в «Героях»" : raw;
-              activitiesList.push({
-                id: `donation-${donation.id}`,
-                type: "donation",
-                title: `Оплата ${formatRub(Number(donation.amount) || 0)}`,
-                description: serviceLabel || "Оплата цифровой услуги",
-                date: donation.createdAt,
-                icon: "CreditCard",
-                color: "#f9bc60",
-              });
-            });
-          }
-        }
-
-        // Обрабатываем достижения
-        if (achievementsRes?.ok) {
-          const achievementsData = await achievementsRes.json();
-          if (achievementsData.success && achievementsData.data?.achievements) {
-            achievementsData.data.achievements
-              .filter((a: any) => a.unlockedAt)
-              .slice(0, 2)
-              .forEach((achievement: any) => {
-                activitiesList.push({
-                  id: `achievement-${achievement.id}`,
-                  type: "achievement",
-                  title: achievement.achievement?.name || "Достижение",
-                  description: "Получено новое достижение",
-                  date: achievement.unlockedAt,
-                  icon: "Award",
-                  color: "#f9bc60",
-                });
-              });
-          }
-        }
-
-        // Сортируем по дате (новые первые)
-        activitiesList.sort((a, b) => {
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        });
-
-        setActivities(activitiesList.slice(0, 5));
-      } catch (error) {
-        console.error("Error fetching activity:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchActivity();
-  }, []);
+  const { activities, loading } = useRecentActivity();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -214,48 +101,13 @@ export default function ProfileRecentActivity() {
 
       {/* Список активности */}
       <div className="p-4 xs:p-4 sm:p-5 md:p-6 space-y-2 xs:space-y-2.5 sm:space-y-3">
-        {activities.map((activity, index) => {
-          const IconComponent = LucideIcons[activity.icon] || LucideIcons.Activity;
-          const content = (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`flex items-start gap-2 xs:gap-3 p-2.5 xs:p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10 hover:border-[${activity.color}]/30 transition-colors ${
-                activity.link ? "cursor-pointer" : ""
-              }`}
-            >
-              <div
-                className="w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{
-                  backgroundColor: `${activity.color}20`,
-                  color: activity.color,
-                }}
-              >
-                <IconComponent size="sm" className="text-current" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs xs:text-sm sm:text-base font-semibold text-[#fffffe] mb-0.5 truncate">
-                  {activity.title}
-                </div>
-                <div className="text-[10px] xs:text-xs sm:text-sm text-[#abd1c6] mb-0.5 xs:mb-1 line-clamp-2">
-                  {activity.description}
-                </div>
-                <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6]/60">
-                  {formatDate(activity.date)}
-                </div>
-              </div>
-            </motion.div>
-          );
-
-          return activity.link ? (
-            <Link key={activity.id} href={activity.link}>
-              {content}
-            </Link>
-          ) : (
-            <div key={activity.id}>{content}</div>
-          );
-        })}
+        {activities.map((activity, index) => (
+          <RecentActivityItem
+            key={activity.id}
+            activity={{ ...activity, date: formatDate(activity.date) }}
+            index={index}
+          />
+        ))}
       </div>
       </div>
     </motion.div>

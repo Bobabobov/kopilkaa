@@ -51,7 +51,10 @@ async function mapReviews(raw: any[], viewerId: string | null) {
     prisma.application
       .groupBy({
         by: ["userId"],
-        where: { userId: { in: userIds }, status: "APPROVED" },
+        where: {
+          userId: { in: userIds },
+          status: { in: ["APPROVED", "approved"] as any },
+        },
         _count: { _all: true },
       })
       .catch(() => []),
@@ -130,7 +133,10 @@ export async function GET(req: NextRequest) {
       viewerId
         ? prisma.application
             .count({
-              where: { userId: viewerId, status: "APPROVED" },
+              where: {
+                userId: viewerId,
+                status: { in: ["APPROVED", "approved"] as any },
+              },
             })
             .catch(() => 0)
         : 0,
@@ -217,7 +223,10 @@ export async function POST(req: NextRequest) {
 
     const approvedCount = await prisma.application
       .count({
-        where: { userId: viewerId, status: "APPROVED" },
+        where: {
+          userId: viewerId,
+          status: { in: ["APPROVED", "approved"] as any },
+        },
       })
       .catch(() => 0);
     if (approvedCount <= 0) {

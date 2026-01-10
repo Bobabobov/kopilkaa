@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 interface UseSettingsModalLifecycleParams {
   isOpen: boolean;
   onClose: () => void;
-  dialogRef: React.RefObject<HTMLDivElement>;
+  dialogRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export function useSettingsModalLifecycle({ isOpen, onClose, dialogRef }: UseSettingsModalLifecycleParams) {

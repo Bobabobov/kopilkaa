@@ -79,6 +79,7 @@ model User {
   phoneLoginCodes      PhoneLoginCode[]
   projectNewsPosts     ProjectNewsPost[]
   projectNewsReactions ProjectNewsReaction[]
+  reviews              Review[]
   isBanned             Boolean               @default(false)
   bannedUntil          DateTime?
   bannedReason         String?
@@ -390,6 +391,29 @@ model Advertisement {
   @@index([expiresAt])
   @@index([createdAt])
   @@index([placement])
+}
+
+model Review {
+  id        String        @id @default(cuid())
+  userId    String        @unique
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  images    ReviewImage[]
+
+  @@index([createdAt])
+}
+
+model ReviewImage {
+  id       String  @id @default(cuid())
+  reviewId String
+  review   Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  url      String
+  sort     Int     @default(0)
+
+  @@index([reviewId])
+  @@index([sort])
 }
 
 // Модель для заявок на размещение рекламы

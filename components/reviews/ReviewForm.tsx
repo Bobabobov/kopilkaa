@@ -10,11 +10,17 @@ type Props = {
   canReview: boolean;
   approvedApplications: number;
   viewerReview: ReviewItem | null;
-  submitting: boolean;
+  submitting?: boolean;
   onSubmit: (content: string, files: File[], existingUrls: string[]) => Promise<void> | void;
 };
 
-export function ReviewForm({ canReview, approvedApplications, viewerReview, submitting, onSubmit }: Props) {
+export function ReviewForm({
+  canReview,
+  approvedApplications,
+  viewerReview,
+  submitting = false,
+  onSubmit,
+}: Props) {
   const [content, setContent] = useState(viewerReview?.content ?? "");
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);

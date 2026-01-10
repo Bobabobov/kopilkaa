@@ -285,6 +285,114 @@ export function HeroBadge({
         </Base>
       );
 
+    case "tester":
+      return (
+        <Base
+          className={`${common} ${wrap} gap-1 rounded-xl border border-[#10B981]/50 bg-gradient-to-br from-[#10B981]/20 to-[#001e1d]/40 text-[#10B981] ${className}`}
+          title="Тестировщик"
+          initial={reduceMotion ? undefined : { opacity: 1, scale: 1 }}
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  scale: [1, 1.015, 0.99, 1],
+                  boxShadow: [
+                    "0 12px 30px rgba(0,0,0,0.30)",
+                    "0 16px 40px rgba(16,185,129,0.25)",
+                    "0 14px 35px rgba(16,185,129,0.20)",
+                    "0 12px 30px rgba(0,0,0,0.30)",
+                  ],
+                }
+          }
+          transition={
+            reduceMotion
+              ? undefined
+              : { duration: 2.5, ease: "easeInOut", repeat: Infinity }
+          }
+          whileHover={
+            reduceMotion
+              ? undefined
+              : {
+                  scale: 1.05,
+                  boxShadow:
+                    "0 20px 60px rgba(16,185,129,0.30), 0 0 0 3px rgba(16,185,129,0.30)",
+                }
+          }
+        >
+          {!reduceMotion && (
+            <>
+              {/* Постоянный фон с легкой пульсацией */}
+              <motion.span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-[inherit] overflow-hidden"
+              >
+                <motion.span
+                  aria-hidden
+                  className="absolute inset-0 rounded-[inherit]"
+                  style={{
+                    background:
+                      "radial-gradient(circle at 50% 50%, rgba(16,185,129,0.20), transparent 70%)",
+                  }}
+                  animate={{
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{ duration: 2.5, ease: "easeInOut", repeat: Infinity }}
+                />
+              </motion.span>
+              
+              {/* Эффект "пузырьков" */}
+              <motion.span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-[inherit] overflow-hidden"
+              >
+                {[...Array(3)].map((_, i) => (
+                  <motion.span
+                    key={i}
+                    aria-hidden
+                    className="absolute w-1 h-1 rounded-full bg-[#10B981]"
+                    style={{
+                      left: `${20 + i * 30}%`,
+                      bottom: "10%",
+                    }}
+                    animate={{
+                      y: [0, -40, 0],
+                      opacity: [0.5, 0.8, 0.5],
+                      scale: [0.8, 1.2, 0.8],
+                    }}
+                    transition={{
+                      duration: 2,
+                      delay: i * 0.4,
+                      ease: "easeInOut",
+                      repeat: Infinity,
+                    }}
+                  />
+                ))}
+              </motion.span>
+            </>
+          )}
+          {/* Вращающаяся иконка с легким наклоном */}
+          <motion.span
+            animate={
+              reduceMotion
+                ? undefined
+                : {
+                    rotate: [0, 4, -4, 0],
+                  }
+            }
+            transition={{
+              duration: 2.5,
+              ease: "easeInOut",
+              repeat: Infinity,
+            }}
+            className="inline-flex"
+          >
+            <LucideIcons.TestTube size={icon} className="text-[#10B981]" />
+          </motion.span>
+          <Label full="Тестировщик" short="Тест." />
+          <span className="sr-only">Тестировщик</span>
+        </Base>
+      );
+
     case "custom":
     default:
       return (

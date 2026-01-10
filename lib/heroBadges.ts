@@ -7,6 +7,7 @@ export type HeroBadge =
   | "hero"
   | "honor"
   | "legend"
+  | "tester"
   | "custom";
 
 export type HeroBadgeMap = Record<string, HeroBadge>;
@@ -28,13 +29,28 @@ function badgeByMaxPaid(maxPaid: number | null | undefined): HeroBadge | null {
  * Rules:
  * - Based on MAX single payment amount (not count, not comment).
  * - If there are no payments => null
- *
- * NOTE about > 5000:
- * - Unique "custom" badges should be set manually (override) later.
- * - We do NOT auto-assign "custom" based on amount.
+ * - Manual override via heroBadgeOverride takes priority over computed badge
  */
 export async function getHeroBadgeForUser(userId: string): Promise<HeroBadge | null> {
   try {
+    // Check for manual override first (admin-assigned badges)
+    try {
+      const u = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { heroBadgeOverride: true },
+      });
+      if (u?.heroBadgeOverride) {
+        // Validate that override is a valid badge
+        const validBadges: HeroBadge[] = ["observer", "member", "active", "hero", "honor", "legend", "tester", "custom"];
+        if (validBadges.includes(u.heroBadgeOverride as HeroBadge)) {
+          return u.heroBadgeOverride as HeroBadge;
+        }
+      }
+    } catch {
+      // If DB is not migrated yet, continue to computed badge.
+    }
+
+    // Compute badge based on max payment
     const max = await prisma.donation.findFirst({
       where: { userId, type: "SUPPORT" },
       orderBy: { amount: "desc" },
@@ -42,21 +58,6 @@ export async function getHeroBadgeForUser(userId: string): Promise<HeroBadge | n
     });
     const maxPaid = max?.amount ?? 0;
     const base = badgeByMaxPaid(maxPaid);
-    if (!base) return null;
-
-    // Manual override for unique badge (only for > 5000)
-    if (maxPaid > 5000) {
-      try {
-        const u = await prisma.user.findUnique({
-          where: { id: userId },
-          select: { heroBadgeOverride: true },
-        });
-        if (u?.heroBadgeOverride) return "custom";
-      } catch {
-        // If DB is not migrated yet, fall back to computed badge.
-      }
-    }
-
     return base;
   } catch {
     return null;
@@ -83,28 +84,31 @@ export async function getHeroBadgesForUsers(userIds: string[]): Promise<HeroBadg
     });
 
     const map: HeroBadgeMap = {};
-    const needsOverrideCheck: string[] = [];
-    for (const g of grouped) {
-      if (!g.userId) continue;
-      const maxPaid = g._max.amount ?? 0;
-      if (maxPaid > 5000) needsOverrideCheck.push(g.userId);
-      const badge = badgeByMaxPaid(maxPaid);
-      if (badge) map[g.userId] = badge;
+    
+    // Check for manual overrides (admin-assigned badges) for all users
+    try {
+      const overrides = await prisma.user.findMany({
+        where: { id: { in: limitedIds } },
+        select: { id: true, heroBadgeOverride: true },
+      });
+      const validBadges: HeroBadge[] = ["observer", "member", "active", "hero", "honor", "legend", "tester", "custom"];
+      for (const u of overrides) {
+        if (u.heroBadgeOverride && validBadges.includes(u.heroBadgeOverride as HeroBadge)) {
+          map[u.id] = u.heroBadgeOverride as HeroBadge;
+        }
+      }
+    } catch {
+      // If DB is not migrated yet, ignore overrides and use computed badges.
     }
 
-    // Unique "custom" badge is NOT auto-assigned: only when heroBadgeOverride is set.
-    if (needsOverrideCheck.length > 0) {
-      try {
-        const overrides = await prisma.user.findMany({
-          where: { id: { in: needsOverrideCheck } },
-          select: { id: true, heroBadgeOverride: true },
-        });
-        for (const u of overrides) {
-          if (u.heroBadgeOverride) map[u.id] = "custom";
-        }
-      } catch {
-        // If DB is not migrated yet, ignore overrides and keep computed tiers.
-      }
+    // Compute badges based on max payment for users without override
+    for (const g of grouped) {
+      if (!g.userId) continue;
+      // Skip if already has override
+      if (map[g.userId]) continue;
+      const maxPaid = g._max.amount ?? 0;
+      const badge = badgeByMaxPaid(maxPaid);
+      if (badge) map[g.userId] = badge;
     }
 
     return map;

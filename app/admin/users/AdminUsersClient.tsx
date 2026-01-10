@@ -7,6 +7,8 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
 import Link from "next/link";
+import { HeroBadge } from "@/components/ui/HeroBadge";
+import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 interface User {
   id: string;
@@ -16,6 +18,7 @@ interface User {
   createdAt: string;
   lastSeen: string | null;
   role: string;
+  badge?: HeroBadgeType | null;
 }
 
 export default function AdminUsersClient() {
@@ -26,9 +29,14 @@ export default function AdminUsersClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [badgeModalUserId, setBadgeModalUserId] = useState<string | null>(null);
+  const [badgeModalBadge, setBadgeModalBadge] = useState<HeroBadgeType | null | undefined>(undefined);
+  const [loadingBadge, setLoadingBadge] = useState(false);
   const { showToast } = useBeautifulToast();
   const { confirm } = useBeautifulNotifications();
   const observerTarget = useRef<HTMLDivElement>(null);
+
+  const VALID_BADGES: HeroBadgeType[] = ["observer", "member", "active", "hero", "honor", "legend", "tester", "custom"];
 
   useEffect(() => {
     loadUsers(1, true);
@@ -152,6 +160,62 @@ export default function AdminUsersClient() {
     }
   };
 
+  const openBadgeModal = async (userId: string) => {
+    setBadgeModalUserId(userId);
+    setBadgeModalBadge(undefined);
+    setLoadingBadge(true);
+    
+    try {
+      const response = await fetch(`/api/admin/users/${userId}/badge`);
+      const data = await response.json();
+      if (response.ok && data.data) {
+        setBadgeModalBadge(data.data.badge || null);
+      }
+    } catch (error) {
+      console.error("Error loading badge:", error);
+    } finally {
+      setLoadingBadge(false);
+    }
+  };
+
+  const handleSetBadge = async (badge: HeroBadgeType | null) => {
+    if (!badgeModalUserId) return;
+
+    setLoadingBadge(true);
+    try {
+      const response = await fetch(`/api/admin/users/${badgeModalUserId}/badge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ badge }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showToast("success", "Бейдж обновлён", data.data?.message || "Бейдж успешно выдан");
+        setBadgeModalBadge(badge);
+        // Обновляем бейдж в списке пользователей
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.id === badgeModalUserId ? { ...user, badge } : user
+          )
+        );
+      } else {
+        showToast("error", "Ошибка", data.error || "Не удалось установить бейдж");
+      }
+    } catch (error) {
+      console.error("Error setting badge:", error);
+      showToast("error", "Ошибка", "Не удалось установить бейдж");
+    } finally {
+      setLoadingBadge(false);
+    }
+  };
+
+  const closeBadgeModal = () => {
+    setBadgeModalUserId(null);
+    setBadgeModalBadge(undefined);
+  };
+
   return (
     <div className="min-h-screen relative">
 
@@ -248,7 +312,7 @@ export default function AdminUsersClient() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 mt-3">
+                      <div className="flex items-center gap-2 mt-3 flex-wrap">
                         <Link
                           href={`/profile/${user.id}`}
                           className="inline-flex items-center gap-1 text-xs text-[#f9bc60] hover:text-[#f9bc60]/80 transition-colors"
@@ -256,6 +320,15 @@ export default function AdminUsersClient() {
                           <span>Открыть профиль</span>
                           <LucideIcons.ArrowRight className="w-3 h-3" />
                         </Link>
+                        
+                        <button
+                          onClick={() => openBadgeModal(user.id)}
+                          className="inline-flex items-center gap-1 text-xs text-[#abd1c6] hover:text-[#f9bc60] transition-colors"
+                          title="Управление бейджем"
+                        >
+                          <LucideIcons.Award className="w-3 h-3" />
+                          <span>Бейдж</span>
+                        </button>
                         
                         <button
                           onClick={() => handleDeleteUser(user.id, user.name || user.email || "Пользователь")}
@@ -305,6 +378,88 @@ export default function AdminUsersClient() {
           )}
         </div>
       </div>
+
+      {/* Модальное окно управления бейджем */}
+      {badgeModalUserId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={closeBadgeModal}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-gradient-to-br from-[#001e1d] to-[#003d3a] rounded-2xl border border-[#abd1c6]/30 p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-[#fffffe]">Управление бейджем</h3>
+              <button
+                onClick={closeBadgeModal}
+                className="text-[#abd1c6] hover:text-[#fffffe] transition-colors"
+              >
+                <LucideIcons.X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {loadingBadge && badgeModalBadge === undefined ? (
+              <div className="text-center py-8">
+                <LucideIcons.Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#f9bc60]" />
+                <p className="text-[#abd1c6] text-sm">Загрузка...</p>
+              </div>
+            ) : (
+              <>
+                <div className="mb-4">
+                  <p className="text-sm text-[#abd1c6] mb-3">Текущий бейдж:</p>
+                  <div className="flex items-center gap-2">
+                    {badgeModalBadge ? (
+                      <HeroBadge badge={badgeModalBadge} size="sm" />
+                    ) : (
+                      <span className="text-sm text-[#abd1c6]/70">Автоматический (по сумме донаций)</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <p className="text-sm text-[#abd1c6] mb-3">Выберите бейдж:</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleSetBadge(null)}
+                      disabled={loadingBadge}
+                      className={`p-3 rounded-lg border-2 text-sm text-center transition-all ${
+                        badgeModalBadge === null
+                          ? "border-[#f9bc60] bg-[#f9bc60]/10 text-[#f9bc60]"
+                          : "border-[#abd1c6]/20 bg-[#001e1d]/40 text-[#abd1c6] hover:border-[#abd1c6]/40"
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      Автоматический
+                    </button>
+                    {VALID_BADGES.map((badge) => (
+                      <button
+                        key={badge}
+                        onClick={() => handleSetBadge(badge)}
+                        disabled={loadingBadge}
+                        className={`p-3 rounded-lg border-2 text-sm text-center transition-all flex items-center justify-center gap-2 ${
+                          badgeModalBadge === badge
+                            ? "border-[#f9bc60] bg-[#f9bc60]/10"
+                            : "border-[#abd1c6]/20 bg-[#001e1d]/40 hover:border-[#abd1c6]/40"
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        <HeroBadge badge={badge} size="xs" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 mt-6">
+                  <button
+                    onClick={closeBadgeModal}
+                    className="px-4 py-2 rounded-lg bg-[#001e1d]/60 text-[#abd1c6] hover:bg-[#001e1d]/80 transition-colors"
+                  >
+                    Закрыть
+                  </button>
+                </div>
+              </>
+            )}
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

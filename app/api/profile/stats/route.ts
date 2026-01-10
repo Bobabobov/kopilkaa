@@ -14,11 +14,11 @@ export async function GET() {
     // Получаем статистику заявок с обработкой ошибок
     const applications = await prisma.application
       .findMany({
-        where: { userId },
-        select: {
-          status: true,
-          amount: true,
-        },
+      where: { userId },
+      select: {
+        status: true,
+        amount: true,
+      },
       })
       .catch(() => []);
 

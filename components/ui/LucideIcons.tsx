@@ -93,6 +93,7 @@ import {
   Code,
   MoreVertical,
   Infinity,
+  FlaskConical,
 } from "lucide-react";
 
 interface IconProps {
@@ -241,6 +242,11 @@ export const LucideIcons = {
   // Корона
   Crown: ({ className = "", size = "md" }: IconProps) => (
     <Crown className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  // Тестировщик
+  TestTube: ({ className = "", size = "md" }: IconProps) => (
+    <FlaskConical className={`${sizeClasses[size]} ${className}`} />
   ),
 
   // Бизнес/портфель

@@ -96,7 +96,7 @@ export async function POST(req: Request) {
 
     // Валидация длин (расширенные лимиты для администратора)
     const titleMax = isAdmin ? 100 : 40;
-    const summaryMax = isAdmin ? 300 : 140;
+    const summaryMax = isAdmin ? 300 : 60;
     const storyMax = isAdmin ? 10000 : 3000;
     const storyMin = 10;
     const paymentMax = isAdmin ? 500 : 200;

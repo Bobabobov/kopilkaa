@@ -115,11 +115,11 @@ export function middleware(req: NextRequest) {
           retryAfterSec,
         }),
         {
-          status: 429,
-          headers: {
-            "Content-Type": "application/json",
-            "Retry-After": String(retryAfterSec),
-          },
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "Retry-After": String(retryAfterSec),
+        },
         },
       );
     }

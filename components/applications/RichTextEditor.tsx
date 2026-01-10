@@ -7,6 +7,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import { useEffect, useState } from "react";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface RichTextEditorProps {
   value: string;
@@ -17,6 +18,8 @@ interface RichTextEditorProps {
   rows?: number;
   className?: string;
   allowLinks?: boolean; // Разрешить добавление ссылок
+  error?: string; // Сообщение об ошибке
+  required?: boolean; // Обязательное поле
 }
 
 export default function RichTextEditor({
@@ -28,6 +31,8 @@ export default function RichTextEditor({
   rows = 6,
   className = "",
   allowLinks = true,
+  error,
+  required = false,
 }: RichTextEditorProps) {
   const [linkUrl, setLinkUrl] = useState("");
   const [showLinkInput, setShowLinkInput] = useState(false);
@@ -101,6 +106,10 @@ export default function RichTextEditor({
   };
 
   const textLength = getTextLength(editor.getHTML());
+  const isEmpty = textLength === 0;
+  const isRequiredEmpty = required && isEmpty;
+  const isValidLength = textLength >= minLength && (maxLength ? textLength <= maxLength : true);
+  const hasError = error || isRequiredEmpty || (textLength > 0 && !isValidLength);
 
   return (
     <div className={`space-y-2 w-full max-w-full overflow-hidden ${className}`}>
@@ -365,13 +374,25 @@ export default function RichTextEditor({
       <div className="w-full max-w-full overflow-hidden">
         <EditorContent
           editor={editor}
-          className={`w-full max-w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus-within:border-[#f9bc60] focus-within:ring-2 focus-within:ring-[#f9bc60]/50 ${
-            editor.isFocused
-              ? "border-[#f9bc60] bg-[#abd1c6]/5"
-              : "border-[#abd1c6]/30 bg-[#004643]/50"
+          className={`w-full max-w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ${
+            hasError
+              ? editor.isFocused
+                ? "border-[#e16162] bg-[#e16162]/5 focus-within:border-[#e16162] focus-within:ring-2 focus-within:ring-[#e16162]/50"
+                : "border-[#e16162] bg-[#e16162]/5"
+              : editor.isFocused
+                ? "border-[#f9bc60] bg-[#abd1c6]/5 focus-within:border-[#f9bc60] focus-within:ring-2 focus-within:ring-[#f9bc60]/50"
+                : "border-[#abd1c6]/30 bg-[#004643]/50"
           }`}
         />
       </div>
+      
+      {/* Сообщение об ошибке */}
+      {hasError && (
+        <div className="flex items-center gap-2 text-sm text-[#e16162] mt-1">
+          <LucideIcons.XCircle className="w-4 h-4" />
+          <span>{error || "Заполните это поле"}</span>
+        </div>
+      )}
 
       {/* Стили для редактора */}
       <style jsx global>{`

@@ -15,7 +15,7 @@ const FORM_START_KEY_BASE = "application_form_started_at";
 
 const LIMITS = {
   titleMax: 40,
-  summaryMax: 140,
+  summaryMax: 60,
   storyMin: 10,
   storyMax: 3000,
   amountMin: 50,

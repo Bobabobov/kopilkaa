@@ -172,7 +172,7 @@ export function ApplicationsForm(props: Props) {
           icon="MessageCircle"
           value={summary}
           onChange={setSummary}
-          placeholder="Основная суть вашей просьбы, а ниже подробное описание"
+          placeholder="Короткое название заявки (3–10 слов)"
           hint={`Краткое описание, видно в списке заявок (макс. ${limits.summaryMax} символов)`}
           maxLength={limits.summaryMax}
           delay={0.2}
@@ -194,6 +194,7 @@ export function ApplicationsForm(props: Props) {
             maxLength={limits.storyMax}
             rows={8}
             allowLinks={false}
+            required={true}
           />
         </div>
 
@@ -205,7 +206,6 @@ export function ApplicationsForm(props: Props) {
           onChange={() => {}}
           placeholder="Укажите сумму в рублях..."
           hint={trustHint}
-          minLength={limits.amountMin}
           maxLength={7}
           inputProps={{
             type: "tel",
@@ -227,7 +227,7 @@ export function ApplicationsForm(props: Props) {
           onChange={setBankName}
           placeholder="Название банка (например, Тинькофф, Сбер)"
           hint="Укажите банк получателя отдельно от реквизитов."
-          maxLength={80}
+          maxLength={15}
           delay={0.45}
           required={true}
         />

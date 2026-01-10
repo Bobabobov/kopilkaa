@@ -14,8 +14,8 @@ interface ProgressBarProps {
 
 const LIMITS = {
   titleMax: 40,
-  summaryMax: 140,
-  storyMin: 200,
+  summaryMax: 60,
+  storyMin: 10,
   storyMax: 3000,
   amountMin: 1,
   amountMax: 1000000,
@@ -34,10 +34,25 @@ export default function ProgressBar({
   // Функция для подсчета символов без пробелов
   const getCharCount = (text: string) => text.replace(/\s/g, "").length;
 
+  // Функция для извлечения plain text из HTML и подсчета символов без пробелов
+  const getPlainTextLength = (html: string): number => {
+    if (!html) return 0;
+    if (typeof window === "undefined") {
+      // На сервере используем простой regex для удаления тегов
+      const textOnly = html.replace(/<[^>]*>/g, "");
+      return textOnly.replace(/\s/g, "").length;
+    }
+    // На клиенте используем DOM API
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    const textContent = div.textContent || div.innerText || "";
+    return textContent.replace(/\s/g, "").length;
+  };
+
   const progress = [
     { name: "Заголовок", filled: getCharCount(title) > 0 },
     { name: "Описание", filled: getCharCount(summary) > 0 },
-    { name: "История", filled: getCharCount(story) >= LIMITS.storyMin },
+    { name: "История", filled: getPlainTextLength(story) >= LIMITS.storyMin },
     {
       name: "Сумма",
       filled: amount.length > 0 && parseInt(amount) >= LIMITS.amountMin,

@@ -152,48 +152,48 @@ export function TrustLevelsInfo() {
         {LEVELS.map((level, idx) => {
           const Icon = level.icon;
           return (
-            <motion.div
+              <motion.div
               key={level.key}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.03 * idx }}
-              className={[
-                "relative rounded-2xl border backdrop-blur-md h-full",
-                level.tone.bg,
-                level.tone.border,
-                level.tone.pad,
-                level.tone.ring,
-              ].join(" ")}
-            >
-              <div className="flex items-start gap-3 sm:gap-4">
-                <div className={`${level.tone.iconBg} p-3.5 sm:p-4 rounded-full shadow-inner shrink-0`}>
-                  <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={2.4} />
+                className={[
+                  "relative rounded-2xl border backdrop-blur-md h-full",
+                  level.tone.bg,
+                  level.tone.border,
+                  level.tone.pad,
+                  level.tone.ring,
+                ].join(" ")}
+              >
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className={`${level.tone.iconBg} p-3.5 sm:p-4 rounded-full shadow-inner shrink-0`}>
+                    <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={2.4} />
+                  </div>
+                  <div className="space-y-1">
+                    <p className={`text-lg sm:text-xl font-semibold ${level.tone.title}`}>
+                      {level.title}
+                    </p>
+                    <p className={`text-xs sm:text-sm ${level.tone.muted}`}>
+                      {level.subtitle}
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <p className={`text-lg sm:text-xl font-semibold ${level.tone.title}`}>
-                    {level.title}
-                  </p>
-                  <p className={`text-xs sm:text-sm ${level.tone.muted}`}>
-                    {level.subtitle}
-                  </p>
-                </div>
-              </div>
 
-              <div className="mt-3 space-y-2">
-                <div className="text-sm text-[#cfded6]">
-                  Доступная поддержка:{" "}
+                <div className="mt-3 space-y-2">
+                  <div className="text-sm text-[#cfded6]">
+                    Доступная поддержка:{" "}
                   <span className="font-semibold text-[#f0c878] whitespace-nowrap">
                     {level.support}
                   </span>
+                  </div>
+                  <div className="text-sm text-[#b5c9c1]">
+                    Как получить: {level.obtain}
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">
+                    {level.desc}
+                  </p>
                 </div>
-                <div className="text-sm text-[#b5c9c1]">
-                  Как получить: {level.obtain}
-                </div>
-                <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">
-                  {level.desc}
-                </p>
-              </div>
-            </motion.div>
+              </motion.div>
           );
         })}
       </div>

@@ -78,20 +78,20 @@ export default function ProfileHeaderCard({
   const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
   const [isGuestActionsOpen, setIsGuestActionsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const actionsButtonRef = useRef<HTMLButtonElement>(null);
-  const guestActionsButtonRef = useRef<HTMLButtonElement>(null);
+  const actionsButtonRef = useRef<HTMLElement | null>(null);
+  const guestActionsButtonRef = useRef<HTMLElement | null>(null);
 
   const status = useUserStatus(user.lastSeen || null);
   const theme = useMemo(() => getHeaderTheme(currentHeaderTheme || "default"), [currentHeaderTheme]);
   const ownerMenuStyle = useFloatingMenu({
     isOpen: isActionsMenuOpen,
-    anchorRef: actionsButtonRef as React.RefObject<HTMLElement | null>,
+    anchorRef: actionsButtonRef,
     menuSelector: '[data-menu="actions"]',
     onClose: () => setIsActionsMenuOpen(false),
   });
   const guestMenuStyle = useFloatingMenu({
     isOpen: isGuestActionsOpen,
-    anchorRef: guestActionsButtonRef as React.RefObject<HTMLElement | null>,
+    anchorRef: guestActionsButtonRef,
     menuSelector: '[data-menu="guest"]',
     onClose: () => setIsGuestActionsOpen(false),
   });

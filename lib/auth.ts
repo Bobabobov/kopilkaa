@@ -71,9 +71,15 @@ export function verifySession(
 export async function getSession(): Promise<SessionPayload | null> {
   try {
     const cookieStore = await cookies();
+    if (!cookieStore) return null;
     const token = cookieStore.get(COOKIE_NAME)?.value;
     return verifySession(token);
-  } catch {
+  } catch (error) {
+    // В Next.js 14 cookies() может выбросить ошибку "digest" в некоторых контекстах
+    // Игнорируем и возвращаем null
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[getSession] Error accessing cookies:", error);
+    }
     return null;
   }
 }
@@ -110,6 +116,7 @@ export async function setSession(payload: Omit<SessionPayload, "exp">) {
   try {
     const token = signSession(payload);
     const cookieStore = await cookies();
+    if (!cookieStore) return;
     cookieStore.set(COOKIE_NAME, token, {
       httpOnly: true,
       sameSite: "lax",
@@ -117,7 +124,11 @@ export async function setSession(payload: Omit<SessionPayload, "exp">) {
       path: "/",
       maxAge: MAX_AGE,
     });
-  } catch {
+  } catch (error) {
+    // В Next.js 14 cookies() может выбросить ошибку "digest" в некоторых контекстах
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[setSession] Error accessing cookies:", error);
+    }
     // ignore
   }
 }
@@ -125,12 +136,17 @@ export async function setSession(payload: Omit<SessionPayload, "exp">) {
 export async function clearSession() {
   try {
     const cookieStore = await cookies();
+    if (!cookieStore) return;
     cookieStore.set(COOKIE_NAME, "", {
       httpOnly: true,
       expires: new Date(0),
       path: "/",
     });
-  } catch {
+  } catch (error) {
+    // В Next.js 14 cookies() может выбросить ошибку "digest" в некоторых контекстах
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[clearSession] Error accessing cookies:", error);
+    }
     // ignore
   }
 }

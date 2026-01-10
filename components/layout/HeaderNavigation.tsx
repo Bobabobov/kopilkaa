@@ -9,6 +9,7 @@ const links: { href: Route; label: string }[] = [
   { href: "/", label: "Главная" },
   { href: "/news", label: "Новости" },
   { href: "/stories", label: "Истории" },
+  { href: "/reviews", label: "Отзывы" },
   { href: "/applications", label: "Заявка" },
   { href: "/reports", label: "Баги" },
   { href: "/games", label: "Игры" },

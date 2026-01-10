@@ -114,8 +114,8 @@ export function ReviewForm({
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <label className="text-sm font-medium text-[#abd1c6]">Фото (до 5)</label>
-            <label className="inline-flex items-center gap-2 rounded-full bg-[#001e1d]/50 px-3 py-1.5 text-xs font-semibold text-[#fffffe] border border-[#abd1c6]/50 cursor-pointer hover:border-[#f9bc60]/70 transition-colors">
-              <LucideIcons.Image size="xs" className="text-[#f9bc60]" />
+            <label className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#f9bc60]/90 to-[#f9bc60]/80 hover:from-[#f9bc60] hover:to-[#f9bc60] px-4 py-2 text-xs sm:text-sm font-semibold text-[#001e1d] border border-[#f9bc60]/60 cursor-pointer hover:border-[#f9bc60] hover:shadow-lg hover:shadow-[#f9bc60]/30 transition-all hover:-translate-y-0.5 active:translate-y-0">
+              <LucideIcons.Image size="xs" className="text-[#001e1d]" />
               Добавить
               <input
                 type="file"

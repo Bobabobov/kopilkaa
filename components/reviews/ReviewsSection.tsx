@@ -2,10 +2,12 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { useReviews } from "@/hooks/reviews/useReviews";
 import { ReviewForm } from "./ReviewForm";
 import { ReviewsList } from "./ReviewsList";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 
 export function ReviewsSection() {
   const {
@@ -126,6 +128,59 @@ export function ReviewsSection() {
           </div>
           <span className="h-px flex-1 max-w-[120px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
         </div>
+
+        {/* Telegram канал баннер */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="relative overflow-hidden rounded-2xl border border-[#229ED9]/40 bg-gradient-to-br from-[#229ED9]/15 via-[#001e1d]/60 to-[#001e1d]/70 backdrop-blur-xl p-4 sm:p-5 shadow-[0_15px_40px_-20px_rgba(34,158,217,0.3)] hover:shadow-[0_20px_50px_-20px_rgba(34,158,217,0.4)] hover:border-[#229ED9]/60 transition-all"
+        >
+          {/* Подсветки */}
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#229ED9]/20 blur-3xl rounded-full" />
+            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#f9bc60]/10 blur-2xl rounded-full" />
+          </div>
+
+          <Link
+            href="https://t.me/+MVL9z_I6LOVjNmE6"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative z-10 flex flex-col sm:flex-row items-center gap-4 group"
+          >
+            <div className="relative flex-shrink-0">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-[#229ED9]/50 bg-white/5 backdrop-blur-sm shadow-lg group-hover:border-[#229ED9] group-hover:shadow-xl group-hover:shadow-[#229ED9]/30 transition-all group-hover:scale-105">
+                <img
+                  src="/logo12.png"
+                  alt="Логотип"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "/logo.png";
+                  }}
+                />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#229ED9] rounded-full border-2 border-[#001e1d] flex items-center justify-center shadow-lg">
+                <TelegramIcon className="w-3.5 h-3.5 text-white" />
+              </div>
+            </div>
+
+            <div className="flex-1 text-center sm:text-left space-y-2 min-w-0">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <TelegramIcon className="w-5 h-5 text-[#229ED9] flex-shrink-0" />
+                <h4 className="text-base sm:text-lg font-semibold text-[#fffffe] group-hover:text-[#229ED9] transition-colors">
+                  Больше историй в Telegram
+                </h4>
+              </div>
+              <p className="text-sm text-[#abd1c6]/90">
+                Присоединяйтесь к нашему Telegram-каналу, где собраны все отзывы и истории участников
+              </p>
+              <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-[#229ED9] font-medium group-hover:text-[#4ab8e8] transition-colors">
+                <span>Перейти в канал</span>
+                <LucideIcons.ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+          </Link>
+        </motion.div>
 
         <ReviewsList reviews={reviews} />
       </div>

@@ -321,6 +321,14 @@ enum ProjectNewsBadge {
   IMPORTANT
 }
 
+// Вспомогательная таблица для enum в SQLite - сохраняем, чтобы Prisma не удаляла её
+// Эта таблица создаётся автоматически для enum ProjectNewsBadge в SQLite и содержит 4 записи
+model ProjectNewsBadgeTable {
+  value String @id
+
+  @@map("ProjectNewsBadge")
+}
+
 model ProjectNewsPost {
   id       String @id @default(cuid())
   authorId String

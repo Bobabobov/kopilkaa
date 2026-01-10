@@ -34,18 +34,18 @@ export default function LightPillar({
 }: LightPillarProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number | null>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const cameraRef = useRef<THREE.OrthographicCamera | null>(null);
-  const geometryRef = useRef<THREE.PlaneGeometry | null>(null);
-  const mouseRef = useRef(new THREE.Vector2(0, 0));
+  const rendererRef = useRef<any>(null);
+  const materialRef = useRef<any>(null);
+  const sceneRef = useRef<any>(null);
+  const cameraRef = useRef<any>(null);
+  const geometryRef = useRef<any>(null);
+  const mouseRef = useRef(new (THREE as any).Vector2(0, 0));
   const timeRef = useRef(0);
   const [webGLSupported, setWebGLSupported] = useState(true);
 
   const parseColor = useCallback((hex: string) => {
-    const color = new THREE.Color(hex);
-    return new THREE.Vector3(color.r, color.g, color.b);
+    const color = new (THREE as any).Color(hex);
+    return new (THREE as any).Vector3(color.r, color.g, color.b);
   }, []);
 
   // Check WebGL support once
@@ -66,14 +66,14 @@ export default function LightPillar({
     const height = container.clientHeight;
 
     // Scene setup
-    const scene = new THREE.Scene();
+    const scene = new (THREE as any).Scene();
     sceneRef.current = scene;
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const camera = new (THREE as any).OrthographicCamera(-1, 1, 1, -1, 0, 1);
     cameraRef.current = camera;
 
-    let renderer: THREE.WebGLRenderer;
+    let renderer: any;
     try {
-      renderer = new THREE.WebGLRenderer({
+      renderer = new (THREE as any).WebGLRenderer({
         antialias: false,
         alpha: true,
         powerPreference: "high-performance",
@@ -220,7 +220,7 @@ export default function LightPillar({
       }
     `;
 
-    const material = new THREE.ShaderMaterial({
+    const material = new (THREE as any).ShaderMaterial({
       vertexShader,
       fragmentShader,
       uniforms: {
@@ -243,7 +243,7 @@ export default function LightPillar({
     });
     materialRef.current = material;
 
-    const geometry = new THREE.PlaneGeometry(2, 2);
+    const geometry = new (THREE as any).PlaneGeometry(2, 2);
     geometryRef.current = geometry;
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);

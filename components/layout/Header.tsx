@@ -223,15 +223,15 @@ export default function Header() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.2 }}
-              className="min-[1200px]:hidden fixed left-0 right-0 z-40 border-t border-[#abd1c6]/15 backdrop-blur-md shadow-2xl rounded-b-3xl bg-[#001e1d]/88 overflow-hidden"
+              className="min-[1200px]:hidden fixed left-0 right-0 z-40 border-t border-[#abd1c6]/25 backdrop-blur-xl shadow-2xl rounded-b-3xl bg-[#001e1d]/98 overflow-hidden"
               style={{ 
                 top: `${menuTop}px`,
                 maxHeight: `calc(100vh - ${menuTop + 12}px)`,
               }}
             >
               {/* Подсветки для мобильного меню (ослабленные) */}
-              <div className="pointer-events-none absolute top-0 right-0 w-36 h-36 bg-gradient-to-br from-[#f9bc60]/10 to-transparent rounded-full blur-[52px]"></div>
-              <div className="pointer-events-none absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#e16162]/10 to-transparent rounded-full blur-[52px]"></div>
+              <div className="pointer-events-none absolute top-0 right-0 w-36 h-36 bg-gradient-to-br from-[#f9bc60]/6 to-transparent rounded-full blur-[52px]"></div>
+              <div className="pointer-events-none absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#e16162]/6 to-transparent rounded-full blur-[52px]"></div>
 
               <div className="container-p py-4 space-y-3 overflow-y-auto relative z-10">
                 {/* Навигационные ссылки */}

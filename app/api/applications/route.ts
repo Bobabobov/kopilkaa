@@ -8,6 +8,7 @@ import {
   sanitizeApplicationStoryHtml,
 } from "@/lib/applications/sanitize";
 import { getTrustLevelFromApprovedCount, getTrustLimits } from "@/lib/trustLevel";
+import { ApplicationStatus } from "@prisma/client";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -158,8 +159,27 @@ export async function POST(req: Request) {
     // Проверка уровня доверия и допустимой суммы (кроме администраторов и вайтлиста)
     if (session.role !== "ADMIN" && !isWhitelisted) {
       const approvedCount = await prisma.application.count({
-        where: { userId: session.uid, status: "APPROVED" },
+        where: { userId: session.uid, status: ApplicationStatus.APPROVED },
       });
+      
+      // Если есть одобренная заявка, проверяем наличие отзыва
+      if (approvedCount > 0) {
+        const review = await prisma.review.findUnique({
+          where: { userId: session.uid },
+          select: { id: true },
+        });
+        
+        if (!review) {
+          return Response.json(
+            { 
+              error: "Для создания новой заявки необходимо сначала оставить отзыв о предыдущей одобренной заявке. Перейдите на страницу /reviews и оставьте отзыв.",
+              requiresReview: true,
+            },
+            { status: 403 },
+          );
+        }
+      }
+      
       const trustLevel = getTrustLevelFromApprovedCount(approvedCount);
       const limits = getTrustLimits(trustLevel);
       if (amountNumber < limits.min || amountNumber > limits.max) {

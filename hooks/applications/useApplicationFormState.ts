@@ -51,6 +51,7 @@ export function useApplicationFormState() {
   const [introOpen, setIntroOpen] = useState(false);
   const [introChecked, setIntroChecked] = useState(false);
   const [approvedCount, setApprovedCount] = useState<number | null>(null);
+  const [hasReview, setHasReview] = useState<boolean | null>(null);
   const isAdmin = user?.role === "ADMIN";
   const [rewardedPassed, setRewardedPassed] = useState(false);
   const [rewardedLoading, setRewardedLoading] = useState(false);
@@ -207,18 +208,27 @@ export function useApplicationFormState() {
 
   useEffect(() => {
     if (!user) return;
-    fetch("/api/profile/stats", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        const approved =
-          d?.approvedApplications ??
-          d?.applications?.approved ??
-          d?.applications?.approvedApplications;
-        if (typeof approved === "number" && approved >= 0) {
-          setApprovedCount(approved);
-        }
-      })
-      .catch(() => {});
+    Promise.all([
+      fetch("/api/profile/stats", { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => {
+          const approved =
+            d?.approvedApplications ??
+            d?.applications?.approved ??
+            d?.applications?.approvedApplications;
+          if (typeof approved === "number" && approved >= 0) {
+            setApprovedCount(approved);
+          }
+        })
+        .catch(() => {}),
+      fetch("/api/reviews", { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => {
+          const review = d?.viewer?.review;
+          setHasReview(Boolean(review));
+        })
+        .catch(() => {}),
+    ]);
   }, [user]);
 
   const storyTextLen = useMemo(() => {
@@ -450,6 +460,9 @@ export function useApplicationFormState() {
         window.location.href = href;
         return;
       }
+      if (r.status === 403 && d?.requiresReview) {
+        throw new Error(d?.error || "Необходимо оставить отзыв перед созданием новой заявки");
+      }
       if (r.status === 429) {
         if (d?.leftMs) {
           setLeft(d.leftMs);
@@ -678,6 +691,8 @@ export function useApplicationFormState() {
     introChecked,
     setIntroChecked,
     approvedCount,
+    hasReview,
+    requiresReview: approvedCount !== null && approvedCount > 0 && hasReview === false,
     trustLevel,
     trustLimits,
     trustHint,

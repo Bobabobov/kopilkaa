@@ -88,15 +88,14 @@ export default function ReviewDetailPage() {
           {/* Хедер с картинкой */}
           <div className="relative">
             <div className="aspect-[2/1] sm:aspect-[16/7] w-full overflow-hidden bg-gradient-to-br from-[#001e1d] via-[#0b2f2c] to-[#102b2a]">
-              {heroImage ? (
-                <img
-                  src={heroImage}
-                  alt="Обложка отзыва"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="h-full w-full bg-[radial-gradient(circle_at_30%_20%,rgba(249,188,96,0.18),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(161,231,197,0.12),transparent_30%),radial-gradient(circle_at_50%_90%,rgba(225,97,98,0.12),transparent_35%)]" />
-              )}
+              <img
+                src={heroImage || "/stories-preview.jpg"}
+                alt="Обложка отзыва"
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/stories-preview.jpg";
+                }}
+              />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-[#000000cc] via-[#00000066] to-transparent" />
 

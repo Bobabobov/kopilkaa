@@ -160,7 +160,7 @@ window.yaContextCb.push(() => {
           <div className="xl:col-span-3 order-1 lg:order-2">
             <TrustLevelsInfo />
 
-            {requiresReview ? (
+              {requiresReview ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

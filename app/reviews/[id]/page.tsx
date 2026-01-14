@@ -7,6 +7,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
+import { StoryLightbox } from "@/components/stories/StoryLightbox";
 import type { ReviewItem } from "@/hooks/reviews/useReviews";
 
 export default function ReviewDetailPage() {
@@ -15,6 +16,8 @@ export default function ReviewDetailPage() {
   const id = params?.id as string;
   const [review, setReview] = useState<ReviewItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -87,16 +90,42 @@ export default function ReviewDetailPage() {
 
           {/* Хедер с картинкой */}
           <div className="relative">
-            <div className="aspect-[2/1] sm:aspect-[16/7] w-full overflow-hidden bg-gradient-to-br from-[#001e1d] via-[#0b2f2c] to-[#102b2a]">
-              <img
-                src={heroImage || "/stories-preview.jpg"}
-                alt="Обложка отзыва"
-                className="h-full w-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = "/stories-preview.jpg";
+            {review.images && review.images.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setLightboxIndex(0);
+                  setLightboxOpen(true);
                 }}
-              />
-            </div>
+                className="aspect-[2/1] sm:aspect-[16/7] w-full overflow-hidden bg-gradient-to-br from-[#001e1d] via-[#0b2f2c] to-[#102b2a] relative group cursor-pointer"
+              >
+                <img
+                  src={heroImage || "/stories-preview.jpg"}
+                  alt="Обложка отзыва"
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  onError={(e) => {
+                    e.currentTarget.src = "/stories-preview.jpg";
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/20">
+                    <LucideIcons.ZoomIn size="sm" className="text-white" />
+                    <span className="text-xs text-white font-medium">Открыть фото</span>
+                  </div>
+                </div>
+              </button>
+            ) : (
+              <div className="aspect-[2/1] sm:aspect-[16/7] w-full overflow-hidden bg-gradient-to-br from-[#001e1d] via-[#0b2f2c] to-[#102b2a]">
+                <img
+                  src="/stories-preview.jpg"
+                  alt="Обложка отзыва"
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "/stories-preview.jpg";
+                  }}
+                />
+              </div>
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#000000cc] via-[#00000066] to-transparent" />
 
             <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4 flex flex-col gap-2 sm:gap-3 md:gap-4 md:flex-row md:items-end md:justify-between w-auto min-w-0">
@@ -187,18 +216,29 @@ export default function ReviewDetailPage() {
               <section className="space-y-2 sm:space-y-3 w-full min-w-0">
                 <h3 className="text-xs sm:text-sm font-semibold text-white/80">Фото</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 w-full">
-                  {review.images.map((img) => (
-                    <div
+                  {review.images.map((img, index) => (
+                    <button
                       key={img.url}
-                      className="group relative overflow-hidden rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 shadow-lg w-full"
+                      type="button"
+                      onClick={() => {
+                        setLightboxIndex(index);
+                        setLightboxOpen(true);
+                      }}
+                      className="group relative overflow-hidden rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 shadow-lg w-full cursor-pointer hover:border-white/20 transition-all"
                     >
                       <img
                         src={img.url}
                         alt="Фото отзыва"
                         className="w-full h-40 xs:h-44 sm:h-48 md:h-52 object-cover transition-transform duration-300 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/10 to-transparent pointer-events-none" />
-                    </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/10 to-transparent pointer-events-none group-hover:from-black/50 transition-colors" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm border border-white/20">
+                          <LucideIcons.ZoomIn size="sm" className="text-white" />
+                          <span className="text-xs text-white font-medium">Открыть</span>
+                        </div>
+                      </div>
+                    </button>
                   ))}
                 </div>
               </section>
@@ -229,6 +269,22 @@ export default function ReviewDetailPage() {
           </div>
         </article>
       </div>
+
+      {/* Lightbox для фото */}
+      {review.images && review.images.length > 0 && (
+        <StoryLightbox
+          isOpen={lightboxOpen}
+          images={review.images}
+          currentIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+          onPrevious={() => {
+            setLightboxIndex((prev) => (prev > 0 ? prev - 1 : review.images.length - 1));
+          }}
+          onNext={() => {
+            setLightboxIndex((prev) => (prev < review.images.length - 1 ? prev + 1 : 0));
+          }}
+        />
+      )}
     </main>
   );
 }

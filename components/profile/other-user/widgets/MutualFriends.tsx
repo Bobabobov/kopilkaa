@@ -83,12 +83,23 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl p-5 border border-[#abd1c6]/20 min-h-[160px]"
+        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/3 backdrop-blur-xl shadow-lg p-4 sm:p-5 min-h-[200px]"
       >
-        <div className="animate-pulse space-y-3">
-          <div className="h-5 bg-[#abd1c6]/20 rounded w-32" />
-          <div className="h-4 bg-[#abd1c6]/10 rounded w-24" />
-          <div className="h-10 bg-[#abd1c6]/10 rounded-xl" />
+        <div className="animate-pulse space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/10 rounded-xl" />
+              <div className="space-y-2">
+                <div className="h-4 bg-white/10 rounded w-24" />
+                <div className="h-3 bg-white/5 rounded w-16" />
+              </div>
+            </div>
+            <div className="w-10 h-6 bg-white/10 rounded-full" />
+          </div>
+          <div className="space-y-2.5">
+            <div className="h-14 bg-white/5 rounded-xl" />
+            <div className="h-14 bg-white/5 rounded-xl" />
+          </div>
         </div>
       </motion.div>
     );
@@ -99,9 +110,29 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl p-5 border border-[#abd1c6]/20 min-h-[160px] flex items-center justify-center"
+        transition={{ duration: 0.3 }}
+        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/3 backdrop-blur-xl shadow-lg"
       >
-        <p className="text-sm text-[#abd1c6]">У пользователя пока нет друзей.</p>
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#f9bc60]/10 blur-3xl rounded-full" />
+        </div>
+        <div className="relative z-10 p-4 sm:p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center">
+              <LucideIcons.Users className="w-5 h-5 text-[#f9bc60]" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white">Друзья</h3>
+            </div>
+          </div>
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-3">
+              <LucideIcons.Users className="w-8 h-8 text-white/40" />
+            </div>
+            <p className="text-sm font-medium text-white/80 mb-1">Пока нет друзей</p>
+            <p className="text-xs text-white/60">У пользователя пока нет друзей</p>
+          </div>
+        </div>
       </motion.div>
     );
   }
@@ -110,98 +141,124 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[#004643]/30 backdrop-blur-sm rounded-2xl p-5 border border-[#abd1c6]/20 min-h-[160px] flex flex-col"
+      transition={{ duration: 0.3 }}
+      className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/3 backdrop-blur-xl shadow-lg"
     >
-      <motion.div 
-        className="flex items-center justify-between mb-3"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <div className="flex items-center gap-2">
-          <motion.div 
-            className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#f9bc60] to-[#e8a545] flex items-center justify-center text-sm text-[#001e1d] shadow-lg shadow-[#f9bc60]/30"
-            animate={{ 
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, -5, 0]
-            }}
-            transition={{ 
-              duration: 2,
-              repeat: Infinity,
-              repeatDelay: 2
-            }}
-          >
-            👥
-          </motion.div>
-          <h3 className="text-sm font-bold text-[#fffffe] bg-gradient-to-r from-[#fffffe] to-[#abd1c6] bg-clip-text text-transparent">
-            Друзья
-          </h3>
-        </div>
-        <motion.span 
-          className="text-xs font-bold text-[#f9bc60] bg-gradient-to-br from-[#f9bc60]/20 to-[#e8a545]/10 px-3 py-1.5 rounded-full border border-[#f9bc60]/30 shadow-md"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", delay: 0.2 }}
-        >
-          {users.length}
-        </motion.span>
-      </motion.div>
-
-      <div className="space-y-2 flex-1">
-        {users.slice(0, 3).map((u, index) => (
-          <motion.div
-            key={u.id}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.05 }}
-          >
-            <motion.div
-              whileHover={{ scale: 1.02, x: 5 }}
-            >
-              <Link
-                href={`/profile/${u.id}`}
-                prefetch={false}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#001e1d]/40 to-[#001e1d]/20 hover:from-[#001e1d]/60 hover:to-[#001e1d]/40 border border-[#abd1c6]/20 hover:border-[#f9bc60]/50 transition-all hover:shadow-lg hover:shadow-[#f9bc60]/20"
-              >
-              <img
-                src={u.avatar || "/default-avatar.png"}
-                alt=""
-                className="w-9 h-9 rounded-full object-cover border-2 border-[#abd1c6]/30"
-                onError={(e) => {
-                  e.currentTarget.src = "/default-avatar.png";
-                }}
-              />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="truncate text-xs font-semibold text-[#fffffe]">
-                    {u.name || (u.email ? u.email.split("@")[0] : "Пользователь")}
-                  </p>
-                  <HeroBadge badge={u.heroBadge} size="xs" />
-                  {getUserStatus(u.lastSeen || null).status === "online" && (
-                    <div className="w-2 h-2 bg-[#10B981] rounded-full flex-shrink-0" />
-                  )}
-                </div>
-                <p className="text-[10px] text-[#abd1c6]/70 mt-0.5">
-                  {getUserStatus(u.lastSeen || null).status === "online" 
-                    ? "Онлайн" 
-                    : `Был(а) в сети: ${getUserStatus(u.lastSeen || null).text}`
-                  }
-                </p>
-              </div>
-            </Link>
-            </motion.div>
-          </motion.div>
-        ))}
+      {/* Подсветки */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#f9bc60]/10 blur-3xl rounded-full" />
+        <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-[#abd1c6]/10 blur-2xl rounded-full" />
       </div>
 
-      {users.length > 3 && (
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="mt-3 w-full text-[11px] text-[#abd1c6]/80 hover:text-[#f9bc60] underline underline-offset-4 text-center"
+      <div className="relative z-10 p-4 sm:p-5 flex flex-col">
+        {/* Header */}
+        <motion.div 
+          className="flex items-center justify-between mb-4"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
         >
-          Показать всех друзей ({users.length})
-        </button>
-      )}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center shadow-lg">
+              <LucideIcons.Users className="w-5 h-5 text-[#f9bc60]" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white">Друзья</h3>
+              <p className="text-xs text-white/60 mt-0.5">
+                {users.length === 1 ? "1 друг" : `${users.length} друзей`}
+              </p>
+            </div>
+          </div>
+          <div className="px-3 py-1.5 rounded-full bg-[#f9bc60]/15 border border-[#f9bc60]/30">
+            <span className="text-sm font-bold text-[#f9bc60]">{users.length}</span>
+          </div>
+        </motion.div>
+
+        {/* Friends List */}
+        <div className="space-y-2.5 flex-1">
+          {users.slice(0, 3).map((u, index) => {
+            const status = getUserStatus(u.lastSeen || null);
+            const isOnline = status.status === "online";
+            
+            return (
+              <motion.div
+                key={u.id}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15 + index * 0.05 }}
+              >
+                <Link
+                  href={`/profile/${u.id}`}
+                  prefetch={false}
+                  className="group flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#f9bc60]/40 transition-all duration-200 hover:shadow-lg hover:shadow-[#f9bc60]/10"
+                >
+                  {/* Avatar */}
+                  <div className="relative flex-shrink-0">
+                    <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 group-hover:border-[#f9bc60]/50 transition-colors shadow-md">
+                      <img
+                        src={u.avatar || "/default-avatar.png"}
+                        alt={u.name || "Пользователь"}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = "/default-avatar.png";
+                        }}
+                      />
+                    </div>
+                    {isOnline && (
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#10B981] rounded-full border-2 border-[#001e1d] shadow-lg" />
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="truncate text-sm font-semibold text-white group-hover:text-[#f9bc60] transition-colors">
+                        {u.name || (u.email ? u.email.split("@")[0] : "Пользователь")}
+                      </p>
+                      {u.heroBadge && (
+                        <HeroBadge badge={u.heroBadge} size="xs" />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-white/60">
+                      {isOnline ? (
+                        <>
+                          <div className="w-1.5 h-1.5 bg-[#10B981] rounded-full" />
+                          <span>Онлайн</span>
+                        </>
+                      ) : (
+                        <>
+                          <LucideIcons.Calendar className="w-3 h-3" />
+                          <span>Был(а): {status.text}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Arrow */}
+                  <LucideIcons.ChevronRight className="w-4 h-4 text-white/40 group-hover:text-[#f9bc60] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Show All Button */}
+        {users.length > 3 && (
+          <motion.button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mt-4 w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#f9bc60]/40 text-sm font-medium text-white/80 hover:text-[#f9bc60] transition-all duration-200 flex items-center justify-center gap-2"
+          >
+            <span>Показать всех</span>
+            <span className="text-xs text-white/60">({users.length})</span>
+            <LucideIcons.ArrowRight className="w-4 h-4" />
+          </motion.button>
+        )}
+      </div>
 
       <OtherUserFriendsModal
         userId={userId}

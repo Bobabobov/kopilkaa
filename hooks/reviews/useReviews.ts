@@ -45,6 +45,7 @@ type ReviewsResponse = {
 
 export function useReviews() {
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [data, setData] = useState<ReviewsResponse | null>(null);
   const { showToast, ToastComponent } = useBeautifulToast();
@@ -55,31 +56,58 @@ export function useReviews() {
     showToastRef.current = showToast;
   }, [showToast]);
 
-  const fetchReviews = useCallback(async () => {
-    setLoading(true);
+  const fetchReviews = useCallback(async (page: number = 1, append: boolean = false) => {
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
     try {
-      const res = await fetch("/api/reviews", { cache: "no-store", signal: controller.signal });
+      const res = await fetch(`/api/reviews?page=${page}&limit=12`, { cache: "no-store", signal: controller.signal });
       if (!res.ok) {
         const text = await res.text().catch(() => "");
         throw new Error(text || "Не удалось загрузить отзывы");
       }
       const json = (await res.json()) as ReviewsResponse;
-      setData(json);
+      if (append) {
+        setData((prev) => {
+          if (!prev) return json;
+          return {
+            ...json,
+            items: [...prev.items, ...json.items],
+          };
+        });
+      } else {
+        setData(json);
+      }
     } catch (error) {
       console.error("Failed to load reviews", error);
-      showToastRef.current?.("error", "Ошибка", "Не удалось загрузить отзывы");
-      setData(null);
+      if (!append) {
+        showToastRef.current?.("error", "Ошибка", "Не удалось загрузить отзывы");
+        setData(null);
+      }
     } finally {
       clearTimeout(timeout);
       setLoading(false);
+      setLoadingMore(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchReviews();
-  }, [fetchReviews]);
+    fetchReviews(1, false);
+  }, []);
+
+  const loadMore = useCallback(() => {
+    if (loadingMore) return;
+    setData((currentData) => {
+      if (!currentData || currentData.page >= currentData.pages) return currentData;
+      // Запускаем загрузку асинхронно
+      fetchReviews(currentData.page + 1, true).catch(console.error);
+      return currentData;
+    });
+  }, [loadingMore, fetchReviews]);
 
   const submitReview = useCallback(
     async (content: string, files: File[], existingUrls: string[] = []) => {
@@ -196,14 +224,25 @@ export function useReviews() {
 
   const viewerReview = useMemo(() => data?.viewer?.review ?? null, [data]);
 
+  const hasMore = useMemo(() => {
+    if (!data) return false;
+    return data.page < data.pages;
+  }, [data]);
+
   return {
     loading,
+    loadingMore,
     submitting,
     reviews: data?.items ?? [],
+    total: data?.total ?? 0,
+    currentPage: data?.page ?? 1,
+    totalPages: data?.pages ?? 0,
+    hasMore,
     canReview: data?.viewer?.canReview ?? false,
     approvedApplications: data?.viewer?.approvedApplications ?? 0,
     viewerReview,
-    refresh: fetchReviews,
+    refresh: () => fetchReviews(1, false),
+    loadMore,
     submitReview,
     deleteReview,
     ToastComponent,

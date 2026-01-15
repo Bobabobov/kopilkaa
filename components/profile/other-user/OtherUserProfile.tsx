@@ -9,9 +9,10 @@ import OtherUserLoadingStates from "./OtherUserLoadingStates";
 import OtherUserPersonalStats from "./OtherUserPersonalStats";
 import OtherUserAchievements from "./OtherUserAchievements";
 import OtherUserActivity from "./OtherUserActivity";
-import OtherUserDonations from "./OtherUserDonations";
 import MutualFriends from "./widgets/MutualFriends";
 import ProfileHeaderCard from "@/components/profile/ProfileHeaderCard";
+import ProfileReviewSection from "@/components/profile/sections/ProfileReviewSection";
+import ProfileStoriesSection from "@/components/profile/sections/ProfileStoriesSection";
 import ReportUserModal from "./modals/ReportUserModal";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import TrustLevelCard from "@/components/profile/TrustLevelCard";
@@ -185,13 +186,14 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
                 descriptionOverride="Расчёт по одобренным заявкам этого профиля"
                 extraOverride="Показывает доступный диапазон поддержки для этого участника"
               />
+              <ProfileReviewSection userId={resolvedUserId || user.id} isOwner={false} />
               <OtherUserPersonalStats userId={resolvedUserId || user.id} />
               <OtherUserAchievements userId={resolvedUserId || user.id} />
             </section>
 
             {/* Правая колонка */}
             <aside className="lg:col-span-5 space-y-4 sm:space-y-5 md:space-y-6">
-              <OtherUserDonations userId={resolvedUserId || user.id} />
+              <ProfileStoriesSection userId={resolvedUserId || user.id} isOwner={false} />
               <OtherUserActivity userId={resolvedUserId || user.id} />
             </aside>
           </div>

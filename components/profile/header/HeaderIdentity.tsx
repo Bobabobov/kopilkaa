@@ -13,7 +13,7 @@ interface HeaderIdentityProps {
 
 export function HeaderIdentity({ name, role, heroBadge, status }: HeaderIdentityProps) {
   return (
-    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-0 -mt-8 sm:-mt-10 md:-mt-12">
       <motion.h1
         className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight"
         initial={{ opacity: 0, y: -6 }}
@@ -29,20 +29,6 @@ export function HeaderIdentity({ name, role, heroBadge, status }: HeaderIdentity
         </span>
       )}
       <HeroBadge badge={heroBadge} size="sm" />
-      <div className="flex items-center gap-1.5">
-        <span
-          className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-            status.status === "online" ? "bg-emerald-400" : "bg-slate-400"
-          }`}
-        />
-        <span className="text-sm text-white/90">
-          {status.status === "online"
-            ? status.text
-            : status.text.startsWith("Никогда")
-              ? status.text
-              : `Был(а) ${status.text}`}
-        </span>
-      </div>
     </div>
   );
 }

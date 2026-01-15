@@ -12,12 +12,18 @@ import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 export function ReviewsSection() {
   const {
     loading,
+    loadingMore,
     reviews,
+    total,
+    currentPage,
+    totalPages,
+    hasMore,
     submitting,
     canReview,
     approvedApplications,
     viewerReview,
     refresh,
+    loadMore,
     submitReview,
     deleteReview,
     ToastComponent,
@@ -37,20 +43,13 @@ export function ReviewsSection() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.25, ease: "easeOut" }}
-        className="max-w-6xl mx-auto flex flex-col gap-3 md:flex-row md:items-center md:justify-between px-1"
+        className="max-w-6xl mx-auto px-1"
       >
         <div className="space-y-1">
           <p className="text-xs uppercase tracking-[0.08em] text-[#94a1b2]">Опыт сообщества</p>
           <h1 className="text-2xl md:text-3xl font-bold text-[#fffffe]">{heroTitle.title}</h1>
           <p className="text-sm md:text-base text-[#abd1c6] max-w-5xl">{heroTitle.subtitle}</p>
         </div>
-        <button
-          onClick={refresh}
-          className="inline-flex items-center gap-2 rounded-xl border border-[#abd1c6]/40 bg-[#004643]/60 text-[#fffffe] px-4 py-2.5 text-sm font-semibold hover:border-[#f9bc60]/70 transition-all self-start md:self-center"
-        >
-          <LucideIcons.RefreshCw size="xs" />
-          Обновить
-        </button>
       </motion.div>
 
       {viewerReview ? (
@@ -122,6 +121,11 @@ export function ReviewsSection() {
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 bg-white/5 border border-white/10 text-white/90 shadow-[0_12px_30px_-24px_rgba(0,0,0,0.8)]">
             <LucideIcons.MessageCircle size="sm" className="text-[#f9bc60]" />
             <h3 className="text-base sm:text-lg font-semibold tracking-wide">Свежие отзывы</h3>
+            {total > 0 && (
+              <span className="text-xs text-white/60 font-medium">
+                ({total.toLocaleString("ru-RU")})
+              </span>
+            )}
             {loading && (
               <LucideIcons.Loader2 className="h-4 w-4 animate-spin text-white/70" />
             )}
@@ -182,7 +186,37 @@ export function ReviewsSection() {
           </Link>
         </motion.div>
 
-        <ReviewsList reviews={reviews} />
+        <ReviewsList reviews={reviews} loading={loading} />
+
+        {hasMore && (
+          <div className="flex justify-center pt-4">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="inline-flex items-center gap-2 rounded-xl border border-[#abd1c6]/40 bg-[#004643]/60 text-[#fffffe] px-6 py-3 text-sm font-semibold hover:border-[#f9bc60]/70 hover:bg-[#004643]/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loadingMore ? (
+                <>
+                  <LucideIcons.Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Загрузка...</span>
+                </>
+              ) : (
+                <>
+                  <LucideIcons.ChevronDown size="sm" />
+                  <span>Загрузить еще</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
+
+        {!loading && !hasMore && reviews.length > 0 && (
+          <div className="text-center py-4">
+            <p className="text-sm text-white/60">
+              Показано {reviews.length} из {total.toLocaleString("ru-RU")} отзывов
+            </p>
+          </div>
+        )}
       </div>
 
       <ToastComponent />

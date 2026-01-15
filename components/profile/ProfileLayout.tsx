@@ -4,12 +4,13 @@
 
 import TrustLevelCard from "@/components/profile/TrustLevelCard";
 import type { TrustLevel } from "@/lib/trustLevel";
+import ProfileReviewSection from "./sections/ProfileReviewSection";
+import ProfileStoriesSection from "./sections/ProfileStoriesSection";
 import {
   ProfileHeaderCard,
   ProfilePersonalStats,
   ProfileFriendsSection,
   ProfileAchievements,
-  ProfileDonations,
   ProfileRecentActivity,
   MotivationalCard,
 } from "./ProfileDynamicImports";
@@ -79,6 +80,7 @@ export default function ProfileLayout({
           <main className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-4 xs:gap-5 sm:gap-6 md:gap-6 lg:gap-7">
             <section className="space-y-4 xs:space-y-5 sm:space-y-6 md:space-y-6">
               <MotivationalCard />
+              <ProfileReviewSection userId={user.id} isOwner />
               <ProfilePersonalStats />
               <ProfileRecentActivity />
             </section>
@@ -94,7 +96,7 @@ export default function ProfileLayout({
               />
               <ProfileFriendsSection />
               <ProfileAchievements />
-              <ProfileDonations />
+              <ProfileStoriesSection userId={user.id} isOwner />
             </aside>
           </main>
         </div>

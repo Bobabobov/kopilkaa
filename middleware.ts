@@ -77,6 +77,7 @@ export function middleware(req: NextRequest) {
   const isApplicationsApi = path === "/api/applications";
   const isStoryLikeApi = /^\/api\/stories\/[^/]+\/like$/.test(path);
   const isHeroesApi = path === "/api/heroes";
+  const isReviewsApi = path === "/api/reviews";
 
   let limit: number | null = null;
   let windowMs: number | null = null;
@@ -104,6 +105,11 @@ export function middleware(req: NextRequest) {
     limit = 300;
     windowMs = 60_000;
     retryAfterSec = 60;
+  } else if (isPost && isReviewsApi) {
+    // Отзывы: ограничение на частые отправки (10 запросов/5 минут на IP)
+    limit = 10;
+    windowMs = 5 * 60_000;
+    retryAfterSec = 5 * 60;
   }
 
   if (limit && windowMs && retryAfterSec) {

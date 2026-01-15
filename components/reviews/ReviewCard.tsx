@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
@@ -35,6 +36,7 @@ function SocialChip({
 }
 
 export function ReviewCard({ review }: { review: ReviewItem }) {
+  const router = useRouter();
   const { user } = review;
   const avatarUrl = user.avatar || "/default-avatar.png";
   const trust = user.trust;
@@ -46,12 +48,21 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
 
   const href = `/reviews/${review.id}`;
 
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (profileHref) {
+      router.push(profileHref);
+    }
+  };
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
-      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-[#fdfbf7] to-[#f5f1ea] shadow-[0_20px_45px_-18px_rgba(0,0,0,0.35)] border border-[#e7ede9] hover:shadow-[0_28px_60px_-20px_rgba(0,0,0,0.35)] transition-transform duration-400 hover:-translate-y-2"
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      whileHover={{ y: -4 }}
+      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-[#fdfbf7] to-[#f5f1ea] shadow-[0_20px_45px_-18px_rgba(0,0,0,0.35)] border border-[#e7ede9] hover:shadow-[0_28px_60px_-20px_rgba(0,0,0,0.4)] transition-all duration-300 group"
     >
       <Link
         href={href}
@@ -62,36 +73,42 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
           <img
             src={review.images?.[0]?.url || "/stories-preview.jpg"}
             alt={review.content.slice(0, 40)}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
               e.currentTarget.src = "/stories-preview.jpg";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/15 to-transparent group-hover:from-black/60 transition-colors duration-300" />
           <div className="absolute bottom-3 left-4 flex items-center gap-2 text-white">
             <div className="relative">
               {profileHref ? (
-                <Link
-                  href={profileHref}
-                  className="block rounded-full focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/70"
+                <button
+                  onClick={handleProfileClick}
+                  className="block rounded-full focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/70 cursor-pointer"
                 >
                   <div className="w-10 h-10 rounded-full overflow-hidden border border-white/60 shadow-lg">
                     <img
                       src={avatarUrl}
                       alt={user.name}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         e.currentTarget.src = "/default-avatar.png";
                       }}
                     />
                   </div>
-                </Link>
+                </button>
               ) : (
                 <div className="w-10 h-10 rounded-full overflow-hidden border border-white/60 shadow-lg">
                   <img
                     src={avatarUrl}
                     alt={user.name}
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       e.currentTarget.src = "/default-avatar.png";
                     }}
@@ -101,23 +118,23 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
             </div>
             <div className="flex flex-col">
               {profileHref ? (
-                <Link
-                  href={profileHref}
-                  className="text-sm font-semibold leading-tight hover:text-[#f9bc60] transition-colors"
+                <button
+                  onClick={handleProfileClick}
+                  className="text-sm font-semibold leading-tight hover:text-[#f9bc60] transition-colors text-left cursor-pointer"
                 >
                   {user.name}
-                </Link>
+                </button>
               ) : (
                 <span className="text-sm font-semibold leading-tight">{user.name}</span>
               )}
               {user.username && (
                 profileHref ? (
-                  <Link
-                    href={profileHref}
-                    className="text-[11px] text-white/85 hover:text-white transition-colors"
+                  <button
+                    onClick={handleProfileClick}
+                    className="text-[11px] text-white/85 hover:text-white transition-colors text-left cursor-pointer"
                   >
                     @{user.username}
-                  </Link>
+                  </button>
                 ) : (
                   <span className="text-[11px] text-white/85">@{user.username}</span>
                 )
@@ -135,7 +152,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
             </div>
           </div>
 
-          <p className="text-base leading-relaxed text-[#0f2d25] whitespace-pre-line line-clamp-3">
+          <p className="text-base leading-relaxed text-[#0f2d25] whitespace-pre-line line-clamp-3 group-hover:text-[#001e1d] transition-colors duration-200">
             {review.content}
           </p>
 
@@ -144,13 +161,16 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
               {review.images.slice(0, 2).map((img) => (
                 <div
                   key={img.url}
-                  className="relative overflow-hidden rounded-2xl border border-[#e7ede9]"
+                  className="relative overflow-hidden rounded-2xl border border-[#e7ede9] group/image"
                 >
                   <img
                     src={img.url}
                     alt="Фото отзыва"
-                    className="w-full h-24 sm:h-28 object-cover transition-transform duration-300 hover:scale-[1.04]"
+                    className="w-full h-24 sm:h-28 object-cover transition-transform duration-300 group-hover/image:scale-110"
+                    loading="lazy"
+                    decoding="async"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-300" />
                 </div>
               ))}
             </div>

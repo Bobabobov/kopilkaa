@@ -115,19 +115,6 @@ export default function RootLayout({
     <html lang="ru" suppressHydrationWarning className="dark">
       <head></head>
       <body className={inter.className} suppressHydrationWarning>
-        {/* Yandex.RTB loader (единожды на сайте) */}
-        <Script
-          id="ya-rtb-loader-cb"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: "window.yaContextCb=window.yaContextCb||[]",
-          }}
-        />
-        <Script
-          id="ya-rtb-loader"
-          strategy="afterInteractive"
-          src="https://yandex.ru/ads/system/context.js"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

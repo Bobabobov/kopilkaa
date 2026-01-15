@@ -41,13 +41,13 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
   const getActivityIcon = (type: string) => {
     switch (type) {
     case "application_created":
-      return <LucideIcons.FileText size="sm" />;
+      return <LucideIcons.FileText className="w-4 h-4 text-[#f9bc60]" />;
     case "profile_updated":
-      return <LucideIcons.User size="sm" />;
+      return <LucideIcons.User className="w-4 h-4 text-[#f9bc60]" />;
     case "donation":
-      return <LucideIcons.Heart size="sm" />;
+      return <LucideIcons.Heart className="w-4 h-4 text-[#f9bc60]" />;
     default:
-      return <LucideIcons.Activity size="sm" />;
+      return <LucideIcons.Activity className="w-4 h-4 text-[#f9bc60]" />;
     }
   };
 
@@ -68,20 +68,26 @@ const relativeTime = (date: string) => {
 
   if (loading) {
     return (
-      <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[300px]">
-        <div className="animate-pulse space-y-3 sm:space-y-4">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#abd1c6]/20 rounded-lg"></div>
-            <div className="h-6 bg-[#abd1c6]/20 rounded w-1/4"></div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/3 backdrop-blur-xl shadow-lg p-4 sm:p-5 md:p-6"
+      >
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full" />
+        </div>
+        <div className="relative z-10 animate-pulse space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/10 rounded-xl"></div>
+            <div className="h-5 bg-white/10 rounded w-32"></div>
           </div>
-          <div className="space-y-2 sm:space-y-3">
-            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
-            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
-            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
-            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
+          <div className="space-y-3">
+            <div className="h-16 bg-white/5 rounded-xl"></div>
+            <div className="h-16 bg-white/5 rounded-xl"></div>
+            <div className="h-16 bg-white/5 rounded-xl"></div>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -89,73 +95,54 @@ const relativeTime = (date: string) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[#abd1c6]/20"
+      transition={{ duration: 0.3 }}
+      className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/3 backdrop-blur-xl shadow-lg"
     >
-      {/* Decorative background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-6 -right-6 w-16 h-16 bg-gradient-to-br from-[#f9bc60]/15 to-[#abd1c6]/10 rounded-full blur-xl"></div>
-        <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-gradient-to-br from-[#abd1c6]/10 to-[#f9bc60]/10 rounded-full blur-lg"></div>
+      {/* Подсветки */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full" />
+        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#abd1c6]/10 blur-2xl rounded-full" />
       </div>
 
-      <div className="relative z-10">
-        <motion.div 
-          className="flex items-center gap-3 mb-6"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-        >
-          <motion.div 
-            className="w-10 h-10 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-[#001e1d] text-xl shadow-lg shadow-[#f9bc60]/30"
-            animate={{ 
-              rotate: [0, 10, -10, 0],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ 
-              duration: 2,
-              repeat: Infinity,
-              repeatDelay: 3
-            }}
-          >
-            ⚡
-          </motion.div>
-          <h3 className="text-lg font-bold text-[#fffffe] bg-gradient-to-r from-[#fffffe] to-[#abd1c6] bg-clip-text text-transparent">
-            Активность
-          </h3>
-        </motion.div>
+      <div className="relative z-10 p-4 sm:p-5 md:p-6">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center shadow-lg">
+            <LucideIcons.Activity className="w-5 h-5 text-[#f9bc60]" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white">Активность</h3>
+          </div>
+        </div>
 
         {activities.length === 0 ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-[#f9bc60]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">⚡</span>
+            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <LucideIcons.Activity className="w-8 h-8 text-white/40" />
             </div>
-            <p className="text-[#abd1c6] text-sm">
-              Пока нет активности
-            </p>
+            <p className="text-sm font-medium text-white/80 mb-1">Пока нет активности</p>
           </div>
         ) : (
           <div className="space-y-3">
             {activities.slice(0, 5).map((activity, index) => (
               <motion.div
                 key={activity.id || `other-activity-${index}`}
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="group flex items-start gap-3 p-3.5 rounded-2xl bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl hover:shadow-[#f9bc60]/20"
+                className="group flex items-start gap-3 p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#f9bc60]/40 transition-all"
               >
-                <motion.div 
-                  className="w-10 h-10 bg-gradient-to-br from-[#f9bc60]/30 to-[#e8a545]/20 rounded-xl flex items-center justify-center text-lg text-[#001e1d] group-hover:scale-110 transition-transform shadow-md"
-                  whileHover={{ rotate: 12, scale: 1.15 }}
-                >
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border border-[#f9bc60]/30 flex items-center justify-center flex-shrink-0 shadow-md">
                   {getActivityIcon(activity.type)}
-                </motion.div>
+                </div>
                 <div className="flex-1 min-w-0">
-                  <div
-                    className="text-sm font-semibold text-[#fffffe] mb-1"
-                  >
+                  <div className="text-sm font-semibold text-white mb-1">
                     {activity.description}
                   </div>
-                  <div className="text-xs text-[#94a3b8] flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-xs text-white/60">
+                    <LucideIcons.Calendar className="w-3 h-3" />
                     <span>{relativeTime(activity.createdAt)}</span>
-                    <span className="w-1 h-1 rounded-full bg-[#94a3b8]/50" />
+                    <span>•</span>
                     <span>{new Date(activity.createdAt).toLocaleDateString("ru-RU")}</span>
                   </div>
                 </div>

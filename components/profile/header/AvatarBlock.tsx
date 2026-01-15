@@ -28,6 +28,13 @@ export function AvatarBlock({
   onOpenCover,
   onTriggerAvatar,
 }: AvatarBlockProps) {
+  const statusLabel =
+    status.status === "online"
+      ? status.text
+      : status.text.startsWith("Никогда")
+        ? status.text
+        : `Был(а) ${status.text}`;
+
   if (isOwner) {
     return (
       <div className="flex-shrink-0">
@@ -37,6 +44,14 @@ export function AvatarBlock({
             userName={user.name || (!user.hideEmail && user.email ? user.email : "Пользователь")}
             onAvatarChange={onAvatarChange || (() => {})}
           />
+        </div>
+        <div className="mt-2 flex items-center gap-2 text-sm text-white">
+          <span
+            className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+              status.status === "online" ? "bg-emerald-400" : "bg-slate-400"
+            }`}
+          />
+          <span className="text-white/90">{statusLabel}</span>
         </div>
         <div className="mt-3 flex gap-2">
           <motion.button
@@ -87,6 +102,14 @@ export function AvatarBlock({
           aria-label={status.status === "online" ? "Онлайн" : "Оффлайн"}
           title={status.status === "online" ? "Онлайн" : "Оффлайн"}
         />
+      </div>
+      <div className="mt-2 flex items-center gap-2 text-sm text-white">
+        <span
+          className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+            status.status === "online" ? "bg-emerald-400" : "bg-slate-400"
+          }`}
+        />
+        <span className="text-white/90">{statusLabel}</span>
       </div>
     </div>
   );

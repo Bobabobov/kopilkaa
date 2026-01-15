@@ -33,10 +33,6 @@ type Props = {
   left: number | null;
   err: string | null;
   submit: (e?: FormEvent) => Promise<void>;
-  triggerRewarded: () => void;
-  rewardedPassed: boolean;
-  rewardedLoading: boolean;
-  rewardedUnavailable: boolean;
   hpCompany: string;
   setHpCompany: (v: string) => void;
   progressPercentage: number;
@@ -84,10 +80,6 @@ export function ApplicationsForm(props: Props) {
     left,
     err,
     submit,
-  triggerRewarded,
-  rewardedPassed,
-  rewardedLoading,
-  rewardedUnavailable,
     hpCompany,
     setHpCompany,
     progressPercentage,
@@ -114,11 +106,7 @@ export function ApplicationsForm(props: Props) {
         className="grid gap-6"
         onSubmit={(e) => {
           e.preventDefault();
-          if (rewardedPassed) {
-            submit(e);
-          } else {
-            triggerRewarded();
-          }
+          submit(e);
         }}
         onFocusCapture={() => {
           if (!trustAcknowledged && !policiesAccepted) return;
@@ -267,20 +255,9 @@ export function ApplicationsForm(props: Props) {
         <SubmitSection
           submitting={submitting}
           uploading={uploading}
-          rewardedLoading={rewardedLoading}
-          rewardedPassed={rewardedPassed}
-          rewardedUnavailable={rewardedUnavailable}
           left={left}
           err={err}
           onSubmit={(e) => {
-            e.preventDefault();
-            if (rewardedPassed) {
-              submit(e);
-            } else {
-              triggerRewarded();
-            }
-          }}
-          onFallbackSubmit={(e) => {
             e.preventDefault();
             submit(e);
           }}

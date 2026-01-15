@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import type { AchievementStats as AchievementStatsType } from "@/lib/achievements/types";
 import OtherUserAchievementsModal from "./OtherUserAchievementsModal";
-import { AchievementsTimeline } from "./widgets/AchievementsTimeline";
 
 interface UserAchievement {
   id: string;
@@ -80,129 +79,141 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
 
   if (loading) {
     return (
-      <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[250px]">
-        <div className="animate-pulse space-y-4">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#abd1c6]/20 rounded-lg"></div>
-            <div className="h-6 bg-[#abd1c6]/20 rounded w-1/2"></div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/3 backdrop-blur-xl shadow-lg p-4 sm:p-5 md:p-6"
+      >
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full" />
+        </div>
+        <div className="relative z-10 animate-pulse space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/10 rounded-xl"></div>
+            <div className="space-y-2">
+              <div className="h-5 bg-white/10 rounded w-32"></div>
+              <div className="h-3 bg-white/5 rounded w-24"></div>
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
-            <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
-          </div>
-          <div className="h-12 bg-[#abd1c6]/10 rounded-lg"></div>
-          <div className="space-y-2">
-            <div className="h-14 bg-[#abd1c6]/10 rounded-lg"></div>
-            <div className="h-14 bg-[#abd1c6]/10 rounded-lg"></div>
+          <div className="space-y-3">
+            <div className="h-16 bg-white/5 rounded-xl"></div>
+            <div className="h-16 bg-white/5 rounded-xl"></div>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[250px]"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/3 backdrop-blur-xl shadow-lg"
     >
-      {/* Улучшенный заголовок */}
-      <motion.div 
-        className="flex items-center justify-between mb-4"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <div className="flex items-center gap-3">
-          <motion.div 
-            className="w-10 h-10 bg-gradient-to-br from-[#f9bc60] via-[#e8a545] to-[#f9bc60] rounded-xl flex items-center justify-center shadow-lg shadow-[#f9bc60]/30"
-            animate={{ 
-              rotate: [0, 5, -5, 0],
-              scale: [1, 1.05, 1]
-            }}
-            transition={{ 
-              duration: 3,
-              repeat: Infinity,
-              repeatDelay: 2
-            }}
-          >
-            <LucideIcons.Award size="sm" className="text-[#001e1d]" />
-          </motion.div>
+      {/* Подсветки */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full" />
+        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#abd1c6]/10 blur-2xl rounded-full" />
+      </div>
+
+      <div className="relative z-10 p-4 sm:p-5 md:p-6">
+        {/* Заголовок */}
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center shadow-lg">
+            <LucideIcons.Award className="w-5 h-5 text-[#f9bc60]" />
+          </div>
           <div>
-            <h3 className="text-base font-bold text-[#fffffe] bg-gradient-to-r from-[#fffffe] to-[#f9bc60] bg-clip-text text-transparent">
-              Достижения
-            </h3>
+            <h3 className="text-lg font-bold text-white">Достижения</h3>
             {stats && (
-              <p className="text-[11px] text-[#abd1c6] font-medium">
-                <span className="text-[#f9bc60] font-bold">{stats.unlockedAchievements}</span> из <span className="text-[#abd1c6]">{stats.totalAchievements}</span> разблокировано
+              <p className="text-xs text-white/60 mt-0.5">
+                {stats.unlockedAchievements} из {stats.totalAchievements} разблокировано
               </p>
             )}
           </div>
         </div>
-      </motion.div>
 
-      {!achievements.length ? (
-        <div className="py-6 text-center text-sm text-[#abd1c6]">
-          У пользователя пока нет достижений.
-        </div>
-      ) : (
-        <>
-          <div className="space-y-2 flex-1">
-            {displayedAchievements.map((ua, index) => (
-              <motion.div
-                key={ua.id}
-                className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#001e1d]/50 to-[#001e1d]/30 border border-[#abd1c6]/30 hover:border-[#f9bc60]/50 transition-all hover:shadow-lg hover:shadow-[#f9bc60]/20"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.02, x: 5 }}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <motion.div 
-                    className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#f9bc60]/30 to-[#e8a545]/20 flex items-center justify-center shadow-md"
-                    whileHover={{ rotate: 15, scale: 1.1 }}
-                  >
-                    <LucideIcons.Star size="xs" className="text-[#f9bc60]" />
-                  </motion.div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-[#fffffe]">
-                      {ua.achievement.name}
-                    </p>
-                    <p className="text-[11px] text-[#abd1c6]/70 truncate">
-                      {new Date(ua.unlockedAt).toLocaleDateString("ru-RU")}
-                    </p>
-                  </div>
-                </div>
-                <span className="text-[11px] text-[#f9bc60] font-semibold">
-                  {getRarityName(ua.achievement.rarity)}
-                </span>
-              </motion.div>
-            ))}
+        {!achievements.length ? (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <LucideIcons.Award className="w-8 h-8 text-white/40" />
+            </div>
+            <p className="text-sm font-medium text-white/80 mb-1">Нет достижений</p>
+            <p className="text-xs text-white/60">У пользователя пока нет достижений</p>
           </div>
+        ) : (
+          <>
+            <div className="space-y-3 mb-4">
+              {displayedAchievements.map((ua, index) => {
+                const rarityColor = ua.achievement.rarity === 'COMMON' ? '#94a1b2' :
+                  ua.achievement.rarity === 'RARE' ? '#abd1c6' :
+                  ua.achievement.rarity === 'EPIC' ? '#e16162' :
+                  ua.achievement.rarity === 'LEGENDARY' ? '#f9bc60' : '#ff6b6b';
+                
+                return (
+                  <motion.div
+                    key={ua.id}
+                    className="flex items-center gap-3 p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <div 
+                      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md"
+                      style={{ 
+                        backgroundColor: rarityColor + '20',
+                        color: rarityColor
+                      }}
+                    >
+                      <LucideIcons.Star className="w-5 h-5 text-current" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-sm font-semibold text-white truncate">
+                          {ua.achievement.name}
+                        </p>
+                        <span 
+                          className="text-xs px-2 py-0.5 rounded font-medium whitespace-nowrap flex-shrink-0"
+                          style={{ 
+                            backgroundColor: rarityColor + '20',
+                            color: rarityColor
+                          }}
+                        >
+                          {getRarityName(ua.achievement.rarity)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs text-white/60">
+                        <LucideIcons.Calendar className="w-3 h-3" />
+                        <span>{new Date(ua.unlockedAt).toLocaleDateString("ru-RU")}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
 
-          <AchievementsTimeline
-            achievements={achievements.map((ua) => ({
-              id: ua.id,
-              title: ua.achievement.name,
-              date: new Date(ua.unlockedAt).toLocaleDateString("ru-RU"),
-              rarity: getRarityName(ua.achievement.rarity),
-            }))}
-          />
+            {achievements.length > 3 && (
+              <motion.button
+                type="button"
+                onClick={() => setIsModalOpen(true)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#f9bc60]/40 text-sm font-medium text-white/80 hover:text-[#f9bc60] transition-all flex items-center justify-center gap-2"
+              >
+                <span>Показать все достижения ({achievements.length})</span>
+                <LucideIcons.ArrowRight className="w-4 h-4" />
+              </motion.button>
+            )}
 
-          {achievements.length > 3 && (
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(true)}
-              className="mt-3 w-full text-[11px] text-[#abd1c6]/80 hover:text-[#f9bc60] underline underline-offset-4 text-center"
-            >
-              Показать все достижения ({achievements.length})
-            </button>
-          )}
-
-          <OtherUserAchievementsModal
-            userId={userId}
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
-        </>
-      )}
-    </div>
+            <OtherUserAchievementsModal
+              userId={userId}
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+            />
+          </>
+        )}
+      </div>
+    </motion.div>
   );
 }
 

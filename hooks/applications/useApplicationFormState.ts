@@ -53,10 +53,6 @@ export function useApplicationFormState() {
   const [approvedCount, setApprovedCount] = useState<number | null>(null);
   const [hasReview, setHasReview] = useState<boolean | null>(null);
   const isAdmin = user?.role === "ADMIN";
-  const [rewardedPassed, setRewardedPassed] = useState(false);
-  const [rewardedLoading, setRewardedLoading] = useState(false);
-  const [rewardedUnavailable, setRewardedUnavailable] = useState(false);
-  const adWatchStartTimeRef = useRef<number | null>(null);
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
   const [hpCompany, setHpCompany] = useState("");
@@ -419,10 +415,6 @@ export function useApplicationFormState() {
     setErr(null);
 
     if (!preValidate()) return;
-    if (!rewardedPassed && rewardedUnavailable) {
-      // Разрешаем отправку без рекламы, если она недоступна
-      setRewardedUnavailable(true);
-    }
 
     try {
       setSubmitting(true);
@@ -486,8 +478,6 @@ export function useApplicationFormState() {
       setTrustAcknowledged(false);
       setPoliciesAccepted(false);
       setAckError(false);
-      setRewardedPassed(false);
-      setRewardedUnavailable(false);
       localStorage.removeItem(saveKey);
       sessionStorage.removeItem(trustAckKey);
       sessionStorage.removeItem(policyAckKey);
@@ -499,157 +489,6 @@ export function useApplicationFormState() {
     }
   };
 
-  const triggerRewarded = () => {
-    if (typeof window === "undefined") return;
-    if (!preValidate()) return;
-
-    setRewardedUnavailable(false);
-    const ya: any = (window as any).Ya;
-    const advManager = ya?.Context?.AdvManager;
-    const platform = typeof advManager?.getPlatform === "function" ? advManager.getPlatform() : "desktop";
-    const blockId = platform === "touch" ? "R-A-18382388-2" : "R-A-18382388-1";
-
-    const renderRewarded = () => {
-      try {
-        if (!ya?.Context?.AdvManager?.render) return false;
-        setRewardedLoading(true);
-        adWatchStartTimeRef.current = Date.now(); // Запоминаем время начала просмотра
-        let settled = false;
-        let checkIntervalId: NodeJS.Timeout | null = null;
-        
-        const checkWatchTime = () => {
-          if (settled || !adWatchStartTimeRef.current) {
-            if (checkIntervalId) clearInterval(checkIntervalId);
-            return;
-          }
-          
-          const watchDuration = Date.now() - adWatchStartTimeRef.current;
-          const minWatchTime = 10000; // 10 секунд в миллисекундах
-          
-          // Если прошло 10 секунд - автоматически засчитываем успех
-          if (watchDuration >= minWatchTime) {
-            settled = true;
-            clearTimeout(timeoutId);
-            if (checkIntervalId) clearInterval(checkIntervalId);
-            setRewardedLoading(false);
-            setRewardedPassed(true);
-            adWatchStartTimeRef.current = null;
-            submit();
-          }
-        };
-        
-        // Проверяем время каждую секунду, начиная с 10-й секунды
-        // Начинаем проверку через 10 секунд, чтобы не нагружать систему
-        setTimeout(() => {
-          if (!settled && adWatchStartTimeRef.current) {
-            checkIntervalId = setInterval(checkWatchTime, 500); // Проверяем каждые 500мс после 10 сек
-          }
-        }, 10000);
-        
-        const failSafe = () => {
-          if (settled) return;
-          if (checkIntervalId) clearInterval(checkIntervalId);
-          
-          // Перед failSafe проверяем, прошло ли 10 секунд
-          const watchDuration = adWatchStartTimeRef.current 
-            ? Date.now() - adWatchStartTimeRef.current 
-            : 0;
-          const minWatchTime = 10000;
-          
-          if (watchDuration >= minWatchTime) {
-            // Если прошло достаточно времени - засчитываем успех
-            settled = true;
-            setRewardedLoading(false);
-            setRewardedPassed(true);
-            adWatchStartTimeRef.current = null;
-            submit();
-          } else {
-            // Если не прошло достаточно времени - показываем ошибку
-            settled = true;
-            setRewardedLoading(false);
-            setRewardedUnavailable(true);
-            setErr("Реклама недоступна. Попробуйте позже.");
-            adWatchStartTimeRef.current = null;
-          }
-        };
-        
-        const timeoutId = setTimeout(failSafe, 20000); // Увеличиваем таймаут до 20 секунд
-        
-        ya.Context.AdvManager.render({
-          blockId,
-          type: "rewarded",
-          platform,
-          onRewarded: (isRewarded: boolean) => {
-            if (settled) return;
-            
-            const watchDuration = adWatchStartTimeRef.current 
-              ? Date.now() - adWatchStartTimeRef.current 
-              : 0;
-            const minWatchTime = 10000; // 10 секунд в миллисекундах
-            const wasWatchedEnough = watchDuration >= minWatchTime;
-            
-            settled = true;
-            clearTimeout(timeoutId);
-            if (checkIntervalId) clearInterval(checkIntervalId);
-            setRewardedLoading(false);
-            adWatchStartTimeRef.current = null;
-            
-            // Если реклама просмотрена минимум 10 секунд - считаем успешной, даже если Yandex вернул false
-            if (wasWatchedEnough) {
-              setRewardedPassed(true);
-              submit();
-            } else if (isRewarded) {
-              // Если Yandex сам засчитал успех (даже если < 10 сек) - тоже отправляем
-              setRewardedPassed(true);
-              submit();
-            } else {
-              // Только если прошло < 10 сек И Yandex вернул false - показываем ошибку
-              setRewardedUnavailable(true);
-            }
-          },
-        });
-        return true;
-      } catch (error) {
-        console.error("Rewarded render error:", error);
-        setRewardedLoading(false);
-        setRewardedUnavailable(true);
-        setErr("Не удалось показать рекламу. Попробуйте позже.");
-        adWatchStartTimeRef.current = null;
-        return false;
-      }
-    };
-
-    // Прямая попытка, если AdvManager уже готов
-    if (renderRewarded()) return;
-
-    // Если скрипт еще не успел инициализироваться — пробуем через очередь yaContextCb
-    const ctxCb = (window as any).yaContextCb;
-    if (Array.isArray(ctxCb)) {
-      setRewardedLoading(true);
-      let handled = false;
-      const onReady = () => {
-        if (handled) return;
-        handled = renderRewarded();
-        if (!handled) {
-          setRewardedLoading(false);
-          setRewardedUnavailable(true);
-          setErr("Реклама недоступна. Попробуйте позже.");
-        }
-      };
-      ctxCb.push(onReady);
-      // Фолбэк, если даже после очереди не отрисовалось
-      setTimeout(() => {
-        if (handled) return;
-        setRewardedLoading(false);
-        setRewardedUnavailable(true);
-        setErr("Реклама недоступна. Попробуйте позже.");
-      }, 3000);
-    } else {
-      setRewardedLoading(false);
-      setRewardedUnavailable(true);
-      setErr("Реклама недоступна. Попробуйте позже.");
-    }
-  };
 
   const amountFormatted = formatAmountRu(amount);
 
@@ -674,9 +513,6 @@ export function useApplicationFormState() {
     setPhotos,
     uploading,
     submitting,
-    rewardedPassed,
-    rewardedLoading,
-  rewardedUnavailable,
     err,
     left,
     submitted,
@@ -705,7 +541,6 @@ export function useApplicationFormState() {
     valid,
     exceedsTrustLimit,
     submit,
-    triggerRewarded,
     formStartedAtRef,
     formStartKey,
     handleAmountInputChange,

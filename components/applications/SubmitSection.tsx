@@ -8,25 +8,17 @@ import { cn } from "@/lib/utils";
 interface SubmitSectionProps {
   submitting: boolean;
   uploading: boolean;
-  rewardedLoading: boolean;
-  rewardedPassed: boolean;
-  rewardedUnavailable: boolean;
   left: number | null;
   err: string | null;
   onSubmit: (e: React.FormEvent) => void;
-  onFallbackSubmit: (e: React.FormEvent) => void;
 }
 
 export default function SubmitSection({
   submitting,
   uploading,
-  rewardedLoading,
-  rewardedPassed,
-  rewardedUnavailable,
   left,
   err,
   onSubmit,
-  onFallbackSubmit,
 }: SubmitSectionProps) {
   return (
     <motion.div
@@ -39,7 +31,7 @@ export default function SubmitSection({
         whileHover={{ scale: 1.02, y: -2 }}
         whileTap={{ scale: 0.98 }}
         type="button"
-        disabled={submitting || uploading || rewardedLoading}
+        disabled={submitting || uploading}
         onClick={onSubmit}
         className={cn(
           "relative w-full px-8 py-4 bg-gradient-to-r from-[#f9bc60] via-[#e8a545] to-[#f9bc60]",
@@ -77,16 +69,6 @@ export default function SubmitSection({
               </motion.span>
               <span>Загрузка фото...</span>
             </>
-          ) : rewardedLoading ? (
-            <>
-              <motion.span
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              >
-                <LucideIcons.Refresh size="sm" />
-              </motion.span>
-              <span>Готовим рекламу...</span>
-            </>
           ) : (
             <>
               <motion.span
@@ -95,46 +77,12 @@ export default function SubmitSection({
               >
                 <LucideIcons.Send size="sm" />
               </motion.span>
-              <span>
-                {rewardedPassed ? "Отправить заявку" : "Посмотреть рекламу и отправить заявку"}
-              </span>
+              <span>Отправить заявку</span>
             </>
           )}
         </span>
       </motion.button>
 
-      {!rewardedPassed && (
-        <p className="text-center text-xs text-[#94a1b2] leading-relaxed">
-          В режиме инкогнито или с блокировщиками реклама может не загрузиться. Если не появляется —
-          отключите блокировку или используйте кнопку отправки без рекламы.
-        </p>
-      )}
-
-      {rewardedUnavailable && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-2"
-        >
-          <p className="text-center text-sm text-[#e16162]">
-            Реклама сейчас недоступна. Вы можете отправить заявку без просмотра.
-          </p>
-          <motion.button
-            whileHover={{ scale: 1.01, y: -1 }}
-            whileTap={{ scale: 0.99 }}
-            type="button"
-            disabled={submitting || uploading || rewardedLoading}
-            onClick={onFallbackSubmit}
-            className={cn(
-              "w-full px-6 py-3 rounded-xl border border-[#f9bc60]/40 text-[#f9bc60] font-semibold",
-              "bg-[#001e1d]/40 hover:bg-[#001e1d]/60 transition-all duration-200",
-              "disabled:opacity-70 disabled:cursor-not-allowed",
-            )}
-          >
-            Отправить заявку без рекламы
-          </motion.button>
-        </motion.div>
-      )}
       {left !== null && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

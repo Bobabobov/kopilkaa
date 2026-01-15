@@ -16,6 +16,15 @@ export const dynamic = "force-dynamic";
 const MAX_IMAGES = 5;
 const MAX_TEXT_LENGTH = 1200;
 
+// Проверка безопасности URL загруженных файлов
+function isSafeUploadUrl(url: string): boolean {
+  // Разрешаем только файлы, выданные нашим upload-роутом
+  if (typeof url !== "string" || !url.trim()) return false;
+  const trimmed = url.trim();
+  // Разрешаем только относительные пути к /api/uploads/
+  return trimmed.startsWith("/api/uploads/") && !trimmed.includes("..");
+}
+
 type TrustSnapshot = {
   status: Lowercase<TrustLevel>;
   approved: number;
@@ -223,7 +232,23 @@ export async function POST(req: NextRequest) {
     if (images.length > MAX_IMAGES) {
       return NextResponse.json({ error: `Максимум ${MAX_IMAGES} фото` }, { status: 400 });
     }
-    const sanitizedImages = images.map((u) => String(u)).filter(Boolean);
+    
+    // Валидация и санитизация URL изображений
+    const sanitizedImages: string[] = [];
+    for (const img of images) {
+      const url = String(img || "").trim();
+      if (!url) continue;
+      
+      // Проверяем, что URL безопасен (только наши загруженные файлы)
+      if (!isSafeUploadUrl(url)) {
+        return NextResponse.json(
+          { error: "Разрешены только файлы, загруженные через форму" },
+          { status: 400 }
+        );
+      }
+      
+      sanitizedImages.push(url);
+    }
 
     const approvedCount = await prisma.application
       .count({

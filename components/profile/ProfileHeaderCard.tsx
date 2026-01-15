@@ -10,11 +10,9 @@ import { useFloatingMenu } from "./hooks/useFloatingMenu";
 import { useUserStatus } from "./hooks/useUserStatus";
 import { SocialLinks } from "./header/SocialLinks";
 import { FriendActions, type FriendshipStatus } from "./header/FriendActions";
-import { OwnerActionsMenu } from "./header/OwnerActionsMenu";
 import { GuestActionsMenu } from "./header/GuestActionsMenu";
 import { AvatarBlock } from "./header/AvatarBlock";
 import { HeaderIdentity } from "./header/HeaderIdentity";
-import { HeaderMeta } from "./header/HeaderMeta";
 import { CtaRow } from "./header/CtaRow";
 import { useCoverStyle } from "./hooks/useCoverStyle";
 
@@ -75,20 +73,12 @@ export default function ProfileHeaderCard({
   const [currentHeaderTheme, setCurrentHeaderTheme] = useState(user.headerTheme);
   const [showHeaderCustomization, setShowHeaderCustomization] = useState(false);
   const [isApplicationsModalOpen, setIsApplicationsModalOpen] = useState(false);
-  const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
   const [isGuestActionsOpen, setIsGuestActionsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const actionsButtonRef = useRef<HTMLElement | null>(null);
   const guestActionsButtonRef = useRef<HTMLElement | null>(null);
 
   const status = useUserStatus(user.lastSeen || null);
   const theme = useMemo(() => getHeaderTheme(currentHeaderTheme || "default"), [currentHeaderTheme]);
-  const ownerMenuStyle = useFloatingMenu({
-    isOpen: isActionsMenuOpen,
-    anchorRef: actionsButtonRef,
-    menuSelector: '[data-menu="actions"]',
-    onClose: () => setIsActionsMenuOpen(false),
-  });
   const guestMenuStyle = useFloatingMenu({
     isOpen: isGuestActionsOpen,
     anchorRef: guestActionsButtonRef,
@@ -134,13 +124,35 @@ export default function ProfileHeaderCard({
           className="relative w-full min-h-[200px] sm:min-h-[240px] md:min-h-[280px] overflow-hidden"
           style={coverStyle}
         >
+          {isOwner && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={onOpenSettings}
+              className="absolute top-4 right-4 z-20 inline-flex items-center gap-2 rounded-lg bg-black/40 hover:bg-black/55 border border-white/20 px-3.5 py-2 text-sm font-semibold text-white transition-all duration-200 backdrop-blur-sm"
+            >
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c0 .69.4 1.3 1.01 1.58.61.28 1.32.17 1.81-.31l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06c-.49.48-.6 1.2-.31 1.81.28.61.89 1.01 1.58 1.01h.09a2 2 0 1 1 0 4h-.09c-.69 0-1.3.4-1.58 1.01-.28.61-.17 1.32.31 1.81l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1c.28-.61.17-1.32-.31-1.81l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06c.48.49 1.2.6 1.81.31.61-.28 1.01-.89 1.01-1.58V3a2 2 0 1 1 4 0v.09c0 .69.4 1.3 1.01 1.58.61.28 1.32.17 1.81-.31l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06c-.48.49-.6 1.2-.31 1.81.28.61.89 1.01 1.58 1.01H21a2 2 0 1 1 0 4h-.09c-.69 0-1.3.4-1.58 1.01-.28.61-.17 1.32.31 1.81Z" />
+              </svg>
+              Редактировать
+            </motion.button>
+          )}
           {/* Затемняющий градиент для читаемости */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
           
           {/* Контент поверх баннера */}
           <div className="relative z-10 px-4 sm:px-6 md:px-8 pb-6 sm:pb-8 pt-20 sm:pt-24 md:pt-28">
             {/* Основной контент: Аватар и информация в одну линию */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 sm:gap-6">
+            <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 md:gap-5">
               <AvatarBlock
                 isOwner={isOwner}
                 user={user}
@@ -162,20 +174,12 @@ export default function ProfileHeaderCard({
                 }}
               />
 
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 flex flex-col gap-3 sm:gap-4">
                 <HeaderIdentity
                   name={user.name}
                   role={user.role}
                   heroBadge={user.heroBadge}
                   status={status}
-                />
-
-                <HeaderMeta
-                  isOwner={isOwner}
-                  emailText={!user.email ? "Email не указан" : user.hideEmail ? "Email скрыт" : user.email}
-                  createdText={formatDate(user.createdAt)}
-                  showActivity={!!user.lastSeen}
-                  activityText={status.text}
                 />
 
                 <CtaRow
@@ -198,13 +202,9 @@ export default function ProfileHeaderCard({
                     ) as HTMLInputElement | null;
                     if (fileInput) fileInput.click();
                   }}
-                  actionsButtonRef={actionsButtonRef}
                   guestActionsButtonRef={guestActionsButtonRef}
-                  ownerMenuStyle={ownerMenuStyle}
                   guestMenuStyle={guestMenuStyle}
                   mounted={mounted}
-                  isActionsMenuOpen={isActionsMenuOpen}
-                  setIsActionsMenuOpen={setIsActionsMenuOpen}
                   isGuestActionsOpen={isGuestActionsOpen}
                   setIsGuestActionsOpen={setIsGuestActionsOpen}
                 />

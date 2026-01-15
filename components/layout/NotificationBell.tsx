@@ -108,6 +108,7 @@ export default function NotificationBell() {
         isOpen={isOpen}
         mounted={mounted}
         menuPosition={menuPosition}
+        buttonRef={buttonRef}
         notifications={notifications}
         loading={loading}
         lastViewedTimestamp={lastViewedTimestamp}

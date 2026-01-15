@@ -191,17 +191,6 @@ export default function ProfileHeaderCard({
                   onAcceptIncoming={onAcceptIncoming}
                   onDeclineIncoming={onDeclineIncoming}
                   onRemoveFriend={onRemoveFriend}
-                  onOpenSettings={onOpenSettings}
-                  onOpenCover={() => {
-                    setShowHeaderCustomization(true);
-                    onBackgroundChange?.();
-                  }}
-                  onTriggerAvatar={() => {
-                    const fileInput = document.querySelector(
-                      'input[type="file"][accept*="image"]',
-                    ) as HTMLInputElement | null;
-                    if (fileInput) fileInput.click();
-                  }}
                   guestActionsButtonRef={guestActionsButtonRef}
                   guestMenuStyle={guestMenuStyle}
                   mounted={mounted}

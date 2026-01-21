@@ -18,10 +18,10 @@ const TRUST_LEVELS_ORDER: TrustLevel[] = [
 const TRUST_LIMITS: Record<TrustLevel, { min: number; max: number }> = {
   LEVEL_1: { min: 50, max: 150 },
   LEVEL_2: { min: 50, max: 300 },
-  LEVEL_3: { min: 50, max: 700 },
-  LEVEL_4: { min: 50, max: 1500 },
-  LEVEL_5: { min: 50, max: 3000 },
-  LEVEL_6: { min: 50, max: 5000 },
+  LEVEL_3: { min: 100, max: 700 },
+  LEVEL_4: { min: 100, max: 1500 },
+  LEVEL_5: { min: 300, max: 3000 },
+  LEVEL_6: { min: 300, max: 5000 },
 };
 
 export function getTrustLevelFromApprovedCount(approvedCount: number): TrustLevel {
@@ -70,3 +70,22 @@ export function getTrustLabel(level: TrustLevel): string {
   }
 }
 
+export function clampTrustLevel(level: TrustLevel): TrustLevel {
+  // уровни заданы порядком массива TRUST_LEVELS_ORDER, поэтому клиппер тривиален
+  return level;
+}
+
+export function getEffectiveApprovedForTrust(
+  effectiveApproved: number,
+  trustDelta: number,
+): number {
+  const base = Number.isFinite(effectiveApproved) ? Math.floor(effectiveApproved) : 0;
+  const delta = Number.isFinite(trustDelta) ? Math.floor(trustDelta) : 0;
+  return Math.max(0, base + delta);
+}export function getTrustLevelFromEffectiveApproved(
+  effectiveApproved: number,
+  trustDelta: number,
+): TrustLevel {
+  const adjusted = getEffectiveApprovedForTrust(effectiveApproved, trustDelta);
+  return getTrustLevelFromApprovedCount(adjusted);
+}

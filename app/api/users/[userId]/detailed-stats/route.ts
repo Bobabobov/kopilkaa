@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
+import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -28,7 +29,7 @@ export async function GET(
     let likesReceived = 0;
     let friendsCount = 0;
     let achievements: any[] = [];
-    let userCreatedAt: { createdAt: Date } | null = null;
+    let userData: { createdAt: Date } | null = null;
 
     try {
       // Параллельно получаем все данные с обработкой ошибок
@@ -40,6 +41,7 @@ export async function GET(
             status: true,
             amount: true,
             createdAt: true,
+            countTowardsTrust: true,
           },
         }),
 
@@ -108,7 +110,7 @@ export async function GET(
       }
 
       if (results[5].status === "fulfilled") {
-        userCreatedAt = results[5].value;
+        userData = results[5].value;
       }
     } catch (dbError) {
       // Database error - using default values
@@ -119,6 +121,9 @@ export async function GET(
       total: applications.length,
       pending: applications.filter((app) => app.status === "PENDING").length,
       approved: applications.filter((app) => app.status === "APPROVED").length,
+      effectiveApproved: applications.filter(
+        (app) => app.status === "APPROVED" && app.countTowardsTrust === true
+      ).length,
       rejected: applications.filter((app) => app.status === "REJECTED").length,
       totalAmount: applications.reduce((sum, app) => sum + (app.amount || 0), 0),
       averageAmount:
@@ -131,9 +136,9 @@ export async function GET(
     };
 
     // Количество дней с момента регистрации
-    const daysActive = userCreatedAt
+    const daysActive = userData
       ? Math.floor(
-          (Date.now() - new Date(userCreatedAt.createdAt).getTime()) /
+          (Date.now() - new Date(userData.createdAt).getTime()) /
             (1000 * 60 * 60 * 24)
         )
       : 0;
@@ -170,14 +175,17 @@ export async function GET(
       rank: 0,
     };
 
+    const trust = await computeUserTrustSnapshot(userId);
     const detailedStats = {
       applications: applicationStats,
       activity: activityStats,
       achievements: achievementStats,
       games: gameStats,
       user: {
-        createdAt: userCreatedAt?.createdAt || new Date(),
+        createdAt: userData?.createdAt || new Date(),
       },
+      effectiveApprovedApplications: applicationStats.effectiveApproved,
+      trust,
     };
 
     return NextResponse.json(
@@ -222,6 +230,18 @@ export async function GET(
       },
       user: {
         createdAt: new Date(),
+      },
+      effectiveApprovedApplications: 0,
+      trust: {
+        approvedApplications: 0,
+        effectiveApprovedApplications: 0,
+        trustLevel: "LEVEL_1",
+        limits: { min: 50, max: 150 },
+        supportRangeText: "от 50 до 150 ₽",
+        nextRequired: 3,
+        progressCurrent: 0,
+        progressTotal: 3,
+        progressText: "До пересмотра уровня — ещё 3 одобренных заявок",
       },
     };
 

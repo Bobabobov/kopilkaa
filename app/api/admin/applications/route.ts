@@ -65,7 +65,20 @@ export async function GET(req: Request) {
       orderBy,
       skip,
       take: limit,
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        title: true,
+        summary: true,
+        story: true,
+        amount: true,
+        payment: true,
+        status: true,
+        adminComment: true,
+        createdAt: true,
+        updatedAt: true,
+        filledMs: true,
+        countTowardsTrust: true,
         user: {
           select: {
             email: true,
@@ -74,6 +87,7 @@ export async function GET(req: Request) {
             avatar: true,
             avatarFrame: true,
             hideEmail: true,
+            trustDelta: true,
           },
         },
         images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },

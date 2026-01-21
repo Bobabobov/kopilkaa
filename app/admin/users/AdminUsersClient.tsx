@@ -9,6 +9,11 @@ import { useBeautifulNotifications } from "@/components/ui/BeautifulNotification
 import Link from "next/link";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
+import {
+  getTrustLabel,
+  getTrustLevelFromEffectiveApproved,
+  type TrustLevel,
+} from "@/lib/trustLevel";
 
 interface User {
   id: string;
@@ -19,6 +24,9 @@ interface User {
   lastSeen: string | null;
   role: string;
   badge?: HeroBadgeType | null;
+  trustDelta?: number;
+  trustLevel?: TrustLevel;
+  effectiveApprovedApplications?: number;
 }
 
 export default function AdminUsersClient() {
@@ -35,6 +43,7 @@ export default function AdminUsersClient() {
   const { showToast } = useBeautifulToast();
   const { confirm } = useBeautifulNotifications();
   const observerTarget = useRef<HTMLDivElement>(null);
+  const [trustDeltaSaving, setTrustDeltaSaving] = useState<string | null>(null);
 
   const VALID_BADGES: HeroBadgeType[] = ["observer", "member", "active", "hero", "honor", "legend", "tester", "custom"];
 
@@ -312,6 +321,37 @@ export default function AdminUsersClient() {
                         </div>
                       </div>
 
+                  <div className="mt-3 p-3 rounded-lg border border-[#abd1c6]/20 bg-[#001e1d]/50 space-y-2">
+                    <div className="text-xs text-[#abd1c6]/80 font-semibold">
+                      Уровень доверия (админ)
+                    </div>
+                    <TrustDeltaControl
+                      userId={user.id}
+                      initialDelta={user.trustDelta ?? 0}
+                      trustLevel={user.trustLevel}
+                      effectiveApprovedApplications={user.effectiveApprovedApplications ?? 0}
+                      savingId={trustDeltaSaving}
+                      setSavingId={setTrustDeltaSaving}
+                      onSaved={(next) => {
+                        setUsers((prev) =>
+                          prev.map((u) =>
+                            u.id === user.id
+                              ? {
+                                  ...u,
+                                  trustDelta: next,
+                                  trustLevel: getTrustLevelFromEffectiveApproved(
+                                    u.effectiveApprovedApplications ?? 0,
+                                    next,
+                                  ),
+                                }
+                              : u,
+                          ),
+                        );
+                      }}
+                      showToast={showToast}
+                    />
+                  </div>
+
                       <div className="flex items-center gap-2 mt-3 flex-wrap">
                         <Link
                           href={`/profile/${user.id}`}
@@ -464,3 +504,89 @@ export default function AdminUsersClient() {
   );
 }
 
+function TrustDeltaControl({
+  userId,
+  initialDelta,
+  trustLevel,
+  effectiveApprovedApplications,
+  savingId,
+  setSavingId,
+  onSaved,
+  showToast,
+}: {
+  userId: string;
+  initialDelta: number;
+  trustLevel?: TrustLevel;
+  effectiveApprovedApplications?: number;
+  savingId: string | null;
+  setSavingId: (id: string | null) => void;
+  onSaved: (next: number) => void;
+  showToast: (type: "success" | "error", title: string, desc?: string) => void;
+}) {
+  const [delta, setDelta] = useState<number>(initialDelta);
+
+  const applyDelta = async (levelStep: number) => {
+    const levelOrder: TrustLevel[] = [
+      "LEVEL_1",
+      "LEVEL_2",
+      "LEVEL_3",
+      "LEVEL_4",
+      "LEVEL_5",
+      "LEVEL_6",
+    ];
+    const currentLevel = trustLevel ?? "LEVEL_1";
+    const currentIndex = Math.max(0, levelOrder.indexOf(currentLevel));
+    const targetIndex = Math.min(
+      levelOrder.length - 1,
+      Math.max(0, currentIndex + levelStep),
+    );
+    const effectiveApproved = effectiveApprovedApplications ?? 0;
+    const targetMinApproved = targetIndex * 3;
+    const next = targetMinApproved - effectiveApproved;
+    setSavingId(userId);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/trust-delta`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trustDelta: next }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Ошибка");
+      onSaved(data?.trustDelta ?? next);
+      setDelta(data?.trustDelta ?? next);
+      showToast("success", "Сохранено", `trustDelta = ${data?.trustDelta ?? next}`);
+    } catch (e: any) {
+      showToast("error", "Не удалось сохранить", e?.message);
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const disabled = savingId === userId;
+  return (
+    <div className="flex items-center gap-2 text-xs text-[#abd1c6]">
+      <span className="text-[#abd1c6]/80">
+        Уровень доверия:{" "}
+        <span className="text-[#f9bc60] font-semibold">
+          {getTrustLabel(trustLevel ?? "LEVEL_1")}
+        </span>
+      </span>
+      <button
+        type="button"
+        className="px-2 py-1 rounded bg-[#001e1d]/70 border border-[#abd1c6]/30 hover:border-[#f9bc60]/50 transition-colors"
+        onClick={() => applyDelta(-1)}
+        disabled={disabled}
+      >
+        -1 уровень
+      </button>
+      <button
+        type="button"
+        className="px-2 py-1 rounded bg-[#001e1d]/70 border border-[#abd1c6]/30 hover:border-[#f9bc60]/50 transition-colors"
+        onClick={() => applyDelta(1)}
+        disabled={disabled}
+      >
+        +1 уровень
+      </button>
+    </div>
+  );
+}

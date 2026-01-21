@@ -128,7 +128,9 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
             <img
               src={mobileImageUrl}
               alt={mobileTitle}
-                  className="w-full h-full object-cover"
+              className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         )}
@@ -194,6 +196,8 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
               alt={desktopTitle}
               className="absolute inset-0 w-full h-full object-contain object-center"
               style={{ objectFit: 'contain' }}
+              loading="lazy"
+              decoding="async"
             />
           )}
 

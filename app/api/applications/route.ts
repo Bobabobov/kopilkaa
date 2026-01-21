@@ -7,7 +7,7 @@ import {
   getPlainTextLenFromHtml,
   sanitizeApplicationStoryHtml,
 } from "@/lib/applications/sanitize";
-import { getTrustLevelFromApprovedCount, getTrustLimits } from "@/lib/trustLevel";
+import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 import { ApplicationStatus } from "@prisma/client";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -136,6 +136,12 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
+    if (images.length === 0) {
+      return Response.json(
+        { error: "Необходимо добавить хотя бы одно фото" },
+        { status: 400 },
+      );
+    }
 
     // Лимит раз в 24 часа (только для обычных пользователей)
     if (session.role !== "ADMIN" && !isWhitelisted) {
@@ -158,12 +164,10 @@ export async function POST(req: Request) {
 
     // Проверка уровня доверия и допустимой суммы (кроме администраторов и вайтлиста)
     if (session.role !== "ADMIN" && !isWhitelisted) {
-      const approvedCount = await prisma.application.count({
-        where: { userId: session.uid, status: ApplicationStatus.APPROVED },
-      });
-      
+      const trust = await computeUserTrustSnapshot(session.uid);
+
       // Если есть одобренная заявка, проверяем наличие отзыва
-      if (approvedCount > 0) {
+      if (trust.approvedApplications > 0) {
         const review = await prisma.review.findUnique({
           where: { userId: session.uid },
           select: { id: true },
@@ -180,11 +184,11 @@ export async function POST(req: Request) {
         }
       }
       
-      const trustLevel = getTrustLevelFromApprovedCount(approvedCount);
-      const limits = getTrustLimits(trustLevel);
-      if (amountNumber < limits.min || amountNumber > limits.max) {
+      if (amountNumber < trust.limits.min || amountNumber > trust.limits.max) {
+        const minText = trust.limits.min.toLocaleString("ru-RU");
+        const maxText = trust.limits.max.toLocaleString("ru-RU");
         return Response.json(
-          { error: "Превышена максимальная сумма для вашего уровня доверия" },
+          { error: `Сумма не соответствует ориентиру вашего уровня (от ${minText} до ${maxText} ₽).` },
           { status: 400 },
         );
       }

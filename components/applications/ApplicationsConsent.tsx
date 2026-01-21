@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -47,7 +48,11 @@ export function ApplicationsConsent({
           onChange={(e) => setPoliciesAccepted(e.target.checked)}
         />
         <span className="text-xs sm:text-sm text-[#c7dad2] leading-relaxed">
-          Продолжая, вы принимаете условия пользовательского соглашения и Политики в отношении обработки персональных данных.
+          Продолжая, вы принимаете условия{" "}
+          <Link href="/terms" className="underline decoration-[#f9bc60]/70 underline-offset-2 hover:decoration-[#f9bc60]">
+            пользовательского соглашения и Политики в отношении обработки персональных данных
+          </Link>
+          .
         </span>
       </label>
     </div>

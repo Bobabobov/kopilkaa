@@ -201,12 +201,15 @@ export function TrustLevelCard({
           <div className="space-y-3 pt-1">
             <div className={cn("", config.divider)} />
 
-            <div className="space-y-1">
-              <span className="text-sm text-[#667a73]">Максимальная поддержка:</span>
-              <span className="text-base sm:text-lg font-semibold text-[#3a554d]">
-                {support}
-              </span>
-            </div>
+          <div className="space-y-1">
+            <span className="text-sm text-[#667a73]">Ориентир по поддержке:</span>
+            <span className="text-base sm:text-lg font-semibold text-[#3a554d]">
+              {support}
+            </span>
+            <p className="text-[11px] text-[#667a73] leading-relaxed">
+              Уровень — ориентир, не гарантия суммы и одобрения.
+            </p>
+          </div>
 
             {progressText && progressPercent !== null && progressCurrent !== null && progressTotal !== null && (
               <>

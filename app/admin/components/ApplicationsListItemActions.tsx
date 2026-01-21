@@ -16,6 +16,7 @@ interface ApplicationsListItemActionsProps {
     comment?: string,
   ) => void;
   onDelete: (id: string) => void;
+  onToggleTrust?: (id: string, next: boolean) => void;
 }
 
 export default function ApplicationsListItemActions({
@@ -23,6 +24,7 @@ export default function ApplicationsListItemActions({
   onStatusChange,
   onQuickUpdate,
   onDelete,
+  onToggleTrust,
 }: ApplicationsListItemActionsProps) {
   const handleDelete = () => {
     if (
@@ -63,6 +65,17 @@ export default function ApplicationsListItemActions({
       >
         Отказать
       </button>
+      {typeof onToggleTrust === "function" && (
+        <label className="inline-flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
+          <input
+            type="checkbox"
+            className="h-4 w-4"
+            checked={item.countTowardsTrust}
+            onChange={(e) => onToggleTrust(item.id, e.target.checked)}
+          />
+          <span>Засчитывать для доверия</span>
+        </label>
+      )}
       <button
         className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-xl transition-all duration-300 hover:scale-105 font-medium shadow-lg hover:shadow-xl"
         onClick={handleDelete}

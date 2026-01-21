@@ -12,6 +12,7 @@ export type ApplicationItem = {
   status: ApplicationStatus;
   adminComment: string | null;
   createdAt: string;
+  countTowardsTrust: boolean;
   user: {
     email: string;
     id: string;
@@ -19,6 +20,7 @@ export type ApplicationItem = {
     avatar: string | null;
     avatarFrame: string | null;
     hideEmail: boolean;
+    trustDelta?: number;
   };
   images: { url: string; sort: number }[];
 };
@@ -35,6 +37,7 @@ export type StatusModal = {
   id: string;
   status: ApplicationStatus;
   comment: string;
+  decreaseTrustOnDecision: boolean;
 };
 
 export type LightboxState = {

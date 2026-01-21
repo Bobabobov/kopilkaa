@@ -62,6 +62,7 @@ model User {
   createdAt           DateTime  @default(now())
   lastSeen            DateTime  @default(now())
   lastCommentAt       DateTime? // Время последнего комментария для кулдауна
+  trustDelta          Int       @default(0)
 
   applications         Application[]
   gameRecords          GameRecord[]
@@ -96,6 +97,7 @@ model Application {
   amount       Int               @default(0)
   payment      String
   status       ApplicationStatus @default(PENDING)
+  countTowardsTrust Boolean      @default(true)
   adminComment String?
   filledMs     Int?
   createdAt    DateTime          @default(now())

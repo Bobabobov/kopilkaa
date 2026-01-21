@@ -109,7 +109,9 @@ export function usePersonalStats() {
     const rejectedPercent = totalApplications
       ? Math.round((stats.applications.rejected / totalApplications) * 100)
       : 0;
-    const pendingPercent = Math.max(0, 100 - approvedPercent - rejectedPercent);
+    const pendingPercent = totalApplications
+      ? Math.round((stats.applications.pending / totalApplications) * 100)
+      : 0;
 
     const successHint = (() => {
       if (totalApplications === 0) {

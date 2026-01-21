@@ -26,9 +26,10 @@ export default function TelegramChannel() {
             width={560}
             height={315}
             sizes="(min-width: 640px) 280px, 100vw"
-            quality={90}
+            quality={85}
+            priority
+            fetchPriority="high"
             className="w-full h-auto rounded-2xl transition-transform duration-300 group-hover:brightness-110"
-            unoptimized
           />
           {/* Overlay при hover */}
           <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all duration-300 rounded-2xl pointer-events-none" />
@@ -46,9 +47,9 @@ export default function TelegramChannel() {
             width={560}
             height={315}
             sizes="(min-width: 640px) 280px, 100vw"
-            quality={90}
+            quality={85}
+            loading="lazy"
             className="w-full h-auto rounded-2xl transition-transform duration-300 group-hover:brightness-110"
-            unoptimized
           />
           {/* Overlay при hover */}
           <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all duration-300 rounded-2xl pointer-events-none" />

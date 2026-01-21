@@ -52,6 +52,7 @@ export function useApplicationFormState() {
   const [introChecked, setIntroChecked] = useState(false);
   const [approvedCount, setApprovedCount] = useState<number | null>(null);
   const [hasReview, setHasReview] = useState<boolean | null>(null);
+  const [trustSnapshot, setTrustSnapshot] = useState<any>(null);
   const isAdmin = user?.role === "ADMIN";
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
@@ -208,13 +209,16 @@ export function useApplicationFormState() {
       fetch("/api/profile/stats", { cache: "no-store" })
         .then((r) => (r.ok ? r.json() : null))
         .then((d) => {
+          const trust = d?.trust ?? d?.stats?.trust ?? null;
           const approved =
+            trust?.approvedApplications ??
             d?.approvedApplications ??
             d?.applications?.approved ??
             d?.applications?.approvedApplications;
           if (typeof approved === "number" && approved >= 0) {
             setApprovedCount(approved);
           }
+          setTrustSnapshot(trust);
         })
         .catch(() => {}),
       fetch("/api/reviews", { cache: "no-store" })
@@ -234,14 +238,21 @@ export function useApplicationFormState() {
     return (div.textContent || div.innerText || "").replace(/\s/g, "").length;
   }, [story]);
 
+  const effectiveApproved =
+    trustSnapshot?.effectiveApprovedApplications ?? approvedCount ?? 0;
   const trustLevel: TrustLevel = useMemo(
-    () => getTrustLevelFromApprovedCount(approvedCount ?? 0),
-    [approvedCount],
+    () =>
+      trustSnapshot?.trustLevel ??
+      getTrustLevelFromApprovedCount(effectiveApproved),
+    [effectiveApproved, trustSnapshot],
   );
-  const trustLimits = useMemo(() => getTrustLimits(trustLevel), [trustLevel]);
+  const trustLimits = useMemo(
+    () => trustSnapshot?.limits ?? getTrustLimits(trustLevel),
+    [trustLevel, trustSnapshot],
+  );
   const trustHint = isAdmin
     ? "Администратор: лимиты суммы не применяются"
-    : `Доступная сумма для вашего уровня: до ${trustLimits.max.toLocaleString("ru-RU")} ₽`;
+    : `Ориентир для вашего уровня: до ${trustLimits.max.toLocaleString("ru-RU")} ₽. Решение принимается индивидуально.`;
   const amountInt = amount ? parseInt(amount) : NaN;
   const withinTrustRange =
     isAdmin ||
@@ -264,6 +275,7 @@ export function useApplicationFormState() {
     bankName.trim().length > 0 &&
     payment.length >= LIMITS.paymentMin &&
     (isAdmin || payment.length <= LIMITS.paymentMax) &&
+    photos.length > 0 &&
     photos.length <= LIMITS.maxPhotos;
 
   const getCharCount = (text: string) => text.replace(/\s/g, "").length;
@@ -401,6 +413,11 @@ export function useApplicationFormState() {
       return false;
     }
     setAckError(false);
+
+    if (photos.length === 0) {
+      setErr("Добавьте хотя бы одну фотографию");
+      return false;
+    }
 
     if (!valid) {
       setErr("Проверьте поля — есть ошибки/лимиты");

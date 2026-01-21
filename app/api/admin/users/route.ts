@@ -1,7 +1,9 @@
 // app/api/admin/users/route.ts
 import { NextResponse } from 'next/server';
+import { ApplicationStatus } from "@prisma/client";
 import { getAllowedAdminUser } from '@/lib/adminAccess';
 import { prisma } from '@/lib/db';
+import { getTrustLevelFromEffectiveApproved } from "@/lib/trustLevel";
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +41,7 @@ export async function GET(request: Request) {
           createdAt: true,
           lastSeen: true,
           role: true,
+          trustDelta: true,
         },
         orderBy: {
           createdAt: 'desc',
@@ -49,9 +52,42 @@ export async function GET(request: Request) {
       prisma.user.count({ where }),
     ]);
 
+    const userIds = users.map((user) => user.id);
+    const effectiveGroups = userIds.length
+      ? await prisma.application
+          .groupBy({
+            by: ["userId"],
+            where: {
+              userId: { in: userIds },
+              status: ApplicationStatus.APPROVED,
+              countTowardsTrust: true,
+            },
+            _count: { _all: true },
+          })
+          .catch(() => [])
+      : [];
+
+    const effectiveMap = new Map<string, number>();
+    effectiveGroups.forEach((group: any) => {
+      effectiveMap.set(group.userId, group._count?._all ?? 0);
+    });
+
+    const usersWithTrust = users.map((user) => {
+      const effectiveApprovedApplications = effectiveMap.get(user.id) ?? 0;
+      const trustDelta = user.trustDelta ?? 0;
+      return {
+        ...user,
+        effectiveApprovedApplications,
+        trustLevel: getTrustLevelFromEffectiveApproved(
+          effectiveApprovedApplications,
+          trustDelta,
+        ),
+      };
+    });
+
     return NextResponse.json({
       success: true,
-      data: users,
+      data: usersWithTrust,
       page,
       limit,
       total,

@@ -35,7 +35,16 @@ function ProfilePageContent() {
   useProfileUrlParams();
 
   const user = profileData?.user || null;
-  const approvedApplications = profileData?.stats?.approvedApplications ?? 0;
+  const trustSnapshot = profileData?.trust ?? profileData?.stats?.trust;
+  const approvedApplicationsRaw =
+    trustSnapshot?.approvedApplications ??
+    profileData?.stats?.approvedApplications ??
+    0;
+  const approvedApplicationsEffective =
+    trustSnapshot?.effectiveApprovedApplications ??
+    profileData?.stats?.effectiveApprovedApplications ??
+    profileData?.stats?.applications?.effectiveApproved ??
+    approvedApplicationsRaw;
 
   // Расчет уровня доверия
   const {
@@ -46,8 +55,14 @@ function ProfilePageContent() {
     progressCurrent,
     progressTotal,
   } = useTrustLevel({
-    approvedApplications,
+    approvedApplications: approvedApplicationsRaw,
+    effectiveApprovedApplications: approvedApplicationsEffective,
   });
+  const trustStatusResolved = trustSnapshot?.trustLevel
+    ? (trustSnapshot.trustLevel.toLowerCase() as typeof trustStatus)
+    : trustStatus;
+  const trustSupportResolved =
+    trustSnapshot?.supportRangeText ?? trustSupportText;
 
   // Обработка обновлений профиля
   const { handleThemeChange, handleAvatarChange } = useProfileUpdates({
@@ -70,8 +85,8 @@ function ProfilePageContent() {
     <>
       <ProfileLayout
         user={user}
-        trustStatus={trustStatus}
-        trustSupportText={trustSupportText}
+        trustStatus={trustStatusResolved}
+        trustSupportText={trustSupportResolved}
         trustProgressText={progressText}
         trustProgressValue={progressValue}
         trustProgressCurrent={progressCurrent}

@@ -16,13 +16,16 @@ interface ApplicationsGridProps {
     id: string,
     status: ApplicationStatus,
     comment: string,
+    decreaseTrustOnDecision?: boolean,
   ) => void;
   onQuickReject: (
     id: string,
     status: ApplicationStatus,
     comment: string,
+    decreaseTrustOnDecision?: boolean,
   ) => void;
   onDelete: (id: string, title: string) => void;
+  onToggleTrust?: (id: string, next: boolean) => void;
 }
 
 export default function ApplicationsGrid({
@@ -35,6 +38,7 @@ export default function ApplicationsGrid({
   onQuickApprove,
   onQuickReject,
   onDelete,
+  onToggleTrust,
 }: ApplicationsGridProps) {
   if (loading) {
     return (
@@ -160,6 +164,7 @@ export default function ApplicationsGrid({
           onQuickApprove={onQuickApprove}
           onQuickReject={onQuickReject}
           onDelete={onDelete}
+          onToggleTrust={onToggleTrust}
         />
       ))}
     </div>

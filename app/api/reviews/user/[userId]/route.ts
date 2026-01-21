@@ -24,12 +24,12 @@ function buildTrustSnapshot(approved: number): TrustSnapshot {
   const level = getTrustLevelFromApprovedCount(approved);
   const status = level.toLowerCase() as Lowercase<TrustLevel>;
   const limits = getTrustLimits(level);
-  const supportRange = `от ${limits.min.toLocaleString("ru-RU")} до ${limits.max.toLocaleString("ru-RU")} ₽`;
+  const supportRange = `Ориентир: от ${limits.min.toLocaleString("ru-RU")} до ${limits.max.toLocaleString("ru-RU")} ₽`;
   const nextReq = getNextLevelRequirement(level);
   const nextRequirement =
     nextReq === null
       ? null
-      : `До следующего уровня — ещё ${Math.max(0, nextReq - approved)} одобренных заявок`;
+      : `До пересмотра уровня — ещё ${Math.max(0, nextReq - approved)} одобренных заявок`;
 
   return {
     status,
@@ -78,7 +78,11 @@ export async function GET(_req: NextRequest, { params }: { params: { userId: str
     }
 
     const approvedCount = await prisma.application.count({
-      where: { userId: review.userId, status: ApplicationStatus.APPROVED },
+      where: {
+        userId: review.userId,
+        status: ApplicationStatus.APPROVED,
+        countTowardsTrust: true,
+      },
     });
     const trust = buildTrustSnapshot(approvedCount);
     const heroBadge = review.user ? (await getHeroBadgesForUsers([review.user.id]))[review.user.id] ?? null : null;

@@ -36,12 +36,12 @@ function buildTrustSnapshot(approved: number): TrustSnapshot {
   const level = getTrustLevelFromApprovedCount(approved);
   const status = level.toLowerCase() as Lowercase<TrustLevel>;
   const limits = getTrustLimits(level);
-  const supportRange = `от ${limits.min.toLocaleString("ru-RU")} до ${limits.max.toLocaleString("ru-RU")} ₽`;
+  const supportRange = `Ориентир: от ${limits.min.toLocaleString("ru-RU")} до ${limits.max.toLocaleString("ru-RU")} ₽`;
   const nextReq = getNextLevelRequirement(level);
   const nextRequirement =
     nextReq === null
       ? null
-      : `До следующего уровня — ещё ${Math.max(0, nextReq - approved)} одобренных заявок`;
+      : `До пересмотра уровня — ещё ${Math.max(0, nextReq - approved)} одобренных заявок`;
 
   return {
     status,
@@ -56,7 +56,7 @@ async function mapReviews(raw: any[], viewerId: string | null) {
 
   const userIds = Array.from(new Set(raw.map((r) => r.userId)));
 
-  const [badges, approvedGroups] = await Promise.all([
+  const [badges, effectiveGroups] = await Promise.all([
     getHeroBadgesForUsers(userIds),
     prisma.application
       .groupBy({
@@ -64,6 +64,7 @@ async function mapReviews(raw: any[], viewerId: string | null) {
         where: {
           userId: { in: userIds },
           status: ApplicationStatus.APPROVED,
+          countTowardsTrust: true,
         },
         _count: { _all: true },
       })
@@ -71,12 +72,13 @@ async function mapReviews(raw: any[], viewerId: string | null) {
   ]);
 
   const approvedMap = new Map<string, number>();
-  approvedGroups.forEach((g: any) => {
+  effectiveGroups.forEach((g: any) => {
     approvedMap.set(g.userId, g._count?._all ?? 0);
   });
 
   return raw.map((item) => {
-    const trust = buildTrustSnapshot(approvedMap.get(item.userId) ?? 0);
+    const approvedCount = approvedMap.get(item.userId) ?? 0;
+    const trust = buildTrustSnapshot(approvedCount);
     const heroBadge = badges[item.user.id] ?? null;
     const displayName = item.user.name || item.user.username || "Без имени";
 

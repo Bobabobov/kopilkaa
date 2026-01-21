@@ -4,12 +4,9 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 import {
-  getNextLevelRequirement,
-  getTrustLevelFromApprovedCount,
-  getTrustLimits,
   type TrustLevel,
 } from "@/lib/trustLevel";
-import { ApplicationStatus } from "@prisma/client";
+import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 
 export const dynamic = "force-dynamic";
 
@@ -20,21 +17,20 @@ type TrustSnapshot = {
   nextRequirement: string | null;
 };
 
-function buildTrustSnapshot(approved: number): TrustSnapshot {
-  const level = getTrustLevelFromApprovedCount(approved);
-  const status = level.toLowerCase() as Lowercase<TrustLevel>;
-  const limits = getTrustLimits(level);
-  const supportRange = `от ${limits.min.toLocaleString("ru-RU")} до ${limits.max.toLocaleString("ru-RU")} ₽`;
-  const nextReq = getNextLevelRequirement(level);
+function buildTrustSnapshot(trust: Awaited<ReturnType<typeof computeUserTrustSnapshot>>): TrustSnapshot {
+  const status = trust.trustLevel.toLowerCase() as Lowercase<TrustLevel>;
   const nextRequirement =
-    nextReq === null
+    trust.nextRequired === null
       ? null
-      : `До следующего уровня — ещё ${Math.max(0, nextReq - approved)} одобренных заявок`;
+      : `До следующего уровня — ещё ${Math.max(
+          0,
+          trust.nextRequired - trust.effectiveApprovedApplications,
+        )} одобренных заявок`;
 
   return {
     status,
-    approved,
-    supportRange,
+    approved: trust.effectiveApprovedApplications,
+    supportRange: trust.supportRangeText,
     nextRequirement,
   };
 }
@@ -76,10 +72,9 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ error: "Не найдено" }, { status: 404 });
     }
 
-    const approvedCount = await prisma.application.count({
-      where: { userId: review.userId, status: ApplicationStatus.APPROVED },
-    });
-    const trust = buildTrustSnapshot(approvedCount);
+    const trust = buildTrustSnapshot(
+      await computeUserTrustSnapshot(review.userId),
+    );
     const heroBadge = review.user ? (await getHeroBadgesForUsers([review.user.id]))[review.user.id] ?? null : null;
 
     const mapped = {

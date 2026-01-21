@@ -19,8 +19,21 @@ export async function GET(
   try {
     const item = await prisma.application.findUnique({
       where: { id: params.id },
-      include: {
-        user: { select: { email: true, id: true } },
+      select: {
+        id: true,
+        userId: true,
+        title: true,
+        summary: true,
+        story: true,
+        amount: true,
+        payment: true,
+        status: true,
+        adminComment: true,
+        filledMs: true,
+        createdAt: true,
+        updatedAt: true,
+        countTowardsTrust: true,
+        user: { select: { email: true, id: true, trustDelta: true } },
         images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
       },
     });
@@ -51,19 +64,35 @@ export async function PATCH(
     | "APPROVED"
     | "REJECTED"
     | undefined;
+  const decreaseTrustOnDecision = Boolean(body?.decreaseTrustOnDecision);
   const adminComment =
     typeof body?.adminComment === "string" ? body.adminComment : undefined;
   if (!status || !["PENDING", "APPROVED", "REJECTED"].includes(status))
     return Response.json({ error: "Invalid status" }, { status: 400 });
 
   try {
-    const item = await prisma.application.update({
-      where: { id: params.id },
-      data: { status, adminComment: adminComment ?? null },
-      include: {
-        user: { select: { email: true, id: true } },
-        images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
-      },
+    const item = await prisma.$transaction(async (tx) => {
+      const updated = await tx.application.update({
+        where: { id: params.id },
+        data: { status, adminComment: adminComment ?? null },
+        include: {
+          user: { select: { email: true, id: true } },
+          images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
+        },
+      });
+
+      if (
+        decreaseTrustOnDecision &&
+        (status === "APPROVED" || status === "REJECTED") &&
+        updated.user?.id
+      ) {
+        await tx.user.update({
+          where: { id: updated.user.id },
+          data: { trustDelta: { decrement: 3 } },
+        });
+      }
+
+      return updated;
     });
 
     // 🔔 НЕ ждём SMTP — отправляем "в фоне" и логируем ошибки

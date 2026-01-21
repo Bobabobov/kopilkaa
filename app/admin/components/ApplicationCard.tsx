@@ -20,13 +20,16 @@ interface ApplicationCardProps {
     id: string,
     status: ApplicationStatus,
     comment: string,
+    decreaseTrustOnDecision?: boolean,
   ) => void;
   onQuickReject: (
     id: string,
     status: ApplicationStatus,
     comment: string,
+    decreaseTrustOnDecision?: boolean,
   ) => void;
   onDelete: (id: string, title: string) => void;
+  onToggleTrust?: (id: string, next: boolean) => void;
 }
 
 export default function ApplicationCard({
@@ -38,6 +41,7 @@ export default function ApplicationCard({
   onQuickApprove,
   onQuickReject,
   onDelete,
+  onToggleTrust,
 }: ApplicationCardProps) {
 
   return (
@@ -74,6 +78,7 @@ export default function ApplicationCard({
             onQuickApprove={onQuickApprove}
             onQuickReject={onQuickReject}
             onDelete={onDelete}
+            onToggleTrust={onToggleTrust}
           />
         </div>
 

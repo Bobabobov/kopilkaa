@@ -16,28 +16,51 @@ export function useAdminActions({
     id: string;
     status: ApplicationStatus;
     comment: string;
+    decreaseTrustOnDecision: boolean;
   }>({
     id: "",
     status: "PENDING",
     comment: "",
+    decreaseTrustOnDecision: false,
   });
 
   const [deleteModal, setDeleteModal] = useState<{
     id: string;
     title: string;
   }>({ id: "", title: "" });
+  const toggleTrust = async (id: string, next: boolean) => {
+    try {
+      const response = await fetch(`/api/admin/applications/${id}/trust`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ countTowardsTrust: next }),
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      showToast("success", "Флаг доверия обновлён");
+      await refreshApplications();
+    } catch (err) {
+      console.error("Failed to update trust flag:", err);
+      showToast("error", "Ошибка обновления флага доверия");
+    }
+  };
+
 
   // Быстрое обновление статуса
   const quickUpdate = async (
     id: string,
     newStatus: ApplicationStatus,
     comment: string,
+    decreaseTrustOnDecision?: boolean,
   ) => {
     try {
       const response = await fetch(`/api/admin/applications/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus, adminComment: comment }),
+        body: JSON.stringify({
+          status: newStatus,
+          adminComment: comment,
+          decreaseTrustOnDecision: Boolean(decreaseTrustOnDecision),
+        }),
       });
 
       if (!response.ok) {
@@ -69,6 +92,7 @@ export function useAdminActions({
         body: JSON.stringify({
           status: modal.status,
           adminComment: modal.comment,
+          decreaseTrustOnDecision: Boolean(modal.decreaseTrustOnDecision),
         }),
       });
 
@@ -79,7 +103,7 @@ export function useAdminActions({
       showToast("success", "Статус заявки обновлен!");
 
       // Закрываем модалку
-      setModal({ id: "", status: "PENDING", comment: "" });
+      setModal({ id: "", status: "PENDING", comment: "", decreaseTrustOnDecision: false });
 
       // Обновляем данные
       await Promise.all([
@@ -128,23 +152,25 @@ export function useAdminActions({
     status: ApplicationStatus,
     comment: string,
   ) => {
-    setModal({ id, status, comment });
+    setModal({ id, status, comment, decreaseTrustOnDecision: false });
   };
 
   const handleQuickApprove = (
     id: string,
     status: ApplicationStatus,
     comment: string,
+    decreaseTrustOnDecision?: boolean,
   ) => {
-    quickUpdate(id, status, comment);
+    quickUpdate(id, status, comment, decreaseTrustOnDecision);
   };
 
   const handleQuickReject = (
     id: string,
     status: ApplicationStatus,
     comment: string,
+    decreaseTrustOnDecision?: boolean,
   ) => {
-    quickUpdate(id, status, comment);
+    quickUpdate(id, status, comment, decreaseTrustOnDecision);
   };
 
   const handleDelete = (id: string, title: string) => {
@@ -162,6 +188,7 @@ export function useAdminActions({
     handleQuickApprove,
     handleQuickReject,
     handleDelete,
+    toggleTrust,
   };
 }
 

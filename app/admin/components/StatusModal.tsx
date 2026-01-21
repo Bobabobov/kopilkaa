@@ -7,6 +7,7 @@ interface StatusModalProps {
   onClose: () => void;
   onStatusChange: (status: ApplicationStatus) => void;
   onCommentChange: (comment: string) => void;
+  onDecreaseTrustChange: (next: boolean) => void;
   onSave: () => Promise<void>;
 }
 
@@ -15,9 +16,11 @@ export default function StatusModal({
   onClose,
   onStatusChange,
   onCommentChange,
+  onDecreaseTrustChange,
   onSave,
 }: StatusModalProps) {
   if (!modal.id) return null;
+  const canDecrease = modal.status === "APPROVED" || modal.status === "REJECTED";
 
   return (
     <motion.div
@@ -108,6 +111,17 @@ export default function StatusModal({
               Этот комментарий увидит пользователь в уведомлении и в модальном окне.
             </p>
           </div>
+
+          <label className="flex items-center gap-2 text-xs sm:text-sm text-[#cfdcd6]">
+            <input
+              type="checkbox"
+              className="h-4 w-4"
+              checked={modal.decreaseTrustOnDecision}
+              onChange={(e) => onDecreaseTrustChange(e.target.checked)}
+              disabled={!canDecrease}
+            />
+            <span>Понизить уровень на 1 (при решении)</span>
+          </label>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 justify-end pt-2">
             <button

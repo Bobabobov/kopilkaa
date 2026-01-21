@@ -76,6 +76,7 @@ export default function AdminClient() {
     handleQuickApprove,
     handleQuickReject,
     handleDelete,
+    toggleTrust,
   } = useAdminActions({
     refreshStats,
     refreshApplications,
@@ -171,6 +172,7 @@ export default function AdminClient() {
               onQuickApprove={handleQuickApprove}
               onQuickReject={handleQuickReject}
               onDelete={handleDelete}
+              onToggleTrust={toggleTrust}
             />
 
             {/* Индикатор загрузки следующих заявок */}
@@ -190,10 +192,24 @@ export default function AdminClient() {
       {/* Модалка статуса */}
       <StatusModal
         modal={modal}
-        onClose={() => setModal({ id: "", status: "PENDING", comment: "" })}
-        onStatusChange={(status) => setModal((prev) => ({ ...prev, status }))}
+        onClose={() =>
+          setModal({ id: "", status: "PENDING", comment: "", decreaseTrustOnDecision: false })
+        }
+        onStatusChange={(status) =>
+          setModal((prev) => ({
+            ...prev,
+            status,
+            decreaseTrustOnDecision:
+              status === "APPROVED" || status === "REJECTED"
+                ? prev.decreaseTrustOnDecision
+                : false,
+          }))
+        }
         onCommentChange={(comment) =>
           setModal((prev) => ({ ...prev, comment }))
+        }
+        onDecreaseTrustChange={(next) =>
+          setModal((prev) => ({ ...prev, decreaseTrustOnDecision: next }))
         }
         onSave={updateStatus}
       />

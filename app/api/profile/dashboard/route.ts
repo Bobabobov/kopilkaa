@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { createHash } from "crypto";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { getHeroBadgeForUser, getHeroBadgesForUsers } from "@/lib/heroBadges";
+import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -141,6 +142,7 @@ export async function GET(request: NextRequest) {
           id: true,
           status: true,
           amount: true,
+          countTowardsTrust: true,
         },
       }).catch(() => []),
 
@@ -193,6 +195,7 @@ export async function GET(request: NextRequest) {
         stats: {
           totalApplications: 0,
           approvedApplications: 0,
+          effectiveApprovedApplications: 0,
           pendingApplications: 0,
           rejectedApplications: 0,
           totalAmountRequested: 0,
@@ -225,6 +228,7 @@ export async function GET(request: NextRequest) {
     const stats = {
       totalApplications: applications.length,
       approvedApplications: applications.filter(app => app.status === "APPROVED").length,
+      effectiveApprovedApplications: applications.filter(app => app.status === "APPROVED" && app.countTowardsTrust === true).length,
       pendingApplications: applications.filter(app => app.status === "PENDING").length,
       rejectedApplications: applications.filter(app => app.status === "REJECTED").length,
       totalAmountRequested: applications.reduce((sum, app) => sum + (app.amount || 0), 0),
@@ -237,6 +241,7 @@ export async function GET(request: NextRequest) {
       gameAttempts: gameRecord?.attempts || 0,
       bestGameScore: gameRecord?.bestScore || 0,
     };
+    const trust = await computeUserTrustSnapshot(userId);
 
     // Форматируем друзей
     const friends = friendsData.map(friendship => ({
@@ -289,6 +294,7 @@ export async function GET(request: NextRequest) {
         heroBadge: heroBadge ?? "",
       },
       stats,
+      trust,
       latest: {
         friend: friendsData[0]?.createdAt ? new Date(friendsData[0].createdAt).getTime() : 0,
         request: receivedRequestsData[0]?.createdAt ? new Date(receivedRequestsData[0].createdAt).getTime() : 0,
@@ -327,8 +333,9 @@ export async function GET(request: NextRequest) {
         grantedByName: ua.grantedByName,
         achievement: ua.achievement,
       })),
-      stats,
+      stats: { ...stats, trust },
       notifications: formattedNotifications,
+      trust,
     });
 
     // Добавляем заголовки кэширования

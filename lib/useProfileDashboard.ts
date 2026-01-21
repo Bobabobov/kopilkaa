@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import type { TrustLevel } from "@/lib/trustLevel";
 
 interface User {
   id: string;
@@ -44,6 +45,7 @@ interface Achievement {
 interface Stats {
   totalApplications: number;
   approvedApplications: number;
+  effectiveApprovedApplications?: number;
   pendingApplications: number;
   rejectedApplications: number;
   totalAmountRequested: number;
@@ -53,7 +55,23 @@ interface Stats {
   achievementsCount: number;
   gameAttempts: number;
   bestGameScore: number;
+  applications?: {
+    effectiveApproved?: number;
+  };
+  trust?: TrustSnapshot;
 }
+
+type TrustSnapshot = {
+  approvedApplications: number;
+  effectiveApprovedApplications: number;
+  trustLevel: TrustLevel;
+  limits: { min: number; max: number };
+  supportRangeText: string;
+  nextRequired: number | null;
+  progressCurrent: number;
+  progressTotal: number;
+  progressText: string | null;
+};
 
 interface Notification {
   id: string;
@@ -80,6 +98,7 @@ interface ProfileDashboardData {
   achievements: Achievement[];
   stats: Stats;
   notifications: Notification[];
+  trust?: TrustSnapshot;
 }
 
 interface UseProfileDashboardReturn {
@@ -212,6 +231,11 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
         statsData?.totalApplications ?? applications.total ?? applications.totalApplications ?? 0;
       const approvedApplications =
         statsData?.approvedApplications ?? applications.approved ?? applications.approvedApplications ?? 0;
+      const effectiveApprovedApplications =
+        statsData?.effectiveApprovedApplications ??
+        applications.effectiveApproved ??
+        statsData?.approvedApplications ??
+        0;
       const pendingApplications =
         statsData?.pendingApplications ?? applications.pending ?? applications.pendingApplications ?? 0;
       const rejectedApplications =
@@ -223,9 +247,11 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
         applications,
         totalApplications,
         approvedApplications,
+        effectiveApprovedApplications,
         pendingApplications,
         rejectedApplications,
         approvedAmount,
+        trust: statsData?.trust ?? statsData?.stats?.trust,
       };
     })();
 
@@ -236,6 +262,7 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       achievements: [],
       stats: normalizedStats || {},
       notifications: [],
+      trust: normalizedStats?.trust ?? statsData?.trust,
     };
 
     setData(fallbackData);

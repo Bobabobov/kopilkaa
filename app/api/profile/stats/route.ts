@@ -1,5 +1,6 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 
 export const dynamic = 'force-dynamic';
 
@@ -12,18 +13,23 @@ export async function GET() {
     const userId = session.uid;
 
     // Получаем статистику заявок с обработкой ошибок
-    const applications = await prisma.application
-      .findMany({
-      where: { userId },
-      select: {
-        status: true,
-        amount: true,
-      },
-      })
-      .catch(() => []);
+    const [applications, trust] = await Promise.all([
+      prisma.application
+        .findMany({
+        where: { userId },
+        select: {
+          status: true,
+          amount: true,
+          countTowardsTrust: true,
+        },
+        })
+        .catch(() => []),
+      computeUserTrustSnapshot(userId),
+    ]);
 
     const totalApplications = applications.length;
     const approvedApplications = applications.filter(app => app.status === "APPROVED").length;
+    const effectiveApprovedApplications = applications.filter(app => app.status === "APPROVED" && app.countTowardsTrust === true).length;
     const pendingApplications = applications.filter(app => app.status === "PENDING").length;
     const rejectedApplications = applications.filter(app => app.status === "REJECTED").length;
     const totalAmount = applications
@@ -88,12 +94,14 @@ export async function GET() {
       user: userStats,
       totalApplications,
       approvedApplications,
+      effectiveApprovedApplications,
       pendingApplications,
       rejectedApplications,
       approvedAmount: totalAmount,
+      trust,
     };
 
-    return Response.json(stats);
+    return Response.json({ ...stats, trust });
   } catch (error) {
     console.error("Error loading stats:", error);
     // Возвращаем пустую статистику вместо ошибки
@@ -106,6 +114,18 @@ export async function GET() {
       },
       user: {
         daysSinceRegistration: 0,
+      },
+      effectiveApprovedApplications: 0,
+      trust: {
+        approvedApplications: 0,
+        effectiveApprovedApplications: 0,
+        trustLevel: "LEVEL_1",
+        limits: { min: 50, max: 150 },
+        supportRangeText: "от 50 до 150 ₽",
+        nextRequired: 3,
+        progressCurrent: 0,
+        progressTotal: 3,
+        progressText: "До пересмотра уровня — ещё 3 одобренных заявок",
       },
     });
   }

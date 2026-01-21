@@ -93,7 +93,7 @@ export default function PhotoUpload({
         <div className="flex items-center gap-2">
           <LucideIcons.Image size="sm" className="text-emerald-500" />
           <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-            Фотографии <span className="text-gray-500">(до {maxPhotos})</span>
+            Фотографии * <span className="text-gray-500">(до {maxPhotos})</span>
           </span>
         </div>
         <input
@@ -152,6 +152,9 @@ export default function PhotoUpload({
           <LucideIcons.Image size="lg" className="text-gray-400 mx-auto mb-2" />
           <p className="text-gray-500 dark:text-gray-400 text-sm">
             Перетащите фотографии сюда или нажмите "Выбрать файлы"
+          </p>
+          <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
+            Нужно добавить хотя бы одно фото
           </p>
         </div>
       )}

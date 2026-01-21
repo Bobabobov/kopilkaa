@@ -263,6 +263,7 @@ export default function AdminNewsClient() {
                   minLength={1}
                   maxLength={5000}
                   rows={8}
+                  allowPaste={true}
                 />
               </div>
 

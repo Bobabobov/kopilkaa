@@ -18,6 +18,7 @@ interface RichTextEditorProps {
   rows?: number;
   className?: string;
   allowLinks?: boolean; // Разрешить добавление ссылок
+  allowPaste?: boolean; // Разрешить вставку текста
   error?: string; // Сообщение об ошибке
   required?: boolean; // Обязательное поле
 }
@@ -31,6 +32,7 @@ export default function RichTextEditor({
   rows = 6,
   className = "",
   allowLinks = true,
+  allowPaste = false,
   error,
   required = false,
 }: RichTextEditorProps) {
@@ -72,6 +74,7 @@ export default function RichTextEditor({
         style: "min-height: " + rows * 1.75 + "rem;",
       },
       handlePaste: () => {
+        if (allowPaste) return false;
         // Запрещаем вставку — только ручной ввод
         setPasteBlocked(true);
         if (typeof window !== "undefined") {
@@ -113,7 +116,7 @@ export default function RichTextEditor({
 
   return (
     <div className={`space-y-2 w-full max-w-full overflow-hidden ${className}`}>
-      {pasteBlocked && (
+      {pasteBlocked && !allowPaste && (
         <div className="text-[12px] text-[#e16162]">
           Вставка запрещена: введите текст вручную.
         </div>

@@ -142,6 +142,7 @@ export function TrustLevelCard({
   const Icon = config.icon;
   const support = supportText || config.limit;
   const baseText = TRUST_TEXTS[status];
+  const levelLabel = `Уровень ${status.split("_")[1]}`;
   const text = {
     title: titleOverride || baseText.title,
     description: descriptionOverride || baseText.description,
@@ -186,6 +187,9 @@ export function TrustLevelCard({
             <div className="space-y-1">
               <p className={cn("text-lg sm:text-xl font-semibold", config.accent)}>
                 {text.title}
+              </p>
+              <p className="inline-flex items-center rounded-full border border-[#1f6a4d]/30 bg-[#e6f3ed] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#1f6a4d]">
+                {levelLabel}
               </p>
               <p className="text-sm text-[#4f615a] leading-relaxed">
                 {text.description}

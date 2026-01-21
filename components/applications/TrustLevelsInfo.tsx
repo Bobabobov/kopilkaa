@@ -128,10 +128,10 @@ export function TrustLevelsInfo() {
         <h2 className="text-xl sm:text-2xl font-semibold text-[#fffffe]">
           Уровни доверия в Копилке
         </h2>
-        <p className="text-sm text-[#94a1b2]">
+        <p className="text-sm text-[#cfded6] font-medium">
           Ориентиры по поддержке зависят от подтверждённого участия в проекте
         </p>
-        <p className="text-xs text-[#94a1b2]/90">
+        <p className="text-xs text-[#9bb3ab]">
           Уровень доверия формируется автоматически и может пересматриваться.
         </p>
       </div>
@@ -140,14 +140,20 @@ export function TrustLevelsInfo() {
         <h3 className="text-sm sm:text-base font-semibold text-[#e2f0ea]">
           Как работает доверие в Копилке
         </h3>
-        <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">
-          В Копилке нет автоматических выплат и гарантированных сумм.
+        <p className="text-xs sm:text-sm text-[#cfded6] font-medium leading-relaxed">
+          В Копилке нет{" "}
+          <span className="text-[#f0c878]">автоматических выплат</span> и{" "}
+          <span className="text-[#f0c878]">гарантированных сумм</span>.
         </p>
         <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">
-          Уровень доверия — это ориентир по возможной сумме поддержки. Он не означает обязательное одобрение заявки и не даёт «права» на деньги.
+          <span className="text-[#cfded6] font-medium">Уровень доверия</span> — это{" "}
+          <span className="text-[#f0c878]">ориентир</span> по возможной сумме поддержки. Он{" "}
+          <span className="text-[#f0c878]">не означает обязательное одобрение</span> заявки и не даёт «права» на деньги.
         </p>
         <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">
-          Уровень формируется на основе подтверждённого участия и качества заявок. В отдельных случаях команда может пересматривать уровень доверия.
+          Уровень формируется на основе{" "}
+          <span className="text-[#f0c878]">подтверждённого участия</span> и качества заявок. В отдельных случаях команда может{" "}
+          <span className="text-[#f0c878]">пересматривать уровень доверия</span>.
         </p>
       </div>
 
@@ -183,13 +189,15 @@ export function TrustLevelsInfo() {
                 </div>
 
                 <div className="mt-3 space-y-2">
-                  <div className="text-sm text-[#cfded6]">
-                    Ориентир по поддержке:{" "}
-                  <span className="font-semibold text-[#f0c878] whitespace-nowrap">
-                    {level.support}
-                  </span>
+                  <div className="space-y-1">
+                    <span className="text-[11px] uppercase tracking-[0.14em] text-[#9bb3ab]">
+                      Ориентир по поддержке
+                    </span>
+                    <span className="block text-base sm:text-lg font-semibold text-[#f0c878] whitespace-nowrap">
+                      {level.support}
+                    </span>
                   </div>
-                  <div className="text-sm text-[#b5c9c1]">
+                  <div className="text-sm font-medium text-[#cfded6]">
                     {level.obtain}
                   </div>
                   <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">

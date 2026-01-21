@@ -217,7 +217,13 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
                 <span className="text-sm font-bold text-[#001e1d] group-hover/author:text-[#004643] transition-colors duration-300 whitespace-nowrap">
                   {authorName}
                 </span>
-                {story.user?.heroBadge && <HeroBadge badge={story.user.heroBadge} size="xs" />}
+                {story.user?.heroBadge && (
+                  <HeroBadge
+                    badge={story.user.heroBadge}
+                    size="sm"
+                    className="ring-1 ring-[#001e1d]/20 shadow-md"
+                  />
+                )}
               </Link>
             ) : (
               <div className="flex items-center gap-2 bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 flex-shrink-0">
@@ -233,7 +239,13 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
                 <span className="text-sm font-bold text-[#001e1d] whitespace-nowrap">
                   {authorName}
                 </span>
-                {story.user?.heroBadge && <HeroBadge badge={story.user.heroBadge} size="xs" />}
+                {story.user?.heroBadge && (
+                  <HeroBadge
+                    badge={story.user.heroBadge}
+                    size="sm"
+                    className="ring-1 ring-[#001e1d]/20 shadow-md"
+                  />
+                )}
               </div>
             )}
             

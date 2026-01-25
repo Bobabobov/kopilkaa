@@ -65,7 +65,7 @@ export default function ActivityRequirementModal({
           title: "Лайк истории",
           description:
             "Поставьте лайк любой истории, которая вам понравится.",
-          helperText: "Каждая новая заявка требует новый лайк.",
+          helperText: "Начиная с 3-й заявки — лайк нужен каждый раз.",
           buttonText: "Открыть истории",
           buttonLink: "/stories",
           buttonIcon: <LucideIcons.BookOpen className="w-5 h-5" />,

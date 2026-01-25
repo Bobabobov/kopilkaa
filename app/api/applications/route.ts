@@ -31,11 +31,33 @@ export async function POST(req: Request) {
 
   const requester = await prisma.user.findUnique({
     where: { id: session.uid },
-    select: { email: true },
+    select: { email: true, avatar: true, headerTheme: true },
   });
   const whitelistEmails = getWhitelistEmails();
   const isWhitelisted =
     requester?.email && whitelistEmails.includes(requester.email.toLowerCase());
+
+  if (!requester?.avatar || requester.avatar.trim() === "") {
+    return Response.json(
+      {
+        error: "Для создания заявки нужно установить аватар в профиле.",
+        requiresActivity: true,
+        activityType: "CHANGE_AVATAR",
+      },
+      { status: 403 },
+    );
+  }
+
+  if (!requester?.headerTheme || requester.headerTheme === "default") {
+    return Response.json(
+      {
+        error: "Для создания заявки нужно установить обложку профиля.",
+        requiresActivity: true,
+        activityType: "CHANGE_HEADER",
+      },
+      { status: 403 },
+    );
+  }
 
   try {
     const {

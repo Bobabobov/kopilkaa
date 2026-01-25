@@ -24,7 +24,7 @@ export async function getAllPossibleRequirements(
     {
       type: "LIKE_STORY",
       message:
-        "Для создания заявки поставьте лайк любой истории, которая вам понравится.",
+        "Для каждой 3-й и последующей заявки поставьте лайк любой истории.",
     },
     {
       type: "CHANGE_AVATAR",

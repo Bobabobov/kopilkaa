@@ -10,12 +10,9 @@ export async function GET() {
     const activeAds = await prisma.advertisement.findMany({
       where: {
         isActive: true,
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: new Date() } }
-        ]
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
       },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     if (activeAds.length === 0) {
@@ -43,7 +40,7 @@ export async function GET() {
     console.error("Error rotating ads:", error);
     return NextResponse.json(
       { error: "Failed to rotate ads" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

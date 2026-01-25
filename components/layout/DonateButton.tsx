@@ -6,11 +6,6 @@ import Link from "next/link";
 
 interface DonateButtonProps {
   /**
-   * legacy флаг для кнопки внутри мобильного меню (полноширинная)
-   * @deprecated используйте variant="mobileMenu"
-   */
-  isMobile?: boolean;
-  /**
    * default: обычная кнопка (desktop/header)
    * mobileMenu: полноширинная кнопка внутри бургер-меню
    * mobileHeader: компактная кнопка рядом с бургером (иконка)
@@ -20,11 +15,10 @@ interface DonateButtonProps {
 }
 
 export default function DonateButton({
-  isMobile = false,
   variant,
   onLinkClick,
 }: DonateButtonProps) {
-  const resolvedVariant = variant ?? (isMobile ? "mobileMenu" : "default");
+  const resolvedVariant = variant ?? "default";
 
   const commonAnimation = {
     borderColor: [
@@ -45,7 +39,12 @@ export default function DonateButton({
 
   if (resolvedVariant === "mobileHeader") {
     return (
-      <Link href="/support" onClick={onLinkClick} className="block" aria-label="Стать героем">
+      <Link
+        href="/support"
+        onClick={onLinkClick}
+        className="block"
+        aria-label="Стать героем"
+      >
         <motion.span
           whileHover={{ scale: 1.05, y: -1 }}
           whileTap={{ scale: 0.97 }}
@@ -112,7 +111,7 @@ export default function DonateButton({
             style={{
               background:
                 "radial-gradient(120% 90% at 10% 10%, rgba(249,188,96,0.25), transparent 50%), radial-gradient(120% 90% at 90% 0%, rgba(171,209,198,0.18), transparent 45%)",
-          }}
+            }}
           />
           <span
             aria-hidden
@@ -129,7 +128,7 @@ export default function DonateButton({
               transition={{ type: "spring", stiffness: 500, damping: 22 }}
               className="text-[#f9bc60]"
             >
-            <LucideIcons.Heart size="sm" />
+              <LucideIcons.Heart size="sm" />
             </motion.span>
             <span className="text-[#fffffe]">Стать героем</span>
           </span>
@@ -141,7 +140,7 @@ export default function DonateButton({
   return (
     <Link href="/support" onClick={onLinkClick} className="block">
       <motion.span
-        whileHover={{ 
+        whileHover={{
           scale: 1.04,
           y: -1,
           boxShadow: "0 18px 44px -26px rgba(249, 188, 96, 0.75)",
@@ -167,7 +166,7 @@ export default function DonateButton({
           style={{
             background:
               "radial-gradient(120% 90% at 10% 10%, rgba(249,188,96,0.22), transparent 55%), radial-gradient(120% 90% at 90% 0%, rgba(171,209,198,0.14), transparent 50%)",
-        }}
+          }}
         />
         {/* subtle shine */}
         <span
@@ -185,7 +184,7 @@ export default function DonateButton({
             transition={{ type: "spring", stiffness: 500, damping: 22 }}
             className="text-[#f9bc60]"
           >
-          <LucideIcons.Heart size="sm" />
+            <LucideIcons.Heart size="sm" />
           </motion.span>
           <span className="text-[#fffffe]">Стать героем</span>
         </span>

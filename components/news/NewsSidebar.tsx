@@ -14,19 +14,19 @@ function formatShortDate(value: string) {
 function getPostWord(count: number): string {
   const lastDigit = count % 10;
   const lastTwoDigits = count % 100;
-  
+
   if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
     return "постов";
   }
-  
+
   if (lastDigit === 1) {
     return "пост";
   }
-  
+
   if (lastDigit >= 2 && lastDigit <= 4) {
     return "поста";
   }
-  
+
   return "постов";
 }
 
@@ -57,14 +57,16 @@ export function NewsSidebar({
       it,
       score: (it.likesCount || 0) - (it.dislikesCount || 0),
     }));
-    scored.sort((a, b) => b.score - a.score || +new Date(b.it.createdAt) - +new Date(a.it.createdAt));
+    scored.sort(
+      (a, b) =>
+        b.score - a.score ||
+        +new Date(b.it.createdAt) - +new Date(a.it.createdAt),
+    );
     return scored.slice(0, 5).map((x) => x.it);
   }, [items]);
 
   const containerClass =
-    variant === "desktop"
-      ? "sticky top-24 space-y-4"
-      : "space-y-4";
+    variant === "desktop" ? "sticky top-24 space-y-4" : "space-y-4";
 
   return (
     <div className={containerClass}>
@@ -78,21 +80,35 @@ export function NewsSidebar({
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="text-xs text-white/60">{getPostWord(stats.total)}</div>
-            <div className="text-xl font-black text-[#fffffe]">{stats.total}</div>
+            <div className="text-xs text-white/60">
+              {getPostWord(stats.total)}
+            </div>
+            <div className="text-xl font-black text-[#fffffe]">
+              {stats.total}
+            </div>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <div className="text-xs text-white/60">Лайков</div>
-            <div className="text-xl font-black text-[#10B981]">{stats.likes}</div>
+            <div className="text-xl font-black text-[#10B981]">
+              {stats.likes}
+            </div>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <div className="text-xs text-white/60">Дизлайков</div>
-            <div className="text-xl font-black text-red-300">{stats.dislikes}</div>
+            <div className="text-xl font-black text-red-300">
+              {stats.dislikes}
+            </div>
           </div>
         </div>
         {lastUpdatedAt && (
           <div className="mt-3 text-xs text-white/55">
-            Обновлено: <span className="text-white/75">{new Date(lastUpdatedAt).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}</span>
+            Обновлено:{" "}
+            <span className="text-white/75">
+              {new Date(lastUpdatedAt).toLocaleTimeString("ru-RU", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
           </div>
         )}
       </div>
@@ -173,5 +189,3 @@ export function NewsSidebar({
     </div>
   );
 }
-
-

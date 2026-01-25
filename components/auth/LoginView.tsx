@@ -31,7 +31,11 @@ export function LoginView({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
-  const emailHref = buildAuthModalUrl({ pathname, search, modal: "auth/login/email" });
+  const emailHref = buildAuthModalUrl({
+    pathname,
+    search,
+    modal: "auth/login/email",
+  });
 
   return (
     <>
@@ -46,7 +50,10 @@ export function LoginView({
             <p className="text-xs mb-4 text-center text-[#6b7280] uppercase tracking-wider font-semibold">
               Через Telegram
             </p>
-            <TelegramWidget onAuth={onTelegramAuth} checkingAuth={checkingAuth} />
+            <TelegramWidget
+              onAuth={onTelegramAuth}
+              checkingAuth={checkingAuth}
+            />
           </motion.div>
 
           <motion.div
@@ -86,5 +93,3 @@ export function LoginView({
     </>
   );
 }
-
-

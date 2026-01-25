@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
 // Явно указываем, что роут динамический (не кэшируется)
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -33,11 +33,11 @@ export async function GET() {
     if (!activeAd) {
       activeAd = await prisma.advertisement
         .findFirst({
-      where: {
-        isActive: true,
+          where: {
+            isActive: true,
             placement: { notIn: ["home_banner", "stories"] },
             ...dateWhere,
-      },
+          },
           orderBy: { createdAt: "desc" },
         })
         .catch((error) => {
@@ -47,11 +47,9 @@ export async function GET() {
     }
 
     if (!activeAd) {
-      console.log("No active ad found for home_sidebar");
       return NextResponse.json({ ad: null });
     }
 
-    console.log("Found active ad:", { id: activeAd.id, placement: activeAd.placement, isActive: activeAd.isActive });
     return NextResponse.json({ ad: activeAd });
   } catch (error) {
     console.error("Error fetching active ad:", error);

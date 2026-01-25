@@ -64,9 +64,7 @@ export default function ApplicationsList({
 
   if (items.length === 0) {
     return (
-      <ApplicationsListEmpty
-        hasFilters={!!searchQuery || status !== "ALL"}
-      />
+      <ApplicationsListEmpty hasFilters={!!searchQuery || status !== "ALL"} />
     );
   }
 

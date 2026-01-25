@@ -91,7 +91,7 @@ export default function AdminClient() {
           loadMore();
         }
       },
-      { threshold: 0.1, rootMargin: "100px" }
+      { threshold: 0.1, rootMargin: "100px" },
     );
 
     const currentTarget = observerTarget.current;
@@ -120,7 +120,6 @@ export default function AdminClient() {
     }
   }, [loading]);
 
-
   // Показываем загрузку при первой загрузке
   if (loading && items.length === 0) {
     return <AdminLoading />;
@@ -128,7 +127,6 @@ export default function AdminClient() {
 
   return (
     <div className="min-h-screen relative">
-
       <div className="relative z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">
           <AdminHeader />
@@ -193,7 +191,12 @@ export default function AdminClient() {
       <StatusModal
         modal={modal}
         onClose={() =>
-          setModal({ id: "", status: "PENDING", comment: "", decreaseTrustOnDecision: false })
+          setModal({
+            id: "",
+            status: "PENDING",
+            comment: "",
+            decreaseTrustOnDecision: false,
+          })
         }
         onStatusChange={(status) =>
           setModal((prev) => ({

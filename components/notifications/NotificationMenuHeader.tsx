@@ -14,9 +14,9 @@ export default function NotificationMenuHeader({
   unreadCount,
 }: NotificationMenuHeaderProps) {
   const getNotificationCountText = (count: number) => {
-    if (count === 1) return 'уведомление';
-    if (count < 5) return 'уведомления';
-    return 'уведомлений';
+    if (count === 1) return "уведомление";
+    if (count < 5) return "уведомления";
+    return "уведомлений";
   };
 
   return (
@@ -27,10 +27,13 @@ export default function NotificationMenuHeader({
             <LucideIcons.Bell className="text-[#f9bc60] w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-semibold text-[#fffffe] leading-tight">Уведомления</h3>
+            <h3 className="text-sm sm:text-base font-semibold text-[#fffffe] leading-tight">
+              Уведомления
+            </h3>
             {notificationsCount > 0 && (
               <p className="text-[10px] sm:text-[11px] text-[#abd1c6]/60 mt-0.5">
-                {notificationsCount} {getNotificationCountText(notificationsCount)}
+                {notificationsCount}{" "}
+                {getNotificationCountText(notificationsCount)}
               </p>
             )}
           </div>
@@ -41,12 +44,10 @@ export default function NotificationMenuHeader({
             animate={{ scale: 1 }}
             className="min-w-[18px] h-5 sm:min-w-[20px] sm:h-5 bg-red-500 text-white text-[10px] sm:text-[11px] font-semibold rounded-full flex items-center justify-center px-1.5 shadow-sm"
           >
-            {unreadCount > 99 ? '99+' : unreadCount}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </motion.span>
         )}
       </div>
     </div>
   );
 }
-
-

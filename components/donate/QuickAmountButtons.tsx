@@ -6,7 +6,11 @@ interface QuickAmountButtonsProps {
   onSelect: (amount: number) => void;
 }
 
-export function QuickAmountButtons({ amounts, selectedAmount, onSelect }: QuickAmountButtonsProps) {
+export function QuickAmountButtons({
+  amounts,
+  selectedAmount,
+  onSelect,
+}: QuickAmountButtonsProps) {
   return (
     <div>
       <p className="text-xs mb-2" style={{ color: "#6b7280" }}>
@@ -26,7 +30,8 @@ export function QuickAmountButtons({ amounts, selectedAmount, onSelect }: QuickA
             style={{
               backgroundColor:
                 selectedAmount === amount.toString() ? "#f9bc60" : "#1f2937",
-              color: selectedAmount === amount.toString() ? "#001e1d" : "#abd1c6"
+              color:
+                selectedAmount === amount.toString() ? "#001e1d" : "#abd1c6",
             }}
           >
             {amount}₽
@@ -36,5 +41,3 @@ export function QuickAmountButtons({ amounts, selectedAmount, onSelect }: QuickA
     </div>
   );
 }
-
-

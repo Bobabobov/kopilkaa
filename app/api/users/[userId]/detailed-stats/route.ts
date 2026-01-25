@@ -122,15 +122,18 @@ export async function GET(
       pending: applications.filter((app) => app.status === "PENDING").length,
       approved: applications.filter((app) => app.status === "APPROVED").length,
       effectiveApproved: applications.filter(
-        (app) => app.status === "APPROVED" && app.countTowardsTrust === true
+        (app) => app.status === "APPROVED" && app.countTowardsTrust === true,
       ).length,
       rejected: applications.filter((app) => app.status === "REJECTED").length,
-      totalAmount: applications.reduce((sum, app) => sum + (app.amount || 0), 0),
+      totalAmount: applications.reduce(
+        (sum, app) => sum + (app.amount || 0),
+        0,
+      ),
       averageAmount:
         applications.length > 0
           ? Math.round(
               applications.reduce((sum, app) => sum + (app.amount || 0), 0) /
-                applications.length
+                applications.length,
             )
           : 0,
     };
@@ -139,7 +142,7 @@ export async function GET(
     const daysActive = userData
       ? Math.floor(
           (Date.now() - new Date(userData.createdAt).getTime()) /
-            (1000 * 60 * 60 * 24)
+            (1000 * 60 * 60 * 24),
         )
       : 0;
 
@@ -155,16 +158,16 @@ export async function GET(
     const achievementStats = {
       total: achievements.length,
       legendary: achievements.filter(
-        (ua) => ua.achievement && ua.achievement.rarity === "LEGENDARY"
+        (ua) => ua.achievement && ua.achievement.rarity === "LEGENDARY",
       ).length,
       epic: achievements.filter(
-        (ua) => ua.achievement && ua.achievement.rarity === "EPIC"
+        (ua) => ua.achievement && ua.achievement.rarity === "EPIC",
       ).length,
       rare: achievements.filter(
-        (ua) => ua.achievement && ua.achievement.rarity === "RARE"
+        (ua) => ua.achievement && ua.achievement.rarity === "RARE",
       ).length,
       common: achievements.filter(
-        (ua) => ua.achievement && ua.achievement.rarity === "COMMON"
+        (ua) => ua.achievement && ua.achievement.rarity === "COMMON",
       ).length,
     };
 
@@ -196,7 +199,7 @@ export async function GET(
           Pragma: "no-cache",
           Expires: "0",
         },
-      }
+      },
     );
   } catch (error) {
     console.error("Error fetching detailed stats:", error);
@@ -253,8 +256,7 @@ export async function GET(
           Pragma: "no-cache",
           Expires: "0",
         },
-      }
+      },
     );
   }
 }
-

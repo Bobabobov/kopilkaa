@@ -53,4 +53,3 @@ export function ApplicationsProgress({
 }
 
 export default ApplicationsProgress;
-

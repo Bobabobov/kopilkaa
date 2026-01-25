@@ -41,7 +41,10 @@ export function AvatarBlock({
         <div className="relative -mt-16 sm:-mt-20 md:-mt-24 transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:shadow-none hover:brightness-100 [&_*]:transition-none [&_*]:duration-0 [&_*]:transform-none [&_*:hover]:transform-none">
           <AvatarUpload
             currentAvatar={currentAvatar}
-            userName={user.name || (!user.hideEmail && user.email ? user.email : "Пользователь")}
+            userName={
+              user.name ||
+              (!user.hideEmail && user.email ? user.email : "Пользователь")
+            }
             onAvatarChange={onAvatarChange || (() => {})}
           />
         </div>
@@ -61,7 +64,13 @@ export function AvatarBlock({
             className="flex items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-200"
             title="Изменить обложку"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            >
               <path d="M4 7h3l2-3h6l2 3h3v12H4z" />
               <circle cx="12" cy="13" r="3.5" />
             </svg>
@@ -74,7 +83,13 @@ export function AvatarBlock({
             className="flex items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-200"
             title="Изменить аватар"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            >
               <path d="M12 5v14M5 12h14" />
             </svg>
             <span>Аватар</span>

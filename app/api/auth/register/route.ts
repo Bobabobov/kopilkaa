@@ -17,7 +17,10 @@ function normalizePhone(raw: string): string | null {
   if (digits.length === 10) {
     return `7${digits}`;
   }
-  if (digits.length === 11 && (digits.startsWith("7") || digits.startsWith("8"))) {
+  if (
+    digits.length === 11 &&
+    (digits.startsWith("7") || digits.startsWith("8"))
+  ) {
     return `7${digits.slice(1)}`;
   }
   if (digits.length >= 7 && digits.length <= 15) {
@@ -34,7 +37,9 @@ export async function POST(req: Request) {
       .toLowerCase();
     const password = String(body?.password ?? "");
     const name = String(body?.name ?? body?.username ?? "").trim();
-    const usernameRaw = String(body?.username ?? "").trim().toLowerCase();
+    const usernameRaw = String(body?.username ?? "")
+      .trim()
+      .toLowerCase();
     const usernamePattern = /^[\p{L}\p{N}._-]{3,20}$/u;
 
     const phoneRaw = String(body?.phone ?? "").trim();
@@ -43,12 +48,9 @@ export async function POST(req: Request) {
       return bad("Некорректный email");
     if (password.length < 8 || password.length > 30)
       return bad("Пароль должен быть 8–30 символов");
-    if (!usernameRaw)
-      return bad("Придумайте логин");
+    if (!usernameRaw) return bad("Придумайте логин");
     if (!usernamePattern.test(usernameRaw))
-      return bad(
-        "Логин может содержать 3-20 символов: буквы, цифры, ._-",
-      );
+      return bad("Логин может содержать 3-20 символов: буквы, цифры, ._-");
 
     // Телефон опционален
     let normalizedPhone: string | null = null;
@@ -121,7 +123,11 @@ export async function POST(req: Request) {
       },
       { status: 201 },
     );
-    attachSessionToResponse(res, { uid: user.id, role: user.role as "USER" | "ADMIN" }, req);
+    attachSessionToResponse(
+      res,
+      { uid: user.id, role: user.role as "USER" | "ADMIN" },
+      req,
+    );
     return res;
   } catch (err: any) {
     if (err?.code === "P2002")

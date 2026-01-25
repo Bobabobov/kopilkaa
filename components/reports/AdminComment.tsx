@@ -32,5 +32,3 @@ export default function AdminComment({ comment }: AdminCommentProps) {
     </motion.div>
   );
 }
-
-

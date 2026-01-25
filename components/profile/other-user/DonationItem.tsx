@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { formatAmount, formatDonationDate, formatServiceLabel } from "./donationUtils";
+import {
+  formatAmount,
+  formatDonationDate,
+  formatServiceLabel,
+} from "./donationUtils";
 import type { Donation } from "./hooks/useOtherUserDonations";
 
 interface DonationItemProps {
@@ -27,11 +31,17 @@ export function DonationItem({ donation, index }: DonationItemProps) {
           <LucideIcons.CreditCard className="text-[#f9bc60]" size="sm" />
         </motion.div>
         <div className="min-w-0 flex-1">
-          <div className="text-sm sm:text-base font-semibold text-[#fffffe]">{formatAmount(donation.amount)}</div>
+          <div className="text-sm sm:text-base font-semibold text-[#fffffe]">
+            {formatAmount(donation.amount)}
+          </div>
           {serviceLabel && (
-            <div className="text-xs sm:text-sm text-[#abd1c6] truncate mt-0.5">{serviceLabel}</div>
+            <div className="text-xs sm:text-sm text-[#abd1c6] truncate mt-0.5">
+              {serviceLabel}
+            </div>
           )}
-          <div className="text-[10px] sm:text-xs text-[#abd1c6]/60 mt-1">{formatDonationDate(donation.createdAt)}</div>
+          <div className="text-[10px] sm:text-xs text-[#abd1c6]/60 mt-1">
+            {formatDonationDate(donation.createdAt)}
+          </div>
         </div>
       </div>
     </motion.div>

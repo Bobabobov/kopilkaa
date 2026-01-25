@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth";
 // PUT - обновление статуса заявки (только для админов)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } },
 ) {
   try {
     const session = await getSession();
@@ -22,7 +22,7 @@ export async function PUT(
     if (!validStatuses.includes(status)) {
       return NextResponse.json(
         { error: "Некорректный статус" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -40,7 +40,7 @@ export async function PUT(
     console.error("Error updating ad request:", error);
     return NextResponse.json(
       { error: "Не удалось обновить заявку" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -50,7 +50,7 @@ export const dynamic = "force-dynamic";
 // DELETE - удаление заявки (только для админов)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } },
 ) {
   try {
     const session = await getSession();
@@ -71,8 +71,7 @@ export async function DELETE(
     console.error("Error deleting ad request:", error);
     return NextResponse.json(
       { error: "Не удалось удалить заявку" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

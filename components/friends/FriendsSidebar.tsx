@@ -8,9 +8,24 @@ import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 const mockActivity = [
-  { id: "a1", text: "asdasdasd стал вашим другом", time: "3 дня назад", icon: "UserPlus" },
-  { id: "a2", text: "TEST получил достижение «Легенда»", time: "1 день назад", icon: "Award" },
-  { id: "a3", text: "Лена приняла вашу заявку", time: "5 часов назад", icon: "CheckCircle2" },
+  {
+    id: "a1",
+    text: "asdasdasd стал вашим другом",
+    time: "3 дня назад",
+    icon: "UserPlus",
+  },
+  {
+    id: "a2",
+    text: "TEST получил достижение «Легенда»",
+    time: "1 день назад",
+    icon: "Award",
+  },
+  {
+    id: "a3",
+    text: "Лена приняла вашу заявку",
+    time: "5 часов назад",
+    icon: "CheckCircle2",
+  },
 ];
 
 export function FriendsSidebar() {
@@ -42,7 +57,9 @@ export function FriendsSidebar() {
           name: u.name,
           email: u.email,
           avatar: u.avatar,
-          mutual: u.mutualFriends ? `${u.mutualFriends} общих друзей` : undefined,
+          mutual: u.mutualFriends
+            ? `${u.mutualFriends} общих друзей`
+            : undefined,
           heroBadge: u.heroBadge ?? null,
         })),
       );
@@ -81,7 +98,9 @@ export function FriendsSidebar() {
     <aside className="hidden md:block lg:sticky lg:top-6 space-y-4 min-w-0">
       <div className="rounded-2xl border border-[#abd1c6]/20 bg-[#052d29] p-4 shadow-xl min-w-0">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-semibold text-[#fffffe]">Активность друзей</h3>
+          <h3 className="text-lg font-semibold text-[#fffffe]">
+            Активность друзей
+          </h3>
           <span className="px-2 py-1 text-[11px] rounded-full bg-[#001e1d]/70 text-[#abd1c6]">
             Сегодня
           </span>
@@ -92,8 +111,8 @@ export function FriendsSidebar() {
               item.icon === "UserPlus"
                 ? LucideIcons.UserPlus
                 : item.icon === "Award"
-                ? LucideIcons.Award
-                : LucideIcons.CheckCircle2;
+                  ? LucideIcons.Award
+                  : LucideIcons.CheckCircle2;
             return (
               <div
                 key={item.id}
@@ -103,7 +122,9 @@ export function FriendsSidebar() {
                   <Icon size="sm" className="w-4 h-4" />
                 </div>
                 <div className="min-w-0 space-y-1">
-                  <p className="text-sm text-[#fffffe] leading-snug">{item.text}</p>
+                  <p className="text-sm text-[#fffffe] leading-snug">
+                    {item.text}
+                  </p>
                   <p className="text-xs text-white/60">{item.time}</p>
                 </div>
               </div>
@@ -113,7 +134,9 @@ export function FriendsSidebar() {
       </div>
 
       <div className="rounded-2xl border border-[#abd1c6]/20 bg-[#052d29] p-4 shadow-xl min-w-0">
-        <h3 className="text-lg font-semibold text-[#fffffe] mb-2.5">Возможно, вы знакомы</h3>
+        <h3 className="text-lg font-semibold text-[#fffffe] mb-2.5">
+          Возможно, вы знакомы
+        </h3>
         <div className="space-y-2.5">
           <AnimatePresence>
             {suggestions.map((person, idx) => {
@@ -136,7 +159,6 @@ export function FriendsSidebar() {
                       title="Открыть профиль"
                       prefetch={false}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={person.avatar || "/default-avatar.png"}
                         alt=""
@@ -157,8 +179,8 @@ export function FriendsSidebar() {
                         className="text-[#fffffe] font-semibold leading-tight min-w-0 truncate group-hover:underline"
                         title={person.name || person.email || "Пользователь"}
                       >
-                          {person.name || person.email || "Пользователь"}
-                        </p>
+                        {person.name || person.email || "Пользователь"}
+                      </p>
 
                       <div className="mt-1 flex flex-wrap items-center gap-1.5 min-w-0">
                         <span className="text-xs text-[#abd1c6] min-w-0 truncate">
@@ -179,7 +201,11 @@ export function FriendsSidebar() {
                           : "bg-[#f9bc60]/80 hover:bg-[#f9bc60] text-[#001e1d]"
                       } ${isSending ? "opacity-70 cursor-wait" : ""}`}
                     >
-                      {isSending ? "Отправка..." : isSent ? "Отправлено" : "Добавить"}
+                      {isSending
+                        ? "Отправка..."
+                        : isSent
+                          ? "Отправлено"
+                          : "Добавить"}
                     </button>
                   </div>
                 </motion.div>
@@ -196,4 +222,3 @@ export function FriendsSidebar() {
     </aside>
   );
 }
-

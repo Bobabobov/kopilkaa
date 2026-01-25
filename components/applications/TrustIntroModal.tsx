@@ -10,7 +10,12 @@ type Props = {
   onConfirm: () => void;
 };
 
-export function TrustIntroModal({ open, checked, onCheckedChange, onConfirm }: Props) {
+export function TrustIntroModal({
+  open,
+  checked,
+  onCheckedChange,
+  onConfirm,
+}: Props) {
   if (!open) return null;
 
   return (
@@ -33,7 +38,9 @@ export function TrustIntroModal({ open, checked, onCheckedChange, onConfirm }: P
           transition={{ duration: 0.25, ease: "easeOut", delay: 0.02 }}
           className="space-y-3 max-w-[68ch]"
         >
-          <p className="text-xs uppercase tracking-[0.14em] text-[#9bb3ab]">Важно перед подачей заявки</p>
+          <p className="text-xs uppercase tracking-[0.14em] text-[#9bb3ab]">
+            Важно перед подачей заявки
+          </p>
           <h2 className="text-2xl sm:text-[26px] font-semibold text-[#f7fbf9] leading-tight drop-shadow-[0_0_12px_rgba(247,251,249,0.12)]">
             Копилка помогает не во всех ситуациях
           </h2>
@@ -55,36 +62,55 @@ export function TrustIntroModal({ open, checked, onCheckedChange, onConfirm }: P
             className="space-y-3 rounded-xl bg-[#0e2420] p-4 sm:p-5 relative overflow-hidden"
           >
             <div className="absolute left-0 top-3 bottom-3 w-[3px] bg-[#1c4037]/70 opacity-60 rounded-full" />
-            <h3 className="text-base sm:text-lg font-semibold text-[#d9e6e0]">Мы не помогаем с:</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-[#d9e6e0]">
+              Мы не помогаем с:
+            </h3>
             <ul className="space-y-4 text-sm text-[#c5d3cd] leading-[1.6]">
               <li className="space-y-1 pl-1">
                 <div className="font-semibold">• Кредиты и займы</div>
                 <div className="text-xs text-[#9fb2ab]">
-                  Банковские кредиты, рассрочки, потребительские займы и похожие обязательства
+                  Банковские кредиты, рассрочки, потребительские займы и похожие
+                  обязательства
                 </div>
               </li>
               <li className="space-y-1 pl-1">
                 <div className="font-semibold">• МФО и займы «до зарплаты»</div>
-                <div className="text-xs text-[#9fb2ab]">Онлайн-займы, быстрые деньги и аналогичные сервисы</div>
+                <div className="text-xs text-[#9fb2ab]">
+                  Онлайн-займы, быстрые деньги и аналогичные сервисы
+                </div>
               </li>
               <li className="space-y-1 pl-1">
-                <div className="font-semibold">• Долги, просрочки, коллекторы</div>
-                <div className="text-xs text-[#9fb2ab]">Задолженности, штрафы, пени и требования коллекторских агентств</div>
+                <div className="font-semibold">
+                  • Долги, просрочки, коллекторы
+                </div>
+                <div className="text-xs text-[#9fb2ab]">
+                  Задолженности, штрафы, пени и требования коллекторских
+                  агентств
+                </div>
               </li>
               <li className="space-y-1 pl-1">
                 <div className="font-semibold">• Лечение и лекарства</div>
-                <div className="text-xs text-[#9fb2ab]">Медицинские услуги, обследования, препараты и расходы на лечение</div>
+                <div className="text-xs text-[#9fb2ab]">
+                  Медицинские услуги, обследования, препараты и расходы на
+                  лечение
+                </div>
               </li>
               <li className="space-y-1 pl-1">
                 <div className="font-semibold">• Медицинские сборы</div>
-                <div className="text-xs text-[#9fb2ab]">Реабилитация, курсы лечения, анализы, платные процедуры</div>
+                <div className="text-xs text-[#9fb2ab]">
+                  Реабилитация, курсы лечения, анализы, платные процедуры
+                </div>
               </li>
               <li className="space-y-1 pl-1">
                 <div className="font-semibold">• Азартные игры и ставки</div>
-                <div className="text-xs text-[#9fb2ab]">Букмекеры, казино, лотереи и рискованные игровые активности</div>
+                <div className="text-xs text-[#9fb2ab]">
+                  Букмекеры, казино, лотереи и рискованные игровые активности
+                </div>
               </li>
             </ul>
-            <p className="text-xs text-[#9fb2ab]">И другие похожие по смыслу ситуации</p>
+            <p className="text-xs text-[#9fb2ab]">
+              И другие похожие по смыслу ситуации
+            </p>
           </motion.div>
 
           <div className="hidden md:block w-px h-full bg-[#2c4f45]/60 mx-1" />
@@ -107,28 +133,44 @@ export function TrustIntroModal({ open, checked, onCheckedChange, onConfirm }: P
               <li className="space-y-1 pl-1">
                 <div className="font-semibold">• Еда и напитки</div>
                 <div className="text-xs text-[#c8d9d2]">
-                  Покупка продуктов, перекус, вода, чай, кофе и другие повседневные траты
+                  Покупка продуктов, перекус, вода, чай, кофе и другие
+                  повседневные траты
                 </div>
               </li>
               <li className="space-y-1 pl-1">
                 <div className="font-semibold">• Небольшие бытовые расходы</div>
-                <div className="text-xs text-[#c8d9d2]">Предметы первой необходимости и повседневные нужды</div>
+                <div className="text-xs text-[#c8d9d2]">
+                  Предметы первой необходимости и повседневные нужды
+                </div>
               </li>
               <li className="space-y-1 pl-1">
-                <div className="font-semibold">• Проезд, связь и мелкие расходы</div>
-                <div className="text-xs text-[#c8d9d2]">Транспорт, мобильная связь, интернет и аналогичные траты</div>
+                <div className="font-semibold">
+                  • Проезд, связь и мелкие расходы
+                </div>
+                <div className="text-xs text-[#c8d9d2]">
+                  Транспорт, мобильная связь, интернет и аналогичные траты
+                </div>
               </li>
               <li className="space-y-1 pl-1">
                 <div className="font-semibold">• Небольшой подарок</div>
-                <div className="text-xs text-[#c8d9d2]">Простой подарок или знак внимания без крупных затрат</div>
+                <div className="text-xs text-[#c8d9d2]">
+                  Простой подарок или знак внимания без крупных затрат
+                </div>
               </li>
               <li className="space-y-1 pl-1">
                 <div className="font-semibold">• Донат в игру или сервис</div>
-                <div className="text-xs text-[#c8d9d2]">Цифровые сервисы, игры, подписки и внутриигровые покупки</div>
+                <div className="text-xs text-[#c8d9d2]">
+                  Цифровые сервисы, игры, подписки и внутриигровые покупки
+                </div>
               </li>
               <li className="space-y-1 pl-1">
-                <div className="font-semibold">• Поддержка в обычной жизненной ситуации</div>
-                <div className="text-xs text-[#c8d9d2]">Небольшая помощь здесь и сейчас без долгов и серьёзных обязательств</div>
+                <div className="font-semibold">
+                  • Поддержка в обычной жизненной ситуации
+                </div>
+                <div className="text-xs text-[#c8d9d2]">
+                  Небольшая помощь здесь и сейчас без долгов и серьёзных
+                  обязательств
+                </div>
               </li>
             </ul>
           </motion.div>
@@ -184,4 +226,3 @@ export function TrustIntroModal({ open, checked, onCheckedChange, onConfirm }: P
 }
 
 export default TrustIntroModal;
-

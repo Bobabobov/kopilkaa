@@ -134,7 +134,8 @@ export default function OtherUserAchievementsModal({
                 </h2>
                 {stats && (
                   <p className="text-xs text-[#abd1c6]/80">
-                    {stats.unlockedAchievements} из {stats.totalAchievements} разблокировано
+                    {stats.unlockedAchievements} из {stats.totalAchievements}{" "}
+                    разблокировано
                   </p>
                 )}
               </div>
@@ -200,5 +201,3 @@ export default function OtherUserAchievementsModal({
 
   return createPortal(content, document.body);
 }
-
-

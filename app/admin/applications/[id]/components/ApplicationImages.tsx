@@ -18,7 +18,10 @@ export default function ApplicationImages({
       transition={{ duration: 0.5, delay: 0.6 }}
       className="mb-6"
     >
-      <h3 className="flex items-center gap-2 text-lg sm:text-xl font-semibold mb-4" style={{ color: "#fffffe" }}>
+      <h3
+        className="flex items-center gap-2 text-lg sm:text-xl font-semibold mb-4"
+        style={{ color: "#fffffe" }}
+      >
         <svg
           className="w-5 h-5 flex-shrink-0"
           fill="none"
@@ -84,13 +87,9 @@ export default function ApplicationImages({
           <p className="text-base sm:text-lg font-medium">
             Фотографии не прикреплены
           </p>
-          <p className="text-sm">
-            Автор не добавил изображения к заявке
-          </p>
+          <p className="text-sm">Автор не добавил изображения к заявке</p>
         </div>
       )}
     </motion.div>
   );
 }
-
-

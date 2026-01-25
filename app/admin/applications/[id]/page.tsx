@@ -41,7 +41,7 @@ export default function AdminApplicationPage({
       } else {
         showToast("error", "Ошибка удаления", "Не удалось удалить заявку");
       }
-    } catch (error) {
+    } catch {
       showToast(
         "error",
         "Ошибка удаления",
@@ -118,7 +118,7 @@ export default function AdminApplicationPage({
       <div className="min-h-screen flex items-center justify-center relative">
         <UniversalBackground />
         <div className="relative z-10">
-          <motion.div 
+          <motion.div
             className="text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -136,7 +136,7 @@ export default function AdminApplicationPage({
       <div className="min-h-screen flex items-center justify-center px-4 relative">
         <UniversalBackground />
         <div className="relative z-10">
-          <motion.div 
+          <motion.div
             className="text-center max-w-4xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -166,7 +166,10 @@ export default function AdminApplicationPage({
         className="relative z-10 pt-24 pb-12 px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-7xl mx-auto">
-          <ApplicationHeader status={item.status} onBack={() => router.back()} />
+          <ApplicationHeader
+            status={item.status}
+            onBack={() => router.back()}
+          />
 
           {/* Основной контент */}
           <div className="grid gap-6 lg:gap-8">

@@ -34,7 +34,7 @@ export default function TelegramChannel() {
           {/* Overlay при hover */}
           <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-all duration-300 rounded-2xl pointer-events-none" />
         </Link>
-        
+
         <Link
           href="https://kick.com/koponline"
           target="_blank"
@@ -58,4 +58,3 @@ export default function TelegramChannel() {
     </motion.div>
   );
 }
-

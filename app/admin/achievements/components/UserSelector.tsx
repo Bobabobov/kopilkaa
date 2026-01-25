@@ -25,26 +25,28 @@ export default function UserSelector({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.user-dropdown-container')) {
+      if (!target.closest(".user-dropdown-container")) {
         setShowDropdown(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Фильтрация пользователей
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = users.filter((user) => {
     const searchTerm = userSearch.toLowerCase();
     return (
       user.name?.toLowerCase().includes(searchTerm) ||
       (user.email ? user.email.toLowerCase().includes(searchTerm) : false) ||
-      (user.email ? user.email.split('@')[0].toLowerCase() : "").includes(searchTerm)
+      (user.email ? user.email.split("@")[0].toLowerCase() : "").includes(
+        searchTerm,
+      )
     );
   });
 
-  const selectedUser = users.find(u => u.id === selectedUserId);
+  const selectedUser = users.find((u) => u.id === selectedUserId);
 
   const handleSelect = (userId: string) => {
     onSelect(userId);
@@ -57,7 +59,7 @@ export default function UserSelector({
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
         👤 Выберите пользователя
       </label>
-      
+
       <div className="relative user-dropdown-container">
         <div className="relative">
           <input
@@ -75,7 +77,7 @@ export default function UserSelector({
             <LucideIcons.Search className="w-5 h-5 text-gray-400" />
           </div>
         </div>
-        
+
         {showDropdown && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-2xl shadow-xl z-10 max-h-96 overflow-y-auto">
             {filteredUsers.length > 0 ? (
@@ -106,13 +108,15 @@ export default function UserSelector({
               <div className="p-6 text-center text-gray-500 dark:text-gray-400">
                 <LucideIcons.Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p>Пользователи не найдены</p>
-                <p className="text-xs mt-1">Попробуйте изменить поисковый запрос</p>
+                <p className="text-xs mt-1">
+                  Попробуйте изменить поисковый запрос
+                </p>
               </div>
             )}
           </div>
         )}
       </div>
-      
+
       {selectedUser && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -143,5 +147,3 @@ export default function UserSelector({
     </div>
   );
 }
-
-

@@ -51,5 +51,3 @@ export function useMetrika() {
     };
   }, [pathname, searchParams?.toString()]);
 }
-
-

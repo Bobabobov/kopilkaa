@@ -13,7 +13,11 @@ interface EmailEditorProps extends BaseEditorProps {
   onSave: (email: string) => void;
 }
 
-export function EmailEditor({ currentEmail, onSave, disabled }: EmailEditorProps) {
+export function EmailEditor({
+  currentEmail,
+  onSave,
+  disabled,
+}: EmailEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(currentEmail);
   const [isValid, setIsValid] = useState(true);
@@ -28,7 +32,11 @@ export function EmailEditor({ currentEmail, onSave, disabled }: EmailEditorProps
   };
 
   const handleSave = () => {
-    if (value.trim() && value.trim() !== currentEmail && validateEmail(value.trim())) {
+    if (
+      value.trim() &&
+      value.trim() !== currentEmail &&
+      validateEmail(value.trim())
+    ) {
       onSave(value.trim());
     }
     setIsEditing(false);
@@ -64,7 +72,12 @@ export function EmailEditor({ currentEmail, onSave, disabled }: EmailEditorProps
           <div className="flex gap-2 sm:gap-2">
             <button
               onClick={handleSave}
-              disabled={disabled || !value.trim() || !isValid || value.trim() === currentEmail}
+              disabled={
+                disabled ||
+                !value.trim() ||
+                !isValid ||
+                value.trim() === currentEmail
+              }
               className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#10B981] hover:bg-[#059669] disabled:bg-[#6B7280] text-white font-semibold rounded-xl transition-colors"
             >
               ✓
@@ -181,23 +194,34 @@ interface UsernameEditorProps extends BaseEditorProps {
   onSave: (username: string) => void;
 }
 
-export function UsernameEditor({ currentUsername, onSave, disabled }: UsernameEditorProps) {
+export function UsernameEditor({
+  currentUsername,
+  onSave,
+  disabled,
+}: UsernameEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState(currentUsername ? `@${currentUsername}` : "");
+  const [value, setValue] = useState(
+    currentUsername ? `@${currentUsername}` : "",
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setValue(currentUsername ? `@${currentUsername}` : "");
   }, [currentUsername]);
 
-  const normalize = (raw: string) => raw.trim().replace(/^@+/, "").toLowerCase();
+  const normalize = (raw: string) =>
+    raw.trim().replace(/^@+/, "").toLowerCase();
 
   const validate = (raw: string) => {
     const normalized = normalize(raw);
     const pattern = /^[\p{L}\p{N}._-]{3,20}$/u;
     if (!normalized) return "Придумайте логин";
-    if (!pattern.test(normalized)) return "Логин: 3–20 символов (буквы, цифры, ._-)";
-    if (!/^[\p{L}\p{N}]/u.test(normalized) || !/[\p{L}\p{N}]$/u.test(normalized)) {
+    if (!pattern.test(normalized))
+      return "Логин: 3–20 символов (буквы, цифры, ._-)";
+    if (
+      !/^[\p{L}\p{N}]/u.test(normalized) ||
+      !/[\p{L}\p{N}]$/u.test(normalized)
+    ) {
       return "Логин должен начинаться и заканчиваться буквой или цифрой";
     }
     return null;
@@ -270,7 +294,11 @@ export function UsernameEditor({ currentUsername, onSave, disabled }: UsernameEd
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
       <div className="flex-1 px-3 py-2.5 sm:px-4 sm:py-3 bg-[#001e1d]/20 rounded-xl text-[#fffffe] border border-[#abd1c6]/20">
-        {currentUsername ? `@${currentUsername}` : <span className="text-[#abd1c6]">Не задан</span>}
+        {currentUsername ? (
+          `@${currentUsername}`
+        ) : (
+          <span className="text-[#abd1c6]">Не задан</span>
+        )}
       </div>
       <button
         onClick={() => {
@@ -292,25 +320,33 @@ interface EmailVisibilityToggleProps extends BaseEditorProps {
   onToggle: (hide: boolean) => void;
 }
 
-export function EmailVisibilityToggle({ hideEmail, onToggle, disabled }: EmailVisibilityToggleProps) {
+export function EmailVisibilityToggle({
+  hideEmail,
+  onToggle,
+  disabled,
+}: EmailVisibilityToggleProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20">
       <div>
-        <h4 className="text-sm font-medium text-[#fffffe] mb-1">Видимость email</h4>
+        <h4 className="text-sm font-medium text-[#fffffe] mb-1">
+          Видимость email
+        </h4>
         <p className="text-xs text-[#abd1c6]">
-          {hideEmail ? "Email скрыт от других пользователей" : "Email виден другим пользователям"}
+          {hideEmail
+            ? "Email скрыт от других пользователей"
+            : "Email виден другим пользователям"}
         </p>
       </div>
       <button
         onClick={() => onToggle(!hideEmail)}
         disabled={disabled}
         className={`relative w-12 h-6 rounded-full transition-colors ${
-          hideEmail ? 'bg-[#6B7280]' : 'bg-[#10B981]'
-        } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          hideEmail ? "bg-[#6B7280]" : "bg-[#10B981]"
+        } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       >
         <div
           className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-            hideEmail ? 'transform translate-x-1' : 'transform translate-x-7'
+            hideEmail ? "transform translate-x-1" : "transform translate-x-7"
           }`}
         />
       </button>

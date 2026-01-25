@@ -19,7 +19,9 @@ export default function ReportsAuthError({
     <div className="min-h-screen relative overflow-hidden">
       <div className="container-p mx-auto max-w-3xl relative z-10 px-4 pt-12 pb-12">
         <div className="rounded-2xl border border-[#e16162]/40 bg-[#001e1d]/40 p-6 text-center space-y-4">
-          <div className="text-lg font-semibold text-[#e16162]">Нет доступа</div>
+          <div className="text-lg font-semibold text-[#e16162]">
+            Нет доступа
+          </div>
           <p className="text-[#abd1c6]">{error}</p>
           <div className="flex items-center justify-center gap-3">
             <button
@@ -29,7 +31,7 @@ export default function ReportsAuthError({
                     pathname: window.location.pathname,
                     search: window.location.search,
                     modal: "auth",
-                  })
+                  }),
                 )
               }
               className="px-4 py-2 rounded-lg bg-[#f9bc60] text-[#001e1d] font-semibold"
@@ -48,5 +50,3 @@ export default function ReportsAuthError({
     </div>
   );
 }
-
-

@@ -3,7 +3,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 
 // Тип для функции showToast
-type ShowToast = (type: "success" | "error" | "info" | "warning", title: string, message?: string) => void;
+type ShowToast = (
+  type: "success" | "error" | "info" | "warning",
+  title: string,
+  message?: string,
+) => void;
 
 export interface Report {
   id: string;
@@ -45,9 +49,12 @@ export function useReports(statusFilter: string) {
     const fetchReports = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/admin/reports?status=${statusFilter}`, {
-          cache: "no-store",
-        });
+        const response = await fetch(
+          `/api/admin/reports?status=${statusFilter}`,
+          {
+            cache: "no-store",
+          },
+        );
 
         if (cancelled) return;
 
@@ -57,14 +64,22 @@ export function useReports(statusFilter: string) {
         } else {
           const errorData = await response.json().catch(() => ({}));
           if (!cancelled) {
-            showToastRef.current("error", "Ошибка", errorData.message || "Не удалось загрузить жалобы");
+            showToastRef.current(
+              "error",
+              "Ошибка",
+              errorData.message || "Не удалось загрузить жалобы",
+            );
             setReports([]);
           }
         }
       } catch (error) {
         if (!cancelled) {
           console.error("Load reports error:", error);
-          showToastRef.current("error", "Ошибка", "Не удалось загрузить жалобы");
+          showToastRef.current(
+            "error",
+            "Ошибка",
+            "Не удалось загрузить жалобы",
+          );
           setReports([]);
         }
       } finally {
@@ -85,16 +100,23 @@ export function useReports(statusFilter: string) {
   const loadReports = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/admin/reports?status=${statusFilter}`, {
-        cache: "no-store",
-      });
+      const response = await fetch(
+        `/api/admin/reports?status=${statusFilter}`,
+        {
+          cache: "no-store",
+        },
+      );
 
       if (response.ok) {
         const data = await response.json();
         setReports(data.reports || []);
       } else {
         const errorData = await response.json().catch(() => ({}));
-        showToastRef.current("error", "Ошибка", errorData.message || "Не удалось загрузить жалобы");
+        showToastRef.current(
+          "error",
+          "Ошибка",
+          errorData.message || "Не удалось загрузить жалобы",
+        );
         setReports([]);
       }
     } catch (error) {
@@ -116,13 +138,21 @@ export function useReports(statusFilter: string) {
         });
 
         if (response.ok) {
-          showToastRef.current("success", "Статус обновлён", "Жалоба обработана");
+          showToastRef.current(
+            "success",
+            "Статус обновлён",
+            "Жалоба обработана",
+          );
           // Перезагружаем жалобы
           await loadReports();
           return true;
         } else {
           const errorData = await response.json().catch(() => ({}));
-          showToastRef.current("error", "Ошибка", errorData.message || "Не удалось обновить статус");
+          showToastRef.current(
+            "error",
+            "Ошибка",
+            errorData.message || "Не удалось обновить статус",
+          );
           return false;
         }
       } catch (error) {
@@ -131,7 +161,7 @@ export function useReports(statusFilter: string) {
         return false;
       }
     },
-    [loadReports]
+    [loadReports],
   );
 
   return {
@@ -141,4 +171,3 @@ export function useReports(statusFilter: string) {
     updateReportStatus,
   };
 }
-

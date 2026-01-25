@@ -10,7 +10,10 @@ interface StoryActionsProps {
   advertiserLink?: string;
 }
 
-export default function StoryActions({ isAd = false, advertiserLink }: StoryActionsProps) {
+export default function StoryActions({
+  isAd = false,
+  advertiserLink,
+}: StoryActionsProps) {
   return (
     <div className="mt-12 flex flex-col sm:flex-row gap-6 justify-center">
       {isAd && advertiserLink ? (

@@ -136,9 +136,9 @@ export default function BeautifulDialog({
       case "alert":
         return "from-red-500 to-rose-500";
       case "confirm":
-      return "from-[#f9bc60] to-[#abd1c6]";
+        return "from-[#f9bc60] to-[#abd1c6]";
       case "prompt":
-      return "from-[#abd1c6] to-[#f9bc60]";
+        return "from-[#abd1c6] to-[#f9bc60]";
     }
   };
 
@@ -195,7 +195,7 @@ export default function BeautifulDialog({
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         placeholder={placeholder}
-                    className="w-full px-3 py-2 border border-[#abd1c6]/20 rounded-lg bg-[#001e1d]/40 text-[#fffffe] placeholder-[#abd1c6]/60 focus:outline-none focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent"
+                        className="w-full px-3 py-2 border border-[#abd1c6]/20 rounded-lg bg-[#001e1d]/40 text-[#fffffe] placeholder-[#abd1c6]/60 focus:outline-none focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent"
                         autoFocus
                       />
                     </div>
@@ -206,14 +206,14 @@ export default function BeautifulDialog({
                     {(type === "confirm" || type === "prompt") && (
                       <button
                         onClick={handleCancel}
-                    className="px-4 py-2 text-sm font-medium text-[#abd1c6] bg-[#001e1d]/40 hover:bg-[#001e1d]/55 border border-[#abd1c6]/20 rounded-lg transition-colors duration-200"
+                        className="px-4 py-2 text-sm font-medium text-[#abd1c6] bg-[#001e1d]/40 hover:bg-[#001e1d]/55 border border-[#abd1c6]/20 rounded-lg transition-colors duration-200"
                       >
                         {cancelText}
                       </button>
                     )}
                     <button
                       onClick={handleConfirm}
-                  className="px-4 py-2 text-sm font-semibold text-[#001e1d] bg-[#f9bc60] hover:bg-[#e8a545] rounded-lg transition-colors duration-200 shadow-lg"
+                      className="px-4 py-2 text-sm font-semibold text-[#001e1d] bg-[#f9bc60] hover:bg-[#e8a545] rounded-lg transition-colors duration-200 shadow-lg"
                     >
                       {confirmText}
                     </button>

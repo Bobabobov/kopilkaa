@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const admin = await getAllowedAdminUser();
   if (!admin) {
@@ -25,7 +25,7 @@ export async function PATCH(
     if (!bugReport) {
       return NextResponse.json(
         { message: "Баг-репорт не найден" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -54,14 +54,14 @@ export async function PATCH(
     console.error("Update bug report error:", error);
     return NextResponse.json(
       { message: "Ошибка обновления баг-репорта" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const admin = await getAllowedAdminUser();
   if (!admin) {
@@ -77,7 +77,10 @@ export async function DELETE(
     });
 
     if (!existing) {
-      return NextResponse.json({ message: "Баг-репорт не найден" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Баг-репорт не найден" },
+        { status: 404 },
+      );
     }
 
     await prisma.bugReport.delete({
@@ -89,9 +92,7 @@ export async function DELETE(
     console.error("Delete bug report error:", error);
     return NextResponse.json(
       { message: "Ошибка удаления баг-репорта" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-
-

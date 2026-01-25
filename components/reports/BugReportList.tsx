@@ -46,7 +46,10 @@ export default function BugReportList({
         animate={{ opacity: 1, y: 0 }}
         className="text-center py-12 rounded-2xl bg-gradient-to-br from-[#004643]/40 to-[#001e1d]/20 border border-[#abd1c6]/20"
       >
-        <LucideIcons.AlertTriangle size="xl" className="text-[#abd1c6]/50 mx-auto mb-4" />
+        <LucideIcons.AlertTriangle
+          size="xl"
+          className="text-[#abd1c6]/50 mx-auto mb-4"
+        />
         <p className="text-[#abd1c6]">Пока нет баг-репортов</p>
       </motion.div>
     );
@@ -77,11 +80,11 @@ export default function BugReportList({
           >
             <LucideIcons.ChevronLeft size="sm" />
           </motion.button>
-          
+
           <span className="px-4 py-2 text-[#abd1c6]">
             Страница {page} из {totalPages}
           </span>
-          
+
           <motion.button
             onClick={() => onPageChange(page + 1)}
             disabled={page === totalPages}
@@ -96,5 +99,3 @@ export default function BugReportList({
     </div>
   );
 }
-
-

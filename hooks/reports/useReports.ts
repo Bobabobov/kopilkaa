@@ -59,7 +59,7 @@ export function useReports({
       try {
         const res = await fetch(
           `/api/bug-reports?status=${statusFilter}&page=${nextPage}&limit=${PAGE_SIZE}`,
-          { cache: "no-store", signal: controller.signal }
+          { cache: "no-store", signal: controller.signal },
         );
 
         if (!res.ok) {
@@ -83,13 +83,13 @@ export function useReports({
         setLoading(false);
       }
     },
-    [userId, statusFilter, page]
+    [userId, statusFilter, page],
   );
 
   const updateStatus = useCallback(
     async (reportId: string, newStatus: string) => {
       setReports((prev) =>
-        prev.map((r) => (r.id === reportId ? { ...r, status: newStatus } : r))
+        prev.map((r) => (r.id === reportId ? { ...r, status: newStatus } : r)),
       );
 
       try {
@@ -106,13 +106,11 @@ export function useReports({
         console.error("Update status error:", err);
         // Откатываем
         setReports((prev) =>
-          prev.map((r) =>
-            r.id === reportId ? { ...r, status: r.status } : r
-          )
+          prev.map((r) => (r.id === reportId ? { ...r, status: r.status } : r)),
         );
       }
     },
-    []
+    [],
   );
 
   const deleteReport = useCallback(
@@ -131,7 +129,7 @@ export function useReports({
         loadReports(page);
       }
     },
-    [loadReports, page]
+    [loadReports, page],
   );
 
   const addReport = useCallback((newReport: any) => {
@@ -152,5 +150,3 @@ export function useReports({
     addReport,
   };
 }
-
-

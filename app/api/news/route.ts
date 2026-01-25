@@ -41,7 +41,7 @@ export async function GET(request: Request) {
 
     const hasMore = posts.length > limit;
     const page = hasMore ? posts.slice(0, limit) : posts;
-    const nextCursor = hasMore ? page[page.length - 1]?.id ?? null : null;
+    const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
 
     // Реакция текущего пользователя на каждый пост (если авторизован)
     let myReactionByPostId: Record<string, "LIKE" | "DISLIKE"> = {};
@@ -62,24 +62,22 @@ export async function GET(request: Request) {
       );
     }
 
-    const res = NextResponse.json(
-      {
-        items: page.map((p) => ({
-          id: p.id,
-          title: p.title,
-          badge: p.badge,
-          content: p.content,
-          createdAt: p.createdAt,
-          updatedAt: p.updatedAt,
-          likesCount: p.likesCount,
-          dislikesCount: p.dislikesCount,
-          author: p.author,
-          media: p.media,
-          myReaction: myReactionByPostId[p.id] ?? null,
-        })),
-        nextCursor,
-      },
-    );
+    const res = NextResponse.json({
+      items: page.map((p) => ({
+        id: p.id,
+        title: p.title,
+        badge: p.badge,
+        content: p.content,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+        likesCount: p.likesCount,
+        dislikesCount: p.dislikesCount,
+        author: p.author,
+        media: p.media,
+        myReaction: myReactionByPostId[p.id] ?? null,
+      })),
+      nextCursor,
+    });
 
     // Кэширование:
     // - для авторизованных response персонализирован (myReaction), поэтому private/no-store
@@ -90,15 +88,18 @@ export async function GET(request: Request) {
       res.headers.set("Pragma", "no-cache");
       res.headers.set("Expires", "0");
     } else {
-      res.headers.set("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
+      res.headers.set(
+        "Cache-Control",
+        "public, s-maxage=30, stale-while-revalidate=60",
+      );
     }
 
     return res;
   } catch (error) {
     console.error("GET /api/news error:", error);
-    return NextResponse.json({ error: "Ошибка загрузки новостей" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Ошибка загрузки новостей" },
+      { status: 500 },
+    );
   }
 }
-
-
-

@@ -87,7 +87,9 @@ export default function AdPlacementCard({
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-3 mb-3">
-              <h3 className="text-lg sm:text-xl font-bold text-[#fffffe] break-words">{ad.title}</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-[#fffffe] break-words">
+                {ad.title}
+              </h3>
               <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
                 <span
                   className={`px-2.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap border ${
@@ -124,7 +126,9 @@ export default function AdPlacementCard({
             <div className="flex flex-wrap items-center gap-3 text-xs text-[#abd1c6]/70">
               <div className="flex items-center gap-1.5">
                 <LucideIcons.Calendar size="xs" className="opacity-50" />
-                <span className="whitespace-nowrap">{new Date(ad.createdAt).toLocaleDateString()}</span>
+                <span className="whitespace-nowrap">
+                  {new Date(ad.createdAt).toLocaleDateString()}
+                </span>
               </div>
               {ad.placement && (
                 <span className="px-2 py-0.5 rounded-md bg-[#004643]/50 text-[#abd1c6] border border-[#0b3b33]/50 text-[10px] uppercase tracking-wide whitespace-nowrap">
@@ -166,4 +170,3 @@ export default function AdPlacementCard({
     </>
   );
 }
-

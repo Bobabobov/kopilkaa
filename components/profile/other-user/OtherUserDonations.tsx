@@ -13,7 +13,9 @@ interface OtherUserDonationsProps {
   userId: string;
 }
 
-export default function OtherUserDonations({ userId }: OtherUserDonationsProps) {
+export default function OtherUserDonations({
+  userId,
+}: OtherUserDonationsProps) {
   const { data, loading, error } = useOtherUserDonations(userId);
 
   if (loading) {
@@ -41,4 +43,3 @@ export default function OtherUserDonations({ userId }: OtherUserDonationsProps) 
     </motion.div>
   );
 }
-

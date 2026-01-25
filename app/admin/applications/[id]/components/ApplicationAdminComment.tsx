@@ -16,8 +16,14 @@ export default function ApplicationAdminComment({
       transition={{ duration: 0.5, delay: 0.8 }}
       className="mb-6"
     >
-      <div className="rounded-xl sm:rounded-2xl border p-4 sm:p-6" style={{ backgroundColor: "#f9bc60/10", borderColor: "#f9bc60/30" }}>
-        <h3 className="flex items-center gap-2 font-semibold mb-3 text-base sm:text-lg" style={{ color: "#f9bc60" }}>
+      <div
+        className="rounded-xl sm:rounded-2xl border p-4 sm:p-6"
+        style={{ backgroundColor: "#f9bc60/10", borderColor: "#f9bc60/30" }}
+      >
+        <h3
+          className="flex items-center gap-2 font-semibold mb-3 text-base sm:text-lg"
+          style={{ color: "#f9bc60" }}
+        >
           <svg
             className="w-5 h-5 flex-shrink-0"
             fill="none"
@@ -33,12 +39,13 @@ export default function ApplicationAdminComment({
           </svg>
           Комментарий модератора
         </h3>
-        <div className="break-words text-sm sm:text-base" style={{ color: "#fffffe" }}>
+        <div
+          className="break-words text-sm sm:text-base"
+          style={{ color: "#fffffe" }}
+        >
           {comment}
         </div>
       </div>
     </motion.div>
   );
 }
-
-

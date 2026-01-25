@@ -42,14 +42,28 @@ export default function ApplicationStatusModalGate() {
   const fetchingRef = useRef(false);
   const mountedRef = useRef(false);
 
-  const title = useMemo(() => notification?.title || "Обновление по заявке", [notification?.title]);
-  const message = useMemo(() => notification?.message || "", [notification?.message]);
-  const timeAgo = useMemo(() => notification?.timestamp || "", [notification?.timestamp]);
+  const title = useMemo(
+    () => notification?.title || "Обновление по заявке",
+    [notification?.title],
+  );
+  const message = useMemo(
+    () => notification?.message || "",
+    [notification?.message],
+  );
+  const timeAgo = useMemo(
+    () => notification?.timestamp || "",
+    [notification?.timestamp],
+  );
   const adminComment = useMemo(
-    () => (typeof notification?.adminComment === "string" ? notification.adminComment.trim() : ""),
+    () =>
+      typeof notification?.adminComment === "string"
+        ? notification.adminComment.trim()
+        : "",
     [notification?.adminComment],
   );
-  const isApproved = notification?.type === "application_status" && notification?.status === "APPROVED";
+  const isApproved =
+    notification?.type === "application_status" &&
+    notification?.status === "APPROVED";
 
   const close = () => {
     if (notification?.createdAt) {
@@ -61,7 +75,10 @@ export default function ApplicationStatusModalGate() {
   };
 
   const goToTarget = () => {
-    if (notification?.type === "application_status" && notification.applicationId) {
+    if (
+      notification?.type === "application_status" &&
+      notification.applicationId
+    ) {
       if (notification.status === "APPROVED") {
         router.push(`/stories/${notification.applicationId}`);
       } else {
@@ -74,7 +91,10 @@ export default function ApplicationStatusModalGate() {
   const pickNewestUnshown = (items: Notification[]): Notification | null => {
     const lastShown = safeGetLastShownMs();
     const candidates = items
-      .filter((n) => n.type === "application_status" && n.applicationId && n.createdAt)
+      .filter(
+        (n) =>
+          n.type === "application_status" && n.applicationId && n.createdAt,
+      )
       .sort((a, b) => toMs(b.createdAt) - toMs(a.createdAt));
     const newest = candidates[0];
     if (!newest) return null;
@@ -111,7 +131,10 @@ export default function ApplicationStatusModalGate() {
       setOpen(true);
     } catch (e) {
       if (!silent && process.env.NODE_ENV !== "production") {
-        console.warn("ApplicationStatusModalGate: failed to fetch notifications", e);
+        console.warn(
+          "ApplicationStatusModalGate: failed to fetch notifications",
+          e,
+        );
       }
     } finally {
       fetchingRef.current = false;
@@ -285,5 +308,3 @@ export default function ApplicationStatusModalGate() {
     </AnimatePresence>
   );
 }
-
-

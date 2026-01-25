@@ -36,9 +36,17 @@ export default function ReportsPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
 
-  const { user, isAdminAllowed, loading: authLoading, error: authError, loadUser } = useReportsAuth();
+  const {
+    user,
+    isAdminAllowed,
+    loading: authLoading,
+    error: authError,
+    loadUser,
+  } = useReportsAuth();
   const isAdmin = useMemo(() => {
-    const roleIsAdmin = user?.role ? user.role.toUpperCase() === "ADMIN" : false;
+    const roleIsAdmin = user?.role
+      ? user.role.toUpperCase() === "ADMIN"
+      : false;
     return roleIsAdmin || isAdminAllowed;
   }, [user?.role, isAdminAllowed]);
 
@@ -100,11 +108,13 @@ export default function ReportsPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-
       {/* Декоративные элементы */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-16 left-8 w-64 h-64 bg-[#e16162]/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-16 right-8 w-80 h-80 bg-[#f9bc60]/5 rounded-full blur-3xl" style={{ animationDelay: "1s" }}></div>
+        <div
+          className="absolute bottom-16 right-8 w-80 h-80 bg-[#f9bc60]/5 rounded-full blur-3xl"
+          style={{ animationDelay: "1s" }}
+        ></div>
       </div>
 
       <div className="container-p mx-auto max-w-7xl relative z-10 px-4 pt-8 pb-12 space-y-8">
@@ -131,7 +141,10 @@ export default function ReportsPage() {
             />
 
             {reportsError && (
-              <ReportsError error={reportsError} onRetry={() => loadReports(page)} />
+              <ReportsError
+                error={reportsError}
+                onRetry={() => loadReports(page)}
+              />
             )}
 
             <BugReportList
@@ -150,4 +163,3 @@ export default function ReportsPage() {
     </div>
   );
 }
-

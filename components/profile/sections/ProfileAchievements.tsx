@@ -11,53 +11,53 @@ import AchievementsModal from "../modals/AchievementsModal";
 const getAchievementIcon = (type: string, name: string) => {
   // Сначала проверяем по названию для более специфичных иконок
   const nameLower = name.toLowerCase();
-  
-  if (nameLower.includes('первые шаги') || nameLower.includes('первая')) {
+
+  if (nameLower.includes("первые шаги") || nameLower.includes("первая")) {
     return LucideIcons.Star;
   }
-  if (nameLower.includes('помощник') || nameLower.includes('помощь')) {
+  if (nameLower.includes("помощник") || nameLower.includes("помощь")) {
     return LucideIcons.Users;
   }
-  if (nameLower.includes('одобрен') || nameLower.includes('одобрение')) {
+  if (nameLower.includes("одобрен") || nameLower.includes("одобрение")) {
     return LucideIcons.CheckCircle;
   }
-  if (nameLower.includes('активный') || nameLower.includes('активность')) {
+  if (nameLower.includes("активный") || nameLower.includes("активность")) {
     return LucideIcons.Zap;
   }
-  if (nameLower.includes('эксперт') || nameLower.includes('мастер')) {
+  if (nameLower.includes("эксперт") || nameLower.includes("мастер")) {
     return LucideIcons.Star;
   }
-  if (nameLower.includes('друг') || nameLower.includes('дружба')) {
+  if (nameLower.includes("друг") || nameLower.includes("дружба")) {
     return LucideIcons.Users;
   }
-  if (nameLower.includes('игра') || nameLower.includes('игр')) {
+  if (nameLower.includes("игра") || nameLower.includes("игр")) {
     return LucideIcons.Star;
   }
-  if (nameLower.includes('серия') || nameLower.includes('серий')) {
+  if (nameLower.includes("серия") || nameLower.includes("серий")) {
     return LucideIcons.Zap;
   }
-  if (nameLower.includes('творч') || nameLower.includes('креатив')) {
+  if (nameLower.includes("творч") || nameLower.includes("креатив")) {
     return LucideIcons.Palette;
   }
-  if (nameLower.includes('сообществ') || nameLower.includes('коммун')) {
+  if (nameLower.includes("сообществ") || nameLower.includes("коммун")) {
     return LucideIcons.Heart;
   }
-  
+
   // Если не найдено по названию, используем тип
   switch (type) {
-    case 'APPLICATIONS':
+    case "APPLICATIONS":
       return LucideIcons.FileText;
-    case 'GAMES':
+    case "GAMES":
       return LucideIcons.Star;
-    case 'SOCIAL':
+    case "SOCIAL":
       return LucideIcons.Users;
-    case 'STREAK':
+    case "STREAK":
       return LucideIcons.Zap;
-    case 'COMMUNITY':
+    case "COMMUNITY":
       return LucideIcons.Heart;
-    case 'CREATIVITY':
+    case "CREATIVITY":
       return LucideIcons.Palette;
-    case 'SPECIAL':
+    case "SPECIAL":
       return LucideIcons.Star;
     default:
       return LucideIcons.Trophy;
@@ -67,36 +67,36 @@ const getAchievementIcon = (type: string, name: string) => {
 // Функция для получения цвета по редкости
 const getRarityColor = (rarity: string) => {
   switch (rarity) {
-    case 'COMMON':
-      return '#94a1b2';
-    case 'RARE':
-      return '#abd1c6';
-    case 'EPIC':
-      return '#e16162';
-    case 'LEGENDARY':
-      return '#f9bc60';
-    case 'EXCLUSIVE':
-      return '#ff6b6b';
+    case "COMMON":
+      return "#94a1b2";
+    case "RARE":
+      return "#abd1c6";
+    case "EPIC":
+      return "#e16162";
+    case "LEGENDARY":
+      return "#f9bc60";
+    case "EXCLUSIVE":
+      return "#ff6b6b";
     default:
-      return '#abd1c6';
+      return "#abd1c6";
   }
 };
 
 // Функция для получения русского названия редкости
 const getRarityName = (rarity: string) => {
   switch (rarity) {
-    case 'COMMON':
-      return 'Обычное';
-    case 'RARE':
-      return 'Редкое';
-    case 'EPIC':
-      return 'Эпическое';
-    case 'LEGENDARY':
-      return 'Легендарное';
-    case 'EXCLUSIVE':
-      return 'Эксклюзивное';
+    case "COMMON":
+      return "Обычное";
+    case "RARE":
+      return "Редкое";
+    case "EPIC":
+      return "Эпическое";
+    case "LEGENDARY":
+      return "Легендарное";
+    case "EXCLUSIVE":
+      return "Эксклюзивное";
     default:
-      return 'Неизвестное';
+      return "Неизвестное";
   }
 };
 
@@ -133,9 +133,10 @@ export default function ProfileAchievements() {
       .finally(() => setLoading(false));
   }, []);
 
-  const unlockedCount = achievements.filter(a => a.unlockedAt).length;
+  const unlockedCount = achievements.filter((a) => a.unlockedAt).length;
   const totalCount = achievements.length;
-  const progress = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
+  const progress =
+    totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
   const displayedAchievements = achievements.slice(0, 2); // Показываем только первые 2
 
   if (loading) {
@@ -166,7 +167,7 @@ export default function ProfileAchievements() {
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -186,7 +187,9 @@ export default function ProfileAchievements() {
               <LucideIcons.Award className="w-5 h-5 text-[#f9bc60]" />
               {stats && stats.unlockedAchievements > 0 && (
                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#10B981] rounded-full flex items-center justify-center border-2 border-[#001e1d] shadow-lg">
-                  <span className="text-white text-[10px] font-bold">{stats.unlockedAchievements}</span>
+                  <span className="text-white text-[10px] font-bold">
+                    {stats.unlockedAchievements}
+                  </span>
                 </div>
               )}
             </div>
@@ -194,12 +197,13 @@ export default function ProfileAchievements() {
               <h3 className="text-lg font-bold text-white">Достижения</h3>
               {stats && (
                 <p className="text-xs text-white/60 mt-0.5">
-                  {stats.unlockedAchievements} из {stats.totalAchievements} разблокировано
+                  {stats.unlockedAchievements} из {stats.totalAchievements}{" "}
+                  разблокировано
                 </p>
               )}
             </div>
           </div>
-          
+
           {stats && (
             <div className="text-right flex-shrink-0">
               <div className="text-2xl font-bold text-[#f9bc60]">
@@ -215,7 +219,9 @@ export default function ProfileAchievements() {
             <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
               <LucideIcons.Award className="w-8 h-8 text-white/40" />
             </div>
-            <p className="text-sm font-medium text-white/80 mb-1">Нет достижений</p>
+            <p className="text-sm font-medium text-white/80 mb-1">
+              Нет достижений
+            </p>
             <p className="text-xs text-white/60 px-4">
               Выполняйте задания для получения
             </p>
@@ -244,70 +250,82 @@ export default function ProfileAchievements() {
 
             {/* Список достижений */}
             <div className="space-y-3 mb-4">
-            <AnimatePresence>
-              {displayedAchievements.map((userAchievement, index) => {
-                const IconComponent = getAchievementIcon(userAchievement.achievement.type, userAchievement.achievement.name) || LucideIcons.Star;
-                const rarityColor = getRarityColor(userAchievement.achievement.rarity);
-                const rarityName = getRarityName(userAchievement.achievement.rarity);
-                
-                return (
-                  <motion.div
-                    key={userAchievement.id}
-                    initial={{ opacity: 0, x: -20, scale: 0.9 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: 20, scale: 0.9 }}
-                    transition={{ 
-                      delay: index * 0.1,
-                      type: "spring",
-                      stiffness: 300
-                    }}
-                    className="group rounded-xl p-3 sm:p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all"
-                    style={{ borderColor: rarityColor + '40' }}
-                    whileHover={{ 
-                      borderColor: rarityColor + '60',
-                      backgroundColor: `${rarityColor}10`
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md"
-                        style={{ 
-                          backgroundColor: rarityColor + '20',
-                          color: rarityColor
-                        }}
-                      >
-                        <IconComponent className="w-5 h-5 text-current" />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-white text-sm truncate">
-                            {userAchievement.achievement.name}
-                          </h4>
-                          <span 
-                            className="text-xs px-2 py-0.5 rounded font-medium whitespace-nowrap flex-shrink-0"
-                            style={{ 
-                              backgroundColor: `${rarityColor}20`,
-                              color: rarityColor
-                            }}
-                          >
-                            {rarityName}
-                          </span>
+              <AnimatePresence>
+                {displayedAchievements.map((userAchievement, index) => {
+                  const IconComponent =
+                    getAchievementIcon(
+                      userAchievement.achievement.type,
+                      userAchievement.achievement.name,
+                    ) || LucideIcons.Star;
+                  const rarityColor = getRarityColor(
+                    userAchievement.achievement.rarity,
+                  );
+                  const rarityName = getRarityName(
+                    userAchievement.achievement.rarity,
+                  );
+
+                  return (
+                    <motion.div
+                      key={userAchievement.id}
+                      initial={{ opacity: 0, x: -20, scale: 0.9 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      exit={{ opacity: 0, x: 20, scale: 0.9 }}
+                      transition={{
+                        delay: index * 0.1,
+                        type: "spring",
+                        stiffness: 300,
+                      }}
+                      className="group rounded-xl p-3 sm:p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all"
+                      style={{ borderColor: rarityColor + "40" }}
+                      whileHover={{
+                        borderColor: rarityColor + "60",
+                        backgroundColor: `${rarityColor}10`,
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md"
+                          style={{
+                            backgroundColor: rarityColor + "20",
+                            color: rarityColor,
+                          }}
+                        >
+                          <IconComponent className="w-5 h-5 text-current" />
                         </div>
-                        <p className="text-xs text-white/70 line-clamp-2 mb-1">
-                          {userAchievement.achievement.description}
-                        </p>
-                        <div className="flex items-center gap-1.5 text-xs text-white/60">
-                          <LucideIcons.Calendar className="w-3 h-3" />
-                          <span>{new Date(userAchievement.unlockedAt).toLocaleDateString('ru-RU')}</span>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-semibold text-white text-sm truncate">
+                              {userAchievement.achievement.name}
+                            </h4>
+                            <span
+                              className="text-xs px-2 py-0.5 rounded font-medium whitespace-nowrap flex-shrink-0"
+                              style={{
+                                backgroundColor: `${rarityColor}20`,
+                                color: rarityColor,
+                              }}
+                            >
+                              {rarityName}
+                            </span>
+                          </div>
+                          <p className="text-xs text-white/70 line-clamp-2 mb-1">
+                            {userAchievement.achievement.description}
+                          </p>
+                          <div className="flex items-center gap-1.5 text-xs text-white/60">
+                            <LucideIcons.Calendar className="w-3 h-3" />
+                            <span>
+                              {new Date(
+                                userAchievement.unlockedAt,
+                              ).toLocaleDateString("ru-RU")}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
 
             {/* Кнопка "Показать все" */}
             {achievements.length > 2 && (

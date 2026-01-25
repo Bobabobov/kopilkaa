@@ -1,7 +1,6 @@
 // app/admin/achievements/components/GrantSuccessScreen.tsx
 "use client";
 import { motion } from "framer-motion";
-import type { Achievement } from "@/lib/achievements/types";
 
 interface GrantSuccessScreenProps {
   achievementName: string;
@@ -26,5 +25,3 @@ export default function GrantSuccessScreen({
     </motion.div>
   );
 }
-
-

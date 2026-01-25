@@ -32,5 +32,3 @@ export async function getAllowedAdminUser(): Promise<AllowedAdminUser | null> {
 
   return { id: user.id, email: user.email };
 }
-
-

@@ -4,12 +4,21 @@ import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 import type { HeroBadge } from "@/lib/heroBadges";
 
-const VALID_BADGES: HeroBadge[] = ["observer", "member", "active", "hero", "honor", "legend", "tester", "custom"];
+const VALID_BADGES: HeroBadge[] = [
+  "observer",
+  "member",
+  "active",
+  "hero",
+  "honor",
+  "legend",
+  "tester",
+  "custom",
+];
 
 // GET - получить текущий бейдж пользователя
 export async function GET(
   request: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: { userId: string } },
 ) {
   try {
     const admin = await getAllowedAdminUser();
@@ -23,7 +32,10 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json({
@@ -37,7 +49,7 @@ export async function GET(
     console.error("Error getting user badge:", error);
     return NextResponse.json(
       { error: "Ошибка получения бейджа" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -45,7 +57,7 @@ export async function GET(
 // POST - выдать или изменить бейдж
 export async function POST(
   request: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: { userId: string } },
 ) {
   try {
     const admin = await getAllowedAdminUser();
@@ -63,7 +75,10 @@ export async function POST(
     });
 
     if (!user) {
-      return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     // Если badge = null или пустая строка, удаляем бейдж (возвращаемся к автоматическому)
@@ -87,7 +102,7 @@ export async function POST(
     if (!VALID_BADGES.includes(badge as HeroBadge)) {
       return NextResponse.json(
         { error: `Недопустимый бейдж. Допустимые: ${VALID_BADGES.join(", ")}` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -109,7 +124,7 @@ export async function POST(
     console.error("Error setting user badge:", error);
     return NextResponse.json(
       { error: "Ошибка выдачи бейджа" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

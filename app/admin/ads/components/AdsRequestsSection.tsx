@@ -13,7 +13,9 @@ export default function AdsRequestsSection() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("all");
-  const [selectedRequest, setSelectedRequest] = useState<AdRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<AdRequest | null>(
+    null,
+  );
   const [showModal, setShowModal] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [adminComment, setAdminComment] = useState("");
@@ -133,7 +135,9 @@ export default function AdsRequestsSection() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#001e1d] border border-[#abd1c6]/20 mb-4">
               <LucideIcons.Mail size="lg" className="text-[#abd1c6]/50" />
             </div>
-            <h3 className="text-xl font-semibold text-[#fffffe] mb-2">Заявок не найдено</h3>
+            <h3 className="text-xl font-semibold text-[#fffffe] mb-2">
+              Заявок не найдено
+            </h3>
             <p className="text-[#abd1c6] max-w-md mx-auto">
               {filterStatus === "all"
                 ? "Пока нет заявок на рекламу. Они появятся здесь после отправки формы на странице /advertising"
@@ -167,5 +171,3 @@ export default function AdsRequestsSection() {
     </>
   );
 }
-
-

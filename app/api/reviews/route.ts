@@ -87,7 +87,9 @@ async function mapReviews(raw: any[], viewerId: string | null) {
       content: item.content,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
-      images: item.images?.map((img: any) => ({ url: img.url, sort: img.sort })) ?? [],
+      images:
+        item.images?.map((img: any) => ({ url: img.url, sort: img.sort })) ??
+        [],
       user: {
         id: item.user.id,
         name: displayName,
@@ -112,35 +114,43 @@ export async function GET(req: NextRequest) {
 
     const url = new URL(req.url);
     const page = Math.max(1, Number(url.searchParams.get("page") || 1));
-    const limit = Math.min(30, Math.max(1, Number(url.searchParams.get("limit") || 12)));
+    const limit = Math.min(
+      30,
+      Math.max(1, Number(url.searchParams.get("limit") || 12)),
+    );
     const skip = (page - 1) * limit;
 
     const [items, total, viewerApproved, viewerReviewRaw] = await Promise.all([
-      prisma.review.findMany({
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          userId: true,
-          content: true,
-          createdAt: true,
-          updatedAt: true,
-          images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
-          user: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-              avatar: true,
-              avatarFrame: true,
-              vkLink: true,
-              telegramLink: true,
-              youtubeLink: true,
+      prisma.review
+        .findMany({
+          orderBy: { createdAt: "desc" },
+          skip,
+          take: limit,
+          select: {
+            id: true,
+            userId: true,
+            content: true,
+            createdAt: true,
+            updatedAt: true,
+            images: {
+              orderBy: { sort: "asc" },
+              select: { url: true, sort: true },
+            },
+            user: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                avatar: true,
+                avatarFrame: true,
+                vkLink: true,
+                telegramLink: true,
+                youtubeLink: true,
+              },
             },
           },
-        },
-      }).catch(() => []),
+        })
+        .catch(() => []),
       prisma.review.count().catch(() => 0),
       viewerId
         ? prisma.application
@@ -164,7 +174,10 @@ export async function GET(req: NextRequest) {
               content: true,
               createdAt: true,
               updatedAt: true,
-              images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
+              images: {
+                orderBy: { sort: "asc" },
+                select: { url: true, sort: true },
+              },
               user: {
                 select: {
                   id: true,
@@ -182,8 +195,10 @@ export async function GET(req: NextRequest) {
         : null,
     ]);
 
-  const mappedItems = await mapReviews(items, viewerId);
-  const mappedViewerReview = viewerReviewRaw ? (await mapReviews([viewerReviewRaw], viewerId))[0] : null;
+    const mappedItems = await mapReviews(items, viewerId);
+    const mappedViewerReview = viewerReviewRaw
+      ? (await mapReviews([viewerReviewRaw], viewerId))[0]
+      : null;
 
     return NextResponse.json({
       page,
@@ -217,7 +232,10 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
   const viewerId = session?.uid ? String(session.uid) : null;
   if (!viewerId) {
-    return NextResponse.json({ error: "Требуется авторизация" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Требуется авторизация" },
+      { status: 401 },
+    );
   }
 
   try {
@@ -226,29 +244,38 @@ export async function POST(req: NextRequest) {
     const images = Array.isArray(body?.images) ? (body.images as string[]) : [];
 
     if (!content) {
-      return NextResponse.json({ error: "Текст отзыва пустой" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Текст отзыва пустой" },
+        { status: 400 },
+      );
     }
     if (content.length > MAX_TEXT_LENGTH) {
-      return NextResponse.json({ error: `Текст не должен превышать ${MAX_TEXT_LENGTH} символов` }, { status: 400 });
+      return NextResponse.json(
+        { error: `Текст не должен превышать ${MAX_TEXT_LENGTH} символов` },
+        { status: 400 },
+      );
     }
     if (images.length > MAX_IMAGES) {
-      return NextResponse.json({ error: `Максимум ${MAX_IMAGES} фото` }, { status: 400 });
+      return NextResponse.json(
+        { error: `Максимум ${MAX_IMAGES} фото` },
+        { status: 400 },
+      );
     }
-    
+
     // Валидация и санитизация URL изображений
     const sanitizedImages: string[] = [];
     for (const img of images) {
       const url = String(img || "").trim();
       if (!url) continue;
-      
+
       // Проверяем, что URL безопасен (только наши загруженные файлы)
       if (!isSafeUploadUrl(url)) {
         return NextResponse.json(
           { error: "Разрешены только файлы, загруженные через форму" },
-          { status: 400 }
+          { status: 400 },
         );
       }
-      
+
       sanitizedImages.push(url);
     }
 
@@ -262,13 +289,18 @@ export async function POST(req: NextRequest) {
       .catch(() => 0);
     if (approvedCount <= 0) {
       return NextResponse.json(
-        { error: "Оставлять отзыв могут только пользователи с одобренной заявкой" },
+        {
+          error:
+            "Оставлять отзыв могут только пользователи с одобренной заявкой",
+        },
         { status: 403 },
       );
     }
 
     const result = await prisma.$transaction(async (tx) => {
-      const existing = await tx.review.findUnique({ where: { userId: viewerId } });
+      const existing = await tx.review.findUnique({
+        where: { userId: viewerId },
+      });
 
       if (existing) {
         await tx.reviewImage.deleteMany({ where: { reviewId: existing.id } });
@@ -286,7 +318,10 @@ export async function POST(req: NextRequest) {
             content: true,
             createdAt: true,
             updatedAt: true,
-            images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
+            images: {
+              orderBy: { sort: "asc" },
+              select: { url: true, sort: true },
+            },
             user: {
               select: {
                 id: true,
@@ -318,7 +353,10 @@ export async function POST(req: NextRequest) {
           content: true,
           createdAt: true,
           updatedAt: true,
-          images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
+          images: {
+            orderBy: { sort: "asc" },
+            select: { url: true, sort: true },
+          },
           user: {
             select: {
               id: true,
@@ -341,6 +379,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ review: mapped }, { status: 200 });
   } catch (error) {
     console.error("Error creating/updating review:", error);
-    return NextResponse.json({ error: "Не удалось сохранить отзыв" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Не удалось сохранить отзыв" },
+      { status: 500 },
+    );
   }
 }

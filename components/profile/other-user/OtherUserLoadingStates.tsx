@@ -17,7 +17,11 @@ export default function OtherUserLoadingStates({
   const searchParams = useSearchParams();
   const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
   const loginHref = buildAuthModalUrl({ pathname, search, modal: "auth" });
-  const signupHref = buildAuthModalUrl({ pathname, search, modal: "auth/signup" });
+  const signupHref = buildAuthModalUrl({
+    pathname,
+    search,
+    modal: "auth/signup",
+  });
 
   const getContent = () => {
     switch (state) {

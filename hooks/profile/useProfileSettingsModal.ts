@@ -19,7 +19,9 @@ export function useProfileSettingsModal() {
 
     const params = new URLSearchParams(searchParams.toString());
     params.delete("settings");
-    const nextUrl = params.toString() ? `/profile?${params.toString()}` : "/profile";
+    const nextUrl = params.toString()
+      ? `/profile?${params.toString()}`
+      : "/profile";
     router.replace(nextUrl, { scroll: true });
 
     return () => clearTimeout(timer);
@@ -30,5 +32,3 @@ export function useProfileSettingsModal() {
     setIsSettingsModalOpen,
   };
 }
-
-

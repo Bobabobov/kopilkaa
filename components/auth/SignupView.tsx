@@ -14,7 +14,11 @@ interface SignupViewProps {
   checkingAuth: boolean;
   onTelegramAuth: (user: any) => Promise<void>;
   onGoogleAuth: (data: any) => Promise<void>;
-  onEmailSignup: (email: string, name: string, password: string) => Promise<void>;
+  onEmailSignup: (
+    email: string,
+    name: string,
+    password: string,
+  ) => Promise<void>;
   busy: boolean;
   error: string | null;
 }
@@ -31,7 +35,11 @@ export function SignupView({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
-  const emailHref = buildAuthModalUrl({ pathname, search, modal: "auth/signup/email" });
+  const emailHref = buildAuthModalUrl({
+    pathname,
+    search,
+    modal: "auth/signup/email",
+  });
 
   return (
     <>
@@ -46,7 +54,10 @@ export function SignupView({
             <p className="text-xs mb-4 text-center text-[#6b7280] uppercase tracking-wider font-semibold">
               Через Telegram
             </p>
-            <TelegramWidget onAuth={onTelegramAuth} checkingAuth={checkingAuth} />
+            <TelegramWidget
+              onAuth={onTelegramAuth}
+              checkingAuth={checkingAuth}
+            />
           </motion.div>
 
           <motion.div
@@ -86,5 +97,3 @@ export function SignupView({
     </>
   );
 }
-
-

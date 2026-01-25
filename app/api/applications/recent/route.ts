@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 // Явно указываем, что роут динамический (использует request.url)
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // Кэшируем на 10 секунд (реже обновляется чем статистика)
 export const revalidate = 10;
@@ -17,46 +17,52 @@ export async function GET(req: Request) {
     );
 
     // Получаем последние одобренные заявки
-    const applications = await prisma.application.findMany({
-      where: {
-        status: "APPROVED", // Показываем только одобренные заявки
-      },
-      orderBy: { createdAt: "desc" },
-      take: limit,
-      select: {
-        id: true,
-        title: true,
-        summary: true,
-        amount: true,
-        status: true,
-        createdAt: true,
-        images: {
-          select: {
-            url: true,
-            sort: true,
+    const applications = await prisma.application
+      .findMany({
+        where: {
+          status: "APPROVED", // Показываем только одобренные заявки
+        },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        select: {
+          id: true,
+          title: true,
+          summary: true,
+          amount: true,
+          status: true,
+          createdAt: true,
+          images: {
+            select: {
+              url: true,
+              sort: true,
+            },
+            orderBy: {
+              sort: "asc",
+            },
           },
-          orderBy: {
-            sort: "asc",
+          user: {
+            select: {
+              id: true,
+              name: true,
+              avatar: true,
+            },
           },
         },
-        user: {
-          select: {
-            id: true,
-            name: true,
-            avatar: true,
-          },
-        },
-      },
-    }).catch(() => []);
+      })
+      .catch(() => []);
 
-    const userIds = applications.map((a) => a.user?.id).filter(Boolean) as string[];
+    const userIds = applications
+      .map((a) => a.user?.id)
+      .filter(Boolean) as string[];
     const badgeMap = await getHeroBadgesForUsers(userIds);
 
     return Response.json({
       success: true,
       applications: applications.map((a: any) => ({
         ...a,
-        user: a.user ? { ...(a.user as any), heroBadge: badgeMap[a.user.id] ?? null } : a.user,
+        user: a.user
+          ? { ...(a.user as any), heroBadge: badgeMap[a.user.id] ?? null }
+          : a.user,
       })),
     });
   } catch (error) {

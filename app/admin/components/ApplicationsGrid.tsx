@@ -66,14 +66,14 @@ export default function ApplicationsGrid({
 
   if (error) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl border border-[#e16162]/40"
       >
         <div className="text-center">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -81,7 +81,7 @@ export default function ApplicationsGrid({
           >
             ⚠️
           </motion.div>
-          <motion.h3 
+          <motion.h3
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -89,7 +89,7 @@ export default function ApplicationsGrid({
           >
             Ошибка загрузки
           </motion.h3>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -115,14 +115,14 @@ export default function ApplicationsGrid({
 
   if (applications.length === 0) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl border border-[#abd1c6]/20"
       >
         <div className="text-center">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -130,7 +130,7 @@ export default function ApplicationsGrid({
           >
             📋
           </motion.div>
-          <motion.h3 
+          <motion.h3
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -138,7 +138,7 @@ export default function ApplicationsGrid({
           >
             Заявки не найдены
           </motion.h3>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}

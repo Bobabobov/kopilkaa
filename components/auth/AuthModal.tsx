@@ -16,7 +16,11 @@ interface AuthModalProps {
   onTelegramAuth: (user: any) => Promise<void>;
   onGoogleAuth: (data: any) => Promise<void>;
   onEmailLogin: (identifier: string, password: string) => Promise<void>;
-  onEmailSignup: (email: string, name: string, password: string) => Promise<void>;
+  onEmailSignup: (
+    email: string,
+    name: string,
+    password: string,
+  ) => Promise<void>;
   busy: boolean;
   error: string | null;
 }
@@ -34,7 +38,8 @@ export function AuthModal({
   const router = useRouter();
   const searchParams = useSearchParams();
   const modal = searchParams.get("modal");
-  const showEmailForm = modal === "auth/login/email" || modal === "auth/signup/email";
+  const showEmailForm =
+    modal === "auth/login/email" || modal === "auth/signup/email";
   const isSignup = mode === "signup";
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
@@ -65,8 +70,9 @@ export function AuthModal({
     const params = new URLSearchParams(searchParams.toString());
     params.delete("modal");
     params.delete("next");
-    const pathname = typeof window !== "undefined" ? window.location.pathname : "/";
-    const nextUrl = params.toString() 
+    const pathname =
+      typeof window !== "undefined" ? window.location.pathname : "/";
+    const nextUrl = params.toString()
       ? `${pathname}?${params.toString()}`
       : pathname;
     router.replace(nextUrl);
@@ -97,7 +103,7 @@ export function AuthModal({
           "input:not([disabled])",
           "select:not([disabled])",
           "[tabindex]:not([tabindex='-1'])",
-        ].join(",")
+        ].join(","),
       );
       return Array.from(nodes).filter((el) => {
         const style = window.getComputedStyle(el);
@@ -173,11 +179,11 @@ export function AuthModal({
           initial={{ opacity: 0, scale: 0.9, y: 30 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 30 }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 300, 
+          transition={{
+            type: "spring",
+            stiffness: 300,
             damping: 30,
-            mass: 0.8
+            mass: 0.8,
           }}
           onClick={(e) => e.stopPropagation()}
           ref={dialogRef}
@@ -208,16 +214,19 @@ export function AuthModal({
             <motion.div
               initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              transition={{ 
+              transition={{
                 delay: 0.15,
                 type: "spring",
                 stiffness: 200,
-                damping: 15
+                damping: 15,
               }}
               className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#f9bc60] via-[#e8a545] to-[#d4a017] flex items-center justify-center shadow-xl shadow-[#f9bc60]/20 relative"
             >
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent" />
-              <LucideIcons.User size="lg" className="text-[#001e1d] relative z-10" />
+              <LucideIcons.User
+                size="lg"
+                className="text-[#001e1d] relative z-10"
+              />
             </motion.div>
             <motion.h1
               id="auth-modal-title"
@@ -235,15 +244,21 @@ export function AuthModal({
               transition={{ delay: 0.25 }}
               className="text-sm text-[#6b7280] leading-relaxed"
             >
-              {showEmailForm 
-                ? (isSignup ? "Зарегистрируйтесь по почте" : "Войдите по почте")
-                : (isSignup ? "Продолжите через Telegram, Google или зарегистрируйтесь по почте" : "Продолжите через Telegram, Google или войдите по почте")
-              }
+              {showEmailForm
+                ? isSignup
+                  ? "Зарегистрируйтесь по почте"
+                  : "Войдите по почте"
+                : isSignup
+                  ? "Продолжите через Telegram, Google или зарегистрируйтесь по почте"
+                  : "Продолжите через Telegram, Google или войдите по почте"}
             </motion.p>
           </div>
 
           {/* Основной контент - скроллируемый */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide px-6 sm:px-8 py-4 relative z-10 flex items-center justify-center min-h-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div
+            className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide px-6 sm:px-8 py-4 relative z-10 flex items-center justify-center min-h-0"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
             <div className="w-full">
               {isSignup ? (
                 <SignupView
@@ -276,5 +291,3 @@ export function AuthModal({
     </AnimatePresence>
   );
 }
-
-

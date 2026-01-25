@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { checkUserBan } from "@/lib/ban-check";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,15 +16,18 @@ export async function GET(request: NextRequest) {
     // Проверяем блокировку пользователя
     const banStatus = await checkUserBan(session.uid);
     if (banStatus.isBanned) {
-      return NextResponse.json({
-        authorized: false,
-        banned: true,
-        banInfo: {
-          reason: banStatus.bannedReason,
-          until: banStatus.bannedUntil?.toISOString() || null,
-          isPermanent: banStatus.isPermanent,
+      return NextResponse.json(
+        {
+          authorized: false,
+          banned: true,
+          banInfo: {
+            reason: banStatus.bannedReason,
+            until: banStatus.bannedUntil?.toISOString() || null,
+            isPermanent: banStatus.isPermanent,
+          },
         },
-      }, { status: 403 });
+        { status: 403 },
+      );
     }
 
     // Получаем данные пользователя из базы

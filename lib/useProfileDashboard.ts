@@ -132,15 +132,15 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       const cacheKey = userCacheKey;
       const cached = cacheKey ? profileCache.get(cacheKey) : undefined;
       const now = Date.now();
-      
-      if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+
+      if (cached && now - cached.timestamp < CACHE_DURATION) {
         setData(cached.data);
         setLoading(false);
         return;
       }
 
       setLoading(true);
-      
+
       const response = await fetch("/api/profile/dashboard", {
         method: "GET",
         headers: {
@@ -172,7 +172,9 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       if (!response.ok) {
         // Если новый API не работает, fallback на старый подход
         if (response.status === 404 || response.status === 500) {
-          console.warn("Dashboard API not available, falling back to individual requests");
+          console.warn(
+            "Dashboard API not available, falling back to individual requests",
+          );
           await fetchDataFallback();
           return;
         }
@@ -182,10 +184,12 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       const profileData = await response.json();
 
       const nextUserId = profileData?.user?.id as string | undefined;
-      const nextCacheKey = nextUserId ? `profile-dashboard:${nextUserId}` : null;
+      const nextCacheKey = nextUserId
+        ? `profile-dashboard:${nextUserId}`
+        : null;
       const etag = response.headers.get("etag");
       if (nextCacheKey) setUserCacheKey(nextCacheKey);
-      
+
       // Сохраняем в кэш
       if (nextCacheKey) {
         profileCache.set(nextCacheKey, {
@@ -194,12 +198,12 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
           etag,
         });
       }
-      
+
       setData(profileData);
     } catch (err) {
       console.error("Error fetching profile dashboard:", err);
       setError(err instanceof Error ? err.message : "Неизвестная ошибка");
-      
+
       // Пытаемся использовать fallback при ошибке
       try {
         await fetchDataFallback();
@@ -228,18 +232,30 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
     const normalizedStats = (() => {
       const applications = statsData?.applications || {};
       const totalApplications =
-        statsData?.totalApplications ?? applications.total ?? applications.totalApplications ?? 0;
+        statsData?.totalApplications ??
+        applications.total ??
+        applications.totalApplications ??
+        0;
       const approvedApplications =
-        statsData?.approvedApplications ?? applications.approved ?? applications.approvedApplications ?? 0;
+        statsData?.approvedApplications ??
+        applications.approved ??
+        applications.approvedApplications ??
+        0;
       const effectiveApprovedApplications =
         statsData?.effectiveApprovedApplications ??
         applications.effectiveApproved ??
         statsData?.approvedApplications ??
         0;
       const pendingApplications =
-        statsData?.pendingApplications ?? applications.pending ?? applications.pendingApplications ?? 0;
+        statsData?.pendingApplications ??
+        applications.pending ??
+        applications.pendingApplications ??
+        0;
       const rejectedApplications =
-        statsData?.rejectedApplications ?? applications.rejected ?? applications.rejectedApplications ?? 0;
+        statsData?.rejectedApplications ??
+        applications.rejected ??
+        applications.rejectedApplications ??
+        0;
       const approvedAmount = statsData?.approvedAmount ?? 0;
 
       return {

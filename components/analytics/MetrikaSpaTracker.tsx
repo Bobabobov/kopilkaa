@@ -6,5 +6,3 @@ export default function MetrikaSpaTracker() {
   useMetrika();
   return null;
 }
-
-

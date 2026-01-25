@@ -45,5 +45,3 @@ export interface AdFormData {
   sidebarMobileTitle: string;
   sidebarMobileContent: string;
 }
-
-

@@ -16,7 +16,12 @@ interface UseOtherUserFriendshipParams {
   currentUserId: string | null;
   user: UserLite;
   emitFriendEvents: () => void;
-  showToast: (type: ToastType, title: string, message?: string, duration?: number) => void;
+  showToast: (
+    type: ToastType,
+    title: string,
+    message?: string,
+    duration?: number,
+  ) => void;
 }
 
 export type FriendshipStatus = "none" | "requested" | "incoming" | "friends";
@@ -40,7 +45,8 @@ export function useOtherUserFriendship({
       if (friendshipResponse.ok) {
         const friendshipData = await friendshipResponse.json();
         const userFriendship = friendshipData.friendships.find(
-          (f: Friendship) => f.requesterId === resolvedUserId || f.receiverId === resolvedUserId,
+          (f: Friendship) =>
+            f.requesterId === resolvedUserId || f.receiverId === resolvedUserId,
         );
         setFriendship(userFriendship || null);
       }
@@ -59,7 +65,11 @@ export function useOtherUserFriendship({
     if (!user) return;
 
     if (!isAuthenticated) {
-      showToast("warning", "Требуется авторизация", "Необходимо войти в аккаунт для добавления в друзья");
+      showToast(
+        "warning",
+        "Требуется авторизация",
+        "Необходимо войти в аккаунт для добавления в друзья",
+      );
       return;
     }
 
@@ -75,13 +85,25 @@ export function useOtherUserFriendship({
       if (response.ok) {
         setFriendship(data.friendship);
         emitFriendEvents();
-        showToast("success", "Заявка отправлена!", "Заявка в друзья успешно отправлена");
+        showToast(
+          "success",
+          "Заявка отправлена!",
+          "Заявка в друзья успешно отправлена",
+        );
       } else {
-        showToast("error", "Ошибка отправки", data.message || "Не удалось отправить заявку в друзья");
+        showToast(
+          "error",
+          "Ошибка отправки",
+          data.message || "Не удалось отправить заявку в друзья",
+        );
       }
     } catch (error) {
       console.error("Friend request error:", error);
-      showToast("error", "Ошибка отправки", "Не удалось отправить заявку в друзья");
+      showToast(
+        "error",
+        "Ошибка отправки",
+        "Не удалось отправить заявку в друзья",
+      );
     }
   }, [user, isAuthenticated, emitFriendEvents, showToast]);
 
@@ -97,12 +119,24 @@ export function useOtherUserFriendship({
       if (response.ok) {
         await fetchFriendshipStatus();
         emitFriendEvents();
-        showToast("success", "Заявка принята!", "Пользователь добавлен в друзья");
+        showToast(
+          "success",
+          "Заявка принята!",
+          "Пользователь добавлен в друзья",
+        );
       } else {
-        showToast("error", "Ошибка принятия", "Не удалось принять заявку в друзья");
+        showToast(
+          "error",
+          "Ошибка принятия",
+          "Не удалось принять заявку в друзья",
+        );
       }
     } catch (error) {
-      showToast("error", "Ошибка принятия", "Не удалось принять заявку в друзья");
+      showToast(
+        "error",
+        "Ошибка принятия",
+        "Не удалось принять заявку в друзья",
+      );
     }
   }, [friendship, fetchFriendshipStatus, emitFriendEvents, showToast]);
 
@@ -120,10 +154,18 @@ export function useOtherUserFriendship({
         emitFriendEvents();
         showToast("info", "Заявка отклонена", "Заявка в друзья отклонена");
       } else {
-        showToast("error", "Ошибка отклонения", "Не удалось отклонить заявку в друзья");
+        showToast(
+          "error",
+          "Ошибка отклонения",
+          "Не удалось отклонить заявку в друзья",
+        );
       }
     } catch (error) {
-      showToast("error", "Ошибка отклонения", "Не удалось отклонить заявку в друзья");
+      showToast(
+        "error",
+        "Ошибка отклонения",
+        "Не удалось отклонить заявку в друзья",
+      );
     }
   }, [friendship, fetchFriendshipStatus, emitFriendEvents, showToast]);
 
@@ -145,14 +187,13 @@ export function useOtherUserFriendship({
     }
   }, [friendship?.id, fetchFriendshipStatus, emitFriendEvents, showToast]);
 
-  const friendshipStatus: FriendshipStatus =
-    !friendship
-      ? "none"
-      : friendship.status === "ACCEPTED"
-        ? "friends"
-        : friendship.requesterId === currentUserId
-          ? "requested"
-          : "incoming";
+  const friendshipStatus: FriendshipStatus = !friendship
+    ? "none"
+    : friendship.status === "ACCEPTED"
+      ? "friends"
+      : friendship.requesterId === currentUserId
+        ? "requested"
+        : "incoming";
 
   return {
     friendship,

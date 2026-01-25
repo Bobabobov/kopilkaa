@@ -81,12 +81,12 @@ export function NewsControlsBar({
             title="Обновить"
           >
             <LucideIcons.RefreshCw size="sm" />
-            <span className="hidden sm:inline">{refreshing ? "..." : "Обновить"}</span>
+            <span className="hidden sm:inline">
+              {refreshing ? "..." : "Обновить"}
+            </span>
           </button>
         </div>
       </div>
     </div>
   );
 }
-
-

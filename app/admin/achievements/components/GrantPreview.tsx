@@ -29,5 +29,3 @@ export default function GrantPreview({ achievement, user }: GrantPreviewProps) {
     </motion.div>
   );
 }
-
-

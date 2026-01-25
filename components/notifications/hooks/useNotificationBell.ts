@@ -11,7 +11,9 @@ export function useNotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [lastViewedTimestamp, setLastViewedTimestamp] = useState<string | null>(null);
+  const [lastViewedTimestamp, setLastViewedTimestamp] = useState<string | null>(
+    null,
+  );
   const [mounted, setMounted] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -22,12 +24,12 @@ export function useNotificationBell() {
   // Загружаем timestamp последнего просмотра из localStorage
   useEffect(() => {
     try {
-      const savedTimestamp = localStorage.getItem('notifications_last_viewed');
+      const savedTimestamp = localStorage.getItem("notifications_last_viewed");
       if (savedTimestamp) {
         setLastViewedTimestamp(savedTimestamp);
       }
     } catch (error) {
-      console.warn('localStorage недоступен:', error);
+      console.warn("localStorage недоступен:", error);
     }
   }, []);
 
@@ -38,7 +40,7 @@ export function useNotificationBell() {
 
   // Вычисляем позицию меню для мобильных
   const updateMenuPosition = useCallback(() => {
-    if (buttonRef.current && typeof window !== 'undefined') {
+    if (buttonRef.current && typeof window !== "undefined") {
       const rect = buttonRef.current.getBoundingClientRect();
       setMenuPosition({
         top: rect.bottom + 8,
@@ -51,8 +53,8 @@ export function useNotificationBell() {
     if (isOpen) {
       updateMenuPosition();
       const handleResize = () => updateMenuPosition();
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
     }
   }, [isOpen, updateMenuPosition]);
 
@@ -68,20 +70,20 @@ export function useNotificationBell() {
 
   const fetchNotifications = useCallback(async (silent = false) => {
     if (fetchInProgressRef.current) return;
-    
+
     fetchInProgressRef.current = true;
-    
+
     try {
       if (!silent) setLoading(true);
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
-      
+
       const response = await fetch("/api/notifications", {
         signal: controller.signal,
       });
-      
+
       clearTimeout(timeoutId);
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -89,13 +91,14 @@ export function useNotificationBell() {
           setNotifications(newNotifications);
 
           const friendRequestCount = newNotifications.filter(
-            (notification: Notification) => notification.type === "friend_request",
+            (notification: Notification) =>
+              notification.type === "friend_request",
           ).length;
           dispatchFriendRequestEventRef.current(friendRequestCount);
         }
       }
     } catch (error) {
-      if (error instanceof Error && error.name !== 'AbortError') {
+      if (error instanceof Error && error.name !== "AbortError") {
         console.error("Error fetching notifications:", error);
       }
     } finally {
@@ -116,7 +119,7 @@ export function useNotificationBell() {
       hasFetchedOnOpenRef.current = true;
       fetchNotifications();
     }
-    
+
     if (!isOpen) {
       hasFetchedOnOpenRef.current = false;
     }
@@ -136,7 +139,7 @@ export function useNotificationBell() {
         const notificationDate = new Date(notification.createdAt).getTime();
         return notificationDate > viewedDate;
       }).length;
-      
+
       setUnreadCount(unreadCount);
     } else {
       setUnreadCount(notifications.length);
@@ -148,15 +151,15 @@ export function useNotificationBell() {
     if (isOpen && !hasMarkedAsViewed.current) {
       try {
         const currentTimestamp = new Date().toISOString();
-        localStorage.setItem('notifications_last_viewed', currentTimestamp);
+        localStorage.setItem("notifications_last_viewed", currentTimestamp);
         setLastViewedTimestamp(currentTimestamp);
         setUnreadCount(0);
         hasMarkedAsViewed.current = true;
       } catch (error) {
-        console.warn('Не удалось сохранить timestamp:', error);
+        console.warn("Не удалось сохранить timestamp:", error);
       }
     }
-    
+
     if (!isOpen) {
       hasMarkedAsViewed.current = false;
     }
@@ -171,26 +174,33 @@ export function useNotificationBell() {
     };
 
     window.addEventListener("friends-updated", handleFriendsUpdated);
-    return () => window.removeEventListener("friends-updated", handleFriendsUpdated);
+    return () =>
+      window.removeEventListener("friends-updated", handleFriendsUpdated);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleNotificationClick = useCallback((notification: Notification) => {
-    if (notification.type === "application_status" && notification.applicationId) {
-      if (notification.status === "APPROVED") {
+  const handleNotificationClick = useCallback(
+    (notification: Notification) => {
+      if (
+        notification.type === "application_status" &&
+        notification.applicationId
+      ) {
+        if (notification.status === "APPROVED") {
+          router.push(`/stories/${notification.applicationId}`);
+        } else {
+          router.push("/applications");
+        }
+        setIsOpen(false);
+      } else if (notification.type === "like" && notification.applicationId) {
         router.push(`/stories/${notification.applicationId}`);
-      } else {
-        router.push("/applications");
+        setIsOpen(false);
+      } else if (notification.type === "friend_request") {
+        router.push("/friends?tab=received");
+        setIsOpen(false);
       }
-      setIsOpen(false);
-    } else if (notification.type === "like" && notification.applicationId) {
-      router.push(`/stories/${notification.applicationId}`);
-      setIsOpen(false);
-    } else if (notification.type === "friend_request") {
-      router.push("/friends?tab=received");
-      setIsOpen(false);
-    }
-  }, [router]);
+    },
+    [router],
+  );
 
   return {
     notifications,
@@ -206,5 +216,3 @@ export function useNotificationBell() {
     fetchNotifications,
   };
 }
-
-

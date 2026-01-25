@@ -9,22 +9,40 @@ import Link from "next/link";
 import TrustLevelsInfo from "@/components/applications/TrustLevelsInfo";
 import ApplicationsTips from "@/components/applications/ApplicationsTips";
 import ApplicationsForm from "@/components/applications/ApplicationsForm";
-import { useApplicationFormState, LIMITS } from "@/hooks/applications/useApplicationFormState";
+import {
+  useApplicationFormState,
+  LIMITS,
+} from "@/hooks/applications/useApplicationFormState";
 import TrustIntroModal from "@/components/applications/TrustIntroModal";
+import ActivityRequirementModal from "@/components/applications/ActivityRequirementModal";
 import { getTrustLabel } from "@/lib/trustLevel";
 
-const SuccessScreen = dynamic(() => import("@/components/applications/SuccessScreen"), {
-  ssr: false,
-  loading: () => <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
-});
+const SuccessScreen = dynamic(
+  () => import("@/components/applications/SuccessScreen"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+    ),
+  },
+);
 
-const PageHeader = dynamic(() => import("@/components/applications/PageHeader"), {
-  ssr: false,
-  loading: () => <div className="h-24 bg-[#004643]/30 animate-pulse rounded-2xl" />
-});
+const PageHeader = dynamic(
+  () => import("@/components/applications/PageHeader"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-24 bg-[#004643]/30 animate-pulse rounded-2xl" />
+    ),
+  },
+);
 
 export default function ApplicationsPage() {
-  usePageTimeTracking({ page: "/applications", enabled: true, sendInterval: 30000 });
+  usePageTimeTracking({
+    page: "/applications",
+    enabled: true,
+    sendInterval: 30000,
+  });
 
   const state = useApplicationFormState();
   const {
@@ -72,6 +90,8 @@ export default function ApplicationsPage() {
     submit,
     setSubmitted,
     requiresReview,
+    activityModal,
+    setActivityModal,
   } = state;
 
   const { introAckKey } = state;
@@ -121,6 +141,21 @@ export default function ApplicationsPage() {
         }}
       />
 
+      {activityModal.activityType && (
+        <ActivityRequirementModal
+          isOpen={activityModal.isOpen}
+          onClose={() =>
+            setActivityModal({
+              isOpen: false,
+              activityType: null,
+              message: "",
+            })
+          }
+          activityType={activityModal.activityType}
+          message={activityModal.message}
+        />
+      )}
+
       <PageHeader />
 
       <div
@@ -137,7 +172,7 @@ export default function ApplicationsPage() {
           <div className="xl:col-span-3 order-1 lg:order-2">
             <TrustLevelsInfo />
 
-              {requiresReview ? (
+            {requiresReview ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -146,7 +181,7 @@ export default function ApplicationsPage() {
               >
                 <div className="absolute top-0 right-0 w-40 h-40 bg-[#f9bc60]/20 blur-3xl rounded-full pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#e16162]/10 blur-2xl rounded-full pointer-events-none" />
-                
+
                 <div className="relative z-10 space-y-4">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#f9bc60] to-[#e16162] flex items-center justify-center text-white shadow-lg flex-shrink-0">
@@ -157,8 +192,9 @@ export default function ApplicationsPage() {
                         Необходимо оставить отзыв
                       </h2>
                       <p className="text-sm sm:text-base text-white/80 leading-relaxed">
-                        У вас есть одобренная заявка, но вы ещё не оставили отзыв. Чтобы создать новую заявку, 
-                        пожалуйста, сначала поделитесь своим опытом на странице отзывов.
+                        У вас есть одобренная заявка, но вы ещё не оставили
+                        отзыв. Чтобы создать новую заявку, пожалуйста, сначала
+                        поделитесь своим опытом на странице отзывов.
                       </p>
                       <Link
                         href="/reviews"
@@ -174,56 +210,57 @@ export default function ApplicationsPage() {
               </motion.div>
             ) : (
               <ApplicationsForm
-              title={title}
-              setTitle={setTitle}
-              summary={summary}
-              setSummary={setSummary}
-              story={story}
-              setStory={setStory}
-              amountFormatted={amountFormatted}
-              handleAmountInputChange={handleAmountInputChange}
-              trustHint={trustHint}
-              trustLimitsMax={trustLimits.max}
-              payment={payment}
-              setPayment={setPayment}
-              bankName={bankName}
-              setBankName={setBankName}
-              photos={photos}
-              setPhotos={setPhotos}
-              uploading={uploading}
-              submitting={submitting}
-              left={left}
-              err={err}
-              submit={submit}
-              hpCompany={hpCompany}
-              setHpCompany={setHpCompany}
-              progressPercentage={progressPercentage}
-              filledFields={filledFields}
-              totalFields={totalFields}
-              limits={{
-                titleMax: LIMITS.titleMax,
-                summaryMax: LIMITS.summaryMax,
-                storyMin: LIMITS.storyMin,
-                storyMax: LIMITS.storyMax,
-                amountMin: LIMITS.amountMin,
-                paymentMin: LIMITS.paymentMin,
-                paymentMax: LIMITS.paymentMax,
-                maxPhotos: LIMITS.maxPhotos,
-              }}
-              amountInputRef={amountInputRef}
-              trustAcknowledged={trustAcknowledged}
-              setTrustAcknowledged={setTrustAcknowledged}
-              policiesAccepted={policiesAccepted}
-              setPoliciesAccepted={setPoliciesAccepted}
-              ackError={ackError}
-              trustSupportNotice={
-                exceedsTrustLimit ? (
-                  <p className="mt-1 text-xs text-[#94a1b2]">
-                    Максимальная сумма для вашего уровня — {trustLimits.max.toLocaleString("ru-RU")} ₽
-                  </p>
-                ) : null
-              }
-            />
+                title={title}
+                setTitle={setTitle}
+                summary={summary}
+                setSummary={setSummary}
+                story={story}
+                setStory={setStory}
+                amountFormatted={amountFormatted}
+                handleAmountInputChange={handleAmountInputChange}
+                trustHint={trustHint}
+                trustLimitsMax={trustLimits.max}
+                payment={payment}
+                setPayment={setPayment}
+                bankName={bankName}
+                setBankName={setBankName}
+                photos={photos}
+                setPhotos={setPhotos}
+                uploading={uploading}
+                submitting={submitting}
+                left={left}
+                err={err}
+                submit={submit}
+                hpCompany={hpCompany}
+                setHpCompany={setHpCompany}
+                progressPercentage={progressPercentage}
+                filledFields={filledFields}
+                totalFields={totalFields}
+                limits={{
+                  titleMax: LIMITS.titleMax,
+                  summaryMax: LIMITS.summaryMax,
+                  storyMin: LIMITS.storyMin,
+                  storyMax: LIMITS.storyMax,
+                  amountMin: LIMITS.amountMin,
+                  paymentMin: LIMITS.paymentMin,
+                  paymentMax: LIMITS.paymentMax,
+                  maxPhotos: LIMITS.maxPhotos,
+                }}
+                amountInputRef={amountInputRef}
+                trustAcknowledged={trustAcknowledged}
+                setTrustAcknowledged={setTrustAcknowledged}
+                policiesAccepted={policiesAccepted}
+                setPoliciesAccepted={setPoliciesAccepted}
+                ackError={ackError}
+                trustSupportNotice={
+                  exceedsTrustLimit ? (
+                    <p className="mt-1 text-xs text-[#94a1b2]">
+                      Максимальная сумма для вашего уровня —{" "}
+                      {trustLimits.max.toLocaleString("ru-RU")} ₽
+                    </p>
+                  ) : null
+                }
+              />
             )}
           </div>
         </div>

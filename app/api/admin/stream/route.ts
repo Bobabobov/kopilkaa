@@ -7,8 +7,7 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const admin = await getAllowedAdminUser();
-  if (!admin)
-    return new Response("Forbidden", { status: 403 });
+  if (!admin) return new Response("Forbidden", { status: 403 });
 
   const encoder = new TextEncoder();
   let un: (() => void) | null = null;
@@ -17,12 +16,12 @@ export async function GET() {
   const stream = new ReadableStream({
     start(controller) {
       const write = (str: string) => controller.enqueue(encoder.encode(str));
-      
+
       write(`retry: 3000\n\n`);
       write(`event: hello\ndata: "connected"\n\n`);
 
       un = subscribe(write);
-      
+
       pingTimer = setInterval(
         () => write(`event: ping\ndata: "${Date.now()}"\n\n`),
         30000,

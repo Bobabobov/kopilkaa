@@ -13,15 +13,16 @@ export default async function Page() {
   }
 
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center relative">
-        <div className="relative z-10">
-          <div className="w-16 h-16 border-4 border-[#f9bc60] border-t-transparent rounded-full animate-spin" />
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center relative">
+          <div className="relative z-10">
+            <div className="w-16 h-16 border-4 border-[#f9bc60] border-t-transparent rounded-full animate-spin" />
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <AdsManagementClient />
     </Suspense>
   );
 }
-

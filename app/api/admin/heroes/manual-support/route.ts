@@ -13,7 +13,9 @@ function normalizeUsername(raw: string): string {
   return raw.trim().replace(/^@+/, "").toLowerCase();
 }
 
-async function resolveUserIdForAdmin(identifierRaw: string): Promise<string | null> {
+async function resolveUserIdForAdmin(
+  identifierRaw: string,
+): Promise<string | null> {
   const identifier = normalizeIdentifier(identifierRaw);
   if (!identifier) return null;
 
@@ -21,18 +23,27 @@ async function resolveUserIdForAdmin(identifierRaw: string): Promise<string | nu
   if (identifier.startsWith("@")) {
     const username = normalizeUsername(identifier);
     if (!username) return null;
-    const u = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+    const u = await prisma.user.findUnique({
+      where: { username },
+      select: { id: true },
+    });
     return u?.id ?? null;
   }
 
   // 2) Try as id
-  const byId = await prisma.user.findUnique({ where: { id: identifier }, select: { id: true } });
+  const byId = await prisma.user.findUnique({
+    where: { id: identifier },
+    select: { id: true },
+  });
   if (byId?.id) return byId.id;
 
   // 3) As a convenience for admin: allow raw username without @
   const username = normalizeUsername(identifier);
   if (!username) return null;
-  const byUsername = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+  const byUsername = await prisma.user.findUnique({
+    where: { username },
+    select: { id: true },
+  });
   return byUsername?.id ?? null;
 }
 
@@ -53,21 +64,43 @@ export async function POST(request: Request) {
     const note = normalizeIdentifier(body?.note);
 
     if (!identifier) {
-      return NextResponse.json({ error: "Укажите пользователя (@username или userId)" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Укажите пользователя (@username или userId)" },
+        { status: 400 },
+      );
     }
     if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
-      return NextResponse.json({ error: "Некорректная сумма" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Некорректная сумма" },
+        { status: 400 },
+      );
     }
-    if (!Number.isFinite(paymentsCount) || paymentsCount <= 0 || paymentsCount > 50) {
-      return NextResponse.json({ error: "Некорректное количество платежей (1-50)" }, { status: 400 });
+    if (
+      !Number.isFinite(paymentsCount) ||
+      paymentsCount <= 0 ||
+      paymentsCount > 50
+    ) {
+      return NextResponse.json(
+        { error: "Некорректное количество платежей (1-50)" },
+        { status: 400 },
+      );
     }
     if (paymentsCount > totalAmount) {
-      return NextResponse.json({ error: "Количество платежей не может превышать сумму (count ≤ amount)" }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            "Количество платежей не может превышать сумму (count ≤ amount)",
+        },
+        { status: 400 },
+      );
     }
 
     const userId = await resolveUserIdForAdmin(identifier);
     if (!userId) {
-      return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     const user = await prisma.user.findUnique({
@@ -75,12 +108,17 @@ export async function POST(request: Request) {
       select: { id: true, username: true, name: true, email: true },
     });
     if (!user) {
-      return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     const base = Math.floor(totalAmount / paymentsCount);
     const remainder = totalAmount - base * paymentsCount;
-    const amounts = Array.from({ length: paymentsCount }, (_, idx) => (idx === 0 ? base + remainder : base));
+    const amounts = Array.from({ length: paymentsCount }, (_, idx) =>
+      idx === 0 ? base + remainder : base,
+    );
 
     const commentParts = [
       "manual_admin_support",
@@ -126,5 +164,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-

@@ -24,13 +24,24 @@ const TRUST_LIMITS: Record<TrustLevel, { min: number; max: number }> = {
   LEVEL_6: { min: 300, max: 5000 },
 };
 
-export function getTrustLevelFromApprovedCount(approvedCount: number): TrustLevel {
-  const safeCount = Math.max(0, Number.isFinite(approvedCount) ? Math.floor(approvedCount) : 0);
-  const levelIndex = Math.min(Math.floor(safeCount / 3), TRUST_LEVELS_ORDER.length - 1);
+export function getTrustLevelFromApprovedCount(
+  approvedCount: number,
+): TrustLevel {
+  const safeCount = Math.max(
+    0,
+    Number.isFinite(approvedCount) ? Math.floor(approvedCount) : 0,
+  );
+  const levelIndex = Math.min(
+    Math.floor(safeCount / 3),
+    TRUST_LEVELS_ORDER.length - 1,
+  );
   return TRUST_LEVELS_ORDER[levelIndex];
 }
 
-export function getTrustLimits(level: TrustLevel): { min: number; max: number } {
+export function getTrustLimits(level: TrustLevel): {
+  min: number;
+  max: number;
+} {
   return TRUST_LIMITS[level];
 }
 
@@ -79,10 +90,13 @@ export function getEffectiveApprovedForTrust(
   effectiveApproved: number,
   trustDelta: number,
 ): number {
-  const base = Number.isFinite(effectiveApproved) ? Math.floor(effectiveApproved) : 0;
+  const base = Number.isFinite(effectiveApproved)
+    ? Math.floor(effectiveApproved)
+    : 0;
   const delta = Number.isFinite(trustDelta) ? Math.floor(trustDelta) : 0;
   return Math.max(0, base + delta);
-}export function getTrustLevelFromEffectiveApproved(
+}
+export function getTrustLevelFromEffectiveApproved(
   effectiveApproved: number,
   trustDelta: number,
 ): TrustLevel {

@@ -37,7 +37,7 @@ export default function HeaderCustomization({
     user.headerTheme || "default",
   );
   const [selectedColor, setSelectedColor] = useState<string | null>(
-    user.headerTheme?.startsWith("color:") ? user.headerTheme : null
+    user.headerTheme?.startsWith("color:") ? user.headerTheme : null,
   );
   const [saving, setSaving] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
@@ -50,15 +50,18 @@ export default function HeaderCustomization({
         accentColor: "text-[#f9bc60]",
       }
     : getHeaderTheme(selectedThemeKey || "default");
-  
+
   // Автоскрытие скроллбаров
   useAutoHideScrollbar();
 
   const themes = getAllHeaderThemes();
 
-  const themeName =
-    selectedColor ? "Своя палитра" : themes.find((t) => t.key === selectedThemeKey)?.name || "Default";
-  const selectedColorValue = selectedColor ? selectedColor.replace("color:", "") : null;
+  const themeName = selectedColor
+    ? "Своя палитра"
+    : themes.find((t) => t.key === selectedThemeKey)?.name || "Default";
+  const selectedColorValue = selectedColor
+    ? selectedColor.replace("color:", "")
+    : null;
 
   // Монтирование для Portal
   useEffect(() => {
@@ -124,7 +127,7 @@ export default function HeaderCustomization({
           "Тема обновлена!",
           "Заголовок профиля успешно изменен",
         );
-        
+
         onClose();
       } else {
         const data = await response.json();
@@ -226,10 +229,15 @@ export default function HeaderCustomization({
                       backgroundRepeat: "no-repeat",
                     }
                   : selectedThemeConfig.background === "gradient"
-                  ? { backgroundImage: (selectedThemeConfig as any).gradient }
-                  : selectedThemeConfig.background === "color"
-                  ? { background: (selectedThemeConfig as any).color || "#004643" }
-                  : { background: "linear-gradient(135deg,#1fe0ba,#0a4c43)" }
+                    ? { backgroundImage: (selectedThemeConfig as any).gradient }
+                    : selectedThemeConfig.background === "color"
+                      ? {
+                          background:
+                            (selectedThemeConfig as any).color || "#004643",
+                        }
+                      : {
+                          background: "linear-gradient(135deg,#1fe0ba,#0a4c43)",
+                        }
               }
             >
               <div className="absolute inset-0 bg-black/12" />
@@ -242,7 +250,10 @@ export default function HeaderCustomization({
                     Мой профиль
                   </h3>
                   <p className="text-sm text-white/90 drop-shadow">
-                    Добро пожаловать, <span className="font-semibold text-[#f9bc60]">Пользователь</span>
+                    Добро пожаловать,{" "}
+                    <span className="font-semibold text-[#f9bc60]">
+                      Пользователь
+                    </span>
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -260,10 +271,12 @@ export default function HeaderCustomization({
               <div>
                 <h3 className="text-lg font-semibold text-[#fffffe]">
                   Цветовой круг Иттена
-            </h3>
-                <p className="text-sm text-[#abd1c6]">Создайте собственный цвет заголовка</p>
-            </div>
-            {selectedColor && (
+                </h3>
+                <p className="text-sm text-[#abd1c6]">
+                  Создайте собственный цвет заголовка
+                </p>
+              </div>
+              {selectedColor && (
                 <button
                   onClick={() => {
                     setSelectedColor(null);
@@ -283,22 +296,25 @@ export default function HeaderCustomization({
                   setSelectedTheme(""); // Сбрасываем выбор готовой темы
                 }}
               />
-              </div>
+            </div>
           </div>
 
           {/* Готовые темы */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-          <div>
+              <div>
                 <h3 className="text-lg font-semibold text-[#fffffe]">
-              Готовые темы
-            </h3>
-                <p className="text-sm text-[#abd1c6]">Подборка готовых пресетов с превью</p>
+                  Готовые темы
+                </h3>
+                <p className="text-sm text-[#abd1c6]">
+                  Подборка готовых пресетов с превью
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {themes.map((theme, index) => {
-                const isSelected = !selectedColor && selectedTheme === theme.key;
+                const isSelected =
+                  !selectedColor && selectedTheme === theme.key;
                 const themeConfig = getHeaderTheme(theme.key);
 
                 return (
@@ -322,8 +338,8 @@ export default function HeaderCustomization({
                         themeConfig.background === "gradient"
                           ? `bg-gradient-to-r ${(themeConfig as any).gradient}`
                           : themeConfig.background === "color"
-                          ? ""
-                          : "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900"
+                            ? ""
+                            : "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900"
                       }`}
                       style={
                         themeConfig.background === "image"
@@ -334,10 +350,11 @@ export default function HeaderCustomization({
                               backgroundRepeat: "no-repeat",
                             }
                           : themeConfig.background === "color"
-                          ? {
-                              backgroundColor: (themeConfig as any).color || "#004643",
-                            }
-                          : {}
+                            ? {
+                                backgroundColor:
+                                  (themeConfig as any).color || "#004643",
+                              }
+                            : {}
                       }
                     >
                       {/* Overlay for better text visibility */}

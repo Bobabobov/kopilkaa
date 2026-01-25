@@ -16,5 +16,3 @@ export function TelegramIcon({ className }: TelegramIconProps) {
     </svg>
   );
 }
-
-

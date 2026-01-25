@@ -11,7 +11,10 @@ interface FriendsListProps {
   data: any[];
   loading: boolean;
   currentUserId: string | null;
-  getUserStatus: (lastSeen: string | null) => { status: "online" | "offline"; text: string };
+  getUserStatus: (lastSeen: string | null) => {
+    status: "online" | "offline";
+    text: string;
+  };
   sendingRequests: Set<string>;
   actions: {
     onRemoveFriend?: (id: string) => Promise<void> | void;
@@ -65,8 +68,8 @@ export function FriendsList({
               ? item.receiver
               : item.requester
             : type === "sent"
-            ? item.receiver
-            : item.requester;
+              ? item.receiver
+              : item.requester;
 
         const userStatus = getUserStatus(user.lastSeen ?? null);
         const isOnline = userStatus.status === "online";
@@ -113,11 +116,15 @@ export function FriendsList({
                 <div className="flex items-center gap-2 min-w-0 flex-wrap">
                   <p
                     className="text-[#fffffe] text-lg font-semibold group-hover:underline min-w-0 flex-1 truncate"
-                    title={user.name || (user.email ? user.email.split("@")[0] : "Пользователь")}
+                    title={
+                      user.name ||
+                      (user.email ? user.email.split("@")[0] : "Пользователь")
+                    }
                   >
-                    {user.name || (user.email ? user.email.split("@")[0] : "Пользователь")}
+                    {user.name ||
+                      (user.email ? user.email.split("@")[0] : "Пользователь")}
                   </p>
-                    <HeroBadge badge={user.heroBadge ?? null} size="xs" />
+                  <HeroBadge badge={user.heroBadge ?? null} size="xs" />
                   {isAccepted && (
                     <LucideIcons.CheckCircle2
                       size="sm"
@@ -141,8 +148,13 @@ export function FriendsList({
                   </span>
                   <span className="text-[#f9bc60]">•</span>
                   <span className="inline-flex items-center gap-1">
-                    <LucideIcons.Calendar size="xs" className="text-[#abd1c6]" />
-                    <span className="text-[#94a3b8]">Друг с {friendSince || "—"}</span>
+                    <LucideIcons.Calendar
+                      size="xs"
+                      className="text-[#abd1c6]"
+                    />
+                    <span className="text-[#94a3b8]">
+                      Друг с {friendSince || "—"}
+                    </span>
                   </span>
                   <span
                     className="inline-flex items-center gap-1 text-[#f9bc60]"
@@ -219,7 +231,9 @@ export function FriendsList({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setOpenMenuId((prev) => (prev === item.id ? null : item.id));
+                      setOpenMenuId((prev) =>
+                        prev === item.id ? null : item.id,
+                      );
                     }}
                     className="inline-flex items-center justify-center px-3 py-2 rounded-lg border border-[#abd1c6]/25 text-[#abd1c6] hover:border-[#f9bc60]/60 hover:text-[#fffffe] transition-colors"
                     aria-label="Еще действия"
@@ -263,4 +277,3 @@ export function FriendsList({
     </div>
   );
 }
-

@@ -52,7 +52,6 @@ export default function HeroesGrid({
   loadingMore,
   observerTargetRef,
 }: HeroesGridProps) {
-
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("ru-RU", {
       day: "numeric",
@@ -122,8 +121,9 @@ export default function HeroesGrid({
           </h3>
         </div>
         <div className="text-xs sm:text-sm md:text-base text-[#abd1c6]">
-          Показано <span className="text-[#fffffe] font-semibold">{heroes.length}</span> из{" "}
-          <span className="text-[#fffffe] font-semibold">{total}</span>
+          Показано{" "}
+          <span className="text-[#fffffe] font-semibold">{heroes.length}</span>{" "}
+          из <span className="text-[#fffffe] font-semibold">{total}</span>
         </div>
       </div>
 
@@ -131,7 +131,9 @@ export default function HeroesGrid({
       {heroes.length === 0 ? (
         <div className="rounded-3xl border border-white/10 bg-white/5 p-8 sm:p-10 text-center">
           <div className="text-4xl mb-3">🔎</div>
-          <div className="text-lg font-semibold text-[#fffffe]">Ничего не найдено</div>
+          <div className="text-lg font-semibold text-[#fffffe]">
+            Ничего не найдено
+          </div>
           <div className="mt-2 text-sm text-[#abd1c6]">
             Попробуйте изменить запрос или сортировку.
           </div>
@@ -170,96 +172,98 @@ export default function HeroesGrid({
                 href={`/profile/${hero.id}`}
                 className="block focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 rounded-2xl"
               >
-              <div className="group relative p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-white/6 to-white/3 hover:from-white/8 hover:to-white/4 transition-all cursor-pointer shadow-[0_18px_48px_rgba(0,0,0,0.28)] hover:-translate-y-1">
-                {/* Accent glow */}
-                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute -left-10 -top-10 w-44 h-44 rounded-full blur-3xl bg-[#f9bc60]/10" />
-                  <div className="absolute -right-10 bottom-0 w-40 h-40 rounded-full blur-3xl bg-[#abd1c6]/10" />
-                </div>
+                <div className="group relative p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-white/6 to-white/3 hover:from-white/8 hover:to-white/4 transition-all cursor-pointer shadow-[0_18px_48px_rgba(0,0,0,0.28)] hover:-translate-y-1">
+                  {/* Accent glow */}
+                  <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute -left-10 -top-10 w-44 h-44 rounded-full blur-3xl bg-[#f9bc60]/10" />
+                    <div className="absolute -right-10 bottom-0 w-40 h-40 rounded-full blur-3xl bg-[#abd1c6]/10" />
+                  </div>
 
-                {/* Ранг */}
-                <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    {getRankIcon(hero.rank) && (
-                      <span className="text-xl sm:text-2xl flex-shrink-0">{getRankIcon(hero.rank)}</span>
+                  {/* Ранг */}
+                  <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {getRankIcon(hero.rank) && (
+                        <span className="text-xl sm:text-2xl flex-shrink-0">
+                          {getRankIcon(hero.rank)}
+                        </span>
+                      )}
+                      <span
+                        className="text-base sm:text-lg font-bold whitespace-nowrap"
+                        style={{
+                          color:
+                            hero.rank <= 3
+                              ? getRankBorder(hero.rank)
+                              : "#f9bc60",
+                        }}
+                      >
+                        #{hero.rank}
+                      </span>
+                    </div>
+                    {(hero.hasExtendedPlacement ?? hero.isSubscriber) && (
+                      <span className="inline-flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full whitespace-nowrap flex-shrink-0 border border-[#f9bc60]/30 bg-[#f9bc60]/10 text-[#f9bc60]">
+                        <LucideIcons.Star size="sm" />
+                        Активный герой
+                      </span>
                     )}
-                    <span 
-                      className="text-base sm:text-lg font-bold whitespace-nowrap" 
-                      style={{ 
-                        color: hero.rank <= 3 ? getRankBorder(hero.rank) : "#f9bc60" 
-                      }}
-                    >
-                      #{hero.rank}
-                    </span>
                   </div>
-                  {(hero.hasExtendedPlacement ?? hero.isSubscriber) && (
-                    <span className="inline-flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full whitespace-nowrap flex-shrink-0 border border-[#f9bc60]/30 bg-[#f9bc60]/10 text-[#f9bc60]">
-                      <LucideIcons.Star size="sm" />
-                      Активный герой
-                    </span>
-                  )}
-                </div>
 
-                {/* Аватар и имя */}
-                <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4 min-w-0">
-                  <div
-                    className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-lg sm:text-xl font-bold flex-shrink-0"
-                    style={{
-                      backgroundImage: `url(${hero.avatar || "/default-avatar.png"})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      color: "transparent",
-                    }}
-                  >
+                  {/* Аватар и имя */}
+                  <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4 min-w-0">
+                    <div
+                      className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-lg sm:text-xl font-bold flex-shrink-0"
+                      style={{
+                        backgroundImage: `url(${hero.avatar || "/default-avatar.png"})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        color: "transparent",
+                      }}
+                    ></div>
+                    <div className="min-w-0 flex-1">
+                      <h3
+                        className="text-base sm:text-lg font-bold truncate"
+                        style={{ color: "#fffffe" }}
+                      >
+                        {hero.name}
+                      </h3>
+                      <p
+                        className="text-xs sm:text-sm truncate"
+                        style={{ color: "#abd1c6" }}
+                      >
+                        С {formatDate(new Date(hero.joinedAt))}
+                      </p>
+                    </div>
+                    <div className="hidden sm:block">
+                      <HeroBadge badge={hero.heroBadge ?? null} size="sm" />
+                    </div>
+                    <div className="text-[#94a1b2] opacity-0 group-hover:opacity-100 transition-opacity">
+                      <LucideIcons.ChevronRight size="sm" />
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-base sm:text-lg font-bold truncate" style={{ color: "#fffffe" }}>
-                      {hero.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm truncate" style={{ color: "#abd1c6" }}>
-                      С {formatDate(new Date(hero.joinedAt))}
-                    </p>
-                  </div>
-                  <div className="hidden sm:block">
+                  <div className="sm:hidden mb-3">
                     <HeroBadge badge={hero.heroBadge ?? null} size="sm" />
                   </div>
-                  <div className="text-[#94a1b2] opacity-0 group-hover:opacity-100 transition-opacity">
-                    <LucideIcons.ChevronRight size="sm" />
-                  </div>
-                </div>
-                <div className="sm:hidden mb-3">
-                  <HeroBadge badge={hero.heroBadge ?? null} size="sm" />
-                </div>
 
-                {/* Статистика */}
-                <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <div 
-                    className="text-center p-2 sm:p-3 rounded-xl border border-white/10 bg-white/5"
-                  >
-                    <p 
-                      className="text-lg sm:text-xl font-bold break-words text-[#fffffe]"
-                    >
-                      {formatRub(hero.totalDonated)}
-                    </p>
-                    <p className="text-xs sm:text-sm text-[#abd1c6]">
-                      Общий вклад
-                    </p>
+                  {/* Статистика */}
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div className="text-center p-2 sm:p-3 rounded-xl border border-white/10 bg-white/5">
+                      <p className="text-lg sm:text-xl font-bold break-words text-[#fffffe]">
+                        {formatRub(hero.totalDonated)}
+                      </p>
+                      <p className="text-xs sm:text-sm text-[#abd1c6]">
+                        Общий вклад
+                      </p>
+                    </div>
+                    <div className="text-center p-2 sm:p-3 rounded-xl border border-white/10 bg-white/5">
+                      <p className="text-lg sm:text-xl font-bold text-[#fffffe]">
+                        {hero.donationCount}
+                      </p>
+                      <p className="text-xs sm:text-sm text-[#abd1c6]">
+                        Поддержки
+                      </p>
+                    </div>
                   </div>
-                  <div 
-                    className="text-center p-2 sm:p-3 rounded-xl border border-white/10 bg-white/5"
-                  >
-                    <p 
-                      className="text-lg sm:text-xl font-bold text-[#fffffe]"
-                    >
-                      {hero.donationCount}
-                    </p>
-                    <p className="text-xs sm:text-sm text-[#abd1c6]">
-                      Поддержки
-                    </p>
-                  </div>
-                </div>
-                {/* Соцсети: фиксированное место, чтобы все карточки были одной высоты */}
-                <div className="mt-3 sm:mt-4 min-h-[32px] sm:min-h-[36px] flex flex-wrap gap-1.5 sm:gap-2 items-center">
+                  {/* Соцсети: фиксированное место, чтобы все карточки были одной высоты */}
+                  <div className="mt-3 sm:mt-4 min-h-[32px] sm:min-h-[36px] flex flex-wrap gap-1.5 sm:gap-2 items-center">
                     {hasSocialLinks && hero.vkLink && (
                       <button
                         type="button"
@@ -302,10 +306,10 @@ export default function HeroesGrid({
                         <span>YouTube</span>
                       </button>
                     )}
+                  </div>
                 </div>
-              </div>
-            </Link>
-          );
+              </Link>
+            );
           })}
         </div>
       )}

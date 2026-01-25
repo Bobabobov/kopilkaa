@@ -13,8 +13,10 @@ type ResolvedAsset = {
 type ResolvedAdResponse = {
   desktop: ResolvedAsset;
   mobile: ResolvedAsset;
+  title: string | null;
   content: string | null;
   linkUrl: string | null;
+  imageUrl: string | null;
 };
 
 const TOP_BANNER_FALLBACK_IMAGE = "/gabriel-cardinal-goosebumps-patreon.gif";
@@ -44,12 +46,18 @@ function pickAsset(args: {
   return { type: null, url: null };
 }
 
-function normalizeMobileFallback(mobile: ResolvedAsset, desktop: ResolvedAsset) {
+function normalizeMobileFallback(
+  mobile: ResolvedAsset,
+  desktop: ResolvedAsset,
+) {
   if (mobile.type && mobile.url) return mobile;
   return desktop;
 }
 
-function normalizeDesktopFallback(desktop: ResolvedAsset, mobile: ResolvedAsset) {
+function normalizeDesktopFallback(
+  desktop: ResolvedAsset,
+  mobile: ResolvedAsset,
+) {
   if (desktop.type && desktop.url) return desktop;
   return mobile;
 }
@@ -97,8 +105,10 @@ export async function GET(req: NextRequest) {
     const payload: ResolvedAdResponse = {
       desktop,
       mobile,
+      title: ad.title || null,
       content: ad.content || ad.title || null,
       linkUrl: ad.linkUrl ?? null,
+      imageUrl: ad.imageUrl ?? null,
     };
 
     return NextResponse.json(payload);
@@ -107,5 +117,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(null);
   }
 }
-
-

@@ -23,10 +23,15 @@ export async function POST(
   const postId = params.id;
 
   try {
-    const body = (await request.json().catch(() => ({}))) as { reaction?: ReactionInput };
+    const body = (await request.json().catch(() => ({}))) as {
+      reaction?: ReactionInput;
+    };
     const reaction = body.reaction;
     if (reaction !== "like" && reaction !== "dislike" && reaction !== "none") {
-      return NextResponse.json({ error: "Некорректная реакция" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Некорректная реакция" },
+        { status: 400 },
+      );
     }
 
     const post = await prisma.projectNewsPost.findFirst({
@@ -34,7 +39,10 @@ export async function POST(
       select: { id: true },
     });
     if (!post) {
-      return NextResponse.json({ error: "Новость не найдена" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Новость не найдена" },
+        { status: 404 },
+      );
     }
 
     const userId = session.uid;
@@ -116,6 +124,3 @@ export async function POST(
     return NextResponse.json({ error: "Ошибка реакции" }, { status: 500 });
   }
 }
-
-
-

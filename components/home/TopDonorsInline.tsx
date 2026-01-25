@@ -82,9 +82,7 @@ export default function TopDonorsInline() {
   }, 0);
 
   const formattedTotal =
-    totalAmount > 0
-      ? totalAmount.toLocaleString("ru-RU")
-      : null;
+    totalAmount > 0 ? totalAmount.toLocaleString("ru-RU") : null;
 
   return (
     <section className="pt-10 pb-20 px-4">
@@ -111,7 +109,10 @@ export default function TopDonorsInline() {
         </div>
 
         {/* Короткая строка с именами первых мест */}
-        <div className="mb-8 flex flex-wrap items-center justify-center gap-2 text-[12px]" style={{ color: "#abd1c6" }}>
+        <div
+          className="mb-8 flex flex-wrap items-center justify-center gap-2 text-[12px]"
+          style={{ color: "#abd1c6" }}
+        >
           {top1 && (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#001e1d]/80 px-3 py-1 border border-[#f9bc60]/60 text-[#f9bc60]">
               <span className="text-[11px] font-semibold">1 место:</span>
@@ -136,176 +137,187 @@ export default function TopDonorsInline() {
             аккуратным, «виджетным» оформлением и акцентом на 1–3 места */}
         <div className="relative">
           <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
-          {donors.map((donor, index) => {
-            const numericAmount = parseInt(donor.amount.replace(/\D/g, ""), 10);
-            const formattedAmount = Number.isNaN(numericAmount)
-              ? donor.amount
-              : numericAmount.toLocaleString("ru-RU");
+            {donors.map((donor, index) => {
+              const numericAmount = parseInt(
+                donor.amount.replace(/\D/g, ""),
+                10,
+              );
+              const formattedAmount = Number.isNaN(numericAmount)
+                ? donor.amount
+                : numericAmount.toLocaleString("ru-RU");
 
-            const place = donor.position || index + 1;
-            const placeLabel =
-              place === 1 ? "Главный герой" : `${place}-е место`;
+              const place = donor.position || index + 1;
+              const placeLabel =
+                place === 1 ? "Главный герой" : `${place}-е место`;
 
-            // Разные акценты для 1, 2 и 3 места
-            const cardBorder =
-              place === 1
-                ? "border-[#f9bc60]/80"
-                : place === 2
-                ? "border-[#abd1c6]/70"
-                : place === 3
-                ? "border-[#e16162]/70"
-                : "border-[#abd1c6]/25";
+              // Разные акценты для 1, 2 и 3 места
+              const cardBorder =
+                place === 1
+                  ? "border-[#f9bc60]/80"
+                  : place === 2
+                    ? "border-[#abd1c6]/70"
+                    : place === 3
+                      ? "border-[#e16162]/70"
+                      : "border-[#abd1c6]/25";
 
-            const badgeBg =
-              place === 1
-                ? "bg-[#f9bc60] text-[#001e1d]"
-                : place === 2
-                ? "bg-[#abd1c6] text-[#001e1d]"
-                : place === 3
-                ? "bg-[#e16162] text-white"
-                : "bg-[#94a1b2] text-[#001e1d]";
+              const badgeBg =
+                place === 1
+                  ? "bg-[#f9bc60] text-[#001e1d]"
+                  : place === 2
+                    ? "bg-[#abd1c6] text-[#001e1d]"
+                    : place === 3
+                      ? "bg-[#e16162] text-white"
+                      : "bg-[#94a1b2] text-[#001e1d]";
 
-            return (
-              <Link
-                key={donor.id}
-                href={`/profile/${donor.id}`}
-                className="block h-full"
-              >
-                <div
-                  className={`rounded-2xl overflow-hidden border ${cardBorder} bg-[#001e1d]/90 shadow-lg shadow-black/35 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl h-full`}
+              return (
+                <Link
+                  key={donor.id}
+                  href={`/profile/${donor.id}`}
+                  className="block h-full"
                 >
-                <div className="p-6 flex flex-col h-full">
-                  {/* Верхняя часть: место + имя + аватар */}
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="relative flex-shrink-0">
-                      <div
-                        className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center ${
-                          place === 1
-                            ? "bg-gradient-to-br from-[#f9bc60] via-[#f97316] to-[#e16162] p-[2px]"
-                            : "bg-[#004643]"
-                        }`}
-                      >
-                        <div className="w-full h-full rounded-full overflow-hidden bg-[#004643]">
-                        <Image
-                          src={donor.avatar || "/default-avatar.png"}
-                          alt={donor.name}
-                          fill
-                          sizes="48px"
-                          quality={70}
-                          className="object-cover"
-                        />
-                      </div>
-                      </div>
-                      {place === 1 && (
-                        <div className="absolute -top-2 -left-1 flex items-center gap-1 rounded-full bg-[#f9bc60] px-2 py-0.5 text-[10px] font-semibold text-[#001e1d] shadow-md shadow-[#f9bc60]/60">
-                          <LucideIcons.Crown size="xs" />
-                          <span>Легенда</span>
+                  <div
+                    className={`rounded-2xl overflow-hidden border ${cardBorder} bg-[#001e1d]/90 shadow-lg shadow-black/35 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl h-full`}
+                  >
+                    <div className="p-6 flex flex-col h-full">
+                      {/* Верхняя часть: место + имя + аватар */}
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="relative flex-shrink-0">
+                          <div
+                            className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center ${
+                              place === 1
+                                ? "bg-gradient-to-br from-[#f9bc60] via-[#f97316] to-[#e16162] p-[2px]"
+                                : "bg-[#004643]"
+                            }`}
+                          >
+                            <div className="w-full h-full rounded-full overflow-hidden bg-[#004643]">
+                              <Image
+                                src={donor.avatar || "/default-avatar.png"}
+                                alt={donor.name}
+                                fill
+                                sizes="48px"
+                                quality={70}
+                                className="object-cover"
+                              />
+                            </div>
+                          </div>
+                          {place === 1 && (
+                            <div className="absolute -top-2 -left-1 flex items-center gap-1 rounded-full bg-[#f9bc60] px-2 py-0.5 text-[10px] font-semibold text-[#001e1d] shadow-md shadow-[#f9bc60]/60">
+                              <LucideIcons.Crown size="xs" />
+                              <span>Легенда</span>
+                            </div>
+                          )}
+                          <div
+                            className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-[#001e1d]/80 text-[11px] font-semibold shadow-sm ${badgeBg}`}
+                          >
+                            {place}
+                          </div>
                         </div>
-                      )}
-                      <div
-                        className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-[#001e1d]/80 text-[11px] font-semibold shadow-sm ${badgeBg}`}
-                      >
-                        {place}
+                        <div className="min-w-0 text-left">
+                          <p
+                            className="text-lg font-semibold truncate"
+                            style={{ color: "#fffffe" }}
+                          >
+                            {donor.name}
+                          </p>
+                          <p
+                            className="text-[11px] font-medium"
+                            style={{ color: "#f9bc60" }}
+                          >
+                            {placeLabel}
+                          </p>
+                          {donor.heroBadge && (
+                            <div className="mt-2">
+                              <HeroBadge badge={donor.heroBadge} size="xs" />
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="min-w-0 text-left">
-                      <p
-                        className="text-lg font-semibold truncate"
-                        style={{ color: "#fffffe" }}
-                      >
-                        {donor.name}
-                      </p>
-                      <p className="text-[11px] font-medium" style={{ color: "#f9bc60" }}>
-                        {placeLabel}
-                      </p>
-                      {donor.heroBadge && (
-                        <div className="mt-2">
-                          <HeroBadge badge={donor.heroBadge} size="xs" />
+
+                      {/* Сумма */}
+                      <div className="mb-4 text-left">
+                        <span className="text-2xl font-bold">
+                          <span style={{ color: "#f9bc60" }}>
+                            {formattedAmount}
+                          </span>
+                          <span
+                            style={{ color: "#ffffff", fontWeight: 900 }}
+                          >{` руб`}</span>
+                        </span>
+                      </div>
+
+                      {/* Соцсети донатера / сообщение, если их нет */}
+                      {donor.vkLink ||
+                      donor.telegramLink ||
+                      donor.youtubeLink ? (
+                        <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-center gap-4">
+                          {donor.vkLink && (
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                window.open(
+                                  donor.vkLink!,
+                                  "_blank",
+                                  "noopener,noreferrer",
+                                );
+                              }}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#4c75a3]/70 bg-transparent text-[#4c75a3] hover:bg-[#4c75a3]/20 transition-colors"
+                              aria-label="VK"
+                            >
+                              <VKIcon className="h-4 w-4" />
+                            </button>
+                          )}
+                          {donor.telegramLink && (
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                window.open(
+                                  donor.telegramLink!,
+                                  "_blank",
+                                  "noopener,noreferrer",
+                                );
+                              }}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#229ED9]/70 bg-transparent text-[#229ED9] hover:bg-[#229ED9]/20 transition-colors"
+                              aria-label="Telegram"
+                            >
+                              <TelegramIcon className="h-4 w-4" />
+                            </button>
+                          )}
+                          {donor.youtubeLink && (
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                window.open(
+                                  donor.youtubeLink!,
+                                  "_blank",
+                                  "noopener,noreferrer",
+                                );
+                              }}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#ff4f45]/70 bg-transparent text-[#ff4f45] hover:bg-[#ff4f45]/20 transition-colors"
+                              aria-label="YouTube"
+                            >
+                              <YouTubeIcon className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <div
+                          className="mt-auto pt-4 border-t border-white/10 text-[12px] text-center"
+                          style={{ color: "#abd1c6" }}
+                        >
+                          Человечек не привязал свои соц.сети
                         </div>
                       )}
                     </div>
                   </div>
-
-                  {/* Сумма */}
-                  <div className="mb-4 text-left">
-                    <span className="text-2xl font-bold">
-                      <span style={{ color: "#f9bc60" }}>{formattedAmount}</span>
-                      <span
-                        style={{ color: "#ffffff", fontWeight: 900 }}
-                      >{` руб`}</span>
-                    </span>
-                  </div>
-
-                  {/* Соцсети донатера / сообщение, если их нет */}
-                  {(donor.vkLink ||
-                    donor.telegramLink ||
-                    donor.youtubeLink) ? (
-                    <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-center gap-4">
-                      {donor.vkLink && (
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            window.open(
-                              donor.vkLink!,
-                              "_blank",
-                              "noopener,noreferrer",
-                            );
-                          }}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#4c75a3]/70 bg-transparent text-[#4c75a3] hover:bg-[#4c75a3]/20 transition-colors"
-                          aria-label="VK"
-                        >
-                          <VKIcon className="h-4 w-4" />
-                        </button>
-                      )}
-                      {donor.telegramLink && (
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            window.open(
-                              donor.telegramLink!,
-                              "_blank",
-                              "noopener,noreferrer",
-                            );
-                          }}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#229ED9]/70 bg-transparent text-[#229ED9] hover:bg-[#229ED9]/20 transition-colors"
-                          aria-label="Telegram"
-                        >
-                          <TelegramIcon className="h-4 w-4" />
-                        </button>
-                      )}
-                      {donor.youtubeLink && (
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            window.open(
-                              donor.youtubeLink!,
-                              "_blank",
-                              "noopener,noreferrer",
-                            );
-                          }}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#ff4f45]/70 bg-transparent text-[#ff4f45] hover:bg-[#ff4f45]/20 transition-colors"
-                          aria-label="YouTube"
-                        >
-                          <YouTubeIcon className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="mt-auto pt-4 border-t border-white/10 text-[12px] text-center" style={{ color: "#abd1c6" }}>
-                      Человечек не привязал свои соц.сети
-                    </div>
-                  )}
-                </div>
-              </div>
-              </Link>
-            );
-          })}
+                </Link>
+              );
+            })}
           </div>
         </div>
 
@@ -337,6 +349,3 @@ export default function TopDonorsInline() {
     </section>
   );
 }
-
-
-

@@ -13,7 +13,10 @@ export function SettingsModalHeader({ onClose }: SettingsModalHeaderProps) {
             <LucideIcons.Settings size="md" className="text-[#001e1d]" />
           </div>
           <div>
-            <h2 id="profile-settings-title" className="text-xl sm:text-2xl font-bold text-[#fffffe]">
+            <h2
+              id="profile-settings-title"
+              className="text-xl sm:text-2xl font-bold text-[#fffffe]"
+            >
               Настройки профиля
             </h2>
             <p id="profile-settings-desc" className="text-[#abd1c6]">

@@ -5,7 +5,6 @@ interface FormActionsProps {
   editingAd: Advertisement | null;
   isActive: boolean;
   onActiveChange: (active: boolean) => void;
-  onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
 }
 
@@ -13,7 +12,6 @@ export default function FormActions({
   editingAd,
   isActive,
   onActiveChange,
-  onSubmit,
   onCancel,
 }: FormActionsProps) {
   return (
@@ -48,4 +46,3 @@ export default function FormActions({
     </>
   );
 }
-

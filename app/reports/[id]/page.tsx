@@ -29,7 +29,7 @@ export default function BugReportDetailPage() {
               pathname: window.location.pathname,
               search: window.location.search,
               modal: "auth",
-            })
+            }),
           );
           return;
         }
@@ -41,13 +41,17 @@ export default function BugReportDetailPage() {
             pathname: window.location.pathname,
             search: window.location.search,
             modal: "auth",
-          })
-        )
+          }),
+        ),
       )
       .finally(() => setLoading(false));
   }, [router]);
 
-  const { report, loading: loadingReport, setReport } = useReportDetail({
+  const {
+    report,
+    loading: loadingReport,
+    setReport,
+  } = useReportDetail({
     reportId: params.id as string | null,
     userId: user?.id || null,
   });
@@ -73,11 +77,13 @@ export default function BugReportDetailPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-
       {/* Декоративные элементы */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-20 left-10 w-72 h-72 bg-[#e16162]/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#f9bc60]/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div
+          className="absolute bottom-20 right-10 w-96 h-96 bg-[#f9bc60]/5 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
       </div>
 
       <div className="container-p mx-auto max-w-4xl relative z-10 px-4 pt-8 pb-12">
@@ -100,13 +106,10 @@ export default function BugReportDetailPage() {
         />
       </div>
 
-      <ImageModal imageUrl={selectedImage} onClose={() => setSelectedImage(null)} />
+      <ImageModal
+        imageUrl={selectedImage}
+        onClose={() => setSelectedImage(null)}
+      />
     </div>
   );
 }
-
-
-
-
-
-

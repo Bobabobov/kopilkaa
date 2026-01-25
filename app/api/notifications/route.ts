@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 function formatTimeAgo(date: Date): string {
   const now = new Date();
@@ -22,9 +22,9 @@ function formatTimeAgo(date: Date): string {
   } else if (diffInDays < 7) {
     return `${diffInDays} ${diffInDays === 1 ? "день" : diffInDays < 5 ? "дня" : "дней"} назад`;
   } else {
-    return date.toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long'
+    return date.toLocaleDateString("ru-RU", {
+      day: "numeric",
+      month: "long",
     });
   }
 }
@@ -41,45 +41,53 @@ export async function GET() {
     const notifications: any[] = [];
 
     // Получаем новые лайки (последние 20 для группировки) с обработкой ошибок
-    const recentLikes = await prisma.storyLike.findMany({
-      where: { 
-        application: {
-          userId: userId
-        }
-      },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
-            hideEmail: true,
+    const recentLikes = await prisma.storyLike
+      .findMany({
+        where: {
+          application: {
+            userId: userId,
           },
         },
-        application: {
-          select: {
-            id: true,
-            title: true,
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+              hideEmail: true,
+            },
+          },
+          application: {
+            select: {
+              id: true,
+              title: true,
+            },
           },
         },
-      },
-    }).catch(() => []);
+      })
+      .catch(() => []);
 
     // Группируем лайки по пользователю и истории (только последний лайк от каждого)
     const groupedLikes = new Map();
     recentLikes.forEach((like) => {
       const key = `${like.userId}_${like.applicationId}`;
-      if (!groupedLikes.has(key) || groupedLikes.get(key).createdAt < like.createdAt) {
+      if (
+        !groupedLikes.has(key) ||
+        groupedLikes.get(key).createdAt < like.createdAt
+      ) {
         groupedLikes.set(key, like);
       }
     });
 
     // Добавляем только уникальные лайки как уведомления (берем последние 10)
     Array.from(groupedLikes.values())
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
       .slice(0, 10)
       .forEach((like) => {
         const safeUser = sanitizeEmailForViewer(like.user, userId);
@@ -101,20 +109,22 @@ export async function GET() {
       });
 
     // Получаем новые достижения с обработкой ошибок
-    const recentAchievements = await prisma.userAchievement.findMany({
-      where: { userId },
-      orderBy: { unlockedAt: "desc" },
-      take: 5,
-      include: {
-        achievement: {
-          select: {
-            name: true,
-            description: true,
-            rarity: true,
+    const recentAchievements = await prisma.userAchievement
+      .findMany({
+        where: { userId },
+        orderBy: { unlockedAt: "desc" },
+        take: 5,
+        include: {
+          achievement: {
+            select: {
+              name: true,
+              description: true,
+              rarity: true,
+            },
           },
         },
-      },
-    }).catch(() => []);
+      })
+      .catch(() => []);
 
     // Добавляем достижения как уведомления
     recentAchievements.forEach((achievement) => {
@@ -132,30 +142,36 @@ export async function GET() {
     });
 
     // Получаем входящие заявки в друзья
-    const pendingFriendRequests = await prisma.friendship.findMany({
-      where: {
-        receiverId: userId,
-        status: "PENDING",
-      },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-      include: {
-        requester: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
-            hideEmail: true,
+    const pendingFriendRequests = await prisma.friendship
+      .findMany({
+        where: {
+          receiverId: userId,
+          status: "PENDING",
+        },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        include: {
+          requester: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+              hideEmail: true,
+            },
           },
         },
-      },
-    }).catch(() => []);
+      })
+      .catch(() => []);
 
     pendingFriendRequests.forEach((request) => {
-      const requester = sanitizeEmailForViewer(request.requester as any, userId);
+      const requester = sanitizeEmailForViewer(
+        request.requester as any,
+        userId,
+      );
       const displayName =
-        requester.name || (requester.email ? requester.email.split("@")[0] : "Пользователь");
+        requester.name ||
+        (requester.email ? requester.email.split("@")[0] : "Пользователь");
 
       notifications.push({
         id: `friend_request_${request.id}`,
@@ -176,34 +192,37 @@ export async function GET() {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const statusChangedApplications = await prisma.application.findMany({
-      where: {
-        userId: userId,
-        status: {
-          in: ["APPROVED", "REJECTED"],
+    const statusChangedApplications = await prisma.application
+      .findMany({
+        where: {
+          userId: userId,
+          status: {
+            in: ["APPROVED", "REJECTED"],
+          },
+          updatedAt: {
+            gte: sevenDaysAgo, // Только недавно измененные
+          },
         },
-        updatedAt: {
-          gte: sevenDaysAgo, // Только недавно измененные
+        orderBy: { updatedAt: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          adminComment: true,
+          updatedAt: true,
+          createdAt: true,
         },
-      },
-      orderBy: { updatedAt: "desc" },
-      take: 10,
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        adminComment: true,
-        updatedAt: true,
-        createdAt: true,
-      },
-    }).catch(() => []);
+      })
+      .catch(() => []);
 
     // Добавляем уведомления о статусе заявок
     // Показываем все одобренные/отклоненные заявки, обновленные за последние 7 дней
     statusChangedApplications.forEach((application) => {
-      const statusText = application.status === "APPROVED" ? "одобрена" : "отклонена";
+      const statusText =
+        application.status === "APPROVED" ? "одобрена" : "отклонена";
       const statusEmoji = application.status === "APPROVED" ? "✅" : "❌";
-      
+
       notifications.push({
         id: `application_${application.id}_${application.status}`,
         type: "application_status",
@@ -221,29 +240,32 @@ export async function GET() {
 
     // Сортируем все уведомления по дате
     notifications.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
 
     // Берем только последние 20
     const recentNotifications = notifications.slice(0, 20);
 
-    return NextResponse.json({
-      success: true,
-      notifications: recentNotifications,
-      unreadCount: recentNotifications.length, // Пока что все считаем непрочитанными
-    }, {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
+    return NextResponse.json(
+      {
+        success: true,
+        notifications: recentNotifications,
+        unreadCount: recentNotifications.length, // Пока что все считаем непрочитанными
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      },
+    );
   } catch (error) {
     console.error("Get notifications error:", error);
     return NextResponse.json(
       { message: "Ошибка получения уведомлений" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

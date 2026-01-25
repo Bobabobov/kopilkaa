@@ -33,7 +33,7 @@ export function AdminHeader() {
           Управление заявками и статистика платформы
         </p>
       </div>
-      
+
       {/* Навигация */}
       <div className="flex flex-wrap gap-2 sm:gap-3">
         {navLinks.map((link) => {
@@ -56,5 +56,3 @@ export function AdminHeader() {
     </motion.div>
   );
 }
-
-

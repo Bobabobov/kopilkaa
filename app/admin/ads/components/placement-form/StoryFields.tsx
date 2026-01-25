@@ -8,7 +8,10 @@ interface StoryFieldsProps {
   storyImageFiles: Record<number, { file: File; url: string }>;
   uploadingStoryImages: Record<number, boolean>;
   onFieldChange: (field: keyof AdFormData, value: any) => void;
-  onStoryImageFileSelect: (index: number, e: React.ChangeEvent<HTMLInputElement>) => void;
+  onStoryImageFileSelect: (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
   onStoryImageUrlChange: (index: number, url: string) => void;
   onStoryImageRemove: (index: number) => void;
   onAddStoryImage: () => void;
@@ -69,8 +72,8 @@ export default function StoryFields({
             maxLength={80}
           />
           <p className="text-xs text-[#abd1c6]/70 mt-1">
-            Это название будет показано рядом с зелёным кружком «Команда проекта» и будет
-            кликабельным.
+            Это название будет показано рядом с зелёным кружком «Команда
+            проекта» и будет кликабельным.
           </p>
         </div>
 
@@ -86,8 +89,8 @@ export default function StoryFields({
             placeholder="https://example.com"
           />
           <p className="text-xs text-[#abd1c6]/70 mt-1">
-            Клик по названию проекта откроет эту ссылку в новой вкладке. Если оставить пустой —
-            подпись будет без ссылки.
+            Клик по названию проекта откроет эту ссылку в новой вкладке. Если
+            оставить пустой — подпись будет без ссылки.
           </p>
         </div>
 
@@ -105,4 +108,3 @@ export default function StoryFields({
     </>
   );
 }
-

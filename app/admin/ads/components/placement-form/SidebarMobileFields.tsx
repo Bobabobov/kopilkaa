@@ -29,15 +29,21 @@ export default function SidebarMobileFields({
           Мобильная версия (для экранов меньше 768px)
         </h3>
         <p className="text-xs text-[#abd1c6]/70 mb-4">
-          Эти настройки используются только на мобильных устройствах. Если не заполнены, будут использоваться данные из десктопной версии.
+          Эти настройки используются только на мобильных устройствах. Если не
+          заполнены, будут использоваться данные из десктопной версии.
         </p>
       </div>
 
       <div className="md:col-span-2">
         <label className="block text-sm font-medium text-[#abd1c6] mb-2">
-          Изображение для мобильной версии (рекомендуется квадрат 48×48px или больше)
+          Изображение для мобильной версии (рекомендуется квадрат 48×48px или
+          больше)
         </label>
-        {previewImageFile !== undefined && uploadingPreview !== undefined && onMobileImageFileSelect && onMobileImageUrlChange && onMobileImageRemove ? (
+        {previewImageFile !== undefined &&
+        uploadingPreview !== undefined &&
+        onMobileImageFileSelect &&
+        onMobileImageUrlChange &&
+        onMobileImageRemove ? (
           <PreviewImageUpload
             imageUrl={formData.sidebarMobileImageUrl}
             uploading={uploadingPreview}
@@ -51,13 +57,16 @@ export default function SidebarMobileFields({
           <input
             type="text"
             value={formData.sidebarMobileImageUrl}
-            onChange={(e) => onFieldChange("sidebarMobileImageUrl", e.target.value)}
+            onChange={(e) =>
+              onFieldChange("sidebarMobileImageUrl", e.target.value)
+            }
             className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none"
             placeholder="https://example.com/mobile-image.jpg или загрузите файл"
           />
         )}
         <p className="text-xs text-[#abd1c6]/70 mt-1">
-          Квадратное изображение, отображаемое слева от текста на мобильных устройствах. Рекомендуемый размер: 48×48px или больше (квадрат).
+          Квадратное изображение, отображаемое слева от текста на мобильных
+          устройствах. Рекомендуемый размер: 48×48px или больше (квадрат).
         </p>
       </div>
 
@@ -74,7 +83,9 @@ export default function SidebarMobileFields({
           maxLength={80}
         />
         <p className="text-xs text-[#abd1c6]/70 mt-1">
-          Этот текст отображается вместо слова "Реклама" в мобильной версии. Если оставить пустым, будет использоваться заголовок из основного блока.
+          Этот текст отображается вместо слова "Реклама" в мобильной версии.
+          Если оставить пустым, будет использоваться заголовок из основного
+          блока.
         </p>
       </div>
 
@@ -84,17 +95,19 @@ export default function SidebarMobileFields({
         </label>
         <textarea
           value={formData.sidebarMobileContent}
-          onChange={(e) => onFieldChange("sidebarMobileContent", e.target.value)}
+          onChange={(e) =>
+            onFieldChange("sidebarMobileContent", e.target.value)
+          }
           rows={3}
           className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none"
           placeholder="Оставьте пустым, чтобы использовать описание из десктопной версии"
           maxLength={200}
         />
         <p className="text-xs text-[#abd1c6]/70 mt-1">
-          Краткое описание для мобильной версии. Если оставить пустым, будет использоваться описание из основного блока.
+          Краткое описание для мобильной версии. Если оставить пустым, будет
+          использоваться описание из основного блока.
         </p>
       </div>
     </div>
   );
 }
-

@@ -10,8 +10,10 @@ export async function POST() {
     }
 
     const userId = session.uid;
-    const granted = await AchievementService.checkAndGrantAutomaticAchievements(userId);
-    const progress = await AchievementService.getUserAchievementProgress(userId);
+    const granted =
+      await AchievementService.checkAndGrantAutomaticAchievements(userId);
+    const progress =
+      await AchievementService.getUserAchievementProgress(userId);
     return NextResponse.json({
       success: true,
       data: {
@@ -23,9 +25,7 @@ export async function POST() {
     console.error("Error checking achievements:", error);
     return NextResponse.json(
       { error: "Ошибка проверки достижений" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-
-

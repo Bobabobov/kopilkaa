@@ -6,7 +6,11 @@ interface UseSettingsModalLifecycleParams {
   dialogRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export function useSettingsModalLifecycle({ isOpen, onClose, dialogRef }: UseSettingsModalLifecycleParams) {
+export function useSettingsModalLifecycle({
+  isOpen,
+  onClose,
+  dialogRef,
+}: UseSettingsModalLifecycleParams) {
   const [mounted, setMounted] = useState(false);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
 
@@ -72,7 +76,9 @@ export function useSettingsModalLifecycle({ isOpen, onClose, dialogRef }: UseSet
       return Array.from(nodes).filter((el) => {
         const style = window.getComputedStyle(el);
         const hidden =
-          style.display === "none" || style.visibility === "hidden" || el.getAttribute("aria-hidden") === "true";
+          style.display === "none" ||
+          style.visibility === "hidden" ||
+          el.getAttribute("aria-hidden") === "true";
         return !hidden;
       });
     };

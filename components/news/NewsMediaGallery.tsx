@@ -66,7 +66,6 @@ export function NewsMediaGallery({ media }: { media: NewsMedia[] }) {
               aria-label="Открыть фото"
               title="Открыть фото"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={m.url}
                 alt={`Фото к новости`}
@@ -87,5 +86,3 @@ export function NewsMediaGallery({ media }: { media: NewsMedia[] }) {
     </div>
   );
 }
-
-

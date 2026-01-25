@@ -10,7 +10,11 @@ interface EmailSignupFormProps {
   error: string | null;
 }
 
-export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps) {
+export function EmailSignupForm({
+  onSubmit,
+  busy,
+  error,
+}: EmailSignupFormProps) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -78,7 +82,10 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <label className="block text-sm font-medium mb-2.5" style={{ color: "#abd1c6" }}>
+          <label
+            className="block text-sm font-medium mb-2.5"
+            style={{ color: "#abd1c6" }}
+          >
             Имя или название
           </label>
           <input
@@ -121,7 +128,10 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.35 }}
         >
-          <label className="block text-sm font-medium mb-2.5" style={{ color: "#abd1c6" }}>
+          <label
+            className="block text-sm font-medium mb-2.5"
+            style={{ color: "#abd1c6" }}
+          >
             Почта
           </label>
           <input
@@ -164,7 +174,10 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.45 }}
         >
-          <label className="block text-sm font-medium mb-2.5" style={{ color: "#abd1c6" }}>
+          <label
+            className="block text-sm font-medium mb-2.5"
+            style={{ color: "#abd1c6" }}
+          >
             Пароль
           </label>
           <input
@@ -208,7 +221,10 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
             animate={{ opacity: 1, height: "auto" }}
             className="bg-red-500/10 border border-red-500/40 text-red-300 text-sm px-4 py-3 rounded-xl flex items-start gap-2"
           >
-            <LucideIcons.AlertCircle size="sm" className="mt-0.5 flex-shrink-0" />
+            <LucideIcons.AlertCircle
+              size="sm"
+              className="mt-0.5 flex-shrink-0"
+            />
             <span>{error}</span>
           </motion.div>
         )}
@@ -221,7 +237,7 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
           className="w-full py-3.5 px-4 rounded-xl font-semibold text-base transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-xl relative overflow-hidden"
           style={{
             backgroundColor: "#f9bc60",
-            color: "#001e1d"
+            color: "#001e1d",
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-[#e8a545] to-[#f9bc60] opacity-0 hover:opacity-100 transition-opacity" />
@@ -238,5 +254,3 @@ export function EmailSignupForm({ onSubmit, busy, error }: EmailSignupFormProps)
     </motion.div>
   );
 }
-
-

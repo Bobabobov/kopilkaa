@@ -106,7 +106,8 @@ const LEVELS = [
     title: "Уровень 6",
     subtitle: "Максимальный уровень",
     support: "от 300 до 5 000 ₽",
-    obtain: "Это верхний ориентир поддержки, не гарантирующий одобрение заявки.",
+    obtain:
+      "Это верхний ориентир поддержки, не гарантирующий одобрение заявки.",
     desc: "Максимальный уровень доверия в проекте. Формируется при длительном и ответственном участии.",
     icon: Crown,
     tone: {
@@ -146,14 +147,20 @@ export function TrustLevelsInfo() {
           <span className="text-[#f0c878]">гарантированных сумм</span>.
         </p>
         <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">
-          <span className="text-[#cfded6] font-medium">Уровень доверия</span> — это{" "}
-          <span className="text-[#f0c878]">ориентир</span> по возможной сумме поддержки. Он{" "}
-          <span className="text-[#f0c878]">не означает обязательное одобрение</span> заявки и не даёт «права» на деньги.
+          <span className="text-[#cfded6] font-medium">Уровень доверия</span> —
+          это <span className="text-[#f0c878]">ориентир</span> по возможной
+          сумме поддержки. Он{" "}
+          <span className="text-[#f0c878]">
+            не означает обязательное одобрение
+          </span>{" "}
+          заявки и не даёт «права» на деньги.
         </p>
         <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">
           Уровень формируется на основе{" "}
-          <span className="text-[#f0c878]">подтверждённого участия</span> и качества заявок. В отдельных случаях команда может{" "}
-          <span className="text-[#f0c878]">пересматривать уровень доверия</span>.
+          <span className="text-[#f0c878]">подтверждённого участия</span> и
+          качества заявок. В отдельных случаях команда может{" "}
+          <span className="text-[#f0c878]">пересматривать уровень доверия</span>
+          .
         </p>
       </div>
 
@@ -161,60 +168,64 @@ export function TrustLevelsInfo() {
         {LEVELS.map((level, idx) => {
           const Icon = level.icon;
           return (
-              <motion.div
+            <motion.div
               key={level.key}
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.03 * idx }}
-                className={[
-                  "relative rounded-2xl border backdrop-blur-md h-full",
-                  level.tone.bg,
-                  level.tone.border,
-                  level.tone.pad,
-                  level.tone.ring,
-                ].join(" ")}
-              >
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <div className={`${level.tone.iconBg} p-3.5 sm:p-4 rounded-full shadow-inner shrink-0`}>
-                    <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={2.4} />
-                  </div>
-                  <div className="space-y-1">
-                    <p className={`text-lg sm:text-xl font-semibold ${level.tone.title}`}>
-                      {level.title}
-                    </p>
-                    <p className={`text-xs sm:text-sm ${level.tone.muted}`}>
-                      {level.subtitle}
-                    </p>
-                  </div>
+              className={[
+                "relative rounded-2xl border backdrop-blur-md h-full",
+                level.tone.bg,
+                level.tone.border,
+                level.tone.pad,
+                level.tone.ring,
+              ].join(" ")}
+            >
+              <div className="flex items-start gap-3 sm:gap-4">
+                <div
+                  className={`${level.tone.iconBg} p-3.5 sm:p-4 rounded-full shadow-inner shrink-0`}
+                >
+                  <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={2.4} />
                 </div>
-
-                <div className="mt-3 space-y-2">
-                  <div className="space-y-1">
-                    <span className="text-[11px] uppercase tracking-[0.14em] text-[#9bb3ab]">
-                      Ориентир по поддержке
-                    </span>
-                    <span className="block text-base sm:text-lg font-semibold text-[#f0c878] whitespace-nowrap">
-                      {level.support}
-                    </span>
-                  </div>
-                  <div className="text-sm font-medium text-[#cfded6]">
-                    {level.obtain}
-                  </div>
-                  <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">
-                    {level.desc}
+                <div className="space-y-1">
+                  <p
+                    className={`text-lg sm:text-xl font-semibold ${level.tone.title}`}
+                  >
+                    {level.title}
+                  </p>
+                  <p className={`text-xs sm:text-sm ${level.tone.muted}`}>
+                    {level.subtitle}
                   </p>
                 </div>
-              </motion.div>
+              </div>
+
+              <div className="mt-3 space-y-2">
+                <div className="space-y-1">
+                  <span className="text-[11px] uppercase tracking-[0.14em] text-[#9bb3ab]">
+                    Ориентир по поддержке
+                  </span>
+                  <span className="block text-base sm:text-lg font-semibold text-[#f0c878] whitespace-nowrap">
+                    {level.support}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-[#cfded6]">
+                  {level.obtain}
+                </div>
+                <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">
+                  {level.desc}
+                </p>
+              </div>
+            </motion.div>
           );
         })}
       </div>
 
       <p className="text-xs sm:text-sm text-[#9bb3ab] leading-relaxed">
-        Уровень доверия задаёт ориентир по сумме поддержки. Каждая заявка рассматривается индивидуально и может быть отклонена.
+        Уровень доверия задаёт ориентир по сумме поддержки. Каждая заявка
+        рассматривается индивидуально и может быть отклонена.
       </p>
     </section>
   );
 }
 
 export default TrustLevelsInfo;
-

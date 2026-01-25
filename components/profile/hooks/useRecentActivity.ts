@@ -25,11 +25,18 @@ export function useRecentActivity() {
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const [applicationsRes, donationsRes, achievementsRes] = await Promise.all([
-          fetch("/api/applications/mine?limit=3", { cache: "no-store" }).catch(() => null),
-          fetch("/api/profile/donations", { cache: "no-store" }).catch(() => null),
-          fetch("/api/achievements/user", { cache: "no-store" }).catch(() => null),
-        ]);
+        const [applicationsRes, donationsRes, achievementsRes] =
+          await Promise.all([
+            fetch("/api/applications/mine?limit=3", {
+              cache: "no-store",
+            }).catch(() => null),
+            fetch("/api/profile/donations", { cache: "no-store" }).catch(
+              () => null,
+            ),
+            fetch("/api/achievements/user", { cache: "no-store" }).catch(
+              () => null,
+            ),
+          ]);
 
         const activitiesList: ActivityItem[] = [];
 
@@ -61,8 +68,12 @@ export function useRecentActivity() {
           const donationsData = await donationsRes.json();
           if (donationsData.donations) {
             donationsData.donations.slice(0, 2).forEach((donation: any) => {
-              const raw = typeof donation.comment === "string" ? donation.comment.trim() : "";
-              const serviceLabel = raw === "heroes_placement" ? "Размещение в «Героях»" : raw;
+              const raw =
+                typeof donation.comment === "string"
+                  ? donation.comment.trim()
+                  : "";
+              const serviceLabel =
+                raw === "heroes_placement" ? "Размещение в «Героях»" : raw;
               activitiesList.push({
                 id: `donation-${donation.id}`,
                 type: "donation",
@@ -96,7 +107,9 @@ export function useRecentActivity() {
           }
         }
 
-        activitiesList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        activitiesList.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
         setActivities(activitiesList.slice(0, 5));
       } catch (error) {
         console.error("Error fetching activity:", error);

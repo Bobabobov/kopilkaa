@@ -17,7 +17,9 @@ interface RecentApplicationsProps {
   userId: string;
 }
 
-export default function RecentApplications({ userId }: RecentApplicationsProps) {
+export default function RecentApplications({
+  userId,
+}: RecentApplicationsProps) {
   const [items, setItems] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -74,7 +76,10 @@ export default function RecentApplications({ userId }: RecentApplicationsProps) 
         {loading ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-16 bg-[#001e1d]/40 rounded-xl animate-pulse border border-[#abd1c6]/10" />
+              <div
+                key={i}
+                className="h-16 bg-[#001e1d]/40 rounded-xl animate-pulse border border-[#abd1c6]/10"
+              />
             ))}
           </div>
         ) : items.length === 0 ? (
@@ -117,7 +122,9 @@ export default function RecentApplications({ userId }: RecentApplicationsProps) 
                       {new Date(a.createdAt).toLocaleString("ru-RU")}
                     </div>
                   </div>
-                  <div className={`text-xs px-3 py-1.5 rounded-lg font-bold ${statusBadge(a.status)} border border-current/20 ml-3 flex-shrink-0`}>
+                  <div
+                    className={`text-xs px-3 py-1.5 rounded-lg font-bold ${statusBadge(a.status)} border border-current/20 ml-3 flex-shrink-0`}
+                  >
                     Одобрена
                   </div>
                 </motion.div>
@@ -129,5 +136,3 @@ export default function RecentApplications({ userId }: RecentApplicationsProps) 
     </motion.div>
   );
 }
-
-

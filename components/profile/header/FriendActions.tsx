@@ -44,7 +44,9 @@ export function FriendActions({
   if (status === "incoming") {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-xs text-white/70 text-center">Пользователь отправил вам заявку</p>
+        <p className="text-xs text-white/70 text-center">
+          Пользователь отправил вам заявку
+        </p>
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={onAcceptIncoming}

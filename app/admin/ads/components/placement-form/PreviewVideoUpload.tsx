@@ -43,7 +43,10 @@ export default function PreviewVideoUpload({
       {/* Индикатор загрузки */}
       {uploading && (
         <div className="flex items-center gap-2 px-4 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg">
-          <LucideIcons.Loader2 size="sm" className="animate-spin text-[#f9bc60]" />
+          <LucideIcons.Loader2
+            size="sm"
+            className="animate-spin text-[#f9bc60]"
+          />
           <span className="text-sm text-[#abd1c6]">Загрузка видео...</span>
         </div>
       )}
@@ -94,5 +97,3 @@ export default function PreviewVideoUpload({
     </div>
   );
 }
-
-

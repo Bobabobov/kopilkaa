@@ -178,6 +178,7 @@ pm2 restart kopilka
 3. **Если ошибка повторяется**, проверьте использование `getSession()` в Server Components - он должен использоваться только в async Server Components или API routes.
 
 4. **Добавлен `sharp` для оптимизации изображений** - установите зависимости заново:
+
 ```bash
 npm ci --no-audit --no-fund
 ```

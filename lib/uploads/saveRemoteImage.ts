@@ -22,7 +22,8 @@ export async function saveRemoteImageAsAvatar(
 
     if (!res.ok) return null;
 
-    const contentType = res.headers.get("content-type")?.split(";")[0]?.trim() || "";
+    const contentType =
+      res.headers.get("content-type")?.split(";")[0]?.trim() || "";
     if (!ALLOWED_TYPES.includes(contentType)) return null;
 
     const buf = Buffer.from(await res.arrayBuffer());
@@ -61,4 +62,3 @@ export async function saveRemoteImageAsAvatar(
     return null;
   }
 }
-

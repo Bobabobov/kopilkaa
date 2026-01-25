@@ -32,18 +32,30 @@ interface ApiResponse {
   detailedStats: DetailedStats;
 }
 
-const getRussianPlural = (count: number, forms: [string, string, string]): string => {
+const getRussianPlural = (
+  count: number,
+  forms: [string, string, string],
+): string => {
   const mod10 = count % 10;
   const mod100 = count % 100;
 
   if (mod10 === 1 && mod100 !== 11) return forms[0];
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return forms[1];
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20))
+    return forms[1];
   return forms[2];
 };
 
-export type StatsTabId = "overview" | "applications" | "social" | "achievements";
+export type StatsTabId =
+  | "overview"
+  | "applications"
+  | "social"
+  | "achievements";
 
-export type PersonalTabs = { id: StatsTabId; label: string; icon: typeof LucideIcons[keyof typeof LucideIcons] };
+export type PersonalTabs = {
+  id: StatsTabId;
+  label: string;
+  icon: (typeof LucideIcons)[keyof typeof LucideIcons];
+};
 
 export interface PersonalStatsViewModel {
   stats: DetailedStats;
@@ -66,8 +78,11 @@ export function usePersonalStats() {
   useEffect(() => {
     const fetchDetailedStats = async () => {
       try {
-        const response = await fetch("/api/profile/detailed-stats", { cache: "no-store" });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const response = await fetch("/api/profile/detailed-stats", {
+          cache: "no-store",
+        });
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
 
         const result: ApiResponse = await response.json();
         if (result.detailedStats) {
@@ -100,7 +115,11 @@ export function usePersonalStats() {
       "Достижения",
       "Достижений",
     ]);
-    const friendsLabel = getRussianPlural(stats.activity.friendsCount, ["Друг", "Друга", "Друзей"]);
+    const friendsLabel = getRussianPlural(stats.activity.friendsCount, [
+      "Друг",
+      "Друга",
+      "Друзей",
+    ]);
 
     const totalApplications = stats.applications.total || 0;
     const approvedPercent = totalApplications
@@ -136,9 +155,17 @@ export function usePersonalStats() {
 
     const tabs = [
       { id: "overview" as const, label: "Обзор", icon: LucideIcons.PieChart },
-      { id: "applications" as const, label: "Заявки", icon: LucideIcons.FileText },
+      {
+        id: "applications" as const,
+        label: "Заявки",
+        icon: LucideIcons.FileText,
+      },
       { id: "social" as const, label: "Социальное", icon: LucideIcons.Users },
-      { id: "achievements" as const, label: "Достижения", icon: LucideIcons.Award },
+      {
+        id: "achievements" as const,
+        label: "Достижения",
+        icon: LucideIcons.Award,
+      },
     ];
 
     return {

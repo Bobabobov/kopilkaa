@@ -19,14 +19,13 @@ export async function POST(req: Request) {
     }
 
     const lookupField = rawIdentifier.includes("@") ? "email" : "username";
-    const lookupValue = rawIdentifier
-      .toLowerCase()
-      .replace(/\s+/g, "");
+    const lookupValue = rawIdentifier.toLowerCase().replace(/\s+/g, "");
 
     const user = await prisma.user.findUnique({
-      where: lookupField === "email"
-        ? { email: lookupValue }
-        : { username: lookupValue },
+      where:
+        lookupField === "email"
+          ? { email: lookupValue }
+          : { username: lookupValue },
       select: {
         id: true,
         email: true,
@@ -52,29 +51,27 @@ export async function POST(req: Request) {
     const banStatus = await checkUserBan(user.id);
     if (banStatus.isBanned) {
       const reason = banStatus.bannedReason || "Нарушение правил";
-      const until = banStatus.bannedUntil 
+      const until = banStatus.bannedUntil
         ? ` до ${banStatus.bannedUntil.toLocaleDateString("ru-RU")}`
         : " навсегда";
-      
+
       return NextResponse.json(
-        { 
-          error: "Ваш аккаунт заблокирован", 
+        {
+          error: "Ваш аккаунт заблокирован",
           banInfo: {
             reason,
             until: banStatus.bannedUntil?.toISOString() || null,
             isPermanent: banStatus.isPermanent,
-          }
+          },
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     // Проверяем и выдаём достижения при входе (в фоне)
     AchievementService.checkAndGrantAutomaticAchievements(user.id)
       .then((granted) => {
-        if (granted.length > 0) {
-          console.log(`User ${user.id} received ${granted.length} achievements on login`);
-        }
+        return granted;
       })
       .catch((error) => {
         console.error("Error checking achievements on login:", error);

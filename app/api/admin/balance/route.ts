@@ -38,7 +38,10 @@ export async function GET() {
   }
 
   const data = await computeBalance();
-  return NextResponse.json({ success: true, data }, { headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json(
+    { success: true, data },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }
 
 export async function POST(request: Request) {
@@ -69,7 +72,11 @@ export async function POST(request: Request) {
   if (delta === 0) {
     return NextResponse.json({
       success: true,
-      data: { ...current, desiredBalance: Math.trunc(desiredBalance), delta: 0 },
+      data: {
+        ...current,
+        desiredBalance: Math.trunc(desiredBalance),
+        delta: 0,
+      },
       message: "Баланс уже соответствует заданному значению",
     });
   }
@@ -91,5 +98,3 @@ export async function POST(request: Request) {
     data: { ...updated, desiredBalance: Math.trunc(desiredBalance), delta },
   });
 }
-
-

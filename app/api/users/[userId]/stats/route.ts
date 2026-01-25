@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(
   request: Request,
@@ -19,7 +19,10 @@ export async function GET(
     const { userId: identifier } = await params;
     const userId = await resolveUserIdFromIdentifier(identifier);
     if (!userId) {
-      return NextResponse.json({ message: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     // Получаем статистику пользователя

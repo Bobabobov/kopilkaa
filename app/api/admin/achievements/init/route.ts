@@ -1,8 +1,8 @@
 // app/api/admin/achievements/init/route.ts
-import { NextResponse } from 'next/server';
-import { getAllowedAdminUser } from '@/lib/adminAccess';
-import { prisma } from '@/lib/db';
-import { DEFAULT_ACHIEVEMENTS } from '@/lib/achievements/config';
+import { NextResponse } from "next/server";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
+import { prisma } from "@/lib/db";
+import { DEFAULT_ACHIEVEMENTS } from "@/lib/achievements/config";
 
 const LEGACY_RENAMES_BY_SLUG: Record<string, string[]> = {
   // renamed achievements (oldName -> new slug/name)
@@ -16,33 +16,34 @@ const LEGACY_RENAMES_BY_SLUG: Record<string, string[]> = {
 };
 
 // POST /api/admin/achievements/init - инициализировать базовые достижения
-export async function POST(request: Request) {
+export async function POST(_request: Request) {
   try {
     const admin = await getAllowedAdminUser();
     if (!admin) {
-      return NextResponse.json({ error: 'Доступ запрещён' }, { status: 403 });
+      return NextResponse.json({ error: "Доступ запрещён" }, { status: 403 });
     }
 
     let createdCount = 0;
     let updatedCount = 0;
-    let skippedCount = 0;
+    const skippedCount = 0;
 
     for (const achievementData of DEFAULT_ACHIEVEMENTS) {
       const slug = (achievementData as any).slug ?? null;
 
       // 1) Prefer slug (stable id)
-      const bySlug = slug ? await prisma.achievement.findUnique({ where: { slug } }) : null;
+      const bySlug = slug
+        ? await prisma.achievement.findUnique({ where: { slug } })
+        : null;
 
       // 2) Fallback for old records without slug: match by name+type, then "migrate" by setting slug
-      const byNameType =
-        !bySlug
-          ? await prisma.achievement.findFirst({
-              where: {
-                name: achievementData.name,
-                type: achievementData.type,
-              },
-            })
-          : null;
+      const byNameType = !bySlug
+        ? await prisma.achievement.findFirst({
+            where: {
+              name: achievementData.name,
+              type: achievementData.type,
+            },
+          })
+        : null;
 
       // 3) Legacy renames: if we changed "name"/"type", migrate old record by known legacy names
       const legacyNames = slug ? LEGACY_RENAMES_BY_SLUG[slug] : undefined;
@@ -93,10 +94,10 @@ export async function POST(request: Request) {
       message: `Создано ${createdCount}, обновлено ${updatedCount}, пропущено ${skippedCount}`,
     });
   } catch (error) {
-    console.error('Error initializing achievements:', error);
+    console.error("Error initializing achievements:", error);
     return NextResponse.json(
-      { error: 'Ошибка инициализации достижений' },
-      { status: 500 }
+      { error: "Ошибка инициализации достижений" },
+      { status: 500 },
     );
   }
 }

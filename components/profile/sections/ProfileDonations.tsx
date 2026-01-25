@@ -51,7 +51,9 @@ export default function ProfileDonations() {
         setData(result);
       } catch (error) {
         console.error("Error fetching donations:", error);
-        setError(error instanceof Error ? error.message : "Failed to load donations");
+        setError(
+          error instanceof Error ? error.message : "Failed to load donations",
+        );
       } finally {
         setLoading(false);
       }
@@ -115,7 +117,10 @@ export default function ProfileDonations() {
     return (
       <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6">
         <div className="text-center py-8">
-          <LucideIcons.AlertTriangle className="text-red-400 mx-auto mb-2" size="lg" />
+          <LucideIcons.AlertTriangle
+            className="text-red-400 mx-auto mb-2"
+            size="lg"
+          />
           <p className="text-sm text-[#abd1c6]">{error}</p>
         </div>
       </div>
@@ -136,7 +141,9 @@ export default function ProfileDonations() {
               <LucideIcons.CreditCard className="text-[#f9bc60]" size="sm" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Мои оплаты</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">
+                Мои оплаты
+              </h3>
             </div>
           </div>
         </div>
@@ -144,9 +151,12 @@ export default function ProfileDonations() {
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#abd1c6]/10 rounded-3xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
             <LucideIcons.CreditCard className="text-[#abd1c6]" size="xl" />
           </div>
-          <p className="text-sm sm:text-base text-[#abd1c6] font-medium mb-1">Пока нет оплат</p>
+          <p className="text-sm sm:text-base text-[#abd1c6] font-medium mb-1">
+            Пока нет оплат
+          </p>
           <p className="text-xs sm:text-sm text-[#abd1c6]/60 px-4">
-            После оплаты размещения профиля в «Героях» здесь появится история платежей
+            После оплаты размещения профиля в «Героях» здесь появится история
+            платежей
           </p>
         </div>
       </motion.div>
@@ -154,8 +164,7 @@ export default function ProfileDonations() {
   }
 
   return (
-    <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden"
-    >
+    <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden">
       {/* Заголовок */}
       <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
         <div className="flex items-center justify-between gap-2">
@@ -164,7 +173,9 @@ export default function ProfileDonations() {
               <LucideIcons.CreditCard className="text-[#f9bc60]" size="sm" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Мои оплаты</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">
+                Мои оплаты
+              </h3>
               <p className="text-[10px] sm:text-xs text-[#abd1c6] mt-0.5">
                 Всего: {formatAmount(data.stats.totalDonated)}
               </p>
@@ -174,7 +185,9 @@ export default function ProfileDonations() {
             <div className="text-lg sm:text-xl font-bold text-[#f9bc60]">
               {data.stats.donationsCount}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">платежей</div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6]">
+              платежей
+            </div>
           </div>
         </div>
       </div>
@@ -189,13 +202,17 @@ export default function ProfileDonations() {
             >
               {formatAmount(data.stats.totalDonated)}
             </div>
-            <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6] leading-tight">Всего оплачено</div>
+            <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6] leading-tight">
+              Всего оплачено
+            </div>
           </div>
           <div className="text-center p-2.5 xs:p-3 sm:p-4 bg-[#001e1d]/30 rounded-lg border border-[#abd1c6]/10">
             <div className="text-lg xs:text-xl sm:text-2xl font-bold text-[#abd1c6] mb-0.5 xs:mb-1">
               {data.stats.donationsCount}
             </div>
-            <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6] leading-tight">Количество</div>
+            <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6] leading-tight">
+              Количество
+            </div>
           </div>
         </div>
       </div>
@@ -213,7 +230,10 @@ export default function ProfileDonations() {
             >
               <div className="flex items-center gap-2 xs:gap-3 min-w-0 flex-1">
                 <div className="w-7 h-7 xs:w-8 xs:h-8 sm:w-10 sm:h-10 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <LucideIcons.CreditCard className="text-[#f9bc60]" size="sm" />
+                  <LucideIcons.CreditCard
+                    className="text-[#f9bc60]"
+                    size="sm"
+                  />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-xs xs:text-sm sm:text-base font-semibold text-[#fffffe]">
@@ -236,4 +256,3 @@ export default function ProfileDonations() {
     </div>
   );
 }
-

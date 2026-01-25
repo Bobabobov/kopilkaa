@@ -23,87 +23,105 @@ const filters = [
 
 export default function FeedContent() {
   const router = useRouter();
-  const { notifications, loading, lastViewedTimestamp, refetch, markAsViewed } = useNotifications();
+  const { notifications, loading, lastViewedTimestamp, refetch, markAsViewed } =
+    useNotifications();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
-  
+
   // Фильтрация и группировка уведомлений
-  const { filteredNotifications, groupedNotifications, unreadCount } = useMemo(() => {
-    // Фильтрация
-    let filtered: Notification[] = [];
-    
-    // Применяем фильтры
-    if (activeFilter === "all") {
-      filtered = [...notifications];
-    } else if (activeFilter === "unread") {
-      filtered = notifications.filter(n => isNotificationUnread(n, lastViewedTimestamp));
-    } else {
-      // Фильтруем по типу - строгое сравнение типов
-      filtered = notifications.filter(n => {
-        // Проверяем точное совпадение типа
-        return n.type === activeFilter;
-      });
-    }
-    
-    // Сортируем: сначала непрочитанные, потом по дате (новые сначала)
-    filtered.sort((a, b) => {
-      const aUnread = isNotificationUnread(a, lastViewedTimestamp);
-      const bUnread = isNotificationUnread(b, lastViewedTimestamp);
-      
-      // Непрочитанные всегда выше
-      if (aUnread && !bUnread) return -1;
-      if (!aUnread && bUnread) return 1;
-      
-      // Если оба прочитаны или непрочитаны, сортируем по дате
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-    
-    // Ограничиваем до 15 уведомлений максимум
-    filtered = filtered.slice(0, 15);
-    
-    // Подсчет непрочитанных из всех уведомлений
-    const unread = notifications.filter(n => isNotificationUnread(n, lastViewedTimestamp)).length;
-    
-    // Группировка по датам
-    const grouped: Record<string, Notification[]> = {};
-    filtered.forEach(notification => {
-      const date = new Date(notification.createdAt).toISOString().split('T')[0];
-      if (!grouped[date]) {
-        grouped[date] = [];
+  const { filteredNotifications, groupedNotifications, unreadCount } =
+    useMemo(() => {
+      // Фильтрация
+      let filtered: Notification[] = [];
+
+      // Применяем фильтры
+      if (activeFilter === "all") {
+        filtered = [...notifications];
+      } else if (activeFilter === "unread") {
+        filtered = notifications.filter((n) =>
+          isNotificationUnread(n, lastViewedTimestamp),
+        );
+      } else {
+        // Фильтруем по типу - строгое сравнение типов
+        filtered = notifications.filter((n) => {
+          // Проверяем точное совпадение типа
+          return n.type === activeFilter;
+        });
       }
-      grouped[date].push(notification);
-    });
-    
-    // Сортируем даты (новые сначала)
-    const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
-    
-    return {
-      filteredNotifications: filtered,
-      groupedNotifications: sortedDates.map(date => ({ date, notifications: grouped[date] })),
-      unreadCount: unread
-    };
-  }, [notifications, activeFilter, lastViewedTimestamp]);
-  
+
+      // Сортируем: сначала непрочитанные, потом по дате (новые сначала)
+      filtered.sort((a, b) => {
+        const aUnread = isNotificationUnread(a, lastViewedTimestamp);
+        const bUnread = isNotificationUnread(b, lastViewedTimestamp);
+
+        // Непрочитанные всегда выше
+        if (aUnread && !bUnread) return -1;
+        if (!aUnread && bUnread) return 1;
+
+        // Если оба прочитаны или непрочитаны, сортируем по дате
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      });
+
+      // Ограничиваем до 15 уведомлений максимум
+      filtered = filtered.slice(0, 15);
+
+      // Подсчет непрочитанных из всех уведомлений
+      const unread = notifications.filter((n) =>
+        isNotificationUnread(n, lastViewedTimestamp),
+      ).length;
+
+      // Группировка по датам
+      const grouped: Record<string, Notification[]> = {};
+      filtered.forEach((notification) => {
+        const date = new Date(notification.createdAt)
+          .toISOString()
+          .split("T")[0];
+        if (!grouped[date]) {
+          grouped[date] = [];
+        }
+        grouped[date].push(notification);
+      });
+
+      // Сортируем даты (новые сначала)
+      const sortedDates = Object.keys(grouped).sort((a, b) =>
+        b.localeCompare(a),
+      );
+
+      return {
+        filteredNotifications: filtered,
+        groupedNotifications: sortedDates.map((date) => ({
+          date,
+          notifications: grouped[date],
+        })),
+        unreadCount: unread,
+      };
+    }, [notifications, activeFilter, lastViewedTimestamp]);
+
   // Автоматическое обновление уведомлений каждые 30 секунд
   React.useEffect(() => {
     const interval = setInterval(() => {
       refetch();
     }, 30000); // 30 секунд
-    
+
     return () => clearInterval(interval);
   }, [refetch]);
-  
+
   // Обновление при возврате фокуса на страницу
   React.useEffect(() => {
     const handleFocus = () => {
       refetch();
     };
-    
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, [refetch]);
 
   const handleNotificationClick = (notification: Notification) => {
-    if (notification.type === "application_status" && notification.applicationId) {
+    if (
+      notification.type === "application_status" &&
+      notification.applicationId
+    ) {
       if (notification.status === "APPROVED") {
         router.push(`/stories/${notification.applicationId}`);
       } else {
@@ -122,7 +140,6 @@ export default function FeedContent() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-
       {/* Декоративные элементы фона */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#abd1c6]/5 rounded-full blur-3xl" />
@@ -177,20 +194,18 @@ export default function FeedContent() {
                     <LucideIcons.Bell className="text-[#abd1c6]/60" size="xl" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-semibold text-[#fffffe] mb-2">
-                    {activeFilter === "unread" 
-                      ? "Нет непрочитанных уведомлений" 
+                    {activeFilter === "unread"
+                      ? "Нет непрочитанных уведомлений"
                       : activeFilter === "all"
-                      ? "Нет уведомлений"
-                      : `Нет уведомлений типа "${filters.find(f => f.type === activeFilter)?.label || activeFilter}"`
-                    }
+                        ? "Нет уведомлений"
+                        : `Нет уведомлений типа "${filters.find((f) => f.type === activeFilter)?.label || activeFilter}"`}
                   </h3>
                   <p className="text-sm sm:text-base text-[#abd1c6]/60">
-                    {activeFilter === "unread" 
-                      ? "Все уведомления прочитаны" 
+                    {activeFilter === "unread"
+                      ? "Все уведомления прочитаны"
                       : activeFilter === "all"
-                      ? "Здесь будут появляться новые уведомления"
-                      : "Попробуйте выбрать другой фильтр"
-                    }
+                        ? "Здесь будут появляться новые уведомления"
+                        : "Попробуйте выбрать другой фильтр"}
                   </p>
                 </motion.div>
               ) : (
@@ -199,9 +214,10 @@ export default function FeedContent() {
                   {groupedNotifications.map((group, groupIndex) => {
                     let startIndex = 0;
                     for (let i = 0; i < groupIndex; i++) {
-                      startIndex += groupedNotifications[i].notifications.length;
+                      startIndex +=
+                        groupedNotifications[i].notifications.length;
                     }
-                    
+
                     return (
                       <NotificationGroup
                         key={group.date}

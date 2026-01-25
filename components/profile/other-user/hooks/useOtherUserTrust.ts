@@ -12,8 +12,14 @@ interface UseOtherUserTrustParams {
   fallbackUserId: string;
 }
 
-export function useOtherUserTrust({ isAuthenticated, resolvedUserId, fallbackUserId }: UseOtherUserTrustParams) {
-  const [approvedApplications, setApprovedApplications] = useState<number | null>(null);
+export function useOtherUserTrust({
+  isAuthenticated,
+  resolvedUserId,
+  fallbackUserId,
+}: UseOtherUserTrustParams) {
+  const [approvedApplications, setApprovedApplications] = useState<
+    number | null
+  >(null);
   const [trustSnapshot, setTrustSnapshot] = useState<any>(null);
 
   useEffect(() => {
@@ -55,8 +61,10 @@ export function useOtherUserTrust({ isAuthenticated, resolvedUserId, fallbackUse
       trustSnapshot?.supportRangeText ??
       `от ${limits.min.toLocaleString("ru-RU")} до ${limits.max.toLocaleString("ru-RU")} ₽`;
     const nextReq = getNextLevelRequirement(trustLevel);
-    const progressValue = nextReq === null ? null : Math.min(1, Math.max(0, approved / nextReq));
-    const progressCurrent = nextReq === null ? null : Math.min(approved, nextReq);
+    const progressValue =
+      nextReq === null ? null : Math.min(1, Math.max(0, approved / nextReq));
+    const progressCurrent =
+      nextReq === null ? null : Math.min(approved, nextReq);
     const progressTotal = nextReq === null ? null : nextReq;
     const progressText =
       nextReq === null
@@ -67,7 +75,14 @@ export function useOtherUserTrust({ isAuthenticated, resolvedUserId, fallbackUse
             const noun = remaining === 1 ? "заявка" : "заявки";
             return `До пересмотра уровня — ещё ${remaining} одобренн${ending} ${noun}`;
           })();
-    return { trustStatus, supportText, progressText, progressValue, progressCurrent, progressTotal };
+    return {
+      trustStatus,
+      supportText,
+      progressText,
+      progressValue,
+      progressCurrent,
+      progressTotal,
+    };
   }, [approvedApplications, trustSnapshot]);
 
   return { approvedApplications, trustDerived };

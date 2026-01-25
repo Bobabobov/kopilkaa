@@ -231,18 +231,18 @@ export function useFriends(): UseFriendsReturn {
       if (response.ok) {
         const data = await response.json();
         showToast("success", "Заявка отправлена");
-        
+
         // Добавляем заявку в список отправленных оптимистично
         if (data.friendship) {
           setSentRequests((prev) => [...prev, data.friendship]);
         }
-        
+
         // Обновляем данные параллельно
         await Promise.all([
           loadFriends(),
           // Небольшая задержка перед обновлением поиска, чтобы БД успела обновиться
-          new Promise(resolve => setTimeout(resolve, 100)).then(() => 
-            searchUsers(debouncedQuery || searchQuery)
+          new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
+            searchUsers(debouncedQuery || searchQuery),
           ),
         ]);
       } else {
@@ -265,7 +265,6 @@ export function useFriends(): UseFriendsReturn {
   // Отмена заявки
   const cancelFriendRequest = async (friendshipId: string, userId: string) => {
     try {
-      console.log("Canceling friend request:", { friendshipId, userId });
       setSendingRequests((prev) => new Set(prev).add(userId));
 
       const response = await fetch(`/api/profile/friends/${friendshipId}`, {
@@ -273,22 +272,19 @@ export function useFriends(): UseFriendsReturn {
         cache: "no-store",
       });
 
-      console.log("Cancel response:", response.status, response.ok);
-
       if (response.ok) {
-        const data = await response.json();
-        console.log("Cancel success:", data);
+        await response.json();
         showToast("success", "Заявка отменена");
-        
+
         // Удаляем заявку из списка отправленных оптимистично
         setSentRequests((prev) => prev.filter((f) => f.id !== friendshipId));
-        
+
         // Обновляем данные параллельно
         await Promise.all([
           loadFriends(),
           // Небольшая задержка перед обновлением поиска, чтобы БД успела обновиться
-          new Promise(resolve => setTimeout(resolve, 100)).then(() => 
-            searchUsers(debouncedQuery || searchQuery)
+          new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
+            searchUsers(debouncedQuery || searchQuery),
           ),
         ]);
       } else {
@@ -323,14 +319,16 @@ export function useFriends(): UseFriendsReturn {
         showToast("success", "Заявка принята");
 
         // Удаляем заявку из списка полученных оптимистично
-        setReceivedRequests((prev) => prev.filter((f) => f.id !== friendshipId));
+        setReceivedRequests((prev) =>
+          prev.filter((f) => f.id !== friendshipId),
+        );
 
         // Обновляем данные параллельно
         await Promise.all([
           loadFriends(),
           // Небольшая задержка перед обновлением поиска, чтобы БД успела обновиться
-          new Promise(resolve => setTimeout(resolve, 100)).then(() => 
-            searchUsers(debouncedQuery || searchQuery)
+          new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
+            searchUsers(debouncedQuery || searchQuery),
           ),
         ]);
       } else {
@@ -358,7 +356,9 @@ export function useFriends(): UseFriendsReturn {
         showToast("success", "Заявка отклонена");
 
         // Удаляем заявку из списка полученных оптимистично
-        setReceivedRequests((prev) => prev.filter((f) => f.id !== friendshipId));
+        setReceivedRequests((prev) =>
+          prev.filter((f) => f.id !== friendshipId),
+        );
 
         // Обновляем данные
         await loadFriends();

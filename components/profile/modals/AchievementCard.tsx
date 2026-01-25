@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { getAchievementIcon, getRarityColor, getRarityName } from "./achievementUtils";
+import {
+  getAchievementIcon,
+  getRarityColor,
+  getRarityName,
+} from "./achievementUtils";
 import type { AchievementProgress } from "./hooks/useAchievementsData";
 
 interface AchievementCardProps {
@@ -11,7 +15,8 @@ interface AchievementCardProps {
 export function AchievementCard({ progressItem, index }: AchievementCardProps) {
   const achievement = progressItem.achievement;
   const isUnlocked = progressItem.isUnlocked;
-  const IconComponent = getAchievementIcon(achievement.type, achievement.name) || LucideIcons.Star;
+  const IconComponent =
+    getAchievementIcon(achievement.type, achievement.name) || LucideIcons.Star;
   const rarityColor = getRarityColor(achievement.rarity);
   const rarityName = getRarityName(achievement.rarity);
 
@@ -51,7 +56,9 @@ export function AchievementCard({ progressItem, index }: AchievementCardProps) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className={`text-base font-bold ${isUnlocked ? "text-[#fffffe]" : "text-[#abd1c6]/60"}`}>
+            <h3
+              className={`text-base font-bold ${isUnlocked ? "text-[#fffffe]" : "text-[#abd1c6]/60"}`}
+            >
               {achievement.name}
             </h3>
             {isUnlocked && (
@@ -66,7 +73,9 @@ export function AchievementCard({ progressItem, index }: AchievementCardProps) {
               </span>
             )}
           </div>
-          <p className={`text-sm mb-2 ${isUnlocked ? "text-[#abd1c6]" : "text-[#abd1c6]/40"}`}>
+          <p
+            className={`text-sm mb-2 ${isUnlocked ? "text-[#abd1c6]" : "text-[#abd1c6]/40"}`}
+          >
             {achievement.description}
           </p>
           {isUnlocked && progressItem.unlockedAt && (
@@ -79,7 +88,9 @@ export function AchievementCard({ progressItem, index }: AchievementCardProps) {
               })}
             </p>
           )}
-          {!isUnlocked && <p className="text-xs text-[#f9bc60]/60 italic">Заблокировано</p>}
+          {!isUnlocked && (
+            <p className="text-xs text-[#f9bc60]/60 italic">Заблокировано</p>
+          )}
         </div>
 
         {isUnlocked ? (

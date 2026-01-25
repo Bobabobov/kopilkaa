@@ -57,7 +57,8 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     }
   }, []);
 
-  const { user, loading, isAuthenticated, currentUserId, resolvedUserId } = useOtherUserData({ userId });
+  const { user, loading, isAuthenticated, currentUserId, resolvedUserId } =
+    useOtherUserData({ userId });
 
   // Обработчик события для открытия модального окна жалобы
   useEffect(() => {
@@ -71,7 +72,10 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
 
     window.addEventListener("open-report-user-modal", handleOpenReportModal);
     return () => {
-      window.removeEventListener("open-report-user-modal", handleOpenReportModal);
+      window.removeEventListener(
+        "open-report-user-modal",
+        handleOpenReportModal,
+      );
     };
   }, [resolvedUserId, user?.id]);
 
@@ -95,7 +99,12 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     currentUserId,
     user,
     emitFriendEvents,
-    showToast: showToast as (type: any, title: string, message?: string, duration?: number) => void,
+    showToast: showToast as (
+      type: any,
+      title: string,
+      message?: string,
+      duration?: number,
+    ) => void,
   });
 
   // Проверка, является ли пользователь владельцем профиля
@@ -129,7 +138,11 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden" role="main" aria-label="Профиль пользователя">
+    <div
+      className="min-h-screen relative overflow-hidden"
+      role="main"
+      aria-label="Профиль пользователя"
+    >
       {/* Универсальный фон */}
 
       {/* Main Content */}
@@ -162,7 +175,11 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
               onSendRequest={sendFriendRequest}
               onAcceptIncoming={acceptFriendRequest}
               onDeclineIncoming={declineFriendRequest}
-              onRemoveFriend={friendship?.status === "ACCEPTED" ? handleRemoveFriend : undefined}
+              onRemoveFriend={
+                friendship?.status === "ACCEPTED"
+                  ? handleRemoveFriend
+                  : undefined
+              }
             />
           </div>
 
@@ -186,14 +203,20 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
                 descriptionOverride="Расчёт по одобренным заявкам этого профиля"
                 extraOverride="Показывает доступный диапазон поддержки для этого участника"
               />
-              <ProfileReviewSection userId={resolvedUserId || user.id} isOwner={false} />
+              <ProfileReviewSection
+                userId={resolvedUserId || user.id}
+                isOwner={false}
+              />
               <OtherUserPersonalStats userId={resolvedUserId || user.id} />
               <OtherUserAchievements userId={resolvedUserId || user.id} />
             </section>
 
             {/* Правая колонка */}
             <aside className="lg:col-span-5 space-y-4 sm:space-y-5 md:space-y-6">
-              <ProfileStoriesSection userId={resolvedUserId || user.id} isOwner={false} />
+              <ProfileStoriesSection
+                userId={resolvedUserId || user.id}
+                isOwner={false}
+              />
               <OtherUserActivity userId={resolvedUserId || user.id} />
             </aside>
           </div>

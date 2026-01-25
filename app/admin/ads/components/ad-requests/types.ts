@@ -23,5 +23,3 @@ export interface Stats {
   approved: number;
   rejected: number;
 }
-
-

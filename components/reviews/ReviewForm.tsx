@@ -11,7 +11,11 @@ type Props = {
   approvedApplications: number;
   viewerReview: ReviewItem | null;
   submitting?: boolean;
-  onSubmit: (content: string, files: File[], existingUrls: string[]) => Promise<void> | void;
+  onSubmit: (
+    content: string,
+    files: File[],
+    existingUrls: string[],
+  ) => Promise<void> | void;
 };
 
 export function ReviewForm({
@@ -25,31 +29,40 @@ export function ReviewForm({
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [existingUrls, setExistingUrls] = useState<string[]>(
-    viewerReview?.images?.map((i) => i.url) ?? []
+    viewerReview?.images?.map((i) => i.url) ?? [],
   );
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast, ToastComponent } = useBeautifulToast();
 
-  const remaining = useMemo(() => Math.max(0, 1200 - content.length), [content.length]);
+  const remaining = useMemo(
+    () => Math.max(0, 1200 - content.length),
+    [content.length],
+  );
 
   const processFiles = (fileList: File[]) => {
-    const selected = Array.from(fileList).filter(file => file.type.startsWith('image/'));
+    const selected = Array.from(fileList).filter((file) =>
+      file.type.startsWith("image/"),
+    );
     const currentTotal = existingUrls.length + files.length;
     const availableSlots = Math.max(0, 5 - currentTotal);
     const toAdd = selected.slice(0, availableSlots);
-    
+
     if (toAdd.length < selected.length) {
-      showToast("warning", "Лимит фото", `Можно добавить только ${availableSlots} фото`);
+      showToast(
+        "warning",
+        "Лимит фото",
+        `Можно добавить только ${availableSlots} фото`,
+      );
     }
-    
+
     if (toAdd.length === 0) {
       if (selected.length > 0) {
         showToast("error", "Ошибка", "Выберите изображения");
       }
       return;
     }
-    
+
     const newFiles = [...files, ...toAdd];
     setFiles(newFiles);
     const mapped = newFiles.map((f) => URL.createObjectURL(f));
@@ -80,9 +93,9 @@ export function ReviewForm({
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-    
+
     if (!canReview || totalImages >= 5) return;
-    
+
     const droppedFiles = Array.from(e.dataTransfer.files);
     processFiles(droppedFiles);
   };
@@ -104,7 +117,11 @@ export function ReviewForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canReview) {
-      showToast("error", "Недоступно", "Отзывы могут оставить только пользователи с одобренной заявкой");
+      showToast(
+        "error",
+        "Недоступно",
+        "Отзывы могут оставить только пользователи с одобренной заявкой",
+      );
       return;
     }
     await onSubmit(content, files, existingUrls);
@@ -132,14 +149,19 @@ export function ReviewForm({
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full" />
         <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-[#abd1c6]/10 blur-3xl rounded-full" />
       </div>
-      
-      <form onSubmit={handleSubmit} className="relative z-10 space-y-6 p-6 sm:p-8">
+
+      <form
+        onSubmit={handleSubmit}
+        className="relative z-10 space-y-6 p-6 sm:p-8"
+      >
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center text-[#f9bc60] shadow-lg flex-shrink-0">
             <LucideIcons.MessageCircle size="sm" />
           </div>
           <div className="flex-1 space-y-2 min-w-0">
-            <p className="text-xs uppercase tracking-[0.1em] text-[#94a1b2] font-semibold">Отзывы сообщества</p>
+            <p className="text-xs uppercase tracking-[0.1em] text-[#94a1b2] font-semibold">
+              Отзывы сообщества
+            </p>
             <h2 className="text-xl sm:text-2xl font-bold text-[#fffffe] leading-tight">
               Поделитесь опытом участия
             </h2>
@@ -168,29 +190,37 @@ export function ReviewForm({
           >
             <LucideIcons.AlertCircle className="w-5 h-5 text-[#e16162] flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-[#fffffe] mb-1">Отзыв недоступен</p>
-              <p className="text-sm text-[#ffd6cc]">Отзыв можно оставить после одобрения заявки.</p>
+              <p className="text-sm font-semibold text-[#fffffe] mb-1">
+                Отзыв недоступен
+              </p>
+              <p className="text-sm text-[#ffd6cc]">
+                Отзыв можно оставить после одобрения заявки.
+              </p>
             </div>
           </motion.div>
         )}
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-[#abd1c6]">Текст отзыва</label>
+            <label className="text-sm font-semibold text-[#abd1c6]">
+              Текст отзыва
+            </label>
             <div className="flex items-center gap-2">
               {viewerReview && (
                 <span className="text-xs text-[#f9bc60] font-medium px-2 py-1 rounded-full bg-[#f9bc60]/10 border border-[#f9bc60]/20">
                   Редактирование
                 </span>
               )}
-              <div className={cn(
-                "text-xs font-medium px-2.5 py-1 rounded-full transition-colors",
-                remaining < 100 
-                  ? "text-[#e16162] bg-[#e16162]/10 border border-[#e16162]/20"
-                  : remaining < 300
-                  ? "text-[#f9bc60] bg-[#f9bc60]/10 border border-[#f9bc60]/20"
-                  : "text-[#94a1b2] bg-white/5 border border-white/10"
-              )}>
+              <div
+                className={cn(
+                  "text-xs font-medium px-2.5 py-1 rounded-full transition-colors",
+                  remaining < 100
+                    ? "text-[#e16162] bg-[#e16162]/10 border border-[#e16162]/20"
+                    : remaining < 300
+                      ? "text-[#f9bc60] bg-[#f9bc60]/10 border border-[#f9bc60]/20"
+                      : "text-[#94a1b2] bg-white/5 border border-white/10",
+                )}
+              >
                 {content.length} / 1200
               </div>
             </div>
@@ -208,12 +238,12 @@ export function ReviewForm({
               "bg-[#001e1d]/60 backdrop-blur-sm",
               canReview
                 ? "border-[#abd1c6]/40 focus:border-[#f9bc60] focus:ring-2 focus:ring-[#f9bc60]/20"
-                : "border-[#abd1c6]/20 cursor-not-allowed opacity-60"
+                : "border-[#abd1c6]/20 cursor-not-allowed opacity-60",
             )}
           />
         </div>
 
-        <div 
+        <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -224,12 +254,12 @@ export function ReviewForm({
               ? "border-[#f9bc60] bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 scale-[1.02]"
               : "border-[#f9bc60]/30 hover:border-[#f9bc60]/50 hover:bg-gradient-to-br hover:from-[#001e1d]/60 hover:to-[#0b2f2c]/50",
             canReview && totalImages < 5 ? "cursor-pointer" : "cursor-default",
-            !canReview && "opacity-60 cursor-not-allowed"
+            !canReview && "opacity-60 cursor-not-allowed",
           )}
         >
           {/* Подсветка */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/5 via-transparent to-transparent pointer-events-none group-hover:from-[#f9bc60]/10 transition-colors" />
-          
+
           <div className="relative z-10 space-y-3">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-2.5">
@@ -237,17 +267,16 @@ export function ReviewForm({
                   <LucideIcons.Image className="w-4 h-4 text-[#f9bc60]" />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-[#fffffe] block">Прикрепить фотографии</label>
+                  <label className="text-sm font-semibold text-[#fffffe] block">
+                    Прикрепить фотографии
+                  </label>
                   <p className="text-xs text-[#abd1c6]/70">
-                    {totalImages > 0 
-                      ? `${totalImages} из 5`
-                      : "До 5 фото"
-                    }
+                    {totalImages > 0 ? `${totalImages} из 5` : "До 5 фото"}
                   </p>
                 </div>
               </div>
               {canReview && totalImages < 5 && (
-                <label 
+                <label
                   onClick={(e) => e.stopPropagation()}
                   className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#f9bc60] to-[#e68b2e] hover:from-[#f9bc60] hover:to-[#f9bc60] px-3 py-1.5 text-xs font-semibold text-[#001e1d] border border-[#f9bc60] cursor-pointer hover:shadow-lg hover:shadow-[#f9bc60]/40 transition-all hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap"
                 >
@@ -282,10 +311,10 @@ export function ReviewForm({
                       exit={{ opacity: 0, scale: 0.9 }}
                       className="relative overflow-hidden rounded-lg border-2 border-[#f9bc60]/40 bg-[#001e1d]/80 group hover:border-[#f9bc60] transition-all shadow-md"
                     >
-                      <img 
-                        src={url} 
-                        alt={`Фото ${idx + 1}`} 
-                        className="w-full h-24 sm:h-28 object-cover transition-transform duration-300 group-hover:scale-110" 
+                      <img
+                        src={url}
+                        alt={`Фото ${idx + 1}`}
+                        className="w-full h-24 sm:h-28 object-cover transition-transform duration-300 group-hover:scale-110"
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -307,10 +336,10 @@ export function ReviewForm({
                       exit={{ opacity: 0, scale: 0.9 }}
                       className="relative overflow-hidden rounded-lg border-2 border-[#f9bc60]/40 bg-[#001e1d]/80 group hover:border-[#f9bc60] transition-all shadow-md"
                     >
-                      <img 
-                        src={url} 
-                        alt={`Фото ${existingUrls.length + idx + 1}`} 
-                        className="w-full h-24 sm:h-28 object-cover transition-transform duration-300 group-hover:scale-110" 
+                      <img
+                        src={url}
+                        alt={`Фото ${existingUrls.length + idx + 1}`}
+                        className="w-full h-24 sm:h-28 object-cover transition-transform duration-300 group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       <button
@@ -332,17 +361,21 @@ export function ReviewForm({
                   onClick={(e) => e.stopPropagation()}
                   className={cn(
                     "flex flex-col items-center justify-center py-6 px-4 text-center border-2 border-dashed rounded-lg bg-[#001e1d]/30 transition-all",
-                    isDragging 
-                      ? "border-[#f9bc60] bg-[#f9bc60]/10" 
+                    isDragging
+                      ? "border-[#f9bc60] bg-[#f9bc60]/10"
                       : "border-[#f9bc60]/20",
-                    canReview && totalImages < 5 && "hover:border-[#f9bc60]/40 hover:bg-[#001e1d]/40"
+                    canReview &&
+                      totalImages < 5 &&
+                      "hover:border-[#f9bc60]/40 hover:bg-[#001e1d]/40",
                   )}
                 >
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border border-[#f9bc60]/40 flex items-center justify-center mb-2 shadow-md">
                     <LucideIcons.Image className="w-6 h-6 text-[#f9bc60]" />
                   </div>
                   <p className="text-xs font-medium text-[#abd1c6] mb-0.5">
-                    {isDragging ? "Отпустите для загрузки" : "Фотографии не добавлены"}
+                    {isDragging
+                      ? "Отпустите для загрузки"
+                      : "Фотографии не добавлены"}
                   </p>
                   <p className="text-[10px] text-[#94a1b2]">
                     {isDragging ? "" : "Перетащите файлы или кликните здесь"}
@@ -356,7 +389,8 @@ export function ReviewForm({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2 border-t border-[#abd1c6]/10">
           <p className="text-xs text-[#94a1b2] leading-relaxed">
             <LucideIcons.Info className="w-3.5 h-3.5 inline mr-1.5 text-[#abd1c6]" />
-            Отзывы видят все. Уважайте правила сообщества, не публикуйте персональные данные.
+            Отзывы видят все. Уважайте правила сообщества, не публикуйте
+            персональные данные.
           </p>
           <button
             type="submit"

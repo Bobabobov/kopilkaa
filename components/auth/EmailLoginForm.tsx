@@ -27,10 +27,7 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier.trim())
     ) {
       errors.identifier = "Введите корректный email";
-    } else if (
-      !identifier.includes("@") &&
-      identifier.trim().length < 3
-    ) {
+    } else if (!identifier.includes("@") && identifier.trim().length < 3) {
       errors.identifier = "Логин должен быть длиннее";
     }
 
@@ -77,7 +74,10 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <label className="block text-sm font-medium mb-2.5" style={{ color: "#abd1c6" }}>
+          <label
+            className="block text-sm font-medium mb-2.5"
+            style={{ color: "#abd1c6" }}
+          >
             Email или логин
           </label>
           <input
@@ -119,7 +119,10 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.35 }}
         >
-          <label className="block text-sm font-medium mb-2.5" style={{ color: "#abd1c6" }}>
+          <label
+            className="block text-sm font-medium mb-2.5"
+            style={{ color: "#abd1c6" }}
+          >
             Пароль
           </label>
           <input
@@ -162,7 +165,10 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
             animate={{ opacity: 1, height: "auto" }}
             className="bg-red-500/10 border border-red-500/40 text-red-300 text-sm px-4 py-3 rounded-xl flex items-start gap-2"
           >
-            <LucideIcons.AlertCircle size="sm" className="mt-0.5 flex-shrink-0" />
+            <LucideIcons.AlertCircle
+              size="sm"
+              className="mt-0.5 flex-shrink-0"
+            />
             <span>{error}</span>
           </motion.div>
         )}
@@ -175,7 +181,7 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
           className="w-full py-3.5 px-4 rounded-xl font-semibold text-base transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-xl relative overflow-hidden"
           style={{
             backgroundColor: "#f9bc60",
-            color: "#001e1d"
+            color: "#001e1d",
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-[#e8a545] to-[#f9bc60] opacity-0 hover:opacity-100 transition-opacity" />
@@ -192,5 +198,3 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
     </motion.div>
   );
 }
-
-

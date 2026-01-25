@@ -120,7 +120,3 @@ export default function AdsManagementClient() {
     </div>
   );
 }
-
-
-
-

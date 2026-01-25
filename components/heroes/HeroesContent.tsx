@@ -68,7 +68,10 @@ export default function HeroesContent({
   }
 
   return (
-    <div id="heroes-list" className="pb-14 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8">
+    <div
+      id="heroes-list"
+      className="pb-14 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8"
+    >
       <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10 md:space-y-12">
         {/* Статистика */}
         <motion.div
@@ -81,7 +84,9 @@ export default function HeroesContent({
           <div className="flex items-center justify-between gap-4 mb-4 sm:mb-5">
             <div>
               <div className="text-xs text-[#94a1b2]">Сводка раздела</div>
-              <div className="text-xl sm:text-2xl font-bold text-[#fffffe]">Статистика</div>
+              <div className="text-xl sm:text-2xl font-bold text-[#fffffe]">
+                Статистика
+              </div>
             </div>
             <div className="hidden sm:block text-sm text-[#abd1c6]">
               Данные обновляются при загрузке списка

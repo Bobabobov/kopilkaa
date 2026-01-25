@@ -31,17 +31,24 @@ export default function HeroesHero() {
 
               <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-bold text-[#fffffe] leading-tight">
                 Герои проекта
-                <span className="block text-[#f9bc60]">публичная витрина поддержки</span>
+                <span className="block text-[#f9bc60]">
+                  публичная витрина поддержки
+                </span>
               </h1>
 
               <p className="mt-4 text-base sm:text-lg md:text-xl leading-relaxed text-[#abd1c6] max-w-2xl">
-                Здесь отображаются пользователи, которые <strong className="text-[#fffffe]">добровольно поддержали</strong> развитие платформы.
-                Это форма благодарности и признания участия в проекте.
+                Здесь отображаются пользователи, которые{" "}
+                <strong className="text-[#fffffe]">
+                  добровольно поддержали
+                </strong>{" "}
+                развитие платформы. Это форма благодарности и признания участия
+                в проекте.
               </p>
 
               <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs sm:text-sm text-[#abd1c6]/90 leading-relaxed max-w-2xl">
-                Участие в разделе «Герои проекта» — знак благодарности со стороны платформы.
-                Поддержка не является финансовой услугой и не предполагает получения вознаграждения или иной выгоды.
+                Участие в разделе «Герои проекта» — знак благодарности со
+                стороны платформы. Поддержка не является финансовой услугой и не
+                предполагает получения вознаграждения или иной выгоды.
               </div>
 
               <div className="mt-6 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
@@ -68,7 +75,8 @@ export default function HeroesHero() {
                   Поддержка → профиль → «Герои проекта»
                 </div>
                 <div className="mt-3 text-sm text-[#abd1c6] leading-relaxed">
-                  Хотите, чтобы в карточке были соцсети? Добавьте их в профиле — они будут видны в разделе «Герои».
+                  Хотите, чтобы в карточке были соцсети? Добавьте их в профиле —
+                  они будут видны в разделе «Герои».
                 </div>
                 <div className="mt-5 flex gap-2">
                   <Link

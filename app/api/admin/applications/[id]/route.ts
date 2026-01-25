@@ -13,8 +13,7 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   const admin = await getAllowedAdminUser();
-  if (!admin)
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {
     const item = await prisma.application.findUnique({
@@ -55,8 +54,7 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   const admin = await getAllowedAdminUser();
-  if (!admin)
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json().catch(() => ({}));
   const status = body?.status as
@@ -77,7 +75,10 @@ export async function PATCH(
         data: { status, adminComment: adminComment ?? null },
         include: {
           user: { select: { email: true, id: true } },
-          images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
+          images: {
+            orderBy: { sort: "asc" },
+            select: { url: true, sort: true },
+          },
         },
       });
 
@@ -107,7 +108,9 @@ export async function PATCH(
     // Проверяем и выдаём достижения при одобрении заявки
     if (status === "APPROVED" && item.user?.id) {
       try {
-        await AchievementService.checkAndGrantAutomaticAchievements(item.user.id);
+        await AchievementService.checkAndGrantAutomaticAchievements(
+          item.user.id,
+        );
       } catch (error) {
         console.error("Error checking achievements:", error);
         // Не прерываем обновление статуса из-за ошибки достижений
@@ -133,8 +136,7 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   const admin = await getAllowedAdminUser();
-  if (!admin)
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {
     // Удаляем заявку (изображения удалятся автоматически из-за onDelete: Cascade)

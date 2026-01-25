@@ -7,9 +7,15 @@ interface AdRequestSuccessScreenProps {
   onReset: () => void;
 }
 
-export function AdRequestSuccessScreen({ onReset }: AdRequestSuccessScreenProps) {
+export function AdRequestSuccessScreen({
+  onReset,
+}: AdRequestSuccessScreenProps) {
   return (
-    <section id="contact" className="py-16 sm:py-24 px-4" style={{ backgroundColor: "#004643" }}>
+    <section
+      id="contact"
+      className="py-16 sm:py-24 px-4"
+      style={{ backgroundColor: "#004643" }}
+    >
       <div className="container mx-auto max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -22,7 +28,12 @@ export function AdRequestSuccessScreen({ onReset }: AdRequestSuccessScreenProps)
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+              transition={{
+                type: "spring",
+                stiffness: 200,
+                damping: 15,
+                delay: 0.2,
+              }}
               className="w-20 h-20 sm:w-24 sm:h-24 mx-auto bg-[#f9bc60] rounded-full flex items-center justify-center shadow-lg shadow-[#f9bc60]/30"
             >
               <LucideIcons.CheckCircle className="text-[#001e1d]" size="2xl" />
@@ -50,7 +61,9 @@ export function AdRequestSuccessScreen({ onReset }: AdRequestSuccessScreenProps)
               Мы уже изучаем вашу заявку и готовим персональное предложение!
             </p>
             <p className="text-base sm:text-lg text-[#abd1c6]">
-              Свяжемся с вами в течение <span className="text-[#f9bc60] font-semibold">15-30 минут</span>. Обычно быстрее!
+              Свяжемся с вами в течение{" "}
+              <span className="text-[#f9bc60] font-semibold">15-30 минут</span>.
+              Обычно быстрее!
             </p>
           </motion.div>
 
@@ -67,10 +80,14 @@ export function AdRequestSuccessScreen({ onReset }: AdRequestSuccessScreenProps)
                   <LucideIcons.Phone className="text-[#abd1c6]" size="lg" />
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-[#fffffe] mb-2">Свяжемся</h3>
-              <p className="text-sm text-[#abd1c6]">Позвоним или напишем для уточнения деталей</p>
+              <h3 className="text-lg font-semibold text-[#fffffe] mb-2">
+                Свяжемся
+              </h3>
+              <p className="text-sm text-[#abd1c6]">
+                Позвоним или напишем для уточнения деталей
+              </p>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -82,10 +99,14 @@ export function AdRequestSuccessScreen({ onReset }: AdRequestSuccessScreenProps)
                   <LucideIcons.Zap className="text-[#f9bc60]" size="lg" />
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-[#fffffe] mb-2">Предложим</h3>
-              <p className="text-sm text-[#abd1c6]">Подберём оптимальный формат и тариф</p>
+              <h3 className="text-lg font-semibold text-[#fffffe] mb-2">
+                Предложим
+              </h3>
+              <p className="text-sm text-[#abd1c6]">
+                Подберём оптимальный формат и тариф
+              </p>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -97,8 +118,12 @@ export function AdRequestSuccessScreen({ onReset }: AdRequestSuccessScreenProps)
                   <LucideIcons.Rocket className="text-[#e16162]" size="lg" />
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-[#fffffe] mb-2">Запустим</h3>
-              <p className="text-sm text-[#abd1c6]">Начнём рекламу уже сегодня</p>
+              <h3 className="text-lg font-semibold text-[#fffffe] mb-2">
+                Запустим
+              </h3>
+              <p className="text-sm text-[#abd1c6]">
+                Начнём рекламу уже сегодня
+              </p>
             </motion.div>
           </div>
 
@@ -120,7 +145,7 @@ export function AdRequestSuccessScreen({ onReset }: AdRequestSuccessScreenProps)
               className="inline-flex items-center gap-2 text-[#f9bc60] hover:text-[#e8a545] font-semibold transition-colors"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
               </svg>
               <span>@bobabobovv</span>
             </a>
@@ -142,4 +167,3 @@ export function AdRequestSuccessScreen({ onReset }: AdRequestSuccessScreenProps)
     </section>
   );
 }
-

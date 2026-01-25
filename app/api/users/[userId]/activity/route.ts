@@ -17,7 +17,10 @@ export async function GET(
     const { userId: identifier } = await params;
     const userId = await resolveUserIdFromIdentifier(identifier);
     if (!userId) {
-      return NextResponse.json({ message: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     // Получаем последние заявки пользователя

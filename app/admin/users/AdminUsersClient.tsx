@@ -38,14 +38,25 @@ export default function AdminUsersClient() {
   const [hasMore, setHasMore] = useState(true);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [badgeModalUserId, setBadgeModalUserId] = useState<string | null>(null);
-  const [badgeModalBadge, setBadgeModalBadge] = useState<HeroBadgeType | null | undefined>(undefined);
+  const [badgeModalBadge, setBadgeModalBadge] = useState<
+    HeroBadgeType | null | undefined
+  >(undefined);
   const [loadingBadge, setLoadingBadge] = useState(false);
   const { showToast } = useBeautifulToast();
   const { confirm } = useBeautifulNotifications();
   const observerTarget = useRef<HTMLDivElement>(null);
   const [trustDeltaSaving, setTrustDeltaSaving] = useState<string | null>(null);
 
-  const VALID_BADGES: HeroBadgeType[] = ["observer", "member", "active", "hero", "honor", "legend", "tester", "custom"];
+  const VALID_BADGES: HeroBadgeType[] = [
+    "observer",
+    "member",
+    "active",
+    "hero",
+    "honor",
+    "legend",
+    "tester",
+    "custom",
+  ];
 
   useEffect(() => {
     loadUsers(1, true);
@@ -58,7 +69,7 @@ export default function AdminUsersClient() {
           loadMore();
         }
       },
-      { threshold: 0.1, rootMargin: "100px" }
+      { threshold: 0.1, rootMargin: "100px" },
     );
 
     const currentTarget = observerTarget.current;
@@ -141,9 +152,9 @@ export default function AdminUsersClient() {
   const handleDeleteUser = async (userId: string, userName: string) => {
     const agreed = await confirm(
       `Вы уверены, что хотите удалить пользователя "${userName}"? Это действие нельзя отменить.`,
-      "Удаление пользователя"
+      "Удаление пользователя",
     );
-    
+
     if (!agreed) return;
 
     try {
@@ -155,11 +166,19 @@ export default function AdminUsersClient() {
       const data = await response.json();
 
       if (response.ok) {
-        showToast("success", "Пользователь удалён", "Аккаунт удалён из системы");
+        showToast(
+          "success",
+          "Пользователь удалён",
+          "Аккаунт удалён из системы",
+        );
         // Удаляем пользователя из списка
         setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
       } else {
-        showToast("error", "Ошибка", data.message || "Не удалось удалить пользователя");
+        showToast(
+          "error",
+          "Ошибка",
+          data.message || "Не удалось удалить пользователя",
+        );
       }
     } catch (error) {
       console.error("Delete user error:", error);
@@ -173,7 +192,7 @@ export default function AdminUsersClient() {
     setBadgeModalUserId(userId);
     setBadgeModalBadge(undefined);
     setLoadingBadge(true);
-    
+
     try {
       const response = await fetch(`/api/admin/users/${userId}/badge`);
       const data = await response.json();
@@ -192,25 +211,36 @@ export default function AdminUsersClient() {
 
     setLoadingBadge(true);
     try {
-      const response = await fetch(`/api/admin/users/${badgeModalUserId}/badge`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ badge }),
-      });
+      const response = await fetch(
+        `/api/admin/users/${badgeModalUserId}/badge`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ badge }),
+        },
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        showToast("success", "Бейдж обновлён", data.data?.message || "Бейдж успешно выдан");
+        showToast(
+          "success",
+          "Бейдж обновлён",
+          data.data?.message || "Бейдж успешно выдан",
+        );
         setBadgeModalBadge(badge);
         // Обновляем бейдж в списке пользователей
         setUsers((prevUsers) =>
           prevUsers.map((user) =>
-            user.id === badgeModalUserId ? { ...user, badge } : user
-          )
+            user.id === badgeModalUserId ? { ...user, badge } : user,
+          ),
         );
       } else {
-        showToast("error", "Ошибка", data.error || "Не удалось установить бейдж");
+        showToast(
+          "error",
+          "Ошибка",
+          data.error || "Не удалось установить бейдж",
+        );
       }
     } catch (error) {
       console.error("Error setting badge:", error);
@@ -227,7 +257,6 @@ export default function AdminUsersClient() {
 
   return (
     <div className="min-h-screen relative">
-
       <div className="relative z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">
           <AdminHeader />
@@ -278,121 +307,144 @@ export default function AdminUsersClient() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {users.map((user, index) => (
-                <motion.div
-                  key={user.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="bg-gradient-to-br from-[#001e1d] to-[#003d3a] rounded-xl p-4 sm:p-6 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 transition-all"
-                >
-                  <div className="flex items-start gap-4">
-                    {/* Аватар */}
-                    <div className="w-12 h-12 rounded-full bg-[#f9bc60]/20 flex items-center justify-center flex-shrink-0 border border-[#f9bc60]/30">
-                      <span className="text-[#f9bc60] text-lg font-bold">
-                        {(user.name || user.email || "П")[0].toUpperCase()}
-                      </span>
-                    </div>
-
-                    {/* Информация */}
-                    <div className="flex-1 min-w-0">
-                      <Link
-                        href={`/profile/${user.id}`}
-                        className="block hover:underline"
-                      >
-                        <h3 className="text-[#fffffe] font-semibold mb-1 truncate">
-                          {user.name || (user.email ? user.email.split("@")[0] : "Пользователь")}
-                        </h3>
-                      </Link>
-                      
-                      {user.email && (
-                        <p className="text-[#abd1c6] text-sm mb-2 truncate">
-                          {user.email}
-                        </p>
-                      )}
-
-                      <div className="space-y-1 text-xs text-[#abd1c6]/70">
-                        <div className="flex items-center gap-1">
-                          <LucideIcons.Calendar className="w-3 h-3" />
-                          <span>Регистрация: {formatDate(user.createdAt)}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <LucideIcons.Clock className="w-3 h-3" />
-                          <span>Был онлайн: {formatDateTime(user.lastSeen)}</span>
-                        </div>
+                  <motion.div
+                    key={user.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="bg-gradient-to-br from-[#001e1d] to-[#003d3a] rounded-xl p-4 sm:p-6 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 transition-all"
+                  >
+                    <div className="flex items-start gap-4">
+                      {/* Аватар */}
+                      <div className="w-12 h-12 rounded-full bg-[#f9bc60]/20 flex items-center justify-center flex-shrink-0 border border-[#f9bc60]/30">
+                        <span className="text-[#f9bc60] text-lg font-bold">
+                          {(user.name || user.email || "П")[0].toUpperCase()}
+                        </span>
                       </div>
 
-                  <div className="mt-3 p-3 rounded-lg border border-[#abd1c6]/20 bg-[#001e1d]/50 space-y-2">
-                    <div className="text-xs text-[#abd1c6]/80 font-semibold">
-                      Уровень доверия (админ)
-                    </div>
-                    <TrustDeltaControl
-                      userId={user.id}
-                      initialDelta={user.trustDelta ?? 0}
-                      trustLevel={user.trustLevel}
-                      effectiveApprovedApplications={user.effectiveApprovedApplications ?? 0}
-                      savingId={trustDeltaSaving}
-                      setSavingId={setTrustDeltaSaving}
-                      onSaved={(next) => {
-                        setUsers((prev) =>
-                          prev.map((u) =>
-                            u.id === user.id
-                              ? {
-                                  ...u,
-                                  trustDelta: next,
-                                  trustLevel: getTrustLevelFromEffectiveApproved(
-                                    u.effectiveApprovedApplications ?? 0,
-                                    next,
-                                  ),
-                                }
-                              : u,
-                          ),
-                        );
-                      }}
-                      showToast={showToast}
-                    />
-                  </div>
-
-                      <div className="flex items-center gap-2 mt-3 flex-wrap">
+                      {/* Информация */}
+                      <div className="flex-1 min-w-0">
                         <Link
                           href={`/profile/${user.id}`}
-                          className="inline-flex items-center gap-1 text-xs text-[#f9bc60] hover:text-[#f9bc60]/80 transition-colors"
+                          className="block hover:underline"
                         >
-                          <span>Открыть профиль</span>
-                          <LucideIcons.ArrowRight className="w-3 h-3" />
+                          <h3 className="text-[#fffffe] font-semibold mb-1 truncate">
+                            {user.name ||
+                              (user.email
+                                ? user.email.split("@")[0]
+                                : "Пользователь")}
+                          </h3>
                         </Link>
-                        
-                        <button
-                          onClick={() => openBadgeModal(user.id)}
-                          className="inline-flex items-center gap-1 text-xs text-[#abd1c6] hover:text-[#f9bc60] transition-colors"
-                          title="Управление бейджем"
-                        >
-                          <LucideIcons.Award className="w-3 h-3" />
-                          <span>Бейдж</span>
-                        </button>
-                        
-                        <button
-                          onClick={() => handleDeleteUser(user.id, user.name || user.email || "Пользователь")}
-                          disabled={deletingUserId === user.id || user.role === "ADMIN"}
-                          className="ml-auto inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          title={user.role === "ADMIN" ? "Нельзя удалить администратора" : "Удалить пользователя"}
-                        >
-                          {deletingUserId === user.id ? (
-                            <>
-                              <LucideIcons.Loader2 className="w-3 h-3 animate-spin" />
-                              <span>Удаление...</span>
-                            </>
-                          ) : (
-                            <>
-                              <LucideIcons.Trash2 className="w-3 h-3" />
-                              <span>Удалить</span>
-                            </>
-                          )}
-                        </button>
+
+                        {user.email && (
+                          <p className="text-[#abd1c6] text-sm mb-2 truncate">
+                            {user.email}
+                          </p>
+                        )}
+
+                        <div className="space-y-1 text-xs text-[#abd1c6]/70">
+                          <div className="flex items-center gap-1">
+                            <LucideIcons.Calendar className="w-3 h-3" />
+                            <span>
+                              Регистрация: {formatDate(user.createdAt)}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <LucideIcons.Clock className="w-3 h-3" />
+                            <span>
+                              Был онлайн: {formatDateTime(user.lastSeen)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 p-3 rounded-lg border border-[#abd1c6]/20 bg-[#001e1d]/50 space-y-2">
+                          <div className="text-xs text-[#abd1c6]/80 font-semibold">
+                            Уровень доверия (админ)
+                          </div>
+                          <TrustDeltaControl
+                            userId={user.id}
+                            initialDelta={user.trustDelta ?? 0}
+                            trustLevel={user.trustLevel}
+                            effectiveApprovedApplications={
+                              user.effectiveApprovedApplications ?? 0
+                            }
+                            savingId={trustDeltaSaving}
+                            setSavingId={setTrustDeltaSaving}
+                            onSaved={(next) => {
+                              setUsers((prev) =>
+                                prev.map((u) =>
+                                  u.id === user.id
+                                    ? {
+                                        ...u,
+                                        trustDelta: next,
+                                        trustLevel:
+                                          getTrustLevelFromEffectiveApproved(
+                                            u.effectiveApprovedApplications ??
+                                              0,
+                                            next,
+                                          ),
+                                      }
+                                    : u,
+                                ),
+                              );
+                            }}
+                            showToast={showToast}
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-3 flex-wrap">
+                          <Link
+                            href={`/profile/${user.id}`}
+                            className="inline-flex items-center gap-1 text-xs text-[#f9bc60] hover:text-[#f9bc60]/80 transition-colors"
+                          >
+                            <span>Открыть профиль</span>
+                            <LucideIcons.ArrowRight className="w-3 h-3" />
+                          </Link>
+
+                          <button
+                            onClick={() => openBadgeModal(user.id)}
+                            className="inline-flex items-center gap-1 text-xs text-[#abd1c6] hover:text-[#f9bc60] transition-colors"
+                            title="Управление бейджем"
+                          >
+                            <LucideIcons.Award className="w-3 h-3" />
+                            <span>Бейдж</span>
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              handleDeleteUser(
+                                user.id,
+                                user.name || user.email || "Пользователь",
+                              )
+                            }
+                            disabled={
+                              deletingUserId === user.id ||
+                              user.role === "ADMIN"
+                            }
+                            className="ml-auto inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={
+                              user.role === "ADMIN"
+                                ? "Нельзя удалить администратора"
+                                : "Удалить пользователя"
+                            }
+                          >
+                            {deletingUserId === user.id ? (
+                              <>
+                                <LucideIcons.Loader2 className="w-3 h-3 animate-spin" />
+                                <span>Удаление...</span>
+                              </>
+                            ) : (
+                              <>
+                                <LucideIcons.Trash2 className="w-3 h-3" />
+                                <span>Удалить</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
               </div>
 
               {/* Индикатор загрузки */}
@@ -411,7 +463,9 @@ export default function AdminUsersClient() {
               {/* Сообщение о конце списка */}
               {!hasMore && users.length > 0 && (
                 <div className="text-center py-8">
-                  <p className="text-[#abd1c6] text-sm">Все пользователи загружены</p>
+                  <p className="text-[#abd1c6] text-sm">
+                    Все пользователи загружены
+                  </p>
                 </div>
               )}
             </>
@@ -421,7 +475,10 @@ export default function AdminUsersClient() {
 
       {/* Модальное окно управления бейджем */}
       {badgeModalUserId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={closeBadgeModal}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={closeBadgeModal}
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -429,7 +486,9 @@ export default function AdminUsersClient() {
             className="bg-gradient-to-br from-[#001e1d] to-[#003d3a] rounded-2xl border border-[#abd1c6]/30 p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-[#fffffe]">Управление бейджем</h3>
+              <h3 className="text-xl font-bold text-[#fffffe]">
+                Управление бейджем
+              </h3>
               <button
                 onClick={closeBadgeModal}
                 className="text-[#abd1c6] hover:text-[#fffffe] transition-colors"
@@ -451,7 +510,9 @@ export default function AdminUsersClient() {
                     {badgeModalBadge ? (
                       <HeroBadge badge={badgeModalBadge} size="sm" />
                     ) : (
-                      <span className="text-sm text-[#abd1c6]/70">Автоматический (по сумме донаций)</span>
+                      <span className="text-sm text-[#abd1c6]/70">
+                        Автоматический (по сумме донаций)
+                      </span>
                     )}
                   </div>
                 </div>
@@ -523,8 +584,6 @@ function TrustDeltaControl({
   onSaved: (next: number) => void;
   showToast: (type: "success" | "error", title: string, desc?: string) => void;
 }) {
-  const [delta, setDelta] = useState<number>(initialDelta);
-
   const applyDelta = async (levelStep: number) => {
     const levelOrder: TrustLevel[] = [
       "LEVEL_1",
@@ -553,8 +612,11 @@ function TrustDeltaControl({
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Ошибка");
       onSaved(data?.trustDelta ?? next);
-      setDelta(data?.trustDelta ?? next);
-      showToast("success", "Сохранено", `trustDelta = ${data?.trustDelta ?? next}`);
+      showToast(
+        "success",
+        "Сохранено",
+        `trustDelta = ${data?.trustDelta ?? next}`,
+      );
     } catch (e: any) {
       showToast("error", "Не удалось сохранить", e?.message);
     } finally {

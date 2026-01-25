@@ -3,7 +3,7 @@ import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const admin = await getAllowedAdminUser();
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    
+
     // Фильтр по статусу
     if (status !== "all") {
       where.status = status;
@@ -73,4 +73,3 @@ export async function GET(request: Request) {
     );
   }
 }
-

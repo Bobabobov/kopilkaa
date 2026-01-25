@@ -137,7 +137,7 @@ export const ProfileHeaderCard = dynamicComponent(
   {
     loading: ProfileHeaderCardLoading,
     ssr: false,
-  }
+  },
 );
 
 export const ProfilePersonalStats = dynamicComponent(
@@ -145,7 +145,7 @@ export const ProfilePersonalStats = dynamicComponent(
   {
     loading: ProfilePersonalStatsLoading,
     ssr: false,
-  }
+  },
 );
 
 export const ProfileFriendsSection = dynamicComponent(
@@ -153,7 +153,7 @@ export const ProfileFriendsSection = dynamicComponent(
   {
     loading: ProfileFriendsSectionLoading,
     ssr: false,
-  }
+  },
 );
 
 export const ProfileAchievements = dynamicComponent(
@@ -161,7 +161,7 @@ export const ProfileAchievements = dynamicComponent(
   {
     loading: ProfileAchievementsLoading,
     ssr: false,
-  }
+  },
 );
 
 export const ProfileDonations = dynamicComponent(
@@ -169,7 +169,7 @@ export const ProfileDonations = dynamicComponent(
   {
     loading: ProfileDonationsLoading,
     ssr: false,
-  }
+  },
 );
 
 export const ProfileRecentActivity = dynamicComponent(
@@ -177,7 +177,7 @@ export const ProfileRecentActivity = dynamicComponent(
   {
     loading: ProfileRecentActivityLoading,
     ssr: false,
-  }
+  },
 );
 
 export const MotivationalCard = dynamicComponent(
@@ -185,7 +185,7 @@ export const MotivationalCard = dynamicComponent(
   {
     loading: MotivationalCardLoading,
     ssr: false,
-  }
+  },
 );
 
 export const SettingsModal = dynamicComponent(
@@ -193,7 +193,5 @@ export const SettingsModal = dynamicComponent(
   {
     ssr: false,
     loading: () => <div className="hidden" />,
-  }
+  },
 );
-
-

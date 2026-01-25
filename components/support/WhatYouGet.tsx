@@ -8,25 +8,29 @@ const items = [
   {
     icon: "Trophy",
     title: "Участие в жизни проекта",
-    description: "Поддержка помогает «Копилке» продолжать работу и развиваться как независимый проект.",
+    description:
+      "Поддержка помогает «Копилке» продолжать работу и развиваться как независимый проект.",
     color: "#f9bc60",
   },
   {
     icon: "Share",
     title: "Отображение в «Героях проекта» (по желанию)",
-    description: "Публичная витрина благодарности: ваш профиль может быть показан в разделе «Герои проекта».",
+    description:
+      "Публичная витрина благодарности: ваш профиль может быть показан в разделе «Герои проекта».",
     color: "#abd1c6",
   },
   {
     icon: "BarChart3",
     title: "Бейдж поддержки",
-    description: "Бейдж — знак благодарности. Он зависит от максимальной разовой суммы поддержки.",
+    description:
+      "Бейдж — знак благодарности. Он зависит от максимальной разовой суммы поддержки.",
     color: "#e16162",
   },
   {
     icon: "Infinity",
     title: "Без подписки и обязательств",
-    description: "Разовая поддержка. Никаких автоматических списаний и продлений.",
+    description:
+      "Разовая поддержка. Никаких автоматических списаний и продлений.",
     color: "#f9bc60",
   },
 ];
@@ -48,14 +52,20 @@ export default function WhatYouGet() {
           >
             🎁 Что даёт поддержка проекта
           </h3>
-          <p className="text-sm sm:text-base max-w-2xl mx-auto px-2" style={{ color: "#abd1c6" }}>
-            Это участие в развитии платформы и знак благодарности со стороны проекта.
+          <p
+            className="text-sm sm:text-base max-w-2xl mx-auto px-2"
+            style={{ color: "#abd1c6" }}
+          >
+            Это участие в развитии платформы и знак благодарности со стороны
+            проекта.
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {items.map((it, idx) => {
-            const Icon = LucideIcons[it.icon as keyof typeof LucideIcons] || LucideIcons.Star;
+            const Icon =
+              LucideIcons[it.icon as keyof typeof LucideIcons] ||
+              LucideIcons.Star;
             return (
               <motion.div
                 key={it.title}
@@ -67,16 +77,25 @@ export default function WhatYouGet() {
               >
                 <div
                   className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
-                  style={{ backgroundColor: `${it.color}20`, border: `2px solid ${it.color}` }}
+                  style={{
+                    backgroundColor: `${it.color}20`,
+                    border: `2px solid ${it.color}`,
+                  }}
                 >
                   <span style={{ color: it.color }}>
                     <Icon className="w-6 h-6 text-current" />
                   </span>
                 </div>
-                <h4 className="text-base sm:text-lg font-semibold mb-2" style={{ color: "#fffffe" }}>
+                <h4
+                  className="text-base sm:text-lg font-semibold mb-2"
+                  style={{ color: "#fffffe" }}
+                >
                   {it.title}
                 </h4>
-                <p className="text-sm leading-relaxed" style={{ color: "#abd1c6" }}>
+                <p
+                  className="text-sm leading-relaxed"
+                  style={{ color: "#abd1c6" }}
+                >
                   {it.description}
                 </p>
               </motion.div>
@@ -98,5 +117,3 @@ export default function WhatYouGet() {
     </section>
   );
 }
-
-

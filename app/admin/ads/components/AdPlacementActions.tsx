@@ -20,7 +20,9 @@ export default function AdPlacementActions({
           <LucideIcons.TrendingUp size="sm" className="text-[#f9bc60]" />
         </div>
         <div>
-          <div className="text-xs text-[#abd1c6]/70 uppercase tracking-wide">Активных размещений</div>
+          <div className="text-xs text-[#abd1c6]/70 uppercase tracking-wide">
+            Активных размещений
+          </div>
           <div className="text-2xl font-bold text-[#f9bc60]">{activeCount}</div>
         </div>
       </div>
@@ -43,4 +45,3 @@ export default function AdPlacementActions({
     </div>
   );
 }
-

@@ -10,5 +10,3 @@ export default async function AdminHeroesPage() {
   if (!admin) redirect("/");
   return <AdminHeroesClient />;
 }
-
-

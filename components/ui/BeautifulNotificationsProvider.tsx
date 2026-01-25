@@ -181,8 +181,7 @@ export function initBeautifulNotifications() {
     if (provider) {
       // Здесь можно добавить логику для получения функций из контекста
       // Пока что оставляем заглушки
-      window.beautifulAlert = (message: string, title?: string) => {
-      };
+      window.beautifulAlert = (message: string, title?: string) => {};
 
       window.beautifulConfirm = (
         message: string,

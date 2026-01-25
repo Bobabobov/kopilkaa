@@ -13,7 +13,9 @@ export function isUsernameIdentifier(identifier: string): boolean {
  * - "@username" -> looks up user by username and returns their id (or null)
  * - "cuid..."   -> verifies user exists by id and returns it (or null)
  */
-export async function resolveUserIdFromIdentifier(identifierRaw: string): Promise<string | null> {
+export async function resolveUserIdFromIdentifier(
+  identifierRaw: string,
+): Promise<string | null> {
   const identifier = String(identifierRaw ?? "").trim();
   if (!identifier) return null;
 
@@ -34,5 +36,3 @@ export async function resolveUserIdFromIdentifier(identifierRaw: string): Promis
   });
   return user?.id ?? null;
 }
-
-

@@ -8,11 +8,13 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function DonateSuccessPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="w-16 h-16 border-4 border-[#f9bc60] border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center px-4">
+          <div className="w-16 h-16 border-4 border-[#f9bc60] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
       <DonateSuccessContent />
     </Suspense>
   );
@@ -21,7 +23,9 @@ export default function DonateSuccessPage() {
 function DonateSuccessContent() {
   const searchParams = useSearchParams();
   const paymentId = searchParams.get("payment_id");
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    "loading",
+  );
 
   useEffect(() => {
     // Можно проверить статус платежа через API
@@ -43,7 +47,10 @@ function DonateSuccessContent() {
 
         {status === "success" && (
           <div className="space-y-6">
-            <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: "#f9bc6020" }}>
+            <div
+              className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "#f9bc6020" }}
+            >
               <LucideIcons.CheckCircle size="lg" className="text-[#f9bc60]" />
             </div>
             <h1 className="text-3xl font-bold" style={{ color: "#fffffe" }}>
@@ -63,7 +70,7 @@ function DonateSuccessContent() {
                 className="px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105"
                 style={{
                   backgroundColor: "#f9bc60",
-                  color: "#001e1d"
+                  color: "#001e1d",
                 }}
               >
                 На главную
@@ -73,7 +80,7 @@ function DonateSuccessContent() {
                 className="px-6 py-3 rounded-xl font-semibold transition-all border-2"
                 style={{
                   borderColor: "#abd1c6",
-                  color: "#abd1c6"
+                  color: "#abd1c6",
                 }}
               >
                 Посмотреть истории
@@ -84,7 +91,10 @@ function DonateSuccessContent() {
 
         {status === "error" && (
           <div className="space-y-6">
-            <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: "#ef444420" }}>
+            <div
+              className="w-20 h-20 mx-auto rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "#ef444420" }}
+            >
               <LucideIcons.AlertCircle size="lg" className="text-[#ef4444]" />
             </div>
             <h1 className="text-3xl font-bold" style={{ color: "#fffffe" }}>
@@ -98,7 +108,7 @@ function DonateSuccessContent() {
               className="inline-block px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105"
               style={{
                 backgroundColor: "#f9bc60",
-                color: "#001e1d"
+                color: "#001e1d",
               }}
             >
               Вернуться на главную
@@ -109,6 +119,3 @@ function DonateSuccessContent() {
     </div>
   );
 }
-
-
-

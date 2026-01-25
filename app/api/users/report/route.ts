@@ -10,9 +10,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    console.log("=== POST /api/users/report ===");
     const { userId, reason } = await request.json();
-    console.log("Received data:", { userId, reasonLength: reason?.length });
 
     if (!userId || !reason || !reason.trim()) {
       return NextResponse.json(
@@ -41,12 +39,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Проверяем доступность модели UserReport
-    console.log("Checking Prisma models...");
-    console.log("Available models:", Object.keys(prisma).filter(key => !key.startsWith('_') && !key.startsWith('$')));
-    
     // Создаём жалобу
-    console.log("Creating report...");
     const report = await prisma.userReport.create({
       data: {
         reporterId: session.uid,
@@ -54,7 +47,6 @@ export async function POST(request: Request) {
         reason: reason.trim(),
       },
     });
-    console.log("Report created:", report.id);
 
     return NextResponse.json({
       message: "Жалоба отправлена",
@@ -64,13 +56,21 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Report user error:", error);
-    console.error("Error stack:", error instanceof Error ? error.stack : "No stack");
-    const errorMessage = error instanceof Error ? error.message : "Неизвестная ошибка";
-    const errorDetails = error instanceof Error ? error.toString() : String(error);
+    console.error(
+      "Error stack:",
+      error instanceof Error ? error.stack : "No stack",
+    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Неизвестная ошибка";
+    const errorDetails =
+      error instanceof Error ? error.toString() : String(error);
     return NextResponse.json(
-      { message: "Ошибка отправки жалобы", error: errorMessage, details: errorDetails },
+      {
+        message: "Ошибка отправки жалобы",
+        error: errorMessage,
+        details: errorDetails,
+      },
       { status: 500 },
     );
   }
 }
-

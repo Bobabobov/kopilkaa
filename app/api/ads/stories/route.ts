@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
 // Явно указываем, что роут динамический (не кэшируется)
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -11,10 +11,7 @@ export async function GET() {
       where: {
         isActive: true,
         placement: "stories",
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: new Date() } },
-        ],
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
       },
       orderBy: {
         createdAt: "desc",
@@ -22,22 +19,25 @@ export async function GET() {
     });
 
     if (!ad) {
-      console.log("No active stories ad found");
       return NextResponse.json({ ad: null });
     }
 
     // Санитизируем HTML-поля, которые будут рендериться через dangerouslySetInnerHTML
-    const safeConfig = (ad.config && typeof ad.config === "object" ? ad.config : {}) as any;
+    const safeConfig = (
+      ad.config && typeof ad.config === "object" ? ad.config : {}
+    ) as any;
     if (typeof safeConfig.storyText === "string") {
       safeConfig.storyText = sanitizeApplicationStoryHtml(safeConfig.storyText);
     }
     const safeAd: any = {
       ...ad,
       config: safeConfig,
-      content: typeof ad.content === "string" ? sanitizeApplicationStoryHtml(ad.content) : ad.content,
+      content:
+        typeof ad.content === "string"
+          ? sanitizeApplicationStoryHtml(ad.content)
+          : ad.content,
     };
 
-    console.log("Found active stories ad:", { id: ad.id, placement: ad.placement, isActive: ad.isActive });
     return NextResponse.json({ ad: safeAd });
   } catch (error) {
     console.error("Error fetching stories advertisement:", error);
@@ -45,5 +45,3 @@ export async function GET() {
     return NextResponse.json({ ad: null });
   }
 }
-
-

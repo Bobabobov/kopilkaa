@@ -58,7 +58,10 @@ export default function RevokeAchievementModal({
       const response = await fetch("/api/admin/achievements/revoke", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ achievementId: selectedAchievement, userId: selectedUser }),
+        body: JSON.stringify({
+          achievementId: selectedAchievement,
+          userId: selectedUser,
+        }),
       });
       const data = await response.json();
       if (data.success) {
@@ -74,7 +77,9 @@ export default function RevokeAchievementModal({
     }
   };
 
-  const selectedAchievementData = achievements.find((a) => a.id === selectedAchievement);
+  const selectedAchievementData = achievements.find(
+    (a) => a.id === selectedAchievement,
+  );
   const selectedUserData = users.find((u) => u.id === selectedUser);
 
   return (
@@ -145,8 +150,12 @@ export default function RevokeAchievementModal({
                   <LucideIcons.Star size="sm" />
                 </div>
                 <div className="flex-1">
-                  <div className="font-semibold text-gray-900 dark:text-white">{selectedAchievementData.name}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">{selectedAchievementData.description}</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">
+                    {selectedAchievementData.name}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {selectedAchievementData.description}
+                  </div>
                 </div>
               </div>
             </div>
@@ -158,8 +167,12 @@ export default function RevokeAchievementModal({
                 <LucideIcons.User size="sm" />
               </div>
               <div className="flex-1">
-                <div className="font-semibold text-gray-900 dark:text-white">{selectedUserData.name || "Без имени"}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">{selectedUserData.email}</div>
+                <div className="font-semibold text-gray-900 dark:text-white">
+                  {selectedUserData.name || "Без имени"}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {selectedUserData.email}
+                </div>
               </div>
             </div>
           )}
@@ -190,5 +203,3 @@ export default function RevokeAchievementModal({
     </motion.div>
   );
 }
-
-

@@ -7,17 +7,23 @@ import TopDonorsInline from "./TopDonorsInline";
 // Lazy load heavy components только там, где это оправдано
 const HowItWorks = dynamic(() => import("./HowItWorks"), {
   ssr: false,
-  loading: () => <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+  loading: () => (
+    <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+  ),
 });
 
 const RecentApplications = dynamic(() => import("./RecentApplications"), {
   ssr: false,
-  loading: () => <div className="h-64 bg-[#004643]/30 animate-pulse rounded-3xl" />
+  loading: () => (
+    <div className="h-64 bg-[#004643]/30 animate-pulse rounded-3xl" />
+  ),
 });
 
 const FAQ = dynamic(() => import("./FAQ"), {
   ssr: false,
-  loading: () => <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+  loading: () => (
+    <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+  ),
 });
 
 type Stats = {
@@ -44,4 +50,3 @@ export default function HomePageClient({ initialStats }: HomePageClientProps) {
     </div>
   );
 }
-

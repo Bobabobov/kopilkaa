@@ -82,4 +82,3 @@ export default function BanCheck({ children }: BanCheckProps) {
 
   return <>{children}</>;
 }
-

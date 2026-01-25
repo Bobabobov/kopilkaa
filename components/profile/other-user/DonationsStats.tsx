@@ -23,7 +23,9 @@ export function DonationsStats({ stats }: DonationsStatsProps) {
           >
             {formatAmount(stats.totalDonated)}
           </div>
-          <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">Всего оплачено</div>
+          <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">
+            Всего оплачено
+          </div>
         </motion.div>
         <motion.div
           className="text-center p-4 sm:p-5 bg-gradient-to-br from-[#001e1d]/40 to-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20 shadow-lg hover:shadow-xl transition-all"
@@ -32,8 +34,12 @@ export function DonationsStats({ stats }: DonationsStatsProps) {
           transition={{ delay: 0.2 }}
           whileHover={{ scale: 1.05 }}
         >
-          <div className="text-2xl sm:text-3xl font-bold text-[#abd1c6] mb-2">{stats.donationsCount}</div>
-          <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">Количество</div>
+          <div className="text-2xl sm:text-3xl font-bold text-[#abd1c6] mb-2">
+            {stats.donationsCount}
+          </div>
+          <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">
+            Количество
+          </div>
         </motion.div>
       </div>
     </div>

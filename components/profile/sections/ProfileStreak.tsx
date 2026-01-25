@@ -28,7 +28,8 @@ export default function ProfileStreak() {
   }
 
   const flameIntensity = Math.min(streak.days / 10, 1);
-  const flameColor = streak.days >= 7 ? "#f9bc60" : streak.days >= 3 ? "#e16162" : "#abd1c6";
+  const flameColor =
+    streak.days >= 7 ? "#f9bc60" : streak.days >= 3 ? "#e16162" : "#abd1c6";
 
   return (
     <motion.div
@@ -45,29 +46,29 @@ export default function ProfileStreak() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 sm:gap-3">
             <motion.div
-              animate={{ 
+              animate={{
                 scale: [1, 1.1, 1],
-                filter: [`drop-shadow(0 0 8px ${flameColor}40)`, `drop-shadow(0 0 16px ${flameColor}60)`, `drop-shadow(0 0 8px ${flameColor}40)`]
+                filter: [
+                  `drop-shadow(0 0 8px ${flameColor}40)`,
+                  `drop-shadow(0 0 16px ${flameColor}60)`,
+                  `drop-shadow(0 0 8px ${flameColor}40)`,
+                ],
               }}
               transition={{ duration: 2, repeat: Infinity }}
               className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center"
-              style={{ 
+              style={{
                 backgroundColor: `${flameColor}20`,
-              border: `2px solid ${flameColor}40`,
-              color: flameColor
+                border: `2px solid ${flameColor}40`,
+                color: flameColor,
               }}
             >
-              <LucideIcons.Zap 
-                size="md"
-              />
+              <LucideIcons.Zap size="md" />
             </motion.div>
             <div>
               <h3 className="text-base sm:text-lg font-semibold text-[#fffffe]">
                 Серия активности
               </h3>
-              <p className="text-xs text-[#abd1c6]">
-                Дней подряд
-              </p>
+              <p className="text-xs text-[#abd1c6]">Дней подряд</p>
             </div>
           </div>
         </div>
@@ -84,11 +85,9 @@ export default function ProfileStreak() {
             >
               {streak.days}
             </motion.div>
-            <span className="text-lg sm:text-xl text-[#abd1c6] mb-1">
-              дней
-            </span>
+            <span className="text-lg sm:text-xl text-[#abd1c6] mb-1">дней</span>
           </div>
-          
+
           {/* Прогресс-бар серии */}
           <div className="relative h-3 bg-[#001e1d] rounded-full overflow-hidden border border-[#abd1c6]/20">
             <motion.div
@@ -96,13 +95,13 @@ export default function ProfileStreak() {
               animate={{ width: `${(streak.days / streak.longest) * 100}%` }}
               transition={{ duration: 1, delay: 0.3 }}
               className="h-full rounded-full relative"
-              style={{ 
+              style={{
                 background: `linear-gradient(90deg, ${flameColor}, ${flameColor}dd)`,
-                boxShadow: `0 0 10px ${flameColor}40`
+                boxShadow: `0 0 10px ${flameColor}40`,
               }}
             >
               <motion.div
-                animate={{ x: ['-100%', '100%'] }}
+                animate={{ x: ["-100%", "100%"] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
               ></motion.div>
@@ -116,23 +115,17 @@ export default function ProfileStreak() {
             <div className="text-lg sm:text-xl font-bold text-[#f9bc60]">
               {streak.longest}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">
-              Рекорд
-            </div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6]">Рекорд</div>
           </div>
           <div className="h-8 w-px bg-[#abd1c6]/20"></div>
           <div className="text-center flex-1">
             <div className="text-lg sm:text-xl font-bold text-[#abd1c6]">
               {streak.days >= 7 ? "🔥" : streak.days >= 3 ? "⭐" : "💪"}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">
-              Статус
-            </div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6]">Статус</div>
           </div>
         </div>
       </div>
     </motion.div>
   );
 }
-
-

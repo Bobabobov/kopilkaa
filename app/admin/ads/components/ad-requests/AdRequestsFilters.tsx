@@ -15,15 +15,31 @@ export default function AdRequestsFilters({
   const filters = [
     { value: "all", label: "Все", icon: LucideIcons.List },
     { value: "new", label: "Новые", icon: LucideIcons.Mail, color: "blue" },
-    { value: "processing", label: "В обработке", icon: LucideIcons.Clock, color: "yellow" },
-    { value: "approved", label: "Одобренные", icon: LucideIcons.CheckCircle, color: "green" },
-    { value: "rejected", label: "Отклонённые", icon: LucideIcons.XCircle, color: "red" },
+    {
+      value: "processing",
+      label: "В обработке",
+      icon: LucideIcons.Clock,
+      color: "yellow",
+    },
+    {
+      value: "approved",
+      label: "Одобренные",
+      icon: LucideIcons.CheckCircle,
+      color: "green",
+    },
+    {
+      value: "rejected",
+      label: "Отклонённые",
+      icon: LucideIcons.XCircle,
+      color: "red",
+    },
   ];
 
   const getButtonClasses = (filterValue: string, filterColor?: string) => {
     const isActive = filterStatus === filterValue;
-    const baseClasses = "px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 flex items-center gap-2";
-    
+    const baseClasses =
+      "px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 flex items-center gap-2";
+
     if (isActive) {
       const activeClasses = {
         all: "bg-[#f9bc60] text-[#001e1d] shadow-lg shadow-[#f9bc60]/20",
@@ -34,7 +50,7 @@ export default function AdRequestsFilters({
       };
       return `${baseClasses} ${activeClasses[filterColor as keyof typeof activeClasses] || activeClasses.all}`;
     }
-    
+
     return `${baseClasses} bg-[#001e1d] text-[#abd1c6] border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 hover:bg-[#002724]`;
   };
 
@@ -60,4 +76,3 @@ export default function AdRequestsFilters({
     </div>
   );
 }
-

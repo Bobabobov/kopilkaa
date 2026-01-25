@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 
 /**
  * Webhook для подтверждения платежа от ЮKassa
- * 
+ *
  * Настройка:
  * 1. В личном кабинете ЮKassa укажи URL: https://твой-домен.ru/api/payments/webhook
  * 2. ЮKassa будет отправлять сюда уведомления о статусе платежа
@@ -13,7 +13,7 @@ import { prisma } from "@/lib/db";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // ВАЖНО: webhook нельзя "доверять" на слово. Любой может отправить POST на этот URL.
     // Поэтому мы подтверждаем платёж отдельным серверным запросом в YooKassa API.
     const shopId = process.env.YOOKASSA_SHOP_ID;
@@ -28,10 +28,13 @@ export async function POST(request: NextRequest) {
     const ykPaymentId = payment?.id;
 
     if (!ykPaymentId || typeof ykPaymentId !== "string") {
-      return NextResponse.json({ error: "Invalid webhook payload" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid webhook payload" },
+        { status: 400 },
+      );
     }
 
-    if (event === 'payment.succeeded' && payment.status === 'succeeded') {
+    if (event === "payment.succeeded" && payment.status === "succeeded") {
       const verifyRes = await fetch(
         `https://api.yookassa.ru/v3/payments/${encodeURIComponent(ykPaymentId)}`,
         {
@@ -47,13 +50,23 @@ export async function POST(request: NextRequest) {
 
       if (!verifyRes.ok) {
         const text = await verifyRes.text().catch(() => "");
-        console.error("YooKassa verify failed:", verifyRes.status, text.slice(0, 500));
-        return NextResponse.json({ error: "Payment verification failed" }, { status: 400 });
+        console.error(
+          "YooKassa verify failed:",
+          verifyRes.status,
+          text.slice(0, 500),
+        );
+        return NextResponse.json(
+          { error: "Payment verification failed" },
+          { status: 400 },
+        );
       }
 
       const verified = await verifyRes.json().catch(() => null);
       if (!verified || verified.id !== ykPaymentId) {
-        return NextResponse.json({ error: "Payment verification failed" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Payment verification failed" },
+          { status: 400 },
+        );
       }
       if (verified.status !== "succeeded") {
         // webhook пришёл, но по факту платёж не succeeded — не создаём донат
@@ -61,8 +74,14 @@ export async function POST(request: NextRequest) {
       }
 
       // Платёж успешен - добавляем деньги в копилку
-      const amount = Math.round(parseFloat(String(verified.amount?.value ?? payment?.amount?.value ?? "0")));
-      const userIdRaw = (verified.metadata?.userId ?? payment?.metadata?.userId ?? null) as unknown;
+      const amount = Math.round(
+        parseFloat(
+          String(verified.amount?.value ?? payment?.amount?.value ?? "0"),
+        ),
+      );
+      const userIdRaw = (verified.metadata?.userId ??
+        payment?.metadata?.userId ??
+        null) as unknown;
       const safeUserId =
         typeof userIdRaw === "string" && /^[a-zA-Z0-9_-]+$/.test(userIdRaw)
           ? userIdRaw
@@ -76,7 +95,6 @@ export async function POST(request: NextRequest) {
       });
 
       if (existing) {
-        console.log(`Платёж ${ykPaymentId} уже обработан`);
         return NextResponse.json({ success: true, message: "Уже обработан" });
       }
 
@@ -84,13 +102,11 @@ export async function POST(request: NextRequest) {
       await prisma.donation.create({
         data: {
           amount,
-          type: 'SUPPORT',
+          type: "SUPPORT",
           userId: safeUserId && safeUserId !== "anonymous" ? safeUserId : null,
           comment: `yookassa_${ykPaymentId}`,
-        }
+        },
       });
-
-      console.log(`✅ YooKassa payment succeeded: ${amount}₽, userId: ${safeUserId ?? "null"}`);
     }
 
     return NextResponse.json({ success: true });
@@ -98,7 +114,7 @@ export async function POST(request: NextRequest) {
     console.error("Error processing webhook:", error);
     return NextResponse.json(
       { error: error.message || "Ошибка обработки webhook" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

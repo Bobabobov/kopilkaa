@@ -19,5 +19,3 @@ export default function ReportsError({ error, onRetry }: ReportsErrorProps) {
     </div>
   );
 }
-
-

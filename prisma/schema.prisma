@@ -39,6 +39,7 @@ model User {
   passwordHash        String
   name                String?
   avatar              String?
+  avatarUpdatedAt     DateTime?
   phone               String?   @unique
   phoneVerified       Boolean   @default(false)
   telegramId          String?   @unique
@@ -49,6 +50,7 @@ model User {
   telegramLink        String?
   youtubeLink         String?
   headerTheme         String?   @default("default")
+  headerThemeUpdatedAt DateTime?
   headerDominantColor String? // Доминантный цвет из обложки
   avatarFrame         String?   @default("none")
   customFrameData     String? // JSON данные пользовательских рамок

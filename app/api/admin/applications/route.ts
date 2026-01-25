@@ -8,8 +8,7 @@ export const revalidate = 0;
 
 export async function GET(req: Request) {
   const admin = await getAllowedAdminUser();
-  if (!admin)
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   const { searchParams } = new URL(req.url);
   const page = Math.max(1, Number(searchParams.get("page") || 1));
@@ -101,17 +100,20 @@ export async function GET(req: Request) {
     story: sanitizeApplicationStoryHtml(it.story),
   }));
 
-  return Response.json({
-    page,
-    limit,
-    total,
-    pages: Math.ceil(total / limit),
-    items: safeItems,
-  }, {
-    headers: {
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
+  return Response.json(
+    {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+      items: safeItems,
     },
-  });
+    {
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    },
+  );
 }

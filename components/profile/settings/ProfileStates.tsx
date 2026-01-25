@@ -34,24 +34,30 @@ export function ProfileLoading() {
 // Notification Message Component
 interface NotificationMessageProps {
   message: string;
-  type: 'success' | 'error' | 'info';
+  type: "success" | "error" | "info";
   onClose: () => void;
 }
 
-export function NotificationMessage({ message, type, onClose }: NotificationMessageProps) {
+export function NotificationMessage({
+  message,
+  type,
+  onClose,
+}: NotificationMessageProps) {
   const bgColor = {
-    success: 'bg-[#10B981]/20 border-[#10B981]/30 text-[#10B981]',
-    error: 'bg-red-500/20 border-red-500/30 text-red-400',
-    info: 'bg-[#f9bc60]/20 border-[#f9bc60]/30 text-[#f9bc60]'
+    success: "bg-[#10B981]/20 border-[#10B981]/30 text-[#10B981]",
+    error: "bg-red-500/20 border-red-500/30 text-red-400",
+    info: "bg-[#f9bc60]/20 border-[#f9bc60]/30 text-[#f9bc60]",
   }[type];
 
   return (
-    <div className={`p-4 rounded-xl border ${bgColor} flex items-center justify-between`}>
+    <div
+      className={`p-4 rounded-xl border ${bgColor} flex items-center justify-between`}
+    >
       <div className="flex items-center gap-3">
         <div className="flex-shrink-0">
-          {type === 'success' && <span className="text-lg">✓</span>}
-          {type === 'error' && <span className="text-lg">✗</span>}
-          {type === 'info' && <span className="text-lg">ℹ</span>}
+          {type === "success" && <span className="text-lg">✓</span>}
+          {type === "error" && <span className="text-lg">✗</span>}
+          {type === "info" && <span className="text-lg">ℹ</span>}
         </div>
         <p className="text-sm font-medium">{message}</p>
       </div>
@@ -72,10 +78,10 @@ interface ErrorStateProps {
   onRetry?: () => void;
 }
 
-export function ErrorState({ 
-  title = "Ошибка загрузки", 
-  message = "Не удалось загрузить данные профиля", 
-  onRetry 
+export function ErrorState({
+  title = "Ошибка загрузки",
+  message = "Не удалось загрузить данные профиля",
+  onRetry,
 }: ErrorStateProps) {
   return (
     <div className="text-center py-12">
@@ -105,12 +111,12 @@ interface EmptyStateProps {
   onAction?: () => void;
 }
 
-export function EmptyState({ 
-  icon = "📭", 
-  title, 
-  message, 
-  actionLabel, 
-  onAction 
+export function EmptyState({
+  icon = "📭",
+  title,
+  message,
+  actionLabel,
+  onAction,
 }: EmptyStateProps) {
   return (
     <div className="text-center py-12">
@@ -144,7 +150,7 @@ export function SettingsLoading() {
   );
 }
 
-// Settings Unauthorized State  
+// Settings Unauthorized State
 export function SettingsUnauthorized({ message }: { message?: string }) {
   return (
     <div className="text-center py-12 space-y-4">
@@ -153,7 +159,9 @@ export function SettingsUnauthorized({ message }: { message?: string }) {
       </div>
       <div className="space-y-2">
         <p className="text-[#fffffe] font-medium">Доступ запрещен</p>
-        <p className="text-[#abd1c6] text-sm">{message || "Вы не авторизованы"}</p>
+        <p className="text-[#abd1c6] text-sm">
+          {message || "Вы не авторизованы"}
+        </p>
       </div>
     </div>
   );

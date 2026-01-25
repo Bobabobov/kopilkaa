@@ -20,7 +20,9 @@ interface BannerMobileFieldProps {
 
   bannerMobileVideoPreviewFile?: { file: File; url: string } | null;
   uploadingBannerMobileVideo?: boolean;
-  onBannerMobileVideoFileSelect?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBannerMobileVideoFileSelect?: (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
   onBannerMobileVideoUrlChange?: (url: string) => void;
   onBannerMobileVideoRemove?: () => void;
 }
@@ -68,14 +70,16 @@ export default function BannerMobileField({
           <input
             type="url"
             value={formData.bannerMobileImageUrl}
-            onChange={(e) => onFieldChange("bannerMobileImageUrl", e.target.value)}
+            onChange={(e) =>
+              onFieldChange("bannerMobileImageUrl", e.target.value)
+            }
             className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none text-sm"
             placeholder="https://example.com/mobile-banner.jpg"
           />
         )}
         <p className="text-xs text-[#abd1c6]/70 mt-1">
-          Если заполнить, этот баннер будет показан на телефонах. Рекомендуемый размер 800–1080px
-          по ширине, ориентир по высоте 200–300px.
+          Если заполнить, этот баннер будет показан на телефонах. Рекомендуемый
+          размер 800–1080px по ширине, ориентир по высоте 200–300px.
         </p>
       </div>
 
@@ -107,7 +111,8 @@ export default function BannerMobileField({
           />
         )}
         <p className="text-xs text-[#abd1c6]/70 mt-1">
-          Если указать видео, оно будет показано вместо изображения на десктопе. Поддерживаются форматы MP4, WebM.
+          Если указать видео, оно будет показано вместо изображения на десктопе.
+          Поддерживаются форматы MP4, WebM.
         </p>
       </div>
 
@@ -133,16 +138,18 @@ export default function BannerMobileField({
           <input
             type="url"
             value={formData.bannerMobileVideoUrl}
-            onChange={(e) => onFieldChange("bannerMobileVideoUrl", e.target.value)}
+            onChange={(e) =>
+              onFieldChange("bannerMobileVideoUrl", e.target.value)
+            }
             className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none text-sm"
             placeholder="https://example.com/mobile-video.mp4"
           />
         )}
         <p className="text-xs text-[#abd1c6]/70 mt-1">
-          Если указать видео, оно будет показано вместо изображения на мобильных устройствах. Поддерживаются форматы MP4, WebM.
+          Если указать видео, оно будет показано вместо изображения на мобильных
+          устройствах. Поддерживаются форматы MP4, WebM.
         </p>
       </div>
     </div>
   );
 }
-

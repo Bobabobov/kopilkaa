@@ -10,6 +10,3 @@ export default async function Page() {
   if (!admin) redirect("/");
   return <AdminNewsClient />;
 }
-
-
-

@@ -1,5 +1,5 @@
 // lib/achievements/service.ts
-import { prisma } from '@/lib/db';
+import { prisma } from "@/lib/db";
 import {
   Achievement,
   UserAchievement,
@@ -8,7 +8,7 @@ import {
   AchievementRarity,
   AchievementType,
   AchievementKind,
-} from './types';
+} from "./types";
 
 export class AchievementService {
   private static getAchievementKey(a: Achievement): string {
@@ -41,7 +41,11 @@ export class AchievementService {
     const desc = String(achievement.description || "").toLowerCase();
 
     // META (Легенда) — получить все eligible NORMAL
-    if ((achievement.kind ?? "NORMAL") === "META" || key === "legend" || name.includes("легенда")) {
+    if (
+      (achievement.kind ?? "NORMAL") === "META" ||
+      key === "legend" ||
+      name.includes("легенда")
+    ) {
       return Math.max(eligibleNormals.length, 1);
     }
 
@@ -53,7 +57,10 @@ export class AchievementService {
     return 1;
   }
 
-  private static getMetricForAchievement(achievement: Achievement, userStats: any): number {
+  private static getMetricForAchievement(
+    achievement: Achievement,
+    userStats: any,
+  ): number {
     const key = this.getAchievementKey(achievement);
     const name = String(achievement.name || "").toLowerCase();
     const desc = String(achievement.description || "").toLowerCase();
@@ -86,7 +93,10 @@ export class AchievementService {
     }
 
     // “Вдохновение” — лайки на одной истории (получено 10+ лайков на одну историю)
-    if (key === "inspiration_10_likes_on_one_story" || (desc.includes("истор") && desc.includes("лайк"))) {
+    if (
+      key === "inspiration_10_likes_on_one_story" ||
+      (desc.includes("истор") && desc.includes("лайк"))
+    ) {
       return userStats.likesReceivedMaxOnOneStory ?? 0;
     }
 
@@ -116,7 +126,11 @@ export class AchievementService {
     }
 
     // Leaf Flight score
-    if (key.startsWith("leaf_flight") || desc.includes("leaf flight") || desc.includes("очк")) {
+    if (
+      key.startsWith("leaf_flight") ||
+      desc.includes("leaf flight") ||
+      desc.includes("очк")
+    ) {
       return userStats.bestScoreLeafFlight ?? 0;
     }
 
@@ -144,10 +158,7 @@ export class AchievementService {
       where: {
         isActive: true,
       },
-      orderBy: [
-        { rarity: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ rarity: "desc" }, { createdAt: "desc" }],
     });
   }
 
@@ -159,7 +170,7 @@ export class AchievementService {
         achievement: true,
       },
       orderBy: {
-        unlockedAt: 'desc',
+        unlockedAt: "desc",
       },
     });
   }
@@ -185,42 +196,51 @@ export class AchievementService {
       prisma.application.count({ where: { userId } }).catch(() => 0),
       prisma.application
         .count({
-          where: { userId, status: 'APPROVED' as any },
+          where: { userId, status: "APPROVED" as any },
         })
         .catch(() => 0),
     ]);
 
     // friends accepted (bidirectional)
-    const friendsCount = await prisma.friendship.count({
-      where: {
-        status: 'ACCEPTED',
-        OR: [{ requesterId: userId }, { receiverId: userId }],
-      },
-    }).catch(() => 0);
+    const friendsCount = await prisma.friendship
+      .count({
+        where: {
+          status: "ACCEPTED",
+          OR: [{ requesterId: userId }, { receiverId: userId }],
+        },
+      })
+      .catch(() => 0);
 
     // likes given
-    const likesGiven = await prisma.storyLike.count({ where: { userId } }).catch(() => 0);
+    const likesGiven = await prisma.storyLike
+      .count({ where: { userId } })
+      .catch(() => 0);
 
     // likes received max on one story (если лайки привязаны к application)
     let likesReceivedMaxOnOneStory = 0;
     try {
       const grouped = await prisma.storyLike.groupBy({
-        by: ['applicationId'],
+        by: ["applicationId"],
         where: { application: { userId } },
         _count: { _all: true },
       });
-      likesReceivedMaxOnOneStory = grouped.reduce((max, g) => Math.max(max, g._count._all), 0);
+      likesReceivedMaxOnOneStory = grouped.reduce(
+        (max, g) => Math.max(max, g._count._all),
+        0,
+      );
     } catch {
       likesReceivedMaxOnOneStory = 0;
     }
 
     // games
-    const gamesPlayed = await prisma.gameRecord.count({ where: { userId } }).catch(() => 0);
+    const gamesPlayed = await prisma.gameRecord
+      .count({ where: { userId } })
+      .catch(() => 0);
     let bestScoreLeafFlight = 0;
     try {
       const best = await prisma.gameRecord.findFirst({
-        where: { userId, gameType: 'leaf-flight' },
-        orderBy: { bestScore: 'desc' },
+        where: { userId, gameType: "leaf-flight" },
+        orderBy: { bestScore: "desc" },
         select: { bestScore: true },
       });
       bestScoreLeafFlight = best?.bestScore ?? 0;
@@ -237,7 +257,7 @@ export class AchievementService {
         select: { story: true, summary: true },
       });
       maxStoryWords = stories.reduce((max, s) => {
-        const text = `${s.summary ?? ''} ${s.story ?? ''}`.trim();
+        const text = `${s.summary ?? ""} ${s.story ?? ""}`.trim();
         const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
         return Math.max(max, words);
       }, 0);
@@ -254,15 +274,17 @@ export class AchievementService {
       const visits = await prisma.pageVisit.findMany({
         where: { userId, visitDate: { gte: since } },
         select: { visitDate: true },
-        orderBy: { visitDate: 'desc' },
+        orderBy: { visitDate: "desc" },
       });
       const days = Array.from(
         new Set(
-          visits.map((v) =>
-            new Date(v.visitDate).toISOString().slice(0, 10) // YYYY-MM-DD
-          )
-        )
-      ).sort().reverse(); // от новых к старым
+          visits.map(
+            (v) => new Date(v.visitDate).toISOString().slice(0, 10), // YYYY-MM-DD
+          ),
+        ),
+      )
+        .sort()
+        .reverse(); // от новых к старым
       const today = new Date().toISOString().slice(0, 10);
       let streak = 0;
       let cursor = today;
@@ -325,7 +347,9 @@ export class AchievementService {
       maxStoryWords,
       isFirst100,
       hasAvatar: Boolean(user.avatar),
-      hasSocialLinks: Boolean(user.vkLink || user.telegramLink || user.youtubeLink),
+      hasSocialLinks: Boolean(
+        user.vkLink || user.telegramLink || user.youtubeLink,
+      ),
       heroMaxPayment,
       heroTotalPaid,
       heroPaymentsCount,
@@ -339,12 +363,18 @@ export class AchievementService {
     userStats: any,
     isUnlocked: boolean,
     eligibleNormals: Achievement[],
-    userAchievement?: UserAchievement
+    userAchievement?: UserAchievement,
   ): AchievementProgress {
     const key = this.getAchievementKey(achievement);
 
     // META: получить все eligible NORMAL
-    if ((achievement.kind ?? 'NORMAL') === 'META' || key === "legend" || String(achievement.name || "").toLowerCase().includes("легенда")) {
+    if (
+      (achievement.kind ?? "NORMAL") === "META" ||
+      key === "legend" ||
+      String(achievement.name || "")
+        .toLowerCase()
+        .includes("легенда")
+    ) {
       const target = this.getTargetForAchievement(achievement, eligibleNormals);
       const unlockedEligible = userStats._unlockedEligibleCount || 0;
       const progress = isUnlocked ? target : unlockedEligible;
@@ -378,15 +408,19 @@ export class AchievementService {
   }
 
   // Получить прогресс достижений пользователя
-  static async getUserAchievementProgress(userId: string): Promise<AchievementProgress[]> {
+  static async getUserAchievementProgress(
+    userId: string,
+  ): Promise<AchievementProgress[]> {
     const achievements = await this.getAllAchievements();
     const userAchievements = await this.getUserAchievements(userId);
-    const userAchievementMap = new Map(userAchievements.map((ua) => [ua.achievementId, ua]));
+    const userAchievementMap = new Map(
+      userAchievements.map((ua) => [ua.achievementId, ua]),
+    );
 
     const eligibleNormals = achievements.filter((a) => {
       const ach: any = a as any;
       return (
-        (ach.kind ?? 'NORMAL') === 'NORMAL' &&
+        (ach.kind ?? "NORMAL") === "NORMAL" &&
         !ach.isExclusive &&
         !ach.isHidden &&
         !ach.isSeasonal
@@ -397,7 +431,9 @@ export class AchievementService {
     if (!userStats) return [];
 
     // Добавляем вспомогательный счётчик полученных eligible NORMAL для META
-    userStats._unlockedEligibleCount = eligibleNormals.filter((a) => userAchievementMap.has(a.id)).length;
+    userStats._unlockedEligibleCount = eligibleNormals.filter((a) =>
+      userAchievementMap.has(a.id),
+    ).length;
 
     const progressList: AchievementProgress[] = [];
 
@@ -410,7 +446,7 @@ export class AchievementService {
         userStats,
         isUnlocked,
         eligibleNormals,
-        userAchievement
+        userAchievement,
       );
 
       progressList.push(p);
@@ -424,7 +460,7 @@ export class AchievementService {
     userId: string,
     achievementId: string,
     grantedBy?: string,
-    grantedByName?: string
+    grantedByName?: string,
   ): Promise<UserAchievement> {
     // Проверяем, не получено ли уже это достижение
     const existing = await prisma.userAchievement.findUnique({
@@ -437,7 +473,7 @@ export class AchievementService {
     });
 
     if (existing) {
-      throw new Error('Достижение уже получено');
+      throw new Error("Достижение уже получено");
     }
 
     // Проверяем лимит достижения
@@ -446,20 +482,20 @@ export class AchievementService {
     });
 
     if (!achievement) {
-      throw new Error('Достижение не найдено');
+      throw new Error("Достижение не найдено");
     }
 
     if (!achievement.isActive) {
-      throw new Error('Достижение неактивно');
+      throw new Error("Достижение неактивно");
     }
 
     // Проверяем период действия
     const now = new Date();
     if (achievement.validFrom && now < achievement.validFrom) {
-      throw new Error('Достижение ещё не активно');
+      throw new Error("Достижение ещё не активно");
     }
     if (achievement.validTo && now > achievement.validTo) {
-      throw new Error('Достижение уже неактивно');
+      throw new Error("Достижение уже неактивно");
     }
 
     // Проверяем лимит количества
@@ -471,7 +507,7 @@ export class AchievementService {
     });
 
     if (userAchievementCount >= achievement.maxCount) {
-      throw new Error('Лимит достижения исчерпан');
+      throw new Error("Лимит достижения исчерпан");
     }
 
     // Выдаём достижение
@@ -489,7 +525,9 @@ export class AchievementService {
   }
 
   // Получить статистику достижений пользователя
-  static async getUserAchievementStats(userId: string): Promise<AchievementStats> {
+  static async getUserAchievementStats(
+    userId: string,
+  ): Promise<AchievementStats> {
     const allAchievements = await this.getAllAchievements();
     const userAchievements = await this.getUserAchievements(userId);
 
@@ -512,7 +550,7 @@ export class AchievementService {
     };
 
     // Подсчитываем полученные достижения
-    userAchievements.forEach(ua => {
+    userAchievements.forEach((ua) => {
       if (ua.achievement) {
         achievementsByRarity[ua.achievement.rarity]++;
         achievementsByType[ua.achievement.type]++;
@@ -521,7 +559,10 @@ export class AchievementService {
 
     const totalAchievements = allAchievements.length;
     const unlockedAchievements = userAchievements.length;
-    const completionPercentage = totalAchievements > 0 ? (unlockedAchievements / totalAchievements) * 100 : 0;
+    const completionPercentage =
+      totalAchievements > 0
+        ? (unlockedAchievements / totalAchievements) * 100
+        : 0;
 
     return {
       totalAchievements,
@@ -534,17 +575,21 @@ export class AchievementService {
   }
 
   // Проверить и выдать автоматические достижения
-  static async checkAndGrantAutomaticAchievements(userId: string): Promise<UserAchievement[]> {
+  static async checkAndGrantAutomaticAchievements(
+    userId: string,
+  ): Promise<UserAchievement[]> {
     const grantedAchievements: UserAchievement[] = [];
 
     const achievements = await this.getAllAchievements();
     const userAchievements = await this.getUserAchievements(userId);
-    const userAchievementMap = new Map(userAchievements.map((ua) => [ua.achievementId, ua]));
+    const userAchievementMap = new Map(
+      userAchievements.map((ua) => [ua.achievementId, ua]),
+    );
 
     const eligibleNormals = achievements.filter((a) => {
       const ach: any = a as any;
       return (
-        (ach.kind ?? 'NORMAL') === 'NORMAL' &&
+        (ach.kind ?? "NORMAL") === "NORMAL" &&
         !ach.isExclusive &&
         !ach.isHidden &&
         !ach.isSeasonal
@@ -553,7 +598,9 @@ export class AchievementService {
 
     const userStats = await this.getUserStats(userId);
     if (!userStats) return grantedAchievements;
-    userStats._unlockedEligibleCount = eligibleNormals.filter((a) => userAchievementMap.has(a.id)).length;
+    userStats._unlockedEligibleCount = eligibleNormals.filter((a) =>
+      userAchievementMap.has(a.id),
+    ).length;
 
     for (const achievement of achievements) {
       const userAchievement = userAchievementMap.get(achievement.id) as any;
@@ -564,20 +611,26 @@ export class AchievementService {
         userStats,
         false,
         eligibleNormals,
-        undefined
+        undefined,
       );
 
-      if (progress.progress >= progress.maxProgress && progress.maxProgress > 0) {
+      if (
+        progress.progress >= progress.maxProgress &&
+        progress.maxProgress > 0
+      ) {
         try {
           const granted = await this.grantAchievement(userId, achievement.id);
           grantedAchievements.push(granted);
           userAchievementMap.set(achievement.id, granted as any);
           const achMeta: any = achievement as any;
-          if ((achMeta.kind ?? 'NORMAL') === 'NORMAL') {
+          if ((achMeta.kind ?? "NORMAL") === "NORMAL") {
             userStats._unlockedEligibleCount += 1;
           }
         } catch (error) {
-          console.log(`Не удалось выдать достижение ${achievement.name}:`, error);
+          console.error(
+            `Не удалось выдать достижение ${achievement.name}:`,
+            error,
+          );
         }
       }
     }
@@ -586,50 +639,68 @@ export class AchievementService {
   }
 
   // Вспомогательные методы для проверки условий
-  private static async checkApplicationAchievements(achievement: Achievement, applications: any[]): Promise<boolean> {
+  private static async checkApplicationAchievements(
+    achievement: Achievement,
+    applications: any[],
+  ): Promise<boolean> {
     switch (achievement.name) {
-      case 'Первые шаги':
+      case "Первые шаги":
         return applications.length >= 1;
-      
-      case 'Помощник':
+
+      case "Помощник":
         return applications.length >= 5;
-      
-      case 'Активный участник':
+
+      case "Активный участник":
         return applications.length >= 10;
-      
-      case 'Одобренная заявка':
-        return applications.some(app => app.status === 'APPROVED');
-      
+
+      case "Одобренная заявка":
+        return applications.some((app) => app.status === "APPROVED");
+
       default:
         return false;
     }
   }
 
-  private static async checkGameAchievements(achievement: Achievement, gameRecords: any[]): Promise<boolean> {
+  private static async checkGameAchievements(
+    achievement: Achievement,
+    gameRecords: any[],
+  ): Promise<boolean> {
     // Логика проверки игровых достижений
     // Например: "Первый рекорд", "100 очков", "10 игр"
     return false; // Заглушка
   }
 
-  private static async checkSocialAchievements(achievement: Achievement, user: any): Promise<boolean> {
+  private static async checkSocialAchievements(
+    achievement: Achievement,
+    user: any,
+  ): Promise<boolean> {
     // Логика проверки социальных достижений
     // Например: "Первый друг", "10 друзей", "Активный комментатор"
     return false; // Заглушка
   }
 
-  private static async checkStreakAchievements(achievement: Achievement, user: any): Promise<boolean> {
+  private static async checkStreakAchievements(
+    achievement: Achievement,
+    user: any,
+  ): Promise<boolean> {
     // Логика проверки достижений за серии
     // Например: "7 дней подряд", "30 дней активности"
     return false; // Заглушка
   }
 
-  private static async checkCommunityAchievements(achievement: Achievement, user: any): Promise<boolean> {
+  private static async checkCommunityAchievements(
+    achievement: Achievement,
+    user: any,
+  ): Promise<boolean> {
     // Логика проверки достижений сообщества
     // Например: "Помощь другим", "Лайки историй"
     return false; // Заглушка
   }
 
-  private static async checkCreativityAchievements(achievement: Achievement, user: any): Promise<boolean> {
+  private static async checkCreativityAchievements(
+    achievement: Achievement,
+    user: any,
+  ): Promise<boolean> {
     // Логика проверки творческих достижений
     // Например: "Красивые истории", "Креативные заявки"
     return false; // Заглушка

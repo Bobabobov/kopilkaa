@@ -14,9 +14,9 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-4 mb-4">
           <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
-            <img 
-              src="/kopibook.png" 
-              alt="Истории" 
+            <img
+              src="/kopibook.png"
+              alt="Истории"
               className="w-full h-full object-contain"
             />
           </div>
@@ -32,7 +32,8 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
           className="text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto px-4"
           style={{ color: "#abd1c6" }}
         >
-          Здесь публикуются истории пользователей, по которым платформа приняла решение о финансовой поддержке.
+          Здесь публикуются истории пользователей, по которым платформа приняла
+          решение о финансовой поддержке.
           <span className="font-medium" style={{ color: "#f9bc60" }}>
             {" "}
             Каждая история — это пример того, как работает «Копилка»

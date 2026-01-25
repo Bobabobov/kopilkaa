@@ -32,7 +32,10 @@ export default function HeroesLoading() {
             <div className="h-7 w-44 rounded-xl bg-white/10 mb-5" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5">
+                <div
+                  key={i}
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5"
+                >
                   <div className="h-4 w-24 rounded bg-white/10 mb-2" />
                   <div className="h-7 w-28 rounded bg-white/10" />
                 </div>
@@ -47,7 +50,10 @@ export default function HeroesLoading() {
             <div className="h-12 rounded-2xl bg-white/8" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <div
+                  key={i}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-5"
+                >
                   <div className="h-5 w-20 rounded bg-white/10 mb-3" />
                   <div className="flex gap-3 items-center mb-4">
                     <div className="w-14 h-14 rounded-full bg-white/10" />

@@ -10,7 +10,11 @@ interface CoverStyleParams {
  * Возвращает inline-стиль для обложки профиля с учётом темы, фоновой картинки
  * и запасного градиента.
  */
-export function useCoverStyle({ theme, headerBackground, backgroundColor }: CoverStyleParams) {
+export function useCoverStyle({
+  theme,
+  headerBackground,
+  backgroundColor,
+}: CoverStyleParams) {
   return useMemo(() => {
     const fallbackGradient =
       "radial-gradient(120% 100% at 15% 20%, rgba(255,255,255,0.12), transparent 45%), radial-gradient(90% 80% at 80% 10%, rgba(30,209,177,0.25), transparent 40%), linear-gradient(135deg, #1fe0ba 0%, #11aa92 45%, #0a4c43 100%)";
@@ -47,5 +51,11 @@ export function useCoverStyle({ theme, headerBackground, backgroundColor }: Cove
       backgroundSize: "cover",
       backgroundPosition: "center",
     } as React.CSSProperties;
-  }, [headerBackground, theme.background, (theme as any).image, (theme as any).gradient, backgroundColor]);
+  }, [
+    headerBackground,
+    theme.background,
+    (theme as any).image,
+    (theme as any).gradient,
+    backgroundColor,
+  ]);
 }

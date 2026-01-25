@@ -72,7 +72,9 @@ export async function GET(
       userLiked,
       likes: likes.map((like) => ({
         id: like.id,
-        user: like.user ? sanitizeEmailForViewer(like.user, session?.uid || "") : like.user,
+        user: like.user
+          ? sanitizeEmailForViewer(like.user, session?.uid || "")
+          : like.user,
         createdAt: like.createdAt,
       })),
     });

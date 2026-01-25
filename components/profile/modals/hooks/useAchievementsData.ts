@@ -32,7 +32,9 @@ interface AchievementStats {
 
 export function useAchievementsData(isOpen: boolean) {
   const [achievements, setAchievements] = useState<AchievementData[]>([]);
-  const [allAchievements, setAllAchievements] = useState<AchievementProgress[]>([]);
+  const [allAchievements, setAllAchievements] = useState<AchievementProgress[]>(
+    [],
+  );
   const [stats, setStats] = useState<AchievementStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -9,7 +9,11 @@ interface AchievementsHeaderProps {
   onClose: () => void;
 }
 
-export function AchievementsHeader({ count, stats, onClose }: AchievementsHeaderProps) {
+export function AchievementsHeader({
+  count,
+  stats,
+  onClose,
+}: AchievementsHeaderProps) {
   return (
     <div className="p-6 border-b border-[#abd1c6]/20 flex-shrink-0">
       <div className="flex items-center justify-between">
@@ -18,13 +22,20 @@ export function AchievementsHeader({ count, stats, onClose }: AchievementsHeader
             <LucideIcons.Trophy size="lg" className="text-[#001e1d]" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-[#fffffe]">Все достижения</h2>
+            <h2 className="text-2xl font-bold text-[#fffffe]">
+              Все достижения
+            </h2>
             <p className="text-[#abd1c6]">
               {count}{" "}
-              {count === 1 ? "достижение" : count < 5 ? "достижения" : "достижений"}
+              {count === 1
+                ? "достижение"
+                : count < 5
+                  ? "достижения"
+                  : "достижений"}
               {stats && (
                 <span className="ml-2">
-                  • {stats.unlockedAchievements} из {stats.totalAchievements} получено
+                  • {stats.unlockedAchievements} из {stats.totalAchievements}{" "}
+                  получено
                 </span>
               )}
             </p>

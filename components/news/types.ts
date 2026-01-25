@@ -27,6 +27,3 @@ export type NewsItem = {
   media: NewsMedia[];
   myReaction: "LIKE" | "DISLIKE" | null;
 };
-
-
-

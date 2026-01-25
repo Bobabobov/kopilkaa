@@ -7,7 +7,12 @@ interface DeleteModalProps {
   onConfirm: () => void;
 }
 
-export function DeleteModal({ id, title, onClose, onConfirm }: DeleteModalProps) {
+export function DeleteModal({
+  id,
+  title,
+  onClose,
+  onConfirm,
+}: DeleteModalProps) {
   if (!id) return null;
 
   return (
@@ -21,9 +26,7 @@ export function DeleteModal({ id, title, onClose, onConfirm }: DeleteModalProps)
           <p className="text-gray-600 dark:text-gray-400 mb-2">
             Вы уверены, что хотите удалить заявку
           </p>
-          <p className="text-sm text-red-500 font-medium mb-8">
-            "{title}"?
-          </p>
+          <p className="text-sm text-red-500 font-medium mb-8">"{title}"?</p>
           <div className="flex gap-4 justify-center">
             <button
               onClick={onClose}
@@ -39,8 +42,7 @@ export function DeleteModal({ id, title, onClose, onConfirm }: DeleteModalProps)
               onClick={onConfirm}
               className="px-6 py-3 text-white rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
               style={{
-                background:
-                  "linear-gradient(135deg, #e16162 0%, #d63384 100%)",
+                background: "linear-gradient(135deg, #e16162 0%, #d63384 100%)",
               }}
             >
               Удалить
@@ -51,5 +53,3 @@ export function DeleteModal({ id, title, onClose, onConfirm }: DeleteModalProps)
     </div>
   );
 }
-
-

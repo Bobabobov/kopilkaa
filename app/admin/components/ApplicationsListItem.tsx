@@ -88,5 +88,3 @@ export default function ApplicationsListItem({
     </motion.div>
   );
 }
-
-

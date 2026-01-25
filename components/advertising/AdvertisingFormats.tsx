@@ -41,7 +41,9 @@ export function AdvertisingFormats() {
     <section id="formats" className="py-24 px-4 border-t border-[#abd1c6]/10">
       <div className="container mx-auto max-w-6xl">
         <div className="mb-16">
-          <h2 className="text-5xl font-bold text-[#fffffe] mb-4">Форматы размещения</h2>
+          <h2 className="text-5xl font-bold text-[#fffffe] mb-4">
+            Форматы размещения
+          </h2>
           <p className="text-xl text-[#abd1c6]">
             4 варианта под разные задачи. Цена — договорная, поможем выбрать.
           </p>
@@ -49,7 +51,7 @@ export function AdvertisingFormats() {
 
         <div className="grid md:grid-cols-2 gap-6">
           {formats.map((format) => (
-            <div 
+            <div
               key={format.id}
               className="border-2 border-[#abd1c6]/20 p-8 hover:border-[#f9bc60] transition-colors group"
             >
@@ -61,14 +63,20 @@ export function AdvertisingFormats() {
                   <p className="text-[#abd1c6]">{format.why}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-[#f9bc60]">{format.price}</div>
-                  <div className="text-[#abd1c6] text-sm">Срок: {format.time}</div>
+                  <div className="text-3xl font-bold text-[#f9bc60]">
+                    {format.price}
+                  </div>
+                  <div className="text-[#abd1c6] text-sm">
+                    Срок: {format.time}
+                  </div>
                 </div>
               </div>
 
               <div className="border-t border-[#abd1c6]/10 pt-4">
-                <div className="text-[#abd1c6] text-sm mb-4">{format.reality}</div>
-                <a 
+                <div className="text-[#abd1c6] text-sm mb-4">
+                  {format.reality}
+                </div>
+                <a
                   href="#contact"
                   className="inline-block bg-[#004643] text-[#fffffe] px-6 py-3 hover:bg-[#f9bc60] hover:text-[#001e1d] transition-colors font-medium"
                 >
@@ -84,11 +92,14 @@ export function AdvertisingFormats() {
           <div className="flex items-start gap-4">
             <div className="text-4xl">💡</div>
             <div>
-              <div className="text-xl font-bold text-[#fffffe] mb-2">Не знаете, что выбрать?</div>
+              <div className="text-xl font-bold text-[#fffffe] mb-2">
+                Не знаете, что выбрать?
+              </div>
               <p className="text-[#abd1c6] mb-4">
-                Напишите нам, расскажите о вашем бизнесе. Мы подскажем, какой формат даст максимум отдачи.
+                Напишите нам, расскажите о вашем бизнесе. Мы подскажем, какой
+                формат даст максимум отдачи.
               </p>
-              <a 
+              <a
                 href="#contact"
                 className="inline-block text-[#f9bc60] hover:underline font-medium"
               >

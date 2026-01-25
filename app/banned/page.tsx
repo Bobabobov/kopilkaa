@@ -79,7 +79,9 @@ export default function BannedPage() {
             {/* Причина */}
             {banInfo.reason && (
               <div className="mb-6 p-4 bg-red-500/10 rounded-xl border border-red-500/30">
-                <p className="text-sm font-semibold text-red-300 mb-2">Причина блокировки:</p>
+                <p className="text-sm font-semibold text-red-300 mb-2">
+                  Причина блокировки:
+                </p>
                 <p className="text-base text-[#abd1c6]">{banInfo.reason}</p>
               </div>
             )}
@@ -88,7 +90,8 @@ export default function BannedPage() {
             <div className="mb-8 text-center">
               {banInfo.isPermanent ? (
                 <p className="text-lg text-[#abd1c6]">
-                  Ваш аккаунт заблокирован <span className="font-semibold text-red-400">навсегда</span>.
+                  Ваш аккаунт заблокирован{" "}
+                  <span className="font-semibold text-red-400">навсегда</span>.
                 </p>
               ) : bannedUntil ? (
                 <div className="space-y-2">
@@ -109,7 +112,8 @@ export default function BannedPage() {
                     })}
                   </p>
                   <p className="text-sm text-[#abd1c6] mt-4">
-                    После истечения срока блокировки доступ будет автоматически восстановлен.
+                    После истечения срока блокировки доступ будет автоматически
+                    восстановлен.
                   </p>
                 </div>
               ) : null}
@@ -118,7 +122,8 @@ export default function BannedPage() {
             {/* Дополнительная информация */}
             <div className="bg-[#001e1d]/40 rounded-xl p-4 border border-[#abd1c6]/20">
               <p className="text-sm text-[#abd1c6] text-center">
-                Если вы считаете, что блокировка была применена по ошибке, обратитесь к администратору.
+                Если вы считаете, что блокировка была применена по ошибке,
+                обратитесь к администратору.
               </p>
             </div>
 
@@ -150,5 +155,3 @@ export default function BannedPage() {
     </div>
   );
 }
-
-

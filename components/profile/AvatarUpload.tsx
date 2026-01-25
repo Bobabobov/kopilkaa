@@ -76,7 +76,6 @@ export default function AvatarUpload({
           "Аватарка загружена!",
           "Ваша аватарка успешно обновлена",
         );
-        
       } else {
         console.error("Upload failed:", data);
         showToast(
@@ -107,7 +106,6 @@ export default function AvatarUpload({
         onAvatarChange(null);
         setPreview(null);
         showToast("success", "Аватарка удалена", "Аватарка успешно удалена");
-        
       } else {
         showToast(
           "error",
@@ -129,7 +127,7 @@ export default function AvatarUpload({
 
   return (
     <>
-      <motion.div 
+      <motion.div
         className="relative inline-block group z-[20]"
         whileHover={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 300 }}
@@ -147,7 +145,7 @@ export default function AvatarUpload({
           >
             {/* Декоративное свечение */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/20 via-transparent to-[#abd1c6]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
-            
+
             {displayAvatar ? (
               <motion.img
                 src={displayAvatar}
@@ -178,7 +176,6 @@ export default function AvatarUpload({
             </div>
           )}
         </div>
-
 
         {/* Скрытый input */}
         <input

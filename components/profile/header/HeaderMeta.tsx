@@ -8,7 +8,13 @@ interface HeaderMetaProps {
   activityText: string;
 }
 
-export function HeaderMeta({ isOwner, emailText, createdText, showActivity, activityText }: HeaderMetaProps) {
+export function HeaderMeta({
+  isOwner,
+  emailText,
+  createdText,
+  showActivity,
+  activityText,
+}: HeaderMetaProps) {
   return (
     <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm text-white/80 mb-4">
       {isOwner && (

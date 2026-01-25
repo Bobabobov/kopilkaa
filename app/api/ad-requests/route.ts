@@ -5,13 +5,24 @@ import { getSession } from "@/lib/auth";
 // POST - создание новой заявки на рекламу (публичный)
 export async function POST(request: NextRequest) {
   try {
-    const { companyName, email, telegram, website, format, duration, bannerUrl, imageUrls, mobileBannerUrls, comment } = await request.json();
+    const {
+      companyName,
+      email,
+      telegram,
+      website,
+      format,
+      duration,
+      bannerUrl,
+      imageUrls,
+      mobileBannerUrls,
+      comment,
+    } = await request.json();
 
     // Валидация обязательных полей
     if (!companyName || !email || !format || !duration || !comment) {
       return NextResponse.json(
         { error: "Заполните все обязательные поля" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -20,7 +31,7 @@ export async function POST(request: NextRequest) {
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         { error: "Некорректный email адрес" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -28,7 +39,7 @@ export async function POST(request: NextRequest) {
     if (duration < 1 || duration > 365) {
       return NextResponse.json(
         { error: "Срок должен быть от 1 до 365 дней" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -36,14 +47,18 @@ export async function POST(request: NextRequest) {
     if (imageUrls && Array.isArray(imageUrls) && imageUrls.length > 5) {
       return NextResponse.json(
         { error: "Можно загрузить до 5 изображений" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    if (mobileBannerUrls && Array.isArray(mobileBannerUrls) && mobileBannerUrls.length > 5) {
+    if (
+      mobileBannerUrls &&
+      Array.isArray(mobileBannerUrls) &&
+      mobileBannerUrls.length > 5
+    ) {
       return NextResponse.json(
         { error: "Можно загрузить до 5 мобильных баннеров" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -52,13 +67,13 @@ export async function POST(request: NextRequest) {
     if (!commentTrimmed) {
       return NextResponse.json(
         { error: "Поле 'Что-то ещё?' обязательно для заполнения" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     if (commentTrimmed.length > 400) {
       return NextResponse.json(
         { error: "Комментарий не должен превышать 400 символов" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -72,23 +87,34 @@ export async function POST(request: NextRequest) {
         format,
         duration,
         bannerUrl: bannerUrl || null, // Для обратной совместимости
-        imageUrls: imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0 ? imageUrls : undefined,
-        mobileBannerUrls: mobileBannerUrls && Array.isArray(mobileBannerUrls) && mobileBannerUrls.length > 0 ? mobileBannerUrls : undefined,
+        imageUrls:
+          imageUrls && Array.isArray(imageUrls) && imageUrls.length > 0
+            ? imageUrls
+            : undefined,
+        mobileBannerUrls:
+          mobileBannerUrls &&
+          Array.isArray(mobileBannerUrls) &&
+          mobileBannerUrls.length > 0
+            ? mobileBannerUrls
+            : undefined,
         comment: commentTrimmed,
         status: "new",
       },
     });
 
-    return NextResponse.json({ 
-      success: true,
-      message: "Спасибо! Мы свяжемся с вами в ближайшее время.",
-      adRequest 
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Спасибо! Мы свяжемся с вами в ближайшее время.",
+        adRequest,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("Error creating ad request:", error);
     return NextResponse.json(
       { error: "Не удалось отправить заявку" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -116,7 +142,9 @@ export async function GET(request: NextRequest) {
     const stats = {
       total: await prisma.adRequest.count(),
       new: await prisma.adRequest.count({ where: { status: "new" } }),
-      processing: await prisma.adRequest.count({ where: { status: "processing" } }),
+      processing: await prisma.adRequest.count({
+        where: { status: "processing" },
+      }),
       approved: await prisma.adRequest.count({ where: { status: "approved" } }),
       rejected: await prisma.adRequest.count({ where: { status: "rejected" } }),
     };
@@ -126,8 +154,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching ad requests:", error);
     return NextResponse.json(
       { error: "Не удалось загрузить заявки" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

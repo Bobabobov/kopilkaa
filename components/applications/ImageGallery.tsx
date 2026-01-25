@@ -12,7 +12,6 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
 
-
   useEffect(() => {
     setMounted(true);
   }, []);

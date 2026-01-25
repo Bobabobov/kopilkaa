@@ -62,7 +62,9 @@ class ProfilePreloader {
         // Если новый API недоступен, используем fallback
         if (response.status === 404 || response.status === 500) {
           if (process.env.NODE_ENV !== "production") {
-            console.warn("Dashboard API not available for preload, using fallback");
+            console.warn(
+              "Dashboard API not available for preload, using fallback",
+            );
           }
           return this.fetchProfileDataFallback();
         }
@@ -127,14 +129,16 @@ class ProfilePreloader {
     this.boundListener = (e: Event) => {
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      const link = target.closest?.('a[href="/profile"], a[href^="/profile/"]') as
-        | HTMLAnchorElement
-        | null;
+      const link = target.closest?.(
+        'a[href="/profile"], a[href^="/profile/"]',
+      ) as HTMLAnchorElement | null;
       if (!link) return;
       this.preloadProfileData();
     };
 
-    document.addEventListener("mouseover", this.boundListener, { passive: true });
+    document.addEventListener("mouseover", this.boundListener, {
+      passive: true,
+    });
     document.addEventListener("focusin", this.boundListener);
   }
 
@@ -172,7 +176,7 @@ export function setupProfilePreloading(): void {
 
   // Настраиваем предзагрузку ссылок
   profilePreloader.setupLinkPreloading();
-  
+
   // Предзагружаем критические ресурсы
   profilePreloader.preloadCriticalResources();
 

@@ -37,12 +37,17 @@ interface StoryCardProps {
 }
 
 // Карточка истории в списке /stories с картинкой, автором и лайками
-export function StoryCard({ story, index, animate = true, isAuthenticated }: StoryCardProps) {
+export function StoryCard({
+  story,
+  index,
+  animate = true,
+  isAuthenticated,
+}: StoryCardProps) {
   const router = useRouter();
   const [liked, setLiked] = useState(!!story.userLiked);
   const [likesCount, setLikesCount] = useState(story._count?.likes || 0);
   const [isLiking, setIsLiking] = useState(false);
-  
+
   const authorName =
     story.user?.name ||
     (story.user?.email ? story.user.email.split("@")[0] : null) ||
@@ -76,7 +81,7 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
           pathname: window.location.pathname,
           search: window.location.search,
           modal: "auth/signup",
-        })
+        }),
       );
       return;
     }
@@ -98,7 +103,7 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
               pathname: window.location.pathname,
               search: window.location.search,
               modal: "auth/signup",
-            })
+            }),
           );
           return;
         }
@@ -135,7 +140,7 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
     >
       {/* Декоративный градиент при hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/0 via-[#f9bc60]/0 to-[#f9bc60]/0 group-hover:from-[#f9bc60]/5 group-hover:via-[#f9bc60]/10 group-hover:to-[#f9bc60]/5 transition-all duration-700 rounded-3xl pointer-events-none"></div>
-      
+
       {/* Изображение */}
       <div className="relative mb-5 rounded-t-3xl overflow-hidden flex-shrink-0 shadow-xl group-hover:shadow-2xl transition-all duration-700">
         <div className="relative w-full h-56 overflow-hidden">
@@ -150,17 +155,20 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
           />
           {/* Градиентный overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/40 group-hover:via-black/10 transition-all duration-700"></div>
-          
+
           {/* Акцентная полоса снизу */}
           <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-[#f9bc60] via-[#e8a545] to-[#f9bc60] group-hover:h-3 transition-all duration-700 shadow-lg shadow-[#f9bc60]/50"></div>
-          
+
           {/* Блестящий эффект при hover */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/0 to-white/0 group-hover:from-white/0 group-hover:via-white/20 group-hover:to-white/0 transition-all duration-1000 opacity-0 group-hover:opacity-100"></div>
-          
+
           {/* Счетчик лайков поверх изображения - только если есть лайки */}
           {likesCount > 0 && (
             <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-black/60 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/20 shadow-lg group-hover:bg-black/80 group-hover:scale-110 transition-all duration-300">
-              <LucideIcons.Heart size="xs" className={`${liked ? "fill-red-400" : ""} text-red-400`} />
+              <LucideIcons.Heart
+                size="xs"
+                className={`${liked ? "fill-red-400" : ""} text-red-400`}
+              />
               <span className="text-white text-xs font-bold">{likesCount}</span>
             </div>
           )}
@@ -173,9 +181,9 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
         <div className="mb-3">
           <h3
             className="text-lg sm:text-xl md:text-2xl font-black leading-tight line-clamp-2 break-words overflow-hidden transition-all duration-500 group-hover:text-[#004643]"
-            style={{ 
+            style={{
               color: "#001e1d",
-              textShadow: "0 2px 4px rgba(0,0,0,0.08)"
+              textShadow: "0 2px 4px rgba(0,0,0,0.08)",
             }}
           >
             {story.title}
@@ -248,7 +256,7 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
                 )}
               </div>
             )}
-            
+
             <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 hover:border-[#f9bc60]/60 hover:from-[#abd1c6]/30 hover:to-[#94c4b8]/30 transition-all duration-300 hover:shadow-md hover:scale-[1.02] flex-shrink-0">
               <LucideIcons.Clock size="sm" className="text-[#004643]" />
               <span className="text-sm font-bold text-[#001e1d]">
@@ -272,10 +280,19 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
                   ? "from-red-50/90 to-pink-50/90 border-[#e16162]/60 shadow-md shadow-red-200/30"
                   : "from-white/40 to-white/30 border-[#abd1c6]/40 hover:border-[#e16162]/60 hover:from-red-50/50 hover:to-pink-50/50"
               }`}
-              title={isAuthenticated === false ? "Войдите в систему, чтобы ставить лайки" : liked ? "Убрать лайк" : "Поставить лайк"}
+              title={
+                isAuthenticated === false
+                  ? "Войдите в систему, чтобы ставить лайки"
+                  : liked
+                    ? "Убрать лайк"
+                    : "Поставить лайк"
+              }
             >
               {isLiking ? (
-                <LucideIcons.Loader2 size="sm" className="text-[#e16162] animate-spin" />
+                <LucideIcons.Loader2
+                  size="sm"
+                  className="text-[#e16162] animate-spin"
+                />
               ) : (
                 <LucideIcons.Heart
                   size="sm"
@@ -286,9 +303,11 @@ export function StoryCard({ story, index, animate = true, isAuthenticated }: Sto
                   }`}
                 />
               )}
-              <span className={`text-sm font-bold transition-colors duration-300 ${
-                liked ? "text-[#e16162]" : "text-[#e16162]"
-              }`}>
+              <span
+                className={`text-sm font-bold transition-colors duration-300 ${
+                  liked ? "text-[#e16162]" : "text-[#e16162]"
+                }`}
+              >
                 {likesCount}
               </span>
             </button>

@@ -19,10 +19,10 @@ export function useProfileUrlParams() {
 
     const params = new URLSearchParams(searchParams.toString());
     params.delete("friendsTab");
-    const nextUrl = params.toString() ? `/profile?${params.toString()}` : "/profile";
+    const nextUrl = params.toString()
+      ? `/profile?${params.toString()}`
+      : "/profile";
     router.replace(nextUrl, { scroll: true });
     router.push(`/friends?tab=${tab}`);
   }, [searchParams, router]);
 }
-
-

@@ -6,7 +6,10 @@ import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_req: NextRequest, { params }: { params: { userId: string } }) {
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: { userId: string } },
+) {
   try {
     const session = await getSession();
     const viewerId = session?.uid || null;
@@ -48,30 +51,38 @@ export async function GET(_req: NextRequest, { params }: { params: { userId: str
     // Проверяем, какие истории лайкнул текущий пользователь
     let likedSet: Set<string> | null = null;
     if (viewerId && stories.length) {
-      const likes = await prisma.storyLike.findMany({
-        where: {
-          userId: viewerId,
-          applicationId: { in: stories.map((s) => s.id) },
-        },
-        select: { applicationId: true },
-      }).catch(() => []);
+      const likes = await prisma.storyLike
+        .findMany({
+          where: {
+            userId: viewerId,
+            applicationId: { in: stories.map((s) => s.id) },
+          },
+          select: { applicationId: true },
+        })
+        .catch(() => []);
       likedSet = new Set(likes.map((l) => l.applicationId));
     }
 
     // Санитизируем email
     const safeStories = stories.map((story) => ({
       ...story,
-      user: story.user ? sanitizeEmailForViewer(story.user, viewerId || "") : story.user,
+      user: story.user
+        ? sanitizeEmailForViewer(story.user, viewerId || "")
+        : story.user,
       userLiked: likedSet ? likedSet.has(story.id) : false,
     }));
 
     // Добавляем бейджи
-    const userIds = safeStories.map((s) => s.user?.id).filter(Boolean) as string[];
+    const userIds = safeStories
+      .map((s) => s.user?.id)
+      .filter(Boolean) as string[];
     const badgeMap = await getHeroBadgesForUsers(userIds);
 
     const withBadges = safeStories.map((story) => ({
       ...story,
-      user: story.user ? { ...story.user, heroBadge: badgeMap[story.user.id] ?? null } : story.user,
+      user: story.user
+        ? { ...story.user, heroBadge: badgeMap[story.user.id] ?? null }
+        : story.user,
     }));
 
     return NextResponse.json({ stories: withBadges });

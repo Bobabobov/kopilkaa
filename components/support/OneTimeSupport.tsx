@@ -35,7 +35,6 @@ export default function OneTimeSupport({
     [profile?.username],
   );
 
-
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -83,7 +82,8 @@ export default function OneTimeSupport({
         return;
       }
       const data = await res.json().catch(() => null);
-      const username = (data?.user?.username as string | null | undefined) ?? null;
+      const username =
+        (data?.user?.username as string | null | undefined) ?? null;
       setProfile({ username, isAuthed: true });
     } finally {
       setIsLoadingProfile(false);
@@ -150,13 +150,23 @@ export default function OneTimeSupport({
                     id="pre-support-desc"
                     className="mt-2 text-sm text-[#abd1c6] leading-relaxed"
                   >
-                    Поддержка помогает «Копилке» развиваться и продолжать работу.
+                    Поддержка помогает «Копилке» развиваться и продолжать
+                    работу.
                     <span className="block mt-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2">
                       Хотите, чтобы мы могли{" "}
-                      <span className="text-[#f9bc60] font-semibold">публично поблагодарить</span> вас
-                      в «Героях» — укажите свой логин в сообщении к поддержке. Сейчас это{" "}
-                      <span className="text-[#f9bc60] font-semibold">вручную</span>, скоро{" "}
-                      <span className="text-[#f9bc60] font-semibold">автоматически</span>.
+                      <span className="text-[#f9bc60] font-semibold">
+                        публично поблагодарить
+                      </span>{" "}
+                      вас в «Героях» — укажите свой логин в сообщении к
+                      поддержке. Сейчас это{" "}
+                      <span className="text-[#f9bc60] font-semibold">
+                        вручную
+                      </span>
+                      , скоро{" "}
+                      <span className="text-[#f9bc60] font-semibold">
+                        автоматически
+                      </span>
+                      .
                     </span>
                   </p>
                 </div>
@@ -173,154 +183,199 @@ export default function OneTimeSupport({
               <div className="p-5 sm:p-6 space-y-4">
                 {/* Auth / Heroes logic */}
                 {profile?.isAuthed === false ? (
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                    <LucideIcons.Info size="sm" className="text-[#abd1c6]" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-[#fffffe]">Можно поддержать прямо сейчас</div>
-                <p className="mt-2 text-sm text-[#abd1c6] leading-relaxed">
-                  Регистрация не обязательна. Но если поддержать{" "}
-                  <span className="text-[#f9bc60] font-semibold">без аккаунта</span>, мы{" "}
-                  <span className="text-[#f9bc60] font-semibold">не сможем</span> добавить вас в «Герои»
-                  (нам не к чему привязать поддержку).
-                </p>
-                  </div>
-                </div>
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5">
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                        <LucideIcons.Info
+                          size="sm"
+                          className="text-[#abd1c6]"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-[#fffffe]">
+                          Можно поддержать прямо сейчас
+                        </div>
+                        <p className="mt-2 text-sm text-[#abd1c6] leading-relaxed">
+                          Регистрация не обязательна. Но если поддержать{" "}
+                          <span className="text-[#f9bc60] font-semibold">
+                            без аккаунта
+                          </span>
+                          , мы{" "}
+                          <span className="text-[#f9bc60] font-semibold">
+                            не сможем
+                          </span>{" "}
+                          добавить вас в «Герои» (нам не к чему привязать
+                          поддержку).
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:items-stretch">
-                  <a
-                    href={dalinkUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={closePreSupport}
-                    className="group sm:flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d] text-sm font-black transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-lg shadow-[#f9bc60]/20 hover:shadow-xl hover:shadow-[#f9bc60]/25 hover:-translate-y-0.5 active:translate-y-0"
-                  >
-                    <LucideIcons.Heart size="sm" className="group-hover:scale-110 transition-transform" />
-                    💚 Поддержать проект
-                    <LucideIcons.ExternalLink size="sm" />
-                  </a>
+                    <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:items-stretch">
+                      <a
+                        href={dalinkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={closePreSupport}
+                        className="group sm:flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d] text-sm font-black transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-lg shadow-[#f9bc60]/20 hover:shadow-xl hover:shadow-[#f9bc60]/25 hover:-translate-y-0.5 active:translate-y-0"
+                      >
+                        <LucideIcons.Heart
+                          size="sm"
+                          className="group-hover:scale-110 transition-transform"
+                        />
+                        💚 Поддержать проект
+                        <LucideIcons.ExternalLink size="sm" />
+                      </a>
 
-                  <a
-                    href={buildAuthModalUrl({
-                      pathname: "/support",
-                      search: typeof window !== "undefined" ? window.location.search : "",
-                      modal: "auth/signup",
-                    })}
-                    className="sm:flex-1 px-4 py-3 rounded-2xl bg-transparent hover:bg-white/5 text-[#fffffe] text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 border border-white/15"
-                  >
-                    <LucideIcons.UserPlus size="sm" />
-                    Войти (для «Героев»)
-                  </a>
-                </div>
-              </div>
-            ) : profile?.isAuthed === true && profile.username ? (
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                    <LucideIcons.Star size="sm" className="text-[#f9bc60]" />
+                      <a
+                        href={buildAuthModalUrl({
+                          pathname: "/support",
+                          search:
+                            typeof window !== "undefined"
+                              ? window.location.search
+                              : "",
+                          modal: "auth/signup",
+                        })}
+                        className="sm:flex-1 px-4 py-3 rounded-2xl bg-transparent hover:bg-white/5 text-[#fffffe] text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 border border-white/15"
+                      >
+                        <LucideIcons.UserPlus size="sm" />
+                        Войти (для «Героев»)
+                      </a>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-[#fffffe]">Опционально: логин для «Героев»</div>
-                <p className="mt-2 text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
-                  Если вы хотите, чтобы мы могли поблагодарить вас публично, укажите этот логин в сообщении к поддержке
-                  (пока добавление в «Герои» — вручную).
-                </p>
-                  </div>
-                </div>
-                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
-                  <div className="flex-1 px-4 py-3 bg-[#001e1d]/30 rounded-2xl text-[#fffffe] border border-[#abd1c6]/15 break-all">
-                    {suggestedTag}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => copyText(suggestedTag)}
-                    className="px-4 py-3 bg-white/5 hover:bg-white/10 text-[#fffffe] text-sm font-semibold rounded-2xl transition-colors inline-flex items-center justify-center gap-2 border border-white/10"
-                  >
-                    <LucideIcons.Copy size="sm" />
-                    Скопировать логин
-                  </button>
-                </div>
+                ) : profile?.isAuthed === true && profile.username ? (
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5">
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                        <LucideIcons.Star
+                          size="sm"
+                          className="text-[#f9bc60]"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-[#fffffe]">
+                          Опционально: логин для «Героев»
+                        </div>
+                        <p className="mt-2 text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
+                          Если вы хотите, чтобы мы могли поблагодарить вас
+                          публично, укажите этот логин в сообщении к поддержке
+                          (пока добавление в «Герои» — вручную).
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
+                      <div className="flex-1 px-4 py-3 bg-[#001e1d]/30 rounded-2xl text-[#fffffe] border border-[#abd1c6]/15 break-all">
+                        {suggestedTag}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => copyText(suggestedTag)}
+                        className="px-4 py-3 bg-white/5 hover:bg-white/10 text-[#fffffe] text-sm font-semibold rounded-2xl transition-colors inline-flex items-center justify-center gap-2 border border-white/10"
+                      >
+                        <LucideIcons.Copy size="sm" />
+                        Скопировать логин
+                      </button>
+                    </div>
 
-                <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:items-stretch">
-                  <a
-                    href={dalinkUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={closePreSupport}
-                    className="group sm:flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d] text-sm font-black transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-lg shadow-[#f9bc60]/20 hover:shadow-xl hover:shadow-[#f9bc60]/25 hover:-translate-y-0.5 active:translate-y-0"
-                  >
-                    <LucideIcons.Heart size="sm" className="group-hover:scale-110 transition-transform" />
-                    💚 Поддержать проект
-                    <LucideIcons.ExternalLink size="sm" />
-                  </a>
-                  <a
-                    href={dalinkUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={closePreSupport}
-                    className="sm:flex-1 px-4 py-3 rounded-2xl bg-transparent hover:bg-white/5 text-[#fffffe] text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 border border-white/15"
-                  >
-                    Поддержать без упоминания
-                  </a>
-                </div>
-              </div>
-            ) : profile?.isAuthed === true ? (
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                    <LucideIcons.Heart size="sm" className="text-[#abd1c6]" />
+                    <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:items-stretch">
+                      <a
+                        href={dalinkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={closePreSupport}
+                        className="group sm:flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d] text-sm font-black transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-lg shadow-[#f9bc60]/20 hover:shadow-xl hover:shadow-[#f9bc60]/25 hover:-translate-y-0.5 active:translate-y-0"
+                      >
+                        <LucideIcons.Heart
+                          size="sm"
+                          className="group-hover:scale-110 transition-transform"
+                        />
+                        💚 Поддержать проект
+                        <LucideIcons.ExternalLink size="sm" />
+                      </a>
+                      <a
+                        href={dalinkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={closePreSupport}
+                        className="sm:flex-1 px-4 py-3 rounded-2xl bg-transparent hover:bg-white/5 text-[#fffffe] text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 border border-white/15"
+                      >
+                        Поддержать без упоминания
+                      </a>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-[#fffffe]">Поддержать можно и без логина</div>
-                <p className="mt-2 text-sm text-[#abd1c6] leading-relaxed">
-                  Если хотите попасть в «Герои», задайте логин в профиле (ссылка будет вида{" "}
-                  <span className="text-[#f9bc60] font-semibold">/profile/@логин</span>). Это необязательно.
-                </p>
+                ) : profile?.isAuthed === true ? (
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5">
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                        <LucideIcons.Heart
+                          size="sm"
+                          className="text-[#abd1c6]"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-[#fffffe]">
+                          Поддержать можно и без логина
+                        </div>
+                        <p className="mt-2 text-sm text-[#abd1c6] leading-relaxed">
+                          Если хотите попасть в «Герои», задайте логин в профиле
+                          (ссылка будет вида{" "}
+                          <span className="text-[#f9bc60] font-semibold">
+                            /profile/@логин
+                          </span>
+                          ). Это необязательно.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:items-stretch">
+                      <a
+                        href={dalinkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={closePreSupport}
+                        className="group sm:flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d] text-sm font-black transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-lg shadow-[#f9bc60]/20 hover:shadow-xl hover:shadow-[#f9bc60]/25 hover:-translate-y-0.5 active:translate-y-0"
+                      >
+                        <LucideIcons.Heart
+                          size="sm"
+                          className="group-hover:scale-110 transition-transform"
+                        />
+                        💚 Поддержать проект
+                        <LucideIcons.ExternalLink size="sm" />
+                      </a>
+                      <a
+                        href="/profile?settings=username"
+                        className="sm:flex-1 px-4 py-3 rounded-2xl bg-transparent hover:bg-white/5 text-[#fffffe] text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 border border-white/15"
+                      >
+                        <LucideIcons.Settings size="sm" />
+                        Задать логин (для «Героев»)
+                      </a>
+                    </div>
                   </div>
-                </div>
-                <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:items-stretch">
-                  <a
-                    href={dalinkUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={closePreSupport}
-                    className="group sm:flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d] text-sm font-black transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-lg shadow-[#f9bc60]/20 hover:shadow-xl hover:shadow-[#f9bc60]/25 hover:-translate-y-0.5 active:translate-y-0"
-                  >
-                    <LucideIcons.Heart size="sm" className="group-hover:scale-110 transition-transform" />
-                    💚 Поддержать проект
-                    <LucideIcons.ExternalLink size="sm" />
-                  </a>
-                  <a
-                    href="/profile?settings=username"
-                    className="sm:flex-1 px-4 py-3 rounded-2xl bg-transparent hover:bg-white/5 text-[#fffffe] text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 border border-white/15"
-                  >
-                    <LucideIcons.Settings size="sm" />
-                    Задать логин (для «Героев»)
-                  </a>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5">
-                <div className="text-sm font-semibold text-[#fffffe]">Проверяем статус аккаунта…</div>
-                <p className="mt-2 text-sm text-[#abd1c6]">
-                  Если вы не авторизованы, можно поддержать проект без регистрации — но тогда мы не сможем добавить вас в «Герои».
-                </p>
-                <div className="mt-4">
-                  <a
-                    href={dalinkUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={closePreSupport}
-                    className="group px-4 py-3 rounded-2xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d] text-sm font-black transition-all duration-200 inline-flex items-center justify-center gap-2 w-full shadow-lg shadow-[#f9bc60]/20 hover:shadow-xl hover:shadow-[#f9bc60]/25 hover:-translate-y-0.5 active:translate-y-0"
-                  >
-                    <LucideIcons.Heart size="sm" className="group-hover:scale-110 transition-transform" />
-                    💚 Поддержать проект
-                    <LucideIcons.ExternalLink size="sm" />
-                  </a>
-                </div>
-              </div>
+                ) : (
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-5">
+                    <div className="text-sm font-semibold text-[#fffffe]">
+                      Проверяем статус аккаунта…
+                    </div>
+                    <p className="mt-2 text-sm text-[#abd1c6]">
+                      Если вы не авторизованы, можно поддержать проект без
+                      регистрации — но тогда мы не сможем добавить вас в
+                      «Герои».
+                    </p>
+                    <div className="mt-4">
+                      <a
+                        href={dalinkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={closePreSupport}
+                        className="group px-4 py-3 rounded-2xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d] text-sm font-black transition-all duration-200 inline-flex items-center justify-center gap-2 w-full shadow-lg shadow-[#f9bc60]/20 hover:shadow-xl hover:shadow-[#f9bc60]/25 hover:-translate-y-0.5 active:translate-y-0"
+                      >
+                        <LucideIcons.Heart
+                          size="sm"
+                          className="group-hover:scale-110 transition-transform"
+                        />
+                        💚 Поддержать проект
+                        <LucideIcons.ExternalLink size="sm" />
+                      </a>
+                    </div>
+                  </div>
                 )}
 
                 {/* actions are inside the blocks above */}
@@ -328,7 +383,8 @@ export default function OneTimeSupport({
 
               <div className="px-5 sm:px-6 pb-5 sm:pb-6">
                 <div className="text-[11px] text-[#abd1c6]/80 leading-relaxed">
-                  Поддержка добровольная и не является покупкой услуги, инвестицией или подпиской.
+                  Поддержка добровольная и не является покупкой услуги,
+                  инвестицией или подпиской.
                 </div>
               </div>
             </div>
@@ -350,20 +406,33 @@ export default function OneTimeSupport({
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f9bc60]/10 border border-[#f9bc60]/30 mb-3">
             <LucideIcons.Trophy className="w-4 h-4 text-[#f9bc60]" />
-            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#e16162" }}>
+            <span
+              className="text-xs font-semibold uppercase tracking-wider"
+              style={{ color: "#e16162" }}
+            >
               Добровольная поддержка
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-2 sm:mb-3" style={{ color: "#fffffe" }}>
+          <h2
+            className="text-2xl sm:text-3xl font-semibold mb-2 sm:mb-3"
+            style={{ color: "#fffffe" }}
+          >
             Выберите сумму поддержки проекта
           </h2>
-          <p className="text-sm sm:text-base max-w-xl mx-auto px-2 leading-relaxed" style={{ color: "#abd1c6" }}>
-            Любая сумма — это вклад в развитие платформы и помощь тем, кому она действительно нужна.
+          <p
+            className="text-sm sm:text-base max-w-xl mx-auto px-2 leading-relaxed"
+            style={{ color: "#abd1c6" }}
+          >
+            Любая сумма — это вклад в развитие платформы и помощь тем, кому она
+            действительно нужна.
           </p>
         </motion.div>
 
         <div className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/15 rounded-xl sm:rounded-2xl p-5 sm:p-6">
-          <h3 className="text-lg sm:text-xl font-semibold mb-5 sm:mb-6 text-center" style={{ color: "#abd1c6" }}>
+          <h3
+            className="text-lg sm:text-xl font-semibold mb-5 sm:mb-6 text-center"
+            style={{ color: "#abd1c6" }}
+          >
             Выберите сумму поддержки
           </h3>
 
@@ -376,10 +445,14 @@ export default function OneTimeSupport({
                     Поддержать проект
                   </div>
                   <div className="mt-1 text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
-                    Нажмите кнопку или отсканируйте QR‑код — откроется страница поддержки.
+                    Нажмите кнопку или отсканируйте QR‑код — откроется страница
+                    поддержки.
                     {hasAmount ? (
                       <span className="block mt-1">
-                        Вы выбрали: <span className="text-[#f9bc60] font-semibold">₽{amountNumber.toLocaleString()}</span>
+                        Вы выбрали:{" "}
+                        <span className="text-[#f9bc60] font-semibold">
+                          ₽{amountNumber.toLocaleString()}
+                        </span>
                       </span>
                     ) : null}
                   </div>
@@ -417,7 +490,9 @@ export default function OneTimeSupport({
           </div>
 
           {/* Pre-support modal */}
-          {mounted && isPreSupportOpen ? createPortal(renderPreSupportModal(), document.body) : null}
+          {mounted && isPreSupportOpen
+            ? createPortal(renderPreSupportModal(), document.body)
+            : null}
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5 sm:mb-6">
             {predefinedAmounts.map((amount, index) => {
@@ -434,7 +509,9 @@ export default function OneTimeSupport({
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onAmountChange(amount.toString())}
                   className={`py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-base transition-all duration-200 relative overflow-hidden ${
-                    isSelected ? "shadow-lg ring-2 ring-[#f9bc60]/50" : "hover:border-[#abd1c6]/40"
+                    isSelected
+                      ? "shadow-lg ring-2 ring-[#f9bc60]/50"
+                      : "hover:border-[#abd1c6]/40"
                   } ${isLarge ? "md:col-span-1" : ""}`}
                   style={{
                     backgroundColor: isSelected ? "#f9bc60" : "transparent",
@@ -446,7 +523,11 @@ export default function OneTimeSupport({
                     <motion.div
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
-                      transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 15,
+                      }}
                       className="absolute top-2 right-2"
                     >
                       <LucideIcons.CheckCircle className="w-4 h-4 text-[#001e1d]" />
@@ -457,7 +538,9 @@ export default function OneTimeSupport({
                       ₽{amount.toLocaleString()}
                     </div>
                     {isLarge && (
-                      <div className="text-xs opacity-70 font-normal mt-1">Вклад</div>
+                      <div className="text-xs opacity-70 font-normal mt-1">
+                        Вклад
+                      </div>
                     )}
                   </div>
                 </motion.button>
@@ -472,7 +555,10 @@ export default function OneTimeSupport({
               viewport={{ once: true }}
               transition={{ delay: 0.2, duration: 0.4 }}
             >
-              <label className="block text-sm sm:text-base font-medium mb-2.5" style={{ color: "#abd1c6" }}>
+              <label
+                className="block text-sm sm:text-base font-medium mb-2.5"
+                style={{ color: "#abd1c6" }}
+              >
                 Или введите свою сумму
               </label>
               <div className="relative">
@@ -484,7 +570,7 @@ export default function OneTimeSupport({
                   className="w-full bg-[#004643]/40 border border-[#abd1c6]/25 rounded-xl px-4 sm:px-5 py-3 text-base font-medium placeholder-[#abd1c6]/40 focus:border-[#e16162] focus:outline-none focus:ring-2 focus:ring-[#e16162]/50 transition-all duration-200"
                   style={{ color: "#fffffe" }}
                 />
-                <span 
+                <span
                   className="absolute right-4 sm:right-5 top-1/2 transform -translate-y-1/2 text-sm font-medium opacity-70"
                   style={{ color: "#abd1c6" }}
                 >
@@ -518,7 +604,8 @@ export default function OneTimeSupport({
                   Привяжите соцсети — они будут видны в «Героях проекта»
                 </p>
                 <p className="text-xs sm:text-sm text-[#ffd499] mt-1">
-                  VK, Telegram или YouTube будут отображаться рядом с вашим профилем в разделе «Герои проекта».
+                  VK, Telegram или YouTube будут отображаться рядом с вашим
+                  профилем в разделе «Герои проекта».
                 </p>
               </div>
               <div className="flex-shrink-0">

@@ -48,7 +48,10 @@ export async function computeUserTrustSnapshot(
   );
   const limits = getTrustLimits(trustLevel);
   const nextRequired = getNextLevelRequirement(trustLevel);
-  const progressCurrent = Math.max(0, Math.floor(effectiveApprovedApplications));
+  const progressCurrent = Math.max(
+    0,
+    Math.floor(effectiveApprovedApplications),
+  );
   const progressTotal = nextRequired ?? progressCurrent;
   const supportRangeText = `от ${limits.min.toLocaleString(
     "ru-RU",

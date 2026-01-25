@@ -65,9 +65,3 @@ export function Pagination({ page, pages, onPageChange }: PaginationProps) {
     </motion.div>
   );
 }
-
-
-
-
-
-

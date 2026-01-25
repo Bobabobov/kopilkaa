@@ -23,7 +23,7 @@ export default function ApplicationsModal({
 }: ApplicationsModalProps) {
   const [mounted, setMounted] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
-  
+
   // Автоскрытие скроллбаров
   useAutoHideScrollbar();
   const {
@@ -145,10 +145,12 @@ export default function ApplicationsModal({
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="rounded-3xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] mx-4 flex flex-col custom-scrollbar"
           style={{
-            border: '1px solid transparent',
-            background: 'linear-gradient(to right, #004643, #001e1d) border-box, linear-gradient(135deg, #004643, #001e1d) padding-box',
-            backgroundClip: 'border-box, padding-box',
-            boxShadow: '0 0 0 1px rgba(171, 209, 198, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+            border: "1px solid transparent",
+            background:
+              "linear-gradient(to right, #004643, #001e1d) border-box, linear-gradient(135deg, #004643, #001e1d) padding-box",
+            backgroundClip: "border-box, padding-box",
+            boxShadow:
+              "0 0 0 1px rgba(171, 209, 198, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.25)",
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -205,7 +207,9 @@ export default function ApplicationsModal({
                         : "ℹ️"}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold break-words">{localNotification.title}</div>
+                    <div className="font-bold break-words">
+                      {localNotification.title}
+                    </div>
                     <div
                       className="text-xs sm:text-sm break-words"
                       style={{ color: "#001e1d", opacity: 0.8 }}

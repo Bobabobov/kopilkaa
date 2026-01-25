@@ -10,7 +10,7 @@ export function getUploadDir(): string {
   if (process.env.UPLOAD_DIR) {
     return process.env.UPLOAD_DIR;
   }
-  
+
   // Иначе используем папку uploads в корне проекта
   return join(process.cwd(), "uploads");
 }
@@ -22,27 +22,3 @@ export function getUploadFilePath(filename: string): string {
   const uploadDir = getUploadDir();
   return join(uploadDir, filename);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

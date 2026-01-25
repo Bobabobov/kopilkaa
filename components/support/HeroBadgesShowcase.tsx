@@ -77,8 +77,8 @@ export default function HeroBadgesShowcase() {
             className="text-sm sm:text-base max-w-3xl mx-auto px-2"
             style={{ color: "#abd1c6" }}
           >
-            Бейджи — это визуальный знак благодарности за поддержку проекта. Они отображаются в профиле пользователя и в разделе
-            «Герои проекта».
+            Бейджи — это визуальный знак благодарности за поддержку проекта. Они
+            отображаются в профиле пользователя и в разделе «Герои проекта».
           </p>
         </motion.div>
 
@@ -95,7 +95,10 @@ export default function HeroBadgesShowcase() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="text-sm text-[#abd1c6]">
-                    от <span className="font-semibold text-[#f9bc60]">{t.minAmount} ₽</span>
+                    от{" "}
+                    <span className="font-semibold text-[#f9bc60]">
+                      {t.minAmount} ₽
+                    </span>
                   </div>
                   <div className="mt-1 text-lg sm:text-xl font-semibold text-[#fffffe] truncate">
                     {t.title}
@@ -103,7 +106,9 @@ export default function HeroBadgesShowcase() {
                 </div>
                 <HeroBadge badge={t.badge} size="md" />
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-[#abd1c6]">{t.description}</p>
+              <p className="mt-3 text-sm leading-relaxed text-[#abd1c6]">
+                {t.description}
+              </p>
             </motion.div>
           ))}
         </div>
@@ -114,15 +119,17 @@ export default function HeroBadgesShowcase() {
               Как получить бейдж
             </h4>
             <ul className="text-sm text-[#abd1c6] space-y-2 leading-relaxed">
+              <li>- Поддержите проект через форму выше.</li>
               <li>
-                - Поддержите проект через форму выше.
+                - Бейдж определяется по{" "}
+                <span className="text-[#f9bc60] font-semibold">
+                  максимальному разовому платежу
+                </span>
+                , а не по количеству платежей.
               </li>
               <li>
-                - Бейдж определяется по <span className="text-[#f9bc60] font-semibold">максимальному разовому платежу</span>, а не по
-                количеству платежей.
-              </li>
-              <li>
-                - После поддержки статус появится в профиле и в списках (может потребоваться обновление страницы).
+                - После поддержки статус появится в профиле и в списках (может
+                потребоваться обновление страницы).
               </li>
             </ul>
           </div>
@@ -132,8 +139,9 @@ export default function HeroBadgesShowcase() {
               Про “Особую благодарность”
             </h4>
             <p className="text-sm text-[#abd1c6] leading-relaxed">
-              Поддержка свыше 5000 ₽ может получить отдельный уникальный бейдж. Он назначается вручную
-              администрацией (например, по обращению), чтобы дизайн был действительно эксклюзивным.
+              Поддержка свыше 5000 ₽ может получить отдельный уникальный бейдж.
+              Он назначается вручную администрацией (например, по обращению),
+              чтобы дизайн был действительно эксклюзивным.
             </p>
           </div>
         </div>
@@ -141,6 +149,3 @@ export default function HeroBadgesShowcase() {
     </section>
   );
 }
-
-
-

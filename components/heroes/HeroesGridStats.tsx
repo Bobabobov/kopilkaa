@@ -16,7 +16,8 @@ interface HeroesGridStatsProps {
 }
 
 export default function HeroesGridStats({ stats }: HeroesGridStatsProps) {
-  const { totalHeroes, totalDonated, subscribersCount, averageDonation } = stats;
+  const { totalHeroes, totalDonated, subscribersCount, averageDonation } =
+    stats;
 
   const formatRub = (n: number) => {
     const s = new Intl.NumberFormat("ru-RU").format(Math.round(n || 0));
@@ -54,7 +55,9 @@ export default function HeroesGridStats({ stats }: HeroesGridStatsProps) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
       {statsData.map((stat) => {
-        const Icon = LucideIcons[stat.icon as keyof typeof LucideIcons] || LucideIcons.Star;
+        const Icon =
+          LucideIcons[stat.icon as keyof typeof LucideIcons] ||
+          LucideIcons.Star;
         return (
           <div
             key={stat.label}
@@ -62,7 +65,9 @@ export default function HeroesGridStats({ stats }: HeroesGridStatsProps) {
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <div className="text-xs sm:text-sm text-[#94a1b2] truncate">{stat.label}</div>
+                <div className="text-xs sm:text-sm text-[#94a1b2] truncate">
+                  {stat.label}
+                </div>
                 <div className="mt-1 text-lg sm:text-xl md:text-2xl font-bold text-[#fffffe] break-words">
                   <span style={{ color: stat.color }}>{stat.value}</span>
                 </div>

@@ -4,7 +4,7 @@ import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
@@ -34,44 +34,51 @@ export async function GET(req: Request) {
     const skip = (page - 1) * limit;
 
     const [items, total] = await Promise.all([
-      prisma.application.findMany({
-        where,
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          title: true,
-          summary: true,
-          createdAt: true,
-          images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              avatar: true,
-              avatarFrame: true,
-              headerTheme: true,
-              hideEmail: true,
+      prisma.application
+        .findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip,
+          take: limit,
+          select: {
+            id: true,
+            title: true,
+            summary: true,
+            createdAt: true,
+            images: {
+              orderBy: { sort: "asc" },
+              select: { url: true, sort: true },
             },
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                avatar: true,
+                avatarFrame: true,
+                headerTheme: true,
+                hideEmail: true,
+              },
+            },
+            _count: { select: { likes: true } },
           },
-          _count: { select: { likes: true } },
-        },
-      }).catch(() => []),
+        })
+        .catch(() => []),
       prisma.application.count({ where }).catch(() => 0),
     ]);
 
     // userLiked батчем (без N+1)
     let likedSet: Set<string> | null = null;
     if (viewerId && items.length) {
-      const likes = await prisma.storyLike.findMany({
-        where: {
-          userId: viewerId,
-          applicationId: { in: items.map((i: any) => i.id) },
-        },
-        select: { applicationId: true },
-      }).catch(() => []);
+      const likes = await prisma.storyLike
+        .findMany({
+          where: {
+            userId: viewerId,
+            applicationId: { in: items.map((i: any) => i.id) },
+          },
+          select: { applicationId: true },
+        })
+        .catch(() => []);
       likedSet = new Set(likes.map((l) => l.applicationId));
     }
 
@@ -81,12 +88,16 @@ export async function GET(req: Request) {
       userLiked: likedSet ? likedSet.has(it.id) : false,
     }));
 
-    const userIds = safeItems.map((it: any) => it.user?.id).filter(Boolean) as string[];
+    const userIds = safeItems
+      .map((it: any) => it.user?.id)
+      .filter(Boolean) as string[];
     const badgeMap = await getHeroBadgesForUsers(userIds);
 
     const withBadges = safeItems.map((it: any) => ({
       ...it,
-      user: it.user ? { ...(it.user as any), heroBadge: badgeMap[it.user.id] ?? null } : it.user,
+      user: it.user
+        ? { ...(it.user as any), heroBadge: badgeMap[it.user.id] ?? null }
+        : it.user,
     }));
 
     const responseData = {
@@ -106,18 +117,21 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("Error fetching stories:", error);
-    return new Response(JSON.stringify({
-      page: 1,
-      limit: 12,
-      total: 0,
-      pages: 0,
-      items: [],
-    }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "no-store",
+    return new Response(
+      JSON.stringify({
+        page: 1,
+        limit: 12,
+        total: 0,
+        pages: 0,
+        items: [],
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+        },
       },
-    });
+    );
   }
 }

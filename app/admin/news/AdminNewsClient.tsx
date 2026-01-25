@@ -56,7 +56,11 @@ export default function AdminNewsClient() {
       setItems(d.items || []);
     } catch (e: any) {
       setError(e?.message || "Ошибка загрузки");
-      showToastRef.current?.("error", "Ошибка", e?.message || "Ошибка загрузки");
+      showToastRef.current?.(
+        "error",
+        "Ошибка",
+        e?.message || "Ошибка загрузки",
+      );
     } finally {
       setLoading(false);
     }
@@ -95,11 +99,23 @@ export default function AdminNewsClient() {
     return (div.textContent || div.innerText || "").replace(/\s/g, "").length;
   }, []);
 
-  const contentTextLength = useMemo(() => getTextLength(content), [content, getTextLength]);
+  const contentTextLength = useMemo(
+    () => getTextLength(content),
+    [content, getTextLength],
+  );
 
-  const canSubmit = useMemo(() => contentTextLength > 0 && contentTextLength <= 5000 && !submitting && !uploading, [contentTextLength, submitting, uploading]);
+  const canSubmit = useMemo(
+    () =>
+      contentTextLength > 0 &&
+      contentTextLength <= 5000 &&
+      !submitting &&
+      !uploading,
+    [contentTextLength, submitting, uploading],
+  );
 
-  const uploadMedia = async (): Promise<{ url: string; type: "IMAGE" | "VIDEO"; sort: number }[]> => {
+  const uploadMedia = async (): Promise<
+    { url: string; type: "IMAGE" | "VIDEO"; sort: number }[]
+  > => {
     if (!media.length) return [];
     setUploading(true);
     try {
@@ -126,7 +142,11 @@ export default function AdminNewsClient() {
       return;
     }
     if (contentTextLength > 5000) {
-      showToast("error", "Ошибка", "Слишком длинный текст (макс. 5000 символов)");
+      showToast(
+        "error",
+        "Ошибка",
+        "Слишком длинный текст (макс. 5000 символов)",
+      );
       return;
     }
     if (title.trim().length > 120) {
@@ -140,12 +160,12 @@ export default function AdminNewsClient() {
       const r = await fetch("/api/admin/news", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: title.trim() || null,
-            badge: badge,
-            content: content, // HTML контент от RichTextEditor
-            media: uploaded,
-          }),
+        body: JSON.stringify({
+          title: title.trim() || null,
+          badge: badge,
+          content: content, // HTML контент от RichTextEditor
+          media: uploaded,
+        }),
       });
       const d = await r.json().catch(() => null);
       if (!r.ok) throw new Error(d?.error || "Ошибка создания новости");
@@ -156,7 +176,11 @@ export default function AdminNewsClient() {
       setMedia([]);
       await fetchItems();
     } catch (err: any) {
-      showToast("error", "Ошибка", err?.message || "Не удалось создать новость");
+      showToast(
+        "error",
+        "Ошибка",
+        err?.message || "Не удалось создать новость",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -192,7 +216,8 @@ export default function AdminNewsClient() {
               📰 Новости проекта
             </h2>
             <p className="mt-1 text-sm text-[#abd1c6]">
-              Только админ может публиковать новости. Пользователи смогут ставить лайки/дизлайки.
+              Только админ может публиковать новости. Пользователи смогут
+              ставить лайки/дизлайки.
             </p>
           </motion.div>
 
@@ -225,7 +250,9 @@ export default function AdminNewsClient() {
                   </label>
                   <select
                     value={badge || ""}
-                    onChange={(e) => setBadge(e.target.value as NewsBadge || null)}
+                    onChange={(e) =>
+                      setBadge((e.target.value as NewsBadge) || null)
+                    }
                     className="w-full rounded-2xl border border-white/10 bg-[#001e1d]/40 px-4 py-3 text-sm text-[#fffffe] outline-none focus:border-[#f9bc60]/50"
                   >
                     <option value="">Без бейджа</option>
@@ -254,7 +281,8 @@ export default function AdminNewsClient() {
                   Текст новости
                 </label>
                 <p className="text-xs text-[#abd1c6]/70 mb-3">
-                  Подробное описание новости (максимум 5000 символов). Используйте кнопки для форматирования текста.
+                  Подробное описание новости (максимум 5000 символов).
+                  Используйте кнопки для форматирования текста.
                 </p>
                 <RichTextEditor
                   value={content}
@@ -269,15 +297,26 @@ export default function AdminNewsClient() {
 
               {media.length > 0 && (
                 <div className="rounded-2xl border border-white/10 bg-[#001e1d]/25 p-3">
-                  <div className="text-xs font-bold text-white/75 mb-2">Предпросмотр</div>
+                  <div className="text-xs font-bold text-white/75 mb-2">
+                    Предпросмотр
+                  </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                     {media.map((m, idx) => (
-                      <div key={`${m.previewUrl}-${idx}`} className="relative group overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+                      <div
+                        key={`${m.previewUrl}-${idx}`}
+                        className="relative group overflow-hidden rounded-2xl border border-white/10 bg-black/20"
+                      >
                         {m.kind === "VIDEO" ? (
-                          <video src={m.previewUrl} className="w-full h-28 object-cover" />
+                          <video
+                            src={m.previewUrl}
+                            className="w-full h-28 object-cover"
+                          />
                         ) : (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={m.previewUrl} alt="" className="w-full h-28 object-cover" />
+                          <img
+                            src={m.previewUrl}
+                            alt=""
+                            className="w-full h-28 object-cover"
+                          />
                         )}
                         <button
                           type="button"
@@ -309,7 +348,11 @@ export default function AdminNewsClient() {
                 </button>
 
                 <div className="text-xs text-white/60">
-                  {uploading ? "Загрузка медиа..." : submitting ? "Сохранение..." : " "}
+                  {uploading
+                    ? "Загрузка медиа..."
+                    : submitting
+                      ? "Сохранение..."
+                      : " "}
                 </div>
               </div>
             </div>
@@ -318,7 +361,9 @@ export default function AdminNewsClient() {
           {/* List */}
           <div className="mt-8">
             <div className="flex items-center justify-between gap-3 mb-3">
-              <h3 className="text-lg font-black text-[#fffffe]">Последние новости</h3>
+              <h3 className="text-lg font-black text-[#fffffe]">
+                Последние новости
+              </h3>
               <button
                 onClick={fetchItems}
                 className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/85 text-sm font-semibold"
@@ -360,7 +405,7 @@ export default function AdminNewsClient() {
                           <div className="text-[#fffffe] font-black text-base sm:text-lg truncate">
                             {it.title || "Без заголовка"}
                           </div>
-                          <div 
+                          <div
                             className="mt-1 text-sm text-white/75 line-clamp-2 prose prose-sm prose-invert max-w-none"
                             dangerouslySetInnerHTML={{ __html: it.content }}
                           />
@@ -369,7 +414,8 @@ export default function AdminNewsClient() {
                               <LucideIcons.ThumbsUp size="xs" /> {it.likesCount}
                             </span>
                             <span className="inline-flex items-center gap-1">
-                              <LucideIcons.ThumbsDown size="xs" /> {it.dislikesCount}
+                              <LucideIcons.ThumbsDown size="xs" />{" "}
+                              {it.dislikesCount}
                             </span>
                             <span className="text-[#f9bc60]">•</span>
                             <span>медиа: {it.media?.length || 0}</span>
@@ -396,5 +442,3 @@ export default function AdminNewsClient() {
     </div>
   );
 }
-
-

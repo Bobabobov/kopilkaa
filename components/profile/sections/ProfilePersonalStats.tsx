@@ -36,22 +36,37 @@ export default function ProfilePersonalStats() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <LucideIcons.FileText className="w-4 h-4 text-[#f9bc60]" />
-                <p className="text-sm font-semibold text-[#fffffe]">Распределение заявок</p>
+                <p className="text-sm font-semibold text-[#fffffe]">
+                  Распределение заявок
+                </p>
               </div>
               <p className="text-xs text-[#abd1c6]">
-                Всего: <span className="text-[#fffffe] font-semibold">{totalApplications}</span>
+                Всего:{" "}
+                <span className="text-[#fffffe] font-semibold">
+                  {totalApplications}
+                </span>
               </p>
             </div>
             <div className="space-y-2">
               {[
                 { label: "Одобрено", value: approvedPercent, color: "#22c55e" },
-                { label: "В процессе", value: pendingPercent, color: "#f59e0b" },
-                { label: "Отклонено", value: rejectedPercent, color: "#ef4444" },
+                {
+                  label: "В процессе",
+                  value: pendingPercent,
+                  color: "#f59e0b",
+                },
+                {
+                  label: "Отклонено",
+                  value: rejectedPercent,
+                  color: "#ef4444",
+                },
               ].map((item) => (
                 <div key={item.label}>
                   <div className="flex justify-between text-xs text-[#abd1c6] mb-1">
                     <span>{item.label}</span>
-                    <span className="text-[#fffffe] font-semibold">{item.value}%</span>
+                    <span className="text-[#fffffe] font-semibold">
+                      {item.value}%
+                    </span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-[#abd1c6]/10 overflow-hidden">
                     <div

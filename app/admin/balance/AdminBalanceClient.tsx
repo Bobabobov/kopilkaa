@@ -89,7 +89,8 @@ export default function AdminBalanceClient() {
                     💰 Баланс на главной (“Всего в копилке”)
                   </h2>
                   <p className="text-sm sm:text-base text-[#abd1c6] mt-1">
-                    Меняется через запись корректировки <span className="font-bold">Donation(type=ADJUST)</span>.
+                    Меняется через запись корректировки{" "}
+                    <span className="font-bold">Donation(type=ADJUST)</span>.
                   </p>
                 </div>
 
@@ -104,15 +105,23 @@ export default function AdminBalanceClient() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="rounded-2xl border border-[#abd1c6]/20 bg-[#001e1d]/40 p-5">
-                  <div className="text-sm font-bold text-[#abd1c6]">Текущее значение</div>
+                  <div className="text-sm font-bold text-[#abd1c6]">
+                    Текущее значение
+                  </div>
                   <div className="mt-2 text-3xl sm:text-4xl font-black text-[#f9bc60]">
                     {loading ? "…" : formattedBalance}
                   </div>
                   {data && (
                     <div className="mt-3 text-xs sm:text-sm text-[#abd1c6]/80 space-y-1">
-                      <div>SUPPORT: ₽ {data.totalSupport.toLocaleString("ru-RU")}</div>
-                      <div>PAYOUT: ₽ {data.totalPayout.toLocaleString("ru-RU")}</div>
-                      <div>ADJUST: ₽ {data.totalAdjust.toLocaleString("ru-RU")}</div>
+                      <div>
+                        SUPPORT: ₽ {data.totalSupport.toLocaleString("ru-RU")}
+                      </div>
+                      <div>
+                        PAYOUT: ₽ {data.totalPayout.toLocaleString("ru-RU")}
+                      </div>
+                      <div>
+                        ADJUST: ₽ {data.totalAdjust.toLocaleString("ru-RU")}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -155,11 +164,8 @@ export default function AdminBalanceClient() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
   );
 }
-
-

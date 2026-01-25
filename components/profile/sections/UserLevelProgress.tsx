@@ -26,7 +26,7 @@ export default function UserLevelProgress() {
           nextLevelXP: 3000,
           totalXP: 12450,
         };
-        
+
         setData(mockData);
       } catch (error) {
         console.error("Error fetching level:", error);
@@ -53,9 +53,12 @@ export default function UserLevelProgress() {
   const xpNeeded = data.nextLevelXP - data.currentXP;
 
   const getLevelColor = (level: number) => {
-    if (level < 5) return { bg: "from-[#abd1c6] to-[#94a1b2]", text: "#abd1c6" };
-    if (level < 10) return { bg: "from-[#f9bc60] to-[#e8a545]", text: "#f9bc60" };
-    if (level < 20) return { bg: "from-[#e16162] to-[#d14d4e]", text: "#e16162" };
+    if (level < 5)
+      return { bg: "from-[#abd1c6] to-[#94a1b2]", text: "#abd1c6" };
+    if (level < 10)
+      return { bg: "from-[#f9bc60] to-[#e8a545]", text: "#f9bc60" };
+    if (level < 20)
+      return { bg: "from-[#e16162] to-[#d14d4e]", text: "#e16162" };
     return { bg: "from-[#7f5af0] to-[#6d4cdb]", text: "#7f5af0" };
   };
 
@@ -75,7 +78,9 @@ export default function UserLevelProgress() {
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className={`w-10 h-10 bg-gradient-to-br ${levelColor.bg} rounded-lg flex items-center justify-center shadow-lg`}>
+            <div
+              className={`w-10 h-10 bg-gradient-to-br ${levelColor.bg} rounded-lg flex items-center justify-center shadow-lg`}
+            >
               <LucideIcons.Star className="text-white" size="md" />
             </div>
             <div>
@@ -83,14 +88,17 @@ export default function UserLevelProgress() {
                 Уровень {data.currentLevel}
               </h3>
               <p className="text-xs text-[#abd1c6]">
-                {data.totalXP.toLocaleString('ru-RU')} опыта всего
+                {data.totalXP.toLocaleString("ru-RU")} опыта всего
               </p>
             </div>
           </div>
           <div className="text-right">
-              <div className="text-2xl sm:text-3xl font-bold" style={{ color: levelColor.text }}>
-                LVL
-              </div>
+            <div
+              className="text-2xl sm:text-3xl font-bold"
+              style={{ color: levelColor.text }}
+            >
+              LVL
+            </div>
           </div>
         </div>
 
@@ -98,10 +106,11 @@ export default function UserLevelProgress() {
         <div className="mb-3">
           <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
             <span className="text-[#abd1c6]">
-              {data.currentXP.toLocaleString('ru-RU')} / {data.nextLevelXP.toLocaleString('ru-RU')} XP
+              {data.currentXP.toLocaleString("ru-RU")} /{" "}
+              {data.nextLevelXP.toLocaleString("ru-RU")} XP
             </span>
             <span className="text-[#f9bc60] font-semibold">
-              Осталось {xpNeeded.toLocaleString('ru-RU')} XP
+              Осталось {xpNeeded.toLocaleString("ru-RU")} XP
             </span>
           </div>
           <div className="relative h-4 sm:h-5 bg-[#001e1d] rounded-full overflow-hidden border border-[#abd1c6]/20">
@@ -127,29 +136,22 @@ export default function UserLevelProgress() {
             <div className="text-lg sm:text-xl font-bold text-[#f9bc60]">
               +{data.currentLevel * 5}%
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">
-              К шансу
-            </div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6]">К шансу</div>
           </div>
           <div className="text-center">
             <div className="text-lg sm:text-xl font-bold text-[#e16162]">
               {data.currentLevel}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">
-              Бейджей
-            </div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6]">Бейджей</div>
           </div>
           <div className="text-center">
             <div className="text-lg sm:text-xl font-bold text-[#abd1c6]">
-              {data.currentLevel >= 10 ? '⭐' : '🔒'}
+              {data.currentLevel >= 10 ? "⭐" : "🔒"}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">
-              Премиум
-            </div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6]">Премиум</div>
           </div>
         </div>
       </div>
     </motion.div>
   );
 }
-

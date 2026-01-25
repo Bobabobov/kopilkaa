@@ -5,10 +5,17 @@ import type { SettingsUser } from "../hooks/useSettings";
 interface SettingsSocialLinksSectionProps {
   user: SettingsUser;
   saving: boolean;
-  onChange: (field: "vkLink" | "telegramLink" | "youtubeLink", link: string) => Promise<void>;
+  onChange: (
+    field: "vkLink" | "telegramLink" | "youtubeLink",
+    link: string,
+  ) => Promise<void>;
 }
 
-export function SettingsSocialLinksSection({ user, saving, onChange }: SettingsSocialLinksSectionProps) {
+export function SettingsSocialLinksSection({
+  user,
+  saving,
+  onChange,
+}: SettingsSocialLinksSectionProps) {
   return (
     <SettingsSection title="Социальные сети">
       <div className="space-y-4">

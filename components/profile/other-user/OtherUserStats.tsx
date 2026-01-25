@@ -59,7 +59,9 @@ export default function OtherUserStats({ userId }: OtherUserStatsProps) {
           </div>
           <h3 className="text-lg font-semibold text-[#fffffe]">Статистика</h3>
         </div>
-        <p className="text-[#abd1c6] text-sm">Не удалось загрузить статистику</p>
+        <p className="text-[#abd1c6] text-sm">
+          Не удалось загрузить статистику
+        </p>
       </div>
     );
   }

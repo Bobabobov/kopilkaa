@@ -19,16 +19,25 @@ async function resolveUserId(identifierRaw: string): Promise<string | null> {
   if (identifier.startsWith("@")) {
     const username = normalizeUsername(identifier);
     if (!username) return null;
-    const u = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+    const u = await prisma.user.findUnique({
+      where: { username },
+      select: { id: true },
+    });
     return u?.id ?? null;
   }
 
-  const byId = await prisma.user.findUnique({ where: { id: identifier }, select: { id: true } });
+  const byId = await prisma.user.findUnique({
+    where: { id: identifier },
+    select: { id: true },
+  });
   if (byId?.id) return byId.id;
 
   const username = normalizeUsername(identifier);
   if (!username) return null;
-  const byUsername = await prisma.user.findUnique({ where: { username }, select: { id: true } });
+  const byUsername = await prisma.user.findUnique({
+    where: { username },
+    select: { id: true },
+  });
   return byUsername?.id ?? null;
 }
 
@@ -46,12 +55,18 @@ export async function POST(request: Request) {
     const hide = Boolean(body?.hide);
 
     if (!identifier) {
-      return NextResponse.json({ error: "Укажите пользователя (@username или userId)" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Укажите пользователя (@username или userId)" },
+        { status: 400 },
+      );
     }
 
     const userId = await resolveUserId(identifier);
     if (!userId) {
-      return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     // NOTE: On some Windows setups Prisma Client binary can be locked (EPERM) and `prisma generate`
@@ -59,14 +74,21 @@ export async function POST(request: Request) {
     const user = await (prisma.user as any).update({
       where: { id: userId },
       data: { hideFromHeroes: hide },
-      select: { id: true, username: true, name: true, email: true, hideFromHeroes: true },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        email: true,
+        hideFromHeroes: true,
+      },
     });
 
     return NextResponse.json({ success: true, data: { user } });
   } catch (error) {
     console.error("admin heroes visibility error:", error);
-    return NextResponse.json({ error: "Ошибка обновления видимости" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Ошибка обновления видимости" },
+      { status: 500 },
+    );
   }
 }
-
-

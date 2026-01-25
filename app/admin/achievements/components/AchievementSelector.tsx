@@ -29,29 +29,36 @@ export default function AchievementSelector({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.achievement-dropdown-container')) {
+      if (!target.closest(".achievement-dropdown-container")) {
         setShowDropdown(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Фильтрация достижений
-  const filteredAchievements = achievements.filter(achievement => {
-    const matchesSearch = achievement.isActive && (
-      achievement.name.toLowerCase().includes(achievementSearch.toLowerCase()) ||
-      achievement.description.toLowerCase().includes(achievementSearch.toLowerCase())
-    );
-    
-    const matchesRarity = rarityFilter === "ALL" || achievement.rarity === rarityFilter;
+  const filteredAchievements = achievements.filter((achievement) => {
+    const matchesSearch =
+      achievement.isActive &&
+      (achievement.name
+        .toLowerCase()
+        .includes(achievementSearch.toLowerCase()) ||
+        achievement.description
+          .toLowerCase()
+          .includes(achievementSearch.toLowerCase()));
+
+    const matchesRarity =
+      rarityFilter === "ALL" || achievement.rarity === rarityFilter;
     const matchesType = typeFilter === "ALL" || achievement.type === typeFilter;
-    
+
     return matchesSearch && matchesRarity && matchesType;
   });
 
-  const selectedAchievement = achievements.find(a => a.id === selectedAchievementId);
+  const selectedAchievement = achievements.find(
+    (a) => a.id === selectedAchievementId,
+  );
 
   const handleSelect = (achievementId: string) => {
     onSelect(achievementId);
@@ -64,7 +71,7 @@ export default function AchievementSelector({
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
         🏆 Выберите достижение
       </label>
-      
+
       {/* Быстрые фильтры для достижений */}
       <div className="flex gap-2 mb-3">
         <select
@@ -79,7 +86,7 @@ export default function AchievementSelector({
           <option value="LEGENDARY">Легендарные</option>
           <option value="EXCLUSIVE">Эксклюзивные</option>
         </select>
-        
+
         <select
           className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white"
           value={typeFilter}
@@ -95,7 +102,7 @@ export default function AchievementSelector({
           <option value="CREATIVITY">Творчество</option>
         </select>
       </div>
-      
+
       <div className="relative achievement-dropdown-container">
         <div className="relative">
           <input
@@ -113,7 +120,7 @@ export default function AchievementSelector({
             <LucideIcons.Search className="w-5 h-5 text-gray-400" />
           </div>
         </div>
-        
+
         {showDropdown && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-2xl shadow-xl z-10 max-h-96 overflow-y-auto">
             {filteredAchievements.length > 0 ? (
@@ -152,13 +159,15 @@ export default function AchievementSelector({
               <div className="p-6 text-center text-gray-500 dark:text-gray-400">
                 <LucideIcons.Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p>Достижения не найдены</p>
-                <p className="text-xs mt-1">Попробуйте изменить фильтры или поисковый запрос</p>
+                <p className="text-xs mt-1">
+                  Попробуйте изменить фильтры или поисковый запрос
+                </p>
               </div>
             )}
           </div>
         )}
       </div>
-      
+
       {selectedAchievement && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -197,5 +206,3 @@ export default function AchievementSelector({
     </div>
   );
 }
-
-

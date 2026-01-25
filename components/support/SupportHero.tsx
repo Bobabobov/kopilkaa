@@ -13,7 +13,15 @@ type Stats = {
 };
 
 // Компонент для анимированного числа
-function AnimatedNumber({ value, prefix = "", suffix = "" }: { value: number; prefix?: string; suffix?: string }) {
+function AnimatedNumber({
+  value,
+  prefix = "",
+  suffix = "",
+}: {
+  value: number;
+  prefix?: string;
+  suffix?: string;
+}) {
   const motionValue = useMotionValue(0);
   const rounded = useTransform(motionValue, (latest) => Math.round(latest));
 
@@ -91,12 +99,13 @@ export default function SupportHero() {
             💚 Поддержка проекта «Копилка»
             <br />
           </motion.h1>
-          
+
           <p
             className="text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed max-w-2xl mx-auto px-2"
             style={{ color: "#abd1c6" }}
           >
-            «Копилка» — независимая платформа, которая благодаря поддержке пользователей помогает людям в сложных жизненных ситуациях.
+            «Копилка» — независимая платформа, которая благодаря поддержке
+            пользователей помогает людям в сложных жизненных ситуациях.
           </p>
           <p
             className="text-sm sm:text-base mb-7 sm:mb-9 leading-relaxed max-w-2xl mx-auto px-2"
@@ -110,35 +119,61 @@ export default function SupportHero() {
               whileHover={{ scale: 1.03, y: -2 }}
               className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/20 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg hover:border-[#abd1c6]/30 transition-all duration-300"
             >
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: "#f9bc60" }}>
+              <div
+                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2"
+                style={{ color: "#f9bc60" }}
+              >
                 {loading ? "0" : <AnimatedNumber value={stats.approved} />}
               </div>
-              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Одобрено заявок</div>
+              <div
+                className="text-sm sm:text-base opacity-80"
+                style={{ color: "#abd1c6" }}
+              >
+                Одобрено заявок
+              </div>
             </motion.div>
-            
+
             <motion.div
               whileHover={{ scale: 1.03, y: -2 }}
               className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/20 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg hover:border-[#abd1c6]/30 transition-all duration-300"
             >
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: "#f9bc60" }}>
+              <div
+                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2"
+                style={{ color: "#f9bc60" }}
+              >
                 {loading ? "0" : <AnimatedNumber value={stats.supporters} />}
               </div>
-              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Поддержали проект</div>
+              <div
+                className="text-sm sm:text-base opacity-80"
+                style={{ color: "#abd1c6" }}
+              >
+                Поддержали проект
+              </div>
             </motion.div>
 
             <motion.div
               whileHover={{ scale: 1.03, y: -2 }}
               className="bg-[#f9bc60]/10 backdrop-blur-sm border border-[#f9bc60]/30 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg transition-all duration-300 sm:col-span-2 md:col-span-1"
             >
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2" style={{ color: "#f9bc60" }}>
-                {loading ? "0" : (
+              <div
+                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2"
+                style={{ color: "#f9bc60" }}
+              >
+                {loading ? (
+                  "0"
+                ) : (
                   <span>
                     <AnimatedNumber value={Math.floor(stats.balance / 1000)} />
                     <span className="text-xl sm:text-2xl">К</span>
                   </span>
                 )}
               </div>
-              <div className="text-sm sm:text-base opacity-80" style={{ color: "#abd1c6" }}>Баланс проекта</div>
+              <div
+                className="text-sm sm:text-base opacity-80"
+                style={{ color: "#abd1c6" }}
+              >
+                Баланс проекта
+              </div>
             </motion.div>
           </div>
         </motion.div>

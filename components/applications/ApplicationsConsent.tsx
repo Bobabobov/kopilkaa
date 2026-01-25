@@ -36,7 +36,8 @@ export function ApplicationsConsent({
           Я прочитал(а) и понимаю, что:
           <br />— уровень доверия не гарантирует одобрение заявки;
           <br />— решение о поддержке принимается индивидуально;
-          <br />— сумма поддержки может быть меньше запрошенной или заявка может быть отклонена.
+          <br />— сумма поддержки может быть меньше запрошенной или заявка может
+          быть отклонена.
         </span>
       </label>
 
@@ -49,8 +50,12 @@ export function ApplicationsConsent({
         />
         <span className="text-xs sm:text-sm text-[#c7dad2] leading-relaxed">
           Продолжая, вы принимаете условия{" "}
-          <Link href="/terms" className="underline decoration-[#f9bc60]/70 underline-offset-2 hover:decoration-[#f9bc60]">
-            пользовательского соглашения и Политики в отношении обработки персональных данных
+          <Link
+            href="/terms"
+            className="underline decoration-[#f9bc60]/70 underline-offset-2 hover:decoration-[#f9bc60]"
+          >
+            пользовательского соглашения и Политики в отношении обработки
+            персональных данных
           </Link>
           .
         </span>
@@ -60,4 +65,3 @@ export function ApplicationsConsent({
 }
 
 export default ApplicationsConsent;
-

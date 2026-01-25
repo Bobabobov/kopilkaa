@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     // Явно указываем тип, чтобы TypeScript не ругался на implicit any[]
     let applications: any[] = [];
-    
+
     try {
       applications = await prisma.application.findMany({
         where: {
@@ -37,19 +37,24 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
         take: limit,
       });
     } catch (dbError) {
-      console.warn("Database error in applications API, returning empty array:", dbError);
+      console.warn(
+        "Database error in applications API, returning empty array:",
+        dbError,
+      );
       applications = [];
     }
 
     const formattedApplications = applications.map((app) => ({
       ...app,
       // Явно указываем тип для img, чтобы не было implicit any
-      images: app.images ? app.images.map((img: { url: string }) => img.url) : [],
+      images: app.images
+        ? app.images.map((img: { url: string }) => img.url)
+        : [],
     }));
 
     return NextResponse.json(
@@ -57,10 +62,10 @@ export async function GET(request: NextRequest) {
       {
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0",
+          Pragma: "no-cache",
+          Expires: "0",
         },
-      }
+      },
     );
   } catch (error) {
     console.error("Error fetching user applications:", error);
@@ -70,10 +75,10 @@ export async function GET(request: NextRequest) {
       {
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0",
+          Pragma: "no-cache",
+          Expires: "0",
         },
-      }
+      },
     );
   }
 }

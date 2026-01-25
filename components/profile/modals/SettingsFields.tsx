@@ -1,18 +1,34 @@
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
-export function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
+export function SettingsSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">{title}</h3>
+      <h3 className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">
+        {title}
+      </h3>
       {children}
     </div>
   );
 }
 
-export function ReadOnlyField({ label, value }: { label: string; value: string }) {
+export function ReadOnlyField({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">{label}</label>
+      <label className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">
+        {label}
+      </label>
       <div className="px-3 py-2.5 sm:px-4 sm:py-3 bg-[#001e1d]/20 rounded-xl text-[#abd1c6] border border-[#abd1c6]/20">
         {value}
       </div>
@@ -35,7 +51,9 @@ export function CopyField({
 }) {
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">{label}</label>
+      <label className="text-sm font-medium text-[#fffffe] uppercase tracking-wide">
+        {label}
+      </label>
       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
         <div className="flex-1 px-3 py-2.5 sm:px-4 sm:py-3 bg-[#001e1d]/20 rounded-xl text-[#abd1c6] border border-[#abd1c6]/20 overflow-hidden">
           <span className="text-[#fffffe] break-all">{value}</span>

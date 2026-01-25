@@ -21,14 +21,21 @@ interface NavAuthProps {
   onLinkClick?: () => void;
 }
 
-export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps) {
+export default function NavAuth({
+  isMobile = false,
+  onLinkClick,
+}: NavAuthProps) {
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
-  const loginHref = buildAuthModalUrl({ pathname, search, modal: "auth" }) as Route;
+  const loginHref = buildAuthModalUrl({
+    pathname,
+    search,
+    modal: "auth",
+  }) as Route;
 
   const notifyAuthChange = (isAuth: boolean) => {
     if (typeof window !== "undefined") {
@@ -42,12 +49,12 @@ export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps)
 
   useEffect(() => {
     let cancelled = false;
-    
+
     // Используем AbortController для отмены при размонтировании
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000); // Таймаут 5 секунд
-    
-    fetch("/api/profile/me", { 
+
+    fetch("/api/profile/me", {
       cache: "no-store",
       signal: controller.signal,
     })
@@ -73,7 +80,7 @@ export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps)
         }
       })
       .catch((error) => {
-        if (!cancelled && error.name !== 'AbortError') {
+        if (!cancelled && error.name !== "AbortError") {
           // В проде не спамим консолью, 401/сетевые мелочи не критичны.
           if (process.env.NODE_ENV !== "production") {
             console.error("Error fetching user:", error);
@@ -90,7 +97,7 @@ export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps)
           setLoading(false);
         }
       });
-    
+
     return () => {
       cancelled = true;
       controller.abort();
@@ -99,7 +106,7 @@ export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps)
 
   const logout = async () => {
     try {
-    await fetch("/api/auth/logout", { method: "POST" });
+      await fetch("/api/auth/logout", { method: "POST" });
       setUser(null);
       notifyAuthChange(false);
       // Перенаправляем на главную страницу
@@ -156,7 +163,9 @@ export default function NavAuth({ isMobile = false, onLinkClick }: NavAuthProps)
   };
 
   return (
-    <div className={`flex ${isMobile ? "flex-col w-full gap-2" : "items-center gap-2"}`}>
+    <div
+      className={`flex ${isMobile ? "flex-col w-full gap-2" : "items-center gap-2"}`}
+    >
       <Link
         href="/profile"
         onClick={onLinkClick}

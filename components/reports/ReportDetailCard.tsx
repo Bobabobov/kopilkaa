@@ -7,7 +7,10 @@ import { BugReport } from "@/app/reports/page";
 import ReportImages from "./ReportImages";
 import AdminComment from "./AdminComment";
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; color: string; icon: any }
+> = {
   OPEN: {
     label: "Открыт",
     color: "bg-[#e16162]/20 text-[#e16162] border-[#e16162]/30",
@@ -65,7 +68,9 @@ export default function ReportDetailCard({
               {report.title}
             </h1>
             <div className="flex items-center gap-3 flex-wrap">
-              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium ${statusConfig.color}`}>
+              <div
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium ${statusConfig.color}`}
+              >
                 <StatusIcon size="sm" />
                 <span>{statusConfig.label}</span>
               </div>
@@ -150,7 +155,9 @@ export default function ReportDetailCard({
               }`}
             >
               <LucideIcons.ThumbsDown size="sm" />
-              <span className="text-sm font-medium">{report.dislikesCount}</span>
+              <span className="text-sm font-medium">
+                {report.dislikesCount}
+              </span>
             </motion.button>
           </div>
         </div>
@@ -161,4 +168,3 @@ export default function ReportDetailCard({
     </motion.div>
   );
 }
-

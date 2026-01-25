@@ -35,7 +35,12 @@ export function BannedNotice({ user, ToastComponent }: BannedNoticeProps) {
           >
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-red-500/30 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-6 h-6 text-red-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -45,9 +50,13 @@ export function BannedNotice({ user, ToastComponent }: BannedNoticeProps) {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-red-400 mb-3">Чечик в бане</h3>
+                <h3 className="text-xl font-bold text-red-400 mb-3">
+                  Чечик в бане
+                </h3>
                 {isBannedPermanent ? (
-                  <p className="text-[#abd1c6] text-base">Этот аккаунт заблокирован навсегда.</p>
+                  <p className="text-[#abd1c6] text-base">
+                    Этот аккаунт заблокирован навсегда.
+                  </p>
                 ) : (
                   <p className="text-[#abd1c6] text-base">
                     Этот аккаунт заблокирован до{" "}
@@ -64,7 +73,11 @@ export function BannedNotice({ user, ToastComponent }: BannedNoticeProps) {
                     .
                   </p>
                 )}
-                {user.bannedReason && <p className="text-[#abd1c6] text-base mt-3">Причина: {user.bannedReason}</p>}
+                {user.bannedReason && (
+                  <p className="text-[#abd1c6] text-base mt-3">
+                    Причина: {user.bannedReason}
+                  </p>
+                )}
               </div>
             </div>
           </motion.div>

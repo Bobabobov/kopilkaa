@@ -39,7 +39,9 @@ export default function StoryHeader({
       )}
       <h1
         className={`text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4 transition-all duration-500 ${
-          isAd ? "bg-gradient-to-r from-[#fffffe] via-[#f9bc60] to-[#fffffe] bg-clip-text text-transparent" : ""
+          isAd
+            ? "bg-gradient-to-r from-[#fffffe] via-[#f9bc60] to-[#fffffe] bg-clip-text text-transparent"
+            : ""
         }`}
         style={isAd ? {} : { color: "#fffffe" }}
       >

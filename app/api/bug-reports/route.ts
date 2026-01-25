@@ -16,11 +16,11 @@ export async function GET(request: Request) {
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    
+
     if (status !== "all") {
       where.status = status;
     }
-    
+
     if (category !== "all") {
       where.category = category;
     }
@@ -77,11 +77,11 @@ export async function GET(request: Request) {
   } catch (error: any) {
     console.error("Get bug reports error:", error);
     return NextResponse.json(
-      { 
+      {
         message: "Ошибка загрузки баг-репортов",
-        error: error?.message || String(error)
+        error: error?.message || String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { title, description, category, images } = body;
-    
+
     const isAdmin = session.role === "ADMIN";
 
     // Ограничение: не больше 1 заявки в сутки на пользователя (для обычных пользователей)
@@ -111,36 +111,29 @@ export async function POST(request: Request) {
       if (recentReport) {
         return NextResponse.json(
           { message: "Можно отправлять только 1 баг-репорт в сутки" },
-          { status: 429 }
+          { status: 429 },
         );
       }
     }
-    
-    console.log("Received bug report data:", { 
-      title: title?.substring(0, 20), 
-      description: description?.substring(0, 20),
-      category,
-      imagesCount: images?.length || 0
-    });
 
     if (!title || !description) {
       return NextResponse.json(
         { message: "Заголовок и описание обязательны" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (title.length > 40) {
       return NextResponse.json(
         { message: "Заголовок не должен превышать 40 символов" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (description.length > 700) {
       return NextResponse.json(
         { message: "Описание не должно превышать 700 символов" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -177,15 +170,14 @@ export async function POST(request: Request) {
       message: error?.message,
       code: error?.code,
       meta: error?.meta,
-      stack: error?.stack
+      stack: error?.stack,
     });
     return NextResponse.json(
-      { 
+      {
         message: "Ошибка создания баг-репорта",
-        error: error?.message || String(error)
+        error: error?.message || String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

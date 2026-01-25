@@ -23,7 +23,10 @@ export default function ApplicationFooter({
       className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t"
       style={{ borderColor: "rgba(171,209,198,0.2)" }}
     >
-      <div className="flex items-center gap-2 text-xs sm:text-sm" style={{ color: "#abd1c6" }}>
+      <div
+        className="flex items-center gap-2 text-xs sm:text-sm"
+        style={{ color: "#abd1c6" }}
+      >
         <svg
           className="w-4 h-4 flex-shrink-0"
           fill="none"
@@ -37,9 +40,7 @@ export default function ApplicationFooter({
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>
-          Отправлено: {new Date(createdAt).toLocaleString()}
-        </span>
+        <span>Отправлено: {new Date(createdAt).toLocaleString()}</span>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
@@ -121,5 +122,3 @@ export default function ApplicationFooter({
     </motion.div>
   );
 }
-
-

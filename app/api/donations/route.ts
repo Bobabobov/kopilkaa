@@ -11,8 +11,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}));
 
     const amount = Number(body.amount);
-    const type = body.type === "PAYOUT" || body.type === "ADJUST" ? body.type : "SUPPORT";
-    const comment = typeof body.comment === "string" ? body.comment.slice(0, 500) : null;
+    const type =
+      body.type === "PAYOUT" || body.type === "ADJUST" ? body.type : "SUPPORT";
+    const comment =
+      typeof body.comment === "string" ? body.comment.slice(0, 500) : null;
 
     if (!amount || !Number.isFinite(amount) || amount <= 0) {
       return NextResponse.json(
@@ -33,7 +35,9 @@ export async function POST(request: NextRequest) {
     // Автоматически проверяем/выдаём достижения после оплаты (важно для /heroes статусов)
     if (session?.uid && type === "SUPPORT") {
       try {
-        await AchievementService.checkAndGrantAutomaticAchievements(session.uid);
+        await AchievementService.checkAndGrantAutomaticAchievements(
+          session.uid,
+        );
       } catch {
         // не блокируем ответ по оплате из‑за достижений
       }
@@ -48,5 +52,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-

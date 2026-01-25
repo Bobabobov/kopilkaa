@@ -10,7 +10,10 @@ interface ProfileErrorStateProps {
   onRetry: () => void;
 }
 
-export default function ProfileErrorState({ error, onRetry }: ProfileErrorStateProps) {
+export default function ProfileErrorState({
+  error,
+  onRetry,
+}: ProfileErrorStateProps) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <motion.div
@@ -24,9 +27,7 @@ export default function ProfileErrorState({ error, onRetry }: ProfileErrorStateP
         <h1 className="text-3xl font-bold text-[#fffffe] mb-4">
           Ошибка загрузки
         </h1>
-        <p className="text-[#abd1c6] mb-8 text-lg">
-          {error}
-        </p>
+        <p className="text-[#abd1c6] mb-8 text-lg">{error}</p>
         <button
           onClick={onRetry}
           className="inline-flex items-center gap-2 px-8 py-4 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] font-bold rounded-full transition-all duration-300"
@@ -38,5 +39,3 @@ export default function ProfileErrorState({ error, onRetry }: ProfileErrorStateP
     </div>
   );
 }
-
-

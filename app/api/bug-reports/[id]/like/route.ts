@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getSession();
   if (!session) {
@@ -26,7 +26,7 @@ export async function POST(
     if (!bugReport) {
       return NextResponse.json(
         { message: "Баг-репорт не найден" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -89,38 +89,7 @@ export async function POST(
     console.error("Like bug report error:", error);
     return NextResponse.json(
       { message: "Ошибка обработки лайка" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

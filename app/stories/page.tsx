@@ -41,7 +41,7 @@ export default function StoriesPage() {
           loadNextPage();
         }
       },
-      { threshold: 0.1, rootMargin: "100px" }
+      { threshold: 0.1, rootMargin: "100px" },
     );
 
     const currentTarget = observerTargetRef.current;

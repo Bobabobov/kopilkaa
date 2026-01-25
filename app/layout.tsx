@@ -15,7 +15,9 @@ import GlobalClickSpark from "@/components/ui/GlobalClickSpark";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru").replace(/\/$/, "");
+const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru"
+).replace(/\/$/, "");
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -25,7 +27,13 @@ export const metadata: Metadata = {
   },
   description:
     "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
-  keywords: ["копилка", "взаимопомощь", "благотворительность", "помощь", "платформа помощи"],
+  keywords: [
+    "копилка",
+    "взаимопомощь",
+    "благотворительность",
+    "помощь",
+    "платформа помощи",
+  ],
   authors: [{ name: "Копилка" }],
   creator: "Копилка",
   publisher: "Копилка",
@@ -43,7 +51,8 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "Копилка",
     title: "Копилка — платформа взаимной помощи",
-    description: "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
+    description:
+      "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
     images: [
       {
         url: "/logo.png",
@@ -56,7 +65,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Копилка — платформа взаимной помощи",
-    description: "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
+    description:
+      "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
     images: ["/logo.png"],
   },
   robots: {
@@ -81,13 +91,11 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Копилка",
-    description: "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
+    description:
+      "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
-    sameAs: [
-      "https://t.me/kkopilka",
-      "https://kick.com/koponline",
-    ],
+    sameAs: ["https://t.me/kkopilka", "https://kick.com/koponline"],
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "Поддержка",
@@ -100,7 +108,8 @@ export default function RootLayout({
     "@type": "WebSite",
     name: "Копилка",
     url: siteUrl,
-    description: "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
+    description:
+      "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
     potentialAction: {
       "@type": "SearchAction",
       target: {
@@ -121,7 +130,9 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteStructuredData) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteStructuredData),
+          }}
         />
         <Script
           id="yandex-metrika"

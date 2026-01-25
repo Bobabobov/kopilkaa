@@ -15,7 +15,6 @@ export async function POST(
 
   try {
     const { userId: identifier } = await params;
-    console.log("=== POST /api/users/[userId]/block ===", { userId: identifier });
 
     const userId = await resolveUserIdFromIdentifier(identifier);
     if (!userId) {
@@ -52,7 +51,7 @@ export async function POST(
         await prisma.friendship.delete({
           where: { id: existingFriendship.id },
         });
-        
+
         return NextResponse.json({
           message: "Пользователь разблокирован",
           blocked: false,
@@ -99,7 +98,6 @@ export async function POST(
       },
     });
 
-    console.log("User blocked successfully:", friendship.id);
     return NextResponse.json({
       message: "Пользователь заблокирован",
       friendship,
@@ -107,11 +105,11 @@ export async function POST(
     });
   } catch (error) {
     console.error("Block user error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Неизвестная ошибка";
+    const errorMessage =
+      error instanceof Error ? error.message : "Неизвестная ошибка";
     return NextResponse.json(
       { message: "Ошибка блокировки пользователя", error: errorMessage },
       { status: 500 },
     );
   }
 }
-

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru").replace(/\/$/, "");
+const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru"
+).replace(/\/$/, "");
 
 export const metadata: Metadata = {
   title: "Герои проекта",
@@ -41,4 +43,3 @@ export default function HeroesLayout({
 }) {
   return children;
 }
-

@@ -67,9 +67,7 @@ export default function FooterLinks() {
                 color: "#f9bc60",
               }}
             >
-              <div className="w-3.5 h-3.5">
-                {link.icon}
-              </div>
+              <div className="w-3.5 h-3.5">{link.icon}</div>
             </div>
             <span
               className="text-xs font-medium transition-colors duration-300 group-hover:text-[#fffffe] flex-1"

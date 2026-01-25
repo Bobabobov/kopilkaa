@@ -255,9 +255,3 @@ export function useBeautifulAlert() {
 
   return { showAlert, hideAlert, AlertComponent };
 }
-
-
-
-
-
-

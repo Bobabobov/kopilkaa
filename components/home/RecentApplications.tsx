@@ -76,7 +76,10 @@ export default function RecentApplications() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: "#fffffe" }}>
+          <h2
+            className="text-4xl md:text-5xl font-bold mb-4"
+            style={{ color: "#fffffe" }}
+          >
             Истории людей
           </h2>
           <p className="text-xl" style={{ color: "#abd1c6" }}>
@@ -102,7 +105,9 @@ export default function RecentApplications() {
                 <div className="relative h-48 overflow-hidden bg-gray-800">
                   <img
                     src={
-                      app.images && app.images.length > 0 ? app.images[0].url : "/stories-preview.jpg"
+                      app.images && app.images.length > 0
+                        ? app.images[0].url
+                        : "/stories-preview.jpg"
                     }
                     alt={app.title}
                     loading="lazy"
@@ -117,33 +122,44 @@ export default function RecentApplications() {
                 {/* Контент */}
                 <div className="p-6">
                   {/* Заголовок */}
-                  <h3 className="text-xl font-bold mb-2 line-clamp-2" style={{ color: "#fffffe" }}>
+                  <h3
+                    className="text-xl font-bold mb-2 line-clamp-2"
+                    style={{ color: "#fffffe" }}
+                  >
                     {app.title}
                   </h3>
 
                   {/* Описание */}
-                  <p className="text-sm mb-4 line-clamp-3" style={{ color: "#abd1c6" }}>
+                  <p
+                    className="text-sm mb-4 line-clamp-3"
+                    style={{ color: "#abd1c6" }}
+                  >
                     {app.summary}
                   </p>
 
                   {/* Сумма */}
-                     <div className="flex items-center justify-between mb-4">
-                       <span className="text-2xl font-bold">
-                         <span style={{ color: "#f9bc60" }}>
-                           {app.amount.toLocaleString('ru-RU')}
-                         </span>
-                         <span style={{ color: "#ffffff", fontWeight: "900" }}>
-                           {' '}руб
-                         </span>
-                       </span>
-                     </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-2xl font-bold">
+                      <span style={{ color: "#f9bc60" }}>
+                        {app.amount.toLocaleString("ru-RU")}
+                      </span>
+                      <span style={{ color: "#ffffff", fontWeight: "900" }}>
+                        {" "}
+                        руб
+                      </span>
+                    </span>
+                  </div>
 
                   {/* Автор */}
                   <div className="flex items-center gap-3 pt-4 border-t border-white/10">
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
                       <img
-                        src={app.user && app.user.avatar ? app.user.avatar : "/default-avatar.png"}
-                        alt={app.user ? (app.user.name || "User") : "User"}
+                        src={
+                          app.user && app.user.avatar
+                            ? app.user.avatar
+                            : "/default-avatar.png"
+                        }
+                        alt={app.user ? app.user.name || "User" : "User"}
                         loading="lazy"
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -153,10 +169,15 @@ export default function RecentApplications() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap min-w-0">
-                        <p className="text-sm font-medium truncate min-w-0" style={{ color: "#fffffe" }}>
-                        {app.user ? (app.user.name || "Аноним") : "Аноним"}
-                      </p>
-                        {app.user?.heroBadge && <HeroBadge badge={app.user.heroBadge} size="xs" />}
+                        <p
+                          className="text-sm font-medium truncate min-w-0"
+                          style={{ color: "#fffffe" }}
+                        >
+                          {app.user ? app.user.name || "Аноним" : "Аноним"}
+                        </p>
+                        {app.user?.heroBadge && (
+                          <HeroBadge badge={app.user.heroBadge} size="xs" />
+                        )}
                       </div>
                       <p className="text-xs" style={{ color: "#abd1c6" }}>
                         {new Date(app.createdAt).toLocaleDateString("ru-RU")}

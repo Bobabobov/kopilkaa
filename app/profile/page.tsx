@@ -29,7 +29,8 @@ export default function ProfilePage() {
 
 function ProfilePageContent() {
   const { data: profileData, loading, error, refetch } = useProfileDashboard();
-  const { isSettingsModalOpen, setIsSettingsModalOpen } = useProfileSettingsModal();
+  const { isSettingsModalOpen, setIsSettingsModalOpen } =
+    useProfileSettingsModal();
 
   // Обработка URL параметров
   useProfileUrlParams();

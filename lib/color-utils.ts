@@ -4,7 +4,9 @@
 /**
  * Конвертирует HEX цвет в RGB
  */
-export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+export function hexToRgb(
+  hex: string,
+): { r: number; g: number; b: number } | null {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
@@ -62,7 +64,7 @@ export function getSecondaryTextColorForBackground(hex: string): string {
  */
 export function getOverlayOpacity(hex: string): number {
   const brightness = getColorBrightness(hex);
-  
+
   // Для очень светлых цветов нужен более темный оверлей
   if (brightness > 0.7) return 0.3;
   // Для светлых цветов - средний оверлей
@@ -71,4 +73,3 @@ export function getOverlayOpacity(hex: string): number {
   if (brightness > 0.3) return 0.1;
   return 0;
 }
-

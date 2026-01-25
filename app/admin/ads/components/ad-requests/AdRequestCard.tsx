@@ -94,7 +94,9 @@ export default function AdRequestCard({
                   <span className="font-medium text-[#fffffe] block mb-1">
                     Срок:
                   </span>
-                  <span className="text-[#abd1c6]">{request.duration} дней</span>
+                  <span className="text-[#abd1c6]">
+                    {request.duration} дней
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-[#fffffe] block mb-1">
@@ -220,4 +222,3 @@ export default function AdRequestCard({
     </motion.div>
   );
 }
-

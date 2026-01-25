@@ -17,11 +17,13 @@ export async function GET(
 
   try {
     const { userId: identifier } = await params;
-    console.log("=== GET /api/users/[userId] ===", { userId: identifier });
 
     const normalized = String(identifier ?? "").trim();
     if (!normalized) {
-      return NextResponse.json({ message: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     const baseSelect = {

@@ -43,8 +43,13 @@ export default function PreviewImageUpload({
       {/* Индикатор загрузки */}
       {uploading && (
         <div className="flex items-center gap-2 px-4 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg">
-          <LucideIcons.Loader2 size="sm" className="animate-spin text-[#f9bc60]" />
-          <span className="text-sm text-[#abd1c6]">Загрузка изображения...</span>
+          <LucideIcons.Loader2
+            size="sm"
+            className="animate-spin text-[#f9bc60]"
+          />
+          <span className="text-sm text-[#abd1c6]">
+            Загрузка изображения...
+          </span>
         </div>
       )}
 
@@ -92,4 +97,3 @@ export default function PreviewImageUpload({
     </div>
   );
 }
-

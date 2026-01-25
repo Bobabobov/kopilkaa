@@ -14,7 +14,6 @@ export default function NotFoundHero() {
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className="relative flex items-center justify-center min-h-[400px] sm:min-h-[500px] md:min-h-[600px] lg:min-h-[700px]"
     >
-
       {/* Основное изображение */}
       <motion.div
         animate={{
@@ -42,7 +41,11 @@ export default function NotFoundHero() {
             <div className="text-center">
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
                 className="text-9xl sm:text-[12rem] md:text-[14rem] mb-4"
               >
                 🐷
@@ -57,4 +60,3 @@ export default function NotFoundHero() {
     </motion.div>
   );
 }
-

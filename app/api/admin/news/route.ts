@@ -40,20 +40,33 @@ export async function POST(request: Request) {
     };
 
     const titleRaw = typeof body.title === "string" ? body.title.trim() : "";
-    const contentRaw = typeof body.content === "string" ? body.content.trim() : "";
+    const contentRaw =
+      typeof body.content === "string" ? body.content.trim() : "";
     const media = Array.isArray(body.media) ? body.media : [];
 
     if (!contentRaw) {
-      return NextResponse.json({ error: "Текст новости обязателен" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Текст новости обязателен" },
+        { status: 400 },
+      );
     }
     if (contentRaw.length > 5000) {
-      return NextResponse.json({ error: "Слишком длинный текст (макс. 5000)" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Слишком длинный текст (макс. 5000)" },
+        { status: 400 },
+      );
     }
     if (titleRaw.length > 120) {
-      return NextResponse.json({ error: "Слишком длинный заголовок (макс. 120)" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Слишком длинный заголовок (макс. 120)" },
+        { status: 400 },
+      );
     }
     if (media.length > 10) {
-      return NextResponse.json({ error: "Слишком много медиа (макс. 10)" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Слишком много медиа (макс. 10)" },
+        { status: 400 },
+      );
     }
 
     const normalizedMedia = media
@@ -66,11 +79,18 @@ export async function POST(request: Request) {
 
     for (const m of normalizedMedia) {
       if (!isSafeUploadUrl(m.url)) {
-        return NextResponse.json({ error: "Разрешены только файлы, загруженные на сайт" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Разрешены только файлы, загруженные на сайт" },
+          { status: 400 },
+        );
       }
     }
 
-    const badgeValue = body.badge && ["UPDATE", "PLANS", "THOUGHTS", "IMPORTANT"].includes(body.badge) ? body.badge : null;
+    const badgeValue =
+      body.badge &&
+      ["UPDATE", "PLANS", "THOUGHTS", "IMPORTANT"].includes(body.badge)
+        ? body.badge
+        : null;
 
     const created = await prisma.projectNewsPost.create({
       data: {
@@ -95,9 +115,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, item: created });
   } catch (error) {
     console.error("POST /api/admin/news error:", error);
-    return NextResponse.json({ error: "Ошибка создания новости" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Ошибка создания новости" },
+      { status: 500 },
+    );
   }
 }
-
-
-

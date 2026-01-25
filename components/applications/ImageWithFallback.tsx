@@ -51,7 +51,6 @@ export function ImageWithFallback({ src, alt, index }: ImageWithFallbackProps) {
         </div>
       ) : (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
             alt={alt}
@@ -65,9 +64,3 @@ export function ImageWithFallback({ src, alt, index }: ImageWithFallbackProps) {
     </motion.div>
   );
 }
-
-
-
-
-
-

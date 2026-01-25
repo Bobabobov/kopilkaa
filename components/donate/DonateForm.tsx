@@ -24,11 +24,17 @@ export function DonateForm({
   return (
     <form onSubmit={onSubmit} className="space-y-5">
       <div>
-        <label className="block text-sm font-semibold mb-3" style={{ color: "#abd1c6" }}>
+        <label
+          className="block text-sm font-semibold mb-3"
+          style={{ color: "#abd1c6" }}
+        >
           Сумма пожертвования
         </label>
         <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold" style={{ color: "#f9bc60" }}>
+          <div
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold"
+            style={{ color: "#f9bc60" }}
+          >
             ₽
           </div>
           <input
@@ -44,7 +50,7 @@ export function DonateForm({
             className="w-full pl-12 pr-6 py-4 rounded-2xl border-2 text-xl font-semibold bg-gradient-to-br from-[#020617] to-[#001e1d] placeholder:text-[#6b7280] focus:outline-none focus:border-[#f9bc60] focus:ring-2 focus:ring-[#f9bc60]/30 transition-all duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             style={{
               borderColor: amount ? "rgba(249, 188, 96, 0.4)" : "#1f2937",
-              color: "#fffffe"
+              color: "#fffffe",
             }}
           />
         </div>
@@ -52,7 +58,7 @@ export function DonateForm({
           <motion.p
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-xs mt-2 text-center" 
+            className="text-xs mt-2 text-center"
             style={{ color: "#6b7280" }}
           >
             Минимум: 1₽ • Максимум: 100 000₽
@@ -83,7 +89,7 @@ export function DonateForm({
         className="w-full py-3 px-4 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 shadow-lg"
         style={{
           backgroundColor: "#f9bc60",
-          color: "#001e1d"
+          color: "#001e1d",
         }}
       >
         {loading ? (
@@ -98,5 +104,3 @@ export function DonateForm({
     </form>
   );
 }
-
-

@@ -50,10 +50,10 @@ export default function StoryImagesSection({
         </button>
       )}
       <p className="text-xs text-[#abd1c6]/70">
-        Эти картинки показываются внутри самой истории в /stories/ad. Превью карточки на странице{" "}
-        <code>/stories</code> берётся из поля выше «Картинка для превью».
+        Эти картинки показываются внутри самой истории в /stories/ad. Превью
+        карточки на странице <code>/stories</code> берётся из поля выше
+        «Картинка для превью».
       </p>
     </div>
   );
 }
-

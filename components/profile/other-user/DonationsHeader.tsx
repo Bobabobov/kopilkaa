@@ -31,7 +31,10 @@ export function DonationsHeader({ stats }: DonationsHeaderProps) {
               Оплаты
             </h3>
             <p className="text-[10px] sm:text-xs text-[#abd1c6] mt-0.5 font-medium">
-              Всего: <span className="text-[#f9bc60] font-bold">{formatAmount(stats.totalDonated)}</span>
+              Всего:{" "}
+              <span className="text-[#f9bc60] font-bold">
+                {formatAmount(stats.totalDonated)}
+              </span>
             </p>
           </div>
         </div>
@@ -44,7 +47,9 @@ export function DonationsHeader({ stats }: DonationsHeaderProps) {
           <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-[#f9bc60] to-[#e8a545] bg-clip-text text-transparent">
             {stats.donationsCount}
           </div>
-          <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">платежей</div>
+          <div className="text-[10px] sm:text-xs text-[#abd1c6] font-medium">
+            платежей
+          </div>
         </motion.div>
       </div>
     </div>

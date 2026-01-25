@@ -47,7 +47,7 @@ export default function NotificationDropdownMenu({
 
   // Вычисляем позицию для десктопа
   const getDesktopPosition = () => {
-    if (typeof window === 'undefined' || !buttonRef?.current) {
+    if (typeof window === "undefined" || !buttonRef?.current) {
       return { top: 0, right: 0 };
     }
     const rect = buttonRef.current.getBoundingClientRect();
@@ -74,18 +74,19 @@ export default function NotificationDropdownMenu({
               className="fixed sm:hidden z-[99999] left-2 right-2 bg-gradient-to-br from-[#004643] via-[#003d3a] to-[#001e1d] rounded-2xl shadow-2xl border border-[#abd1c6]/30 overflow-hidden backdrop-blur-xl"
               style={{
                 top: `${menuPosition.top}px`,
-                maxHeight: typeof window !== 'undefined' 
-                  ? `${Math.min(window.innerHeight - menuPosition.top - 16, window.innerHeight - 16)}px`
-                  : 'calc(100vh - 5rem)',
-                position: 'fixed',
+                maxHeight:
+                  typeof window !== "undefined"
+                    ? `${Math.min(window.innerHeight - menuPosition.top - 16, window.innerHeight - 16)}px`
+                    : "calc(100vh - 5rem)",
+                position: "fixed",
               }}
               onClick={(e) => e.stopPropagation()}
             >
               {menuContent}
             </motion.div>,
-            document.body
+            document.body,
           )}
-          
+
           {/* Планшетная и десктопная версия через Portal */}
           {createPortal(
             <motion.div
@@ -98,18 +99,16 @@ export default function NotificationDropdownMenu({
               style={{
                 top: `${desktopPosition.top}px`,
                 right: `${desktopPosition.right}px`,
-                position: 'fixed',
+                position: "fixed",
               }}
               onClick={(e) => e.stopPropagation()}
             >
               {menuContent}
             </motion.div>,
-            document.body
+            document.body,
           )}
         </>
       )}
     </AnimatePresence>
   );
 }
-
-

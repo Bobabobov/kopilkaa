@@ -6,7 +6,7 @@ import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 export async function GET() {
   try {
     const admin = await getAllowedAdminUser();
-    
+
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -17,24 +17,28 @@ export async function GET() {
 
     const safeAds = ads.map((ad: any) => {
       const safeConfig =
-        ad?.config && typeof ad.config === "object" ? { ...(ad.config as any) } : null;
+        ad?.config && typeof ad.config === "object"
+          ? { ...(ad.config as any) }
+          : null;
       if (safeConfig && typeof safeConfig.storyText === "string") {
-        safeConfig.storyText = sanitizeApplicationStoryHtml(safeConfig.storyText);
+        safeConfig.storyText = sanitizeApplicationStoryHtml(
+          safeConfig.storyText,
+        );
       }
       return {
         ...ad,
         config: safeConfig,
-        content: typeof ad.content === "string" ? sanitizeApplicationStoryHtml(ad.content) : ad.content,
+        content:
+          typeof ad.content === "string"
+            ? sanitizeApplicationStoryHtml(ad.content)
+            : ad.content,
       };
     });
 
     return NextResponse.json({ ads: safeAds });
   } catch (error) {
     console.error("Error fetching ads:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch ads" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch ads" }, { status: 500 });
   }
 }
 
@@ -58,11 +62,16 @@ export async function POST(request: NextRequest) {
 
     const finalPlacement: string = placement || "home_sidebar";
     const finalIsActive: boolean = isActive ?? true;
-    const safeContent = typeof content === "string" ? sanitizeApplicationStoryHtml(content) : content;
+    const safeContent =
+      typeof content === "string"
+        ? sanitizeApplicationStoryHtml(content)
+        : content;
     const safeConfig =
       config && typeof config === "object" ? { ...(config as any) } : config;
     if (safeConfig && typeof (safeConfig as any).storyText === "string") {
-      (safeConfig as any).storyText = sanitizeApplicationStoryHtml((safeConfig as any).storyText);
+      (safeConfig as any).storyText = sanitizeApplicationStoryHtml(
+        (safeConfig as any).storyText,
+      );
     }
 
     // Гарантируем "один активный баннер на слот" для home_banner:
@@ -93,14 +102,14 @@ export async function POST(request: NextRequest) {
       ad: {
         ...ad,
         config: safeConfig || null,
-        content: typeof ad.content === "string" ? sanitizeApplicationStoryHtml(ad.content) : ad.content,
+        content:
+          typeof ad.content === "string"
+            ? sanitizeApplicationStoryHtml(ad.content)
+            : ad.content,
       },
     });
   } catch (error) {
     console.error("Error creating ad:", error);
-    return NextResponse.json(
-      { error: "Failed to create ad" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create ad" }, { status: 500 });
   }
 }

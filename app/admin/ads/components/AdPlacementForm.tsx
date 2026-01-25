@@ -7,7 +7,11 @@ import BannerMobileField from "./placement-form/BannerMobileField";
 import SidebarMobileFields from "./placement-form/SidebarMobileFields";
 import ContentField from "./placement-form/ContentField";
 import FormActions from "./placement-form/FormActions";
-import { useImageUpload, useMultipleImageUpload, useVideoUpload } from "./placement-form/useImageUpload";
+import {
+  useImageUpload,
+  useMultipleImageUpload,
+  useVideoUpload,
+} from "./placement-form/useImageUpload";
 
 interface AdPlacementFormProps {
   formData: AdFormData;
@@ -96,7 +100,9 @@ export default function AdPlacementForm({
     }
   };
 
-  const handlePreviewFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePreviewFileSelectWrapper = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     handlePreviewFileSelect(e, (url) => {
       updateField("imageUrl", url);
     });
@@ -112,7 +118,9 @@ export default function AdPlacementForm({
     updateField("imageUrl", "");
   };
 
-  const handleSidebarImageFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSidebarImageFileSelectWrapper = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     handleSidebarImageFileSelect(e, (url) => {
       updateField("imageUrl", url);
     });
@@ -128,7 +136,9 @@ export default function AdPlacementForm({
     updateField("imageUrl", "");
   };
 
-  const handleSidebarMobileImageFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSidebarMobileImageFileSelectWrapper = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     handleSidebarMobileImageFileSelect(e, (url) => {
       updateField("sidebarMobileImageUrl", url);
     });
@@ -144,7 +154,9 @@ export default function AdPlacementForm({
     updateField("sidebarMobileImageUrl", "");
   };
 
-  const handleBannerImageFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerImageFileSelectWrapper = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     handleBannerImageFileSelect(e, (url) => {
       updateField("imageUrl", url);
     });
@@ -160,7 +172,9 @@ export default function AdPlacementForm({
     updateField("imageUrl", "");
   };
 
-  const handleBannerMobileImageFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerMobileImageFileSelectWrapper = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     handleBannerMobileImageFileSelect(e, (url) => {
       updateField("bannerMobileImageUrl", url);
     });
@@ -176,7 +190,9 @@ export default function AdPlacementForm({
     updateField("bannerMobileImageUrl", "");
   };
 
-  const handleBannerVideoFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerVideoFileSelectWrapper = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     handleBannerVideoFileSelect(e, (url) => {
       updateField("bannerVideoUrl", url);
     });
@@ -192,7 +208,9 @@ export default function AdPlacementForm({
     updateField("bannerVideoUrl", "");
   };
 
-  const handleBannerMobileVideoFileSelectWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerMobileVideoFileSelectWrapper = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     handleBannerMobileVideoFileSelect(e, (url) => {
       updateField("bannerMobileVideoUrl", url);
     });
@@ -210,7 +228,7 @@ export default function AdPlacementForm({
 
   const handleStoryImageFileSelectWrapper = (
     index: number,
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     handleStoryImageFileSelect(index, e, (idx, url) => {
       updateStoryImageUrl(idx, url);
@@ -313,7 +331,9 @@ export default function AdPlacementForm({
             onBannerVideoRemove={handleBannerVideoRemove}
             bannerMobileVideoPreviewFile={bannerMobileVideoFile}
             uploadingBannerMobileVideo={uploadingBannerMobileVideo}
-            onBannerMobileVideoFileSelect={handleBannerMobileVideoFileSelectWrapper}
+            onBannerMobileVideoFileSelect={
+              handleBannerMobileVideoFileSelectWrapper
+            }
             onBannerMobileVideoUrlChange={handleBannerMobileVideoUrlChange}
             onBannerMobileVideoRemove={handleBannerMobileVideoRemove}
           />
@@ -337,7 +357,6 @@ export default function AdPlacementForm({
           editingAd={editingAd}
           isActive={formData.isActive}
           onActiveChange={(active) => updateField("isActive", active)}
-          onSubmit={onSubmit}
           onCancel={onCancel}
         />
       </form>

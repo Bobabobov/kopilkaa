@@ -27,7 +27,12 @@ function SocialChip({
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
-      style={{ color, borderColor: `${color}55`, backgroundColor: `${color}12`, borderWidth: 1 }}
+      style={{
+        color,
+        borderColor: `${color}55`,
+        backgroundColor: `${color}12`,
+        borderWidth: 1,
+      }}
     >
       {children}
       <span>{label}</span>
@@ -41,9 +46,12 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
   const avatarUrl = user.avatar || "/default-avatar.png";
   const trust = user.trust;
   const trustLevelNumber = trust.status.split("_")[1] || "";
-  const trustTitle = trustLevelNumber ? `Уровень одобрения ${trustLevelNumber}` : "Уровень одобрения";
+  const trustTitle = trustLevelNumber
+    ? `Уровень одобрения ${trustLevelNumber}`
+    : "Уровень одобрения";
   const trustLabel =
-    trust.nextRequirement ?? `Одобрено заявок: ${trust.approved.toLocaleString("ru-RU")}`;
+    trust.nextRequirement ??
+    `Одобрено заявок: ${trust.approved.toLocaleString("ru-RU")}`;
   const profileHref = user.id ? `/profile/${user.id}` : null;
 
   const href = `/reviews/${review.id}`;
@@ -125,10 +133,12 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                   {user.name}
                 </button>
               ) : (
-                <span className="text-sm font-semibold leading-tight">{user.name}</span>
+                <span className="text-sm font-semibold leading-tight">
+                  {user.name}
+                </span>
               )}
-              {user.username && (
-                profileHref ? (
+              {user.username &&
+                (profileHref ? (
                   <button
                     onClick={handleProfileClick}
                     className="text-[11px] text-white/85 hover:text-white transition-colors text-left cursor-pointer"
@@ -136,9 +146,10 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                     @{user.username}
                   </button>
                 ) : (
-                  <span className="text-[11px] text-white/85">@{user.username}</span>
-                )
-              )}
+                  <span className="text-[11px] text-white/85">
+                    @{user.username}
+                  </span>
+                ))}
             </div>
           </div>
         </div>
@@ -184,12 +195,20 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                 </SocialChip>
               )}
               {user.telegramLink && (
-                <SocialChip href={user.telegramLink} label="Telegram" color="#229ED9">
+                <SocialChip
+                  href={user.telegramLink}
+                  label="Telegram"
+                  color="#229ED9"
+                >
                   <TelegramIcon className="w-4 h-4" />
                 </SocialChip>
               )}
               {user.youtubeLink && (
-                <SocialChip href={user.youtubeLink} label="YouTube" color="#ff4f45">
+                <SocialChip
+                  href={user.youtubeLink}
+                  label="YouTube"
+                  color="#ff4f45"
+                >
                   <YouTubeIcon className="w-4 h-4" />
                 </SocialChip>
               )}

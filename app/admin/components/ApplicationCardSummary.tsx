@@ -1,6 +1,5 @@
 // app/admin/components/ApplicationCardSummary.tsx
 "use client";
-import type { ApplicationItem } from "../types";
 
 interface ApplicationCardSummaryProps {
   summary: string;
@@ -17,4 +16,3 @@ export default function ApplicationCardSummary({
     </div>
   );
 }
-

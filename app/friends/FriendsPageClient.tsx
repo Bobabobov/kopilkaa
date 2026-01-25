@@ -11,19 +11,29 @@ import { FriendsSearch } from "@/components/friends/FriendsSearch";
 import { FriendsSidebar } from "@/components/friends/FriendsSidebar";
 import { FriendsPageHeader } from "@/app/friends/components/FriendsPageHeader";
 import { FriendsSummaryCards } from "@/app/friends/components/FriendsSummaryCards";
-import { FriendsTabsBar, FriendsTabId } from "@/app/friends/components/FriendsTabsBar";
+import {
+  FriendsTabsBar,
+  FriendsTabId,
+} from "@/app/friends/components/FriendsTabsBar";
 
 export default function FriendsPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const allowedTabs = new Set<FriendsTabId>(["friends", "sent", "received", "search"]);
+  const allowedTabs = new Set<FriendsTabId>([
+    "friends",
+    "sent",
+    "received",
+    "search",
+  ]);
   const initialTab: FriendsTabId = allowedTabs.has(tabParam as FriendsTabId)
     ? (tabParam as FriendsTabId)
     : "friends";
 
   const [activeTab, setActiveTab] = useState<FriendsTabId>(initialTab);
-  const [lastReadRequestId, setLastReadRequestId] = useState<string | null>(null);
+  const [lastReadRequestId, setLastReadRequestId] = useState<string | null>(
+    null,
+  );
 
   useAutoHideScrollbar();
 
@@ -66,8 +76,11 @@ export default function FriendsPageClient() {
   }, [activeTab, receivedRequests]);
 
   const newRequestsCount = useMemo(() => {
-    if (!lastReadRequestId || receivedRequests.length === 0) return receivedRequests.length;
-    const lastReadIndex = receivedRequests.findIndex((req) => req.id === lastReadRequestId);
+    if (!lastReadRequestId || receivedRequests.length === 0)
+      return receivedRequests.length;
+    const lastReadIndex = receivedRequests.findIndex(
+      (req) => req.id === lastReadRequestId,
+    );
     if (lastReadIndex === -1) return receivedRequests.length;
     return lastReadIndex;
   }, [lastReadRequestId, receivedRequests]);
@@ -91,7 +104,11 @@ export default function FriendsPageClient() {
       count: receivedRequests.length,
       icon: <LucideIcons.Inbox size="sm" />,
     },
-    { id: "search" as const, label: "Поиск", icon: <LucideIcons.Search size="sm" /> },
+    {
+      id: "search" as const,
+      label: "Поиск",
+      icon: <LucideIcons.Search size="sm" />,
+    },
   ];
 
   const handleSendRequest = async (userId: string) => {
@@ -258,5 +275,3 @@ export default function FriendsPageClient() {
     </div>
   );
 }
-
-

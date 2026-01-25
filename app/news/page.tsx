@@ -33,7 +33,7 @@ export default async function NewsPage() {
 
   const hasMore = posts.length > limit;
   const page = hasMore ? posts.slice(0, limit) : posts;
-  const nextCursor = hasMore ? page[page.length - 1]?.id ?? null : null;
+  const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
 
   // Реакция текущего пользователя на каждый пост (если авторизован)
   let myReactionByPostId: Record<string, "LIKE" | "DISLIKE"> = {};
@@ -48,10 +48,13 @@ export default async function NewsPage() {
       })
       .catch(() => []);
 
-    myReactionByPostId = reactions.reduce((acc: any, r: any) => {
-      acc[r.postId] = r.type;
-      return acc;
-    }, {} as Record<string, "LIKE" | "DISLIKE">);
+    myReactionByPostId = reactions.reduce(
+      (acc: any, r: any) => {
+        acc[r.postId] = r.type;
+        return acc;
+      },
+      {} as Record<string, "LIKE" | "DISLIKE">,
+    );
   }
 
   const initialItems: NewsItem[] = page.map((p: any) => ({
@@ -76,6 +79,3 @@ export default async function NewsPage() {
     />
   );
 }
-
-
-

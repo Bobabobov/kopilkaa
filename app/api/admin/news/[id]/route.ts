@@ -17,9 +17,9 @@ export async function DELETE(
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("DELETE /api/admin/news/[id] error:", error);
-    return NextResponse.json({ error: "Ошибка удаления новости" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Ошибка удаления новости" },
+      { status: 500 },
+    );
   }
 }
-
-
-

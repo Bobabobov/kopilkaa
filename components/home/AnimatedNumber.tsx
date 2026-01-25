@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion, useMotionValue, useTransform, animate, useInView } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  animate,
+  useInView,
+} from "framer-motion";
 
 interface AnimatedNumberProps {
   value: number;
@@ -13,7 +19,11 @@ interface AnimatedNumberProps {
  * Оптимизированный компонент анимированного числа
  * Анимация запускается только при попадании в viewport и только один раз
  */
-export default function AnimatedNumber({ value, prefix = "", suffix = "" }: AnimatedNumberProps) {
+export default function AnimatedNumber({
+  value,
+  prefix = "",
+  suffix = "",
+}: AnimatedNumberProps) {
   const motionValue = useMotionValue(0);
   const rounded = useTransform(motionValue, (latest) => Math.round(latest));
   const ref = useRef<HTMLSpanElement>(null);
@@ -51,4 +61,3 @@ export default function AnimatedNumber({ value, prefix = "", suffix = "" }: Anim
     </motion.span>
   );
 }
-

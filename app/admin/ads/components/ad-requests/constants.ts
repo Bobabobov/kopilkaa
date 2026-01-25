@@ -22,5 +22,3 @@ export const statusColors: Record<string, string> = {
   approved: "bg-green-500/20 text-green-300 border-green-500/50",
   rejected: "bg-red-500/20 text-red-300 border-red-500/50",
 };
-
-

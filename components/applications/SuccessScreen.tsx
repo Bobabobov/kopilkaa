@@ -50,7 +50,12 @@ export default function SuccessScreen({
         />
         <motion.div
           animate={{ scale: [1, 1.5, 1], opacity: [0.2, 0, 0.2] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.5,
+          }}
           className="absolute inset-0 w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-[#f9bc60]/20 mx-auto"
         />
       </motion.div>
@@ -140,7 +145,11 @@ export default function SuccessScreen({
             >
               <motion.div
                 animate={{ y: [0, -3, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               >
                 <LucideIcons.Mail size="lg" className="text-[#f9bc60]" />
               </motion.div>
@@ -172,7 +181,11 @@ export default function SuccessScreen({
             >
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               >
                 <LucideIcons.Clock size="lg" className="text-[#d7e9e0]" />
               </motion.div>
@@ -181,7 +194,8 @@ export default function SuccessScreen({
               Следующая заявка
             </h3>
             <p className="text-xs sm:text-sm text-center text-[#c8ddd6] leading-relaxed">
-              Новую заявку можно подать через 24 часа — это помогает сохранять честность и порядок
+              Новую заявку можно подать через 24 часа — это помогает сохранять
+              честность и порядок
             </p>
           </div>
         </motion.div>
@@ -206,7 +220,11 @@ export default function SuccessScreen({
               >
                 <motion.div
                   animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                 >
                   <LucideIcons.Heart size="lg" className="text-red-400" />
                 </motion.div>
@@ -234,7 +252,10 @@ export default function SuccessScreen({
             whileTap={{ scale: 0.95 }}
             className="px-8 sm:px-10 py-3 bg-[#abd1c6]/10 hover:bg-[#abd1c6]/20 text-[#fffffe] font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 flex items-center justify-center gap-2 group"
           >
-            <LucideIcons.User className="group-hover:scale-110 transition-transform duration-300" size="sm" />
+            <LucideIcons.User
+              className="group-hover:scale-110 transition-transform duration-300"
+              size="sm"
+            />
             Мой профиль
           </motion.button>
         </Link>

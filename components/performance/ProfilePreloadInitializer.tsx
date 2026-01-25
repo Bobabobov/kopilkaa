@@ -13,19 +13,3 @@ export default function ProfilePreloadInitializer() {
 
   return null; // Этот компонент ничего не рендерит
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

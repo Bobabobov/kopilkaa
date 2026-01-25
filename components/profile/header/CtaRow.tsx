@@ -45,9 +45,7 @@ export function CtaRow({
   return (
     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
       {isOwner ? (
-        <>
-          {hasSocialLinks && <SocialLinks user={user} />}
-        </>
+        <>{hasSocialLinks && <SocialLinks user={user} />}</>
       ) : (
         <>
           {hasSocialLinks && <SocialLinks user={user} />}
@@ -77,7 +75,9 @@ export function CtaRow({
                 onClose={() => setIsGuestActionsOpen(false)}
                 onReport={() => {
                   window.dispatchEvent(
-                    new CustomEvent("open-report-user-modal", { detail: { userId: user.id } }),
+                    new CustomEvent("open-report-user-modal", {
+                      detail: { userId: user.id },
+                    }),
                   );
                 }}
               />,

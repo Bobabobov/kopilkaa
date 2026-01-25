@@ -24,26 +24,36 @@ export default function ReportsTips() {
         <div className="space-y-2">
           <div className="flex items-start gap-2">
             <span className="mt-0.5 text-[#f9bc60]">•</span>
-            <span><span className="text-[#f9bc60]">Заголовок:</span> что именно не так.</span>
+            <span>
+              <span className="text-[#f9bc60]">Заголовок:</span> что именно не
+              так.
+            </span>
           </div>
           <div className="flex items-start gap-2">
             <span className="mt-0.5 text-[#f9bc60]">•</span>
-            <span><span className="text-[#f9bc60]">Шаги и ожидание:</span> что сделали, что хотели получить, что получили.</span>
+            <span>
+              <span className="text-[#f9bc60]">Шаги и ожидание:</span> что
+              сделали, что хотели получить, что получили.
+            </span>
           </div>
         </div>
         <div className="space-y-2">
           <div className="flex items-start gap-2">
             <span className="mt-0.5 text-[#f9bc60]">•</span>
-            <span><span className="text-[#f9bc60]">Доказательства:</span> скриншоты, ссылки, короткое видео.</span>
+            <span>
+              <span className="text-[#f9bc60]">Доказательства:</span> скриншоты,
+              ссылки, короткое видео.
+            </span>
           </div>
           <div className="flex items-start gap-2">
             <span className="mt-0.5 text-[#f9bc60]">•</span>
-            <span><span className="text-[#f9bc60]">Безопасность:</span> опишите, как воспроизвести уязвимость (без лишних деталей наружу).</span>
+            <span>
+              <span className="text-[#f9bc60]">Безопасность:</span> опишите, как
+              воспроизвести уязвимость (без лишних деталей наружу).
+            </span>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-

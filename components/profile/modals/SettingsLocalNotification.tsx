@@ -7,7 +7,9 @@ interface SettingsLocalNotificationProps {
   notification: LocalNotification;
 }
 
-export function SettingsLocalNotification({ notification }: SettingsLocalNotificationProps) {
+export function SettingsLocalNotification({
+  notification,
+}: SettingsLocalNotificationProps) {
   return (
     <AnimatePresence>
       {notification.show && (
@@ -27,10 +29,17 @@ export function SettingsLocalNotification({ notification }: SettingsLocalNotific
           <div className="flex items-center gap-2 sm:gap-3">
             <div
               className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: notification.type === "error" ? "#e16162" : "#f9bc60" }}
+              style={{
+                backgroundColor:
+                  notification.type === "error" ? "#e16162" : "#f9bc60",
+              }}
             >
               <span className="text-white text-xs sm:text-sm">
-                {notification.type === "success" ? "✓" : notification.type === "error" ? "✗" : "ℹ"}
+                {notification.type === "success"
+                  ? "✓"
+                  : notification.type === "error"
+                    ? "✗"
+                    : "ℹ"}
               </span>
             </div>
             <div className="flex-1 min-w-0">

@@ -20,29 +20,41 @@ const formatGroupDate = (dateString: string): string => {
   yesterday.setDate(yesterday.getDate() - 1);
 
   // Сбрасываем время для сравнения
-  const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const yesterdayOnly = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
+  const dateOnly = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  );
+  const todayOnly = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+  const yesterdayOnly = new Date(
+    yesterday.getFullYear(),
+    yesterday.getMonth(),
+    yesterday.getDate(),
+  );
 
   if (dateOnly.getTime() === todayOnly.getTime()) {
     return "Сегодня";
   } else if (dateOnly.getTime() === yesterdayOnly.getTime()) {
     return "Вчера";
   } else {
-    return date.toLocaleDateString("ru-RU", { 
-      day: "numeric", 
+    return date.toLocaleDateString("ru-RU", {
+      day: "numeric",
       month: "long",
-      year: date.getFullYear() !== today.getFullYear() ? "numeric" : undefined
+      year: date.getFullYear() !== today.getFullYear() ? "numeric" : undefined,
     });
   }
 };
 
-export default function NotificationGroup({ 
-  date, 
-  notifications, 
+export default function NotificationGroup({
+  date,
+  notifications,
   lastViewedTimestamp,
   onNotificationClick,
-  startIndex 
+  startIndex,
 }: NotificationGroupProps) {
   return (
     <motion.div
@@ -74,5 +86,3 @@ export default function NotificationGroup({
     </motion.div>
   );
 }
-
-

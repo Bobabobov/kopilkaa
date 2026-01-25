@@ -11,7 +11,12 @@ interface HeaderIdentityProps {
   status: UserStatus;
 }
 
-export function HeaderIdentity({ name, role, heroBadge, status }: HeaderIdentityProps) {
+export function HeaderIdentity({
+  name,
+  role,
+  heroBadge,
+  status,
+}: HeaderIdentityProps) {
   return (
     <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-0 -mt-8 sm:-mt-10 md:-mt-12">
       <motion.h1

@@ -9,7 +9,13 @@ export function PersonalStatsSocial({ vm }: PersonalStatsSocialProps) {
   const { stats } = vm;
   return (
     <div className="grid gap-2 sm:gap-3 md:gap-4 [grid-template-columns:repeat(auto-fit,minmax(170px,1fr))]">
-      <PersonalStatCard label="Друзья" value={stats.activity.friendsCount} icon="Users" color="#8B5CF6" hint="Общее число друзей" />
+      <PersonalStatCard
+        label="Друзья"
+        value={stats.activity.friendsCount}
+        icon="Users"
+        color="#8B5CF6"
+        hint="Общее число друзей"
+      />
       <PersonalStatCard
         label="Лайков получено"
         value={stats.activity.likesReceived}

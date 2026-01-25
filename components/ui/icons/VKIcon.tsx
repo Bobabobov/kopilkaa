@@ -16,5 +16,3 @@ export function VKIcon({ className }: VKIconProps) {
     </svg>
   );
 }
-
-

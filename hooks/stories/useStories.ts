@@ -49,7 +49,7 @@ export function useStories(): UseStoriesReturn {
   const [hasMore, setHasMore] = useState(true);
   const [query, setQuery] = useState("");
   const observerTargetRef = useRef<HTMLDivElement>(null);
-  
+
   // Отслеживание предыдущего запроса для корректного debounce
   const previousQueryRef = useRef("");
   // Флаг для отслеживания первой загрузки (для анимаций)
@@ -58,130 +58,130 @@ export function useStories(): UseStoriesReturn {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Загрузка историй с защитой от race conditions
-  const loadStories = useCallback(async (page: number, searchQuery: string, isNewSearch: boolean) => {
-    // НЕ используем AbortController для первой загрузки - это предотвращает отмену запросов
-    // Используем AbortController только для пагинации (page > 1)
-    let abortController: AbortController | null = null;
-    
-    if (page > 1) {
-      // Отменяем предыдущий запрос только при пагинации
-      if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
-        abortControllerRef.current.abort();
-      }
-      abortController = new AbortController();
-      abortControllerRef.current = abortController;
-    }
+  const loadStories = useCallback(
+    async (page: number, searchQuery: string, isNewSearch: boolean) => {
+      // НЕ используем AbortController для первой загрузки - это предотвращает отмену запросов
+      // Используем AbortController только для пагинации (page > 1)
+      let abortController: AbortController | null = null;
 
-    try {
-      if (page === 1) {
-        setLoading(true);
-        setIsInitialLoad(isNewSearch);
-      } else {
-        setLoadingMore(true);
-        setIsInitialLoad(false); // При подгрузке это уже не первая загрузка
+      if (page > 1) {
+        // Отменяем предыдущий запрос только при пагинации
+        if (
+          abortControllerRef.current &&
+          !abortControllerRef.current.signal.aborted
+        ) {
+          abortControllerRef.current.abort();
+        }
+        abortController = new AbortController();
+        abortControllerRef.current = abortController;
       }
 
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: "12",
-        ...(searchQuery && { q: searchQuery }),
-      });
-
-      const url = `/api/stories?${params}`;
-      
-      let response: Response;
       try {
-        response = await fetch(url, {
-          cache: "no-store",
-          ...(abortController && { signal: abortController.signal }),
-        });
-      } catch (fetchError: any) {
-        // Обрабатываем ошибки сети
-        if (fetchError.name === "AbortError") {
-          return;
-        }
-        console.error("[useStories] Network error:", fetchError);
         if (page === 1) {
-          setStories([]);
+          setLoading(true);
+          setIsInitialLoad(isNewSearch);
+        } else {
+          setLoadingMore(true);
+          setIsInitialLoad(false); // При подгрузке это уже не первая загрузка
         }
-        return;
-      }
 
-      // Проверяем, не был ли запрос отменён (только если используется AbortController)
-      if (abortController && abortController.signal.aborted) {
-        return;
-      }
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: "12",
+          ...(searchQuery && { q: searchQuery }),
+        });
 
-      if (response.ok) {
-        let data: StoriesResponse;
+        const url = `/api/stories?${params}`;
+
+        let response: Response;
         try {
-          data = await response.json();
-        } catch (jsonError) {
-          console.error("[useStories] JSON parse error:", jsonError);
+          response = await fetch(url, {
+            cache: "no-store",
+            ...(abortController && { signal: abortController.signal }),
+          });
+        } catch (fetchError: any) {
+          // Обрабатываем ошибки сети
+          if (fetchError.name === "AbortError") {
+            return;
+          }
+          console.error("[useStories] Network error:", fetchError);
           if (page === 1) {
             setStories([]);
           }
           return;
         }
 
-        const newStories = data.items || [];
-
-        // Отладочное логирование (можно убрать в production)
-        if (process.env.NODE_ENV === "development") {
-          console.log("[useStories] Loaded stories:", {
-            page,
-            count: newStories.length,
-            total: data.total,
-            pages: data.pages,
-          });
-        }
-
-        // Проверяем, не был ли запрос отменён после получения данных
+        // Проверяем, не был ли запрос отменён (только если используется AbortController)
         if (abortController && abortController.signal.aborted) {
           return;
         }
 
-        if (isNewSearch || page === 1) {
-          // При новом поиске - заменяем истории
-          setStories(newStories);
-        } else {
-          // При подгрузке - добавляем к существующим
-          setStories((prev) => [...prev, ...newStories]);
-        }
+        if (response.ok) {
+          let data: StoriesResponse;
+          try {
+            data = await response.json();
+          } catch (jsonError) {
+            console.error("[useStories] JSON parse error:", jsonError);
+            if (page === 1) {
+              setStories([]);
+            }
+            return;
+          }
 
-        // Проверяем, есть ли ещё страницы
-        setHasMore(page < (data.pages || 1));
-        setCurrentPage(page);
-      } else {
-        console.error("[useStories] Failed to load stories:", response.status, response.statusText);
-        // Пытаемся прочитать тело ответа для дополнительной информации
-        try {
-          const errorData = await response.text();
-          console.error("[useStories] Error response:", errorData);
-        } catch (e) {
-          // Игнорируем ошибки чтения тела ответа
+          const newStories = data.items || [];
+
+          // Проверяем, не был ли запрос отменён после получения данных
+          if (abortController && abortController.signal.aborted) {
+            return;
+          }
+
+          if (isNewSearch || page === 1) {
+            // При новом поиске - заменяем истории
+            setStories(newStories);
+          } else {
+            // При подгрузке - добавляем к существующим
+            setStories((prev) => [...prev, ...newStories]);
+          }
+
+          // Проверяем, есть ли ещё страницы
+          setHasMore(page < (data.pages || 1));
+          setCurrentPage(page);
+        } else {
+          console.error(
+            "[useStories] Failed to load stories:",
+            response.status,
+            response.statusText,
+          );
+          // Пытаемся прочитать тело ответа для дополнительной информации
+          try {
+            const errorData = await response.text();
+            console.error("[useStories] Error response:", errorData);
+          } catch (e) {
+            // Игнорируем ошибки чтения тела ответа
+          }
+          if (page === 1) {
+            setStories([]);
+          }
         }
+      } catch (error: any) {
+        // Игнорируем ошибки отменённых запросов
+        if (error.name === "AbortError") {
+          return;
+        }
+        console.error("Error loading stories:", error);
         if (page === 1) {
           setStories([]);
         }
+      } finally {
+        // Обновляем состояние только если запрос не был отменён
+        if (!abortController || !abortController.signal.aborted) {
+          setLoading(false);
+          setLoadingMore(false);
+        }
       }
-    } catch (error: any) {
-      // Игнорируем ошибки отменённых запросов
-      if (error.name === "AbortError") {
-        return;
-      }
-      console.error("Error loading stories:", error);
-      if (page === 1) {
-        setStories([]);
-      }
-    } finally {
-      // Обновляем состояние только если запрос не был отменён
-      if (!abortController || !abortController.signal.aborted) {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    }
-  }, []); // Пустой массив зависимостей - функция стабильна
+    },
+    [],
+  ); // Пустой массив зависимостей - функция стабильна
 
   // Загрузка следующей страницы
   const loadNextPage = useCallback(() => {
@@ -192,17 +192,20 @@ export function useStories(): UseStoriesReturn {
   }, [currentPage, query, hasMore, loading, loadingMore, loadStories]);
 
   // Сброс и новый поиск
-  const resetAndSearch = useCallback((newQuery: string) => {
-    const isNewSearch = newQuery !== previousQueryRef.current;
-    previousQueryRef.current = newQuery;
-    
-    if (isNewSearch) {
-      setCurrentPage(1);
-      setHasMore(true);
-      setStories([]);
-      loadStories(1, newQuery, true);
-    }
-  }, [loadStories]);
+  const resetAndSearch = useCallback(
+    (newQuery: string) => {
+      const isNewSearch = newQuery !== previousQueryRef.current;
+      previousQueryRef.current = newQuery;
+
+      if (isNewSearch) {
+        setCurrentPage(1);
+        setHasMore(true);
+        setStories([]);
+        loadStories(1, newQuery, true);
+      }
+    },
+    [loadStories],
+  );
 
   // Флаг для отслеживания первоначальной загрузки
   const hasInitializedRef = useRef(false);
@@ -219,7 +222,7 @@ export function useStories(): UseStoriesReturn {
 
     // Обработка изменения поискового запроса
     const isNewSearch = query !== previousQueryRef.current;
-    
+
     if (isNewSearch) {
       previousQueryRef.current = query;
       setCurrentPage(1);
@@ -252,5 +255,3 @@ export function useStories(): UseStoriesReturn {
     isInitialLoad,
   };
 }
-
-

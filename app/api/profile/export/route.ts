@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -148,9 +148,3 @@ export async function GET() {
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-
-
-
-
-
-

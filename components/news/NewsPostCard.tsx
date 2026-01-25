@@ -112,7 +112,6 @@ export function NewsPostCard({ item }: { item: NewsItem }) {
 
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/70">
               <span className="inline-flex items-center gap-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.author?.avatar || "/default-avatar.png"}
                   alt={`Аватар ${authorName}`}
@@ -128,7 +127,10 @@ export function NewsPostCard({ item }: { item: NewsItem }) {
               <span className="text-[#f9bc60]">•</span>
               <span>{created}</span>
               <span className="text-[#f9bc60]">•</span>
-              <Link href="/support" className="text-[#abd1c6] hover:text-[#fffffe] underline-offset-2 hover:underline">
+              <Link
+                href="/support"
+                className="text-[#abd1c6] hover:text-[#fffffe] underline-offset-2 hover:underline"
+              >
                 Поддержать проект
               </Link>
             </div>
@@ -154,7 +156,8 @@ export function NewsPostCard({ item }: { item: NewsItem }) {
               margin-bottom: 0.5rem;
               color: rgba(255, 255, 254, 0.9);
             }
-            .prose ul, .prose ol {
+            .prose ul,
+            .prose ol {
               margin-left: 1.5rem;
               margin-top: 0.5rem;
               margin-bottom: 0.5rem;
@@ -246,5 +249,3 @@ export function NewsPostCard({ item }: { item: NewsItem }) {
     </motion.article>
   );
 }
-
-

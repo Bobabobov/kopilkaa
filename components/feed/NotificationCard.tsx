@@ -4,11 +4,11 @@
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Notification } from "@/components/notifications/types";
-import { 
-  getNotificationIcon, 
-  getRarityColor, 
+import {
+  getNotificationIcon,
+  getRarityColor,
   getRarityLabel,
-  isNotificationUnread
+  isNotificationUnread,
 } from "@/components/notifications/utils";
 
 interface NotificationCardProps {
@@ -19,9 +19,14 @@ interface NotificationCardProps {
 }
 
 // Утилиты для визуального оформления
-const getNotificationAccent = (type: string, status?: string, rarity?: string, isRead?: boolean) => {
+const getNotificationAccent = (
+  type: string,
+  status?: string,
+  rarity?: string,
+  isRead?: boolean,
+) => {
   const opacity = isRead ? "20" : "40";
-  
+
   if (type === "like") {
     return `bg-gradient-to-r from-red-500/${opacity} to-pink-500/${opacity}`;
   }
@@ -61,21 +66,23 @@ const extractStoryTitleFromMessage = (message: string): string | null => {
   return match ? match[1] : null;
 };
 
-export default function NotificationCard({ 
-  notification, 
-  index, 
+export default function NotificationCard({
+  notification,
+  index,
   lastViewedTimestamp,
-  onClick 
+  onClick,
 }: NotificationCardProps) {
   const isUnread = isNotificationUnread(notification, lastViewedTimestamp);
-  const userName = notification.type === "like" 
-    ? extractUserNameFromMessage(notification.message) 
-    : notification.type === "friend_request"
-    ? notification.message.split(" хочет")[0]
-    : null;
-  const storyTitle = notification.type === "like" || notification.type === "application_status"
-    ? extractStoryTitleFromMessage(notification.message)
-    : null;
+  const userName =
+    notification.type === "like"
+      ? extractUserNameFromMessage(notification.message)
+      : notification.type === "friend_request"
+        ? notification.message.split(" хочет")[0]
+        : null;
+  const storyTitle =
+    notification.type === "like" || notification.type === "application_status"
+      ? extractStoryTitleFromMessage(notification.message)
+      : null;
 
   return (
     <motion.div
@@ -109,9 +116,10 @@ export default function NotificationCard({
           overflow-hidden
           transition-all duration-300
           cursor-pointer
-          ${isUnread 
-            ? 'opacity-100 shadow-2xl shadow-[#f9bc60]/10' 
-            : 'opacity-75 hover:opacity-100'
+          ${
+            isUnread
+              ? "opacity-100 shadow-2xl shadow-[#f9bc60]/10"
+              : "opacity-75 hover:opacity-100"
           }
           hover:border-[#abd1c6]/40
           hover:shadow-2xl
@@ -125,9 +133,9 @@ export default function NotificationCard({
               notification.type,
               notification.status,
               notification.rarity,
-              !isUnread
+              !isUnread,
             )}
-            ${isUnread ? 'shadow-lg shadow-[#f9bc60]/30' : ''}
+            ${isUnread ? "shadow-lg shadow-[#f9bc60]/30" : ""}
           `}
         />
 
@@ -141,7 +149,9 @@ export default function NotificationCard({
           <div className="flex items-start gap-4 sm:gap-5 lg:gap-6 flex-1">
             {/* Аватар или иконка */}
             <div className="flex-shrink-0">
-              {notification.avatar && (notification.type === "like" || notification.type === "friend_request") ? (
+              {notification.avatar &&
+              (notification.type === "like" ||
+                notification.type === "friend_request") ? (
                 <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl overflow-hidden border-2 border-[#abd1c6]/30 shadow-lg">
                   <img
                     src={notification.avatar}
@@ -149,7 +159,7 @@ export default function NotificationCard({
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.currentTarget;
-                      if (target.src !== '/default-avatar.png') {
+                      if (target.src !== "/default-avatar.png") {
                         target.src = "/default-avatar.png";
                       }
                     }}
@@ -167,13 +177,13 @@ export default function NotificationCard({
                     transition-all duration-300
                     group-hover:scale-110
                     group-hover:border-[#abd1c6]/40
-                    ${isUnread ? 'ring-2 ring-[#f9bc60]/20' : ''}
+                    ${isUnread ? "ring-2 ring-[#f9bc60]/20" : ""}
                   `}
                 >
                   {getNotificationIcon(
                     notification.type,
                     notification.rarity,
-                    notification.status
+                    notification.status,
                   )}
                 </div>
               )}
@@ -189,7 +199,7 @@ export default function NotificationCard({
                     font-semibold
                     text-[#fffffe]
                     leading-tight
-                    ${isUnread ? 'font-bold' : 'font-medium'}
+                    ${isUnread ? "font-bold" : "font-medium"}
                   `}
                 >
                   {notification.title}
@@ -206,7 +216,9 @@ export default function NotificationCard({
                   <>
                     <p className="text-sm sm:text-base text-[#abd1c6]/70 leading-relaxed">
                       {userName && (
-                        <span className="font-medium text-[#abd1c6]/90">{userName}</span>
+                        <span className="font-medium text-[#abd1c6]/90">
+                          {userName}
+                        </span>
                       )}
                       {userName && " поставил(а) лайк вашей истории"}
                       {!userName && notification.message}
@@ -235,14 +247,21 @@ export default function NotificationCard({
                         transition={{ delay: 0.8 + index * 0.08 }}
                         className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border"
                         style={{
-                          backgroundColor: getRarityColor(notification.rarity) + '20',
-                          borderColor: getRarityColor(notification.rarity) + '40',
+                          backgroundColor:
+                            getRarityColor(notification.rarity) + "20",
+                          borderColor:
+                            getRarityColor(notification.rarity) + "40",
                         }}
                       >
-                        <span style={{ color: getRarityColor(notification.rarity) }}>
+                        <span
+                          style={{ color: getRarityColor(notification.rarity) }}
+                        >
                           <LucideIcons.Star className="w-4 h-4" />
                         </span>
-                        <span className="text-xs sm:text-sm font-medium" style={{ color: getRarityColor(notification.rarity) }}>
+                        <span
+                          className="text-xs sm:text-sm font-medium"
+                          style={{ color: getRarityColor(notification.rarity) }}
+                        >
                           {getRarityLabel(notification.rarity)}
                         </span>
                       </motion.div>
@@ -255,9 +274,19 @@ export default function NotificationCard({
                   <>
                     <p className="text-sm sm:text-base text-[#abd1c6]/70 leading-relaxed">
                       {notification.status === "APPROVED" ? (
-                        <>Ваша заявка была <span className="font-medium text-green-400">одобрена</span></>
+                        <>
+                          Ваша заявка была{" "}
+                          <span className="font-medium text-green-400">
+                            одобрена
+                          </span>
+                        </>
                       ) : (
-                        <>Ваша заявка была <span className="font-medium text-red-400">отклонена</span></>
+                        <>
+                          Ваша заявка была{" "}
+                          <span className="font-medium text-red-400">
+                            отклонена
+                          </span>
+                        </>
                       )}
                     </p>
                     {storyTitle && (
@@ -275,9 +304,13 @@ export default function NotificationCard({
                 {notification.type === "friend_request" && (
                   <p className="text-sm sm:text-base text-[#abd1c6]/70 leading-relaxed">
                     {userName && (
-                      <span className="font-medium text-[#abd1c6]/90">{userName}</span>
+                      <span className="font-medium text-[#abd1c6]/90">
+                        {userName}
+                      </span>
                     )}
-                    {userName ? " хочет добавить вас в друзья" : notification.message}
+                    {userName
+                      ? " хочет добавить вас в друзья"
+                      : notification.message}
                   </p>
                 )}
 
@@ -298,7 +331,9 @@ export default function NotificationCard({
                   className="inline-flex items-center gap-2 mt-auto"
                 >
                   <div className="w-2 h-2 rounded-full bg-[#f9bc60] shadow-lg shadow-[#f9bc60]/50" />
-                  <span className="text-xs text-[#f9bc60]/80 font-medium">Новое</span>
+                  <span className="text-xs text-[#f9bc60]/80 font-medium">
+                    Новое
+                  </span>
                 </motion.div>
               )}
             </div>
@@ -311,5 +346,3 @@ export default function NotificationCard({
     </motion.div>
   );
 }
-
-

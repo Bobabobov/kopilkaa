@@ -4,7 +4,11 @@
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { RARITY_NAMES, AchievementRarity } from "@/lib/achievements/types";
 
-export function getNotificationIcon(type: string, rarity?: string, status?: string) {
+export function getNotificationIcon(
+  type: string,
+  rarity?: string,
+  status?: string,
+) {
   switch (type) {
     case "like":
       return <LucideIcons.Heart className="text-red-500" size="sm" />;
@@ -26,12 +30,18 @@ export function getNotificationIcon(type: string, rarity?: string, status?: stri
 
 export function getRarityColor(rarity?: string): string {
   switch (rarity) {
-    case 'COMMON': return '#94a1b2';
-    case 'RARE': return '#abd1c6';
-    case 'EPIC': return '#e16162';
-    case 'LEGENDARY': return '#f9bc60';
-    case 'EXCLUSIVE': return '#ff6b6b';
-    default: return '#abd1c6';
+    case "COMMON":
+      return "#94a1b2";
+    case "RARE":
+      return "#abd1c6";
+    case "EPIC":
+      return "#e16162";
+    case "LEGENDARY":
+      return "#f9bc60";
+    case "EXCLUSIVE":
+      return "#ff6b6b";
+    default:
+      return "#abd1c6";
   }
 }
 
@@ -40,7 +50,10 @@ export function getRarityLabel(rarity?: string): string {
   return RARITY_NAMES[rarity as AchievementRarity] || rarity;
 }
 
-export function getNotificationBackgroundColor(type: string, status?: string): string {
+export function getNotificationBackgroundColor(
+  type: string,
+  status?: string,
+): string {
   if (type === "application_status" && status === "APPROVED") {
     return "bg-[#10B981]/20";
   }
@@ -55,11 +68,11 @@ export function getNotificationBackgroundColor(type: string, status?: string): s
 
 export function isNotificationUnread(
   notification: { isRead?: boolean; createdAt: string },
-  lastViewedTimestamp: string | null
+  lastViewedTimestamp: string | null,
 ): boolean {
   // Если явно помечено как прочитанное - не прочитано
   if (notification.isRead === true) return false;
-  
+
   // Если есть lastViewedTimestamp, используем его как основной критерий
   if (lastViewedTimestamp) {
     const notificationDate = new Date(notification.createdAt).getTime();
@@ -67,11 +80,10 @@ export function isNotificationUnread(
     // Если уведомление создано после последнего просмотра - оно непрочитанное
     return notificationDate > viewedDate;
   }
-  
+
   // Если явно помечено как непрочитанное - непрочитанное
   if (notification.isRead === false) return true;
-  
+
   // По умолчанию считаем непрочитанным, если нет информации
   return true;
 }
-

@@ -103,9 +103,3 @@ export default function Pagination({
     </motion.div>
   );
 }
-
-
-
-
-
-

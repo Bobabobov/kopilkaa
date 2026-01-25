@@ -168,7 +168,7 @@ export default function StoryPage() {
   useEffect(() => {
     // ПроверОЧКа регистрации
     checkAuth();
-    
+
     if (params.id) {
       const id = params.id as string;
 
@@ -204,7 +204,7 @@ export default function StoryPage() {
       setError(null);
 
       const response = await fetch(`/api/stories/${id}`, {
-        cache: 'no-store'
+        cache: "no-store",
       });
 
       if (!response.ok) {
@@ -255,7 +255,7 @@ export default function StoryPage() {
       const newLikedState = !liked;
       setLiked(newLikedState);
       setLikesCount((prev) => (liked ? prev - 1 : prev + 1));
-      
+
       // Затем перезагружаем данные с сервера для синхронизации
       await loadStory(story.id);
     } catch (error) {
@@ -353,7 +353,9 @@ export default function StoryPage() {
               authorAvatar={story.user?.avatar}
               createdAt={story.createdAt}
               isAd={story.id === "ad"}
-              authorExternalUrl={story.id === "ad" ? story.advertiserLink : undefined}
+              authorExternalUrl={
+                story.id === "ad" ? story.advertiserLink : undefined
+              }
             />
 
             {/* Метаданные */}
@@ -396,19 +398,31 @@ export default function StoryPage() {
                       Рекламная история
                     </h3>
                     <p className="text-[#abd1c6] leading-relaxed mb-4">
-                      Это рекламная история в разделе историй. Рекламодатель может разместить здесь информацию о себе, своих услугах или продуктах. История отображается в первой позиции списка и доступна всем посетителям сайта.
+                      Это рекламная история в разделе историй. Рекламодатель
+                      может разместить здесь информацию о себе, своих услугах
+                      или продуктах. История отображается в первой позиции
+                      списка и доступна всем посетителям сайта.
                     </p>
                     <div className="flex flex-wrap gap-3">
                       <div className="flex items-center gap-2 text-sm text-[#abd1c6]">
-                        <LucideIcons.Star size="sm" className="text-[#f9bc60]" />
+                        <LucideIcons.Star
+                          size="sm"
+                          className="text-[#f9bc60]"
+                        />
                         <span>Первая позиция в списке</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-[#abd1c6]">
-                        <LucideIcons.Users size="sm" className="text-[#f9bc60]" />
+                        <LucideIcons.Users
+                          size="sm"
+                          className="text-[#f9bc60]"
+                        />
                         <span>Доступна всем посетителям</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-[#abd1c6]">
-                        <LucideIcons.Calendar size="sm" className="text-[#f9bc60]" />
+                        <LucideIcons.Calendar
+                          size="sm"
+                          className="text-[#f9bc60]"
+                        />
                         <span>От 2000₽/неделя</span>
                       </div>
                     </div>
@@ -418,7 +432,10 @@ export default function StoryPage() {
             )}
 
             {/* Действия */}
-            <StoryActions isAd={story.id === "ad"} advertiserLink={story.advertiserLink} />
+            <StoryActions
+              isAd={story.id === "ad"}
+              advertiserLink={story.advertiserLink}
+            />
           </div>
         </div>
       </div>

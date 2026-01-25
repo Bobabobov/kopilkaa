@@ -34,11 +34,11 @@ export default function NotificationMenuContent({
       />
 
       {/* Список уведомлений */}
-      <div 
-        className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar overscroll-contain touch-pan-y min-h-0" 
-        style={{ 
-          WebkitOverflowScrolling: 'touch',
-          touchAction: 'pan-y',
+      <div
+        className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar overscroll-contain touch-pan-y min-h-0"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          touchAction: "pan-y",
         }}
         onWheel={(e) => {
           e.stopPropagation();
@@ -68,5 +68,3 @@ export default function NotificationMenuContent({
     </>
   );
 }
-
-

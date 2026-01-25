@@ -11,6 +11,6 @@ export default async function AdminAchievementsPage() {
   if (!admin) {
     redirect("/"); // Моментально уводим не-админа
   }
-  
+
   return <AdminAchievementsClient />;
 }

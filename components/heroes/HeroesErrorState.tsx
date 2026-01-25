@@ -7,7 +7,10 @@ interface HeroesErrorStateProps {
   onRetry?: () => void;
 }
 
-export default function HeroesErrorState({ error, onRetry }: HeroesErrorStateProps) {
+export default function HeroesErrorState({
+  error,
+  onRetry,
+}: HeroesErrorStateProps) {
   return (
     <div className="py-12 px-4">
       <div className="max-w-2xl mx-auto text-center">
@@ -22,11 +25,11 @@ export default function HeroesErrorState({ error, onRetry }: HeroesErrorStatePro
           }}
         >
           <div className="text-6xl mb-6">⚠️</div>
-          
+
           <h3 className="text-3xl font-bold mb-4" style={{ color: "#fffffe" }}>
             Что-то пошло не так
           </h3>
-          
+
           <p className="text-lg mb-8" style={{ color: "#e16162" }}>
             {error}
           </p>

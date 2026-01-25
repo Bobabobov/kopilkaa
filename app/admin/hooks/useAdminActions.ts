@@ -35,7 +35,8 @@ export function useAdminActions({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ countTowardsTrust: next }),
       });
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
       showToast("success", "Флаг доверия обновлён");
       await refreshApplications();
     } catch (err) {
@@ -43,7 +44,6 @@ export function useAdminActions({
       showToast("error", "Ошибка обновления флага доверия");
     }
   };
-
 
   // Быстрое обновление статуса
   const quickUpdate = async (
@@ -69,14 +69,11 @@ export function useAdminActions({
 
       showToast(
         "success",
-        `Заявка ${newStatus === "APPROVED" ? "одобрена" : "отклонена"}!`
+        `Заявка ${newStatus === "APPROVED" ? "одобрена" : "отклонена"}!`,
       );
 
       // Обновляем данные
-      await Promise.all([
-        refreshStats(),
-        refreshApplications()
-      ]);
+      await Promise.all([refreshStats(), refreshApplications()]);
     } catch (err) {
       console.error("Failed to update application:", err);
       showToast("error", "Ошибка обновления заявки");
@@ -103,13 +100,15 @@ export function useAdminActions({
       showToast("success", "Статус заявки обновлен!");
 
       // Закрываем модалку
-      setModal({ id: "", status: "PENDING", comment: "", decreaseTrustOnDecision: false });
+      setModal({
+        id: "",
+        status: "PENDING",
+        comment: "",
+        decreaseTrustOnDecision: false,
+      });
 
       // Обновляем данные
-      await Promise.all([
-        refreshStats(),
-        refreshApplications()
-      ]);
+      await Promise.all([refreshStats(), refreshApplications()]);
     } catch (err) {
       console.error("Failed to update application:", err);
       showToast("error", "Ошибка обновления заявки");
@@ -136,10 +135,7 @@ export function useAdminActions({
       setDeleteModal({ id: "", title: "" });
 
       // Обновляем данные
-      await Promise.all([
-        refreshStats(),
-        refreshApplications()
-      ]);
+      await Promise.all([refreshStats(), refreshApplications()]);
     } catch (err) {
       console.error("Failed to delete application:", err);
       showToast("error", "Ошибка удаления заявки");
@@ -191,5 +187,3 @@ export function useAdminActions({
     toggleTrust,
   };
 }
-
-

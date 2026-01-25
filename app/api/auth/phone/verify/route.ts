@@ -10,7 +10,10 @@ function normalizePhone(raw: string): string | null {
   if (digits.length === 10) {
     return `7${digits}`;
   }
-  if (digits.length === 11 && (digits.startsWith("7") || digits.startsWith("8"))) {
+  if (
+    digits.length === 11 &&
+    (digits.startsWith("7") || digits.startsWith("8"))
+  ) {
     return `7${digits.slice(1)}`;
   }
   if (digits.length >= 7 && digits.length <= 15) {
@@ -81,7 +84,11 @@ export async function POST(req: NextRequest) {
     });
 
     const res = NextResponse.json({ success: true });
-    attachSessionToResponse(res, { uid: user.id, role: (user.role as any) || "USER" }, req);
+    attachSessionToResponse(
+      res,
+      { uid: user.id, role: (user.role as any) || "USER" },
+      req,
+    );
     return res;
   } catch (error) {
     console.error("Error in /api/auth/phone/verify:", error);
@@ -91,5 +98,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-

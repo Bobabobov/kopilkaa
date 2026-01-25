@@ -3,9 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { getHeroBadgesForUsers } from "@/lib/heroBadges";
-import {
-  type TrustLevel,
-} from "@/lib/trustLevel";
+import { type TrustLevel } from "@/lib/trustLevel";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +15,9 @@ type TrustSnapshot = {
   nextRequirement: string | null;
 };
 
-function buildTrustSnapshot(trust: Awaited<ReturnType<typeof computeUserTrustSnapshot>>): TrustSnapshot {
+function buildTrustSnapshot(
+  trust: Awaited<ReturnType<typeof computeUserTrustSnapshot>>,
+): TrustSnapshot {
   const status = trust.trustLevel.toLowerCase() as Lowercase<TrustLevel>;
   const nextRequirement =
     trust.nextRequired === null
@@ -35,7 +35,10 @@ function buildTrustSnapshot(trust: Awaited<ReturnType<typeof computeUserTrustSna
   };
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const session = await getSession();
     const viewerId = session?.uid || null;
@@ -75,14 +78,18 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     const trust = buildTrustSnapshot(
       await computeUserTrustSnapshot(review.userId),
     );
-    const heroBadge = review.user ? (await getHeroBadgesForUsers([review.user.id]))[review.user.id] ?? null : null;
+    const heroBadge = review.user
+      ? ((await getHeroBadgesForUsers([review.user.id]))[review.user.id] ??
+        null)
+      : null;
 
     const mapped = {
       id: review.id,
       content: review.content,
       createdAt: review.createdAt,
       updatedAt: review.updatedAt,
-      images: review.images?.map((img) => ({ url: img.url, sort: img.sort })) ?? [],
+      images:
+        review.images?.map((img) => ({ url: img.url, sort: img.sort })) ?? [],
       user: review.user
         ? {
             ...review.user,
@@ -100,13 +107,19 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: { id: string } },
+) {
   try {
     const session = await getSession();
     const viewerId = session?.uid ? String(session.uid) : null;
-    
+
     if (!viewerId) {
-      return NextResponse.json({ error: "Требуется авторизация" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Требуется авторизация" },
+        { status: 401 },
+      );
     }
 
     const reviewId = params.id;
@@ -133,9 +146,15 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
       where: { id: reviewId },
     });
 
-    return NextResponse.json({ success: true, message: "Отзыв удалён" }, { status: 200 });
+    return NextResponse.json(
+      { success: true, message: "Отзыв удалён" },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Error deleting review:", error);
-    return NextResponse.json({ error: "Не удалось удалить отзыв" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Не удалось удалить отзыв" },
+      { status: 500 },
+    );
   }
 }

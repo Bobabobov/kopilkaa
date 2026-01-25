@@ -55,7 +55,9 @@ export function OtherUserAvatar({ user }: { user: OtherUserBasic }) {
           transition={{ delay: 0.45 }}
           className="mt-4 w-full"
         >
-          <p className="text-xs uppercase tracking-wide text-center text-[#abd1c6]/70 mb-2">Соц сети</p>
+          <p className="text-xs uppercase tracking-wide text-center text-[#abd1c6]/70 mb-2">
+            Соц сети
+          </p>
           <div className="flex flex-wrap justify-center gap-2">
             {user.vkLink && (
               <SocialChip href={user.vkLink} color="#4c75a3" label="VK">
@@ -63,12 +65,20 @@ export function OtherUserAvatar({ user }: { user: OtherUserBasic }) {
               </SocialChip>
             )}
             {user.telegramLink && (
-              <SocialChip href={user.telegramLink} color="#229ED9" label="Telegram">
+              <SocialChip
+                href={user.telegramLink}
+                color="#229ED9"
+                label="Telegram"
+              >
                 <TelegramIcon className="w-4 h-4" />
               </SocialChip>
             )}
             {user.youtubeLink && (
-              <SocialChip href={user.youtubeLink} color="#ff4f45" label="YouTube">
+              <SocialChip
+                href={user.youtubeLink}
+                color="#ff4f45"
+                label="YouTube"
+              >
                 <YouTubeIcon className="w-4 h-4" />
               </SocialChip>
             )}
@@ -88,7 +98,9 @@ function renderAvatarWithFrame(user: OtherUserBasic) {
       <div className="w-24 h-24 rounded-lg mx-auto mb-4 overflow-hidden relative group-hover/avatar:scale-105 transition-transform duration-300">
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat rounded-lg"
-          style={{ backgroundImage: `url(${(frame as any).imageUrl || "/default-avatar.png"})` }}
+          style={{
+            backgroundImage: `url(${(frame as any).imageUrl || "/default-avatar.png"})`,
+          }}
         />
         <div className="absolute inset-2 rounded-md overflow-hidden">
           <img
@@ -137,7 +149,11 @@ function SocialChip({
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold bg-opacity-10 hover:bg-opacity-20 transition-colors"
-      style={{ color, borderColor: `${color}99`, backgroundColor: `${color}1A` }}
+      style={{
+        color,
+        borderColor: `${color}99`,
+        backgroundColor: `${color}1A`,
+      }}
       aria-label={label}
     >
       {children}

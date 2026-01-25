@@ -420,7 +420,11 @@ export function useSettings(): UseSettingsReturn {
         showLocalNotification("success", "Успешно!", "Аватарка обновлена");
       } catch (error) {
         console.error("Error uploading avatar:", error);
-        showLocalNotification("error", "Ошибка", "Произошла ошибка при загрузке аватарки");
+        showLocalNotification(
+          "error",
+          "Ошибка",
+          "Произошла ошибка при загрузке аватарки",
+        );
       } finally {
         setSaving(false);
       }
@@ -445,12 +449,15 @@ export function useSettings(): UseSettingsReturn {
       showLocalNotification("success", "Успешно!", "Аватарка удалена");
     } catch (error) {
       console.error("Error deleting avatar:", error);
-      showLocalNotification("error", "Ошибка", "Произошла ошибка при удалении аватарки");
+      showLocalNotification(
+        "error",
+        "Ошибка",
+        "Произошла ошибка при удалении аватарки",
+      );
     } finally {
       setSaving(false);
     }
   }, [showLocalNotification, user]);
-
 
   // Изменение пароля
   const handlePasswordChange = async (

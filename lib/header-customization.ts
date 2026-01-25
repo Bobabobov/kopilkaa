@@ -80,7 +80,7 @@ export function getHeaderTheme(themeKey: string) {
       decoration: "none",
     };
   }
-  
+
   return (
     headerThemes[themeKey as keyof typeof headerThemes] || headerThemes.default
   );
@@ -230,7 +230,7 @@ export function getAvatarFrame(frameKey: string) {
       color: color,
     };
   }
-  
+
   return (
     avatarFrames[frameKey as keyof typeof avatarFrames] || avatarFrames.none
   );

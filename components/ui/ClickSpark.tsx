@@ -134,7 +134,15 @@ export default function ClickSpark({
     return () => {
       cancelAnimationFrame(animationId);
     };
-  }, [sparkColor, sparkSize, sparkRadius, sparkCount, duration, easeFunc, extraScale]);
+  }, [
+    sparkColor,
+    sparkSize,
+    sparkRadius,
+    sparkCount,
+    duration,
+    easeFunc,
+    extraScale,
+  ]);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const canvas = canvasRef.current;
@@ -155,7 +163,10 @@ export default function ClickSpark({
   };
 
   return (
-    <div className={`relative w-full h-full ${className}`} onClick={handleClick}>
+    <div
+      className={`relative w-full h-full ${className}`}
+      onClick={handleClick}
+    >
       <canvas
         ref={canvasRef}
         className="absolute top-0 left-0 block h-full w-full select-none pointer-events-none"

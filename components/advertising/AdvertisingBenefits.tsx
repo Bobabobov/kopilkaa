@@ -10,22 +10,21 @@ export function AdvertisingBenefits() {
       <div className="absolute bottom-20 left-10 text-[#f9bc60]/5 text-[200px] font-bold leading-none pointer-events-none">
         BETA
       </div>
-      
+
       <div className="container mx-auto max-w-6xl relative z-10">
-        
         {/* Заголовок с акцентом */}
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-6xl font-bold text-[#fffffe] mb-6">
             Как это будет работать
           </h2>
           <p className="text-xl text-[#abd1c6] max-w-3xl mx-auto">
-            Проект на старте. Ниже — как мы всё устроим и каких результатов хотим добиться, опираясь на опыт похожих площадок.
+            Проект на старте. Ниже — как мы всё устроим и каких результатов
+            хотим добиться, опираясь на опыт похожих площадок.
           </p>
         </div>
 
         {/* Три больших блока */}
         <div className="space-y-20">
-          
           {/* Блок 1 - Аудитория */}
           <div className="relative">
             <div className="flex flex-col lg:flex-row items-center gap-16">
@@ -38,8 +37,9 @@ export function AdvertisingBenefits() {
                     Проект только запускается
                   </div>
                   <p className="text-[#abd1c6] text-xl leading-relaxed">
-                    Мы честно: сейчас это запуск. Аудитория ещё небольшая, но растёт каждый день. 
-                    Поэтому первые рекламодатели получают максимум внимания — на сайте почти нет других объявлений.
+                    Мы честно: сейчас это запуск. Аудитория ещё небольшая, но
+                    растёт каждый день. Поэтому первые рекламодатели получают
+                    максимум внимания — на сайте почти нет других объявлений.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-8">
@@ -49,46 +49,80 @@ export function AdvertisingBenefits() {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 bg-[#f9bc60] rounded-full"></div>
-                    <span className="text-[#abd1c6] text-lg">Люди, которые помогают и донатят</span>
+                    <span className="text-[#abd1c6] text-lg">
+                      Люди, которые помогают и донатят
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 bg-[#f9bc60] rounded-full"></div>
-                    <span className="text-[#abd1c6] text-lg">Фокус на историях и реальных людях</span>
+                    <span className="text-[#abd1c6] text-lg">
+                      Фокус на историях и реальных людях
+                    </span>
                   </div>
                 </div>
               </div>
               <div className="w-full lg:w-1/2 bg-[#004643]/40 border border-[#abd1c6]/20 rounded-3xl p-8 backdrop-blur-sm">
                 <div className="flex items-center gap-3 mb-8">
                   <div className="w-3 h-3 bg-[#f9bc60] rounded-full"></div>
-                  <div className="text-[#abd1c6] text-base font-medium">Топ городов по активности</div>
+                  <div className="text-[#abd1c6] text-base font-medium">
+                    Топ городов по активности
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-[#001e1d]/60 border border-[#f9bc60]/20 rounded-xl p-6 hover:bg-[#001e1d]/80 transition-colors">
-                    <div className="text-[#fffffe] font-bold text-xl mb-2">Москва</div>
-                    <div className="text-[#abd1c6] text-sm mb-3">~35% трафика</div>
+                    <div className="text-[#fffffe] font-bold text-xl mb-2">
+                      Москва
+                    </div>
+                    <div className="text-[#abd1c6] text-sm mb-3">
+                      ~35% трафика
+                    </div>
                     <div className="w-full bg-[#abd1c6]/20 rounded-full h-3">
-                      <div className="bg-gradient-to-r from-[#f9bc60] to-[#e8a545] h-3 rounded-full" style={{width: '35%'}}></div>
+                      <div
+                        className="bg-gradient-to-r from-[#f9bc60] to-[#e8a545] h-3 rounded-full"
+                        style={{ width: "35%" }}
+                      ></div>
                     </div>
                   </div>
                   <div className="bg-[#001e1d]/60 border border-[#f9bc60]/20 rounded-xl p-6 hover:bg-[#001e1d]/80 transition-colors">
-                    <div className="text-[#fffffe] font-bold text-xl mb-2">СПб</div>
-                    <div className="text-[#abd1c6] text-sm mb-3">~15% трафика</div>
+                    <div className="text-[#fffffe] font-bold text-xl mb-2">
+                      СПб
+                    </div>
+                    <div className="text-[#abd1c6] text-sm mb-3">
+                      ~15% трафика
+                    </div>
                     <div className="w-full bg-[#abd1c6]/20 rounded-full h-3">
-                      <div className="bg-gradient-to-r from-[#f9bc60] to-[#e8a545] h-3 rounded-full" style={{width: '15%'}}></div>
+                      <div
+                        className="bg-gradient-to-r from-[#f9bc60] to-[#e8a545] h-3 rounded-full"
+                        style={{ width: "15%" }}
+                      ></div>
                     </div>
                   </div>
                   <div className="bg-[#001e1d]/60 border border-[#f9bc60]/20 rounded-xl p-6 hover:bg-[#001e1d]/80 transition-colors">
-                    <div className="text-[#fffffe] font-bold text-xl mb-2">Екатеринбург</div>
-                    <div className="text-[#abd1c6] text-sm mb-3">~8% трафика</div>
+                    <div className="text-[#fffffe] font-bold text-xl mb-2">
+                      Екатеринбург
+                    </div>
+                    <div className="text-[#abd1c6] text-sm mb-3">
+                      ~8% трафика
+                    </div>
                     <div className="w-full bg-[#abd1c6]/20 rounded-full h-3">
-                      <div className="bg-gradient-to-r from-[#f9bc60] to-[#e8a545] h-3 rounded-full" style={{width: '8%'}}></div>
+                      <div
+                        className="bg-gradient-to-r from-[#f9bc60] to-[#e8a545] h-3 rounded-full"
+                        style={{ width: "8%" }}
+                      ></div>
                     </div>
                   </div>
                   <div className="bg-[#001e1d]/60 border border-[#f9bc60]/20 rounded-xl p-6 hover:bg-[#001e1d]/80 transition-colors">
-                    <div className="text-[#fffffe] font-bold text-xl mb-2">Новосибирск</div>
-                    <div className="text-[#abd1c6] text-sm mb-3">~6% трафика</div>
+                    <div className="text-[#fffffe] font-bold text-xl mb-2">
+                      Новосибирск
+                    </div>
+                    <div className="text-[#abd1c6] text-sm mb-3">
+                      ~6% трафика
+                    </div>
                     <div className="w-full bg-[#abd1c6]/20 rounded-full h-3">
-                      <div className="bg-gradient-to-r from-[#f9bc60] to-[#e8a545] h-3 rounded-full" style={{width: '6%'}}></div>
+                      <div
+                        className="bg-gradient-to-r from-[#f9bc60] to-[#e8a545] h-3 rounded-full"
+                        style={{ width: "6%" }}
+                      ></div>
                     </div>
                   </div>
                 </div>
@@ -108,7 +142,9 @@ export function AdvertisingBenefits() {
                     Кликают на рекламу
                   </div>
                   <p className="text-[#abd1c6] text-xl leading-relaxed">
-                    Это ориентир по опыту похожих проектов и форматов. Когда наберём достаточно данных, честно покажем реальные цифры именно нашего сайта.
+                    Это ориентир по опыту похожих проектов и форматов. Когда
+                    наберём достаточно данных, честно покажем реальные цифры
+                    именно нашего сайта.
                   </p>
                 </div>
                 <div className="bg-gradient-to-r from-[#004643]/60 to-[#001e1d]/60 border border-[#f9bc60]/30 rounded-2xl p-8 backdrop-blur-sm">
@@ -127,9 +163,11 @@ export function AdvertisingBenefits() {
               <div className="w-full lg:w-1/2 bg-[#004643]/40 border border-[#abd1c6]/20 rounded-3xl p-8 backdrop-blur-sm">
                 <div className="flex items-center gap-3 mb-8">
                   <div className="w-3 h-3 bg-[#f9bc60] rounded-full"></div>
-                  <div className="text-[#abd1c6] text-base font-medium">Сравнение с другими площадками</div>
+                  <div className="text-[#abd1c6] text-base font-medium">
+                    Сравнение с другими площадками
+                  </div>
                 </div>
-                
+
                 {/* Визуальная диаграмма */}
                 <div className="mb-6">
                   <div className="flex items-end justify-center gap-2 h-32">
@@ -162,43 +200,64 @@ export function AdvertisingBenefits() {
                   <div className="group flex justify-between items-center py-3 px-4 bg-[#001e1d]/60 rounded-xl hover:bg-[#001e1d]/80 hover:scale-105 transition-all duration-300 cursor-pointer">
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 bg-[#abd1c6] rounded-full group-hover:bg-[#f9bc60] transition-colors"></div>
-                      <span className="text-[#abd1c6] text-lg group-hover:text-[#fffffe] transition-colors">Социальные сети</span>
+                      <span className="text-[#abd1c6] text-lg group-hover:text-[#fffffe] transition-colors">
+                        Социальные сети
+                      </span>
                     </div>
                     <div className="text-right">
-                      <div className="text-[#fffffe] font-bold text-xl group-hover:text-[#f9bc60] transition-colors">0.5-1%</div>
-                      <div className="text-[#abd1c6] text-xs group-hover:text-[#abd1c6]">много отвлечений</div>
+                      <div className="text-[#fffffe] font-bold text-xl group-hover:text-[#f9bc60] transition-colors">
+                        0.5-1%
+                      </div>
+                      <div className="text-[#abd1c6] text-xs group-hover:text-[#abd1c6]">
+                        много отвлечений
+                      </div>
                     </div>
                   </div>
-                  
+
                   <div className="group flex justify-between items-center py-3 px-4 bg-[#001e1d]/60 rounded-xl hover:bg-[#001e1d]/80 hover:scale-105 transition-all duration-300 cursor-pointer">
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 bg-[#abd1c6] rounded-full group-hover:bg-[#f9bc60] transition-colors"></div>
-                      <span className="text-[#abd1c6] text-lg group-hover:text-[#fffffe] transition-colors">Обычные сайты</span>
+                      <span className="text-[#abd1c6] text-lg group-hover:text-[#fffffe] transition-colors">
+                        Обычные сайты
+                      </span>
                     </div>
                     <div className="text-right">
-                      <div className="text-[#fffffe] font-bold text-xl group-hover:text-[#f9bc60] transition-colors">1-2%</div>
-                      <div className="text-[#abd1c6] text-xs group-hover:text-[#abd1c6]">стандартный CTR</div>
+                      <div className="text-[#fffffe] font-bold text-xl group-hover:text-[#f9bc60] transition-colors">
+                        1-2%
+                      </div>
+                      <div className="text-[#abd1c6] text-xs group-hover:text-[#abd1c6]">
+                        стандартный CTR
+                      </div>
                     </div>
                   </div>
-                  
+
                   <div className="group flex justify-between items-center py-3 px-4 bg-gradient-to-r from-[#f9bc60]/20 to-[#e8a545]/20 border border-[#f9bc60]/40 rounded-xl hover:from-[#f9bc60]/30 hover:to-[#e8a545]/30 hover:scale-105 hover:shadow-lg hover:shadow-[#f9bc60]/20 transition-all duration-300 cursor-pointer">
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 bg-[#f9bc60] rounded-full animate-pulse group-hover:scale-125 transition-transform"></div>
-                      <span className="text-[#f9bc60] font-bold text-xl group-hover:text-[#001e1d] transition-colors">Наш сайт</span>
+                      <span className="text-[#f9bc60] font-bold text-xl group-hover:text-[#001e1d] transition-colors">
+                        Наш сайт
+                      </span>
                     </div>
                     <div className="text-right">
-                      <div className="text-[#f9bc60] font-bold text-2xl group-hover:text-[#001e1d] transition-colors">3-5%</div>
-                      <div className="text-[#f9bc60] text-xs font-bold group-hover:text-[#001e1d] transition-colors">целевая аудитория</div>
+                      <div className="text-[#f9bc60] font-bold text-2xl group-hover:text-[#001e1d] transition-colors">
+                        3-5%
+                      </div>
+                      <div className="text-[#f9bc60] text-xs font-bold group-hover:text-[#001e1d] transition-colors">
+                        целевая аудитория
+                      </div>
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Итоговый блок */}
                 <div className="mt-6 p-4 bg-gradient-to-r from-[#f9bc60]/10 to-[#e8a545]/10 rounded-xl border border-[#f9bc60]/20">
                   <div className="text-center">
-                    <div className="text-[#f9bc60] font-bold text-lg mb-1">Ориентируемся на эффективность выше средней</div>
+                    <div className="text-[#f9bc60] font-bold text-lg mb-1">
+                      Ориентируемся на эффективность выше средней
+                    </div>
                     <div className="text-[#abd1c6] text-sm">
-                      цифры берём из опыта похожих площадок и будем обновлять по мере роста проекта
+                      цифры берём из опыта похожих площадок и будем обновлять по
+                      мере роста проекта
                     </div>
                   </div>
                 </div>
@@ -218,8 +277,9 @@ export function AdvertisingBenefits() {
                     И реклама уже работает
                   </div>
                   <p className="text-[#abd1c6] text-xl leading-relaxed">
-                    Оплатили — разместили. Никаких согласований, ожидания модерации 
-                    или сложных процессов. Максимум через сутки ваша реклама показывается.
+                    Оплатили — разместили. Никаких согласований, ожидания
+                    модерации или сложных процессов. Максимум через сутки ваша
+                    реклама показывается.
                   </p>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
@@ -228,58 +288,78 @@ export function AdvertisingBenefits() {
                       <span className="text-2xl">⚡</span>
                       <span className="text-xl">Быстро</span>
                     </div>
-                    <div className="text-[#abd1c6] text-lg">Обычно размещаем за 2-4 часа</div>
+                    <div className="text-[#abd1c6] text-lg">
+                      Обычно размещаем за 2-4 часа
+                    </div>
                   </div>
                   <div className="bg-gradient-to-br from-[#004643]/60 to-[#001e1d]/60 border border-[#f9bc60]/30 rounded-2xl p-6 backdrop-blur-sm">
                     <div className="text-[#f9bc60] font-bold mb-3 flex items-center gap-3">
                       <span className="text-2xl">📊</span>
                       <span className="text-xl">Прозрачно</span>
                     </div>
-                    <div className="text-[#abd1c6] text-lg">Статистику присылаем каждый день</div>
+                    <div className="text-[#abd1c6] text-lg">
+                      Статистику присылаем каждый день
+                    </div>
                   </div>
                 </div>
               </div>
               <div className="w-full lg:w-1/2 bg-[#004643]/40 border border-[#abd1c6]/20 rounded-3xl p-8 backdrop-blur-sm">
                 <div className="flex items-center gap-3 mb-8">
                   <div className="w-3 h-3 bg-[#f9bc60] rounded-full"></div>
-                  <div className="text-[#abd1c6] text-base font-medium">Что получаете</div>
+                  <div className="text-[#abd1c6] text-base font-medium">
+                    Что получаете
+                  </div>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-start gap-4 p-4 bg-[#001e1d]/60 rounded-xl hover:bg-[#001e1d]/80 transition-colors">
                     <div className="w-3 h-3 bg-[#f9bc60] rounded-full mt-2"></div>
                     <div>
-                      <div className="text-[#fffffe] font-bold text-lg mb-1">Детальную статистику показов</div>
-                      <div className="text-[#abd1c6]">Каждый день в удобном формате</div>
+                      <div className="text-[#fffffe] font-bold text-lg mb-1">
+                        Детальную статистику показов
+                      </div>
+                      <div className="text-[#abd1c6]">
+                        Каждый день в удобном формате
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-start gap-4 p-4 bg-[#001e1d]/60 rounded-xl hover:bg-[#001e1d]/80 transition-colors">
                     <div className="w-3 h-3 bg-[#f9bc60] rounded-full mt-2"></div>
                     <div>
-                      <div className="text-[#fffffe] font-bold text-lg mb-1">Количество кликов</div>
-                      <div className="text-[#abd1c6]">Точные данные в реальном времени</div>
+                      <div className="text-[#fffffe] font-bold text-lg mb-1">
+                        Количество кликов
+                      </div>
+                      <div className="text-[#abd1c6]">
+                        Точные данные в реальном времени
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-start gap-4 p-4 bg-[#001e1d]/60 rounded-xl hover:bg-[#001e1d]/80 transition-colors">
                     <div className="w-3 h-3 bg-[#f9bc60] rounded-full mt-2"></div>
                     <div>
-                      <div className="text-[#fffffe] font-bold text-lg mb-1">Поддержку 24/7</div>
-                      <div className="text-[#abd1c6]">Ответим в любое время</div>
+                      <div className="text-[#fffffe] font-bold text-lg mb-1">
+                        Поддержку 24/7
+                      </div>
+                      <div className="text-[#abd1c6]">
+                        Ответим в любое время
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-start gap-4 p-4 bg-[#001e1d]/60 rounded-xl hover:bg-[#001e1d]/80 transition-colors">
                     <div className="w-3 h-3 bg-[#f9bc60] rounded-full mt-2"></div>
                     <div>
-                      <div className="text-[#fffffe] font-bold text-lg mb-1">Возможность изменить креатив</div>
-                      <div className="text-[#abd1c6]">Бесплатно в течение кампании</div>
+                      <div className="text-[#fffffe] font-bold text-lg mb-1">
+                        Возможность изменить креатив
+                      </div>
+                      <div className="text-[#abd1c6]">
+                        Бесплатно в течение кампании
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
         </div>
-
       </div>
     </section>
   );

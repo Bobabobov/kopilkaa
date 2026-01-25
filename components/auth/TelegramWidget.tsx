@@ -18,7 +18,6 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
   // Устанавливаем глобальный callback один раз
   useEffect(() => {
     (window as any).onTelegramAuth = async (user: any) => {
-      console.log("Telegram auth callback called", user);
       await onAuth(user);
     };
 
@@ -39,9 +38,9 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
       setError("Telegram авторизация недоступна");
       return;
     }
-    
+
     // Убираем @ из username, если он есть (Telegram Widget требует username без @)
-    const cleanBotUsername = botUsername.replace(/^@/, '');
+    const cleanBotUsername = botUsername.replace(/^@/, "");
 
     if (!modalContainerRef.current) {
       console.warn("Контейнер для Telegram-виджета не найден");
@@ -60,10 +59,12 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
 
     // Добавляем таймаут для случая, когда скрипт не загружается
     let timeoutId: NodeJS.Timeout | null = null;
-    
+
     script.onerror = () => {
       console.error("Не удалось загрузить Telegram Login Widget");
-      setError("Не удалось загрузить Telegram. Возможно, блокировщик рекламы или настройки приватности браузера блокируют загрузку. Попробуйте войти через Google или по почте.");
+      setError(
+        "Не удалось загрузить Telegram. Возможно, блокировщик рекламы или настройки приватности браузера блокируют загрузку. Попробуйте войти через Google или по почте.",
+      );
       setIsReady(false);
       if (timeoutId) clearTimeout(timeoutId);
     };
@@ -72,12 +73,14 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
       setIsReady(true);
       if (timeoutId) clearTimeout(timeoutId);
     };
-    
+
     // Устанавливаем таймаут
     timeoutId = setTimeout(() => {
       if (!isReady) {
         console.error("Таймаут загрузки Telegram Login Widget");
-        setError("Таймаут загрузки Telegram. Попробуйте войти через Google или по почте.");
+        setError(
+          "Таймаут загрузки Telegram. Попробуйте войти через Google или по почте.",
+        );
       }
     }, 10000);
 
@@ -98,7 +101,6 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     };
   }, [showWidget, checkingAuth]);
 
-
   // Если Telegram Bot Username не задан, показываем заглушку
   if (!process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME) {
     return (
@@ -117,7 +119,7 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
           <span>{error}</span>
         </div>
       )}
-      
+
       {/* Кастомная красивая кнопка Telegram в стиле других кнопок */}
       {!error && (
         <>
@@ -130,24 +132,30 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
           >
             <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#f9bc60]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             {/* Telegram логотип */}
-            <svg className="w-5 h-5 relative z-10 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.17 1.858-.896 6.37-1.264 8.445-.15.85-.444 1.133-.73 1.16-.62.055-1.09-.41-1.69-.803-.93-.64-1.456-1.04-2.36-1.666-1.045-.71-.368-1.1.228-1.777.157-.177 2.848-2.616 2.9-2.84.007-.03.014-.15-.056-.212-.07-.057-.173-.037-.248-.022-.106.023-1.79 1.14-5.06 3.345-.48.33-.914.49-1.302.48-.428-.01-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.78.026-.2.4-.405 1.1-.615 4.33-1.89 7.22-3.14 8.66-3.75 4.2-1.8 5.07-2.11 5.64-2.13.13-.01.41-.03.6.034.18.06.3.2.34.33.04.13.07.43.03.66z"/>
+            <svg
+              className="w-5 h-5 relative z-10 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.17 1.858-.896 6.37-1.264 8.445-.15.85-.444 1.133-.73 1.16-.62.055-1.09-.41-1.69-.803-.93-.64-1.456-1.04-2.36-1.666-1.045-.71-.368-1.1.228-1.777.157-.177 2.848-2.616 2.9-2.84.007-.03.014-.15-.056-.212-.07-.057-.173-.037-.248-.022-.106.023-1.79 1.14-5.06 3.345-.48.33-.914.49-1.302.48-.428-.01-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.78.026-.2.4-.405 1.1-.615 4.33-1.89 7.22-3.14 8.66-3.75 4.2-1.8 5.07-2.11 5.64-2.13.13-.01.41-.03.6.034.18.06.3.2.34.33.04.13.07.43.03.66z" />
             </svg>
             <span className="relative z-10">Войти через Telegram</span>
           </motion.button>
-          
+
           {/* Модальное окно с Telegram виджетом */}
           {showWidget && (
-            <div 
+            <div
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
               onClick={() => setShowWidget(false)}
             >
-              <div 
+              <div
                 className="bg-[#0f1f1c] rounded-2xl p-6 max-w-md w-full border border-[#1d8a78]/45 shadow-xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-[#fffffe]">Вход через Telegram</h3>
+                  <h3 className="text-lg font-semibold text-[#fffffe]">
+                    Вход через Telegram
+                  </h3>
                   <button
                     onClick={() => setShowWidget(false)}
                     className="text-[#abd1c6] hover:text-[#fffffe] transition-colors"
@@ -168,5 +176,3 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     </div>
   );
 }
-
-

@@ -39,7 +39,9 @@ export function useOtherUserDonations(userId: string) {
         setData(result);
       } catch (error) {
         console.error("Error fetching donations:", error);
-        setError(error instanceof Error ? error.message : "Failed to load donations");
+        setError(
+          error instanceof Error ? error.message : "Failed to load donations",
+        );
       } finally {
         setLoading(false);
       }

@@ -15,10 +15,12 @@ const getStats = cache(async (): Promise<Stats> => {
   try {
     // Получаем статистику напрямую из БД (быстрее чем через API)
     const [applicationsStats, totalUsers, donationSums] = await Promise.all([
-      prisma.application.groupBy({
-        by: ["status"],
-        _count: { status: true },
-      }).catch(() => []),
+      prisma.application
+        .groupBy({
+          by: ["status"],
+          _count: { status: true },
+        })
+        .catch(() => []),
       prisma.user.count().catch(() => 0),
       prisma.donation
         .groupBy({
@@ -44,11 +46,12 @@ const getStats = cache(async (): Promise<Stats> => {
 
     const totalApplications = applicationsStats.reduce(
       (acc, item) => acc + item._count.status,
-      0
+      0,
     );
 
     const approvedApplications =
-      applicationsStats.find((item) => item.status === "APPROVED")?._count.status || 0;
+      applicationsStats.find((item) => item.status === "APPROVED")?._count
+        .status || 0;
 
     return {
       collected: balance,

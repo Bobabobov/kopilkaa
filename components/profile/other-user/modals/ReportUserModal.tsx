@@ -52,7 +52,11 @@ export default function ReportUserModal({
         setReason("");
         onClose();
       } else {
-        showToast("error", "Ошибка", data.message || "Не удалось отправить жалобу");
+        showToast(
+          "error",
+          "Ошибка",
+          data.message || "Не удалось отправить жалобу",
+        );
       }
     } catch (error) {
       console.error("Report error:", error);
@@ -91,7 +95,9 @@ export default function ReportUserModal({
                 Пожаловаться на пользователя
               </h2>
               <p className="text-[#abd1c6] text-sm">
-                {userName ? `Жалоба на пользователя: ${userName}` : "Расскажите о проблеме"}
+                {userName
+                  ? `Жалоба на пользователя: ${userName}`
+                  : "Расскажите о проблеме"}
               </p>
             </div>
 
@@ -141,4 +147,3 @@ export default function ReportUserModal({
 
   return createPortal(modalContent, document.body);
 }
-

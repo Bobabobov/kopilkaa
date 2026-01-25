@@ -48,5 +48,3 @@ export function verifyTelegramAuth(data: TelegramAuthData): {
 
   return { ok: true };
 }
-
-

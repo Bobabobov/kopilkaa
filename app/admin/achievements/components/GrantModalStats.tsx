@@ -28,7 +28,7 @@ export default function GrantModalStats({
           </div>
         </div>
       </div>
-      
+
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-4 border border-blue-200 dark:border-blue-800">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -47,5 +47,3 @@ export default function GrantModalStats({
     </div>
   );
 }
-
-

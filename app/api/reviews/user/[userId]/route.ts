@@ -39,12 +39,15 @@ function buildTrustSnapshot(approved: number): TrustSnapshot {
   };
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { userId: string } }) {
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: { userId: string } },
+) {
   try {
     const session = await getSession();
     const viewerId = session?.uid ? String(session.uid) : null;
     const userId = params.userId;
-    
+
     if (!userId) {
       return NextResponse.json({ error: "userId required" }, { status: 400 });
     }
@@ -85,14 +88,18 @@ export async function GET(_req: NextRequest, { params }: { params: { userId: str
       },
     });
     const trust = buildTrustSnapshot(approvedCount);
-    const heroBadge = review.user ? (await getHeroBadgesForUsers([review.user.id]))[review.user.id] ?? null : null;
+    const heroBadge = review.user
+      ? ((await getHeroBadgesForUsers([review.user.id]))[review.user.id] ??
+        null)
+      : null;
 
     const mapped = {
       id: review.id,
       content: review.content,
       createdAt: review.createdAt,
       updatedAt: review.updatedAt,
-      images: review.images?.map((img) => ({ url: img.url, sort: img.sort })) ?? [],
+      images:
+        review.images?.map((img) => ({ url: img.url, sort: img.sort })) ?? [],
       user: review.user
         ? {
             ...review.user,

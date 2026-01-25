@@ -36,10 +36,14 @@ export default function LikeButton({
       <button
         onClick={handleClick}
         disabled={isAuthenticated === false}
-        title={isAuthenticated === false ? "Войдите в систему, чтобы ставить лайки" : undefined}
+        title={
+          isAuthenticated === false
+            ? "Войдите в систему, чтобы ставить лайки"
+            : undefined
+        }
         className={`relative z-10 flex items-center gap-3 px-4 py-2 rounded-xl transition-all duration-300 ${
-          isAuthenticated === false 
-            ? "cursor-not-allowed opacity-60" 
+          isAuthenticated === false
+            ? "cursor-not-allowed opacity-60"
             : "cursor-pointer"
         } ${
           liked

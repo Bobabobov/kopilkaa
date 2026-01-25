@@ -15,15 +15,17 @@ export default function ApplicationsListItemImages({
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
       {images.map((img, i) => (
-        <div
-          key={i}
-          className="group relative overflow-hidden rounded-2xl"
-        >
+        <div key={i} className="group relative overflow-hidden rounded-2xl">
           <img
             src={img.url}
             alt=""
             className="w-full h-32 object-cover rounded-2xl border border-gray-200 dark:border-gray-600 cursor-zoom-in transition-all duration-300 group-hover:scale-105"
-            onClick={() => onImageClick(images.map((x) => x.url), i)}
+            onClick={() =>
+              onImageClick(
+                images.map((x) => x.url),
+                i,
+              )
+            }
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 rounded-2xl flex items-center justify-center">
             <svg
@@ -45,5 +47,3 @@ export default function ApplicationsListItemImages({
     </div>
   );
 }
-
-

@@ -2,7 +2,7 @@
 // Публичный endpoint для загрузки изображений при создании заявки на рекламу
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
-import { join, extname } from "path";
+import { extname } from "path";
 import { randomUUID } from "crypto";
 import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
 
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     if (files.length > MAX_FILES) {
       return NextResponse.json(
         { error: `Можно загрузить до ${MAX_FILES} файлов за раз` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
         const maxSizeMB = Math.round(MAX_SIZE / (1024 * 1024));
         return NextResponse.json(
           { error: `Файл ${file.name} больше ${maxSizeMB} МБ` },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       if (!allowedTypes.includes(file.type)) {
         return NextResponse.json(
           { error: `Неподдерживаемый тип файла: ${file.type}` },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -72,9 +72,7 @@ export async function POST(req: NextRequest) {
     console.error("Error uploading ad request files:", error);
     return NextResponse.json(
       { error: "Ошибка загрузки файлов" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-
-

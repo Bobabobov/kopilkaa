@@ -69,12 +69,6 @@ export async function sendStatusEmail(
   data: { title: string; status: Status; comment?: string | null },
 ) {
   if (!MAIL_ENABLED || !mailer) {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[mail] skipped", {
-        to,
-        subject: statusSubject(data.status),
-      });
-    }
     return;
   }
 

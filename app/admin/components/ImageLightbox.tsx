@@ -88,11 +88,3 @@ export default function ImageLightbox({
     </div>
   );
 }
-
-
-
-
-
-
-
-

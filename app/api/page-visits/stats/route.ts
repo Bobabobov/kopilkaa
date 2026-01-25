@@ -1,7 +1,7 @@
 // app/api/page-visits/stats/route.ts
 import { prisma } from "@/lib/db";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {

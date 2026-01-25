@@ -71,8 +71,8 @@ export function ApplicationsForm(props: Props) {
     trustLimitsMax,
     payment,
     setPayment,
-  bankName,
-  setBankName,
+    bankName,
+    setBankName,
     photos,
     setPhotos,
     uploading,
@@ -168,11 +168,16 @@ export function ApplicationsForm(props: Props) {
         />
 
         <div>
-          <label className="block text-sm font-medium mb-2" style={{ color: "#abd1c6" }}>
+          <label
+            className="block text-sm font-medium mb-2"
+            style={{ color: "#abd1c6" }}
+          >
             Подробная история *
           </label>
           <p className="text-xs text-[#abd1c6]/70 mb-3">
-            Подробное описание ситуации (минимум {limits.storyMin}, максимум {limits.storyMax} символов). Используйте кнопки для форматирования текста. Вставка запрещена: введите текст вручную.
+            Подробное описание ситуации (минимум {limits.storyMin}, максимум{" "}
+            {limits.storyMax} символов). Используйте кнопки для форматирования
+            текста. Вставка запрещена: введите текст вручную.
           </p>
           <RichTextEditor
             value={story}
@@ -268,4 +273,3 @@ export function ApplicationsForm(props: Props) {
 }
 
 export default ApplicationsForm;
-

@@ -58,7 +58,10 @@ export default function ApplicationPaymentDetails({
       className="mb-6"
     >
       <details className="toggle">
-        <summary className="flex items-center gap-2 cursor-pointer select-none font-medium transition-colors text-base sm:text-lg mb-4 hover:opacity-80" style={{ color: "#f9bc60" }}>
+        <summary
+          className="flex items-center gap-2 cursor-pointer select-none font-medium transition-colors text-base sm:text-lg mb-4 hover:opacity-80"
+          style={{ color: "#f9bc60" }}
+        >
           <svg
             className="w-5 h-5 flex-shrink-0"
             fill="none"
@@ -77,24 +80,39 @@ export default function ApplicationPaymentDetails({
         </summary>
         <div
           className="open-only rounded-xl border relative group p-4 sm:p-6 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.7)]"
-          style={{ backgroundColor: "#0b1615", borderColor: "rgba(171,209,198,0.25)" }}
+          style={{
+            backgroundColor: "#0b1615",
+            borderColor: "rgba(171,209,198,0.25)",
+          }}
         >
           <dl className="space-y-2 break-all text-anywhere pr-12 sm:pr-16">
             {parsed.bankName && (
               <div>
-                <dt className="font-medium text-sm sm:text-base" style={{ color: "#abd1c6" }}>
+                <dt
+                  className="font-medium text-sm sm:text-base"
+                  style={{ color: "#abd1c6" }}
+                >
                   Банк
                 </dt>
-                <dd className="select-all text-sm sm:text-base" style={{ color: "#e8f2ef" }}>
+                <dd
+                  className="select-all text-sm sm:text-base"
+                  style={{ color: "#e8f2ef" }}
+                >
                   {parsed.bankName}
                 </dd>
               </div>
             )}
             <div>
-              <dt className="font-medium text-sm sm:text-base" style={{ color: "#abd1c6" }}>
+              <dt
+                className="font-medium text-sm sm:text-base"
+                style={{ color: "#abd1c6" }}
+              >
                 Реквизиты
               </dt>
-              <dd className="select-all text-sm sm:text-base" style={{ color: "#e8f2ef" }}>
+              <dd
+                className="select-all text-sm sm:text-base"
+                style={{ color: "#e8f2ef" }}
+              >
                 {parsed.payment || "Не указаны"}
               </dd>
             </div>
@@ -113,5 +131,3 @@ export default function ApplicationPaymentDetails({
     </motion.div>
   );
 }
-
-

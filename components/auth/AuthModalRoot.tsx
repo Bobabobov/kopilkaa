@@ -12,10 +12,11 @@ export default function AuthModalRoot() {
   const modal = searchParams.get("modal");
   const nextParam = searchParams.get("next");
 
-  const isAuthModal = modal === "auth" || 
-                      modal === "auth/signup" || 
-                      modal === "auth/login/email" || 
-                      modal === "auth/signup/email";
+  const isAuthModal =
+    modal === "auth" ||
+    modal === "auth/signup" ||
+    modal === "auth/login/email" ||
+    modal === "auth/signup/email";
 
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -58,7 +59,7 @@ export default function AuthModalRoot() {
   useEffect(() => {
     if (isAuthModal) {
       const scrollY = window.scrollY;
-      
+
       document.body.style.overflow = "hidden";
       document.body.style.position = "fixed";
       document.body.style.top = `-${scrollY}px`;
@@ -117,7 +118,10 @@ export default function AuthModalRoot() {
 
   if (!isAuthModal || checkingAuth) return null;
 
-  const mode: AuthMode = modal === "auth/signup" || modal === "auth/signup/email" ? "signup" : "login";
+  const mode: AuthMode =
+    modal === "auth/signup" || modal === "auth/signup/email"
+      ? "signup"
+      : "login";
 
   const handleTelegramAuth = async (user: any) => {
     try {
@@ -185,7 +189,9 @@ export default function AuthModalRoot() {
       });
       if (r.status === 429) {
         const waitSec = getRetryAfterSeconds(r, 60);
-        setError(`Слишком много попыток. Подождите ${waitSec} сек и попробуйте снова.`);
+        setError(
+          `Слишком много попыток. Подождите ${waitSec} сек и попробуйте снова.`,
+        );
         return;
       }
 
@@ -207,15 +213,29 @@ export default function AuthModalRoot() {
     }
   };
 
-  const handleEmailSignup = async (email: string, name: string, password: string) => {
+  const handleEmailSignup = async (
+    email: string,
+    name: string,
+    password: string,
+  ) => {
     try {
       setError(null);
       setBusy(true);
 
       // Генерируем username из name или email
-      const nameForUsername = name.trim().toLowerCase().replace(/[^\p{L}\p{N}._-]/gu, "").substring(0, 20);
-      const emailForUsername = email.trim().toLowerCase().split("@")[0].replace(/[^\p{L}\p{N}._-]/gu, "").substring(0, 20);
-      const generatedUsername = nameForUsername || emailForUsername || `user${Date.now()}`;
+      const nameForUsername = name
+        .trim()
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}._-]/gu, "")
+        .substring(0, 20);
+      const emailForUsername = email
+        .trim()
+        .toLowerCase()
+        .split("@")[0]
+        .replace(/[^\p{L}\p{N}._-]/gu, "")
+        .substring(0, 20);
+      const generatedUsername =
+        nameForUsername || emailForUsername || `user${Date.now()}`;
 
       const r = await fetch("/api/auth/register", {
         method: "POST",
@@ -229,7 +249,9 @@ export default function AuthModalRoot() {
       });
       if (r.status === 429) {
         const waitSec = getRetryAfterSeconds(r, 60);
-        setError(`Слишком много попыток. Подождите ${waitSec} сек и попробуйте снова.`);
+        setError(
+          `Слишком много попыток. Подождите ${waitSec} сек и попробуйте снова.`,
+        );
         return;
       }
 

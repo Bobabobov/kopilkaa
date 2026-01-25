@@ -58,7 +58,9 @@ export async function GET(
     return Response.json({ error: "Not found" }, { status: 404 });
   }
 
-  const heroBadge = story.user?.id ? await getHeroBadgeForUser(story.user.id) : null;
+  const heroBadge = story.user?.id
+    ? await getHeroBadgeForUser(story.user.id)
+    : null;
 
   // Проверяем, лайкнул ли текущий пользователь
   let userLiked = false;
@@ -72,18 +74,27 @@ export async function GET(
     userLiked = !!userLike;
   }
 
-  return Response.json({
-    ...story,
-    story: sanitizeApplicationStoryHtml(story.story || ""),
-    user: story.user
-      ? { ...(sanitizeEmailForViewer(story.user as any, session?.uid || "") as any), heroBadge }
-      : story.user,
-    userLiked,
-  }, {
-    headers: {
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
+  return Response.json(
+    {
+      ...story,
+      story: sanitizeApplicationStoryHtml(story.story || ""),
+      user: story.user
+        ? {
+            ...(sanitizeEmailForViewer(
+              story.user as any,
+              session?.uid || "",
+            ) as any),
+            heroBadge,
+          }
+        : story.user,
+      userLiked,
     },
-  });
+    {
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    },
+  );
 }

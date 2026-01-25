@@ -21,11 +21,11 @@ export default function ActivityHeatmap() {
         // Генерируем данные за последние 52 недели (364 дня)
         const days: DayData[] = [];
         const today = new Date();
-        
+
         for (let i = 363; i >= 0; i--) {
           const date = new Date(today);
           date.setDate(date.getDate() - i);
-          
+
           // Симулируем активность (в реальности это будет из API)
           const count = Math.floor(Math.random() * 10);
           let level: 0 | 1 | 2 | 3 | 4 = 0;
@@ -34,14 +34,14 @@ export default function ActivityHeatmap() {
           else if (count <= 5) level = 2;
           else if (count <= 7) level = 3;
           else level = 4;
-          
+
           days.push({
-            date: date.toISOString().split('T')[0],
+            date: date.toISOString().split("T")[0],
             count,
             level,
           });
         }
-        
+
         setData(days);
       } catch (error) {
         console.error("Error fetching activity:", error);
@@ -55,12 +55,18 @@ export default function ActivityHeatmap() {
 
   const getColor = (level: number) => {
     switch (level) {
-      case 0: return "bg-[#001e1d] border border-[#abd1c6]/10";
-      case 1: return "bg-[#004643]/40 border border-[#abd1c6]/20";
-      case 2: return "bg-[#f9bc60]/40 border border-[#f9bc60]/30";
-      case 3: return "bg-[#f9bc60]/60 border border-[#f9bc60]/40";
-      case 4: return "bg-[#f9bc60] border border-[#f9bc60]";
-      default: return "bg-[#001e1d]";
+      case 0:
+        return "bg-[#001e1d] border border-[#abd1c6]/10";
+      case 1:
+        return "bg-[#004643]/40 border border-[#abd1c6]/20";
+      case 2:
+        return "bg-[#f9bc60]/40 border border-[#f9bc60]/30";
+      case 3:
+        return "bg-[#f9bc60]/60 border border-[#f9bc60]/40";
+      case 4:
+        return "bg-[#f9bc60] border border-[#f9bc60]";
+      default:
+        return "bg-[#001e1d]";
     }
   };
 
@@ -70,7 +76,7 @@ export default function ActivityHeatmap() {
   }
 
   const totalActivity = data.reduce((sum, day) => sum + day.count, 0);
-  const maxCount = Math.max(...data.map(d => d.count), 1);
+  const maxCount = Math.max(...data.map((d) => d.count), 1);
 
   if (loading) {
     return (
@@ -103,9 +109,7 @@ export default function ActivityHeatmap() {
           <div className="text-lg sm:text-xl font-bold text-[#f9bc60]">
             {totalActivity}
           </div>
-          <div className="text-xs text-[#abd1c6]">
-            действий за год
-          </div>
+          <div className="text-xs text-[#abd1c6]">действий за год</div>
         </div>
       </div>
 
@@ -120,7 +124,7 @@ export default function ActivityHeatmap() {
                   onHoverStart={() => setSelectedDay(day)}
                   onHoverEnd={() => setSelectedDay(null)}
                   className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded ${getColor(day.level)} cursor-pointer transition-all`}
-                  title={`${day.count} действий ${new Date(day.date).toLocaleDateString('ru-RU')}`}
+                  title={`${day.count} действий ${new Date(day.date).toLocaleDateString("ru-RU")}`}
                 />
               ))}
             </div>
@@ -147,14 +151,19 @@ export default function ActivityHeatmap() {
           className="mt-4 p-3 bg-[#001e1d]/80 backdrop-blur-sm rounded-lg border border-[#abd1c6]/20"
         >
           <div className="text-sm text-[#fffffe] font-semibold">
-            {selectedDay.count} {selectedDay.count === 1 ? 'действие' : selectedDay.count < 5 ? 'действия' : 'действий'}
+            {selectedDay.count}{" "}
+            {selectedDay.count === 1
+              ? "действие"
+              : selectedDay.count < 5
+                ? "действия"
+                : "действий"}
           </div>
           <div className="text-xs text-[#abd1c6]">
-            {new Date(selectedDay.date).toLocaleDateString('ru-RU', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
+            {new Date(selectedDay.date).toLocaleDateString("ru-RU", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </div>
         </motion.div>
@@ -162,4 +171,3 @@ export default function ActivityHeatmap() {
     </motion.div>
   );
 }
-

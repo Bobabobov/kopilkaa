@@ -7,25 +7,29 @@ const benefits = [
   {
     icon: "Trophy",
     title: "Проект без инвесторов и рекламы",
-    description: "«Копилка» развивается за счёт поддержки сообщества — без инвесторов и навязчивой рекламы.",
+    description:
+      "«Копилка» развивается за счёт поддержки сообщества — без инвесторов и навязчивой рекламы.",
     color: "#f9bc60",
   },
   {
     icon: "Share",
     title: "Поддержка помогает реальным людям",
-    description: "Проект самостоятельно распределяет средства между одобренными заявками и поддерживает работу платформы.",
+    description:
+      "Проект самостоятельно распределяет средства между одобренными заявками и поддерживает работу платформы.",
     color: "#abd1c6",
   },
   {
     icon: "BarChart3",
     title: "Прозрачность и публичность",
-    description: "Истории и активность проекта видны публично — это помогает сообществу доверять платформе.",
+    description:
+      "Истории и активность проекта видны публично — это помогает сообществу доверять платформе.",
     color: "#e16162",
   },
   {
     icon: "Infinity",
     title: "Поддержка — это участие, а не покупка",
-    description: "Никаких обещаний выгоды. Это добровольный вклад в развитие проекта и помощь тем, кому она нужна.",
+    description:
+      "Никаких обещаний выгоды. Это добровольный вклад в развитие проекта и помощь тем, кому она нужна.",
     color: "#f9bc60",
   },
 ];
@@ -41,10 +45,16 @@ export default function SupportBenefits() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 sm:mb-10"
         >
-          <h3 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 sm:mb-4" style={{ color: "#fffffe" }}>
+          <h3
+            className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 sm:mb-4"
+            style={{ color: "#fffffe" }}
+          >
             ✨ Почему люди поддерживают «Копилку»
           </h3>
-          <p className="text-sm sm:text-base max-w-2xl mx-auto px-2" style={{ color: "#abd1c6" }}>
+          <p
+            className="text-sm sm:text-base max-w-2xl mx-auto px-2"
+            style={{ color: "#abd1c6" }}
+          >
             Коротко о том, почему поддержка важна для проекта и сообщества.
           </p>
         </motion.div>
@@ -63,26 +73,36 @@ export default function SupportBenefits() {
                 className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/15 rounded-xl sm:rounded-2xl p-5 sm:p-6 text-center hover:border-[#abd1c6]/30 transition-all duration-300"
               >
                 <motion.div
-                  animate={{ 
+                  animate={{
                     rotate: [0, 5, -5, 0],
-                    scale: [1, 1.1, 1]
+                    scale: [1, 1.1, 1],
                   }}
-                  transition={{ 
-                    duration: 4, 
+                  transition={{
+                    duration: 4,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                   className="mb-4 sm:mb-5 mx-auto flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full"
-                  style={{ backgroundColor: `${benefit.color}20`, border: `2px solid ${benefit.color}`, color: benefit.color }}
+                  style={{
+                    backgroundColor: `${benefit.color}20`,
+                    border: `2px solid ${benefit.color}`,
+                    color: benefit.color,
+                  }}
                 >
                   <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-current" />
                 </motion.div>
-                
-                <h4 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4" style={{ color: "#fffffe" }}>
+
+                <h4
+                  className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4"
+                  style={{ color: "#fffffe" }}
+                >
                   {benefit.title}
                 </h4>
-                
-                <p className="text-sm sm:text-base" style={{ color: "#abd1c6" }}>
+
+                <p
+                  className="text-sm sm:text-base"
+                  style={{ color: "#abd1c6" }}
+                >
                   {benefit.description}
                 </p>
               </motion.div>
@@ -99,34 +119,43 @@ export default function SupportBenefits() {
           className="text-center bg-gradient-to-br from-[#004643]/40 via-[#004643]/30 to-[#001e1d]/40 backdrop-blur-sm border-2 border-[#f9bc60]/40 rounded-xl sm:rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8"
         >
           <motion.div
-            animate={{ 
+            animate={{
               scale: [1, 1.1, 1],
             }}
-            transition={{ 
-              duration: 3, 
+            transition={{
+              duration: 3,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
             className="mb-4 sm:mb-5 mx-auto flex items-center justify-center w-16 h-16 sm:w-18 sm:h-18 rounded-full"
-            style={{ backgroundColor: "#f9bc6020", border: "2px solid #f9bc60" }}
+            style={{
+              backgroundColor: "#f9bc6020",
+              border: "2px solid #f9bc60",
+            }}
           >
             <LucideIcons.Trophy className="w-8 h-8 sm:w-9 sm:h-9 text-[#f9bc60]" />
           </motion.div>
 
-          <h4 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 sm:mb-4" style={{ color: "#fffffe" }}>
+          <h4
+            className="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 sm:mb-4"
+            style={{ color: "#fffffe" }}
+          >
             Посмотрите «Героев проекта»
           </h4>
-          
-          <p className="text-base sm:text-lg mb-5 sm:mb-6 max-w-2xl mx-auto leading-relaxed px-2" style={{ color: "#abd1c6" }}>
-            Это публичная витрина благодарности пользователям, которые поддержали развитие платформы. Откройте страницу{" "}
-            <Link 
-              href="/heroes" 
+
+          <p
+            className="text-base sm:text-lg mb-5 sm:mb-6 max-w-2xl mx-auto leading-relaxed px-2"
+            style={{ color: "#abd1c6" }}
+          >
+            Это публичная витрина благодарности пользователям, которые
+            поддержали развитие платформы. Откройте страницу{" "}
+            <Link
+              href="/heroes"
               className="font-semibold hover:underline transition-all"
               style={{ color: "#f9bc60" }}
             >
               «Герои проекта»
-            </Link>
-            {" "}
+            </Link>{" "}
             и посмотрите список участников, бейджи и активность сообщества.
           </p>
 
@@ -148,10 +177,14 @@ export default function SupportBenefits() {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-center bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/20 rounded-2xl sm:rounded-3xl p-6 sm:p-7 md:p-8"
         >
-          <p className="text-sm sm:text-base md:text-lg mb-4 sm:mb-5 md:mb-6 px-2" style={{ color: "#abd1c6" }}>
-            Хотите добавить соцсети и оформить профиль? Они могут отображаться рядом с вами в «Героях проекта».
+          <p
+            className="text-sm sm:text-base md:text-lg mb-4 sm:mb-5 md:mb-6 px-2"
+            style={{ color: "#abd1c6" }}
+          >
+            Хотите добавить соцсети и оформить профиль? Они могут отображаться
+            рядом с вами в «Героях проекта».
           </p>
-          
+
           <Link
             href="/profile?settings=socials"
             className="inline-flex items-center text-sm sm:text-base md:text-lg font-semibold hover:scale-105 transition-transform duration-300"

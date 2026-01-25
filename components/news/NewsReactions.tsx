@@ -18,7 +18,11 @@ export function NewsReactions({
   initialLikes: number;
   initialDislikes: number;
   initialMyReaction: Reaction;
-  onChange?: (v: { likesCount: number; dislikesCount: number; myReaction: Reaction }) => void;
+  onChange?: (v: {
+    likesCount: number;
+    dislikesCount: number;
+    myReaction: Reaction;
+  }) => void;
 }) {
   const [likes, setLikes] = useState(initialLikes);
   const [dislikes, setDislikes] = useState(initialDislikes);
@@ -45,13 +49,21 @@ export function NewsReactions({
         return;
       }
       if (!r.ok) {
-        showToast("error", "Ошибка", d?.error || "Не удалось поставить реакцию");
+        showToast(
+          "error",
+          "Ошибка",
+          d?.error || "Не удалось поставить реакцию",
+        );
         return;
       }
       setLikes(d.likesCount);
       setDislikes(d.dislikesCount);
       setMyReaction(d.myReaction ?? null);
-      onChange?.({ likesCount: d.likesCount, dislikesCount: d.dislikesCount, myReaction: d.myReaction ?? null });
+      onChange?.({
+        likesCount: d.likesCount,
+        dislikesCount: d.dislikesCount,
+        myReaction: d.myReaction ?? null,
+      });
     } finally {
       setBusy(false);
     }
@@ -100,6 +112,3 @@ export function NewsReactions({
     </div>
   );
 }
-
-
-

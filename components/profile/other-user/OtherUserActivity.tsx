@@ -40,31 +40,31 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-    case "application_created":
-      return <LucideIcons.FileText className="w-4 h-4 text-[#f9bc60]" />;
-    case "profile_updated":
-      return <LucideIcons.User className="w-4 h-4 text-[#f9bc60]" />;
-    case "donation":
-      return <LucideIcons.Heart className="w-4 h-4 text-[#f9bc60]" />;
-    default:
-      return <LucideIcons.Activity className="w-4 h-4 text-[#f9bc60]" />;
+      case "application_created":
+        return <LucideIcons.FileText className="w-4 h-4 text-[#f9bc60]" />;
+      case "profile_updated":
+        return <LucideIcons.User className="w-4 h-4 text-[#f9bc60]" />;
+      case "donation":
+        return <LucideIcons.Heart className="w-4 h-4 text-[#f9bc60]" />;
+      default:
+        return <LucideIcons.Activity className="w-4 h-4 text-[#f9bc60]" />;
     }
   };
 
-const relativeTime = (date: string) => {
-  const d = new Date(date);
-  const now = new Date();
-  const diff = now.getTime() - d.getTime();
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return "только что";
-  if (minutes < 60) return `${minutes} мин назад`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} ч назад`;
-  const days = Math.floor(hours / 24);
-  if (days === 1) return "вчера";
-  if (days < 7) return `${days} дн назад`;
-  return d.toLocaleDateString("ru-RU");
-};
+  const relativeTime = (date: string) => {
+    const d = new Date(date);
+    const now = new Date();
+    const diff = now.getTime() - d.getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return "только что";
+    if (minutes < 60) return `${minutes} мин назад`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} ч назад`;
+    const days = Math.floor(hours / 24);
+    if (days === 1) return "вчера";
+    if (days < 7) return `${days} дн назад`;
+    return d.toLocaleDateString("ru-RU");
+  };
 
   if (loading) {
     return (
@@ -120,7 +120,9 @@ const relativeTime = (date: string) => {
             <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
               <LucideIcons.Activity className="w-8 h-8 text-white/40" />
             </div>
-            <p className="text-sm font-medium text-white/80 mb-1">Пока нет активности</p>
+            <p className="text-sm font-medium text-white/80 mb-1">
+              Пока нет активности
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -143,7 +145,9 @@ const relativeTime = (date: string) => {
                     <LucideIcons.Calendar className="w-3 h-3" />
                     <span>{relativeTime(activity.createdAt)}</span>
                     <span>•</span>
-                    <span>{new Date(activity.createdAt).toLocaleDateString("ru-RU")}</span>
+                    <span>
+                      {new Date(activity.createdAt).toLocaleDateString("ru-RU")}
+                    </span>
                   </div>
                 </div>
               </motion.div>

@@ -98,5 +98,3 @@ export default function ApplicationsListItemActions({
     </div>
   );
 }
-
-

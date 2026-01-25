@@ -96,7 +96,7 @@ export default function ReportCard({
         <div className="flex items-center gap-4">
           <span
             className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(
-              report.status
+              report.status,
             )}`}
           >
             {getStatusLabel(report.status)}
@@ -109,4 +109,3 @@ export default function ReportCard({
     </motion.div>
   );
 }
-

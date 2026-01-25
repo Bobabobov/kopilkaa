@@ -12,8 +12,7 @@ const MAX_AGE = 60 * 60 * 24 * 30; // 30 дней
 const enc = (obj: any) =>
   Buffer.from(JSON.stringify(obj)).toString("base64url");
 
-const dec = (s: string) =>
-  JSON.parse(Buffer.from(s, "base64url").toString());
+const dec = (s: string) => JSON.parse(Buffer.from(s, "base64url").toString());
 
 const hmac = (data: string, secret: string) =>
   crypto.createHmac("sha256", secret).update(data).digest("base64url");
@@ -57,7 +56,8 @@ export function verifySession(
     if (!p1 || !p2 || !sig) return null;
 
     const expect = hmac(`${p1}.${p2}`, secret);
-    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expect))) return null;
+    if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expect)))
+      return null;
 
     const payload: SessionPayload = dec(p2);
     if (payload.exp < Math.floor(Date.now() / 1000)) return null;
@@ -112,27 +112,6 @@ export function attachClearSessionToResponse(res: NextResponse) {
 }
 
 // Legacy: оставляем для совместимости, но для API лучше использовать attachSessionToResponse.
-export async function setSession(payload: Omit<SessionPayload, "exp">) {
-  try {
-    const token = signSession(payload);
-    const cookieStore = await cookies();
-    if (!cookieStore) return;
-    cookieStore.set(COOKIE_NAME, token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: MAX_AGE,
-    });
-  } catch (error) {
-    // В Next.js 14 cookies() может выбросить ошибку "digest" в некоторых контекстах
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[setSession] Error accessing cookies:", error);
-    }
-    // ignore
-  }
-}
-
 export async function clearSession() {
   try {
     const cookieStore = await cookies();

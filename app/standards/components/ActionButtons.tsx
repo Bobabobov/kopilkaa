@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 export function ActionButtons() {
   return (
@@ -15,10 +15,7 @@ export function ActionButtons() {
     >
       {/* Кнопка возврата на /advertising */}
       <div className="flex justify-center px-4 mb-6">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Link
             href="/advertising"
             className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 border-2 rounded-lg sm:rounded-xl transition-all hover:shadow-lg text-sm sm:text-base font-medium"
@@ -64,8 +61,12 @@ export function ActionButtons() {
           whileTap={{ scale: 0.95 }}
           className="inline-flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#0088cc] to-[#0077b5] text-white font-bold rounded-lg sm:rounded-xl transition-all shadow-lg shadow-[#0088cc]/30 hover:shadow-[#0088cc]/50 text-sm sm:text-base"
         >
-          <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
+          <svg
+            className="w-5 h-5 sm:w-6 sm:h-6"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
           </svg>
           <span className="whitespace-nowrap">Открыть бота в Telegram</span>
         </motion.a>

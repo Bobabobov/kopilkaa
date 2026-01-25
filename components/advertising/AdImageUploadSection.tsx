@@ -109,7 +109,9 @@ export function AdImageUploadSection({
               }`}
             >
               <LucideIcons.Upload className="w-5 h-5" />
-              <span>Выбрать файлы ({images.length}/{maxImages})</span>
+              <span>
+                Выбрать файлы ({images.length}/{maxImages})
+              </span>
             </label>
 
             {/* Превью загруженных изображений */}
@@ -165,7 +167,9 @@ export function AdImageUploadSection({
                     key={index}
                     className="flex items-center justify-between p-2 bg-[#004643] rounded-lg border border-[#abd1c6]/20"
                   >
-                    <span className="text-sm text-[#abd1c6] truncate flex-1">{url}</span>
+                    <span className="text-sm text-[#abd1c6] truncate flex-1">
+                      {url}
+                    </span>
                     <button
                       type="button"
                       onClick={() => onRemoveImageUrl(index)}
@@ -183,4 +187,3 @@ export function AdImageUploadSection({
     </div>
   );
 }
-

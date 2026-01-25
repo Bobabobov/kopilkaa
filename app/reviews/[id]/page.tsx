@@ -25,7 +25,8 @@ export default function ReviewDetailPage() {
     fetch(`/api/reviews/${id}`, { cache: "no-store" })
       .then(async (res) => {
         const json = await res.json();
-        if (!res.ok) throw new Error(json?.error || "Не удалось загрузить отзыв");
+        if (!res.ok)
+          throw new Error(json?.error || "Не удалось загрузить отзыв");
         setReview(json.review);
       })
       .catch(() => setReview(null))
@@ -66,7 +67,9 @@ export default function ReviewDetailPage() {
   const avatar = user?.avatar || "/default-avatar.png";
   const heroImage = review.images?.[0]?.url;
   const trustLevelNumber = user?.trust?.status?.split("_")[1];
-  const trustTitle = trustLevelNumber ? `Уровень одобрения ${trustLevelNumber}` : "Уровень одобрения";
+  const trustTitle = trustLevelNumber
+    ? `Уровень одобрения ${trustLevelNumber}`
+    : "Уровень одобрения";
   const profileHref = user?.id ? `/profile/${user.id}` : null;
 
   return (
@@ -110,7 +113,9 @@ export default function ReviewDetailPage() {
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-sm border border-white/20">
                     <LucideIcons.ZoomIn size="sm" className="text-white" />
-                    <span className="text-xs text-white font-medium">Открыть фото</span>
+                    <span className="text-xs text-white font-medium">
+                      Открыть фото
+                    </span>
                   </div>
                 </div>
               </button>
@@ -169,10 +174,12 @@ export default function ReviewDetailPage() {
                       {user?.name || "Аноним"}
                     </Link>
                   ) : (
-                    <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-white break-words w-full">{user?.name || "Аноним"}</h1>
+                    <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-white break-words w-full">
+                      {user?.name || "Аноним"}
+                    </h1>
                   )}
-                  {user?.username && (
-                    profileHref ? (
+                  {user?.username &&
+                    (profileHref ? (
                       <Link
                         href={profileHref}
                         className="block text-xs sm:text-sm text-white/70 hover:text-white transition-colors break-all w-full"
@@ -180,14 +187,22 @@ export default function ReviewDetailPage() {
                         @{user.username}
                       </Link>
                     ) : (
-                      <p className="text-xs sm:text-sm text-white/70 break-all w-full">@{user.username}</p>
-                    )
-                  )}
+                      <p className="text-xs sm:text-sm text-white/70 break-all w-full">
+                        @{user.username}
+                      </p>
+                    ))}
                   {user?.trust && (
                     <div className="inline-flex items-center gap-1.5 sm:gap-2 text-[10px] xs:text-xs text-white/85 bg-white/10 border border-white/15 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-lg backdrop-blur flex-wrap max-w-full">
-                      <LucideIcons.Shield size="xs" className="text-[#f9bc60] flex-shrink-0" />
-                      <span className="font-semibold break-words min-w-0">{trustTitle}</span>
-                      <span className="opacity-80 whitespace-nowrap flex-shrink-0">· {user.trust.supportRange}</span>
+                      <LucideIcons.Shield
+                        size="xs"
+                        className="text-[#f9bc60] flex-shrink-0"
+                      />
+                      <span className="font-semibold break-words min-w-0">
+                        {trustTitle}
+                      </span>
+                      <span className="opacity-80 whitespace-nowrap flex-shrink-0">
+                        · {user.trust.supportRange}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -208,13 +223,19 @@ export default function ReviewDetailPage() {
           {/* Контент */}
           <div className="relative z-10 space-y-4 sm:space-y-5 md:space-y-6 px-3 xs:px-4 sm:px-5 md:px-6 lg:px-8 py-4 sm:py-5 md:py-6 lg:py-8 w-full min-w-0">
             <section className="rounded-xl sm:rounded-2xl border border-white/10 bg-[#001e1d]/60 p-3 sm:p-4 md:p-5 lg:p-6 text-white shadow-[0_15px_40px_-30px_rgba(0,0,0,0.9)] w-full min-w-0">
-              <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">Опыт участника</h2>
-              <p className="text-sm sm:text-base leading-relaxed text-white/85 whitespace-pre-line force-wrap w-full max-w-full min-w-0">{review.content}</p>
+              <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3">
+                Опыт участника
+              </h2>
+              <p className="text-sm sm:text-base leading-relaxed text-white/85 whitespace-pre-line force-wrap w-full max-w-full min-w-0">
+                {review.content}
+              </p>
             </section>
 
             {review.images?.length > 0 && (
               <section className="space-y-2 sm:space-y-3 w-full min-w-0">
-                <h3 className="text-xs sm:text-sm font-semibold text-white/80">Фото</h3>
+                <h3 className="text-xs sm:text-sm font-semibold text-white/80">
+                  Фото
+                </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 w-full">
                   {review.images.map((img, index) => (
                     <button
@@ -234,8 +255,13 @@ export default function ReviewDetailPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/10 to-transparent pointer-events-none group-hover:from-black/50 transition-colors" />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm border border-white/20">
-                          <LucideIcons.ZoomIn size="sm" className="text-white" />
-                          <span className="text-xs text-white font-medium">Открыть</span>
+                          <LucideIcons.ZoomIn
+                            size="sm"
+                            className="text-white"
+                          />
+                          <span className="text-xs text-white font-medium">
+                            Открыть
+                          </span>
                         </div>
                       </div>
                     </button>
@@ -246,7 +272,9 @@ export default function ReviewDetailPage() {
 
             {(user?.vkLink || user?.telegramLink || user?.youtubeLink) && (
               <section className="rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-3 sm:p-4 md:p-5 space-y-2 sm:space-y-3 w-full min-w-0">
-                <h3 className="text-xs sm:text-sm font-semibold text-white/80">Социальные сети</h3>
+                <h3 className="text-xs sm:text-sm font-semibold text-white/80">
+                  Социальные сети
+                </h3>
                 <div className="flex flex-wrap gap-2 sm:gap-2.5 w-full">
                   {user.vkLink && (
                     <SocialChip href={user.vkLink} label="VK" color="#4c75a3">
@@ -254,12 +282,20 @@ export default function ReviewDetailPage() {
                     </SocialChip>
                   )}
                   {user.telegramLink && (
-                    <SocialChip href={user.telegramLink} label="Telegram" color="#229ED9">
+                    <SocialChip
+                      href={user.telegramLink}
+                      label="Telegram"
+                      color="#229ED9"
+                    >
                       <TelegramIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </SocialChip>
                   )}
                   {user.youtubeLink && (
-                    <SocialChip href={user.youtubeLink} label="YouTube" color="#ff4f45">
+                    <SocialChip
+                      href={user.youtubeLink}
+                      label="YouTube"
+                      color="#ff4f45"
+                    >
                       <YouTubeIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </SocialChip>
                   )}
@@ -278,10 +314,14 @@ export default function ReviewDetailPage() {
           currentIndex={lightboxIndex}
           onClose={() => setLightboxOpen(false)}
           onPrevious={() => {
-            setLightboxIndex((prev) => (prev > 0 ? prev - 1 : review.images.length - 1));
+            setLightboxIndex((prev) =>
+              prev > 0 ? prev - 1 : review.images.length - 1,
+            );
           }}
           onNext={() => {
-            setLightboxIndex((prev) => (prev < review.images.length - 1 ? prev + 1 : 0));
+            setLightboxIndex((prev) =>
+              prev < review.images.length - 1 ? prev + 1 : 0,
+            );
           }}
         />
       )}

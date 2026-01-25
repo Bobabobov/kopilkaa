@@ -10,7 +10,11 @@ export type FriendsSummaryItem = {
   hint?: string;
 };
 
-export function FriendsSummaryCards({ items }: { items: FriendsSummaryItem[] }) {
+export function FriendsSummaryCards({
+  items,
+}: {
+  items: FriendsSummaryItem[];
+}) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 min-w-0">
       {items.map((item) => (
@@ -25,7 +29,9 @@ export function FriendsSummaryCards({ items }: { items: FriendsSummaryItem[] }) 
             <p className="text-sm text-[#abd1c6]">{item.label}</p>
             <p className="text-xl font-bold text-[#fffffe]">
               {item.value}
-              {item.hint && <span className="ml-2 text-xs text-[#f9bc60]">{item.hint}</span>}
+              {item.hint && (
+                <span className="ml-2 text-xs text-[#f9bc60]">{item.hint}</span>
+              )}
             </p>
           </div>
         </div>
@@ -33,5 +39,3 @@ export function FriendsSummaryCards({ items }: { items: FriendsSummaryItem[] }) 
     </div>
   );
 }
-
-

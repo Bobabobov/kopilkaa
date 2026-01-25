@@ -59,12 +59,14 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
           initializeGoogle(clientId);
         }
       }, 100);
-      
+
       // Таймаут на 10 секунд
       timeoutId = setTimeout(() => {
         clearInterval(checkInterval);
         if (!window.google?.accounts?.id) {
-          setError("Таймаут загрузки Google Identity Services. Возможно, блокировщик рекламы или настройки приватности браузера блокируют загрузку. Попробуйте войти через Telegram или по почте.");
+          setError(
+            "Таймаут загрузки Google Identity Services. Возможно, блокировщик рекламы или настройки приватности браузера блокируют загрузку. Попробуйте войти через Telegram или по почте.",
+          );
           setLoading(false);
         }
       }, 10000);
@@ -136,21 +138,25 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
           src="https://accounts.google.com/gsi/client"
           strategy="lazyOnload"
           onError={() => {
-            setError("Не удалось загрузить Google Identity Services. Возможно, блокировщик рекламы или настройки приватности браузера блокируют загрузку. Попробуйте войти через Telegram или по почте.");
+            setError(
+              "Не удалось загрузить Google Identity Services. Возможно, блокировщик рекламы или настройки приватности браузера блокируют загрузку. Попробуйте войти через Telegram или по почте.",
+            );
             setLoading(false);
           }}
           onLoad={() => {
             // Даем время на инициализацию
             setTimeout(() => {
               if (!window.google?.accounts?.id && !error) {
-                setError("Google Identity Services не инициализирован. Попробуйте войти через Telegram или по почте.");
+                setError(
+                  "Google Identity Services не инициализирован. Попробуйте войти через Telegram или по почте.",
+                );
                 setLoading(false);
               }
             }, 2000);
           }}
         />
       )}
-      
+
       {loading && !error && (
         <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] text-[#abd1c6] flex items-center justify-center gap-2.5 border border-[#1f2937]/50">
           <div className="w-4 h-4 border-2 border-[#abd1c6] border-t-transparent rounded-full animate-spin" />
@@ -163,7 +169,7 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
           <span>{error}</span>
         </div>
       )}
-      
+
       {/* Кастомная красивая кнопка Google в стиле других кнопок */}
       {!loading && !error && isReady && (
         <motion.button
@@ -172,7 +178,7 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
             if (window.google?.accounts?.id && containerRef.current) {
               // Очищаем контейнер
               containerRef.current.innerHTML = "";
-              
+
               // Рендерим стандартную кнопку Google
               // Получаем ширину контейнера для правильной ширины кнопки
               const containerWidth = containerRef.current.offsetWidth || 300;
@@ -185,10 +191,12 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
                 logo_alignment: "left",
                 width: containerWidth,
               });
-              
+
               // Кликаем по кнопке программно
               setTimeout(() => {
-                const button = containerRef.current?.querySelector('div[role="button"]') as HTMLElement;
+                const button = containerRef.current?.querySelector(
+                  'div[role="button"]',
+                ) as HTMLElement;
                 if (button) {
                   button.click();
                 }
@@ -201,7 +209,10 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
         >
           <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#f9bc60]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           {/* Google логотип */}
-          <svg className="w-5 h-5 relative z-10 flex-shrink-0" viewBox="0 0 24 24">
+          <svg
+            className="w-5 h-5 relative z-10 flex-shrink-0"
+            viewBox="0 0 24 24"
+          >
             <path
               fill="#4285F4"
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -222,13 +233,9 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
           <span className="relative z-10">Войти через Google</span>
         </motion.button>
       )}
-      
+
       {/* Скрытый контейнер для Google Identity Services (для программного клика) */}
-      <div
-        ref={containerRef}
-        className="hidden"
-      />
+      <div ref={containerRef} className="hidden" />
     </div>
   );
 }
-

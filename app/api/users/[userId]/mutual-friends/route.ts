@@ -27,7 +27,10 @@ export async function GET(
 
     const otherUserId = await resolveUserIdFromIdentifier(otherUserIdParam);
     if (!otherUserId) {
-      return NextResponse.json({ message: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     // Друзья текущего пользователя
@@ -39,7 +42,9 @@ export async function GET(
       select: { requesterId: true, receiverId: true },
     });
     const myFriendIds = new Set(
-      myFriendships.map((f) => (f.requesterId === me ? f.receiverId : f.requesterId)),
+      myFriendships.map((f) =>
+        f.requesterId === me ? f.receiverId : f.requesterId,
+      ),
     );
 
     // Друзья другого пользователя
@@ -94,5 +99,3 @@ export async function GET(
     );
   }
 }
-
-

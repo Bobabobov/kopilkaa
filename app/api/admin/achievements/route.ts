@@ -1,7 +1,7 @@
 // app/api/admin/achievements/route.ts
-import { NextResponse } from 'next/server';
-import { getAllowedAdminUser } from '@/lib/adminAccess';
-import { prisma } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { getAllowedAdminUser } from "@/lib/adminAccess";
+import { prisma } from "@/lib/db";
 
 const IS_PROD = process.env.NODE_ENV === "production";
 
@@ -9,16 +9,16 @@ const IS_PROD = process.env.NODE_ENV === "production";
 export async function GET() {
   try {
     const admin = await getAllowedAdminUser();
-    
+
     if (!admin) {
-      return NextResponse.json({ error: 'Доступ запрещён' }, { status: 403 });
+      return NextResponse.json({ error: "Доступ запрещён" }, { status: 403 });
     }
 
     const achievements = await prisma.achievement.findMany({
       orderBy: [
-        { isActive: 'desc' },
-        { rarity: 'desc' },
-        { createdAt: 'desc' },
+        { isActive: "desc" },
+        { rarity: "desc" },
+        { createdAt: "desc" },
       ],
     });
 
@@ -28,12 +28,15 @@ export async function GET() {
     });
   } catch (error) {
     if (!IS_PROD) {
-      console.error('Error fetching achievements for admin:', error);
-      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      console.error("Error fetching achievements for admin:", error);
+      console.error(
+        "Error stack:",
+        error instanceof Error ? error.stack : "No stack trace",
+      );
     }
     return NextResponse.json(
-      { error: 'Ошибка получения достижений' },
-      { status: 500 }
+      { error: "Ошибка получения достижений" },
+      { status: 500 },
     );
   }
 }
@@ -43,7 +46,7 @@ export async function POST(request: Request) {
   try {
     const admin = await getAllowedAdminUser();
     if (!admin) {
-      return NextResponse.json({ error: 'Доступ запрещён' }, { status: 403 });
+      return NextResponse.json({ error: "Доступ запрещён" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -62,8 +65,8 @@ export async function POST(request: Request) {
 
     if (!name || !description || !icon || !rarity || !type) {
       return NextResponse.json(
-        { error: 'Не все обязательные поля заполнены' },
-        { status: 400 }
+        { error: "Не все обязательные поля заполнены" },
+        { status: 400 },
       );
     }
 
@@ -87,10 +90,10 @@ export async function POST(request: Request) {
       data: achievement,
     });
   } catch (error) {
-    console.error('Error creating achievement:', error);
+    console.error("Error creating achievement:", error);
     return NextResponse.json(
-      { error: 'Ошибка создания достижения' },
-      { status: 500 }
+      { error: "Ошибка создания достижения" },
+      { status: 500 },
     );
   }
 }

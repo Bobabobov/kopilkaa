@@ -14,7 +14,11 @@ export function AuthModeSwitcher({ isSignup }: AuthModeSwitcherProps) {
   const searchParams = useSearchParams();
   const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
   const loginHref = buildAuthModalUrl({ pathname, search, modal: "auth" });
-  const signupHref = buildAuthModalUrl({ pathname, search, modal: "auth/signup" });
+  const signupHref = buildAuthModalUrl({
+    pathname,
+    search,
+    modal: "auth/signup",
+  });
 
   return (
     <motion.div
@@ -51,5 +55,3 @@ export function AuthModeSwitcher({ isSignup }: AuthModeSwitcherProps) {
     </motion.div>
   );
 }
-
-

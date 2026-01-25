@@ -21,7 +21,8 @@ export default function BasicFields({
   onPreviewUrlChange,
   onPreviewRemove,
 }: BasicFieldsProps) {
-  const showTitle = formData.placement !== "stories" &&
+  const showTitle =
+    formData.placement !== "stories" &&
     formData.placement !== "home_sidebar" &&
     formData.placement !== "home_banner";
 
@@ -89,7 +90,13 @@ export default function BasicFields({
               onFileSelect={onPreviewFileSelect}
               onUrlChange={onPreviewUrlChange}
               onRemove={onPreviewRemove}
-              inputId={isStories ? "stories-preview-image-upload" : isHomeSidebar ? "sidebar-desktop-image-upload" : "banner-desktop-image-upload"}
+              inputId={
+                isStories
+                  ? "stories-preview-image-upload"
+                  : isHomeSidebar
+                    ? "sidebar-desktop-image-upload"
+                    : "banner-desktop-image-upload"
+              }
             />
           ) : (
             <input
@@ -103,20 +110,22 @@ export default function BasicFields({
           <p className="text-xs text-[#abd1c6]/70 mt-1">
             {formData.placement === "home_banner" && (
               <>
-                <strong>Большой баннер наверху (для десктопа):</strong> по ширине блока, высота
-                ~180–250px. Лучше использовать картинку 1600–1920px по ширине.
+                <strong>Большой баннер наверху (для десктопа):</strong> по
+                ширине блока, высота ~180–250px. Лучше использовать картинку
+                1600–1920px по ширине.
               </>
             )}
             {formData.placement === "home_sidebar" && (
               <>
-                <strong>Блок под кнопками на главной:</strong> горизонтальный баннер примерно
-                600–900×220–260px.
+                <strong>Блок под кнопками на главной:</strong> горизонтальный
+                баннер примерно 600–900×220–260px.
               </>
             )}
             {isStories && (
               <>
-                <strong>Для раздела историй:</strong> эта картинка используется только как превью
-                карточки на странице <code>/stories</code>. Картинки ниже — внутри самой истории.
+                <strong>Для раздела историй:</strong> эта картинка используется
+                только как превью карточки на странице <code>/stories</code>.
+                Картинки ниже — внутри самой истории.
               </>
             )}
             {formData.placement === "other" && (
@@ -153,10 +162,10 @@ export default function BasicFields({
           <option value="other">Другое / вручную</option>
         </select>
         <p className="text-xs text-[#abd1c6]/70 mt-1">
-          Это влияет только на то, где на сайте будет использоваться это размещение.
+          Это влияет только на то, где на сайте будет использоваться это
+          размещение.
         </p>
       </div>
     </div>
   );
 }
-

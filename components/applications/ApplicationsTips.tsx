@@ -5,10 +5,26 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export function ApplicationsTips() {
   const tips = [
-    { icon: LucideIcons.Target, text: "Будьте конкретными в описании ситуации", color: "#10B981" },
-    { icon: LucideIcons.Image, text: "Приложите фотографии для подтверждения", color: "#3B82F6" },
-    { icon: LucideIcons.DollarSign, text: "Укажите точную сумму, которая нужна", color: "#F59E0B" },
-    { icon: LucideIcons.FileText, text: "Опишите, как планируете использовать средства", color: "#8B5CF6" },
+    {
+      icon: LucideIcons.Target,
+      text: "Будьте конкретными в описании ситуации",
+      color: "#10B981",
+    },
+    {
+      icon: LucideIcons.Image,
+      text: "Приложите фотографии для подтверждения",
+      color: "#3B82F6",
+    },
+    {
+      icon: LucideIcons.DollarSign,
+      text: "Укажите точную сумму, которая нужна",
+      color: "#F59E0B",
+    },
+    {
+      icon: LucideIcons.FileText,
+      text: "Опишите, как планируете использовать средства",
+      color: "#8B5CF6",
+    },
   ];
 
   return (
@@ -67,7 +83,10 @@ export function ApplicationsTips() {
                 >
                   <motion.div
                     className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md"
-                    style={{ backgroundColor: `${tip.color}20`, color: tip.color }}
+                    style={{
+                      backgroundColor: `${tip.color}20`,
+                      color: tip.color,
+                    }}
                     whileHover={{ rotate: 15, scale: 1.1 }}
                   >
                     <IconComponent size="xs" />
@@ -86,4 +105,3 @@ export function ApplicationsTips() {
 }
 
 export default ApplicationsTips;
-

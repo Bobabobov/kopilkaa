@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 export function RequirementsSection() {
   return (
@@ -27,9 +27,11 @@ export function RequirementsSection() {
               <div className="w-12 h-12 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-2xl">
                 📋
               </div>
-              <h2 className="text-2xl font-bold text-[#fffffe]">Общие требования</h2>
+              <h2 className="text-2xl font-bold text-[#fffffe]">
+                Общие требования
+              </h2>
             </div>
-            
+
             <div className="space-y-4">
               <div className="p-4 bg-[#004643]/30 rounded-xl border border-[#abd1c6]/5">
                 <h3 className="text-base font-semibold text-[#f9bc60] mb-2 flex items-center gap-2">
@@ -37,21 +39,39 @@ export function RequirementsSection() {
                   Текстовый контент
                 </h3>
                 <ul className="space-y-1.5 text-[#abd1c6] text-sm">
-                  <li>• <strong className="text-[#fffffe]">Заголовок:</strong> 20-40 символов</li>
-                  <li>• <strong className="text-[#fffffe]">Описание:</strong> 60-120 символов</li>
-                  <li>• <strong className="text-[#fffffe]">Доп. информация:</strong> до 400 символов</li>
+                  <li>
+                    • <strong className="text-[#fffffe]">Заголовок:</strong>{" "}
+                    20-40 символов
+                  </li>
+                  <li>
+                    • <strong className="text-[#fffffe]">Описание:</strong>{" "}
+                    60-120 символов
+                  </li>
+                  <li>
+                    •{" "}
+                    <strong className="text-[#fffffe]">Доп. информация:</strong>{" "}
+                    до 400 символов
+                  </li>
                 </ul>
               </div>
-              
+
               <div className="p-4 bg-[#004643]/30 rounded-xl border border-[#abd1c6]/5">
                 <h3 className="text-base font-semibold text-[#f9bc60] mb-2 flex items-center gap-2">
                   <span>🖼️</span>
                   Изображения
                 </h3>
                 <ul className="space-y-1.5 text-[#abd1c6] text-sm">
-                  <li>• <strong className="text-[#fffffe]">Форматы:</strong> JPG, PNG, WebP</li>
-                  <li>• <strong className="text-[#fffffe]">Размер:</strong> до 5MB на изображение</li>
-                  <li>• <strong className="text-[#fffffe]">Качество:</strong> HD</li>
+                  <li>
+                    • <strong className="text-[#fffffe]">Форматы:</strong> JPG,
+                    PNG, WebP
+                  </li>
+                  <li>
+                    • <strong className="text-[#fffffe]">Размер:</strong> до 5MB
+                    на изображение
+                  </li>
+                  <li>
+                    • <strong className="text-[#fffffe]">Качество:</strong> HD
+                  </li>
                 </ul>
               </div>
 
@@ -61,9 +81,18 @@ export function RequirementsSection() {
                   Видео (для большого баннера)
                 </h3>
                 <ul className="space-y-1.5 text-[#abd1c6] text-sm">
-                  <li>• <strong className="text-[#fffffe]">Форматы:</strong> MP4, WebM</li>
-                  <li>• <strong className="text-[#fffffe]">Размер:</strong> до 5MB на файл</li>
-                  <li>• <strong className="text-[#fffffe]">Показ:</strong> contain (видео целиком, без обрезки)</li>
+                  <li>
+                    • <strong className="text-[#fffffe]">Форматы:</strong> MP4,
+                    WebM
+                  </li>
+                  <li>
+                    • <strong className="text-[#fffffe]">Размер:</strong> до 5MB
+                    на файл
+                  </li>
+                  <li>
+                    • <strong className="text-[#fffffe]">Показ:</strong> contain
+                    (видео целиком, без обрезки)
+                  </li>
                 </ul>
               </div>
             </div>
@@ -84,9 +113,11 @@ export function RequirementsSection() {
               <div className="w-12 h-12 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-2xl">
                 💡
               </div>
-              <h2 className="text-2xl font-bold text-[#fffffe]">Рекомендации</h2>
+              <h2 className="text-2xl font-bold text-[#fffffe]">
+                Рекомендации
+              </h2>
             </div>
-            
+
             <div className="space-y-4">
               <div className="p-4 bg-[#004643]/30 rounded-xl border border-[#abd1c6]/5">
                 <h3 className="text-base font-semibold text-[#f9bc60] mb-2 flex items-center gap-2">
@@ -99,7 +130,7 @@ export function RequirementsSection() {
                   <li>• Используйте призыв к действию</li>
                 </ul>
               </div>
-              
+
               <div className="p-4 bg-[#004643]/30 rounded-xl border border-[#abd1c6]/5">
                 <h3 className="text-base font-semibold text-[#f9bc60] mb-2 flex items-center gap-2">
                   <span>🎨</span>

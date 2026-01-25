@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ApplicationItem, Stats, ApplicationStatus } from "../types";
+import { ApplicationItem, Stats } from "../types";
 
 interface UseAdminApplicationsProps {
   initialPage?: number;
@@ -91,20 +91,20 @@ export function useAdminApplications({
 
       const data = await response.json();
       const newItems = data.items || [];
-      
+
       if (currentPage === 1) {
         // При первой загрузке или новом поиске - заменяем данные
         setItems(newItems);
       } else {
         // При подгрузке - добавляем к существующим
-        setItems(prev => [...prev, ...newItems]);
+        setItems((prev) => [...prev, ...newItems]);
       }
-      
+
       // Проверяем, есть ли ещё страницы
       setHasMore(currentPage < (data.pages || 1));
-      
+
       // Переходим на следующую страницу для следующей загрузки
-      setCurrentPage(prev => prev + 1);
+      setCurrentPage((prev) => prev + 1);
     } catch (err) {
       console.error("Failed to load applications:", err);
       setError("Ошибка загрузки заявок");
@@ -151,24 +151,24 @@ export function useAdminApplications({
 
   // Debounced обновление для избежания множественных запросов
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Обновление списка заявок (перезагрузка первой страницы)
   const refreshApplications = useCallback(async () => {
     // Отменяем предыдущее обновление, если оно еще не выполнилось
     if (refreshTimeoutRef.current) {
       clearTimeout(refreshTimeoutRef.current);
     }
-    
+
     refreshTimeoutRef.current = setTimeout(async () => {
       try {
         setError(null);
-        
+
         // Не показываем loading если это быстрое обновление через SSE
         const isQuickRefresh = items.length > 0;
         if (!isQuickRefresh) {
           setLoading(true);
         }
-        
+
         setCurrentPage(1);
 
         const params = new URLSearchParams({
@@ -183,16 +183,16 @@ export function useAdminApplications({
         });
 
         const response = await fetch(`/api/admin/applications?${params}`, {
-          cache: 'no-store'
+          cache: "no-store",
         });
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
         const newItems = data.items || [];
-        
+
         setItems(newItems);
         setHasMore(1 < (data.pages || 1));
         setCurrentPage(2);
@@ -219,7 +219,7 @@ export function useAdminApplications({
 
   // SSE подключение для real-time обновлений
   const eventSourceRef = useRef<EventSource | null>(null);
-  
+
   useEffect(() => {
     // Подключаемся к SSE
     const connectSSE = () => {
@@ -227,26 +227,26 @@ export function useAdminApplications({
         eventSourceRef.current.close();
       }
 
-      const eventSource = new EventSource('/api/admin/stream');
+      const eventSource = new EventSource("/api/admin/stream");
       eventSourceRef.current = eventSource;
 
-      eventSource.addEventListener('application:update', (event) => {
+      eventSource.addEventListener("application:update", () => {
         refreshApplications();
       });
 
-      eventSource.addEventListener('application:created', (event) => {
+      eventSource.addEventListener("application:created", () => {
         refreshApplications();
       });
 
-      eventSource.addEventListener('application:delete', (event) => {
+      eventSource.addEventListener("application:delete", () => {
         refreshApplications();
       });
 
-      eventSource.addEventListener('stats:dirty', () => {
+      eventSource.addEventListener("stats:dirty", () => {
         refreshStats();
       });
 
-      eventSource.onerror = (error) => {
+      eventSource.onerror = () => {
         eventSource.close();
         setTimeout(connectSSE, 3000);
       };

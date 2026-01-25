@@ -119,7 +119,6 @@ export async function DELETE(
 
   try {
     const { friendshipId } = await params;
-    console.log("=== DELETE /api/profile/friends/[friendshipId] ===", { friendshipId, userId: session.uid });
 
     // Проверяем, что пользователь является участником заявки
     const friendship = await prisma.friendship.findFirst({
@@ -130,26 +129,17 @@ export async function DELETE(
     });
 
     if (!friendship) {
-      console.log("Friendship not found:", { friendshipId, userId: session.uid });
       return NextResponse.json(
         { message: "Заявка не найдена" },
         { status: 404 },
       );
     }
 
-    console.log("Found friendship:", {
-      id: friendship.id,
-      requesterId: friendship.requesterId,
-      receiverId: friendship.receiverId,
-      status: friendship.status,
-    });
-
     // Удаляем заявку
     await prisma.friendship.delete({
       where: { id: friendshipId },
     });
 
-    console.log("Friendship deleted successfully");
     return NextResponse.json({ message: "Заявка удалена" });
   } catch (error) {
     console.error("Delete friendship error:", error);

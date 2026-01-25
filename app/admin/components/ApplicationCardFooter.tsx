@@ -1,6 +1,5 @@
 // app/admin/components/ApplicationCardFooter.tsx
 "use client";
-import type { ApplicationItem } from "../types";
 
 interface ApplicationCardFooterProps {
   applicationId: string;
@@ -27,9 +26,7 @@ export default function ApplicationCardFooter({
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>
-          Отправлено: {new Date(createdAt).toLocaleString("ru-RU")}
-        </span>
+        <span>Отправлено: {new Date(createdAt).toLocaleString("ru-RU")}</span>
       </div>
 
       <a
@@ -54,4 +51,3 @@ export default function ApplicationCardFooter({
     </div>
   );
 }
-

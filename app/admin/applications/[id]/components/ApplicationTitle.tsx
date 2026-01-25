@@ -14,11 +14,12 @@ export default function ApplicationTitle({ title }: ApplicationTitleProps) {
       transition={{ duration: 0.5, delay: 0.2 }}
       className="mb-6"
     >
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold break-words leading-tight" style={{ color: "#fffffe" }}>
+      <h1
+        className="text-2xl sm:text-3xl lg:text-4xl font-bold break-words leading-tight"
+        style={{ color: "#fffffe" }}
+      >
         {title}
       </h1>
     </motion.div>
   );
 }
-
-

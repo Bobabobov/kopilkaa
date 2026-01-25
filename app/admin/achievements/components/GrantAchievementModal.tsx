@@ -34,7 +34,6 @@ export default function GrantAchievementModal({
     loadUsers();
   }, []);
 
-
   const loadUsers = async () => {
     try {
       const response = await fetch("/api/admin/users");
@@ -69,7 +68,7 @@ export default function GrantAchievementModal({
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setSuccess(true);
         setTimeout(() => {
@@ -87,11 +86,15 @@ export default function GrantAchievementModal({
   };
 
   // Подсчет отфильтрованных данных для статистики
-  const filteredAchievementsCount = achievements.filter(a => a.isActive).length;
+  const filteredAchievementsCount = achievements.filter(
+    (a) => a.isActive,
+  ).length;
   const filteredUsersCount = users.length;
 
-  const selectedAchievementData = achievements.find(a => a.id === selectedAchievement);
-  const selectedUserData = users.find(u => u.id === selectedUser);
+  const selectedAchievementData = achievements.find(
+    (a) => a.id === selectedAchievement,
+  );
+  const selectedUserData = users.find((u) => u.id === selectedUser);
 
   return (
     <motion.div

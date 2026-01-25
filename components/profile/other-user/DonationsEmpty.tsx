@@ -15,7 +15,9 @@ export function DonationsEmpty() {
             <LucideIcons.CreditCard className="text-[#f9bc60]" size="sm" />
           </div>
           <div className="min-w-0">
-            <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">Оплаты</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">
+              Оплаты
+            </h3>
           </div>
         </div>
       </div>
@@ -23,7 +25,9 @@ export function DonationsEmpty() {
         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#abd1c6]/10 rounded-3xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
           <LucideIcons.CreditCard className="text-[#abd1c6]" size="xl" />
         </div>
-        <p className="text-sm sm:text-base text-[#abd1c6] font-medium mb-1">Пока нет оплат</p>
+        <p className="text-sm sm:text-base text-[#abd1c6] font-medium mb-1">
+          Пока нет оплат
+        </p>
         <p className="text-xs sm:text-sm text-[#abd1c6]/60 px-4">
           Пользователь ещё не оплачивал размещение профиля в «Героях»
         </p>

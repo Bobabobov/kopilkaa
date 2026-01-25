@@ -49,15 +49,22 @@ export default function HeaderNavigation({
             "px-3 sm:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
             isActive(l.href) ? "shadow-lg" : "hover:shadow-md",
             // Улучшенная читаемость для мобильного меню (когда используется flex-col)
-            className?.includes("flex-col") && !isActive(l.href) && "text-white font-semibold drop-shadow-lg",
+            className?.includes("flex-col") &&
+              !isActive(l.href) &&
+              "text-white font-semibold drop-shadow-lg",
             !className?.includes("flex-col") && "drop-shadow-md",
           )}
           style={{
             backgroundColor: isActive(l.href) ? "#f9bc60" : "transparent",
-            color: isActive(l.href) ? "#001e1d" : className?.includes("flex-col") ? "#ffffff" : "#fffffe",
-            textShadow: !isActive(l.href) && className?.includes("flex-col") 
-              ? "0 2px 4px rgba(0,0,0,0.7), 0 0 12px rgba(0,0,0,0.5)" 
-              : undefined,
+            color: isActive(l.href)
+              ? "#001e1d"
+              : className?.includes("flex-col")
+                ? "#ffffff"
+                : "#fffffe",
+            textShadow:
+              !isActive(l.href) && className?.includes("flex-col")
+                ? "0 2px 4px rgba(0,0,0,0.7), 0 0 12px rgba(0,0,0,0.5)"
+                : undefined,
           }}
           suppressHydrationWarning
         >

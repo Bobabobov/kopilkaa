@@ -81,6 +81,3 @@ export function getRealIP(req: NextRequest): string {
     cfConnectingIP || realIP || forwarded?.split(",")[0] || req.ip || "unknown"
   );
 }
-
-
-

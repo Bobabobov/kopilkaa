@@ -34,5 +34,3 @@ export function buildAuthModalUrl(opts: {
   const qs = params.toString();
   return qs ? `${pathname}?${qs}` : pathname;
 }
-
-

@@ -19,8 +19,13 @@ function validateUsernameOrThrow(raw: string): string {
   if (!usernamePattern.test(normalized)) {
     throw new Error("Логин может содержать 3-20 символов: буквы, цифры, ._-");
   }
-  if (!/^[\p{L}\p{N}]/u.test(normalized) || !/[\p{L}\p{N}]$/u.test(normalized)) {
-    throw new Error("Логин должен начинаться и заканчиваться буквой или цифрой");
+  if (
+    !/^[\p{L}\p{N}]/u.test(normalized) ||
+    !/[\p{L}\p{N}]$/u.test(normalized)
+  ) {
+    throw new Error(
+      "Логин должен начинаться и заканчиваться буквой или цифрой",
+    );
   }
   const reserved = new Set([
     "me",
@@ -42,7 +47,10 @@ function validateUsernameOrThrow(raw: string): string {
   return normalized;
 }
 
-function sanitizeSocialLink(value: unknown, type: SocialLinkType): string | null {
+function sanitizeSocialLink(
+  value: unknown,
+  type: SocialLinkType,
+): string | null {
   if (value === null) {
     return null;
   }
@@ -63,7 +71,9 @@ function sanitizeSocialLink(value: unknown, type: SocialLinkType): string | null
       throw new Error("Укажите логин после @");
     }
     if (!/^[a-zA-Z0-9_]{3,32}$/.test(username)) {
-      throw new Error("Логин может содержать только буквы, цифры и _ (3-32 символа)");
+      throw new Error(
+        "Логин может содержать только буквы, цифры и _ (3-32 символа)",
+      );
     }
     normalized = `https://t.me/${username}`;
   }
@@ -147,15 +157,18 @@ export async function GET() {
     // Проверяем блокировку пользователя
     const banStatus = await checkUserBan(session.uid);
     if (banStatus.isBanned) {
-      return Response.json({
-        error: "Banned",
-        banned: true,
-        banInfo: {
-          reason: banStatus.bannedReason,
-          until: banStatus.bannedUntil?.toISOString() || null,
-          isPermanent: banStatus.isPermanent,
+      return Response.json(
+        {
+          error: "Banned",
+          banned: true,
+          banInfo: {
+            reason: banStatus.bannedReason,
+            until: banStatus.bannedUntil?.toISOString() || null,
+            isPermanent: banStatus.isPermanent,
+          },
         },
-      }, { status: 403 });
+        { status: 403 },
+      );
     }
 
     // Получаем пользователя без обновления lastSeen при каждом запросе
@@ -244,7 +257,15 @@ export async function PATCH(req: Request) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const { username, name, email, hideEmail, vkLink, telegramLink, youtubeLink } = body;
+    const {
+      username,
+      name,
+      email,
+      hideEmail,
+      vkLink,
+      telegramLink,
+      youtubeLink,
+    } = body;
 
     // Валидация
     if (name !== undefined && (typeof name !== "string" || name.length > 100)) {
@@ -292,14 +313,20 @@ export async function PATCH(req: Request) {
     const updateData: Record<string, any> = {};
     if (username !== undefined) {
       if (typeof username !== "string") {
-        return Response.json({ error: "Логин должен быть строкой" }, { status: 400 });
+        return Response.json(
+          { error: "Логин должен быть строкой" },
+          { status: 400 },
+        );
       }
       let normalizedUsername: string;
       try {
         normalizedUsername = validateUsernameOrThrow(username);
       } catch (error) {
         return Response.json(
-          { error: error instanceof Error ? error.message : "Некорректный логин" },
+          {
+            error:
+              error instanceof Error ? error.message : "Некорректный логин",
+          },
           { status: 400 },
         );
       }
@@ -337,7 +364,9 @@ export async function PATCH(req: Request) {
         return Response.json(
           {
             error:
-              error instanceof Error ? error.message : "Некорректная ссылка на VK",
+              error instanceof Error
+                ? error.message
+                : "Некорректная ссылка на VK",
           },
           { status: 400 },
         );

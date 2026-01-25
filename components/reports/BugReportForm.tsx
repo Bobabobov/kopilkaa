@@ -53,7 +53,7 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Скрываем предыдущее сообщение об успехе при новой отправке
     setSuccessMessage(false);
 
@@ -96,20 +96,22 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
 
       if (!response.ok) {
         console.error("API error:", data);
-        throw new Error(data.message || data.error || "Ошибка создания баг-репорта");
+        throw new Error(
+          data.message || data.error || "Ошибка создания баг-репорта",
+        );
       }
 
       // Показываем сообщение об успехе внутри формы
       setSuccessMessage(true);
-      
+
       // Очищаем форму
       setTitle("");
       setDescription("");
       setImages([]);
-      
+
       // Передаем созданный баг-репорт для немедленного отображения
       onReportCreated(data.report);
-      
+
       // Автоматически скрываем сообщение через 5 секунд
       setTimeout(() => {
         setSuccessMessage(false);
@@ -119,7 +121,7 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
       const errorMessage = error.message || "Не удалось создать баг-репорт";
       // Сообщение про лимит уже показано в форме, тост не нужен
       if (!errorMessage.includes("1 баг-репорт")) {
-      showToast("error", "Ошибка", errorMessage);
+        showToast("error", "Ошибка", errorMessage);
       }
     } finally {
       setSubmitting(false);
@@ -139,11 +141,11 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
       <div className="relative z-10">
         <div className="flex flex-col gap-2 mb-4">
           <h2 className="text-xl font-bold text-[#fffffe] flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#e16162] to-[#d14d4e] rounded-xl flex items-center justify-center shadow-lg">
-            <LucideIcons.AlertTriangle className="text-white" size="sm" />
-          </div>
-          Сообщить о проблеме
-        </h2>
+            <div className="w-10 h-10 bg-gradient-to-br from-[#e16162] to-[#d14d4e] rounded-xl flex items-center justify-center shadow-lg">
+              <LucideIcons.AlertTriangle className="text-white" size="sm" />
+            </div>
+            Сообщить о проблеме
+          </h2>
           <p className="text-xs text-[#f9bc60] bg-[#e16162]/10 border border-[#e16162]/30 rounded-lg px-3 py-2">
             Можно отправлять только 1 баг-репорт в сутки
           </p>
@@ -159,32 +161,36 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
               transition={{ duration: 0.3 }}
               className="mb-4 rounded-lg bg-gradient-to-r from-emerald-500/20 to-green-500/20 border border-emerald-400/40 p-4 flex items-center gap-3"
             >
-            <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg
-                className="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-emerald-300">
+                  Баг-репорт создан
+                </p>
+                <p className="text-xs text-emerald-200/80 mt-0.5">
+                  Ваш отчёт успешно отправлен
+                </p>
+              </div>
+              <button
+                onClick={() => setSuccessMessage(false)}
+                className="flex-shrink-0 p-1 rounded-md hover:bg-emerald-500/20 transition-colors"
+                aria-label="Закрыть"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-emerald-300">Баг-репорт создан</p>
-              <p className="text-xs text-emerald-200/80 mt-0.5">Ваш отчёт успешно отправлен</p>
-            </div>
-            <button
-              onClick={() => setSuccessMessage(false)}
-              className="flex-shrink-0 p-1 rounded-md hover:bg-emerald-500/20 transition-colors"
-              aria-label="Закрыть"
-            >
-              <LucideIcons.X size="xs" className="text-emerald-300" />
-            </button>
+                <LucideIcons.X size="xs" className="text-emerald-300" />
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -305,4 +311,3 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
     </motion.div>
   );
 }
-

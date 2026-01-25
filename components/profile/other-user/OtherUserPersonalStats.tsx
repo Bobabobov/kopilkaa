@@ -39,7 +39,9 @@ interface OtherUserPersonalStatsProps {
   userId: string;
 }
 
-export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStatsProps) {
+export default function OtherUserPersonalStats({
+  userId,
+}: OtherUserPersonalStatsProps) {
   const [data, setData] = useState<DetailedStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +50,7 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
     const fetchDetailedStats = async () => {
       try {
         const response = await fetch(`/api/users/${userId}/detailed-stats`, {
-          cache: 'no-store',
+          cache: "no-store",
         });
 
         if (!response.ok) {
@@ -56,15 +58,17 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
         }
 
         const result: ApiResponse = await response.json();
-        
+
         if (result.detailedStats) {
           setData(result.detailedStats);
         } else {
-          throw new Error('No detailed stats in response');
+          throw new Error("No detailed stats in response");
         }
       } catch (error) {
-        console.error('Error fetching detailed stats:', error);
-        setError(error instanceof Error ? error.message : 'Failed to load stats');
+        console.error("Error fetching detailed stats:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to load stats",
+        );
       } finally {
         setLoading(false);
       }
@@ -102,7 +106,10 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
     return (
       <div className="p-6 bg-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20">
         <div className="text-center py-8">
-          <LucideIcons.AlertTriangle className="text-red-400 mx-auto mb-2" size="lg" />
+          <LucideIcons.AlertTriangle
+            className="text-red-400 mx-auto mb-2"
+            size="lg"
+          />
           <p className="text-sm text-[#abd1c6]">{error}</p>
         </div>
       </div>
@@ -114,18 +121,27 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
   }
 
   const stats = calculatedStats;
-  const approvedPercent = stats.applications.total > 0
-    ? Math.round((stats.applications.approved / stats.applications.total) * 100)
-    : 0;
-  const pendingPercent = stats.applications.total > 0
-    ? Math.round((stats.applications.pending / stats.applications.total) * 100)
-    : 0;
-  const rejectedPercent = stats.applications.total > 0
-    ? Math.round((stats.applications.rejected / stats.applications.total) * 100)
-    : 0;
+  const approvedPercent =
+    stats.applications.total > 0
+      ? Math.round(
+          (stats.applications.approved / stats.applications.total) * 100,
+        )
+      : 0;
+  const pendingPercent =
+    stats.applications.total > 0
+      ? Math.round(
+          (stats.applications.pending / stats.applications.total) * 100,
+        )
+      : 0;
+  const rejectedPercent =
+    stats.applications.total > 0
+      ? Math.round(
+          (stats.applications.rejected / stats.applications.total) * 100,
+        )
+      : 0;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -139,7 +155,7 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
 
       <div className="relative z-10 p-4 sm:p-5 md:p-6 w-full">
         {/* Заголовок */}
-        <motion.div 
+        <motion.div
           className="flex items-center gap-3 mb-5 md:mb-6"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -156,7 +172,7 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
 
         {/* Success Breakdown */}
         {stats.applications.total > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
@@ -166,9 +182,12 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
             <div className="relative z-10 space-y-4">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-xs text-white/60 mb-1">Успешность заявок</p>
+                  <p className="text-xs text-white/60 mb-1">
+                    Успешность заявок
+                  </p>
                   <p className="text-white font-medium text-sm">
-                    Одобрено {stats.applications.approved} из {stats.applications.total} заявок
+                    Одобрено {stats.applications.approved} из{" "}
+                    {stats.applications.total} заявок
                   </p>
                 </div>
                 <div className="text-3xl font-bold text-[#f9bc60]">
@@ -231,7 +250,10 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
                     >
                       <div
                         className="p-2 rounded-lg shadow-md"
-                        style={{ backgroundColor: `${item.color}20`, color: item.color }}
+                        style={{
+                          backgroundColor: `${item.color}20`,
+                          color: item.color,
+                        }}
                       >
                         <IconComponent className="w-4 h-4 text-current" />
                       </div>
@@ -243,7 +265,10 @@ export default function OtherUserPersonalStats({ userId }: OtherUserPersonalStat
                           {item.label}
                         </div>
                       </div>
-                      <div className="text-sm font-bold" style={{ color: item.color }}>
+                      <div
+                        className="text-sm font-bold"
+                        style={{ color: item.color }}
+                      >
                         {item.percent}%
                       </div>
                     </motion.div>

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface Advertisement {
-  id: string;
   title: string;
   content: string;
   imageUrl?: string | null;
@@ -18,12 +17,28 @@ export default function AdBanner() {
   useEffect(() => {
     const fetchBanner = async () => {
       try {
-        const response = await fetch("/api/ads/banner");
+        const response = await fetch("/api/ads?placement=home_banner", {
+          cache: "no-store",
+        });
         if (!response.ok) {
           return;
         }
-        const data = await response.json();
-        setAd(data.ad);
+        const data = (await response.json()) as {
+          title: string | null;
+          content: string | null;
+          imageUrl: string | null;
+          linkUrl: string | null;
+        } | null;
+        if (!data) {
+          setAd(null);
+          return;
+        }
+        setAd({
+          title: data.title || "Реклама",
+          content: data.content || "",
+          imageUrl: data.imageUrl,
+          linkUrl: data.linkUrl,
+        });
       } catch (error) {
         console.error("Error fetching banner ad:", error);
       } finally {
@@ -50,10 +65,16 @@ export default function AdBanner() {
                 <span>Реклама</span>
               </div>
 
-              <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: "#fffffe" }}>
+              <h2
+                className="text-2xl md:text-3xl font-bold mb-3"
+                style={{ color: "#fffffe" }}
+              >
                 {ad.title}
               </h2>
-              <p className="text-sm md:text-base mb-5 max-w-xl" style={{ color: "#abd1c6" }}>
+              <p
+                className="text-sm md:text-base mb-5 max-w-xl"
+                style={{ color: "#abd1c6" }}
+              >
                 {ad.content}
               </p>
 
@@ -95,7 +116,3 @@ export default function AdBanner() {
     </div>
   );
 }
-
-
-
-

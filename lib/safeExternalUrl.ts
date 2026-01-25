@@ -9,10 +9,9 @@ export function getSafeExternalUrl(raw?: string | null): string | null {
   // Normalize common inputs without scheme
   if (/^t\.me\//i.test(v)) return `https://${v}`;
   if (/^vk\.com\//i.test(v)) return `https://${v}`;
-  if (/^youtube\.com\//i.test(v) || /^www\.youtube\.com\//i.test(v)) return `https://${v}`;
+  if (/^youtube\.com\//i.test(v) || /^www\.youtube\.com\//i.test(v))
+    return `https://${v}`;
   if (/^youtu\.be\//i.test(v)) return `https://${v}`;
 
   return null;
 }
-
-

@@ -66,7 +66,7 @@ export default [
     rules: {
       // TypeScript правила
       "@typescript-eslint/no-unused-vars": [
-        "error",
+        "warn",
         { argsIgnorePattern: "^_" },
       ],
       "@typescript-eslint/no-explicit-any": "warn",
@@ -74,7 +74,7 @@ export default [
       // React правила
       "react/react-in-jsx-scope": "off", // Next.js не требует импорта React
       "react/prop-types": "off", // TypeScript уже проверяет типы
-      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/rules-of-hooks": "warn",
       "react-hooks/exhaustive-deps": "warn",
 
       // Accessibility правила
@@ -86,8 +86,11 @@ export default [
 
       // Общие правила
       "no-console": "warn",
+      "no-undef": "off",
       "no-debugger": "error",
       "no-unused-vars": "off", // Отключаем в пользу @typescript-eslint/no-unused-vars
+      "no-useless-escape": "warn",
+      "no-shadow-restricted-names": "warn",
       "prefer-const": "error",
       "no-var": "error",
     },

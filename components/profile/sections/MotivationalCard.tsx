@@ -72,7 +72,8 @@ export default function MotivationalCard() {
   if (!mounted) return null;
 
   const quote = motivationalQuotes[currentQuote];
-  const IconComponent = LucideIcons[quote.icon as keyof typeof LucideIcons] || LucideIcons.Star;
+  const IconComponent =
+    LucideIcons[quote.icon as keyof typeof LucideIcons] || LucideIcons.Star;
 
   return (
     <motion.div
@@ -82,7 +83,7 @@ export default function MotivationalCard() {
       className="bg-gradient-to-br from-[#004643] to-[#001e1d] rounded-xl border border-[#abd1c6]/20 p-3 xs:p-4 sm:p-5 md:p-6 relative overflow-hidden group"
     >
       {/* Анимированные декоративные элементы */}
-      <motion.div 
+      <motion.div
         key={currentQuote}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 0.4 }}
@@ -90,14 +91,14 @@ export default function MotivationalCard() {
         className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl"
         style={{ backgroundColor: quote.color }}
       ></motion.div>
-      <motion.div 
+      <motion.div
         key={`${currentQuote}-2`}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 0.2 }}
         transition={{ duration: 0.8, delay: 0.2 }}
         className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#abd1c6]/20 to-transparent rounded-full blur-2xl"
       ></motion.div>
-      
+
       {/* Дополнительные световые эффекты */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
@@ -112,7 +113,7 @@ export default function MotivationalCard() {
             className="space-y-4"
           >
             <div className="flex items-start gap-2.5 xs:gap-3 sm:gap-4">
-              <motion.div 
+              <motion.div
                 initial={{ rotate: -180, scale: 0 }}
                 animate={{ rotate: 0, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
@@ -120,30 +121,33 @@ export default function MotivationalCard() {
               >
                 {/* Блестящий эффект на иконке */}
                 <motion.div
-                  animate={{ x: ['-100%', '200%'] }}
-                  transition={{ 
-                    duration: 2, 
-                    repeat: Infinity, 
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
                     repeatDelay: 3,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
                   }}
                   className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
                 ></motion.div>
-                <IconComponent 
-                  className="text-white relative z-10" 
-                  size="md"
-                />
+                <IconComponent className="text-white relative z-10" size="md" />
               </motion.div>
               <div className="flex-1 min-w-0">
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                   className="text-xs xs:text-sm sm:text-base text-[#fffffe] font-medium leading-relaxed mb-1.5 xs:mb-2 relative"
                 >
-                  <span className="text-xl xs:text-2xl text-[#abd1c6]/40 absolute -left-1.5 xs:-left-2 -top-0.5 xs:-top-1">"</span>
-                  <span className="relative z-10 pl-3 xs:pl-4">{quote.text}</span>
-                  <span className="text-xl xs:text-2xl text-[#abd1c6]/40">"</span>
+                  <span className="text-xl xs:text-2xl text-[#abd1c6]/40 absolute -left-1.5 xs:-left-2 -top-0.5 xs:-top-1">
+                    "
+                  </span>
+                  <span className="relative z-10 pl-3 xs:pl-4">
+                    {quote.text}
+                  </span>
+                  <span className="text-xl xs:text-2xl text-[#abd1c6]/40">
+                    "
+                  </span>
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -170,13 +174,13 @@ export default function MotivationalCard() {
                 key={index}
                 onClick={() => setCurrentQuote(index)}
                 className={`relative transition-all duration-300 ${
-                  index === currentQuote 
-                    ? 'w-6 xs:w-8 h-1.5 xs:h-2' 
-                    : 'w-1.5 xs:w-2 h-1.5 xs:h-2 hover:w-3 xs:hover:w-4'
+                  index === currentQuote
+                    ? "w-6 xs:w-8 h-1.5 xs:h-2"
+                    : "w-1.5 xs:w-2 h-1.5 xs:h-2 hover:w-3 xs:hover:w-4"
                 } rounded-full ${
-                  index === currentQuote 
-                    ? `bg-gradient-to-r ${quote.gradient} shadow-lg` 
-                    : 'bg-[#abd1c6]/30 hover:bg-[#abd1c6]/50'
+                  index === currentQuote
+                    ? `bg-gradient-to-r ${quote.gradient} shadow-lg`
+                    : "bg-[#abd1c6]/30 hover:bg-[#abd1c6]/50"
                 }`}
                 aria-label={`Цитата ${index + 1}`}
               >
@@ -198,4 +202,3 @@ export default function MotivationalCard() {
     </motion.div>
   );
 }
-

@@ -35,7 +35,7 @@ export function AdCard({ index }: AdCardProps) {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [cardTitle, setCardTitle] = useState("Разместите свою рекламу здесь!");
   const [cardText, setCardText] = useState(
-    "Привлекайте новых клиентов с помощью рекламы в разделе историй!"
+    "Привлекайте новых клиентов с помощью рекламы в разделе историй!",
   );
   const [ctaLink, setCtaLink] = useState<string | null>(null);
   const [hasActiveAd, setHasActiveAd] = useState(false);
@@ -129,7 +129,9 @@ export function AdCard({ index }: AdCardProps) {
                 target.style.display = "none";
                 const parent = target.parentElement;
                 if (parent) {
-                  const placeholder = parent.querySelector(".image-placeholder") as HTMLElement;
+                  const placeholder = parent.querySelector(
+                    ".image-placeholder",
+                  ) as HTMLElement;
                   if (placeholder) {
                     placeholder.style.display = "flex";
                   }
@@ -173,13 +175,13 @@ export function AdCard({ index }: AdCardProps) {
           <div className="bg-gradient-to-r from-[#abd1c6]/80 to-[#94c4b8]/70 rounded-2xl p-3 border-2 border-[#abd1c6]/60 shadow-lg flex-shrink-0 transition-all duration-300 group-hover:shadow-xl group-hover:border-[#f9bc60]/40 group-hover:bg-gradient-to-r group-hover:from-[#abd1c6]/90 group-hover:to-[#94c4b8]/80">
             <div className="flex items-center justify-between text-xs">
               {!hasActiveAd && (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 bg-gradient-to-r from-[#f9bc60]/20 to-[#e8a545]/20 rounded-lg px-2 py-1 shadow-md border border-[#f9bc60]/40 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-[#f9bc60]/60">
-                  <span className="font-bold text-[#001e1d] text-xs">
-                    от 2тыс
-                  </span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 bg-gradient-to-r from-[#f9bc60]/20 to-[#e8a545]/20 rounded-lg px-2 py-1 shadow-md border border-[#f9bc60]/40 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-[#f9bc60]/60">
+                    <span className="font-bold text-[#001e1d] text-xs">
+                      от 2тыс
+                    </span>
+                  </div>
                 </div>
-              </div>
               )}
 
               <div className="flex items-center gap-1 bg-white/90 rounded-lg px-2 py-1 shadow-md border border-[#abd1c6]/40 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:border-[#f9bc60]/60">

@@ -42,12 +42,16 @@ export function useUserActions(onSuccess?: () => void) {
             "Пользователь заблокирован",
             days
               ? `На ${days} дней${updatedCount > 0 ? `. Обновлено жалоб: ${updatedCount}` : ""}`
-              : `Навсегда${updatedCount > 0 ? `. Обновлено жалоб: ${updatedCount}` : ""}`
+              : `Навсегда${updatedCount > 0 ? `. Обновлено жалоб: ${updatedCount}` : ""}`,
           );
           onSuccessRef.current?.();
           return true;
         } else {
-          showToast("error", "Ошибка", data.message || "Не удалось заблокировать");
+          showToast(
+            "error",
+            "Ошибка",
+            data.message || "Не удалось заблокировать",
+          );
           return false;
         }
       } catch (error) {
@@ -56,14 +60,14 @@ export function useUserActions(onSuccess?: () => void) {
         return false;
       }
     },
-    [confirm, showToast]
+    [confirm, showToast],
   );
 
   const unbanUser = useCallback(
     async (userId: string) => {
       const agreed = await confirm(
         "Вы уверены, что хотите разблокировать этого пользователя?",
-        "Разблокировка пользователя"
+        "Разблокировка пользователя",
       );
       if (!agreed) return false;
 
@@ -81,12 +85,16 @@ export function useUserActions(onSuccess?: () => void) {
             "Блокировка снята",
             deletedCount > 0
               ? `Пользователь разблокирован. Удалено жалоб: ${deletedCount}`
-              : "Пользователь разблокирован"
+              : "Пользователь разблокирован",
           );
           onSuccessRef.current?.();
           return true;
         } else {
-          showToast("error", "Ошибка", data.message || "Не удалось снять блокировку");
+          showToast(
+            "error",
+            "Ошибка",
+            data.message || "Не удалось снять блокировку",
+          );
           return false;
         }
       } catch (error) {
@@ -95,14 +103,14 @@ export function useUserActions(onSuccess?: () => void) {
         return false;
       }
     },
-    [confirm, showToast]
+    [confirm, showToast],
   );
 
   const deleteUser = useCallback(
     async (userId: string) => {
       const agreed = await confirm(
         "Вы уверены, что хотите удалить этого пользователя? Это действие нельзя отменить.",
-        "Удаление пользователя"
+        "Удаление пользователя",
       );
       if (!agreed) return false;
 
@@ -114,7 +122,11 @@ export function useUserActions(onSuccess?: () => void) {
         const data = await response.json();
 
         if (response.ok) {
-          showToast("success", "Пользователь удалён", "Аккаунт удалён из системы");
+          showToast(
+            "success",
+            "Пользователь удалён",
+            "Аккаунт удалён из системы",
+          );
           onSuccessRef.current?.();
           return true;
         } else {
@@ -127,7 +139,7 @@ export function useUserActions(onSuccess?: () => void) {
         return false;
       }
     },
-    [confirm, showToast]
+    [confirm, showToast],
   );
 
   return {
@@ -136,4 +148,3 @@ export function useUserActions(onSuccess?: () => void) {
     deleteUser,
   };
 }
-

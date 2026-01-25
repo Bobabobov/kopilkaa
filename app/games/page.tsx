@@ -45,7 +45,6 @@ export default function GamesPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-10 sm:pt-12 pb-12 sm:pb-16 relative z-10">
         <div className="max-w-4xl mx-auto flex flex-col items-center justify-center min-h-[70vh]">
           {/* Картинка */}
@@ -57,7 +56,7 @@ export default function GamesPage() {
           >
             <div
               className="rounded-3xl p-4 sm:p-6 bg-gradient-to-br from-[#001e1d]/40 to-[#004643]/40 border border-[#f9bc60]/20"
-              style={{ willChange: 'auto' }}
+              style={{ willChange: "auto" }}
             >
               <Image
                 src="/game.png"
@@ -78,9 +77,7 @@ export default function GamesPage() {
             transition={{ delay: 0.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-center"
           >
-            <span
-              className="bg-gradient-to-r from-[#fffffe] via-[#f9bc60] to-[#fffffe] bg-clip-text text-transparent inline-block"
-            >
+            <span className="bg-gradient-to-r from-[#fffffe] via-[#f9bc60] to-[#fffffe] bg-clip-text text-transparent inline-block">
               Раздел в разработке
             </span>
           </motion.h1>

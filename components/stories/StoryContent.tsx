@@ -6,7 +6,10 @@ interface StoryContentProps {
   isAd?: boolean;
 }
 
-export default function StoryContent({ content, isAd = false }: StoryContentProps) {
+export default function StoryContent({
+  content,
+  isAd = false,
+}: StoryContentProps) {
   // Для всех историй (обычных и рекламных) используем HTML рендеринг
   // Теперь рекламные истории тоже поддерживают форматирование через RichTextEditor
   return (
@@ -32,7 +35,9 @@ export default function StoryContent({ content, isAd = false }: StoryContentProp
       )}
 
       <div className="relative z-10">
-        <div className={`prose prose-lg max-w-none ${isAd ? "prose-headings:text-[#001e1d] prose-p:text-[#2d5a4e] prose-strong:text-[#004643]" : ""}`}>
+        <div
+          className={`prose prose-lg max-w-none ${isAd ? "prose-headings:text-[#001e1d] prose-p:text-[#2d5a4e] prose-strong:text-[#004643]" : ""}`}
+        >
           <div
             className={`break-words overflow-wrap-anywhere ${
               isAd ? "text-lg sm:text-xl leading-relaxed" : "text-lg"

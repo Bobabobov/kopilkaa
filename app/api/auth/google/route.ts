@@ -21,7 +21,10 @@ export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const googleData = body?.google as { credential: string } | GoogleAuthData | undefined;
+    const googleData = body?.google as
+      | { credential: string }
+      | GoogleAuthData
+      | undefined;
 
     if (!googleData || !googleData.credential) {
       return NextResponse.json(
@@ -32,7 +35,10 @@ export async function POST(req: NextRequest) {
 
     if (!googleClientId) {
       return NextResponse.json(
-        { success: false, error: "Google OAuth не настроен (GOOGLE_CLIENT_ID)" },
+        {
+          success: false,
+          error: "Google OAuth не настроен (GOOGLE_CLIENT_ID)",
+        },
         // 503 = сервис не готов (а не “внутренняя ошибка кода”)
         { status: 503 },
       );
@@ -84,7 +90,7 @@ export async function POST(req: NextRequest) {
               isPermanent: banStatus.isPermanent,
             },
           },
-          { status: 403 }
+          { status: 403 },
         );
       }
 
@@ -141,10 +147,7 @@ export async function POST(req: NextRequest) {
     // 2) Если не нашли, ищем по email
     let user = await prisma.user.findFirst({
       where: {
-        OR: [
-          { googleId },
-          { email: googleEmail },
-        ],
+        OR: [{ googleId }, { email: googleEmail }],
       },
       select: {
         id: true,
@@ -161,7 +164,12 @@ export async function POST(req: NextRequest) {
     // Если пользователя ещё нет — автоматически регистрируем его
     if (!user) {
       // Генерируем username из email или имени
-      const baseUsername = googleEmail.split("@")[0].toLowerCase().replace(/[^\p{L}\p{N}._-]/gu, "").substring(0, 20) || `google${googleId.substring(0, 10)}`;
+      const baseUsername =
+        googleEmail
+          .split("@")[0]
+          .toLowerCase()
+          .replace(/[^\p{L}\p{N}._-]/gu, "")
+          .substring(0, 20) || `google${googleId.substring(0, 10)}`;
       let username = baseUsername;
 
       // Гарантируем уникальность логина
@@ -215,7 +223,10 @@ export async function POST(req: NextRequest) {
       }
 
       // Обновляем основной email, если его нет или он отличается от Google email
-      if (!user.email || user.email.toLowerCase() !== googleEmail.toLowerCase()) {
+      if (
+        !user.email ||
+        user.email.toLowerCase() !== googleEmail.toLowerCase()
+      ) {
         updateData.email = googleEmail;
       }
 
@@ -263,7 +274,7 @@ export async function POST(req: NextRequest) {
             isPermanent: banStatus.isPermanent,
           },
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -276,7 +287,11 @@ export async function POST(req: NextRequest) {
         googleEmail: user.googleEmail,
       },
     });
-    attachSessionToResponse(res, { uid: user.id, role: (user.role as any) || "USER" }, req);
+    attachSessionToResponse(
+      res,
+      { uid: user.id, role: (user.role as any) || "USER" },
+      req,
+    );
     return res;
   } catch (error: any) {
     console.error("Error in /api/auth/google:", error);
@@ -292,4 +307,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

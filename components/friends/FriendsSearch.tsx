@@ -10,10 +10,16 @@ interface FriendsSearchProps {
   searchResults: any[];
   searchLoading: boolean;
   currentUserId: string | null;
-  getUserStatus: (lastSeen: string | null) => { status: "online" | "offline"; text: string };
+  getUserStatus: (lastSeen: string | null) => {
+    status: "online" | "offline";
+    text: string;
+  };
   sendingRequests: Set<string>;
   onSendRequest: (userId: string) => Promise<void> | void;
-  onCancelRequest: (friendshipId: string, userId: string) => Promise<void> | void;
+  onCancelRequest: (
+    friendshipId: string,
+    userId: string,
+  ) => Promise<void> | void;
 }
 
 export function FriendsSearch({
@@ -74,9 +80,15 @@ export function FriendsSearch({
                   <div className="flex items-center gap-2 min-w-0 flex-wrap">
                     <p
                       className="text-[#fffffe] font-medium group-hover:underline min-w-0 flex-1 truncate"
-                      title={user.name || (user.email ? user.email.split("@")[0] : "Пользователь")}
+                      title={
+                        user.name ||
+                        (user.email ? user.email.split("@")[0] : "Пользователь")
+                      }
                     >
-                      {user.name || (user.email ? user.email.split("@")[0] : "Пользователь")}
+                      {user.name ||
+                        (user.email
+                          ? user.email.split("@")[0]
+                          : "Пользователь")}
                     </p>
                     <HeroBadge badge={user.heroBadge ?? null} size="xs" />
                   </div>
@@ -101,7 +113,9 @@ export function FriendsSearch({
                       disabled={sendingRequests.has(user.id)}
                       className="w-full sm:w-auto px-4 py-2 bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {sendingRequests.has(user.id) ? "Отправка..." : "Добавить"}
+                      {sendingRequests.has(user.id)
+                        ? "Отправка..."
+                        : "Добавить"}
                     </button>
                   )}
 
@@ -113,7 +127,10 @@ export function FriendsSearch({
                       onClick={async (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        if (!sendingRequests.has(user.id) && user.friendshipId) {
+                        if (
+                          !sendingRequests.has(user.id) &&
+                          user.friendshipId
+                        ) {
                           await onCancelRequest(user.friendshipId, user.id);
                         }
                       }}
@@ -131,4 +148,3 @@ export function FriendsSearch({
     </div>
   );
 }
-

@@ -30,7 +30,10 @@ interface ProfileReviewSectionProps {
   isOwner?: boolean;
 }
 
-export default function ProfileReviewSection({ userId, isOwner = false }: ProfileReviewSectionProps) {
+export default function ProfileReviewSection({
+  userId,
+  isOwner = false,
+}: ProfileReviewSectionProps) {
   const [review, setReview] = useState<ReviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const { ToastComponent } = useBeautifulToast();
@@ -39,7 +42,9 @@ export default function ProfileReviewSection({ userId, isOwner = false }: Profil
     const fetchReview = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/reviews/user/${userId}`, { cache: "no-store" });
+        const res = await fetch(`/api/reviews/user/${userId}`, {
+          cache: "no-store",
+        });
         const json = await res.json();
         if (res.ok && json.review) {
           setReview(json.review);
@@ -97,7 +102,9 @@ export default function ProfileReviewSection({ userId, isOwner = false }: Profil
               <LucideIcons.MessageCircle className="w-5 h-5 text-[#f9bc60]" />
             </div>
             <div>
-              <h3 className="text-base font-semibold text-white">Отзыв участника</h3>
+              <h3 className="text-base font-semibold text-white">
+                Отзыв участника
+              </h3>
               <p className="text-xs text-white/60 mt-0.5">
                 {isOwner ? "Ваш отзыв" : "Отзыв пользователя"}
               </p>
@@ -154,7 +161,9 @@ export default function ProfileReviewSection({ userId, isOwner = false }: Profil
           <div className="flex items-center gap-2">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f9bc60]/15 border border-[#f9bc60]/30 text-xs font-medium text-[#f9bc60]">
               <LucideIcons.Shield className="w-3 h-3" />
-              <span>Уровень {review.user.trust.status.split("_")[1] || ""}</span>
+              <span>
+                Уровень {review.user.trust.status.split("_")[1] || ""}
+              </span>
             </div>
           </div>
         </div>

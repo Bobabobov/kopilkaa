@@ -56,44 +56,54 @@ export function useReviews() {
     showToastRef.current = showToast;
   }, [showToast]);
 
-  const fetchReviews = useCallback(async (page: number = 1, append: boolean = false) => {
-    if (append) {
-      setLoadingMore(true);
-    } else {
-      setLoading(true);
-    }
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
-    try {
-      const res = await fetch(`/api/reviews?page=${page}&limit=12`, { cache: "no-store", signal: controller.signal });
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(text || "Не удалось загрузить отзывы");
-      }
-      const json = (await res.json()) as ReviewsResponse;
+  const fetchReviews = useCallback(
+    async (page: number = 1, append: boolean = false) => {
       if (append) {
-        setData((prev) => {
-          if (!prev) return json;
-          return {
-            ...json,
-            items: [...prev.items, ...json.items],
-          };
-        });
+        setLoadingMore(true);
       } else {
-        setData(json);
+        setLoading(true);
       }
-    } catch (error) {
-      console.error("Failed to load reviews", error);
-      if (!append) {
-        showToastRef.current?.("error", "Ошибка", "Не удалось загрузить отзывы");
-        setData(null);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      try {
+        const res = await fetch(`/api/reviews?page=${page}&limit=12`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(text || "Не удалось загрузить отзывы");
+        }
+        const json = (await res.json()) as ReviewsResponse;
+        if (append) {
+          setData((prev) => {
+            if (!prev) return json;
+            return {
+              ...json,
+              items: [...prev.items, ...json.items],
+            };
+          });
+        } else {
+          setData(json);
+        }
+      } catch (error) {
+        console.error("Failed to load reviews", error);
+        if (!append) {
+          showToastRef.current?.(
+            "error",
+            "Ошибка",
+            "Не удалось загрузить отзывы",
+          );
+          setData(null);
+        }
+      } finally {
+        clearTimeout(timeout);
+        setLoading(false);
+        setLoadingMore(false);
       }
-    } finally {
-      clearTimeout(timeout);
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   useEffect(() => {
     fetchReviews(1, false);
@@ -102,7 +112,8 @@ export function useReviews() {
   const loadMore = useCallback(() => {
     if (loadingMore) return;
     setData((currentData) => {
-      if (!currentData || currentData.page >= currentData.pages) return currentData;
+      if (!currentData || currentData.page >= currentData.pages)
+        return currentData;
       // Запускаем загрузку асинхронно
       fetchReviews(currentData.page + 1, true).catch(console.error);
       return currentData;
@@ -117,7 +128,11 @@ export function useReviews() {
         return;
       }
       if (content.trim().length > 1200) {
-        showToastRef.current?.("error", "Ошибка", "Текст не должен превышать 1200 символов");
+        showToastRef.current?.(
+          "error",
+          "Ошибка",
+          "Текст не должен превышать 1200 символов",
+        );
         return;
       }
       if (files.length > 5) {
@@ -131,12 +146,19 @@ export function useReviews() {
         if (files.length) {
           const fd = new FormData();
           files.forEach((f) => fd.append("files", f));
-          const uploadRes = await fetch("/api/uploads", { method: "POST", body: fd });
+          const uploadRes = await fetch("/api/uploads", {
+            method: "POST",
+            body: fd,
+          });
           const uploadJson = await uploadRes.json();
           if (!uploadRes.ok) {
             throw new Error(uploadJson?.error || "Ошибка загрузки файлов");
           }
-          uploadedUrls.push(...((uploadJson.files as { url: string }[]) || []).map((f) => f.url));
+          uploadedUrls.push(
+            ...((uploadJson.files as { url: string }[]) || []).map(
+              (f) => f.url,
+            ),
+          );
         }
 
         const res = await fetch("/api/reviews", {
@@ -173,7 +195,11 @@ export function useReviews() {
         });
       } catch (error: any) {
         console.error("Submit review error", error);
-        showToastRef.current?.("error", "Ошибка", error?.message || "Не удалось сохранить отзыв");
+        showToastRef.current?.(
+          "error",
+          "Ошибка",
+          error?.message || "Не удалось сохранить отзыв",
+        );
       } finally {
         setSubmitting(false);
       }
@@ -184,7 +210,7 @@ export function useReviews() {
   const deleteReview = useCallback(
     async (reviewId: string) => {
       if (submitting) return;
-      
+
       setSubmitting(true);
       try {
         const res = await fetch(`/api/reviews/${reviewId}`, {
@@ -214,7 +240,11 @@ export function useReviews() {
         });
       } catch (error: any) {
         console.error("Delete review error", error);
-        showToastRef.current?.("error", "Ошибка", error?.message || "Не удалось удалить отзыв");
+        showToastRef.current?.(
+          "error",
+          "Ошибка",
+          error?.message || "Не удалось удалить отзыв",
+        );
       } finally {
         setSubmitting(false);
       }

@@ -40,7 +40,9 @@ const getRarityName = (rarity: string) => {
   }
 };
 
-export default function OtherUserAchievements({ userId }: OtherUserAchievementsProps) {
+export default function OtherUserAchievements({
+  userId,
+}: OtherUserAchievementsProps) {
   const [achievements, setAchievements] = useState<UserAchievement[]>([]);
   const [stats, setStats] = useState<AchievementStatsType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -127,7 +129,8 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
             <h3 className="text-lg font-bold text-white">Достижения</h3>
             {stats && (
               <p className="text-xs text-white/60 mt-0.5">
-                {stats.unlockedAchievements} из {stats.totalAchievements} разблокировано
+                {stats.unlockedAchievements} из {stats.totalAchievements}{" "}
+                разблокировано
               </p>
             )}
           </div>
@@ -138,18 +141,28 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
             <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
               <LucideIcons.Award className="w-8 h-8 text-white/40" />
             </div>
-            <p className="text-sm font-medium text-white/80 mb-1">Нет достижений</p>
-            <p className="text-xs text-white/60">У пользователя пока нет достижений</p>
+            <p className="text-sm font-medium text-white/80 mb-1">
+              Нет достижений
+            </p>
+            <p className="text-xs text-white/60">
+              У пользователя пока нет достижений
+            </p>
           </div>
         ) : (
           <>
             <div className="space-y-3 mb-4">
               {displayedAchievements.map((ua, index) => {
-                const rarityColor = ua.achievement.rarity === 'COMMON' ? '#94a1b2' :
-                  ua.achievement.rarity === 'RARE' ? '#abd1c6' :
-                  ua.achievement.rarity === 'EPIC' ? '#e16162' :
-                  ua.achievement.rarity === 'LEGENDARY' ? '#f9bc60' : '#ff6b6b';
-                
+                const rarityColor =
+                  ua.achievement.rarity === "COMMON"
+                    ? "#94a1b2"
+                    : ua.achievement.rarity === "RARE"
+                      ? "#abd1c6"
+                      : ua.achievement.rarity === "EPIC"
+                        ? "#e16162"
+                        : ua.achievement.rarity === "LEGENDARY"
+                          ? "#f9bc60"
+                          : "#ff6b6b";
+
                 return (
                   <motion.div
                     key={ua.id}
@@ -158,11 +171,11 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <div 
+                    <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md"
-                      style={{ 
-                        backgroundColor: rarityColor + '20',
-                        color: rarityColor
+                      style={{
+                        backgroundColor: rarityColor + "20",
+                        color: rarityColor,
                       }}
                     >
                       <LucideIcons.Star className="w-5 h-5 text-current" />
@@ -172,11 +185,11 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
                         <p className="text-sm font-semibold text-white truncate">
                           {ua.achievement.name}
                         </p>
-                        <span 
+                        <span
                           className="text-xs px-2 py-0.5 rounded font-medium whitespace-nowrap flex-shrink-0"
-                          style={{ 
-                            backgroundColor: rarityColor + '20',
-                            color: rarityColor
+                          style={{
+                            backgroundColor: rarityColor + "20",
+                            color: rarityColor,
                           }}
                         >
                           {getRarityName(ua.achievement.rarity)}
@@ -184,7 +197,9 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
                       </div>
                       <div className="flex items-center gap-1.5 text-xs text-white/60">
                         <LucideIcons.Calendar className="w-3 h-3" />
-                        <span>{new Date(ua.unlockedAt).toLocaleDateString("ru-RU")}</span>
+                        <span>
+                          {new Date(ua.unlockedAt).toLocaleDateString("ru-RU")}
+                        </span>
                       </div>
                     </div>
                   </motion.div>
@@ -216,5 +231,3 @@ export default function OtherUserAchievements({ userId }: OtherUserAchievementsP
     </motion.div>
   );
 }
-
-

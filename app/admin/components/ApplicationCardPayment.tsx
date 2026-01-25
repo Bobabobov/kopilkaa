@@ -1,6 +1,5 @@
 // app/admin/components/ApplicationCardPayment.tsx
 "use client";
-import type { ApplicationItem } from "../types";
 
 interface ApplicationCardPaymentProps {
   payment: string;
@@ -53,7 +52,9 @@ export default function ApplicationCardPayment({
             )}
             <div>
               <span className="text-[#f9bc60] font-semibold">Реквизиты:</span>{" "}
-              <span className="text-[#e8f2ef]">{parsed.payment || "Не указаны"}</span>
+              <span className="text-[#e8f2ef]">
+                {parsed.payment || "Не указаны"}
+              </span>
             </div>
           </div>
         </div>
@@ -61,4 +62,3 @@ export default function ApplicationCardPayment({
     </details>
   );
 }
-

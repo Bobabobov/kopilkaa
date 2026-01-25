@@ -2,7 +2,12 @@
 
 export interface Notification {
   id: string;
-  type: "like" | "achievement" | "system" | "application_status" | "friend_request";
+  type:
+    | "like"
+    | "achievement"
+    | "system"
+    | "application_status"
+    | "friend_request";
   title: string;
   message: string;
   adminComment?: string | null;
@@ -18,5 +23,3 @@ export interface Notification {
 }
 
 export type NotificationType = Notification["type"];
-
-

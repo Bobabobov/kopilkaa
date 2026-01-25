@@ -3,8 +3,6 @@ import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-const IS_PROD = process.env.NODE_ENV === "production";
-
 function clampInt(n: unknown, min: number, max: number): number | null {
   const v = typeof n === "number" ? n : typeof n === "string" ? Number(n) : NaN;
   if (!Number.isFinite(v)) return null;
@@ -25,14 +23,6 @@ export async function POST(
     const { userId } = params;
     const { reason, days } = await request.json();
     const daysClamped = clampInt(days, 1, 365); // максимум 365 дней
-    if (!IS_PROD) {
-      console.log("=== POST /api/admin/users/[userId]/ban ===", {
-        userId,
-        reason,
-        days: daysClamped,
-      });
-    }
-
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -54,15 +44,6 @@ export async function POST(
     const bannedUntil = daysClamped
       ? new Date(Date.now() + daysClamped * 24 * 60 * 60 * 1000)
       : null;
-
-    if (!IS_PROD) {
-      console.log("Banning user with data:", {
-        userId,
-        isBanned: true,
-        bannedUntil: bannedUntil?.toISOString(),
-        bannedReason: reason || "Нарушение правил",
-      });
-    }
 
     // Обновляем пользователя
     const updated = await prisma.user.update({
@@ -96,12 +77,6 @@ export async function POST(
       },
     });
 
-    if (!IS_PROD) {
-      console.log(
-        `User ${userId} banned. Updated ${updatedReports.count} reports to resolved status.`,
-      );
-    }
-
     return NextResponse.json({
       message: daysClamped
         ? `Пользователь заблокирован на ${daysClamped} дней`
@@ -134,10 +109,6 @@ export async function DELETE(
 
   try {
     const { userId } = params;
-    if (!IS_PROD) {
-      console.log("=== DELETE /api/admin/users/[userId]/ban ===", { userId });
-    }
-
     if (!userId || typeof userId !== "string") {
       return NextResponse.json(
         { message: "Некорректный ID пользователя" },
@@ -197,11 +168,6 @@ export async function DELETE(
       },
     });
 
-    if (!IS_PROD) {
-      console.log("User unbanned successfully:", updated);
-      console.log(`Deleted ${deletedReports.count} reports for unbanned user`);
-    }
-
     return NextResponse.json({
       message: "Блокировка снята",
       user: updated,
@@ -209,11 +175,11 @@ export async function DELETE(
     });
   } catch (error) {
     console.error("Unban user error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Неизвестная ошибка";
+    const errorMessage =
+      error instanceof Error ? error.message : "Неизвестная ошибка";
     return NextResponse.json(
       { message: "Ошибка снятия блокировки", error: errorMessage },
       { status: 500 },
     );
   }
 }
-

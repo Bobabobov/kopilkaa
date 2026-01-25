@@ -76,13 +76,13 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
             <h1 className="text-2xl sm:text-3xl font-semibold text-[#fffffe] mb-2">
               {user.name || "Пользователь"}
             </h1>
-            
+
             <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-[#abd1c6]">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-[#abd1c6]"></div>
                 <span>Участник с {joinDate}</span>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <div
                   className={`w-2 h-2 rounded-full ${
@@ -92,7 +92,9 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
                   }`}
                 ></div>
                 <span>
-                  {status.status === "online" ? status.text : `Был ${status.text}`}
+                  {status.status === "online"
+                    ? status.text
+                    : `Был ${status.text}`}
                 </span>
               </div>
             </div>

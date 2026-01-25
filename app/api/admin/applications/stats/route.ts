@@ -2,12 +2,11 @@
 import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const admin = await getAllowedAdminUser();
-  if (!admin)
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   const [pending, approved, rejected, total, totalAmount] = await Promise.all([
     prisma.application.count({ where: { status: "PENDING" } }),

@@ -27,4 +27,3 @@ export function KickIcon({ className }: KickIconProps) {
     </svg>
   );
 }
-

@@ -9,6 +9,10 @@ import {
 } from "@/lib/applications/sanitize";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 import { ApplicationStatus } from "@prisma/client";
+import {
+  checkActivityRequirement,
+  isActivityRequirementMet,
+} from "@/lib/activity/checkActivityRequirement";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -118,7 +122,12 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     const amountNumber = parseInt(amount);
-    if (!amount || isNaN(amountNumber) || amountNumber < 1 || amountNumber > 1000000)
+    if (
+      !amount ||
+      isNaN(amountNumber) ||
+      amountNumber < 1 ||
+      amountNumber > 1000000
+    )
       return Response.json(
         { error: `Сумма должна быть от 1 до 1 000 000 рублей` },
         { status: 400 },
@@ -163,34 +172,95 @@ export async function POST(req: Request) {
     }
 
     // Проверка уровня доверия и допустимой суммы (кроме администраторов и вайтлиста)
-    if (session.role !== "ADMIN" && !isWhitelisted) {
-      const trust = await computeUserTrustSnapshot(session.uid);
+    const trust = await computeUserTrustSnapshot(session.uid);
 
+    if (session.role !== "ADMIN" && !isWhitelisted) {
       // Если есть одобренная заявка, проверяем наличие отзыва
       if (trust.approvedApplications > 0) {
         const review = await prisma.review.findUnique({
           where: { userId: session.uid },
           select: { id: true },
         });
-        
+
         if (!review) {
           return Response.json(
-            { 
-              error: "Для создания новой заявки необходимо сначала оставить отзыв о предыдущей одобренной заявке. Перейдите на страницу /reviews и оставьте отзыв.",
+            {
+              error:
+                "Для создания новой заявки необходимо сначала оставить отзыв о предыдущей одобренной заявке. Перейдите на страницу /reviews и оставьте отзыв.",
               requiresReview: true,
             },
             { status: 403 },
           );
         }
       }
-      
+
       if (amountNumber < trust.limits.min || amountNumber > trust.limits.max) {
         const minText = trust.limits.min.toLocaleString("ru-RU");
         const maxText = trust.limits.max.toLocaleString("ru-RU");
         return Response.json(
-          { error: `Сумма не соответствует ориентиру вашего уровня (от ${minText} до ${maxText} ₽).` },
+          {
+            error: `Сумма не соответствует ориентиру вашего уровня (от ${minText} до ${maxText} ₽).`,
+          },
           { status: 400 },
         );
+      }
+    }
+
+    // Для 3+ одобренных заявок требуется активность (для всех пользователей, включая админов)
+    if (trust.effectiveApprovedApplications >= 3) {
+      const {
+        getAllPossibleRequirements,
+        isActivityRequirementMet,
+        checkActivityRequirement,
+      } = await import("@/lib/activity/checkActivityRequirement");
+
+      const lastApplication = await prisma.application.findFirst({
+        where: { userId: session.uid },
+        orderBy: { createdAt: "desc" },
+        select: { createdAt: true },
+      });
+      const lastApplicationAt = lastApplication?.createdAt ?? null;
+
+      // Получаем все возможные требования (включая уже выполненные)
+      const allPossible = await getAllPossibleRequirements(session.uid);
+
+      // Если есть возможные требования - проверяем, выполнено ли хотя бы одно
+      if (allPossible.length > 0) {
+        // Проверяем, выполнено ли хотя бы одно из возможных требований
+        const completedRequirements = await Promise.all(
+          allPossible.map(async (req) => ({
+            requirement: req,
+            isMet: await isActivityRequirementMet(
+              session.uid,
+              req,
+              lastApplicationAt,
+            ),
+          })),
+        );
+
+        const hasCompletedAny = completedRequirements.some((r) => r.isMet);
+
+        // Если ни одно требование не выполнено - выбираем рандомное и блокируем заявку
+        if (!hasCompletedAny) {
+          const activityRequirement = await checkActivityRequirement(
+            session.uid,
+            trust.effectiveApprovedApplications,
+            lastApplicationAt,
+          );
+
+          if (activityRequirement) {
+            return Response.json(
+              {
+                error: activityRequirement.message,
+                requiresActivity: true,
+                activityType: activityRequirement.type,
+              },
+              { status: 403 },
+            );
+          }
+        }
+        // Если хотя бы одно требование выполнено - разрешаем заявку
+        // Для следующей заявки снова потребуется выполнить одно действие
       }
     }
 
@@ -233,17 +303,17 @@ export async function POST(req: Request) {
     }
 
     // SSE уведомления для админки
-    await new Promise(resolve => setTimeout(resolve, 50));
-    
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
     publish("application:created", {
       id: result.id,
       userId: session.uid,
       title,
       summary,
       amount: parseInt(amount),
-      status: "PENDING"
+      status: "PENDING",
     });
-    
+
     publish("stats:dirty", {});
 
     return Response.json({ ok: true, id: result.id });

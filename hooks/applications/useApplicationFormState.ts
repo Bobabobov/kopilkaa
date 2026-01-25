@@ -2,7 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
-import { getTrustLevelFromApprovedCount, getTrustLimits, TrustLevel } from "@/lib/trustLevel";
+import {
+  getTrustLevelFromApprovedCount,
+  getTrustLimits,
+  TrustLevel,
+} from "@/lib/trustLevel";
 
 type LocalImage = { file: File; url: string };
 type UserShape = { id: string; email?: string | null; role?: "USER" | "ADMIN" };
@@ -53,6 +57,15 @@ export function useApplicationFormState() {
   const [approvedCount, setApprovedCount] = useState<number | null>(null);
   const [hasReview, setHasReview] = useState<boolean | null>(null);
   const [trustSnapshot, setTrustSnapshot] = useState<any>(null);
+  const [activityModal, setActivityModal] = useState<{
+    isOpen: boolean;
+    activityType: "LIKE_STORY" | "CHANGE_AVATAR" | "CHANGE_HEADER" | null;
+    message: string;
+  }>({
+    isOpen: false,
+    activityType: null,
+    message: "",
+  });
   const isAdmin = user?.role === "ADMIN";
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
@@ -60,18 +73,36 @@ export function useApplicationFormState() {
   const formStartedAtRef = useRef<number | null>(null);
 
   const storageSuffix = user?.id ?? "anon";
-  const saveKey = useMemo(() => `${SAVE_KEY_BASE}:${storageSuffix}`, [storageSuffix]);
-  const trustAckKey = useMemo(() => `${TRUST_ACK_KEY_BASE}:${storageSuffix}`, [storageSuffix]);
-  const policyAckKey = useMemo(() => `${POLICY_ACK_KEY_BASE}:${storageSuffix}`, [storageSuffix]);
-  const introAckKey = useMemo(() => `${INTRO_ACK_KEY_BASE}:${storageSuffix}`, [storageSuffix]);
-  const formStartKey = useMemo(() => `${FORM_START_KEY_BASE}:${storageSuffix}`, [storageSuffix]);
+  const saveKey = useMemo(
+    () => `${SAVE_KEY_BASE}:${storageSuffix}`,
+    [storageSuffix],
+  );
+  const trustAckKey = useMemo(
+    () => `${TRUST_ACK_KEY_BASE}:${storageSuffix}`,
+    [storageSuffix],
+  );
+  const policyAckKey = useMemo(
+    () => `${POLICY_ACK_KEY_BASE}:${storageSuffix}`,
+    [storageSuffix],
+  );
+  const introAckKey = useMemo(
+    () => `${INTRO_ACK_KEY_BASE}:${storageSuffix}`,
+    [storageSuffix],
+  );
+  const formStartKey = useMemo(
+    () => `${FORM_START_KEY_BASE}:${storageSuffix}`,
+    [storageSuffix],
+  );
 
   useEffect(() => {
     const getLoc = () => {
       if (typeof window === "undefined") {
         return { pathname: "/applications", search: "" };
       }
-      return { pathname: window.location.pathname, search: window.location.search };
+      return {
+        pathname: window.location.pathname,
+        search: window.location.search,
+      };
     };
 
     const maybeRedirectToAuth = () => {
@@ -110,7 +141,9 @@ export function useApplicationFormState() {
       const saved = localStorage.getItem(saveKey);
       const trustAck = sessionStorage.getItem(trustAckKey);
       const policyAck = sessionStorage.getItem(policyAckKey);
-      const introAck = sessionStorage.getItem(introAckKey) ?? localStorage.getItem(introAckKey);
+      const introAck =
+        sessionStorage.getItem(introAckKey) ??
+        localStorage.getItem(introAckKey);
       const savedStart = localStorage.getItem(formStartKey);
 
       if (saved) {
@@ -149,17 +182,30 @@ export function useApplicationFormState() {
         setIntroChecked(false);
       }
     } catch (error) {
-      console.log("Ошибка при восстановлении данных:", error);
+      console.error("Ошибка при восстановлении данных:", error);
     }
-  }, [saveKey, trustAckKey, policyAckKey, introAckKey, formStartKey, loadingAuth]);
+  }, [
+    saveKey,
+    trustAckKey,
+    policyAckKey,
+    introAckKey,
+    formStartKey,
+    loadingAuth,
+  ]);
 
   useEffect(() => {
     const data = { title, summary, story, amount, payment, bankName };
     const t = window.setTimeout(() => {
       try {
         localStorage.setItem(saveKey, JSON.stringify(data));
-        sessionStorage.setItem(trustAckKey, trustAcknowledged ? "true" : "false");
-        sessionStorage.setItem(policyAckKey, policiesAccepted ? "true" : "false");
+        sessionStorage.setItem(
+          trustAckKey,
+          trustAcknowledged ? "true" : "false",
+        );
+        sessionStorage.setItem(
+          policyAckKey,
+          policiesAccepted ? "true" : "false",
+        );
         if (introChecked) {
           sessionStorage.setItem(introAckKey, "true");
           localStorage.setItem(introAckKey, "true");
@@ -168,7 +214,7 @@ export function useApplicationFormState() {
           localStorage.setItem(formStartKey, String(formStartedAtRef.current));
         }
       } catch (error) {
-        console.log("Ошибка при сохранении данных:", error);
+        console.error("Ошибка при сохранении данных:", error);
       }
     }, 250);
     return () => window.clearTimeout(t);
@@ -257,9 +303,14 @@ export function useApplicationFormState() {
   const withinTrustRange =
     isAdmin ||
     approvedCount === null ||
-    (Number.isFinite(amountInt) && amountInt >= trustLimits.min && amountInt <= trustLimits.max);
+    (Number.isFinite(amountInt) &&
+      amountInt >= trustLimits.min &&
+      amountInt <= trustLimits.max);
   const exceedsTrustLimit =
-    !isAdmin && approvedCount !== null && Number.isFinite(amountInt) && amountInt > trustLimits.max;
+    !isAdmin &&
+    approvedCount !== null &&
+    Number.isFinite(amountInt) &&
+    amountInt > trustLimits.max;
 
   const valid =
     title.length > 0 &&
@@ -321,7 +372,9 @@ export function useApplicationFormState() {
     if (nextDigits.length > 0) {
       const numeric = parseInt(nextDigits, 10);
       if (Number.isFinite(numeric)) {
-        clampedDigits = (isAdmin ? numeric : Math.min(numeric, trustLimits.max)).toString();
+        clampedDigits = (
+          isAdmin ? numeric : Math.min(numeric, trustLimits.max)
+        ).toString();
       }
     }
 
@@ -331,7 +384,10 @@ export function useApplicationFormState() {
       const el = amountInputRef.current;
       if (!el) return;
       const nextFormatted = formatAmountRu(clampedDigits);
-      const safeDigitsBefore = Math.min(digitsBeforeCaret, countDigits(nextFormatted));
+      const safeDigitsBefore = Math.min(
+        digitsBeforeCaret,
+        countDigits(nextFormatted),
+      );
       const nextCaret = caretPosForDigitIndex(nextFormatted, safeDigitsBefore);
       try {
         el.setSelectionRange(nextCaret, nextCaret);
@@ -360,9 +416,13 @@ export function useApplicationFormState() {
         filesToUpload.push(file);
       });
 
-      const tooBig = filesToUpload.find((f) => f.size > UPLOAD_LIMITS.maxFileBytes);
+      const tooBig = filesToUpload.find(
+        (f) => f.size > UPLOAD_LIMITS.maxFileBytes,
+      );
       if (tooBig) {
-        throw new Error(`Файл "${tooBig.name}" слишком большой. Максимум: 5 МБ на фото.`);
+        throw new Error(
+          `Файл "${tooBig.name}" слишком большой. Максимум: 5 МБ на фото.`,
+        );
       }
       const totalBytes = filesToUpload.reduce((sum, f) => sum + f.size, 0);
       if (totalBytes > UPLOAD_LIMITS.maxTotalBytes) {
@@ -383,8 +443,9 @@ export function useApplicationFormState() {
         );
       }
 
-      const d =
-        contentType.includes("application/json") ? await r.json().catch(() => null) : null;
+      const d = contentType.includes("application/json")
+        ? await r.json().catch(() => null)
+        : null;
       if (!r.ok) {
         const serverMsg = d?.error || d?.message;
         throw new Error(serverMsg || "Ошибка загрузки фото");
@@ -398,12 +459,15 @@ export function useApplicationFormState() {
   const preValidate = (): boolean => {
     if (!user) {
       const href = buildAuthModalUrl({
-        pathname: typeof window !== "undefined" ? window.location.pathname : "/applications",
+        pathname:
+          typeof window !== "undefined"
+            ? window.location.pathname
+            : "/applications",
         search: typeof window !== "undefined" ? window.location.search : "",
         modal: "auth/signup",
       });
       if (typeof window !== "undefined") {
-      window.location.href = href;
+        window.location.href = href;
       }
       return false;
     }
@@ -443,7 +507,9 @@ export function useApplicationFormState() {
         formStartedAtRef.current != null
           ? Math.max(0, Date.now() - formStartedAtRef.current)
           : null;
-      const paymentPayload = bankName ? `Банк: ${bankName}\n${payment}` : payment;
+      const paymentPayload = bankName
+        ? `Банк: ${bankName}\n${payment}`
+        : payment;
       const r = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -462,7 +528,10 @@ export function useApplicationFormState() {
       const d = await r.json();
       if (r.status === 401) {
         const href = buildAuthModalUrl({
-          pathname: typeof window !== "undefined" ? window.location.pathname : "/applications",
+          pathname:
+            typeof window !== "undefined"
+              ? window.location.pathname
+              : "/applications",
           search: typeof window !== "undefined" ? window.location.search : "",
           modal: "auth",
         });
@@ -470,7 +539,19 @@ export function useApplicationFormState() {
         return;
       }
       if (r.status === 403 && d?.requiresReview) {
-        throw new Error(d?.error || "Необходимо оставить отзыв перед созданием новой заявки");
+        throw new Error(
+          d?.error || "Необходимо оставить отзыв перед созданием новой заявки",
+        );
+      }
+      if (r.status === 403 && d?.requiresActivity) {
+        // Показываем модальное окно вместо ошибки
+        setActivityModal({
+          isOpen: true,
+          activityType: d?.activityType || "LIKE_STORY",
+          message: d?.error || "Для создания заявки требуется активность",
+        });
+        setErr(null); // Не показываем текстовую ошибку
+        return;
       }
       if (r.status === 429) {
         if (d?.leftMs) {
@@ -505,7 +586,6 @@ export function useApplicationFormState() {
       setSubmitting(false);
     }
   };
-
 
   const amountFormatted = formatAmountRu(amount);
 
@@ -545,7 +625,8 @@ export function useApplicationFormState() {
     setIntroChecked,
     approvedCount,
     hasReview,
-    requiresReview: approvedCount !== null && approvedCount > 0 && hasReview === false,
+    requiresReview:
+      approvedCount !== null && approvedCount > 0 && hasReview === false,
     trustLevel,
     trustLimits,
     trustHint,
@@ -561,9 +642,9 @@ export function useApplicationFormState() {
     formStartedAtRef,
     formStartKey,
     handleAmountInputChange,
+    activityModal,
+    setActivityModal,
   };
 }
 
 export { LIMITS };
-
-

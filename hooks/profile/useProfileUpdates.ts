@@ -11,19 +11,21 @@ interface UseProfileUpdatesReturn {
   handleAvatarChange: (avatarUrl: string | null) => Promise<void>;
 }
 
-export function useProfileUpdates({ refetch }: UseProfileUpdatesProps): UseProfileUpdatesReturn {
+export function useProfileUpdates({
+  refetch,
+}: UseProfileUpdatesProps): UseProfileUpdatesReturn {
   const handleThemeChange = useCallback(
     async (_newTheme: string | null) => {
       await refetch();
     },
-    [refetch]
+    [refetch],
   );
 
   const handleAvatarChange = useCallback(
     async (_avatarUrl: string | null) => {
       await refetch();
     },
-    [refetch]
+    [refetch],
   );
 
   return {
@@ -31,5 +33,3 @@ export function useProfileUpdates({ refetch }: UseProfileUpdatesProps): UseProfi
     handleAvatarChange,
   };
 }
-
-

@@ -1,17 +1,27 @@
 import type { Metadata } from "next";
 
-const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru").replace(/\/$/, "");
+const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru"
+).replace(/\/$/, "");
 
 export const metadata: Metadata = {
   title: "Истории",
-  description: "Читайте реальные истории людей, которые получили помощь на платформе Копилка. Вдохновляйтесь и помогайте другим",
-  keywords: ["истории", "помощь", "реальные истории", "благотворительность", "копилка"],
+  description:
+    "Читайте реальные истории людей, которые получили помощь на платформе Копилка. Вдохновляйтесь и помогайте другим",
+  keywords: [
+    "истории",
+    "помощь",
+    "реальные истории",
+    "благотворительность",
+    "копилка",
+  ],
   alternates: {
     canonical: "/stories",
   },
   openGraph: {
     title: "Истории | Копилка",
-    description: "Читайте реальные истории людей, которые получили помощь на платформе Копилка. Вдохновляйтесь и помогайте другим",
+    description:
+      "Читайте реальные истории людей, которые получили помощь на платформе Копилка. Вдохновляйтесь и помогайте другим",
     url: "/stories",
     type: "website",
     images: [
@@ -26,7 +36,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Истории | Копилка",
-    description: "Читайте реальные истории людей, которые получили помощь на платформе Копилка. Вдохновляйтесь и помогайте другим",
+    description:
+      "Читайте реальные истории людей, которые получили помощь на платформе Копилка. Вдохновляйтесь и помогайте другим",
     images: ["/stories-preview.jpg"],
   },
 };
@@ -38,4 +49,3 @@ export default function StoriesLayout({
 }) {
   return children;
 }
-

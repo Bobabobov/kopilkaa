@@ -91,13 +91,19 @@ export async function GET(request: Request) {
       ...f,
       requester: f.requester
         ? sanitizeEmailForViewer(
-            { ...(f.requester as any), heroBadge: badgeMap[f.requesterId] ?? null },
+            {
+              ...(f.requester as any),
+              heroBadge: badgeMap[f.requesterId] ?? null,
+            },
             session.uid,
           )
         : f.requester,
       receiver: f.receiver
         ? sanitizeEmailForViewer(
-            { ...(f.receiver as any), heroBadge: badgeMap[f.receiverId] ?? null },
+            {
+              ...(f.receiver as any),
+              heroBadge: badgeMap[f.receiverId] ?? null,
+            },
             session.uid,
           )
         : f.receiver,
@@ -122,15 +128,8 @@ export async function POST(request: Request) {
 
   try {
     const { receiverId } = await request.json();
-    console.log(
-      "POST /api/profile/friends - receiverId:",
-      receiverId,
-      "session.uid:",
-      session.uid,
-    );
 
     if (!receiverId) {
-      console.log("Error: receiverId is missing");
       return NextResponse.json(
         { message: "ID получателя обязателен" },
         { status: 400 },
@@ -138,7 +137,6 @@ export async function POST(request: Request) {
     }
 
     if (receiverId === session.uid) {
-      console.log("Error: trying to add self as friend");
       return NextResponse.json(
         { message: "Нельзя добавить себя в друзья" },
         { status: 400 },
@@ -152,7 +150,6 @@ export async function POST(request: Request) {
     });
 
     if (!receiver) {
-      console.log("Error: receiver not found:", receiverId);
       return NextResponse.json(
         { message: "Пользователь не найден" },
         { status: 404 },
@@ -175,17 +172,15 @@ export async function POST(request: Request) {
         // Проверяем, кто заблокировал
         const blockerId = existingFriendship.requesterId;
         const blockedId = existingFriendship.receiverId;
-        
+
         if (blockerId === receiverId && blockedId === session.uid) {
           // Пользователь заблокировал вас - нельзя отправить заявку
-          console.log("Error: user blocked by receiver");
           return NextResponse.json(
             { message: "Вы заблокированы этим пользователем" },
             { status: 403 },
           );
         } else if (blockerId === session.uid && blockedId === receiverId) {
           // Вы заблокировали пользователя - удаляем блокировку и создаем заявку
-          console.log("User was blocked by requester, removing block and creating request");
           // Удаляем блокировку
           await prisma.friendship.delete({
             where: { id: existingFriendship.id },
@@ -193,29 +188,29 @@ export async function POST(request: Request) {
           // Продолжаем создание заявки (не возвращаем ошибку)
         } else {
           // Неизвестная ситуация с блокировкой
-          console.log("Error: unknown block situation");
           return NextResponse.json(
             { message: "Заявка уже существует" },
             { status: 400 },
           );
         }
-      } else if (existingFriendship.status === "PENDING" || existingFriendship.status === "ACCEPTED") {
+      } else if (
+        existingFriendship.status === "PENDING" ||
+        existingFriendship.status === "ACCEPTED"
+      ) {
         // Заявка уже существует или пользователи уже друзья
-      console.log("Error: friendship already exists:", existingFriendship);
-      return NextResponse.json(
-        { message: "Заявка уже существует" },
-        { status: 400 },
+        return NextResponse.json(
+          { message: "Заявка уже существует" },
+          { status: 400 },
         );
       } else if (existingFriendship.status === "DECLINED") {
         // Заявка была отклонена - удаляем и создаем новую
-        console.log("Previous request was declined, creating new one");
         await prisma.friendship.delete({
           where: { id: existingFriendship.id },
         });
         // Продолжаем создание заявки
       }
     }
-    
+
     // Дополнительная проверка: не заблокировал ли получатель отправителя
     const reverseBlock = await prisma.friendship.findFirst({
       where: {
@@ -224,9 +219,8 @@ export async function POST(request: Request) {
         status: "BLOCKED",
       },
     });
-    
+
     if (reverseBlock) {
-      console.log("Error: requester is blocked by receiver");
       return NextResponse.json(
         { message: "Вы заблокированы этим пользователем" },
         { status: 403 },
@@ -270,7 +264,6 @@ export async function POST(request: Request) {
       },
     });
 
-    console.log("Successfully created friendship:", friendship.id);
     const badgeMap = await getHeroBadgesForUsers([
       friendship.requesterId,
       friendship.receiverId,

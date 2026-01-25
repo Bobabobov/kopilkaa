@@ -7,37 +7,45 @@ import { AchievementCard } from "./AchievementCard";
 import { AchievementsHeader } from "./AchievementsHeader";
 import { AchievementsStats } from "./AchievementsStats";
 import { useAchievementsData } from "./hooks/useAchievementsData";
-import { getAchievementIcon, getRarityColor, getRarityName } from "./achievementUtils";
+import {
+  getAchievementIcon,
+  getRarityColor,
+  getRarityName,
+} from "./achievementUtils";
 
 interface AchievementsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function AchievementsModal({ isOpen, onClose }: AchievementsModalProps) {
-  const { achievements, allAchievements, stats, loading, error, mounted } = useAchievementsData(isOpen);
+export default function AchievementsModal({
+  isOpen,
+  onClose,
+}: AchievementsModalProps) {
+  const { achievements, allAchievements, stats, loading, error, mounted } =
+    useAchievementsData(isOpen);
 
   // Закрытие по Escape
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === "Escape" && isOpen) {
         onClose();
       }
     };
 
     if (isOpen) {
       const originalOverflow = document.body.style.overflow;
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
 
       return () => {
-        document.removeEventListener('keydown', handleEscape);
+        document.removeEventListener("keydown", handleEscape);
         document.body.style.overflow = originalOverflow;
       };
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("keydown", handleEscape);
       // Если модалка уже закрыта — ничего не ломаем.
     };
   }, [isOpen, onClose]);
@@ -62,15 +70,21 @@ export default function AchievementsModal({ isOpen, onClose }: AchievementsModal
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="rounded-3xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] mx-4 flex flex-col custom-scrollbar"
           style={{
-            border: '1px solid transparent',
-            background: 'linear-gradient(to right, #004643, #001e1d) border-box, linear-gradient(135deg, #004643, #001e1d) padding-box',
-            backgroundClip: 'border-box, padding-box',
-            boxShadow: '0 0 0 1px rgba(171, 209, 198, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+            border: "1px solid transparent",
+            background:
+              "linear-gradient(to right, #004643, #001e1d) border-box, linear-gradient(135deg, #004643, #001e1d) padding-box",
+            backgroundClip: "border-box, padding-box",
+            boxShadow:
+              "0 0 0 1px rgba(171, 209, 198, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.25)",
           }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Заголовок */}
-          <AchievementsHeader count={achievements.length} stats={stats} onClose={onClose} />
+          <AchievementsHeader
+            count={achievements.length}
+            stats={stats}
+            onClose={onClose}
+          />
 
           {/* Статистика */}
           {stats && (
@@ -102,14 +116,16 @@ export default function AchievementsModal({ isOpen, onClose }: AchievementsModal
                 <h3 className="text-xl font-bold mb-3 text-[#fffffe]">
                   Нет доступных достижений
                 </h3>
-                <p className="text-[#abd1c6] mb-6">
-                  Достижения появятся позже
-                </p>
+                <p className="text-[#abd1c6] mb-6">Достижения появятся позже</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {allAchievements.map((progressItem, index) => (
-                  <AchievementCard key={progressItem.achievement.id} progressItem={progressItem} index={index} />
+                  <AchievementCard
+                    key={progressItem.achievement.id}
+                    progressItem={progressItem}
+                    index={index}
+                  />
                 ))}
               </div>
             )}

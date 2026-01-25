@@ -6,11 +6,13 @@ import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 type HeroBadgeSize = "xs" | "sm" | "md";
 
-const sizeMap: Record<HeroBadgeSize, { wrap: string; icon: "xs" | "sm" | "md"; text: string }> =
-  {
-    xs: { wrap: "h-5 px-2", icon: "xs", text: "text-[11px]" },
-    sm: { wrap: "h-6 px-2.5", icon: "xs", text: "text-xs" },
-    md: { wrap: "h-7 px-3", icon: "sm", text: "text-sm" },
+const sizeMap: Record<
+  HeroBadgeSize,
+  { wrap: string; icon: "xs" | "sm" | "md"; text: string }
+> = {
+  xs: { wrap: "h-5 px-2", icon: "xs", text: "text-[11px]" },
+  sm: { wrap: "h-6 px-2.5", icon: "xs", text: "text-xs" },
+  md: { wrap: "h-7 px-3", icon: "sm", text: "text-sm" },
 };
 
 export function HeroBadge({
@@ -33,12 +35,18 @@ export function HeroBadge({
 
   // На мобилках показываем полный текст (без сокращений), но делаем его компактнее по размеру.
   const Label = ({ full }: { full: string; short: string }) => (
-    <span className={`ml-1 whitespace-nowrap leading-none ${text}`}>{full}</span>
+    <span className={`ml-1 whitespace-nowrap leading-none ${text}`}>
+      {full}
+    </span>
   );
 
   const Base = motion.span;
 
-  const shimmerNode = (color: string, durationSec: number, delaySec: number) => {
+  const shimmerNode = (
+    color: string,
+    durationSec: number,
+    delaySec: number,
+  ) => {
     if (reduceMotion) return null;
     return (
       <motion.span
@@ -121,7 +129,12 @@ export function HeroBadge({
             transition={
               reduceMotion
                 ? undefined
-                : { duration: 2.2, ease: "easeInOut", repeat: Infinity, repeatDelay: 9.8 }
+                : {
+                    duration: 2.2,
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                    repeatDelay: 9.8,
+                  }
             }
             className="inline-flex"
           >
@@ -151,7 +164,12 @@ export function HeroBadge({
           transition={
             reduceMotion
               ? undefined
-              : { duration: 2.8, ease: "easeInOut", repeat: Infinity, repeatDelay: 3.2 }
+              : {
+                  duration: 2.8,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: 3.2,
+                }
           }
           whileHover={
             reduceMotion
@@ -168,7 +186,12 @@ export function HeroBadge({
             transition={
               reduceMotion
                 ? undefined
-                : { duration: 0.55, ease: "easeOut", repeat: Infinity, repeatDelay: 9.45 }
+                : {
+                    duration: 0.55,
+                    ease: "easeOut",
+                    repeat: Infinity,
+                    repeatDelay: 9.45,
+                  }
             }
             className="inline-flex"
           >
@@ -186,12 +209,15 @@ export function HeroBadge({
           title="Герой"
           initial={reduceMotion ? undefined : { opacity: 0, scale: 0.96 }}
           animate={reduceMotion ? undefined : { opacity: 1, scale: 1 }}
-          transition={reduceMotion ? undefined : { duration: 0.22, ease: "easeOut" }}
+          transition={
+            reduceMotion ? undefined : { duration: 0.22, ease: "easeOut" }
+          }
           whileHover={
             reduceMotion
               ? undefined
               : {
-                  boxShadow: "0 0 0 2px rgba(249,188,96,0.35), 0 18px 44px rgba(249,188,96,0.18)",
+                  boxShadow:
+                    "0 0 0 2px rgba(249,188,96,0.35), 0 18px 44px rgba(249,188,96,0.18)",
                 }
           }
         >
@@ -221,7 +247,9 @@ export function HeroBadge({
             aria-hidden
             animate={reduceMotion ? undefined : { rotate: 360 }}
             transition={
-              reduceMotion ? undefined : { duration: 26, ease: "linear", repeat: Infinity }
+              reduceMotion
+                ? undefined
+                : { duration: 26, ease: "linear", repeat: Infinity }
             }
             className="inline-flex"
           >
@@ -254,7 +282,12 @@ export function HeroBadge({
           transition={
             reduceMotion
               ? undefined
-              : { duration: 3.4, ease: "easeInOut", repeat: Infinity, repeatDelay: 2.8 }
+              : {
+                  duration: 3.4,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: 2.8,
+                }
           }
           whileHover={
             reduceMotion
@@ -336,10 +369,14 @@ export function HeroBadge({
                   animate={{
                     scale: [1, 1.2, 1],
                   }}
-                  transition={{ duration: 2.5, ease: "easeInOut", repeat: Infinity }}
+                  transition={{
+                    duration: 2.5,
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                  }}
                 />
               </motion.span>
-              
+
               {/* Эффект "пузырьков" */}
               <motion.span
                 aria-hidden
@@ -413,7 +450,12 @@ export function HeroBadge({
           transition={
             reduceMotion
               ? undefined
-              : { duration: 3.6, ease: "easeInOut", repeat: Infinity, repeatDelay: 3.2 }
+              : {
+                  duration: 3.6,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: 3.2,
+                }
           }
         >
           {shimmerNode("rgba(217,70,239,0.22)", 1.0, 9)}
@@ -424,5 +466,3 @@ export function HeroBadge({
       );
   }
 }
-
-

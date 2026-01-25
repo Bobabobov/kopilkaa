@@ -22,9 +22,15 @@ export async function PATCH(
       select: { id: true, countTowardsTrust: true },
     });
 
-    return NextResponse.json({ ok: true, countTowardsTrust: updated.countTowardsTrust });
+    return NextResponse.json({
+      ok: true,
+      countTowardsTrust: updated.countTowardsTrust,
+    });
   } catch (error) {
     console.error("Error updating countTowardsTrust:", error);
-    return NextResponse.json({ error: "Не удалось обновить флаг доверия" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Не удалось обновить флаг доверия" },
+      { status: 500 },
+    );
   }
 }

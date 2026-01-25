@@ -7,10 +7,13 @@ export function AdvertisingHero() {
         {/* Простой, но мощный заголовок */}
         <div className="mb-16">
           <h1 className="text-6xl md:text-8xl font-bold text-[#fffffe] mb-6 tracking-tight">
-            Реклама,<br />которая работает
+            Реклама,
+            <br />
+            которая работает
           </h1>
           <p className="text-xl text-[#abd1c6] max-w-2xl">
-            Проект только запускается, аудитория ещё растёт. Первые рекламодатели будут особенно заметны на сайте.
+            Проект только запускается, аудитория ещё растёт. Первые
+            рекламодатели будут особенно заметны на сайте.
           </p>
         </div>
 
@@ -19,9 +22,12 @@ export function AdvertisingHero() {
           <div className="flex items-start gap-4 group">
             <div className="text-[#f9bc60] text-2xl font-bold mt-1">01</div>
             <div>
-              <div className="text-[#fffffe] text-xl font-medium mb-1">Вы — среди первых</div>
+              <div className="text-[#fffffe] text-xl font-medium mb-1">
+                Вы — среди первых
+              </div>
               <div className="text-[#abd1c6]">
-                Реклама на главной странице в момент запуска проекта. Пока конкурентов мало, каждое размещение привлекает больше внимания.
+                Реклама на главной странице в момент запуска проекта. Пока
+                конкурентов мало, каждое размещение привлекает больше внимания.
               </div>
             </div>
           </div>
@@ -29,16 +35,26 @@ export function AdvertisingHero() {
           <div className="flex items-start gap-4 group">
             <div className="text-[#f9bc60] text-2xl font-bold mt-1">02</div>
             <div>
-              <div className="text-[#fffffe] text-xl font-medium mb-1">Условия — гибкие</div>
-              <div className="text-[#abd1c6]">Цена обсуждается индивидуально — подберём формат и срок под вашу задачу</div>
+              <div className="text-[#fffffe] text-xl font-medium mb-1">
+                Условия — гибкие
+              </div>
+              <div className="text-[#abd1c6]">
+                Цена обсуждается индивидуально — подберём формат и срок под вашу
+                задачу
+              </div>
             </div>
           </div>
 
           <div className="flex items-start gap-4 group">
             <div className="text-[#f9bc60] text-2xl font-bold mt-1">03</div>
             <div>
-              <div className="text-[#fffffe] text-xl font-medium mb-1">Запускаем за день</div>
-              <div className="text-[#abd1c6]">Оплатили — реклама уже показывается. Никаких согласований и ожиданий</div>
+              <div className="text-[#fffffe] text-xl font-medium mb-1">
+                Запускаем за день
+              </div>
+              <div className="text-[#abd1c6]">
+                Оплатили — реклама уже показывается. Никаких согласований и
+                ожиданий
+              </div>
             </div>
           </div>
         </div>

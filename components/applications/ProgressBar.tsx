@@ -74,10 +74,10 @@ export default function ProgressBar({
       {/* Декоративные элементы */}
       <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#f9bc60]/10 rounded-full blur-2xl"></div>
       <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-[#e16162]/10 rounded-full blur-xl"></div>
-      
+
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
-          <motion.h3 
+          <motion.h3
             className="text-lg font-bold bg-gradient-to-r from-[#fffffe] to-[#abd1c6] bg-clip-text text-transparent"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -93,7 +93,7 @@ export default function ProgressBar({
             {percentage}%
           </motion.div>
         </div>
-        
+
         {/* Улучшенная Progress bar */}
         <div className="w-full bg-[#001e1d]/40 rounded-full h-3 mb-6 overflow-hidden shadow-inner">
           <motion.div
@@ -132,9 +132,13 @@ export default function ProgressBar({
                     ? "bg-[#10B981] shadow-lg shadow-[#10B981]/30"
                     : "bg-[#abd1c6]/20"
                 }`}
-                animate={step.filled ? {
-                  scale: [1, 1.2, 1],
-                } : {}}
+                animate={
+                  step.filled
+                    ? {
+                        scale: [1, 1.2, 1],
+                      }
+                    : {}
+                }
                 transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
               >
                 {step.filled ? (
@@ -145,9 +149,7 @@ export default function ProgressBar({
               </motion.div>
               <span
                 className={`text-xs font-medium ${
-                  step.filled
-                    ? "text-[#10B981]"
-                    : "text-[#abd1c6]"
+                  step.filled ? "text-[#10B981]" : "text-[#abd1c6]"
                 }`}
               >
                 {step.name}

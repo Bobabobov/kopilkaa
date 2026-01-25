@@ -61,8 +61,7 @@ export async function GET() {
     console.error("Error fetching user donations:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

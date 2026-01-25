@@ -12,9 +12,9 @@ export default function ReportsHeader() {
       className="text-center space-y-4"
     >
       <div className="inline-flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56">
-        <img 
-          src="/kopibag.png" 
-          alt="Баг-репорты" 
+        <img
+          src="/kopibag.png"
+          alt="Баг-репорты"
           className="w-full h-full object-contain"
         />
       </div>
@@ -22,10 +22,9 @@ export default function ReportsHeader() {
         Баг-репорты
       </h1>
       <p className="text-lg text-[#abd1c6] max-w-2xl mx-auto">
-        Копилка — молодой проект: баги, уязвимости или любые дыры безопасности сразу пишите сюда, мы быстро разберёмся.
+        Копилка — молодой проект: баги, уязвимости или любые дыры безопасности
+        сразу пишите сюда, мы быстро разберёмся.
       </p>
     </motion.div>
   );
 }
-
-

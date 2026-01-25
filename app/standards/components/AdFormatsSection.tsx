@@ -1,8 +1,8 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { AdFormatCard } from './AdFormatCard';
-import { adFormats } from './adFormatsData';
+import { motion } from "framer-motion";
+import { AdFormatCard } from "./AdFormatCard";
+import { adFormats } from "./adFormatsData";
 
 export function AdFormatsSection() {
   return (
@@ -23,7 +23,9 @@ export function AdFormatsSection() {
         >
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 bg-[#001e1d]/50 border border-[#abd1c6]/20 rounded-full mb-4 sm:mb-6 backdrop-blur-md">
             <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-[#f9bc60] rounded-full"></div>
-            <span className="text-xs sm:text-sm font-medium text-[#abd1c6]">Форматы размещения</span>
+            <span className="text-xs sm:text-sm font-medium text-[#abd1c6]">
+              Форматы размещения
+            </span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#fffffe] mb-3 sm:mb-4 px-4">
             Форматы рекламы

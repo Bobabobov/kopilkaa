@@ -29,19 +29,20 @@ export default function AdminReportsClient() {
       }
       return success;
     },
-    [banUser, statusFilter, loadReports]
+    [banUser, statusFilter, loadReports],
   );
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-
       <div className="w-full px-6 pt-32 pb-8 relative z-10">
         <div className="max-w-7xl mx-auto">
           {/* Заголовок */}
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-[#fffffe] mb-2">Жалобы</h1>
-              <p className="text-[#abd1c6]">Управление жалобами на пользователей</p>
+              <p className="text-[#abd1c6]">
+                Управление жалобами на пользователей
+              </p>
             </div>
 
             {/* Навигация */}
@@ -102,4 +103,3 @@ export default function AdminReportsClient() {
     </div>
   );
 }
-

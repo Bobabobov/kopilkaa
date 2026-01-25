@@ -28,7 +28,10 @@ export async function GET(_req: Request, { params }: RouteParams) {
 
     const userId = await resolveUserIdFromIdentifier(identifier);
     if (!userId) {
-      return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     const friendships = await prisma.friendship.findMany({
@@ -71,5 +74,3 @@ export async function GET(_req: Request, { params }: RouteParams) {
     );
   }
 }
-
-

@@ -9,7 +9,12 @@ import { getPublicProfilePath } from "@/lib/profileUrl";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
 
-type ResultUser = { id: string; username: string | null; name: string | null; email: string | null };
+type ResultUser = {
+  id: string;
+  username: string | null;
+  name: string | null;
+  email: string | null;
+};
 
 export default function AdminHeroesClient() {
   const { showToast } = useBeautifulToast();
@@ -40,11 +45,19 @@ export default function AdminHeroesClient() {
   }, [identifier, totalAmount, paymentsCount]);
 
   const canSubmit =
-    !!parsed.identifier && parsed.amount > 0 && parsed.count > 0 && parsed.count <= 50 && parsed.amount >= parsed.count;
+    !!parsed.identifier &&
+    parsed.amount > 0 &&
+    parsed.count > 0 &&
+    parsed.count <= 50 &&
+    parsed.amount >= parsed.count;
 
   async function submit() {
     if (!canSubmit) {
-      showToast("error", "Проверьте данные", "Укажите пользователя, сумму и количество платежей (count ≤ amount).");
+      showToast(
+        "error",
+        "Проверьте данные",
+        "Укажите пользователя, сумму и количество платежей (count ≤ amount).",
+      );
       return;
     }
     setSubmitting(true);
@@ -63,7 +76,11 @@ export default function AdminHeroesClient() {
       });
       const data = await r.json().catch(() => null);
       if (!r.ok) {
-        showToast("error", "Ошибка", data?.error || "Не удалось добавить поддержку");
+        showToast(
+          "error",
+          "Ошибка",
+          data?.error || "Не удалось добавить поддержку",
+        );
         return;
       }
       setResult(data?.data ?? null);
@@ -73,7 +90,7 @@ export default function AdminHeroesClient() {
         "Готово",
         `Поддержка добавлена для ${u?.username ? `@${u.username}` : u?.id || "пользователя"}`,
       );
-    } catch (e) {
+    } catch {
       showToast("error", "Ошибка", "Не удалось выполнить запрос");
     } finally {
       setSubmitting(false);
@@ -83,7 +100,11 @@ export default function AdminHeroesClient() {
   async function setVisibility(hide: boolean) {
     const id = parsed.identifier;
     if (!id) {
-      showToast("error", "Проверьте данные", "Укажите пользователя (@username или userId).");
+      showToast(
+        "error",
+        "Проверьте данные",
+        "Укажите пользователя (@username или userId).",
+      );
       return;
     }
     const ok = await confirm(
@@ -103,12 +124,24 @@ export default function AdminHeroesClient() {
       });
       const data = await r.json().catch(() => null);
       if (!r.ok) {
-        showToast("error", "Ошибка", data?.error || "Не удалось обновить видимость");
+        showToast(
+          "error",
+          "Ошибка",
+          data?.error || "Не удалось обновить видимость",
+        );
         return;
       }
-      const user = data?.data?.user as (ResultUser & { hideFromHeroes: boolean }) | undefined;
+      const user = data?.data?.user as
+        | (ResultUser & { hideFromHeroes: boolean })
+        | undefined;
       if (user) setVisibilityUser(user);
-      showToast("success", "Готово", hide ? "Пользователь скрыт из /heroes" : "Пользователь возвращён в /heroes");
+      showToast(
+        "success",
+        "Готово",
+        hide
+          ? "Пользователь скрыт из /heroes"
+          : "Пользователь возвращён в /heroes",
+      );
     } catch {
       showToast("error", "Ошибка", "Не удалось выполнить запрос");
     } finally {
@@ -131,10 +164,15 @@ export default function AdminHeroesClient() {
           >
             <div className="flex items-start justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-xl sm:text-2xl font-black text-[#fffffe]">Герои — ручное добавление</h2>
+                <h2 className="text-xl sm:text-2xl font-black text-[#fffffe]">
+                  Герои — ручное добавление
+                </h2>
                 <p className="mt-2 text-sm text-[#abd1c6] leading-relaxed max-w-2xl">
                   Добавляйте поддержавших вручную, чтобы они появились в{" "}
-                  <Link className="text-[#f9bc60] hover:underline font-semibold" href="/heroes">
+                  <Link
+                    className="text-[#f9bc60] hover:underline font-semibold"
+                    href="/heroes"
+                  >
                     /heroes
                   </Link>
                   .
@@ -144,7 +182,9 @@ export default function AdminHeroesClient() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-[#abd1c6]">Пользователь</label>
+                <label className="text-xs font-bold text-[#abd1c6]">
+                  Пользователь
+                </label>
                 <input
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
@@ -155,7 +195,9 @@ export default function AdminHeroesClient() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-[#abd1c6]">Сумма (₽)</label>
+                  <label className="text-xs font-bold text-[#abd1c6]">
+                    Сумма (₽)
+                  </label>
                   <input
                     value={totalAmount}
                     onChange={(e) => setTotalAmount(e.target.value)}
@@ -164,7 +206,9 @@ export default function AdminHeroesClient() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-[#abd1c6]">Кол-во платежей</label>
+                  <label className="text-xs font-bold text-[#abd1c6]">
+                    Кол-во платежей
+                  </label>
                   <input
                     value={paymentsCount}
                     onChange={(e) => setPaymentsCount(e.target.value)}
@@ -175,7 +219,9 @@ export default function AdminHeroesClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-[#abd1c6]">Источник</label>
+                <label className="text-xs font-bold text-[#abd1c6]">
+                  Источник
+                </label>
                 <select
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
@@ -188,7 +234,9 @@ export default function AdminHeroesClient() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-[#abd1c6]">Комментарий (опционально)</label>
+                <label className="text-xs font-bold text-[#abd1c6]">
+                  Комментарий (опционально)
+                </label>
                 <input
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
@@ -230,11 +278,15 @@ export default function AdminHeroesClient() {
 
             {result && (
               <div className="mt-6 rounded-2xl border border-[#abd1c6]/20 bg-[#001e1d]/40 p-4">
-                <div className="text-sm font-bold text-[#fffffe] mb-2">Результат</div>
+                <div className="text-sm font-bold text-[#fffffe] mb-2">
+                  Результат
+                </div>
                 <div className="text-sm text-[#abd1c6]">
                   Пользователь:{" "}
                   <span className="text-[#f9bc60] font-semibold">
-                    {result.user.username ? `@${result.user.username}` : result.user.id}
+                    {result.user.username
+                      ? `@${result.user.username}`
+                      : result.user.id}
                   </span>{" "}
                   ({result.user.name || result.user.email || "без имени"})
                 </div>
@@ -252,7 +304,8 @@ export default function AdminHeroesClient() {
                     Видимость в /heroes
                   </div>
                   <div className="mt-1 text-xs sm:text-sm text-[#abd1c6]">
-                    Скрывает/возвращает пользователя в витрину героев без удаления истории.
+                    Скрывает/возвращает пользователя в витрину героев без
+                    удаления истории.
                   </div>
                 </div>
               </div>
@@ -293,5 +346,3 @@ export default function AdminHeroesClient() {
     </div>
   );
 }
-
-

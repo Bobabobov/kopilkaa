@@ -43,23 +43,22 @@ export default function ApplicationCard({
   onDelete,
   onToggleTrust,
 }: ApplicationCardProps) {
-
   return (
     <motion.div
       key={it.id}
       initial={{ opacity: 0, y: 30, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ 
-        duration: 0.6, 
+      transition={{
+        duration: 0.6,
         delay: index * 0.1,
         type: "spring",
         stiffness: 100,
-        damping: 15
+        damping: 15,
       }}
-      whileHover={{ 
-        y: -5, 
+      whileHover={{
+        y: -5,
         scale: 1.02,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       }}
       className="group relative overflow-hidden bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40"
     >
@@ -88,10 +87,7 @@ export default function ApplicationCard({
 
         <ApplicationCardStory story={it.story} />
 
-        <ApplicationCardFooter
-          applicationId={it.id}
-          createdAt={it.createdAt}
-        />
+        <ApplicationCardFooter applicationId={it.id} createdAt={it.createdAt} />
       </div>
     </motion.div>
   );

@@ -5,7 +5,10 @@ import { motion } from "framer-motion";
 import type { NewsItem } from "@/components/news/types";
 import { NewsPostCard } from "@/components/news/NewsPostCard";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { NewsControlsBar, type NewsSort } from "@/components/news/NewsControlsBar";
+import {
+  NewsControlsBar,
+  type NewsSort,
+} from "@/components/news/NewsControlsBar";
 import { NewsSidebar } from "@/components/news/NewsSidebar";
 import { NewsFeedSkeleton } from "@/components/news/NewsFeedSkeleton";
 
@@ -17,30 +20,40 @@ function getDayKey(d: Date) {
 
 function dayLabel(d: Date) {
   const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  );
   const startOfThat = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const diffDays = Math.round((startOfToday.getTime() - startOfThat.getTime()) / (24 * 60 * 60 * 1000));
+  const diffDays = Math.round(
+    (startOfToday.getTime() - startOfThat.getTime()) / (24 * 60 * 60 * 1000),
+  );
   if (diffDays === 0) return "Сегодня";
   if (diffDays === 1) return "Вчера";
-  return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "long", year: "numeric" });
+  return d.toLocaleDateString("ru-RU", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 function getPostWord(count: number): string {
   const lastDigit = count % 10;
   const lastTwoDigits = count % 100;
-  
+
   if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
     return "постов";
   }
-  
+
   if (lastDigit === 1) {
     return "пост";
   }
-  
+
   if (lastDigit >= 2 && lastDigit <= 4) {
     return "поста";
   }
-  
+
   return "постов";
 }
 
@@ -54,13 +67,17 @@ export default function NewsPageClient({
   initialLastUpdatedAt?: string | null;
 }) {
   const [items, setItems] = useState<NewsItem[]>(() => initialItems);
-  const [nextCursor, setNextCursor] = useState<string | null>(() => initialNextCursor);
+  const [nextCursor, setNextCursor] = useState<string | null>(
+    () => initialNextCursor,
+  );
   const [loading, setLoading] = useState(() => initialItems.length === 0);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<NewsSort>("new");
-  const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(initialLastUpdatedAt);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<string | null>(
+    initialLastUpdatedAt,
+  );
 
   const fetchPage = useCallback(async (cursor?: string | null) => {
     const url = new URL("/api/news", window.location.origin);
@@ -123,7 +140,7 @@ export default function NewsPageClient({
     if (sort === "top") {
       list.sort(
         (a, b) =>
-          (b.likesCount - b.dislikesCount) - (a.likesCount - a.dislikesCount) ||
+          b.likesCount - b.dislikesCount - (a.likesCount - a.dislikesCount) ||
           +new Date(b.createdAt) - +new Date(a.createdAt),
       );
       return list;
@@ -136,7 +153,10 @@ export default function NewsPageClient({
     if (sort !== "new") {
       return [{ key: "all", label: "Лента", items: sorted }];
     }
-    const map = new Map<string, { key: string; label: string; items: NewsItem[] }>();
+    const map = new Map<
+      string,
+      { key: string; label: string; items: NewsItem[] }
+    >();
     for (const it of sorted) {
       const d = new Date(it.createdAt);
       const k = getDayKey(d);
@@ -153,7 +173,7 @@ export default function NewsPageClient({
   // Прокрутка к новости по hash в URL
   useEffect(() => {
     if (loading || sorted.length === 0) return;
-    
+
     const hash = window.location.hash.slice(1);
     if (!hash) return;
 
@@ -187,7 +207,8 @@ export default function NewsPageClient({
                     Новости проекта
                   </h1>
                   <p className="mt-2 text-sm sm:text-base text-[#abd1c6] max-w-2xl">
-                    Обновления, фичи, важные объявления и изменения на платформе.
+                    Обновления, фичи, важные объявления и изменения на
+                    платформе.
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-3 flex-shrink-0 w-full sm:w-auto">
@@ -199,8 +220,11 @@ export default function NewsPageClient({
                     title="Телеграм канал"
                   >
                     <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/logo12.png" alt="Telegram" className="w-full h-full object-cover" />
+                      <img
+                        src="/logo12.png"
+                        alt="Telegram"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div className="flex-1 sm:flex-initial text-left sm:text-right">
                       <div className="text-xs font-semibold text-white/90 group-hover:text-white transition-colors">
@@ -219,8 +243,11 @@ export default function NewsPageClient({
                     title="Kick стрим"
                   >
                     <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/kick.png" alt="Kick" className="w-full h-full object-cover" />
+                      <img
+                        src="/kick.png"
+                        alt="Kick"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div className="flex-1 sm:flex-initial text-left sm:text-right">
                       <div className="text-xs font-semibold text-white/90 group-hover:text-white transition-colors">
@@ -255,7 +282,10 @@ export default function NewsPageClient({
               ) : error ? (
                 <div className="rounded-3xl border border-red-400/20 bg-red-500/10 p-6 text-white">
                   <div className="flex items-center gap-2 font-bold">
-                    <LucideIcons.AlertTriangle size="sm" className="text-red-300" />
+                    <LucideIcons.AlertTriangle
+                      size="sm"
+                      className="text-red-300"
+                    />
                     Ошибка загрузки
                   </div>
                   <div className="mt-2 text-white/80">{error}</div>
@@ -269,8 +299,12 @@ export default function NewsPageClient({
                 </div>
               ) : items.length === 0 ? (
                 <div className="rounded-3xl border border-[#abd1c6]/20 bg-[#004643]/35 p-8 text-center">
-                  <div className="text-[#fffffe] font-bold text-lg">Пока новостей нет</div>
-                  <div className="mt-2 text-[#abd1c6]">Загляните чуть позже.</div>
+                  <div className="text-[#fffffe] font-bold text-lg">
+                    Пока новостей нет
+                  </div>
+                  <div className="mt-2 text-[#abd1c6]">
+                    Загляните чуть позже.
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-5">
@@ -318,13 +352,21 @@ export default function NewsPageClient({
               {/* mobile sidebar */}
               {!loading && !error && (
                 <div className="mt-5 lg:hidden">
-                  <NewsSidebar items={sorted} lastUpdatedAt={lastUpdatedAt} variant="mobile" />
+                  <NewsSidebar
+                    items={sorted}
+                    lastUpdatedAt={lastUpdatedAt}
+                    variant="mobile"
+                  />
                 </div>
               )}
             </div>
 
             <aside className="hidden lg:block">
-              <NewsSidebar items={sorted} lastUpdatedAt={lastUpdatedAt} variant="desktop" />
+              <NewsSidebar
+                items={sorted}
+                lastUpdatedAt={lastUpdatedAt}
+                variant="desktop"
+              />
             </aside>
           </div>
         </div>
@@ -332,5 +374,3 @@ export default function NewsPageClient({
     </div>
   );
 }
-
-

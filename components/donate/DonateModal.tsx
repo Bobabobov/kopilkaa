@@ -37,16 +37,16 @@ export function DonateModal({
             onClick={onClose}
             className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md"
           />
-          
+
           {/* Модальное окно */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ 
-              type: "spring", 
+            transition={{
+              type: "spring",
               duration: 0.4,
-              bounce: 0.2
+              bounce: 0.2,
             }}
             onClick={(e) => e.stopPropagation()}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
@@ -77,20 +77,20 @@ export function DonateModal({
                   className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-[#f9bc60] via-[#e8a545] to-[#f9bc60] flex items-center justify-center shadow-lg shadow-[#f9bc60]/30"
                 >
                   <motion.div
-                    animate={{ 
+                    animate={{
                       scale: [1, 1.1, 1],
-                      rotate: [0, 5, -5, 0]
+                      rotate: [0, 5, -5, 0],
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2,
                       repeat: Infinity,
-                      repeatDelay: 2
+                      repeatDelay: 2,
                     }}
                   >
                     <LucideIcons.Heart size="lg" className="text-[#001e1d]" />
                   </motion.div>
                 </motion.div>
-                
+
                 <motion.h2
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -99,12 +99,12 @@ export function DonateModal({
                 >
                   Пополнить копилку
                 </motion.h2>
-                
+
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="text-sm" 
+                  className="text-sm"
                   style={{ color: "#abd1c6" }}
                 >
                   Ваша поддержка помогает проекту развиваться

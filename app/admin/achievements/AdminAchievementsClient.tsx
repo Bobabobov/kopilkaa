@@ -2,14 +2,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Achievement } from "@/lib/achievements/types";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { AchievementCard } from "@/components/achievements";
 import GrantAchievementModal from "./components/GrantAchievementModal";
 import RevokeAchievementModal from "./components/RevokeAchievementModal";
-import { getRarityLabel } from "@/lib/achievements/rarity";
 
 export default function AdminAchievementsClient() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -54,37 +52,41 @@ export default function AdminAchievementsClient() {
     }
   };
 
-
   // Фильтрация достижений
   const filteredAchievements = achievements.filter((achievement) => {
-    const matchesSearch = achievement.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         achievement.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesRarity = rarityFilter === "ALL" || achievement.rarity === rarityFilter;
+    const matchesSearch =
+      achievement.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      achievement.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesRarity =
+      rarityFilter === "ALL" || achievement.rarity === rarityFilter;
     const matchesType = typeFilter === "ALL" || achievement.type === typeFilter;
-    const matchesActive = activeFilter === "ALL" || 
-                         (activeFilter === "ACTIVE" && achievement.isActive) ||
-                         (activeFilter === "INACTIVE" && !achievement.isActive);
+    const matchesActive =
+      activeFilter === "ALL" ||
+      (activeFilter === "ACTIVE" && achievement.isActive) ||
+      (activeFilter === "INACTIVE" && !achievement.isActive);
 
     return matchesSearch && matchesRarity && matchesType && matchesActive;
   });
 
   return (
     <div className="min-h-screen">
-
       <div className="relative z-10">
         {/* Заголовок */}
         <div className="container mx-auto px-4 pt-24 pb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold mb-2" style={{ color: "#fffffe" }}>
+              <h1
+                className="text-3xl lg:text-4xl font-bold mb-2"
+                style={{ color: "#fffffe" }}
+              >
                 🏆 Управление достижениями
               </h1>
               <p className="text-base lg:text-lg" style={{ color: "#abd1c6" }}>
                 Выдача достижений и управление системой
               </p>
             </div>
-            
+
             {/* Навигация */}
             <div className="flex flex-wrap gap-2">
               <Link
@@ -116,8 +118,12 @@ export default function AdminAchievementsClient() {
                   <LucideIcons.Star className="text-[#abd1c6]" size="sm" />
                 </div>
                 <div>
-                  <div className="text-xl lg:text-2xl font-bold text-[#fffffe]">{achievements.length}</div>
-                  <div className="text-xs lg:text-sm text-[#abd1c6]">Всего достижений</div>
+                  <div className="text-xl lg:text-2xl font-bold text-[#fffffe]">
+                    {achievements.length}
+                  </div>
+                  <div className="text-xs lg:text-sm text-[#abd1c6]">
+                    Всего достижений
+                  </div>
                 </div>
               </div>
             </div>
@@ -125,13 +131,18 @@ export default function AdminAchievementsClient() {
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 lg:p-6 border border-white/10">
               <div className="flex items-center gap-2 lg:gap-3">
                 <div className="w-8 h-8 lg:w-10 lg:h-10 bg-[#f9bc60]/20 rounded-xl flex items-center justify-center">
-                  <LucideIcons.CheckCircle className="text-[#f9bc60]" size="sm" />
+                  <LucideIcons.CheckCircle
+                    className="text-[#f9bc60]"
+                    size="sm"
+                  />
                 </div>
                 <div>
                   <div className="text-xl lg:text-2xl font-bold text-[#fffffe]">
-                    {achievements.filter(a => a.isActive).length}
+                    {achievements.filter((a) => a.isActive).length}
                   </div>
-                  <div className="text-xs lg:text-sm text-[#abd1c6]">Активных</div>
+                  <div className="text-xs lg:text-sm text-[#abd1c6]">
+                    Активных
+                  </div>
                 </div>
               </div>
             </div>
@@ -143,9 +154,11 @@ export default function AdminAchievementsClient() {
                 </div>
                 <div>
                   <div className="text-xl lg:text-2xl font-bold text-[#fffffe]">
-                    {achievements.filter(a => !a.isActive).length}
+                    {achievements.filter((a) => !a.isActive).length}
                   </div>
-                  <div className="text-xs lg:text-sm text-[#abd1c6]">Неактивных</div>
+                  <div className="text-xs lg:text-sm text-[#abd1c6]">
+                    Неактивных
+                  </div>
                 </div>
               </div>
             </div>
@@ -157,9 +170,11 @@ export default function AdminAchievementsClient() {
                 </div>
                 <div>
                   <div className="text-xl lg:text-2xl font-bold text-[#fffffe]">
-                    {achievements.filter(a => a.isExclusive).length}
+                    {achievements.filter((a) => a.isExclusive).length}
                   </div>
-                  <div className="text-xs lg:text-sm text-[#abd1c6]">Эксклюзивных</div>
+                  <div className="text-xs lg:text-sm text-[#abd1c6]">
+                    Эксклюзивных
+                  </div>
                 </div>
               </div>
             </div>
@@ -282,7 +297,9 @@ export default function AdminAchievementsClient() {
               <div className="w-16 h-16 bg-[#abd1c6]/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <LucideIcons.Star className="text-[#abd1c6]" size="lg" />
               </div>
-              <p className="text-[#abd1c6] text-lg mb-2">Достижения не найдены</p>
+              <p className="text-[#abd1c6] text-lg mb-2">
+                Достижения не найдены
+              </p>
               <p className="text-[#94a1b2] text-sm mb-6">
                 Попробуйте изменить фильтры поиска
               </p>

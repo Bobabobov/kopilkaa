@@ -56,7 +56,9 @@ export default function AdsPlacementsSection() {
     e.preventDefault();
 
     try {
-      const url = editingAd ? `/api/admin/ads/${editingAd.id}` : "/api/admin/ads";
+      const url = editingAd
+        ? `/api/admin/ads/${editingAd.id}`
+        : "/api/admin/ads";
       const method = editingAd ? "PUT" : "POST";
 
       const cleanedStoryImages =
@@ -167,7 +169,10 @@ export default function AdsPlacementsSection() {
       if (response.ok && data?.success) {
         await fetchAds();
       } else {
-        console.error("Failed to delete ad:", data?.error || response.statusText);
+        console.error(
+          "Failed to delete ad:",
+          data?.error || response.statusText,
+        );
         alert(data?.error || "Не удалось удалить размещение");
       }
     } catch (error) {
@@ -258,9 +263,12 @@ export default function AdsPlacementsSection() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#001e1d] border border-[#abd1c6]/20 mb-4">
               <LucideIcons.LayoutGrid size="lg" className="text-[#abd1c6]/50" />
             </div>
-            <h3 className="text-xl font-semibold text-[#fffffe] mb-2">Нет размещений</h3>
+            <h3 className="text-xl font-semibold text-[#fffffe] mb-2">
+              Нет размещений
+            </h3>
             <p className="text-[#abd1c6] mb-6 max-w-md mx-auto">
-              Создайте первое размещение рекламы, чтобы начать управлять рекламными блоками на сайте
+              Создайте первое размещение рекламы, чтобы начать управлять
+              рекламными блоками на сайте
             </p>
             <button
               onClick={() => setShowForm(true)}
@@ -284,4 +292,3 @@ export default function AdsPlacementsSection() {
     </>
   );
 }
-

@@ -110,7 +110,9 @@ export default function ApplicationCardHeader({
               >
                 {it.user.name ||
                   (!it.user.hideEmail
-                    ? (it.user.email ? it.user.email.split("@")[0] : "Пользователь")
+                    ? it.user.email
+                      ? it.user.email.split("@")[0]
+                      : "Пользователь"
                     : "Пользователь")}
               </Link>
             </div>
@@ -134,4 +136,3 @@ export default function ApplicationCardHeader({
     </div>
   );
 }
-

@@ -11,9 +11,15 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, Number(searchParams.get("page") || 1));
-    const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit") || 24)));
+    const limit = Math.min(
+      50,
+      Math.max(1, Number(searchParams.get("limit") || 24)),
+    );
     const q = (searchParams.get("q") || "").trim().toLowerCase();
-    const sortBy = (searchParams.get("sortBy") || "total") as "total" | "count" | "date";
+    const sortBy = (searchParams.get("sortBy") || "total") as
+      | "total"
+      | "count"
+      | "date";
 
     // Агрегируем оплаты услуги размещения в разделе «Герои» (DonationType.SUPPORT)
     // ВАЖНО: это оплата цифровой услуги размещения профиля (не благотворительность).
@@ -51,13 +57,14 @@ export async function GET(request: Request) {
             subscribersCount: 0,
             averageDonation: 0,
           },
-          message: "Пока нет размещённых профилей в разделе «Герои». Разместите свой профиль первым.",
+          message:
+            "Пока нет размещённых профилей в разделе «Герои». Разместите свой профиль первым.",
         },
         {
           headers: {
             "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache",
-            "Expires": "0",
+            Pragma: "no-cache",
+            Expires: "0",
           },
         },
       );
@@ -108,7 +115,9 @@ export async function GET(request: Request) {
         const paymentsCount = agg._count._all || 0;
 
         const fallbackName =
-          !user.hideEmail && user.email ? user.email.split("@")[0] : "Пользователь";
+          !user.hideEmail && user.email
+            ? user.email.split("@")[0]
+            : "Пользователь";
 
         return {
           id: user.id,
@@ -142,11 +151,15 @@ export async function GET(request: Request) {
     }));
 
     const totalHeroes = heroesAll.length;
-    const totalDonated = heroesAll.reduce((sum, h) => sum + (h.totalDonated || 0), 0);
+    const totalDonated = heroesAll.reduce(
+      (sum, h) => sum + (h.totalDonated || 0),
+      0,
+    );
     const activeParticipantsCount = heroesAll.filter(
       (h) => !!h.hasExtendedPlacement || !!h.isSubscriber,
     ).length;
-    const averageDonation = totalHeroes > 0 ? Math.round(totalDonated / totalHeroes) : 0;
+    const averageDonation =
+      totalHeroes > 0 ? Math.round(totalDonated / totalHeroes) : 0;
 
     // Top 3 всегда по totalDonated
     const topThree = heroesByTotal.slice(0, 3).map((h) => ({
@@ -170,7 +183,9 @@ export async function GET(request: Request) {
         case "count":
           return b.donationCount - a.donationCount;
         case "date":
-          return new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
+          return (
+            new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime()
+          );
         case "total":
         default:
           return b.totalDonated - a.totalDonated;
@@ -210,8 +225,8 @@ export async function GET(request: Request) {
       {
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       },
     );
@@ -235,13 +250,14 @@ export async function GET(request: Request) {
           subscribersCount: 0,
           averageDonation: 0,
         },
-        message: "Пока нет размещённых профилей в разделе «Герои». Разместите свой профиль первым.",
+        message:
+          "Пока нет размещённых профилей в разделе «Герои». Разместите свой профиль первым.",
       },
       {
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       },
     );

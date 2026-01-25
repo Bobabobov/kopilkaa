@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
               isPermanent: banStatus.isPermanent,
             },
           },
-          { status: 403 }
+          { status: 403 },
         );
       }
 
@@ -145,7 +145,8 @@ export async function POST(req: NextRequest) {
         // создаём случайный пароль, т.к. вход по нему не предполагается
         passwordHash: "telegram-auto-user",
         name:
-          [tgData.first_name, tgData.last_name].filter(Boolean).join(" ") || null,
+          [tgData.first_name, tgData.last_name].filter(Boolean).join(" ") ||
+          null,
         telegramId,
         telegramUsername,
         role: "USER",
@@ -222,7 +223,7 @@ export async function POST(req: NextRequest) {
             isPermanent: banStatus.isPermanent,
           },
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -235,7 +236,11 @@ export async function POST(req: NextRequest) {
         telegramUsername: user.telegramUsername,
       },
     });
-    attachSessionToResponse(res, { uid: user.id, role: (user.role as any) || "USER" }, req);
+    attachSessionToResponse(
+      res,
+      { uid: user.id, role: (user.role as any) || "USER" },
+      req,
+    );
     return res;
   } catch (error: any) {
     console.error("Error in /api/auth/telegram:", error);
@@ -251,5 +256,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-

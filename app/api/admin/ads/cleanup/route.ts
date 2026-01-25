@@ -13,24 +13,24 @@ export async function POST() {
     const expiredAds = await prisma.advertisement.updateMany({
       where: {
         expiresAt: {
-          lt: new Date()
+          lt: new Date(),
         },
-        isActive: true
+        isActive: true,
       },
       data: {
-        isActive: false
-      }
+        isActive: false,
+      },
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      deactivatedCount: expiredAds.count 
+    return NextResponse.json({
+      success: true,
+      deactivatedCount: expiredAds.count,
     });
   } catch (error) {
     console.error("Error cleaning up expired ads:", error);
     return NextResponse.json(
       { error: "Failed to cleanup expired ads" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

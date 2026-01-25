@@ -56,7 +56,7 @@ export default function QuickStatsWidget() {
             trend: "neutral",
           },
         ];
-        
+
         setStats(mockStats);
       } catch (error) {
         console.error("Error fetching quick stats:", error);
@@ -72,7 +72,10 @@ export default function QuickStatsWidget() {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 animate-pulse">
+          <div
+            key={i}
+            className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 animate-pulse"
+          >
             <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
           </div>
         ))}
@@ -93,30 +96,28 @@ export default function QuickStatsWidget() {
             className="group relative bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 overflow-hidden cursor-pointer transition-all duration-300 hover:border-[#abd1c6]/40"
           >
             {/* Декоративный градиент при наведении */}
-            <div 
+            <div
               className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
-              style={{ 
-                background: `radial-gradient(circle at center, ${stat.color}, transparent)`
+              style={{
+                background: `radial-gradient(circle at center, ${stat.color}, transparent)`,
               }}
             ></div>
-            
+
             {/* Анимированная иконка */}
             <motion.div
               whileHover={{ rotate: [0, -10, 10, -10, 0] }}
               transition={{ duration: 0.5 }}
               className="relative z-10 mb-3"
             >
-              <div 
+              <div
                 className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center"
-                style={{ 
+                style={{
                   backgroundColor: `${stat.color}20`,
                   border: `2px solid ${stat.color}40`,
-                  color: stat.color
+                  color: stat.color,
                 }}
               >
-                <IconComponent 
-                  size="md"
-                />
+                <IconComponent size="md" />
               </div>
             </motion.div>
 
@@ -143,9 +144,11 @@ export default function QuickStatsWidget() {
                   animate={{ y: [0, -3, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
-                  <LucideIcons.TrendingUp 
+                  <LucideIcons.TrendingUp
                     size="sm"
-                    className={stat.trend === "up" ? "text-green-400" : "text-red-400"}
+                    className={
+                      stat.trend === "up" ? "text-green-400" : "text-red-400"
+                    }
                   />
                 </motion.div>
               </div>
@@ -164,4 +167,3 @@ export default function QuickStatsWidget() {
     </div>
   );
 }
-

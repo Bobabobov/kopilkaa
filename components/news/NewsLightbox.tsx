@@ -127,7 +127,6 @@ export function NewsLightbox({
               style={{ maxWidth: "95vw", maxHeight: "90vh" }}
             >
               {/* Изображение */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={currentImage}
                 alt={`Изображение ${currentIndex + 1} из ${images.length}`}

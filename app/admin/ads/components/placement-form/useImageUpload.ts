@@ -48,7 +48,7 @@ export function useImageUpload() {
 
   const handleFileSelect = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    onSuccess: (url: string) => void
+    onSuccess: (url: string) => void,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -187,7 +187,9 @@ export function useVideoUpload() {
 
 export function useMultipleImageUpload() {
   const [uploading, setUploading] = useState<Record<number, boolean>>({});
-  const [previewFiles, setPreviewFiles] = useState<Record<number, ImageFile>>({});
+  const [previewFiles, setPreviewFiles] = useState<Record<number, ImageFile>>(
+    {},
+  );
 
   const validateFile = (file: File): string | null => {
     if (!file.type.startsWith("image/")) {
@@ -229,7 +231,7 @@ export function useMultipleImageUpload() {
   const handleFileSelect = async (
     index: number,
     e: React.ChangeEvent<HTMLInputElement>,
-    onSuccess: (index: number, url: string) => void
+    onSuccess: (index: number, url: string) => void,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -295,4 +297,3 @@ export function useMultipleImageUpload() {
     clearPreview,
   };
 }
-

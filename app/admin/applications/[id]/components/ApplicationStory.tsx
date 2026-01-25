@@ -14,7 +14,10 @@ export default function ApplicationStory({ story }: ApplicationStoryProps) {
       transition={{ duration: 0.5, delay: 0.7 }}
       className="mb-6"
     >
-      <h3 className="flex items-center gap-2 text-lg sm:text-xl font-semibold mb-4" style={{ color: "#fffffe" }}>
+      <h3
+        className="flex items-center gap-2 text-lg sm:text-xl font-semibold mb-4"
+        style={{ color: "#fffffe" }}
+      >
         <svg
           className="w-5 h-5 flex-shrink-0"
           fill="none"
@@ -30,12 +33,12 @@ export default function ApplicationStory({ story }: ApplicationStoryProps) {
         </svg>
         История
       </h3>
-      <div 
+      <div
         className="break-words text-[15px] sm:text-base lg:text-[17px] leading-8 sm:leading-8 lg:leading-9 rounded-xl sm:rounded-2xl p-5 sm:p-7 lg:p-9 border prose prose-sm sm:prose-base max-w-none shadow-[0_18px_48px_-30px_rgba(0,0,0,0.9)]"
-        style={{ 
+        style={{
           backgroundColor: "#0e1f1d",
           borderColor: "rgba(171, 209, 198, 0.35)",
-          color: "#f8fbfa"
+          color: "#f8fbfa",
         }}
         dangerouslySetInnerHTML={{ __html: story }}
       />
@@ -43,13 +46,19 @@ export default function ApplicationStory({ story }: ApplicationStoryProps) {
         .prose {
           color: #f8fbfa !important;
         }
-        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+        .prose h1,
+        .prose h2,
+        .prose h3,
+        .prose h4,
+        .prose h5,
+        .prose h6 {
           color: #f8fbfa !important;
         }
         .prose strong {
           color: #f8fbfa !important;
         }
-        .prose ul, .prose ol {
+        .prose ul,
+        .prose ol {
           color: #f8fbfa !important;
         }
         .prose a {
@@ -68,5 +77,3 @@ export default function ApplicationStory({ story }: ApplicationStoryProps) {
     </motion.div>
   );
 }
-
-

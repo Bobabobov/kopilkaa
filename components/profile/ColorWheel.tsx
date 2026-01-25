@@ -7,7 +7,10 @@ interface ColorWheelProps {
   onColorChange: (color: string) => void;
 }
 
-export default function ColorWheel({ selectedColor, onColorChange }: ColorWheelProps) {
+export default function ColorWheel({
+  selectedColor,
+  onColorChange,
+}: ColorWheelProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [saturation, setSaturation] = useState(1); // Насыщенность (0 = серый, 1 = чистый цвет)
@@ -51,10 +54,10 @@ export default function ColorWheel({ selectedColor, onColorChange }: ColorWheelP
           data[index + 1] = color.g;
           data[index + 2] = color.b;
           data[index + 3] = 255;
-        } 
+        }
         // Если точка в центральном круге (яркость)
         else if (distance < innerRadius) {
-          const brightness = 1 - (distance / innerRadius);
+          const brightness = 1 - distance / innerRadius;
           const gray = Math.round(255 * brightness);
           data[index] = gray;
           data[index + 1] = gray;
@@ -79,26 +82,44 @@ export default function ColorWheel({ selectedColor, onColorChange }: ColorWheelP
   }, [saturation]);
 
   // Конвертация HSL в RGB
-  function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
+  function hslToRgb(
+    h: number,
+    s: number,
+    l: number,
+  ): { r: number; g: number; b: number } {
     h = h % 360;
     const c = (1 - Math.abs(2 * l - 1)) * s;
     const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
     const m = l - c / 2;
 
-    let r = 0, g = 0, b = 0;
+    let r = 0,
+      g = 0,
+      b = 0;
 
     if (h >= 0 && h < 60) {
-      r = c; g = x; b = 0;
+      r = c;
+      g = x;
+      b = 0;
     } else if (h >= 60 && h < 120) {
-      r = x; g = c; b = 0;
+      r = x;
+      g = c;
+      b = 0;
     } else if (h >= 120 && h < 180) {
-      r = 0; g = c; b = x;
+      r = 0;
+      g = c;
+      b = x;
     } else if (h >= 180 && h < 240) {
-      r = 0; g = x; b = c;
+      r = 0;
+      g = x;
+      b = c;
     } else if (h >= 240 && h < 300) {
-      r = x; g = 0; b = c;
+      r = x;
+      g = 0;
+      b = c;
     } else if (h >= 300 && h < 360) {
-      r = c; g = 0; b = x;
+      r = c;
+      g = 0;
+      b = x;
     }
 
     return {
@@ -110,10 +131,12 @@ export default function ColorWheel({ selectedColor, onColorChange }: ColorWheelP
 
   // Конвертация RGB в HEX
   function rgbToHex(r: number, g: number, b: number): string {
-    return `#${[r, g, b].map(x => {
-      const hex = x.toString(16);
-      return hex.length === 1 ? "0" + hex : hex;
-    }).join("")}`;
+    return `#${[r, g, b]
+      .map((x) => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      })
+      .join("")}`;
   }
 
   // Получаем цвет из точки на canvas
@@ -135,14 +158,17 @@ export default function ColorWheel({ selectedColor, onColorChange }: ColorWheelP
 
     // Если клик в центральном круге - это яркость (черно-белый градиент)
     if (distance < innerRadius) {
-      const brightness = 1 - (distance / innerRadius);
+      const brightness = 1 - distance / innerRadius;
       const gray = Math.round(255 * brightness);
       return rgbToHex(gray, gray, gray);
     }
 
     // Если клик в цветовом круге
     if (distance <= radius) {
-      const sat = Math.min(1, (distance - innerRadius) / (radius - innerRadius));
+      const sat = Math.min(
+        1,
+        (distance - innerRadius) / (radius - innerRadius),
+      );
       const rgb = hslToRgb(hue, sat * saturation, 0.5);
       return rgbToHex(rgb.r, rgb.g, rgb.b);
     }
@@ -197,7 +223,7 @@ export default function ColorWheel({ selectedColor, onColorChange }: ColorWheelP
           onMouseLeave={handleMouseUp}
         />
       </div>
-      
+
       {/* Превью выбранного цвета */}
       <div className="flex flex-col items-center gap-3 w-full">
         <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -221,4 +247,3 @@ export default function ColorWheel({ selectedColor, onColorChange }: ColorWheelP
     </div>
   );
 }
-

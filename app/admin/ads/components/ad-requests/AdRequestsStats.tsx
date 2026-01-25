@@ -10,11 +10,31 @@ interface AdRequestsStatsProps {
 
 export default function AdRequestsStats({ stats }: AdRequestsStatsProps) {
   const statCards = [
-    { label: "Всего заявок", value: stats.total, color: "gray", icon: LucideIcons.FileText },
+    {
+      label: "Всего заявок",
+      value: stats.total,
+      color: "gray",
+      icon: LucideIcons.FileText,
+    },
     { label: "Новые", value: stats.new, color: "blue", icon: LucideIcons.Mail },
-    { label: "В обработке", value: stats.processing, color: "yellow", icon: LucideIcons.Clock },
-    { label: "Одобрено", value: stats.approved, color: "green", icon: LucideIcons.CheckCircle },
-    { label: "Отклонено", value: stats.rejected, color: "red", icon: LucideIcons.XCircle },
+    {
+      label: "В обработке",
+      value: stats.processing,
+      color: "yellow",
+      icon: LucideIcons.Clock,
+    },
+    {
+      label: "Одобрено",
+      value: stats.approved,
+      color: "green",
+      icon: LucideIcons.CheckCircle,
+    },
+    {
+      label: "Отклонено",
+      value: stats.rejected,
+      color: "red",
+      icon: LucideIcons.XCircle,
+    },
   ];
 
   const colorClasses = {
@@ -50,4 +70,3 @@ export default function AdRequestsStats({ stats }: AdRequestsStatsProps) {
     </div>
   );
 }
-

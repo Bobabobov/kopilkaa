@@ -6,7 +6,10 @@ interface ContentFieldProps {
   onFieldChange: (field: keyof AdFormData, value: any) => void;
 }
 
-export default function ContentField({ formData, onFieldChange }: ContentFieldProps) {
+export default function ContentField({
+  formData,
+  onFieldChange,
+}: ContentFieldProps) {
   const showContent =
     formData.placement !== "stories" &&
     formData.placement !== "home_sidebar" &&
@@ -34,4 +37,3 @@ export default function ContentField({ formData, onFieldChange }: ContentFieldPr
     </div>
   );
 }
-

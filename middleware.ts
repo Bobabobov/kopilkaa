@@ -87,7 +87,7 @@ export function middleware(req: NextRequest) {
     // Auth API: делаем лимит мягче для обычных пользователей.
     // Регистрация/вход: 10 запросов/мин на IP
     // Остальные auth-эндпоинты (telegram/google/logout/check): 30 запросов/мин на IP
-    limit = (isPost && (isAuthRegister || isAuthLogin || isAuthPhone)) ? 10 : 30;
+    limit = isPost && (isAuthRegister || isAuthLogin || isAuthPhone) ? 10 : 30;
     windowMs = 60_000;
     retryAfterSec = 60;
   } else if (isPost && isUploadsApi) {
@@ -95,7 +95,10 @@ export function middleware(req: NextRequest) {
     limit = 20;
     windowMs = 5 * 60_000;
     retryAfterSec = 5 * 60;
-  } else if ((req.method === "POST" || req.method === "DELETE") && isStoryLikeApi) {
+  } else if (
+    (req.method === "POST" || req.method === "DELETE") &&
+    isStoryLikeApi
+  ) {
     // Лайки: ограничение на частые клики/ботов
     limit = 60;
     windowMs = 60_000;
@@ -114,18 +117,23 @@ export function middleware(req: NextRequest) {
 
   if (limit && windowMs && retryAfterSec) {
     if (!rateLimit(realIP, limit, windowMs)) {
-      logSecurityEvent(req, "rate_limit", `Rate limit exceeded for IP: ${realIP}`);
+      logSecurityEvent(
+        req,
+        "rate_limit",
+        `Rate limit exceeded for IP: ${realIP}`,
+      );
       return new NextResponse(
         JSON.stringify({
-          error: "Лимит: не более 5 отправок заявки в час с одного IP. Подождите и попробуйте позже.",
+          error:
+            "Лимит: не более 5 отправок заявки в час с одного IP. Подождите и попробуйте позже.",
           retryAfterSec,
         }),
         {
-        status: 429,
-        headers: {
-          "Content-Type": "application/json",
-          "Retry-After": String(retryAfterSec),
-        },
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(retryAfterSec),
+          },
         },
       );
     }

@@ -61,7 +61,9 @@ export async function GET() {
         if (!user) return null;
         const totalAmount = agg._sum.amount ?? 0;
         const fallbackName =
-          !user.hideEmail && user.email ? user.email.split("@")[0] : "Пользователь";
+          !user.hideEmail && user.email
+            ? user.email.split("@")[0]
+            : "Пользователь";
         return {
           id: user.id,
           name: user.name || fallbackName,
@@ -102,6 +104,3 @@ export async function GET() {
     });
   }
 }
-
-
-

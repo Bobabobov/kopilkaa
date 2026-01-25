@@ -26,13 +26,13 @@ export default function CommunityImpact() {
         color: "#e16162",
         description: "Человек получили помощь",
       },
-    {
-      label: "Собрано средств",
-      value: 125000,
-      icon: "Coin",
-      color: "#f9bc60",
-      description: "Рублей через ваши заявки",
-    },
+      {
+        label: "Собрано средств",
+        value: 125000,
+        icon: "Coin",
+        color: "#f9bc60",
+        description: "Рублей через ваши заявки",
+      },
       {
         label: "Лайков получено",
         value: 156,
@@ -41,7 +41,7 @@ export default function CommunityImpact() {
         description: "Ваши истории понравились",
       },
     ];
-    
+
     setStats(mockStats);
     setLoading(false);
   }, []);
@@ -80,18 +80,18 @@ export default function CommunityImpact() {
             <h3 className="text-base sm:text-lg font-semibold text-[#fffffe]">
               Влияние на сообщество
             </h3>
-            <p className="text-xs text-[#abd1c6]">
-              Ваш вклад в проект
-            </p>
+            <p className="text-xs text-[#abd1c6]">Ваш вклад в проект</p>
           </div>
         </div>
 
         <div className="space-y-3 sm:space-y-4">
           {stats.map((stat, index) => {
-            const IconComponent = LucideIcons[stat.icon] || LucideIcons.Activity;
-            const formattedValue = stat.value >= 1000 
-              ? `${(stat.value / 1000).toFixed(1)}K` 
-              : stat.value.toString();
+            const IconComponent =
+              LucideIcons[stat.icon] || LucideIcons.Activity;
+            const formattedValue =
+              stat.value >= 1000
+                ? `${(stat.value / 1000).toFixed(1)}K`
+                : stat.value.toString();
 
             return (
               <motion.div
@@ -101,17 +101,15 @@ export default function CommunityImpact() {
                 transition={{ delay: index * 0.1 }}
                 className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-[#001e1d]/40 rounded-lg border border-[#abd1c6]/10 hover:border-[#abd1c6]/20 transition-all group"
               >
-                <div 
+                <div
                   className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
-                  style={{ 
+                  style={{
                     backgroundColor: `${stat.color}20`,
                     border: `2px solid ${stat.color}40`,
-                    color: stat.color
+                    color: stat.color,
                   }}
                 >
-                  <IconComponent 
-                    size="sm"
-                  />
+                  <IconComponent size="sm" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2 mb-1">
@@ -140,5 +138,3 @@ export default function CommunityImpact() {
     </motion.div>
   );
 }
-
-

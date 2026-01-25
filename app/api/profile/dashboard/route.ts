@@ -27,162 +27,176 @@ export async function GET(request: NextRequest) {
       achievements,
       applications,
       gameRecord,
-      notifications
+      notifications,
     ] = await Promise.all([
       // Основные данные пользователя
-      prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          id: true,
-          email: true,
-          username: true,
-          role: true,
-          name: true,
-          avatar: true,
-          vkLink: true,
-          telegramLink: true,
-          youtubeLink: true,
-          headerTheme: true,
-          avatarFrame: true,
-          hideEmail: true,
-          createdAt: true,
-          lastSeen: true,
-        },
-      }).catch(() => null),
+      prisma.user
+        .findUnique({
+          where: { id: userId },
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            role: true,
+            name: true,
+            avatar: true,
+            vkLink: true,
+            telegramLink: true,
+            youtubeLink: true,
+            headerTheme: true,
+            avatarFrame: true,
+            hideEmail: true,
+            createdAt: true,
+            lastSeen: true,
+          },
+        })
+        .catch(() => null),
 
       // Друзья с полной информацией
-      prisma.friendship.findMany({
-        where: {
-          OR: [
-            { requesterId: userId, status: "ACCEPTED" },
-            { receiverId: userId, status: "ACCEPTED" },
-          ],
-        },
-        include: {
-          requester: {
-            select: {
-              id: true,
-              username: true,
-              name: true,
-              email: true,
-              avatar: true,
-              avatarFrame: true,
-              headerTheme: true,
-              hideEmail: true,
-              vkLink: true,
-              telegramLink: true,
-              youtubeLink: true,
-              createdAt: true,
-              lastSeen: true,
+      prisma.friendship
+        .findMany({
+          where: {
+            OR: [
+              { requesterId: userId, status: "ACCEPTED" },
+              { receiverId: userId, status: "ACCEPTED" },
+            ],
+          },
+          include: {
+            requester: {
+              select: {
+                id: true,
+                username: true,
+                name: true,
+                email: true,
+                avatar: true,
+                avatarFrame: true,
+                headerTheme: true,
+                hideEmail: true,
+                vkLink: true,
+                telegramLink: true,
+                youtubeLink: true,
+                createdAt: true,
+                lastSeen: true,
+              },
+            },
+            receiver: {
+              select: {
+                id: true,
+                username: true,
+                name: true,
+                email: true,
+                avatar: true,
+                avatarFrame: true,
+                headerTheme: true,
+                hideEmail: true,
+                vkLink: true,
+                telegramLink: true,
+                youtubeLink: true,
+                createdAt: true,
+                lastSeen: true,
+              },
             },
           },
-          receiver: {
-            select: {
-              id: true,
-              username: true,
-              name: true,
-              email: true,
-              avatar: true,
-              avatarFrame: true,
-              headerTheme: true,
-              hideEmail: true,
-              vkLink: true,
-              telegramLink: true,
-              youtubeLink: true,
-              createdAt: true,
-              lastSeen: true,
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-      }).catch(() => []),
+          orderBy: { createdAt: "desc" },
+        })
+        .catch(() => []),
 
       // Входящие заявки в друзья
-      prisma.friendship.findMany({
-        where: {
-          receiverId: userId,
-          status: "PENDING",
-        },
-        include: {
-          requester: {
-            select: {
-              id: true,
-              username: true,
-              name: true,
-              email: true,
-              avatar: true,
-              avatarFrame: true,
-              headerTheme: true,
-              hideEmail: true,
-              vkLink: true,
-              telegramLink: true,
-              youtubeLink: true,
-              createdAt: true,
-              lastSeen: true,
+      prisma.friendship
+        .findMany({
+          where: {
+            receiverId: userId,
+            status: "PENDING",
+          },
+          include: {
+            requester: {
+              select: {
+                id: true,
+                username: true,
+                name: true,
+                email: true,
+                avatar: true,
+                avatarFrame: true,
+                headerTheme: true,
+                hideEmail: true,
+                vkLink: true,
+                telegramLink: true,
+                youtubeLink: true,
+                createdAt: true,
+                lastSeen: true,
+              },
             },
           },
-        },
-        orderBy: { createdAt: "desc" },
-      }).catch(() => []),
+          orderBy: { createdAt: "desc" },
+        })
+        .catch(() => []),
 
       // Достижения пользователя
-      prisma.userAchievement.findMany({
-        where: { userId },
-        include: {
-          achievement: true,
-        },
-        orderBy: { unlockedAt: "desc" },
-        take: 5, // Показываем только последние 5
-      }).catch(() => []),
+      prisma.userAchievement
+        .findMany({
+          where: { userId },
+          include: {
+            achievement: true,
+          },
+          orderBy: { unlockedAt: "desc" },
+          take: 5, // Показываем только последние 5
+        })
+        .catch(() => []),
 
       // Статистика заявок
-      prisma.application.findMany({
-        where: { userId },
-        select: {
-          id: true,
-          status: true,
-          amount: true,
-          countTowardsTrust: true,
-        },
-      }).catch(() => []),
+      prisma.application
+        .findMany({
+          where: { userId },
+          select: {
+            id: true,
+            status: true,
+            amount: true,
+            countTowardsTrust: true,
+          },
+        })
+        .catch(() => []),
 
       // Игровые рекорды
-      prisma.gameRecord.findFirst({
-        where: { userId },
-        select: {
-          attempts: true,
-          bestScore: true,
-        },
-      }).catch(() => null),
+      prisma.gameRecord
+        .findFirst({
+          where: { userId },
+          select: {
+            attempts: true,
+            bestScore: true,
+          },
+        })
+        .catch(() => null),
 
       // Уведомления
-      prisma.storyLike.findMany({
-        where: {
-          application: {
-            userId: userId,
-          },
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              name: true,
-              email: true,
-              avatar: true,
-              hideEmail: true,
+      prisma.storyLike
+        .findMany({
+          where: {
+            application: {
+              userId: userId,
             },
           },
-          application: {
-            select: {
-              id: true,
-              title: true,
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                name: true,
+                email: true,
+                avatar: true,
+                hideEmail: true,
+              },
+            },
+            application: {
+              select: {
+                id: true,
+                title: true,
+              },
             },
           },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 10, // Последние 10 уведомлений
-      }).catch(() => []),
+          orderBy: { createdAt: "desc" },
+          take: 10, // Последние 10 уведомлений
+        })
+        .catch(() => []),
     ]);
 
     if (!user) {
@@ -227,13 +241,24 @@ export async function GET(request: NextRequest) {
     // Подсчитываем статистику
     const stats = {
       totalApplications: applications.length,
-      approvedApplications: applications.filter(app => app.status === "APPROVED").length,
-      effectiveApprovedApplications: applications.filter(app => app.status === "APPROVED" && app.countTowardsTrust === true).length,
-      pendingApplications: applications.filter(app => app.status === "PENDING").length,
-      rejectedApplications: applications.filter(app => app.status === "REJECTED").length,
-      totalAmountRequested: applications.reduce((sum, app) => sum + (app.amount || 0), 0),
+      approvedApplications: applications.filter(
+        (app) => app.status === "APPROVED",
+      ).length,
+      effectiveApprovedApplications: applications.filter(
+        (app) => app.status === "APPROVED" && app.countTowardsTrust === true,
+      ).length,
+      pendingApplications: applications.filter(
+        (app) => app.status === "PENDING",
+      ).length,
+      rejectedApplications: applications.filter(
+        (app) => app.status === "REJECTED",
+      ).length,
+      totalAmountRequested: applications.reduce(
+        (sum, app) => sum + (app.amount || 0),
+        0,
+      ),
       approvedAmount: applications
-        .filter(app => app.status === "APPROVED")
+        .filter((app) => app.status === "APPROVED")
         .reduce((sum, app) => sum + (app.amount || 0), 0),
       friendsCount: friendsData.length,
       pendingFriendRequests: receivedRequestsData.length,
@@ -244,7 +269,7 @@ export async function GET(request: NextRequest) {
     const trust = await computeUserTrustSnapshot(userId);
 
     // Форматируем друзей
-    const friends = friendsData.map(friendship => ({
+    const friends = friendsData.map((friendship) => ({
       id: friendship.id,
       status: friendship.status,
       createdAt: friendship.createdAt,
@@ -266,10 +291,10 @@ export async function GET(request: NextRequest) {
       ),
     }));
 
-    // Форматируем уведомления 
-    const formattedNotifications = notifications.map(like => ({
+    // Форматируем уведомления
+    const formattedNotifications = notifications.map((like) => ({
       id: like.id,
-      type: 'like',
+      type: "like",
       user: sanitizeEmailForViewer(
         { ...(like.user as any), heroBadge: listBadgeMap[like.userId] ?? null },
         userId,
@@ -296,17 +321,28 @@ export async function GET(request: NextRequest) {
       stats,
       trust,
       latest: {
-        friend: friendsData[0]?.createdAt ? new Date(friendsData[0].createdAt).getTime() : 0,
-        request: receivedRequestsData[0]?.createdAt ? new Date(receivedRequestsData[0].createdAt).getTime() : 0,
-        achievement: achievements[0]?.unlockedAt ? new Date(achievements[0].unlockedAt).getTime() : 0,
-        notification: notifications[0]?.createdAt ? new Date(notifications[0].createdAt).getTime() : 0,
+        friend: friendsData[0]?.createdAt
+          ? new Date(friendsData[0].createdAt).getTime()
+          : 0,
+        request: receivedRequestsData[0]?.createdAt
+          ? new Date(receivedRequestsData[0].createdAt).getTime()
+          : 0,
+        achievement: achievements[0]?.unlockedAt
+          ? new Date(achievements[0].unlockedAt).getTime()
+          : 0,
+        notification: notifications[0]?.createdAt
+          ? new Date(notifications[0].createdAt).getTime()
+          : 0,
       },
     };
     const etag = `"${createHash("sha1").update(JSON.stringify(etagPayload)).digest("hex")}"`;
     const ifNoneMatch = request.headers.get("if-none-match");
     if (ifNoneMatch && ifNoneMatch === etag) {
       const notModified = new NextResponse(null, { status: 304 });
-      notModified.headers.set("Cache-Control", "private, max-age=30, stale-while-revalidate=60");
+      notModified.headers.set(
+        "Cache-Control",
+        "private, max-age=30, stale-while-revalidate=60",
+      );
       notModified.headers.set("ETag", etag);
       return notModified;
     }
@@ -320,13 +356,13 @@ export async function GET(request: NextRequest) {
           ? sanitizeEmailForViewer(
               {
                 ...(req.requester as any),
-                  heroBadge: listBadgeMap[req.requesterId] ?? null,
+                heroBadge: listBadgeMap[req.requesterId] ?? null,
               },
               userId,
             )
           : req.requester,
       })),
-      achievements: achievements.map(ua => ({
+      achievements: achievements.map((ua) => ({
         id: ua.id,
         unlockedAt: ua.unlockedAt,
         grantedBy: ua.grantedBy,
@@ -339,7 +375,10 @@ export async function GET(request: NextRequest) {
     });
 
     // Добавляем заголовки кэширования
-    response.headers.set("Cache-Control", "private, max-age=30, stale-while-revalidate=60");
+    response.headers.set(
+      "Cache-Control",
+      "private, max-age=30, stale-while-revalidate=60",
+    );
     response.headers.set("ETag", etag);
 
     return response;
@@ -347,7 +386,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching profile dashboard:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

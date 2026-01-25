@@ -11,11 +11,11 @@ interface FeedHeaderProps {
   hasUnread: boolean;
 }
 
-export default function FeedHeader({ 
-  unreadCount, 
-  totalCount, 
+export default function FeedHeader({
+  unreadCount,
+  totalCount,
   onMarkAllAsRead,
-  hasUnread 
+  hasUnread,
 }: FeedHeaderProps) {
   return (
     <motion.div
@@ -31,9 +31,9 @@ export default function FeedHeader({
         transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
         className="inline-flex items-center justify-center w-48 h-48 sm:w-64 sm:h-64 lg:w-80 lg:h-80"
       >
-        <img 
-          src="/kopikol.png" 
-          alt="Лента" 
+        <img
+          src="/kopikol.png"
+          alt="Лента"
           className="w-full h-full object-contain"
         />
       </motion.div>
@@ -83,14 +83,10 @@ export default function FeedHeader({
                 {unreadCount} непрочитанных
               </span>
             )}
-            <span className="text-[#abd1c6]/50">
-              Всего: {totalCount}
-            </span>
+            <span className="text-[#abd1c6]/50">Всего: {totalCount}</span>
           </motion.div>
         )}
       </div>
     </motion.div>
   );
 }
-
-

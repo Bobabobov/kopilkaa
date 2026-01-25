@@ -8,8 +8,12 @@ interface RecentActivityItemProps {
   index: number;
 }
 
-export function RecentActivityItem({ activity, index }: RecentActivityItemProps) {
-  const IconComponent = (LucideIcons as any)[activity.icon] || LucideIcons.Activity;
+export function RecentActivityItem({
+  activity,
+  index,
+}: RecentActivityItemProps) {
+  const IconComponent =
+    (LucideIcons as any)[activity.icon] || LucideIcons.Activity;
   const card = (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -34,7 +38,9 @@ export function RecentActivityItem({ activity, index }: RecentActivityItemProps)
         <div className="text-[10px] xs:text-xs sm:text-sm text-[#abd1c6] mb-0.5 xs:mb-1 line-clamp-2">
           {activity.description}
         </div>
-        <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6]/60">{activity.date}</div>
+        <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6]/60">
+          {activity.date}
+        </div>
       </div>
     </motion.div>
   );

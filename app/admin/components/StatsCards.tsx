@@ -22,7 +22,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
     {
       icon: "💰",
       title: "Общая сумма",
-      value: `₽${stats.totalAmount?.toLocaleString() || '0'}`,
+      value: `₽${stats.totalAmount?.toLocaleString() || "0"}`,
       description: "Запрошено всего",
       gradient:
         "from-emerald-500/10 to-green-500/10 group-hover:from-emerald-500/20 group-hover:to-green-500/20",
@@ -67,11 +67,36 @@ export default function StatsCards({ stats }: StatsCardsProps) {
 
   const getCardStyle = (index: number) => {
     const styles = [
-      { bg: "from-[#f9bc60]/10 to-[#e8a545]/10", border: "border-[#f9bc60]/30", icon: "from-[#f9bc60] to-[#e8a545]", value: "text-[#f9bc60]" },
-      { bg: "from-[#abd1c6]/10 to-[#94c4b8]/10", border: "border-[#abd1c6]/30", icon: "from-[#abd1c6] to-[#94c4b8]", value: "text-[#abd1c6]" },
-      { bg: "from-[#f9bc60]/10 to-[#e8a545]/10", border: "border-[#f9bc60]/30", icon: "from-[#f9bc60] to-[#e8a545]", value: "text-[#f9bc60]" },
-      { bg: "from-[#10B981]/10 to-[#059669]/10", border: "border-[#10B981]/30", icon: "from-[#10B981] to-[#059669]", value: "text-[#10B981]" },
-      { bg: "from-[#e16162]/10 to-[#dc2626]/10", border: "border-[#e16162]/30", icon: "from-[#e16162] to-[#dc2626]", value: "text-[#e16162]" },
+      {
+        bg: "from-[#f9bc60]/10 to-[#e8a545]/10",
+        border: "border-[#f9bc60]/30",
+        icon: "from-[#f9bc60] to-[#e8a545]",
+        value: "text-[#f9bc60]",
+      },
+      {
+        bg: "from-[#abd1c6]/10 to-[#94c4b8]/10",
+        border: "border-[#abd1c6]/30",
+        icon: "from-[#abd1c6] to-[#94c4b8]",
+        value: "text-[#abd1c6]",
+      },
+      {
+        bg: "from-[#f9bc60]/10 to-[#e8a545]/10",
+        border: "border-[#f9bc60]/30",
+        icon: "from-[#f9bc60] to-[#e8a545]",
+        value: "text-[#f9bc60]",
+      },
+      {
+        bg: "from-[#10B981]/10 to-[#059669]/10",
+        border: "border-[#10B981]/30",
+        icon: "from-[#10B981] to-[#059669]",
+        value: "text-[#10B981]",
+      },
+      {
+        bg: "from-[#e16162]/10 to-[#dc2626]/10",
+        border: "border-[#e16162]/30",
+        icon: "from-[#e16162] to-[#dc2626]",
+        value: "text-[#e16162]",
+      },
     ];
     return styles[index % styles.length];
   };
@@ -92,12 +117,16 @@ export default function StatsCards({ stats }: StatsCardsProps) {
               <div
                 className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-r ${style.icon} rounded-lg sm:rounded-xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
               >
-                <span className="text-xl sm:text-2xl md:text-3xl">{card.icon}</span>
+                <span className="text-xl sm:text-2xl md:text-3xl">
+                  {card.icon}
+                </span>
               </div>
               <div className="text-xs sm:text-sm font-bold text-[#abd1c6] mb-1 sm:mb-2 uppercase tracking-wide">
                 {card.title}
               </div>
-              <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black ${style.value} mb-1 sm:mb-2`}>
+              <div
+                className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black ${style.value} mb-1 sm:mb-2`}
+              >
                 {card.value}
               </div>
               <div className="text-xs text-[#abd1c6]/70">

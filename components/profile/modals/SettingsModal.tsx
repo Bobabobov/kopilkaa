@@ -5,7 +5,12 @@ import { useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSettings } from "../hooks/useSettings";
-import { EmailEditor, NameEditor, UsernameEditor, EmailVisibilityToggle } from "../settings/ProfileEditors";
+import {
+  EmailEditor,
+  NameEditor,
+  UsernameEditor,
+  EmailVisibilityToggle,
+} from "../settings/ProfileEditors";
 import {
   SettingsLoading,
   SettingsUnauthorized,
@@ -53,7 +58,11 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      showLocalNotification("success", "Скопировано", "Данные скопированы в буфер обмена");
+      showLocalNotification(
+        "success",
+        "Скопировано",
+        "Данные скопированы в буфер обмена",
+      );
     } catch {
       showLocalNotification("error", "Ошибка", "Не удалось скопировать");
     }
@@ -79,10 +88,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="rounded-2xl sm:rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92dvh] sm:max-h-[85vh] overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] mx-2 sm:mx-4 flex flex-col custom-scrollbar"
           style={{
-            border: '1px solid transparent',
-            background: 'linear-gradient(to right, #004643, #001e1d) border-box, linear-gradient(135deg, #004643, #001e1d) padding-box',
-            backgroundClip: 'border-box, padding-box',
-            boxShadow: '0 0 0 1px rgba(171, 209, 198, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+            border: "1px solid transparent",
+            background:
+              "linear-gradient(to right, #004643, #001e1d) border-box, linear-gradient(135deg, #004643, #001e1d) padding-box",
+            backgroundClip: "border-box, padding-box",
+            boxShadow:
+              "0 0 0 1px rgba(171, 209, 198, 0.2), 0 25px 50px -12px rgba(0, 0, 0, 0.25)",
           }}
           onClick={(e) => e.stopPropagation()}
           ref={dialogRef}
@@ -140,11 +151,23 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 </SettingsSection>
 
                 {/* Видимость email */}
-                <EmailVisibilityToggle hideEmail={user.hideEmail ?? true} onToggle={handleEmailVisibilityChange} disabled={saving} />
+                <EmailVisibilityToggle
+                  hideEmail={user.hideEmail ?? true}
+                  onToggle={handleEmailVisibilityChange}
+                  disabled={saving}
+                />
 
-                <SettingsSocialLinksSection user={user} saving={saving} onChange={handleSocialLinkChange} />
+                <SettingsSocialLinksSection
+                  user={user}
+                  saving={saving}
+                  onChange={handleSocialLinkChange}
+                />
 
-                <SettingsMetaInfo user={user} saving={saving} onCopy={handleCopy} />
+                <SettingsMetaInfo
+                  user={user}
+                  saving={saving}
+                  onCopy={handleCopy}
+                />
               </div>
             )}
           </div>

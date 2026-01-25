@@ -7,7 +7,10 @@ import { useBeautifulNotifications } from "@/components/ui/BeautifulNotification
 import ReportUserModal from "./modals/ReportUserModal";
 import { OtherUserAvatar, type OtherUserBasic } from "./OtherUserAvatar";
 import { OtherUserInfo } from "./OtherUserInfo";
-import { OtherUserFriendshipActions, type OtherUserFriendship } from "./OtherUserFriendshipActions";
+import {
+  OtherUserFriendshipActions,
+  type OtherUserFriendship,
+} from "./OtherUserFriendshipActions";
 import { OtherUserExtraActions } from "./OtherUserExtraActions";
 import { OtherUserQuickActions } from "./OtherUserQuickActions";
 import { useRemoveFriend } from "./hooks/useRemoveFriend";
@@ -31,8 +34,12 @@ export default function OtherUserCard({
 }: OtherUserCardProps) {
   const { showToast, confirm } = useBeautifulNotifications();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const { handleRemoveFriend } = useRemoveFriend({ friendshipId: friendship?.id, confirm, showToast });
-  
+  const { handleRemoveFriend } = useRemoveFriend({
+    friendshipId: friendship?.id,
+    confirm,
+    showToast,
+  });
+
   return (
     <div>
       <motion.div

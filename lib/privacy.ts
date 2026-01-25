@@ -21,6 +21,3 @@ export function sanitizeEmailForViewer<T extends EmailPrivacyUser>(
   }
   return user;
 }
-
-
-

@@ -127,10 +127,18 @@ export default function ControlPanel({
                 onStatusChange(e.target.value as "ALL" | ApplicationStatus)
               }
             >
-              <option value="ALL" className="bg-[#001e1d]">Все статусы</option>
-              <option value="PENDING" className="bg-[#001e1d]">В обработке</option>
-              <option value="APPROVED" className="bg-[#001e1d]">Одобрено</option>
-              <option value="REJECTED" className="bg-[#001e1d]">Отказано</option>
+              <option value="ALL" className="bg-[#001e1d]">
+                Все статусы
+              </option>
+              <option value="PENDING" className="bg-[#001e1d]">
+                В обработке
+              </option>
+              <option value="APPROVED" className="bg-[#001e1d]">
+                Одобрено
+              </option>
+              <option value="REJECTED" className="bg-[#001e1d]">
+                Отказано
+              </option>
             </select>
           </div>
 
@@ -186,9 +194,15 @@ export default function ControlPanel({
                 onSortByChange(e.target.value as "date" | "amount" | "status")
               }
             >
-              <option value="date" className="bg-[#001e1d]">По дате</option>
-              <option value="amount" className="bg-[#001e1d]">По сумме</option>
-              <option value="status" className="bg-[#001e1d]">По статусу</option>
+              <option value="date" className="bg-[#001e1d]">
+                По дате
+              </option>
+              <option value="amount" className="bg-[#001e1d]">
+                По сумме
+              </option>
+              <option value="status" className="bg-[#001e1d]">
+                По статусу
+              </option>
             </select>
           </div>
 
@@ -203,8 +217,12 @@ export default function ControlPanel({
                 onSortOrderChange(e.target.value as "asc" | "desc")
               }
             >
-              <option value="desc" className="bg-[#001e1d]">По убыванию</option>
-              <option value="asc" className="bg-[#001e1d]">По возрастанию</option>
+              <option value="desc" className="bg-[#001e1d]">
+                По убыванию
+              </option>
+              <option value="asc" className="bg-[#001e1d]">
+                По возрастанию
+              </option>
             </select>
           </div>
         </div>

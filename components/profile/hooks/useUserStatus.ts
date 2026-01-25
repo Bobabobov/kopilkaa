@@ -14,7 +14,8 @@ function calcStatus(lastSeen: string | null): UserStatus {
 
   if (diffMinutes <= 5) return { status: "online", text: "Онлайн" };
   const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 1) return { status: "offline", text: `${diffMinutes}м назад` };
+  if (diffHours < 1)
+    return { status: "offline", text: `${diffMinutes}м назад` };
   if (diffHours < 24) return { status: "offline", text: `${diffHours}ч назад` };
   if (diffHours < 48) return { status: "offline", text: "Вчера" };
 

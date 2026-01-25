@@ -1,6 +1,5 @@
 // app/admin/components/ApplicationsListItemPayment.tsx
 "use client";
-import type { ApplicationItem } from "../types";
 
 interface ApplicationsListItemPaymentProps {
   payment: string;
@@ -79,7 +78,9 @@ export default function ApplicationsListItemPayment({
           <div className="select-all text-gray-900 dark:text-white space-y-1">
             {parsed.bankName && (
               <div>
-                <span className="text-blue-500 dark:text-blue-300 font-semibold">Банк: </span>
+                <span className="text-blue-500 dark:text-blue-300 font-semibold">
+                  Банк:{" "}
+                </span>
                 {parsed.bankName}
               </div>
             )}
@@ -98,5 +99,3 @@ export default function ApplicationsListItemPayment({
     </details>
   );
 }
-
-

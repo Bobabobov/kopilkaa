@@ -21,5 +21,3 @@ export function NewsFeedSkeleton({ count = 3 }: { count?: number }) {
     </div>
   );
 }
-
-

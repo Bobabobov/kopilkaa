@@ -21,7 +21,10 @@ const CATEGORY_LABELS: Record<string, string> = {
   OTHER: "Другое",
 };
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; color: string; icon: any }
+> = {
   OPEN: {
     label: "Открыт",
     color: "bg-[#e16162]/20 text-[#e16162] border-[#e16162]/30",
@@ -86,7 +89,7 @@ export default function BugReportCard({
         const data = await response.json();
         setLikes(data.likes);
         setDislikes(data.dislikes);
-        
+
         if (userLike === isLike) {
           setUserLike(null); // Убираем лайк/дизлайк
         } else {
@@ -161,7 +164,9 @@ export default function BugReportCard({
             >
               {isAdmin ? (
                 <div className="flex items-center gap-2">
-                  <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium ${statusConfig.color}`}>
+                  <div
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium ${statusConfig.color}`}
+                  >
                     <StatusIcon size="xs" />
                     <select
                       value={selectedStatus}
@@ -169,16 +174,24 @@ export default function BugReportCard({
                       disabled={updatingStatus}
                       className="bg-transparent text-inherit focus:outline-none cursor-pointer"
                     >
-                      {Object.entries(STATUS_CONFIG).map(([statusKey, config]) => (
-                        <option key={statusKey} value={statusKey} className="text-black">
-                          {config.label}
-                        </option>
-                      ))}
+                      {Object.entries(STATUS_CONFIG).map(
+                        ([statusKey, config]) => (
+                          <option
+                            key={statusKey}
+                            value={statusKey}
+                            className="text-black"
+                          >
+                            {config.label}
+                          </option>
+                        ),
+                      )}
                     </select>
                   </div>
                   <button
                     type="button"
-                    disabled={updatingStatus || selectedStatus === currentStatus}
+                    disabled={
+                      updatingStatus || selectedStatus === currentStatus
+                    }
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -189,21 +202,23 @@ export default function BugReportCard({
                     {updatingStatus ? "..." : "Сохранить"}
                   </button>
                   {onDeleteReport && (
-                            <button
+                    <button
                       type="button"
-                              onClick={(e) => {
+                      onClick={(e) => {
                         e.preventDefault();
-                                e.stopPropagation();
+                        e.stopPropagation();
                         onDeleteReport(report.id);
-                              }}
+                      }}
                       className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#e16162] text-white hover:bg-[#d14d4e] transition-colors"
                     >
                       Удалить
-                            </button>
+                    </button>
                   )}
                 </div>
               ) : (
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium ${statusConfig.color}`}>
+                <div
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium ${statusConfig.color}`}
+                >
                   <StatusIcon size="xs" />
                   <span>{statusConfig.label}</span>
                 </div>
@@ -306,7 +321,7 @@ export default function BugReportCard({
           </div>
         </div>
 
-        {/* Комментарий администратора */}
+        {/* Комментарий адммина */}
         {report.adminComment && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -314,7 +329,10 @@ export default function BugReportCard({
             className="mt-4 p-4 bg-[#3B82F6]/10 border border-[#3B82F6]/30 rounded-lg"
           >
             <div className="flex items-start gap-2">
-              <LucideIcons.MessageCircle size="xs" className="text-[#3B82F6] mt-0.5 flex-shrink-0" />
+              <LucideIcons.MessageCircle
+                size="xs"
+                className="text-[#3B82F6] mt-0.5 flex-shrink-0"
+              />
               <div>
                 <div className="text-xs font-medium text-[#3B82F6] mb-1">
                   Комментарий администратора:
@@ -330,4 +348,3 @@ export default function BugReportCard({
     </motion.div>
   );
 }
-

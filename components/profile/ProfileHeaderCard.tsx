@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import HeaderCustomization from "./HeaderCustomization";
 import ApplicationsModal from "./modals/ApplicationsModal";
@@ -53,7 +54,10 @@ interface ProfileHeaderCardProps {
 }
 
 const formatDate = (value: string) =>
-  new Date(value).toLocaleDateString("ru-RU", { month: "short", year: "numeric" });
+  new Date(value).toLocaleDateString("ru-RU", {
+    month: "short",
+    year: "numeric",
+  });
 
 export default function ProfileHeaderCard({
   user,
@@ -70,7 +74,9 @@ export default function ProfileHeaderCard({
   onAvatarChange,
 }: ProfileHeaderCardProps) {
   const [currentAvatar, setCurrentAvatar] = useState(user.avatar || null);
-  const [currentHeaderTheme, setCurrentHeaderTheme] = useState(user.headerTheme);
+  const [currentHeaderTheme, setCurrentHeaderTheme] = useState(
+    user.headerTheme,
+  );
   const [showHeaderCustomization, setShowHeaderCustomization] = useState(false);
   const [isApplicationsModalOpen, setIsApplicationsModalOpen] = useState(false);
   const [isGuestActionsOpen, setIsGuestActionsOpen] = useState(false);
@@ -78,7 +84,10 @@ export default function ProfileHeaderCard({
   const guestActionsButtonRef = useRef<HTMLElement | null>(null);
 
   const status = useUserStatus(user.lastSeen || null);
-  const theme = useMemo(() => getHeaderTheme(currentHeaderTheme || "default"), [currentHeaderTheme]);
+  const theme = useMemo(
+    () => getHeaderTheme(currentHeaderTheme || "default"),
+    [currentHeaderTheme],
+  );
   const guestMenuStyle = useFloatingMenu({
     isOpen: isGuestActionsOpen,
     anchorRef: guestActionsButtonRef,
@@ -88,7 +97,11 @@ export default function ProfileHeaderCard({
 
   const isColorTheme = theme.background === "color";
   const backgroundColor = isColorTheme ? (theme as any).color : null;
-  const hasSocialLinks = !!(user.vkLink || user.telegramLink || user.youtubeLink);
+  const hasSocialLinks = !!(
+    user.vkLink ||
+    user.telegramLink ||
+    user.youtubeLink
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -101,9 +114,51 @@ export default function ProfileHeaderCard({
 
   useEffect(() => {
     const handleOpenApplicationsModal = () => setIsApplicationsModalOpen(true);
-    window.addEventListener("open-applications-modal", handleOpenApplicationsModal);
-    return () => window.removeEventListener("open-applications-modal", handleOpenApplicationsModal);
+    window.addEventListener(
+      "open-applications-modal",
+      handleOpenApplicationsModal,
+    );
+    return () =>
+      window.removeEventListener(
+        "open-applications-modal",
+        handleOpenApplicationsModal,
+      );
   }, []);
+
+  useEffect(() => {
+    const handleOpenHeaderCustomization = () =>
+      setShowHeaderCustomization(true);
+    window.addEventListener(
+      "open-header-customization",
+      handleOpenHeaderCustomization,
+    );
+    return () =>
+      window.removeEventListener(
+        "open-header-customization",
+        handleOpenHeaderCustomization,
+      );
+  }, []);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Обработка URL параметра для открытия модалки обложки
+  useEffect(() => {
+    const openHeaderTheme = searchParams.get("headerTheme");
+    if (openHeaderTheme === "open") {
+      const timer = setTimeout(() => {
+        setShowHeaderCustomization(true);
+        // Удаляем параметр из URL
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("headerTheme");
+        const nextUrl = params.toString()
+          ? `/profile?${params.toString()}`
+          : "/profile";
+        router.replace(nextUrl, { scroll: true });
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, router]);
 
   const coverStyle = useCoverStyle({
     theme,
@@ -148,7 +203,7 @@ export default function ProfileHeaderCard({
           )}
           {/* Затемняющий градиент для читаемости */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
-          
+
           {/* Контент поверх баннера */}
           <div className="relative z-10 px-4 sm:px-6 md:px-8 pb-6 sm:pb-8 pt-20 sm:pt-24 md:pt-28">
             {/* Основной контент: Аватар и информация в одну линию */}
@@ -215,7 +270,10 @@ export default function ProfileHeaderCard({
             onClose={() => setShowHeaderCustomization(false)}
           />
 
-          <ApplicationsModal isOpen={isApplicationsModalOpen} onClose={() => setIsApplicationsModalOpen(false)} />
+          <ApplicationsModal
+            isOpen={isApplicationsModalOpen}
+            onClose={() => setIsApplicationsModalOpen(false)}
+          />
         </>
       )}
     </motion.div>

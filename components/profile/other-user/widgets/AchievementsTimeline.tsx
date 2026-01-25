@@ -13,7 +13,9 @@ interface AchievementsTimelineProps {
   achievements: TimelineItem[];
 }
 
-export function AchievementsTimeline({ achievements }: AchievementsTimelineProps) {
+export function AchievementsTimeline({
+  achievements,
+}: AchievementsTimelineProps) {
   if (!achievements || achievements.length === 0) return null;
 
   return (
@@ -46,6 +48,3 @@ export function AchievementsTimeline({ achievements }: AchievementsTimelineProps
     </div>
   );
 }
-
-
-

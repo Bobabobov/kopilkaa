@@ -13,7 +13,10 @@ export async function POST(request: Request) {
     const { achievementId, userId } = await request.json();
 
     if (!achievementId || !userId) {
-      return NextResponse.json({ error: "Не указаны ID достижения или пользователя" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Не указаны ID достижения или пользователя" },
+        { status: 400 },
+      );
     }
 
     // Проверяем наличие userAchievement
@@ -28,7 +31,10 @@ export async function POST(request: Request) {
     });
 
     if (!userAchievement) {
-      return NextResponse.json({ error: "У пользователя нет этого достижения" }, { status: 404 });
+      return NextResponse.json(
+        { error: "У пользователя нет этого достижения" },
+        { status: 404 },
+      );
     }
 
     await prisma.userAchievement.delete({
@@ -44,9 +50,7 @@ export async function POST(request: Request) {
     console.error("Error revoking achievement:", error);
     return NextResponse.json(
       { error: "Ошибка отзыва достижения" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-
-

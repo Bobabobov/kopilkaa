@@ -6,17 +6,19 @@ export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastViewedTimestamp, setLastViewedTimestamp] = useState<string | null>(null);
+  const [lastViewedTimestamp, setLastViewedTimestamp] = useState<string | null>(
+    null,
+  );
 
   // Загружаем timestamp последнего просмотра
   useEffect(() => {
     try {
-      const savedTimestamp = localStorage.getItem('notifications_last_viewed');
+      const savedTimestamp = localStorage.getItem("notifications_last_viewed");
       if (savedTimestamp) {
         setLastViewedTimestamp(savedTimestamp);
       }
     } catch (error) {
-      console.warn('localStorage недоступен:', error);
+      console.warn("localStorage недоступен:", error);
     }
   }, []);
 
@@ -29,7 +31,7 @@ export function useNotifications() {
         const response = await fetch("/api/notifications", {
           cache: "no-store",
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.success) {
@@ -54,10 +56,10 @@ export function useNotifications() {
   const markAsViewed = () => {
     try {
       const currentTimestamp = new Date().toISOString();
-      localStorage.setItem('notifications_last_viewed', currentTimestamp);
+      localStorage.setItem("notifications_last_viewed", currentTimestamp);
       setLastViewedTimestamp(currentTimestamp);
     } catch (error) {
-      console.warn('Не удалось сохранить timestamp:', error);
+      console.warn("Не удалось сохранить timestamp:", error);
     }
   };
 
@@ -87,5 +89,3 @@ export function useNotifications() {
     },
   };
 }
-
-

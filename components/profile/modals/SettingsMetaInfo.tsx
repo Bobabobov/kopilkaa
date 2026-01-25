@@ -8,7 +8,11 @@ interface SettingsMetaInfoProps {
   onCopy: (text: string) => void;
 }
 
-export function SettingsMetaInfo({ user, saving, onCopy }: SettingsMetaInfoProps) {
+export function SettingsMetaInfo({
+  user,
+  saving,
+  onCopy,
+}: SettingsMetaInfoProps) {
   const path = getPublicProfilePath(user);
   const url =
     typeof window !== "undefined" && window.location?.origin
@@ -17,15 +21,32 @@ export function SettingsMetaInfo({ user, saving, onCopy }: SettingsMetaInfoProps
 
   return (
     <>
-      <CopyField label="Технический ID" value={user.id} copyValue={user.id} onCopy={onCopy} disabled={saving} />
+      <CopyField
+        label="Технический ID"
+        value={user.id}
+        copyValue={user.id}
+        onCopy={onCopy}
+        disabled={saving}
+      />
 
-      <CopyField label="Ссылка на профиль" value={url} copyValue={url} onCopy={onCopy} disabled={saving} />
+      <CopyField
+        label="Ссылка на профиль"
+        value={url}
+        copyValue={url}
+        onCopy={onCopy}
+        disabled={saving}
+      />
 
-      <ReadOnlyField label="Дата регистрации" value={new Date(user.createdAt).toLocaleDateString("ru-RU")} />
+      <ReadOnlyField
+        label="Дата регистрации"
+        value={new Date(user.createdAt).toLocaleDateString("ru-RU")}
+      />
 
       <ReadOnlyField
         label="Последний вход"
-        value={new Date(user.lastSeen || user.createdAt).toLocaleString("ru-RU")}
+        value={new Date(user.lastSeen || user.createdAt).toLocaleString(
+          "ru-RU",
+        )}
       />
 
       <SettingsSection title="Пароль">

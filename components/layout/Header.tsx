@@ -27,7 +27,8 @@ export default function Header() {
     let resolvedByEvent = false;
 
     const handleAuthChange = (event: Event) => {
-      const detail = (event as CustomEvent<{ isAuthenticated?: boolean }>).detail;
+      const detail = (event as CustomEvent<{ isAuthenticated?: boolean }>)
+        .detail;
       if (typeof detail?.isAuthenticated === "boolean") {
         resolvedByEvent = true;
         setIsAuthenticated(detail.isAuthenticated);
@@ -144,19 +145,19 @@ export default function Header() {
   return (
     <>
       {/* Spacer для Header + TopBanner через CSS-переменную */}
-      <div 
+      <div
         className="header-spacer"
-        style={{ 
-          height: "var(--header-offset)"
-        }} 
+        style={{
+          height: "var(--header-offset)",
+        }}
       />
 
       <header
         ref={headerRef}
         className="fixed left-0 right-0 z-50 backdrop-blur-md border-b border-[#abd1c6]/15 shadow-lg bg-[#001e1d]/82 header-component overflow-hidden"
-        style={{ 
+        style={{
           top: "var(--top-banner-height)",
-          height: "var(--header-height)"
+          height: "var(--header-height)",
         }}
       >
         {/* Две размытые подсветки в углах (ослабленные) */}
@@ -183,15 +184,15 @@ export default function Header() {
             <div className="hidden sm:block">
               <DonateButton />
             </div>
-            
+
             {/* NotificationBell - виден всегда (если авторизован) */}
             {isAuthenticated && !authLoading && <NotificationBell />}
-            
+
             {/* NavAuth - скрыт на мобильных */}
             <div className="hidden sm:block">
               <NavAuth />
             </div>
-            
+
             {/* Мобильные/планшетные кнопки: donate + burger (до 1200px) */}
             <div className="min-[1200px]:hidden flex items-center gap-2">
               <DonateButton variant="mobileHeader" />
@@ -224,7 +225,7 @@ export default function Header() {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.2 }}
               className="min-[1200px]:hidden fixed left-0 right-0 z-40 border-t border-[#abd1c6]/25 backdrop-blur-xl shadow-2xl rounded-b-3xl bg-[#001e1d]/98 overflow-hidden"
-              style={{ 
+              style={{
                 top: `${menuTop}px`,
                 maxHeight: `calc(100vh - ${menuTop + 12}px)`,
               }}
@@ -245,7 +246,10 @@ export default function Header() {
                 {/* Авторизация для мобильных */}
                 <div className="pt-3 border-t border-white/15">
                   <div className="px-2 sm:px-4 space-y-3">
-                    <NavAuth isMobile onLinkClick={() => setMobileMenuOpen(false)} />
+                    <NavAuth
+                      isMobile
+                      onLinkClick={() => setMobileMenuOpen(false)}
+                    />
                   </div>
                 </div>
               </div>

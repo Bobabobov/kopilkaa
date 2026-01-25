@@ -21,7 +21,7 @@ export default function NotificationBell() {
   } = useNotificationBell();
 
   const handleShowAll = () => {
-    router.push('/feed?section=notifications');
+    router.push("/feed?section=notifications");
     setIsOpen(false);
   };
 
@@ -29,11 +29,11 @@ export default function NotificationBell() {
   useEffect(() => {
     if (!isOpen) return;
 
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-    
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+
     if (isMobile) {
       const scrollY = window.scrollY;
-      
+
       document.body.style.overflow = "hidden";
       document.body.style.position = "fixed";
       document.body.style.top = `-${scrollY}px`;
@@ -42,7 +42,7 @@ export default function NotificationBell() {
 
       const preventScroll = (e: Event) => {
         const target = e.target as Element;
-        if (target.closest('[data-notification-menu]')) {
+        if (target.closest("[data-notification-menu]")) {
           return;
         }
         e.preventDefault();
@@ -73,23 +73,26 @@ export default function NotificationBell() {
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (!target.closest('.notification-dropdown') && !target.closest('[data-notification-menu]')) {
+      if (
+        !target.closest(".notification-dropdown") &&
+        !target.closest("[data-notification-menu]")
+      ) {
         setIsOpen(false);
       }
     };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-    
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [isOpen]);
 

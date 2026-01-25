@@ -19,9 +19,12 @@ export function FriendsPageHeader({
       <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <p className="text-sm text-[#abd1c6]">Раздел друзей</p>
-          <h1 className="text-2xl sm:text-3xl font-bold leading-tight">Мои друзья</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
+            Мои друзья
+          </h1>
           <p className="text-sm text-[#abd1c6] mt-2 max-w-2xl">
-            Управляйте друзьями, отвечайте на заявки или находите новых людей. Всё в одном месте.
+            Управляйте друзьями, отвечайте на заявки или находите новых людей.
+            Всё в одном месте.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -45,13 +48,10 @@ export function FriendsPageHeader({
             href="/profile"
             className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border border-[#abd1c6]/30 text-[#abd1c6] hover:border-[#f9bc60]/60 hover:text-[#fffffe] transition-colors"
           >
-            <LucideIcons.ArrowLeft size="sm" />
-            В профиль
+            <LucideIcons.ArrowLeft size="sm" />В профиль
           </Link>
         </div>
       </div>
     </div>
   );
 }
-
-

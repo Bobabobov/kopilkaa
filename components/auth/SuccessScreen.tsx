@@ -40,9 +40,3 @@ export default function SuccessScreen() {
     </div>
   );
 }
-
-
-
-
-
-

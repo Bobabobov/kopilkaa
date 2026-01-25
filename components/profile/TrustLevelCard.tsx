@@ -181,11 +181,21 @@ export function TrustLevelCard({
       >
         <div className="relative flex flex-col gap-4">
           <div className="flex items-start gap-3">
-            <div className={cn("p-2.5 rounded-xl border border-[#d6e9e0]/70", config.iconWrapper)}>
+            <div
+              className={cn(
+                "p-2.5 rounded-xl border border-[#d6e9e0]/70",
+                config.iconWrapper,
+              )}
+            >
               <Icon className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2.3} />
             </div>
             <div className="space-y-1">
-              <p className={cn("text-lg sm:text-xl font-semibold", config.accent)}>
+              <p
+                className={cn(
+                  "text-lg sm:text-xl font-semibold",
+                  config.accent,
+                )}
+              >
                 {text.title}
               </p>
               <p className="inline-flex items-center rounded-full border border-[#1f6a4d]/30 bg-[#e6f3ed] px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#1f6a4d]">
@@ -205,60 +215,77 @@ export function TrustLevelCard({
           <div className="space-y-3 pt-1">
             <div className={cn("", config.divider)} />
 
-          <div className="space-y-1">
-            <span className="text-sm text-[#667a73]">Ориентир по поддержке:</span>
-            <span className="text-base sm:text-lg font-semibold text-[#3a554d]">
-              {support}
-            </span>
-            <p className="text-[11px] text-[#667a73] leading-relaxed">
-              Уровень — ориентир, не гарантия суммы и одобрения.
-            </p>
-          </div>
+            <div className="space-y-1">
+              <span className="text-sm text-[#667a73]">
+                Ориентир по поддержке:
+              </span>
+              <span className="text-base sm:text-lg font-semibold text-[#3a554d]">
+                {support}
+              </span>
+              <p className="text-[11px] text-[#667a73] leading-relaxed">
+                Уровень — ориентир, не гарантия суммы и одобрения.
+              </p>
+            </div>
 
-            {progressText && progressPercent !== null && progressCurrent !== null && progressTotal !== null && (
-              <>
-                <div className={cn("pt-1", config.divider)} />
+            {progressText &&
+              progressPercent !== null &&
+              progressCurrent !== null &&
+              progressTotal !== null && (
+                <>
+                  <div className={cn("pt-1", config.divider)} />
 
-                <div className="rounded-xl border border-[#d7e6dd] bg-[#eef4f1] px-3 py-3 space-y-2.5">
-                  <motion.p
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, ease: "easeOut", delay: 0.05 }}
-                    className="text-[11px] sm:text-xs font-medium text-[#2f4b41] tracking-[0.01em]"
-                  >
-                    Прогресс до следующего уровня
-                  </motion.p>
+                  <div className="rounded-xl border border-[#d7e6dd] bg-[#eef4f1] px-3 py-3 space-y-2.5">
+                    <motion.p
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.25,
+                        ease: "easeOut",
+                        delay: 0.05,
+                      }}
+                      className="text-[11px] sm:text-xs font-medium text-[#2f4b41] tracking-[0.01em]"
+                    >
+                      Прогресс до следующего уровня
+                    </motion.p>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, ease: "easeOut", delay: 0.12 }}
-                    className="text-sm sm:text-base font-semibold text-[#0f2d25]"
-                  >
-                    {progressCurrent} из {progressTotal} одобренных заявок
-                  </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.25,
+                        ease: "easeOut",
+                        delay: 0.12,
+                      }}
+                      className="text-sm sm:text-base font-semibold text-[#0f2d25]"
+                    >
+                      {progressCurrent} из {progressTotal} одобренных заявок
+                    </motion.div>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, ease: "easeOut", delay: 0.16 }}
-                    className="space-y-1.5"
-                  >
-                    <div className="h-2 rounded-full bg-[#d8e6dd] overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progressPercent}%` }}
-                        transition={{ duration: 0.7, ease: "easeOut" }}
-                        className="h-full rounded-full bg-[#1f6a4d]"
-                      />
-                    </div>
-                    <p className="text-[11px] sm:text-xs text-[#3e5a51] leading-relaxed">
-                      {progressText}
-                    </p>
-                  </motion.div>
-                </div>
-              </>
-            )}
+                    <motion.div
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.25,
+                        ease: "easeOut",
+                        delay: 0.16,
+                      }}
+                      className="space-y-1.5"
+                    >
+                      <div className="h-2 rounded-full bg-[#d8e6dd] overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${progressPercent}%` }}
+                          transition={{ duration: 0.7, ease: "easeOut" }}
+                          className="h-full rounded-full bg-[#1f6a4d]"
+                        />
+                      </div>
+                      <p className="text-[11px] sm:text-xs text-[#3e5a51] leading-relaxed">
+                        {progressText}
+                      </p>
+                    </motion.div>
+                  </div>
+                </>
+              )}
           </div>
         </div>
       </motion.div>
@@ -267,4 +294,3 @@ export function TrustLevelCard({
 }
 
 export default TrustLevelCard;
-

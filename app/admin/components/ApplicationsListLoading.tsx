@@ -13,11 +13,7 @@ export default function ApplicationsListLoading() {
       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
         Загружаем заявки...
       </h3>
-      <p className="text-gray-600 dark:text-gray-400">
-        Пожалуйста, подождите
-      </p>
+      <p className="text-gray-600 dark:text-gray-400">Пожалуйста, подождите</p>
     </motion.div>
   );
 }
-
-

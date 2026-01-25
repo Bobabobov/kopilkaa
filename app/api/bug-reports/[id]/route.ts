@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 // GET - получить один баг-репорт по ID
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -39,7 +39,7 @@ export async function GET(
     if (!report) {
       return NextResponse.json(
         { message: "Баг-репорт не найден" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -73,11 +73,7 @@ export async function GET(
         message: "Ошибка загрузки баг-репорта",
         error: error?.message || String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-
-
-
-

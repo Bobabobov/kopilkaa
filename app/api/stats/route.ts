@@ -7,32 +7,38 @@ export const revalidate = 0;
 export async function GET(request: NextRequest) {
   try {
     // Получаем статистику по заявкам
-    const applicationsStats = await prisma.application.groupBy({
-      by: ["status"],
-      _count: {
-        status: true,
-      },
-    }).catch(() => []);
+    const applicationsStats = await prisma.application
+      .groupBy({
+        by: ["status"],
+        _count: {
+          status: true,
+        },
+      })
+      .catch(() => []);
 
     // Получаем общее количество пользователей
     const totalUsers = await prisma.user.count().catch(() => 0);
 
     // Получаем количество новых пользователей за последние 7 дней
-    const newUsers = await prisma.user.count({
-      where: {
-        createdAt: {
-          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    const newUsers = await prisma.user
+      .count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+          },
         },
-      },
-    }).catch(() => 0);
+      })
+      .catch(() => 0);
 
     // Получаем статистику по донатам/копилке
-    const donations = await prisma.donation.findMany({
-      select: {
-        type: true,
-        amount: true,
-      },
-    }).catch(() => []);
+    const donations = await prisma.donation
+      .findMany({
+        select: {
+          type: true,
+          amount: true,
+        },
+      })
+      .catch(() => []);
 
     const totalSupport = donations
       .filter((d) => d.type === "SUPPORT")
@@ -106,11 +112,3 @@ export async function GET(request: NextRequest) {
     });
   }
 }
-
-
-
-
-
-
-
-

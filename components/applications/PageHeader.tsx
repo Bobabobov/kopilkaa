@@ -23,9 +23,9 @@ export default function PageHeader() {
           }}
           className="inline-flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 mb-6"
         >
-          <img 
-            src="/kopibym.png" 
-            alt="Заявка" 
+          <img
+            src="/kopibym.png"
+            alt="Заявка"
             className="w-full h-full object-contain"
           />
         </motion.div>
@@ -46,10 +46,12 @@ export default function PageHeader() {
           className="text-lg max-w-2xl mx-auto leading-relaxed"
           style={{ color: "#abd1c6" }}
         >
-          Расскажите свою историю — платформа рассмотрит её и примет решение о финансовой поддержке.
+          Расскажите свою историю — платформа рассмотрит её и примет решение о
+          финансовой поддержке.
           <br />
           <span style={{ color: "#f9bc60" }}>
-            Чем понятнее и честнее вы опишете ситуацию, тем проще платформе принять решение.
+            Чем понятнее и честнее вы опишете ситуацию, тем проще платформе
+            принять решение.
           </span>
         </motion.p>
       </motion.div>

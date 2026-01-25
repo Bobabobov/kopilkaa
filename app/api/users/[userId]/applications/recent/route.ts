@@ -16,14 +16,17 @@ export async function GET(
     const { userId: identifier } = await params;
     const otherUserId = await resolveUserIdFromIdentifier(identifier);
     if (!otherUserId) {
-      return NextResponse.json({ message: "Пользователь не найден" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Пользователь не найден" },
+        { status: 404 },
+      );
     }
 
     // Получаем только первые 3 одобренные заявки
     const apps = await prisma.application.findMany({
-      where: { 
+      where: {
         userId: otherUserId,
-        status: "APPROVED" // Только одобренные заявки
+        status: "APPROVED", // Только одобренные заявки
       },
       select: {
         id: true,
@@ -45,5 +48,3 @@ export async function GET(
     );
   }
 }
-
-

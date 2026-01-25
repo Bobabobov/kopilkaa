@@ -87,7 +87,7 @@ const faqStructuredData = {
 export default async function HomePage() {
   // Загружаем статистику на сервере с кэшированием через Next.js
   let stats = fallbackStats;
-  
+
   try {
     stats = await StatsLoader();
   } catch (error) {

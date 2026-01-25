@@ -57,9 +57,7 @@ export default function TopDonors() {
   }, 0);
 
   const formattedTotalAmount =
-    totalAmount > 0
-      ? new Intl.NumberFormat("ru-RU").format(totalAmount)
-      : null;
+    totalAmount > 0 ? new Intl.NumberFormat("ru-RU").format(totalAmount) : null;
 
   const getRankIcon = (position: number) => {
     switch (position) {
@@ -156,8 +154,8 @@ export default function TopDonors() {
         ) : donors.length === 0 ? (
           <div className="relative mt-1 rounded-2xl border border-dashed border-[#abd1c6]/45 bg-[#001e1d]/70 px-4 py-4 text-[12px] text-[#abd1c6]">
             <p className="mb-2">
-              Здесь появится главный герой проекта — человек, который поддержит нас
-              больше всех. Возможно, это будете именно вы.
+              Здесь появится главный герой проекта — человек, который поддержит
+              нас больше всех. Возможно, это будете именно вы.
             </p>
             <Link
               href="/support"
@@ -327,7 +325,9 @@ export default function TopDonors() {
                           <div className="min-w-0">
                             <p
                               className={`truncate font-semibold text-[#fffffe] ${
-                                isSecond ? "text-sm sm:text-base" : "text-xs sm:text-sm"
+                                isSecond
+                                  ? "text-sm sm:text-base"
+                                  : "text-xs sm:text-sm"
                               }`}
                             >
                               {donor.name}
@@ -346,69 +346,69 @@ export default function TopDonors() {
                             </p>
                           </div>
                         </div>
-                      {(donor.vkLink ||
-                        donor.telegramLink ||
-                        donor.youtubeLink) && (
-                        <div className="flex items-center gap-1">
-                          {donor.vkLink && (
-                            <button
-                              type="button"
-                              onClick={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                window.open(
-                                  donor.vkLink!,
-                                  "_blank",
-                                  "noopener,noreferrer",
-                                );
-                              }}
-                              className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#4c75a3]/60 bg-transparent text-[#4c75a3] hover:bg-[#4c75a3]/20 transition-colors"
-                              aria-label="VK"
-                            >
-                              <VKIcon className="h-3 w-3" />
-                            </button>
-                          )}
-                          {donor.telegramLink && (
-                            <button
-                              type="button"
-                              onClick={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                window.open(
-                                  donor.telegramLink!,
-                                  "_blank",
-                                  "noopener,noreferrer",
-                                );
-                              }}
-                              className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#229ED9]/60 bg-transparent text-[#229ED9] hover:bg-[#229ED9]/20 transition-colors"
-                              aria-label="Telegram"
-                            >
-                              <TelegramIcon className="h-3 w-3" />
-                            </button>
-                          )}
-                          {donor.youtubeLink && (
-                            <button
-                              type="button"
-                              onClick={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                window.open(
-                                  donor.youtubeLink!,
-                                  "_blank",
-                                  "noopener,noreferrer",
-                                );
-                              }}
-                              className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#ff4f45]/60 bg-transparent text-[#ff4f45] hover:bg-[#ff4f45]/20 transition-colors"
-                              aria-label="YouTube"
-                            >
-                              <YouTubeIcon className="h-3 w-3" />
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </motion.div>
-                  </Link>
-                );
+                        {(donor.vkLink ||
+                          donor.telegramLink ||
+                          donor.youtubeLink) && (
+                          <div className="flex items-center gap-1">
+                            {donor.vkLink && (
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  window.open(
+                                    donor.vkLink!,
+                                    "_blank",
+                                    "noopener,noreferrer",
+                                  );
+                                }}
+                                className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#4c75a3]/60 bg-transparent text-[#4c75a3] hover:bg-[#4c75a3]/20 transition-colors"
+                                aria-label="VK"
+                              >
+                                <VKIcon className="h-3 w-3" />
+                              </button>
+                            )}
+                            {donor.telegramLink && (
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  window.open(
+                                    donor.telegramLink!,
+                                    "_blank",
+                                    "noopener,noreferrer",
+                                  );
+                                }}
+                                className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#229ED9]/60 bg-transparent text-[#229ED9] hover:bg-[#229ED9]/20 transition-colors"
+                                aria-label="Telegram"
+                              >
+                                <TelegramIcon className="h-3 w-3" />
+                              </button>
+                            )}
+                            {donor.youtubeLink && (
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  window.open(
+                                    donor.youtubeLink!,
+                                    "_blank",
+                                    "noopener,noreferrer",
+                                  );
+                                }}
+                                className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#ff4f45]/60 bg-transparent text-[#ff4f45] hover:bg-[#ff4f45]/20 transition-colors"
+                                aria-label="YouTube"
+                              >
+                                <YouTubeIcon className="h-3 w-3" />
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </motion.div>
+                    </Link>
+                  );
                 })}
               </div>
             )}

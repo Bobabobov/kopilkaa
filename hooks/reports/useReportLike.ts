@@ -5,7 +5,9 @@ import { BugReport } from "@/app/reports/page";
 
 interface UseReportLikeProps {
   report: (BugReport & { userLike: boolean | null }) | null;
-  setReport: React.Dispatch<React.SetStateAction<(BugReport & { userLike: boolean | null }) | null>>;
+  setReport: React.Dispatch<
+    React.SetStateAction<(BugReport & { userLike: boolean | null }) | null>
+  >;
 }
 
 interface UseReportLikeReturn {
@@ -50,10 +52,8 @@ export function useReportLike({
         setLiking(false);
       }
     },
-    [liking, report, setReport]
+    [liking, report, setReport],
   );
 
   return { liking, handleLike };
 }
-
-

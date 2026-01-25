@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     const filepath = getUploadFilePath(filename);
 
     await writeFile(filepath, buf);
-    
+
     // Проверяем, что файл действительно сохранён
     const { access, constants, stat } = await import("fs/promises");
     try {
@@ -67,13 +67,6 @@ export async function POST(req: NextRequest) {
       if (!fileStat.isFile()) {
         throw new Error("Saved path is not a file");
       }
-      console.log("Avatar saved successfully:", {
-        filename,
-        filepath,
-        size: fileStat.size,
-        uploadDir: UPLOAD_DIR,
-        cwd: process.cwd(),
-      });
     } catch (error: any) {
       console.error("File was not saved correctly:", {
         filepath,
@@ -89,7 +82,7 @@ export async function POST(req: NextRequest) {
     // Обновляем аватарку в базе данных
     await prisma.user.update({
       where: { id: session.uid },
-      data: { avatar: avatarUrl },
+      data: { avatar: avatarUrl, avatarUpdatedAt: new Date() },
     });
 
     return NextResponse.json({
@@ -120,7 +113,7 @@ export async function DELETE() {
     // Удаляем аватарку из базы данных
     await prisma.user.update({
       where: { id: session.uid },
-      data: { avatar: null },
+      data: { avatar: null, avatarUpdatedAt: new Date() },
     });
 
     return NextResponse.json({

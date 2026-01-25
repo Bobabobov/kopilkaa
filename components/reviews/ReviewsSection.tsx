@@ -46,9 +46,15 @@ export function ReviewsSection() {
         className="max-w-6xl mx-auto px-1"
       >
         <div className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.08em] text-[#94a1b2]">Опыт сообщества</p>
-          <h1 className="text-2xl md:text-3xl font-bold text-[#fffffe]">{heroTitle.title}</h1>
-          <p className="text-sm md:text-base text-[#abd1c6] max-w-5xl">{heroTitle.subtitle}</p>
+          <p className="text-xs uppercase tracking-[0.08em] text-[#94a1b2]">
+            Опыт сообщества
+          </p>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#fffffe]">
+            {heroTitle.title}
+          </h1>
+          <p className="text-sm md:text-base text-[#abd1c6] max-w-5xl">
+            {heroTitle.subtitle}
+          </p>
         </div>
       </motion.div>
 
@@ -60,15 +66,24 @@ export function ReviewsSection() {
             </div>
             <div className="space-y-3 flex-1 min-w-0">
               <div className="space-y-1">
-                <p className="text-xs uppercase tracking-[0.08em] text-white/70">Отзыв уже оставлен</p>
-                <h2 className="text-lg sm:text-xl font-semibold text-white">Спасибо за ваш отзыв</h2>
+                <p className="text-xs uppercase tracking-[0.08em] text-white/70">
+                  Отзыв уже оставлен
+                </p>
+                <h2 className="text-lg sm:text-xl font-semibold text-white">
+                  Спасибо за ваш отзыв
+                </h2>
                 <p className="text-sm text-white/80">
-                  Вы можете прочитать свой отзыв в списке ниже или удалить его и написать новый.
+                  Вы можете прочитать свой отзыв в списке ниже или удалить его и
+                  написать новый.
                 </p>
               </div>
               <button
                 onClick={() => {
-                  if (confirm("Вы уверены, что хотите удалить свой отзыв? После удаления вы сможете написать новый.")) {
+                  if (
+                    confirm(
+                      "Вы уверены, что хотите удалить свой отзыв? После удаления вы сможете написать новый.",
+                    )
+                  ) {
                     deleteReview(viewerReview.id);
                   }
                 }}
@@ -97,10 +112,15 @@ export function ReviewsSection() {
               <LucideIcons.Info size="sm" />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.08em] text-white/70">Недоступно</p>
-              <h2 className="text-lg sm:text-xl font-semibold text-white">Отзыв можно оставить после одобрения заявки</h2>
+              <p className="text-xs uppercase tracking-[0.08em] text-white/70">
+                Недоступно
+              </p>
+              <h2 className="text-lg sm:text-xl font-semibold text-white">
+                Отзыв можно оставить после одобрения заявки
+              </h2>
               <p className="text-sm text-white/80">
-                Как только ваша заявка будет одобрена, появится возможность поделиться опытом.
+                Как только ваша заявка будет одобрена, появится возможность
+                поделиться опытом.
               </p>
             </div>
           </div>
@@ -120,7 +140,9 @@ export function ReviewsSection() {
           <span className="h-px flex-1 max-w-[120px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 bg-white/5 border border-white/10 text-white/90 shadow-[0_12px_30px_-24px_rgba(0,0,0,0.8)]">
             <LucideIcons.MessageCircle size="sm" className="text-[#f9bc60]" />
-            <h3 className="text-base sm:text-lg font-semibold tracking-wide">Свежие отзывы</h3>
+            <h3 className="text-base sm:text-lg font-semibold tracking-wide">
+              Свежие отзывы
+            </h3>
             {total > 0 && (
               <span className="text-xs text-white/60 font-medium">
                 ({total.toLocaleString("ru-RU")})
@@ -176,7 +198,8 @@ export function ReviewsSection() {
                 </h4>
               </div>
               <p className="text-sm text-[#abd1c6]/90">
-                Присоединяйтесь к нашему Telegram-каналу, где собраны все отзывы и истории участников
+                Присоединяйтесь к нашему Telegram-каналу, где собраны все отзывы
+                и истории участников
               </p>
               <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-[#229ED9] font-medium group-hover:text-[#4ab8e8] transition-colors">
                 <span>Перейти в канал</span>
@@ -213,7 +236,8 @@ export function ReviewsSection() {
         {!loading && !hasMore && reviews.length > 0 && (
           <div className="text-center py-4">
             <p className="text-sm text-white/60">
-              Показано {reviews.length} из {total.toLocaleString("ru-RU")} отзывов
+              Показано {reviews.length} из {total.toLocaleString("ru-RU")}{" "}
+              отзывов
             </p>
           </div>
         )}

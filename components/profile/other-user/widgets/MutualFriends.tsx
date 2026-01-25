@@ -29,27 +29,28 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
 
   // Функция для определения статуса пользователя
   const getUserStatus = (lastSeen: string | null) => {
-    if (!lastSeen) return { status: "offline" as const, text: "Никогда не был в сети" };
-    
+    if (!lastSeen)
+      return { status: "offline" as const, text: "Никогда не был в сети" };
+
     const date = new Date(lastSeen);
     const now = new Date();
-    
+
     // Проверяем валидность даты
     if (isNaN(date.getTime())) {
       return { status: "offline" as const, text: "Никогда не был в сети" };
     }
-    
+
     const diffInMs = now.getTime() - date.getTime();
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-    
+
     // Если разница отрицательная (дата в будущем) или пользователь был активен в последние 5 минут - считаем онлайн
     if (diffInMinutes < 0 || diffInMinutes < 5) {
       return { status: "online" as const, text: "Онлайн" };
     }
-    
+
     // Иначе показываем время последнего входа
     const diffInHours = Math.floor(diffInMinutes / 60);
-    
+
     if (diffInHours < 1) {
       return { status: "offline" as const, text: `${diffInMinutes}м назад` };
     }
@@ -59,7 +60,10 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
     if (diffInHours < 48) {
       return { status: "offline" as const, text: "Вчера" };
     }
-    return { status: "offline" as const, text: date.toLocaleDateString("ru-RU") };
+    return {
+      status: "offline" as const,
+      text: date.toLocaleDateString("ru-RU"),
+    };
   };
 
   useEffect(() => {
@@ -129,8 +133,12 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
             <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-3">
               <LucideIcons.Users className="w-8 h-8 text-white/40" />
             </div>
-            <p className="text-sm font-medium text-white/80 mb-1">Пока нет друзей</p>
-            <p className="text-xs text-white/60">У пользователя пока нет друзей</p>
+            <p className="text-sm font-medium text-white/80 mb-1">
+              Пока нет друзей
+            </p>
+            <p className="text-xs text-white/60">
+              У пользователя пока нет друзей
+            </p>
           </div>
         </div>
       </motion.div>
@@ -152,7 +160,7 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
 
       <div className="relative z-10 p-4 sm:p-5 flex flex-col">
         {/* Header */}
-        <motion.div 
+        <motion.div
           className="flex items-center justify-between mb-4"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -170,7 +178,9 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
             </div>
           </div>
           <div className="px-3 py-1.5 rounded-full bg-[#f9bc60]/15 border border-[#f9bc60]/30">
-            <span className="text-sm font-bold text-[#f9bc60]">{users.length}</span>
+            <span className="text-sm font-bold text-[#f9bc60]">
+              {users.length}
+            </span>
           </div>
         </motion.div>
 
@@ -179,7 +189,7 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
           {users.slice(0, 3).map((u, index) => {
             const status = getUserStatus(u.lastSeen || null);
             const isOnline = status.status === "online";
-            
+
             return (
               <motion.div
                 key={u.id}
@@ -214,7 +224,8 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="truncate text-sm font-semibold text-white group-hover:text-[#f9bc60] transition-colors">
-                        {u.name || (u.email ? u.email.split("@")[0] : "Пользователь")}
+                        {u.name ||
+                          (u.email ? u.email.split("@")[0] : "Пользователь")}
                       </p>
                       {u.heroBadge && (
                         <HeroBadge badge={u.heroBadge} size="xs" />
@@ -268,5 +279,3 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
     </motion.div>
   );
 }
-
-

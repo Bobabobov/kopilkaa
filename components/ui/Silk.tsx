@@ -94,23 +94,23 @@ void main() {
 }
 `;
 
-const SilkPlane = forwardRef<any, { uniforms: SilkUniforms }>(function SilkPlane({ uniforms }, ref) {
-  const { viewport } = useThree();
+const SilkPlane = forwardRef<any, { uniforms: SilkUniforms }>(
+  function SilkPlane({ uniforms }, ref) {
+    const { viewport } = useThree();
 
-  useLayoutEffect(() => {
-    if (ref && "current" in ref && ref.current) {
-      ref.current.scale.set(viewport.width, viewport.height, 1);
-    }
-  }, [ref, viewport]);
+    useLayoutEffect(() => {
+      if (ref && "current" in ref && ref.current) {
+        ref.current.scale.set(viewport.width, viewport.height, 1);
+      }
+    }, [ref, viewport]);
 
-  useFrame((_, delta) => {
-    if (ref && "current" in ref && ref.current) {
-      ref.current.material.uniforms.uTime.value += 0.1 * delta;
-    }
-  });
+    useFrame((_, delta) => {
+      if (ref && "current" in ref && ref.current) {
+        ref.current.material.uniforms.uTime.value += 0.1 * delta;
+      }
+    });
 
-  return (
-    React.createElement(
+    return React.createElement(
       "mesh",
       { ref },
       React.createElement("planeGeometry", { args: [1, 1, 1, 1] }),
@@ -118,10 +118,10 @@ const SilkPlane = forwardRef<any, { uniforms: SilkUniforms }>(function SilkPlane
         uniforms,
         vertexShader,
         fragmentShader,
-      })
-    ) as any
-  );
-});
+      }),
+    ) as any;
+  },
+);
 SilkPlane.displayName = "SilkPlane";
 
 export default function Silk({
@@ -155,4 +155,3 @@ export default function Silk({
     </Canvas>
   );
 }
-

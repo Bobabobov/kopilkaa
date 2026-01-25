@@ -29,18 +29,18 @@ export default function NotificationsSection({
   useEffect(() => {
     if (scrollToOnMount && sectionRef.current) {
       setTimeout(() => {
-        sectionRef.current?.scrollIntoView({ 
-          behavior: "smooth", 
-          block: "start" 
+        sectionRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
       }, 100);
     }
   }, [scrollToOnMount]);
 
   const getNotificationCountText = (count: number) => {
-    if (count === 1) return 'уведомление';
-    if (count < 5) return 'уведомления';
-    return 'уведомлений';
+    if (count === 1) return "уведомление";
+    if (count < 5) return "уведомления";
+    return "уведомлений";
   };
 
   return (
@@ -60,10 +60,13 @@ export default function NotificationsSection({
               <LucideIcons.Bell className="text-[#f9bc60] w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg sm:text-xl font-semibold text-[#fffffe]">Уведомления</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-[#fffffe]">
+                Уведомления
+              </h2>
               {notifications.length > 0 && (
                 <p className="text-xs sm:text-sm text-[#abd1c6]/60 mt-0.5">
-                  {notifications.length} {getNotificationCountText(notifications.length)}
+                  {notifications.length}{" "}
+                  {getNotificationCountText(notifications.length)}
                 </p>
               )}
             </div>
@@ -89,5 +92,3 @@ export default function NotificationsSection({
     </motion.section>
   );
 }
-
-

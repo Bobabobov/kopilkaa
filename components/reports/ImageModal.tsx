@@ -38,5 +38,3 @@ export default function ImageModal({ imageUrl, onClose }: ImageModalProps) {
     </div>
   );
 }
-
-

@@ -8,7 +8,12 @@ interface GuestActionsMenuProps {
   onReport: () => void;
 }
 
-export function GuestActionsMenu({ isOpen, style, onClose, onReport }: GuestActionsMenuProps) {
+export function GuestActionsMenu({
+  isOpen,
+  style,
+  onClose,
+  onReport,
+}: GuestActionsMenuProps) {
   if (!isOpen) return null;
 
   return (

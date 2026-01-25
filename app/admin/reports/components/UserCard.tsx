@@ -2,7 +2,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 interface UserCardProps {
   userId: string;
@@ -51,14 +50,13 @@ export default function UserCard({
             {name || "Пользователь"}
           </p>
           <p className="text-[#abd1c6] text-sm truncate">{email}</p>
-          {isBanned &&
-            (!bannedUntil || new Date(bannedUntil) > new Date()) && (
-              <p className="text-red-400 text-xs mt-1">
-                {bannedUntil
-                  ? `Заблокирован до ${new Date(bannedUntil).toLocaleDateString("ru-RU")}`
-                  : "Заблокирован навсегда"}
-              </p>
-            )}
+          {isBanned && (!bannedUntil || new Date(bannedUntil) > new Date()) && (
+            <p className="text-red-400 text-xs mt-1">
+              {bannedUntil
+                ? `Заблокирован до ${new Date(bannedUntil).toLocaleDateString("ru-RU")}`
+                : "Заблокирован навсегда"}
+            </p>
+          )}
         </div>
         <svg
           className="w-4 h-4 text-[#abd1c6] group-hover:text-[#f9bc60] transition-colors flex-shrink-0"
@@ -77,4 +75,3 @@ export default function UserCard({
     </div>
   );
 }
-

@@ -29,10 +29,9 @@ export function MutualFriendsInline({ friends }: MutualFriendsInlineProps) {
           whileHover={{ scale: 1.1 }}
         >
           <Link href={`/profile/${f.id}`} prefetch={false}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img 
-              src={f.avatar || "/default-avatar.png"} 
-              alt="" 
+            <img
+              src={f.avatar || "/default-avatar.png"}
+              alt=""
               className="w-full h-full object-cover"
               onError={(e) => {
                 e.currentTarget.src = "/default-avatar.png";
@@ -47,7 +46,3 @@ export function MutualFriendsInline({ friends }: MutualFriendsInlineProps) {
     </div>
   );
 }
-
-
-
-

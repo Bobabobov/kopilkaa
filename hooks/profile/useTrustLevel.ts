@@ -53,8 +53,11 @@ export function useTrustLevel({
             return `До пересмотра уровня: ещё ${remaining} одобренн${ending} ${noun}`;
           })();
     const progressValue =
-      nextRequired === null ? null : Math.min(1, Math.max(0, approvedBase / nextRequired));
-    const progressCurrent = nextRequired === null ? null : Math.min(approvedBase, nextRequired);
+      nextRequired === null
+        ? null
+        : Math.min(1, Math.max(0, approvedBase / nextRequired));
+    const progressCurrent =
+      nextRequired === null ? null : Math.min(approvedBase, nextRequired);
     const progressTotal = nextRequired === null ? null : nextRequired;
 
     return {
@@ -69,5 +72,3 @@ export function useTrustLevel({
     };
   }, [approvedApplications, effectiveApprovedApplications]);
 }
-
-

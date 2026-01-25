@@ -15,7 +15,9 @@ export async function PATCH(
   try {
     const body = await req.json();
     const trustDeltaRaw = Number(body?.trustDelta ?? 0);
-    const trustDelta = Number.isFinite(trustDeltaRaw) ? Math.trunc(trustDeltaRaw) : 0;
+    const trustDelta = Number.isFinite(trustDeltaRaw)
+      ? Math.trunc(trustDeltaRaw)
+      : 0;
 
     const updated = await prisma.user.update({
       where: { id: params.userId },

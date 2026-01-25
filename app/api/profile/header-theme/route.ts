@@ -22,11 +22,12 @@ export async function PATCH(req: Request) {
 
     // Валидация темы: разрешены все ключи из headerThemes + цветовые
     const validThemes = Object.keys(headerThemes);
-    
+
     // Проверяем, является ли это цветной темой (формат color:#HEX)
     const isColorTheme = headerTheme.startsWith("color:#");
-    const isValidColor = isColorTheme && /^color:#[0-9A-Fa-f]{6}$/.test(headerTheme);
-    
+    const isValidColor =
+      isColorTheme && /^color:#[0-9A-Fa-f]{6}$/.test(headerTheme);
+
     // Если это не валидная готовая тема и не валидная цветная тема, возвращаем ошибку
     if (!validThemes.includes(headerTheme) && !isValidColor) {
       return NextResponse.json(
@@ -35,9 +36,18 @@ export async function PATCH(req: Request) {
       );
     }
 
+    const current = await prisma.user.findUnique({
+      where: { id: session.uid },
+      select: { headerTheme: true },
+    });
+
+    const headerThemeChanged = current?.headerTheme !== headerTheme;
+
     const user = await prisma.user.update({
       where: { id: session.uid },
-      data: { headerTheme },
+      data: headerThemeChanged
+        ? { headerTheme, headerThemeUpdatedAt: new Date() }
+        : { headerTheme },
       select: {
         id: true,
         email: true,
@@ -63,9 +73,3 @@ export async function PATCH(req: Request) {
     );
   }
 }
-
-
-
-
-
-

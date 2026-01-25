@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const session = await getSession();

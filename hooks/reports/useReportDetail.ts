@@ -12,7 +12,9 @@ interface UseReportDetailProps {
 interface UseReportDetailReturn {
   report: (BugReport & { userLike: boolean | null }) | null;
   loading: boolean;
-  setReport: React.Dispatch<React.SetStateAction<(BugReport & { userLike: boolean | null }) | null>>;
+  setReport: React.Dispatch<
+    React.SetStateAction<(BugReport & { userLike: boolean | null }) | null>
+  >;
 }
 
 export function useReportDetail({
@@ -54,5 +56,3 @@ export function useReportDetail({
 
   return { report, loading, setReport };
 }
-
-

@@ -26,11 +26,13 @@ export default function NotificationsList({
           index={index}
           lastViewedTimestamp={lastViewedTimestamp}
           variant={variant}
-          onClick={onNotificationClick ? () => onNotificationClick(notification) : undefined}
+          onClick={
+            onNotificationClick
+              ? () => onNotificationClick(notification)
+              : undefined
+          }
         />
       ))}
     </div>
   );
 }
-
-

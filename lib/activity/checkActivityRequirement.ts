@@ -129,7 +129,8 @@ export async function isActivityRequirementMet(
         where: { id: userId },
         select: { avatar: true },
       });
-      return user?.avatar !== null && user.avatar.trim() !== "";
+      if (!user?.avatar) return false;
+      return user.avatar.trim() !== "";
     }
 
     case "CHANGE_HEADER": {
@@ -137,7 +138,8 @@ export async function isActivityRequirementMet(
         where: { id: userId },
         select: { headerTheme: true },
       });
-      return user?.headerTheme !== null && user.headerTheme !== "default";
+      if (!user?.headerTheme) return false;
+      return user.headerTheme !== "default";
     }
 
     default:

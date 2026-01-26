@@ -99,18 +99,16 @@ export async function POST(request: Request) {
 
     const isAdmin = session.role === "ADMIN";
 
-    // Ограничение: не больше 1 заявки в сутки на пользователя (для обычных пользователей)
+    // Ограничение: не больше 5 заявок в сутки на пользователя (для обычных пользователей)
     if (!isAdmin) {
       const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const recentReport = await prisma.bugReport.findFirst({
+      const recentReportsCount = await prisma.bugReport.count({
         where: { userId: session.uid, createdAt: { gte: oneDayAgo } },
-        orderBy: { createdAt: "desc" },
-        select: { id: true, createdAt: true },
       });
 
-      if (recentReport) {
+      if (recentReportsCount >= 5) {
         return NextResponse.json(
-          { message: "Можно отправлять только 1 баг-репорт в сутки" },
+          { message: "Можно отправлять до 5 баг-репортов в сутки" },
           { status: 429 },
         );
       }

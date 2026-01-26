@@ -120,7 +120,7 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
       console.error("Submit error:", error);
       const errorMessage = error.message || "Не удалось создать баг-репорт";
       // Сообщение про лимит уже показано в форме, тост не нужен
-      if (!errorMessage.includes("1 баг-репорт")) {
+      if (!errorMessage.includes("5 баг-репортов")) {
         showToast("error", "Ошибка", errorMessage);
       }
     } finally {
@@ -147,7 +147,7 @@ export default function BugReportForm({ onReportCreated }: BugReportFormProps) {
             Сообщить о проблеме
           </h2>
           <p className="text-xs text-[#f9bc60] bg-[#e16162]/10 border border-[#e16162]/30 rounded-lg px-3 py-2">
-            Можно отправлять только 1 баг-репорт в сутки
+            Можно отправлять до 5 баг-репортов в сутки
           </p>
         </div>
 

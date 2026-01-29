@@ -276,7 +276,7 @@ export class PlayScene {
     const display = this.coins.get(coinId);
     if (!display) return;
     display.removeAllListeners?.();
-    display.destroy({ children: true, texture: false, baseTexture: false });
+    display.destroy({ children: true, texture: false });
     this.coins.delete(coinId);
   }
 
@@ -309,7 +309,7 @@ export class PlayScene {
           requestAnimationFrame(animate);
         } else {
           ring.removeAllListeners?.();
-          ring.destroy({ children: true, texture: false, baseTexture: false });
+          ring.destroy({ children: true, texture: false });
         }
       };
     animate();
@@ -341,7 +341,7 @@ export class PlayScene {
           requestAnimationFrame(animateParticle);
         } else {
           particle.removeAllListeners?.();
-          particle.destroy({ children: true, texture: false, baseTexture: false });
+          particle.destroy({ children: true, texture: false });
           const index = this.particles.indexOf(particle);
           if (index > -1) {
             this.particles.splice(index, 1);
@@ -352,14 +352,14 @@ export class PlayScene {
     }
 
     display.removeAllListeners?.();
-    display.destroy({ children: true, texture: false, baseTexture: false });
+    display.destroy({ children: true, texture: false });
     this.coins.delete(coinId);
   }
 
   clearCoins(): void {
     for (const node of this.coins.values()) {
       node.removeAllListeners?.();
-      node.destroy({ children: true, texture: false, baseTexture: false });
+      node.destroy({ children: true, texture: false });
     }
     this.coins.clear();
   }
@@ -415,22 +415,22 @@ export class PlayScene {
   destroy(): void {
     this.app.ticker.remove(this.tickerRef);
     if (this.bgFar) {
-      this.bgFar.destroy({ children: true, texture: false, baseTexture: false });
+      this.bgFar.destroy({ children: true, texture: false });
       this.bgFar = null;
     }
     if (this.bgMid) {
-      this.bgMid.destroy({ children: true, texture: false, baseTexture: false });
+      this.bgMid.destroy({ children: true, texture: false });
       this.bgMid = null;
     }
     if (this.bgNear) {
-      this.bgNear.destroy({ children: true, texture: false, baseTexture: false });
+      this.bgNear.destroy({ children: true, texture: false });
       this.bgNear = null;
     }
     this.backgroundContainer.removeChildren();
-    this.backgroundContainer.destroy({ children: true, texture: false, baseTexture: false });
+    this.backgroundContainer.destroy({ children: true, texture: false });
     this.clearCoins();
     for (const particle of this.particles) {
-      particle.destroy({ children: true, texture: false, baseTexture: false });
+      particle.destroy({ children: true, texture: false });
     }
     this.particles = [];
     this.container.destroy({ children: true });

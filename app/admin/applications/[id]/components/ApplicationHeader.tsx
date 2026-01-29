@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { statusRu, statusColor } from "@/lib/status";
 
-type Status = "PENDING" | "APPROVED" | "REJECTED";
+type Status = "PENDING" | "APPROVED" | "REJECTED" | "CONTEST";
 
 interface ApplicationHeaderProps {
   status: Status;

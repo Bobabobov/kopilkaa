@@ -42,7 +42,6 @@ export class PlayScene {
 
     this.backgroundContainer = new PIXI.Container();
     this.backgroundContainer.eventMode = "none";
-    this.backgroundContainer.eventChildren = false;
     this.container.addChildAt(this.backgroundContainer, 0);
 
     this.coinsContainer = new PIXI.Container();

@@ -40,12 +40,12 @@ export async function GET() {
             },
           },
         },
-        gameRecords: {
+        gameScores: {
           select: {
-            gameType: true,
-            attempts: true,
-            bestScore: true,
-            lastPlayed: true,
+            gameKey: true,
+            weekKey: true,
+            score: true,
+            displayName: true,
             createdAt: true,
           },
         },
@@ -125,7 +125,7 @@ export async function GET() {
         lastSeen: user.lastSeen,
       },
       applications: user.applications,
-      gameRecords: user.gameRecords,
+      gameScores: user.gameScores,
       tree: user.userTree,
       achievements: user.userAchievements,
       friendships: {

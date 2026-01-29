@@ -32,7 +32,7 @@ export class PlayScene {
   private bgNear: PIXI.Sprite | null = null;
   private centerX = 0;
   private centerY = 0;
-  private tickerRef: (t: number) => void = () => {};
+  private tickerRef: (ticker: PIXI.Ticker) => void = () => {};
 
   constructor(app: PIXI.Application, config: GameConfig) {
     this.container = new PIXI.Container();
@@ -109,7 +109,7 @@ export class PlayScene {
     }
   }
 
-  private tickParallax(): void {
+  private tickParallax(_ticker: PIXI.Ticker): void {
     const offset = Math.sin(Date.now() / 8000) * 12;
     if (this.bgFar) this.bgFar.x = this.centerX + offset * 0.1;
     if (this.bgMid) this.bgMid.x = this.centerX + offset * 0.3;

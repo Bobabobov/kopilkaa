@@ -107,7 +107,7 @@ export async function PATCH(
     ) {
       sendStatusEmail(item.user.email, {
         title: item.title,
-        status: item.status,
+        status, // здесь status уже PENDING | APPROVED | REJECTED
         comment: item.adminComment ?? "",
       }).catch((e) => console.error("mail error:", e));
     }

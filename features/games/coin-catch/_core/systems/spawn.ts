@@ -4,7 +4,7 @@ import type { Coin, GameConfig } from "../../_types";
 
 /** Максимум монет на экране: desktop 14, mobile 12 (чтобы не было завала и мисскликов) */
 export const MAX_COINS_ON_SCREEN_DESKTOP = 14;
-export const MAX_COINS_ON_SCREEN_MOBILE = 12;
+export const MAX_COINS_ON_SCREEN_MOBILE = 18;
 
 export function getMaxCoinsOnScreen(isMobile: boolean): number {
   return isMobile ? MAX_COINS_ON_SCREEN_MOBILE : MAX_COINS_ON_SCREEN_DESKTOP;
@@ -18,8 +18,8 @@ export function spawnCoin(
   isMobile: boolean,
 ): Coin {
   const minSide = Math.min(width, height);
-  const radiusBase = minSide * 0.055;
-  const radius = Math.max(18, Math.min(isMobile ? 48 : 40, radiusBase));
+  const radiusBase = minSide * 0.065;
+  const radius = Math.max(22, Math.min(isMobile ? 58 : 50, radiusBase));
 
   // Безопасная зона: монеты только внутри области обзора, с отступом от краёв
   const marginX = Math.max(radius + 20, width * 0.05);

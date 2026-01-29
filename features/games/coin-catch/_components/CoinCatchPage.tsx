@@ -5,6 +5,7 @@ import Link from "next/link";
 import { GameCanvas } from "./GameCanvas";
 import { getMe } from "../_services/api";
 import type { UserProfile } from "../_types";
+import { playButtonSound } from "../_services/sfx";
 
 export function CoinCatchPage() {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -78,6 +79,10 @@ export function CoinCatchPage() {
       <header className="flex-shrink-0 flex items-center justify-between gap-2 px-3 sm:px-5 py-2.5 sm:py-3 bg-[#001e1d]/98 border-b-2 border-[#f9bc60]/40 shadow-md">
         <Link
           href="/games"
+          onClick={() => playButtonSound()}
+          onPointerDown={() => playButtonSound()}
+          onPointerEnter={() => playButtonSound()}
+          onTouchStart={() => playButtonSound()}
           className="flex items-center gap-1 text-[#abd1c6] hover:text-[#f9bc60] transition-colors text-sm sm:text-base font-medium whitespace-nowrap px-3 py-2 rounded-lg hover:bg-[#f9bc60]/10 active:bg-[#f9bc60]/15"
         >
           ← <span className="hidden sm:inline">Назад</span>

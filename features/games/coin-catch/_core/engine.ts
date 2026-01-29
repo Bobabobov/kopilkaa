@@ -6,6 +6,7 @@ import { GAME_CONFIG } from "../_types";
 import { isMobile, getVisibleViewport } from "./systems/adaptive";
 import type { Viewport } from "./systems/adaptive";
 import { spawnCoin, getMaxCoinsOnScreen } from "./systems/spawn";
+import { getMusicVolume } from "../_services/sfx";
 import { MenuScene } from "./scenes/MenuScene";
 import { PlayScene } from "./scenes/PlayScene";
 import { GameOverScene } from "./scenes/GameOverScene";
@@ -30,6 +31,28 @@ export class GameEngine {
   private clickHandler: ((event: PIXI.FederatedPointerEvent) => void) | null = null;
   private resizeHandler: (() => void) | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  private bgAudio: HTMLAudioElement | null = null;
+  private setMusicVolume(base: number): void {
+    if (!this.bgAudio) return;
+    this.bgAudio.volume = getMusicVolume(base);
+  }
+
+  applyMusicVolume(): void {
+    const base = this.gameState.isPlaying && !this.gameState.isGameOver ? 0.2 : 0.08;
+    this.setMusicVolume(base);
+  }
+
+  previewMusic(): void {
+    if (typeof Audio === "undefined") return;
+    if (!this.bgAudio) {
+      this.bgAudio = new Audio("/coin/muzaka/lost-eon-along-in-the-night.mp3");
+      this.bgAudio.loop = true;
+    }
+    this.setMusicVolume(0.2);
+    this.bgAudio.play().catch(() => {
+      // ignore autoplay restrictions
+    });
+  }
   /** Время старта раунда — игнорируем промах от клика по кнопке "Начать игру" */
   private gameStartTime = 0;
   private destroyed = false;
@@ -107,6 +130,12 @@ export class GameEngine {
       this.onLeaderboardClick,
     );
 
+    // Порядок: игра сзади, меню поверх (чтобы через прозрачную панель было видно игру)
+    this.app.stage.removeChild(this.playScene.getContainer());
+    this.app.stage.addChildAt(this.playScene.getContainer(), 0);
+    this.app.stage.removeChild(this.menuScene.getContainer());
+    this.app.stage.addChildAt(this.menuScene.getContainer(), 1);
+
     this.showScene("menu");
   }
 
@@ -162,9 +191,10 @@ export class GameEngine {
     this.playScene?.hide();
     this.gameOverScene?.hide();
 
-    // Показываем нужную сцену
+    // Показываем нужную сцену (на меню игра остаётся видимой сзади)
     switch (scene) {
       case "menu":
+        this.playScene?.show();
         this.menuScene?.show();
         break;
       case "play":
@@ -180,6 +210,14 @@ export class GameEngine {
   startGame(): void {
     if (!this.app) return;
 
+    if (!this.bgAudio && typeof Audio !== "undefined") {
+      this.bgAudio = new Audio("/coin/muzaka/lost-eon-along-in-the-night.mp3");
+      this.bgAudio.loop = true;
+    }
+    if (this.bgAudio) {
+      this.setMusicVolume(0.2);
+    }
+
     this.gameState = {
       score: 0,
       lives: this.config.maxLives,
@@ -193,6 +231,13 @@ export class GameEngine {
     this.gameStartTime = Date.now(); // сброс grace 500ms при каждом рестарте
 
     this.showScene("play");
+
+    if (this.bgAudio) {
+      this.bgAudio.currentTime = 0;
+      this.bgAudio.play().catch(() => {
+        // игнорируем ошибки автозапуска
+      });
+    }
 
     // Запускаем таймер игры
     this.gameTimer = window.setInterval(() => {
@@ -248,7 +293,7 @@ export class GameEngine {
     const activeCount = this.coins.size;
     if (activeCount >= maxCoins) return;
 
-    const wantCount = 1 + Math.floor(Math.random() * 4);
+    const wantCount = mobile ? 2 + Math.floor(Math.random() * 4) : 1 + Math.floor(Math.random() * 4);
     const count = Math.min(wantCount, maxCoins - activeCount);
     const w = this.app.screen.width;
     const h = this.app.screen.height;
@@ -293,6 +338,7 @@ export class GameEngine {
       const sinceStart = Date.now() - this.gameStartTime;
       if (sinceStart < 500) return;
 
+      this.playScene.showMissEffect(point.x, point.y);
       this.gameState.lives--;
       this.playScene.updateState(this.gameState);
 
@@ -311,6 +357,8 @@ export class GameEngine {
       clearInterval(this.spawnTimer);
       this.spawnTimer = null;
     }
+
+    this.setMusicVolume(0.08);
 
     this.gameState.isPlaying = false;
     this.gameState.isGameOver = true;
@@ -383,6 +431,11 @@ export class GameEngine {
     this.gameOverScene = null;
 
     this.app = null;
+    if (this.bgAudio) {
+      this.bgAudio.pause();
+      this.bgAudio.currentTime = 0;
+      this.bgAudio = null;
+    }
     if (app) {
       try {
         if (app.canvas && app.canvas.parentNode) {

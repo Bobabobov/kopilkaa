@@ -2,9 +2,10 @@
 
 import * as PIXI from "pixi.js";
 import type { GameState, Coin, GameConfig } from "../../_types";
+import { playCoinCollectSound } from "../../_services/sfx";
 import type { Viewport } from "../systems/adaptive";
 
-const BG_PATHS = ["/coin/bg_layer_far.png", "/coin/bg_layer_mid.png", "/coin/bg_layer_near.png"] as const;
+const BG_PATH = "/coin/bg.png";
 /** Кадры анимации монеты: /coin/co/1.png … 6.png */
 const COIN_FRAME_PATHS = ["/coin/co/1.png", "/coin/co/2.png", "/coin/co/3.png", "/coin/co/4.png", "/coin/co/5.png", "/coin/co/6.png"] as const;
 const COIN_ANIMATION_SPEED = 0.2;
@@ -17,6 +18,7 @@ export class PlayScene {
   private coinFrames: PIXI.Texture[] = [];
   private coinFrameSize = 256;
   private particles: PIXI.Graphics[] = [];
+  private missEffects: PIXI.Graphics[] = [];
   private uiContainer: PIXI.Container;
   private scoreText: PIXI.Text | null = null;
   private livesText: PIXI.Text | null = null;
@@ -27,12 +29,7 @@ export class PlayScene {
 
   private backgroundContainer: PIXI.Container;
   private coinsContainer: PIXI.Container;
-  private bgFar: PIXI.Sprite | null = null;
-  private bgMid: PIXI.Sprite | null = null;
-  private bgNear: PIXI.Sprite | null = null;
-  private centerX = 0;
-  private centerY = 0;
-  private tickerRef: (ticker: PIXI.Ticker) => void = () => {};
+  private bgSprite: PIXI.Sprite | null = null;
 
   constructor(app: PIXI.Application, config: GameConfig) {
     this.container = new PIXI.Container();
@@ -58,23 +55,11 @@ export class PlayScene {
 
   async initBackground(): Promise<void> {
     try {
-      const [texFar, texMid, texNear] = await Promise.all([
-        PIXI.Assets.load(BG_PATHS[0]),
-        PIXI.Assets.load(BG_PATHS[1]),
-        PIXI.Assets.load(BG_PATHS[2]),
-      ]);
-      this.bgFar = new PIXI.Sprite({ texture: texFar });
-      this.bgMid = new PIXI.Sprite({ texture: texMid });
-      this.bgNear = new PIXI.Sprite({ texture: texNear });
-      this.bgFar.anchor.set(0.5);
-      this.bgMid.anchor.set(0.5);
-      this.bgNear.anchor.set(0.5);
-      this.backgroundContainer.addChild(this.bgFar);
-      this.backgroundContainer.addChild(this.bgMid);
-      this.backgroundContainer.addChild(this.bgNear);
+      const texBg = await PIXI.Assets.load(BG_PATH);
+      this.bgSprite = PIXI.Sprite.from(texBg);
+      this.bgSprite.anchor.set(0.5);
+      this.backgroundContainer.addChild(this.bgSprite);
       this.updateBackgroundSize();
-      this.tickerRef = this.tickParallax.bind(this);
-      this.app.ticker.add(this.tickerRef);
     } catch {
       const fallback = new PIXI.Graphics();
       fallback.rect(0, 0, this.sceneWidth, this.sceneHeight);
@@ -95,25 +80,14 @@ export class PlayScene {
   }
 
   private updateBackgroundSize(): void {
+    if (!this.bgSprite) return;
     const w = this.sceneWidth;
     const h = this.sceneHeight;
-    this.centerX = w / 2;
-    this.centerY = h / 2;
-    const layers = [this.bgFar, this.bgMid, this.bgNear].filter(Boolean) as PIXI.Sprite[];
-    for (const sprite of layers) {
-      const tw = sprite.texture?.width ?? 1;
-      const th = sprite.texture?.height ?? 1;
-      const scale = Math.max(w / tw, h / th);
-      sprite.scale.set(scale);
-      sprite.position.set(this.centerX, this.centerY);
-    }
-  }
-
-  private tickParallax(_ticker: PIXI.Ticker): void {
-    const offset = Math.sin(Date.now() / 8000) * 12;
-    if (this.bgFar) this.bgFar.x = this.centerX + offset * 0.1;
-    if (this.bgMid) this.bgMid.x = this.centerX + offset * 0.3;
-    if (this.bgNear) this.bgNear.x = this.centerX + offset * 0.6;
+    const tw = this.bgSprite.texture?.width ?? 1;
+    const th = this.bgSprite.texture?.height ?? 1;
+    const scale = Math.max(w / tw, h / th);
+    this.bgSprite.scale.set(scale);
+    this.bgSprite.position.set(w / 2, h / 2);
   }
 
   private setupUI(): void {
@@ -121,110 +95,109 @@ export class PlayScene {
     const height = this.sceneHeight;
     const minSide = Math.min(width, height);
     const scale = Math.max(0.5, Math.min(2, minSide / 400));
-    const baseFontSize = Math.max(16, Math.min(32, 20 * scale));
-    const padding = Math.max(8, 14 * scale);
-    const gap = Math.max(6, 10 * scale);
+    const baseFontSize = Math.max(16, Math.min(22, Math.floor(18 * scale)));
+    const labelFontSize = Math.max(10, Math.min(14, Math.floor(12 * scale)));
+    const pad = Math.max(8, Math.floor(14 * scale));
+    const radius = Math.max(6, Math.floor(10 * scale));
 
-    // Панель — стеклянный эффект, адаптивная ширина
-    const panelWidth = Math.min(width * 0.9, Math.max(260, 320 * scale));
-    const panelHeight = Math.max(56, Math.min(88, 72 * scale));
-    const radius = 12 * scale;
+    const panelWidth = Math.min(width - pad * 2, Math.max(300, Math.floor(360 * scale)));
+    const panelHeight = Math.max(64, Math.min(88, Math.floor(72 * scale)));
+    const px = Math.floor(pad);
+    const py = Math.floor(pad);
 
     const panel = new PIXI.Graphics();
-    panel.roundRect(padding, padding, panelWidth, panelHeight, radius);
-    panel.fill({ color: 0x001e1d, alpha: 0.94 });
-    panel.stroke({ width: 2 * scale, color: 0xf9bc60, alpha: 0.85 });
+    panel.roundRect(px, py, panelWidth, panelHeight, radius);
+    panel.fill({ color: 0x001e1d, alpha: 0.65 });
+    panel.stroke({ width: 2, color: 0xf9bc60, alpha: 0.9 });
     const inner = new PIXI.Graphics();
-    inner.roundRect(padding + 2, padding + 2, panelWidth - 4, panelHeight - 4, radius - 2);
-    inner.stroke({ width: 1, color: 0xf9bc60, alpha: 0.2 });
+    inner.roundRect(px + 2, py + 2, panelWidth - 4, panelHeight - 4, Math.max(2, radius - 2));
+    inner.stroke({ width: 1, color: 0xf9bc60, alpha: 0.35 });
     panel.addChild(inner);
+
+    const colW = panelWidth / 3;
+    const center1 = px + colW * 0.5;
+    const center2 = px + colW * 1.5;
+    const center3 = px + colW * 2.5;
+    const rowY = py + panelHeight / 2;
+    const labelY = Math.floor(rowY - panelHeight * 0.2);
+    const valueY = Math.floor(rowY + panelHeight * 0.12);
+
+    const divider1 = new PIXI.Graphics();
+    divider1.rect(Math.floor(px + colW - 1), py + 8, 2, panelHeight - 16);
+    divider1.fill({ color: 0xf9bc60, alpha: 0.45 });
+    panel.addChild(divider1);
+    const divider2 = new PIXI.Graphics();
+    divider2.rect(Math.floor(px + colW * 2 - 1), py + 8, 2, panelHeight - 16);
+    divider2.fill({ color: 0xf9bc60, alpha: 0.45 });
+    panel.addChild(divider2);
+
     this.uiContainer.addChild(panel);
 
-    const rowY = padding + panelHeight / 2;
-    const scoreX = padding + 16 * scale;
-    const livesX = padding + panelWidth * 0.35;
-    const timeX = padding + panelWidth * 0.68;
-    const labelOffset = baseFontSize * 0.75;
+    const pixelFont = "'Press Start 2P', monospace";
+    const labelStyle = {
+      fontFamily: pixelFont,
+      fontSize: labelFontSize,
+      fill: 0xabd1c6,
+    };
 
-    const scoreLabel = new PIXI.Text({
-      text: "Очки",
-      style: {
-        fontFamily: "system-ui, sans-serif",
-        fontSize: baseFontSize * 0.65,
-        fill: 0xabd1c6,
-      },
-    });
-    scoreLabel.anchor.set(0, 0.5);
-    scoreLabel.x = scoreX;
-    scoreLabel.y = rowY - labelOffset;
+    const scoreLabel = new PIXI.Text({ text: "ОЧКИ", style: labelStyle });
+    scoreLabel.anchor.set(0.5, 0.5);
+    scoreLabel.x = Math.floor(center1);
+    scoreLabel.y = labelY;
     this.uiContainer.addChild(scoreLabel);
 
     this.scoreText = new PIXI.Text({
       text: "0",
       style: {
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: pixelFont,
         fontSize: baseFontSize,
         fill: 0xfffffe,
-        fontWeight: "bold",
       },
     });
-    this.scoreText.anchor.set(0, 0.5);
-    this.scoreText.x = scoreX;
-    this.scoreText.y = rowY;
+    this.scoreText.resolution = 2;
+    this.scoreText.anchor.set(0.5, 0.5);
+    this.scoreText.x = Math.floor(center1);
+    this.scoreText.y = valueY;
     this.uiContainer.addChild(this.scoreText);
 
-    const livesLabel = new PIXI.Text({
-      text: "Жизни",
-      style: {
-        fontFamily: "system-ui, sans-serif",
-        fontSize: baseFontSize * 0.65,
-        fill: 0xabd1c6,
-      },
-    });
+    const livesLabel = new PIXI.Text({ text: "ЖИЗНИ", style: labelStyle });
     livesLabel.anchor.set(0.5, 0.5);
-    livesLabel.x = livesX;
-    livesLabel.y = rowY - labelOffset;
+    livesLabel.x = Math.floor(center2);
+    livesLabel.y = labelY;
     this.uiContainer.addChild(livesLabel);
 
     this.livesText = new PIXI.Text({
       text: "3",
       style: {
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: pixelFont,
         fontSize: baseFontSize,
         fill: 0xff6b6b,
-        fontWeight: "bold",
       },
     });
+    this.livesText.resolution = 2;
     this.livesText.anchor.set(0.5, 0.5);
-    this.livesText.x = livesX;
-    this.livesText.y = rowY;
+    this.livesText.x = Math.floor(center2);
+    this.livesText.y = valueY;
     this.uiContainer.addChild(this.livesText);
 
-    const timeLabel = new PIXI.Text({
-      text: "Сек",
-      style: {
-        fontFamily: "system-ui, sans-serif",
-        fontSize: baseFontSize * 0.65,
-        fill: 0xabd1c6,
-      },
-    });
+    const timeLabel = new PIXI.Text({ text: "СЕК", style: labelStyle });
     timeLabel.anchor.set(0.5, 0.5);
-    timeLabel.x = timeX;
-    timeLabel.y = rowY - labelOffset;
+    timeLabel.x = Math.floor(center3);
+    timeLabel.y = labelY;
     this.uiContainer.addChild(timeLabel);
 
     this.timeText = new PIXI.Text({
       text: "30",
       style: {
-        fontFamily: "system-ui, sans-serif",
-        fontSize: baseFontSize * 1.15,
+        fontFamily: pixelFont,
+        fontSize: baseFontSize,
         fill: 0xf9bc60,
-        fontWeight: "bold",
       },
     });
+    this.timeText.resolution = 2;
     this.timeText.anchor.set(0.5, 0.5);
-    this.timeText.x = timeX;
-    this.timeText.y = rowY;
+    this.timeText.x = Math.floor(center3);
+    this.timeText.y = valueY;
     this.uiContainer.addChild(this.timeText);
   }
 
@@ -283,6 +256,7 @@ export class PlayScene {
   collectCoin(coinId: string): void {
     const display = this.coins.get(coinId);
     if (!display) return;
+    playCoinCollectSound();
     const data = (display as PIXI.Container & { userData?: { x: number; y: number; radius: number } }).userData;
     const cx = data?.x ?? 0;
     const cy = data?.y ?? 0;
@@ -356,6 +330,33 @@ export class PlayScene {
     this.coins.delete(coinId);
   }
 
+  showMissEffect(x: number, y: number): void {
+    const ring = new PIXI.Graphics();
+    ring.circle(0, 0, 26);
+    ring.stroke({ width: 4, color: 0xff3b3b, alpha: 0.9 });
+    ring.position.set(x, y);
+    this.container.addChild(ring);
+    this.missEffects.push(ring);
+
+    const startTime = Date.now();
+    const duration = 260;
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      if (elapsed < duration) {
+        const t = elapsed / duration;
+        ring.scale.set(1 + t * 1.2);
+        ring.alpha = 0.9 * (1 - t);
+        requestAnimationFrame(animate);
+      } else {
+        ring.removeAllListeners?.();
+        ring.destroy({ children: true, texture: false });
+        const idx = this.missEffects.indexOf(ring);
+        if (idx > -1) this.missEffects.splice(idx, 1);
+      }
+    };
+    animate();
+  }
+
   clearCoins(): void {
     for (const node of this.coins.values()) {
       node.removeAllListeners?.();
@@ -412,19 +413,14 @@ export class PlayScene {
     this.container.visible = false;
   }
 
+  getContainer(): PIXI.Container {
+    return this.container;
+  }
+
   destroy(): void {
-    this.app.ticker.remove(this.tickerRef);
-    if (this.bgFar) {
-      this.bgFar.destroy({ children: true, texture: false });
-      this.bgFar = null;
-    }
-    if (this.bgMid) {
-      this.bgMid.destroy({ children: true, texture: false });
-      this.bgMid = null;
-    }
-    if (this.bgNear) {
-      this.bgNear.destroy({ children: true, texture: false });
-      this.bgNear = null;
+    if (this.bgSprite) {
+      this.bgSprite.destroy({ children: true, texture: false });
+      this.bgSprite = null;
     }
     this.backgroundContainer.removeChildren();
     this.backgroundContainer.destroy({ children: true, texture: false });
@@ -433,6 +429,10 @@ export class PlayScene {
       particle.destroy({ children: true, texture: false });
     }
     this.particles = [];
+    for (const miss of this.missEffects) {
+      miss.destroy({ children: true, texture: false });
+    }
+    this.missEffects = [];
     this.container.destroy({ children: true });
   }
 }

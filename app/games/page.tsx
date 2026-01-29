@@ -44,9 +44,6 @@ export default function GamesPage() {
     return null;
   }
 
-  /** На сервере не задавать NEXT_PUBLIC_GAMES_ENABLED — игры пока «Игра ещё не готова». Локально в .env.local задать NEXT_PUBLIC_GAMES_ENABLED=true для доступа. */
-  const gamesEnabled = process.env.NEXT_PUBLIC_GAMES_ENABLED === "true";
-
   const games: Array<{
     title: string;
     description: string;
@@ -121,50 +118,25 @@ export default function GamesPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 0.6 }}
-                  className={`rounded-2xl bg-gradient-to-br from-[#001e1d]/40 to-[#004643]/40 border border-[#f9bc60]/20 p-4 ${!gamesEnabled ? "opacity-90" : ""}`}
+                  className="rounded-2xl bg-gradient-to-br from-[#001e1d]/40 to-[#004643]/40 border border-[#f9bc60]/20 p-4"
                 >
-                  {gamesEnabled ? (
-                    <Link
-                      href={game.href}
-                      className="block rounded-xl overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/60"
-                    >
-                      <div className="rounded-xl overflow-hidden relative">
-                        <Image
-                          src={game.image}
-                          alt={game.title}
-                          width={640}
-                          height={480}
-                          className="w-full h-44 sm:h-48 object-cover"
-                        />
-                        <span className="absolute top-3 left-3 rounded-full bg-[#f9bc60] text-[#001e1d] text-xs font-semibold px-3 py-1">
-                          {game.badge}
-                        </span>
-                      </div>
-                      <div className="mt-4">
-                        <div className="text-xl font-bold text-[#fffffe]">{game.title}</div>
-                        <div className="text-sm text-[#abd1c6] mt-1">{game.description}</div>
-                        <div className="text-sm text-[#f9bc60] mt-3">Открыть →</div>
-                      </div>
-                    </Link>
-                  ) : (
-                    <div className="block rounded-xl overflow-hidden cursor-not-allowed">
-                      <div className="rounded-xl overflow-hidden relative">
-                        <Image
-                          src={game.image}
-                          alt=""
-                          width={640}
-                          height={480}
-                          className="w-full h-44 sm:h-48 object-cover"
-                        />
-                        <span className="absolute inset-0 flex items-center justify-center bg-[#001e1d]/70 rounded-xl text-[#f9bc60] font-semibold text-lg">
-                          Игра ещё не готова
-                        </span>
-                      </div>
-                      <div className="mt-4">
-                        <div className="text-sm text-[#abd1c6]">Игра ещё не готова</div>
-                      </div>
+                  <div className="block rounded-xl overflow-hidden cursor-not-allowed">
+                    <div className="rounded-xl overflow-hidden relative">
+                      <Image
+                        src={game.image}
+                        alt={game.title}
+                        width={640}
+                        height={480}
+                        className="w-full h-44 sm:h-48 object-cover"
+                      />
+                      <span className="absolute inset-0 flex items-center justify-center bg-[#001e1d]/70 rounded-xl text-[#f9bc60] font-semibold text-lg">
+                        Игра ещё разрабатывается
+                      </span>
                     </div>
-                  )}
+                    <div className="mt-4">
+                      <div className="text-sm text-[#abd1c6]">Игра ещё разрабатывается</div>
+                    </div>
+                  </div>
                 </motion.div>
               ))}
 

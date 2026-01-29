@@ -393,7 +393,7 @@ export class GameEngine {
           }
         }
         if (typeof app.destroy === "function") {
-          app.destroy(true, { children: true, texture: false, baseTexture: false });
+          app.destroy(true, { children: true, texture: false });
         }
       } catch (error) {
         if (process.env.NODE_ENV !== "production") {

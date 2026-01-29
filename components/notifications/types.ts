@@ -17,7 +17,7 @@ export interface Notification {
   isRead: boolean;
   rarity?: string;
   applicationId?: string;
-  status?: "APPROVED" | "REJECTED";
+  status?: "APPROVED" | "REJECTED" | "CONTEST";
   friendshipId?: string;
   requesterId?: string;
 }

@@ -12,7 +12,7 @@ interface ApplicationsListProps {
   loading: boolean;
   error: string | null;
   searchQuery: string;
-  status: "ALL" | "PENDING" | "APPROVED" | "REJECTED";
+  status: "ALL" | "PENDING" | "APPROVED" | "REJECTED" | "CONTEST";
   onStatusChange: (
     id: string,
     status: ApplicationItem["status"],

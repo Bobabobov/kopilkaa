@@ -125,14 +125,6 @@ export class AchievementService {
       return userStats.maxStoryWords ?? 0;
     }
 
-    // Leaf Flight score
-    if (
-      key.startsWith("leaf_flight") ||
-      desc.includes("leaf flight") ||
-      desc.includes("очк")
-    ) {
-      return userStats.bestScoreLeafFlight ?? 0;
-    }
 
     // “Первый рекорд” — факт наличия любой записи игры
     if (key === "first_record" || desc.includes("рекорд")) {
@@ -232,22 +224,6 @@ export class AchievementService {
       likesReceivedMaxOnOneStory = 0;
     }
 
-    // games
-    const gamesPlayed = await prisma.gameRecord
-      .count({ where: { userId } })
-      .catch(() => 0);
-    let bestScoreLeafFlight = 0;
-    try {
-      const best = await prisma.gameRecord.findFirst({
-        where: { userId, gameType: "leaf-flight" },
-        orderBy: { bestScore: "desc" },
-        select: { bestScore: true },
-      });
-      bestScoreLeafFlight = best?.bestScore ?? 0;
-    } catch {
-      bestScoreLeafFlight = 0;
-    }
-    const hasAnyGameRecord = gamesPlayed > 0;
 
     // creativity: максимальная длина текста истории/заявки (если поля есть)
     let maxStoryWords = 0;
@@ -341,9 +317,6 @@ export class AchievementService {
       friendsCount,
       likesGiven,
       likesReceivedMaxOnOneStory,
-      gamesPlayed,
-      bestScoreLeafFlight,
-      hasAnyGameRecord,
       maxStoryWords,
       isFirst100,
       hasAvatar: Boolean(user.avatar),

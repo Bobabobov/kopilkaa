@@ -1,0 +1,21 @@
+{
+  "prompt": "A highly detailed spritesheet for a golden coin spinning animation. The spritesheet should be arranged in a 6x4 grid (6 columns, 4 rows), where each individual frame is 256x256 pixels. The total image resolution must be 1536x1024 pixels (width: 6*256, height: 4*256).\n\n**Coin Appearance:** The coin is golden, depicted with a realistic, slightly aged metallic texture, featuring subtle highlights and shadows that suggest depth and a sense of volume. The rim of the coin has clearly defined, sharp serrated edges.\n\n**Coin Faces:**\n- One side (front) features the number '1' embossed in the center, encircled by a finely detailed laurel wreath.\n- The other side (back) features the Russian Ruble symbol (₽) embossed in the center, also encircled by a finely detailed laurel wreath.\n\n**Animation Sequence:** The spritesheet should depict a smooth, continuous 360-degree rotation of the coin. The first five frames in the top row (from left to right) should specifically illustrate the coin starting face-on with the '1' side, progressively rotating to an angled view, then almost fully on its edge, then completely on its edge, and finally beginning to reveal the '₽' side from an angle. The subsequent frames should continue this rotation, eventually showing the '₽' side face-on and completing the full spin, ensuring seamless transitions between all 24 frames.",
+  "negative_prompt": "blurry, low quality, cartoon, abstract, pixel art, text errors, mismatched symbols, dull colors, flat lighting, inaccurate rotation, incomplete frames, multiple coins, modern currency symbols, out of focus, poor resolution",
+  "styles": [
+    "game asset",
+    "realistic",
+    "high detail",
+    "metallic texture",
+    "3D rendering"
+  ],
+  "resolution": "1536x1024",
+  "aspect_ratio": "3:2",
+  "grid": {
+    "columns": 6,
+    "rows": 4,
+    "frame_width": 256,
+    "frame_height": 256,
+    "total_frames": 24
+  },
+  "usage_notes": "First row (frames 0-4) used for coin animation in game; each frame 256x256."
+}

@@ -20,6 +20,7 @@ export default function StatusModal({
   onSave,
 }: StatusModalProps) {
   if (!modal.id) return null;
+  // «Конкурс» — только пометка для админа, не одобряет и не отклоняет
   const canDecrease =
     modal.status === "APPROVED" || modal.status === "REJECTED";
 
@@ -106,6 +107,7 @@ export default function StatusModal({
               <option value="PENDING">⏳ В обработке</option>
               <option value="APPROVED">✅ Одобрено</option>
               <option value="REJECTED">❌ Отказано</option>
+              <option value="CONTEST">🏆 Конкурс</option>
             </select>
           </div>
 

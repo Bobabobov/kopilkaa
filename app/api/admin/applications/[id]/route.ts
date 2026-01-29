@@ -61,11 +61,15 @@ export async function PATCH(
     | "PENDING"
     | "APPROVED"
     | "REJECTED"
+    | "CONTEST"
     | undefined;
   const decreaseTrustOnDecision = Boolean(body?.decreaseTrustOnDecision);
   const adminComment =
     typeof body?.adminComment === "string" ? body.adminComment : undefined;
-  if (!status || !["PENDING", "APPROVED", "REJECTED"].includes(status))
+  if (
+    !status ||
+    !["PENDING", "APPROVED", "REJECTED", "CONTEST"].includes(status)
+  )
     return Response.json({ error: "Invalid status" }, { status: 400 });
 
   try {
@@ -96,8 +100,11 @@ export async function PATCH(
       return updated;
     });
 
-    // 🔔 НЕ ждём SMTP — отправляем "в фоне" и логируем ошибки
-    if (item.user?.email) {
+    // 🔔 Письмо только при одобрении/отклонении. «Конкурс» — только пометка для админа.
+    if (
+      item.user?.email &&
+      (status === "APPROVED" || status === "REJECTED" || status === "PENDING")
+    ) {
       sendStatusEmail(item.user.email, {
         title: item.title,
         status: item.status,
@@ -105,7 +112,7 @@ export async function PATCH(
       }).catch((e) => console.error("mail error:", e));
     }
 
-    // Проверяем и выдаём достижения при одобрении заявки
+    // Проверяем и выдаём достижения только при одобрении заявки
     if (status === "APPROVED" && item.user?.id) {
       try {
         await AchievementService.checkAndGrantAutomaticAchievements(

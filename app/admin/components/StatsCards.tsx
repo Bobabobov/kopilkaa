@@ -63,6 +63,17 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       valueColor: "text-red-600 dark:text-red-400",
       delay: 0.6,
     },
+    {
+      icon: "🏆",
+      title: "Конкурс",
+      value: stats.contest ?? 0,
+      description: "Помечены для конкурса",
+      gradient:
+        "from-violet-500/10 to-purple-500/10 group-hover:from-violet-500/20 group-hover:to-purple-500/20",
+      iconGradient: "from-violet-500 to-purple-500",
+      valueColor: "text-violet-600 dark:text-violet-400",
+      delay: 0.65,
+    },
   ];
 
   const getCardStyle = (index: number) => {
@@ -96,6 +107,12 @@ export default function StatsCards({ stats }: StatsCardsProps) {
         border: "border-[#e16162]/30",
         icon: "from-[#e16162] to-[#dc2626]",
         value: "text-[#e16162]",
+      },
+      {
+        bg: "from-[#9b87f5]/10 to-[#7c6fdc]/10",
+        border: "border-[#9b87f5]/30",
+        icon: "from-[#9b87f5] to-[#7c6fdc]",
+        value: "text-[#9b87f5]",
       },
     ];
     return styles[index % styles.length];

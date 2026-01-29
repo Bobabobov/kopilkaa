@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
       receivedRequestsData,
       achievements,
       applications,
-      gameRecord,
       notifications,
     ] = await Promise.all([
       // Основные данные пользователя
@@ -156,17 +155,6 @@ export async function GET(request: NextRequest) {
         })
         .catch(() => []),
 
-      // Игровые рекорды
-      prisma.gameRecord
-        .findFirst({
-          where: { userId },
-          select: {
-            attempts: true,
-            bestScore: true,
-          },
-        })
-        .catch(() => null),
-
       // Уведомления
       prisma.storyLike
         .findMany({
@@ -217,8 +205,6 @@ export async function GET(request: NextRequest) {
           friendsCount: 0,
           pendingFriendRequests: 0,
           achievementsCount: 0,
-          gameAttempts: 0,
-          bestGameScore: 0,
         },
         notifications: [],
       });
@@ -263,8 +249,6 @@ export async function GET(request: NextRequest) {
       friendsCount: friendsData.length,
       pendingFriendRequests: receivedRequestsData.length,
       achievementsCount: achievements.length,
-      gameAttempts: gameRecord?.attempts || 0,
-      bestGameScore: gameRecord?.bestScore || 0,
     };
     const trust = await computeUserTrustSnapshot(userId);
 

@@ -6,6 +6,74 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { Notification } from "@/components/notifications/types";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
+const CONFETTI_COLORS = [
+  "#9b87f5",
+  "#c4b5fd",
+  "#f9bc60",
+  "#fcd34d",
+  "#34d399",
+  "#6ee7b7",
+  "#f472b6",
+  "#fbbf24",
+];
+const CONFETTI_COUNT = 60;
+
+function ContestConfetti() {
+  const particles = useMemo(
+    () =>
+      Array.from({ length: CONFETTI_COUNT }, (_, i) => ({
+        id: i,
+        color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+        x: (Math.random() - 0.5) * 120,
+        y: (Math.random() - 0.5) * 120,
+        rotation: Math.random() * 360,
+        size: 4 + Math.random() * 6,
+        delay: Math.random() * 0.15,
+        duration: 1.2 + Math.random() * 0.8,
+      })),
+    [],
+  );
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl"
+      aria-hidden
+    >
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute left-1/2 top-1/2 rounded-sm"
+          style={{
+            width: p.size,
+            height: p.size * (Math.random() > 0.5 ? 1 : 0.4),
+            backgroundColor: p.color,
+            boxShadow: `0 0 6px ${p.color}80`,
+          }}
+          initial={{
+            x: "-50%",
+            y: "-50%",
+            opacity: 1,
+            scale: 1,
+            rotate: 0,
+          }}
+          animate={{
+            x: `calc(-50% + ${p.x}vw)`,
+            y: `calc(-50% + ${p.y}vh)`,
+            opacity: 0,
+            scale: 0.2,
+            rotate: p.rotation + 180,
+          }}
+          transition={{
+            duration: p.duration,
+            delay: p.delay,
+            ease: "easeOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 const LS_KEY_LAST_SHOWN = "application_status_last_shown_at";
 
 function safeGetLastShownMs(): number {
@@ -64,6 +132,9 @@ export default function ApplicationStatusModalGate() {
   const isApproved =
     notification?.type === "application_status" &&
     notification?.status === "APPROVED";
+  const isContest =
+    notification?.type === "application_status" &&
+    notification?.status === "CONTEST";
 
   const close = () => {
     if (notification?.createdAt) {
@@ -87,6 +158,9 @@ export default function ApplicationStatusModalGate() {
     }
     close();
   };
+
+  const actionButtonLabel = isApproved ? "Открыть историю" : "Открыть заявки";
+  const showActionButton = !isContest; // для конкурса только «Понятно», перейти нельзя
 
   const pickNewestUnshown = (items: Notification[]): Notification | null => {
     const lastShown = safeGetLastShownMs();
@@ -226,44 +300,86 @@ export default function ApplicationStatusModalGate() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.97, y: 8 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="relative w-full max-w-[720px] rounded-2xl border border-[#2c4f45]/70 bg-[#0f2622] shadow-xl p-5 sm:p-6"
+              className={`relative w-full max-w-[720px] rounded-2xl border shadow-xl p-5 sm:p-6 overflow-hidden ${
+                isContest
+                  ? "border-[#9b87f5]/50 bg-gradient-to-b from-[#1a1525] via-[#151020] to-[#0f0d18] shadow-[0_0_40px_rgba(155,135,245,0.2),inset_0_1px_0_rgba(255,255,255,0.06)]"
+                  : "border-[#2c4f45]/70 bg-[#0f2622]"
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-start justify-between gap-3">
+              {isContest && (
+                <ContestConfetti key={notification.id} />
+              )}
+
+              <div className="flex items-start justify-between gap-3 relative z-10">
                 <div className="flex items-start gap-3 min-w-0">
                   <div
-                    className={`mt-0.5 w-10 h-10 rounded-xl flex items-center justify-center border flex-shrink-0 ${
+                    className={`mt-0.5 flex items-center justify-center border flex-shrink-0 ${
                       isApproved
-                        ? "bg-[#10B981]/15 border-[#10B981]/30 text-[#10B981]"
-                        : "bg-[#e16162]/15 border-[#e16162]/30 text-[#e16162]"
+                        ? "w-10 h-10 rounded-xl bg-[#10B981]/15 border-[#10B981]/30 text-[#10B981]"
+                        : isContest
+                          ? "w-14 h-14 rounded-2xl bg-[#9b87f5]/20 border-[#9b87f5]/40 text-[#c4b5fd] shadow-[0_0_24px_rgba(155,135,245,0.3)]"
+                          : "w-10 h-10 rounded-xl bg-[#e16162]/15 border-[#e16162]/30 text-[#e16162]"
                     }`}
                   >
                     {isApproved ? (
                       <LucideIcons.CheckCircle className="w-5 h-5" />
+                    ) : isContest ? (
+                      <LucideIcons.Trophy className="w-8 h-8" />
                     ) : (
                       <LucideIcons.XCircle className="w-5 h-5" />
                     )}
                   </div>
 
                   <div className="min-w-0">
-                    <p className="text-xs uppercase tracking-[0.14em] text-[#9bb3ab]">
-                      Обновление по заявке
+                    <p
+                      className={`text-xs uppercase tracking-[0.14em] ${
+                        isContest ? "text-[#c4b5fd]/80" : "text-[#9bb3ab]"
+                      }`}
+                    >
+                      {isContest ? "Поздравляем!" : "Обновление по заявке"}
                     </p>
-                    <h3 className="mt-1 text-lg sm:text-xl font-semibold text-[#f7fbf9] leading-tight">
+                    <h3
+                      className={`mt-1 font-semibold leading-tight ${
+                        isContest
+                          ? "text-xl sm:text-2xl bg-gradient-to-r from-[#e9e0ff] via-[#c4b5fd] to-[#a78bfa] bg-clip-text text-transparent"
+                          : "text-lg sm:text-xl text-[#f7fbf9]"
+                      }`}
+                    >
                       {title}
                     </h3>
                     {timeAgo ? (
-                      <div className="mt-1 flex items-center gap-1.5 text-xs text-[#9bb3ab]">
+                      <div
+                        className={`mt-1 flex items-center gap-1.5 text-xs ${
+                          isContest ? "text-[#a78bfa]/70" : "text-[#9bb3ab]"
+                        }`}
+                      >
                         <LucideIcons.Clock className="w-3.5 h-3.5" />
                         <span>{timeAgo}</span>
                       </div>
                     ) : null}
-                    <p className="mt-2 text-sm sm:text-base text-[#cfdcd6] leading-relaxed">
+                    <p
+                      className={`mt-2 leading-relaxed ${
+                        isContest
+                          ? "text-sm sm:text-base text-[#e2ddff]"
+                          : "text-sm sm:text-base text-[#cfdcd6]"
+                      }`}
+                    >
                       {message}
                     </p>
                     {adminComment ? (
-                      <div className="mt-3 rounded-xl border border-[#2c4f45]/70 bg-[#0e2420] p-3">
-                        <div className="text-xs uppercase tracking-[0.12em] text-[#9bb3ab]">
+                      <div
+                        className={`mt-3 rounded-xl border p-3 ${
+                          isContest
+                            ? "border-[#9b87f5]/30 bg-[#1a1525]/80"
+                            : "border-[#2c4f45]/70 bg-[#0e2420]"
+                        }`}
+                      >
+                        <div
+                          className={`text-xs uppercase tracking-[0.12em] ${
+                            isContest ? "text-[#c4b5fd]/90" : "text-[#9bb3ab]"
+                          }`}
+                        >
                           Комментарий администратора
                         </div>
                         <div className="mt-1 text-sm text-[#e9f4ef] leading-relaxed max-h-[28vh] overflow-y-auto pr-1 break-all whitespace-pre-wrap">
@@ -276,30 +392,40 @@ export default function ApplicationStatusModalGate() {
 
                 <button
                   onClick={close}
-                  className="p-2 rounded-xl hover:bg-white/5 text-[#9bb3ab] hover:text-[#f7fbf9] transition-colors flex-shrink-0"
+                  className={`p-2 rounded-xl flex-shrink-0 transition-colors ${
+                    isContest
+                      ? "hover:bg-[#9b87f5]/15 text-[#c4b5fd] hover:text-[#e9e0ff]"
+                      : "hover:bg-white/5 text-[#9bb3ab] hover:text-[#f7fbf9]"
+                  }`}
                   aria-label="Закрыть"
                 >
                   <LucideIcons.X className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="mt-5 flex flex-col sm:flex-row gap-2 sm:justify-end">
+              <div className="mt-5 flex flex-col sm:flex-row gap-2 sm:justify-end relative z-10">
                 <button
                   onClick={close}
-                  className="px-4 py-2.5 rounded-xl border border-[#2c4f45]/70 bg-[#0e2420] text-[#cfdcd6] hover:text-[#f7fbf9] hover:border-[#2c4f45] transition-colors"
+                  className={`px-4 py-2.5 rounded-xl font-semibold transition-colors ${
+                    isContest
+                      ? "bg-[#9b87f5] text-[#fffffe] hover:bg-[#8b77e5] shadow-[0_4px_14px_rgba(155,135,245,0.4)]"
+                      : "border border-[#2c4f45]/70 bg-[#0e2420] text-[#cfdcd6] hover:text-[#f7fbf9] hover:border-[#2c4f45]"
+                  }`}
                 >
                   Понятно
                 </button>
-                <button
-                  onClick={goToTarget}
-                  className={`px-4 py-2.5 rounded-xl font-semibold transition-colors ${
-                    isApproved
-                      ? "bg-[#10B981] text-[#001e1d] hover:bg-[#0ea371]"
-                      : "bg-[#e16162] text-[#fffffe] hover:bg-[#d55556]"
-                  }`}
-                >
-                  {isApproved ? "Открыть историю" : "Открыть заявки"}
-                </button>
+                {showActionButton && (
+                  <button
+                    onClick={goToTarget}
+                    className={`px-4 py-2.5 rounded-xl font-semibold transition-colors ${
+                      isApproved
+                        ? "bg-[#10B981] text-[#001e1d] hover:bg-[#0ea371]"
+                        : "bg-[#e16162] text-[#fffffe] hover:bg-[#d55556]"
+                    }`}
+                  >
+                    {actionButtonLabel}
+                  </button>
+                )}
               </div>
             </motion.div>
           </motion.div>

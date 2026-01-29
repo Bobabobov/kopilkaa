@@ -1,5 +1,5 @@
 // app/admin/applications/[id]/types.ts
-export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED" | "CONTEST";
 
 export type ApplicationItem = {
   id: string;

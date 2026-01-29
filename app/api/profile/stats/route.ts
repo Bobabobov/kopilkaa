@@ -56,26 +56,6 @@ export async function GET() {
       })
       .catch(() => 0);
 
-    // Получаем статистику игр с обработкой ошибок
-    const gameRecords = await prisma.gameRecord
-      .findMany({
-        where: { userId },
-        select: {
-          attempts: true,
-          bestScore: true,
-        },
-      })
-      .catch(() => []);
-
-    const gamesPlayed = gameRecords.reduce(
-      (sum, record) => sum + record.attempts,
-      0,
-    );
-    const bestScore = Math.max(
-      ...gameRecords.map((record) => record.bestScore || 0),
-      0,
-    );
-
     // Получаем детальную статистику заявок
     const applicationsStats = {
       total: totalApplications,

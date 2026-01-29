@@ -197,10 +197,10 @@ export async function GET() {
         where: {
           userId: userId,
           status: {
-            in: ["APPROVED", "REJECTED"],
+            in: ["APPROVED", "REJECTED", "CONTEST"],
           },
           updatedAt: {
-            gte: sevenDaysAgo, // Только недавно измененные
+            gte: sevenDaysAgo,
           },
         },
         orderBy: { updatedAt: "desc" },
@@ -216,18 +216,32 @@ export async function GET() {
       })
       .catch(() => []);
 
-    // Добавляем уведомления о статусе заявок
-    // Показываем все одобренные/отклоненные заявки, обновленные за последние 7 дней
     statusChangedApplications.forEach((application) => {
-      const statusText =
-        application.status === "APPROVED" ? "одобрена" : "отклонена";
-      const statusEmoji = application.status === "APPROVED" ? "✅" : "❌";
+      let statusText: string;
+      let statusEmoji: string;
+      let title: string;
+      let message: string;
+
+      if (application.status === "APPROVED") {
+        statusText = "одобрена";
+        statusEmoji = "✅";
+        title = "Заявка одобрена";
+        message = `${statusEmoji} Ваша заявка "${application.title || "Без названия"}" была одобрена.`;
+      } else if (application.status === "REJECTED") {
+        statusText = "отклонена";
+        statusEmoji = "❌";
+        title = "Заявка отклонена";
+        message = `${statusEmoji} Ваша заявка "${application.title || "Без названия"}" была отклонена.`;
+      } else {
+        title = "Вы участвуете в конкурсе";
+        message = `🏆 Ваша заявка «${application.title || "Без названия"}» принята в конкурс. Мы рассмотрим её и свяжемся с вами.`;
+      }
 
       notifications.push({
         id: `application_${application.id}_${application.status}`,
         type: "application_status",
-        title: `Заявка ${statusText}`,
-        message: `${statusEmoji} Ваша заявка "${application.title || "Без названия"}" была ${statusText}.`,
+        title,
+        message,
         adminComment: application.adminComment ?? null,
         avatar: null,
         createdAt: application.updatedAt,

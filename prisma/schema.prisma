@@ -12,6 +12,7 @@ enum ApplicationStatus {
   PENDING
   APPROVED
   REJECTED
+  CONTEST
 }
 
 enum AchievementRarity {
@@ -67,7 +68,6 @@ model User {
   trustDelta          Int       @default(0)
 
   applications         Application[]
-  gameRecords          GameRecord[]
   userTree             UserTree?
   userAchievements     UserAchievement[]
   friendshipsSent      Friendship[]          @relation("FriendshipRequester")
@@ -83,6 +83,7 @@ model User {
   projectNewsPosts     ProjectNewsPost[]
   projectNewsReactions ProjectNewsReaction[]
   reviews              Review[]
+  gameScores           GameScore[]
   isBanned             Boolean               @default(false)
   bannedUntil          DateTime?
   bannedReason         String?
@@ -124,26 +125,6 @@ model ApplicationImage {
 
   @@index([applicationId])
   @@index([sort])
-}
-
-// Модель для игровых записей
-model GameRecord {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  gameType    String // Тип игры: leaf-flight, etc.
-  attempts    Int       @default(0) // Количество попыток
-  maxAttempts Int       @default(3) // Максимальное количество попыток
-  bestScore   Int? // Лучший результат
-  cooldownEnd DateTime? // Конец кулдауна
-  lastPlayed  DateTime? // Последняя игра
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@unique([userId, gameType])
-  @@index([userId])
-  @@index([gameType])
-  @@index([cooldownEnd])
 }
 
 // Модель для дерева мотивации
@@ -522,4 +503,23 @@ model BugReportLike {
   @@index([userId])
   @@index([bugReportId])
   @@index([isLike])
+}
+
+// Модель для результатов игр
+model GameScore {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameKey     String   @default("coin-catch") // например "coin-catch"
+  weekKey     String   @default("2026-W05") // например "2026-W05"
+  score       Int
+  displayName String   @default("Игрок") // имя пользователя на момент записи
+  createdAt   DateTime @default(now())
+
+  @@index([gameKey])
+  @@index([weekKey])
+  @@index([userId])
+  @@index([score])
+  @@index([createdAt])
+  @@index([gameKey, weekKey, score])
 }

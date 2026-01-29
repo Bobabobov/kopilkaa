@@ -205,7 +205,7 @@ export default function AdminClient() {
             decreaseTrustOnDecision:
               status === "APPROVED" || status === "REJECTED"
                 ? prev.decreaseTrustOnDecision
-                : false,
+                : false, // «Конкурс» не одобряет и не отклоняет
           }))
         }
         onCommentChange={(comment) =>

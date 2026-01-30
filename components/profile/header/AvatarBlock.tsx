@@ -8,6 +8,7 @@ import type { UserStatus } from "../hooks/useUserStatus";
 const DEFAULT_AVATAR = "/default-avatar.png";
 
 type AvatarUser = {
+  id?: string;
   name?: string | null;
   email: string | null;
   hideEmail?: boolean;

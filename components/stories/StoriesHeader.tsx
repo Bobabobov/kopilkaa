@@ -28,17 +28,30 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
           </h1>
         </div>
 
-        <p
-          className="text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto px-4"
-          style={{ color: "#abd1c6" }}
-        >
-          Здесь публикуются истории пользователей, по которым платформа приняла
-          решение о финансовой поддержке.
-          <span className="font-medium" style={{ color: "#f9bc60" }}>
-            {" "}
-            Каждая история — это пример того, как работает «Копилка»
-          </span>
-        </p>
+        <div className="mt-4 mx-auto max-w-3xl px-4 text-center">
+          <p className="text-base sm:text-lg leading-relaxed text-[#dceee6]">
+            Здесь публикуются истории пользователей, по которым платформа
+            приняла решение о{" "}
+            <span className="bg-gradient-to-r from-[#f9bc60] via-[#ffe0a3] to-[#f9bc60] bg-clip-text text-transparent font-semibold drop-shadow-[0_1px_6px_rgba(249,188,96,0.35)]">
+              финансовой поддержке
+            </span>
+            .
+          </p>
+          <p className="mt-2 text-sm sm:text-base text-[#abd1c6]">
+            Каждая история — это{" "}
+            <span className="text-[#f9bc60] font-semibold tracking-wide">
+              пример того, как работает «Копилка»
+            </span>
+            .
+          </p>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <span className="h-px w-10 bg-gradient-to-r from-transparent via-[#f9bc60]/70 to-transparent" />
+            <span className="text-xs uppercase tracking-[0.18em] text-[#f9bc60]/80">
+              Истории поддержки
+            </span>
+            <span className="h-px w-10 bg-gradient-to-r from-transparent via-[#f9bc60]/70 to-transparent" />
+          </div>
+        </div>
       </div>
 
       {/* Поиск */}
@@ -79,9 +92,6 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
             </button>
           )}
         </div>
-        <p className="mt-3 text-center text-xs sm:text-sm text-[#abd1c6]/80">
-          Умный поиск: несколько слов, автор, текст, сумма
-        </p>
       </div>
     </div>
   );

@@ -2,7 +2,6 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import HeroesFilters from "./HeroesFilters";
 import HeroesTopThree from "./HeroesTopThree";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
@@ -208,17 +207,15 @@ export default function HeroesGrid({
 
                   {/* Аватар и имя */}
                   <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4 min-w-0">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 flex-shrink-0 relative">
-                      <Image
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 flex-shrink-0">
+                      <img
                         src={
                           failedAvatars[hero.id]
                             ? DEFAULT_AVATAR
                             : hero.avatar || DEFAULT_AVATAR
                         }
                         alt={hero.name}
-                        fill
-                        sizes="(max-width: 640px) 48px, 56px"
-                        className="object-cover"
+                        className="w-full h-full object-cover"
                         onError={() =>
                           setFailedAvatars((prev) => ({
                             ...prev,

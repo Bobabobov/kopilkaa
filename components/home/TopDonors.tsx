@@ -8,7 +8,6 @@ import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-import Image from "next/image";
 
 interface Donor {
   id: string;
@@ -182,17 +181,13 @@ export default function TopDonors() {
                   <div className="relative flex items-center gap-4">
                     <div className="relative flex-shrink-0">
                       <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-[#f9bc60] shadow-md shadow-[#f9bc60]/40">
-                        <Image
+                        <img
                           src={
                             failedAvatars[topDonor.id]
                               ? DEFAULT_AVATAR
                               : topDonor.avatar || DEFAULT_AVATAR
                           }
                           alt={topDonor.name}
-                          width={56}
-                          height={56}
-                          sizes="56px"
-                          quality={70}
                           className="h-full w-full object-cover"
                           onError={() =>
                             setFailedAvatars((prev) => ({
@@ -322,17 +317,13 @@ export default function TopDonors() {
                                 isSecond ? "h-11 w-11" : "h-10 w-10"
                               }`}
                             >
-                              <Image
+                              <img
                                 src={
                                   failedAvatars[donor.id]
                                     ? DEFAULT_AVATAR
                                     : donor.avatar || DEFAULT_AVATAR
                                 }
                                 alt={donor.name}
-                                width={isSecond ? 44 : 40}
-                                height={isSecond ? 44 : 40}
-                                sizes={isSecond ? "44px" : "40px"}
-                                quality={70}
                                 className="h-full w-full object-cover"
                                 onError={() =>
                                   setFailedAvatars((prev) => ({

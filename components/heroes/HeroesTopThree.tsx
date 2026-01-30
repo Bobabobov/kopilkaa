@@ -2,7 +2,6 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
@@ -111,17 +110,15 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               }}
             >
               <div className="text-2xl sm:text-3xl mb-2">{getRankIcon(2)}</div>
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 mx-auto mb-2 sm:mb-3 relative">
-                <Image
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 mx-auto mb-2 sm:mb-3">
+                <img
                   src={
                     failedAvatars[topThree[1].id]
                       ? DEFAULT_AVATAR
                       : topThree[1].avatar || DEFAULT_AVATAR
                   }
                   alt={topThree[1].name}
-                  fill
-                  sizes="64px"
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                   onError={() =>
                     setFailedAvatars((prev) => ({
                       ...prev,
@@ -210,17 +207,15 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">
                 {getRankIcon(1)}
               </div>
-              <div className="w-16 h-16 sm:w-[72px] sm:h-[72px] md:w-20 md:h-20 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 mx-auto mb-3 sm:mb-4 relative">
-                <Image
+              <div className="w-16 h-16 sm:w-[72px] sm:h-[72px] md:w-20 md:h-20 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 mx-auto mb-3 sm:mb-4">
+                <img
                   src={
                     failedAvatars[topThree[0].id]
                       ? DEFAULT_AVATAR
                       : topThree[0].avatar || DEFAULT_AVATAR
                   }
                   alt={topThree[0].name}
-                  fill
-                  sizes="80px"
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                   onError={() =>
                     setFailedAvatars((prev) => ({
                       ...prev,
@@ -307,19 +302,15 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               }}
             >
               <div className="text-2xl sm:text-3xl mb-2">{getRankIcon(3)}</div>
-              <div
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 mx-auto mb-2 sm:mb-3 relative"
-              >
-                <Image
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 mx-auto mb-2 sm:mb-3">
+                <img
                   src={
                     failedAvatars[topThree[2].id]
                       ? DEFAULT_AVATAR
                       : topThree[2].avatar || DEFAULT_AVATAR
                   }
                   alt={topThree[2].name}
-                  fill
-                  sizes="64px"
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                   onError={() =>
                     setFailedAvatars((prev) => ({
                       ...prev,

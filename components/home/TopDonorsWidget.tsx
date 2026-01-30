@@ -5,7 +5,6 @@ import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-import Image from "next/image";
 
 interface Donor {
   id: string;
@@ -97,17 +96,13 @@ export default function TopDonorsWidget() {
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="relative flex-shrink-0">
                       <div className="h-9 w-9 rounded-full overflow-hidden border border-[#abd1c6]/40">
-                        <Image
+                        <img
                           src={
                             failedAvatars[donor.id]
                               ? DEFAULT_AVATAR
                               : donor.avatar || DEFAULT_AVATAR
                           }
                           alt={donor.name}
-                          width={36}
-                          height={36}
-                          sizes="36px"
-                          quality={70}
                           className="h-full w-full object-cover"
                           onError={() =>
                             setFailedAvatars((prev) => ({

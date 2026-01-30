@@ -8,7 +8,6 @@ import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-import Image from "next/image";
 
 interface Donor {
   id: string;
@@ -195,17 +194,14 @@ export default function TopDonorsInline() {
                             }`}
                           >
                             <div className="w-full h-full rounded-full overflow-hidden bg-[#004643]">
-                              <Image
+                              <img
                                 src={
                                   failedAvatars[donor.id]
                                     ? DEFAULT_AVATAR
                                     : donor.avatar || DEFAULT_AVATAR
                                 }
                                 alt={donor.name}
-                                fill
-                                sizes="48px"
-                                quality={70}
-                                className="object-cover"
+                                className="w-full h-full object-cover"
                                 onError={() =>
                                   setFailedAvatars((prev) => ({
                                     ...prev,

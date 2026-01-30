@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import { postAvatarApi, deleteAvatarApi } from "../api";
+import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
 import type { SettingsUser } from "../types";
 
 type ShowNotification = (
@@ -30,6 +31,11 @@ export function useAvatarHandlers(
         const { avatar } = await postAvatarApi(file);
         if (user) setUser({ ...user, avatar });
         showLocalNotification("success", "Успешно!", "Аватарка обновлена");
+        const submitted = await submitPendingApplicationIfNeeded();
+        if (submitted && typeof window !== "undefined") {
+          window.location.href = "/applications";
+          return;
+        }
       } catch (e) {
         showLocalNotification(
           "error",

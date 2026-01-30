@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useCallback } from "react";
+import { useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import {
   SAVE_KEY_BASE,
@@ -27,6 +27,10 @@ import { uploadApplicationPhotos } from "./upload";
 import { postApplication } from "./submitApi";
 import { clearFormStorage } from "./storage";
 import type { ActivityModalState } from "./types";
+import {
+  consumePendingSubmissionSuccess,
+  savePendingApplication,
+} from "@/lib/applications/pendingSubmission";
 
 export function useApplicationFormState() {
   const { user, loadingAuth } = useApplicationFormAuth();
@@ -119,6 +123,32 @@ export function useApplicationFormState() {
   });
 
   useIntroOverflow(introOpen);
+
+  useEffect(() => {
+    if (loadingAuth) return;
+    const wasSubmitted = consumePendingSubmissionSuccess();
+    if (!wasSubmitted) return;
+    setSubmitted(true);
+    setPhotos([]);
+    setTitle("");
+    setSummary("");
+    setStory("");
+    setAmount("");
+    setPayment("");
+    setBankName("");
+    setTrustAcknowledged(false);
+    setPoliciesAccepted(false);
+    setAckError(false);
+    setErr(null);
+    setLeft(null);
+    clearFormStorage(saveKey, trustAckKey, policyAckKey, formStartKey);
+  }, [
+    loadingAuth,
+    saveKey,
+    trustAckKey,
+    policyAckKey,
+    formStartKey,
+  ]);
 
   const trust = useTrustAndReview(user, amount);
   const {
@@ -248,7 +278,7 @@ export function useApplicationFormState() {
           ? `Банк: ${bankName}\n${payment}`
           : payment;
 
-        const { response: r, data: d } = await postApplication({
+        const pendingPayload = {
           title,
           summary,
           story,
@@ -258,7 +288,9 @@ export function useApplicationFormState() {
           hpCompany,
           acknowledgedRules: trustAcknowledged && policiesAccepted,
           clientMeta: { filledMs },
-        });
+        };
+
+        const { response: r, data: d } = await postApplication(pendingPayload);
 
         if (r.status === 401) {
           const href = buildAuthModalUrl({
@@ -279,6 +311,7 @@ export function useApplicationFormState() {
           );
         }
         if (r.status === 403 && (d?.requiresActivity as boolean)) {
+          savePendingApplication(pendingPayload);
           setActivityModal({
             isOpen: true,
             activityType:

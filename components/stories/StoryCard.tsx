@@ -8,6 +8,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
+import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
 
 interface Story {
   id: string;
@@ -162,6 +163,13 @@ export function StoryCard({
       const newLikedState = !liked;
       setLiked(newLikedState);
       setLikesCount((prev) => (liked ? prev - 1 : prev + 1));
+
+      if (method === "POST") {
+        const submitted = await submitPendingApplicationIfNeeded();
+        if (submitted && typeof window !== "undefined") {
+          window.location.href = "/applications";
+        }
+      }
     } catch (error) {
       console.error("Error updating like:", error);
     } finally {

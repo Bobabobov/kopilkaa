@@ -5,6 +5,7 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
 
 interface AvatarUploadProps {
   currentAvatar?: string | null;
@@ -76,6 +77,11 @@ export default function AvatarUpload({
           "Аватарка загружена!",
           "Ваша аватарка успешно обновлена",
         );
+        const submitted = await submitPendingApplicationIfNeeded();
+        if (submitted && typeof window !== "undefined") {
+          window.location.href = "/applications";
+          return;
+        }
       } else {
         console.error("Upload failed:", data);
         showToast(

@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useAutoHideScrollbar } from "@/hooks/ui/useAutoHideScrollbar";
 import { getAllHeaderThemes, getHeaderTheme } from "@/lib/header-customization";
+import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
 import ColorWheel from "./ColorWheel";
 
 interface User {
@@ -127,7 +128,11 @@ export default function HeaderCustomization({
           "Тема обновлена!",
           "Заголовок профиля успешно изменен",
         );
-
+        const submitted = await submitPendingApplicationIfNeeded();
+        if (submitted && typeof window !== "undefined") {
+          window.location.href = "/applications";
+          return;
+        }
         onClose();
       } else {
         const data = await response.json();

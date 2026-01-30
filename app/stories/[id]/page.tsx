@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
+import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
 import {
   StoryHeader,
   StoryContent,
@@ -275,6 +276,14 @@ export default function StoryPage() {
       const newLikedState = !liked;
       setLiked(newLikedState);
       setLikesCount((prev) => (liked ? prev - 1 : prev + 1));
+
+      if (method === "POST") {
+        const submitted = await submitPendingApplicationIfNeeded();
+        if (submitted && typeof window !== "undefined") {
+          window.location.href = "/applications";
+          return;
+        }
+      }
 
       // Затем перезагружаем данные с сервера для синхронизации
       await loadStory(story.id);

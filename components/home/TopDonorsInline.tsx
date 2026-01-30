@@ -26,9 +26,14 @@ interface Donor {
  * Блок «Топ‑донатёры» в стиле секции «Истории успеха».
  * Показывается между статистикой и блоком «Как это работает».
  */
+const DEFAULT_AVATAR = "/default-avatar.png";
+
 export default function TopDonorsInline() {
   const [donors, setDonors] = useState<Donor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [failedAvatars, setFailedAvatars] = useState<Record<string, boolean>>(
+    {},
+  );
 
   useEffect(() => {
     const fetchTopDonors = async () => {
@@ -191,12 +196,22 @@ export default function TopDonorsInline() {
                           >
                             <div className="w-full h-full rounded-full overflow-hidden bg-[#004643]">
                               <Image
-                                src={donor.avatar || "/default-avatar.png"}
+                                src={
+                                  failedAvatars[donor.id]
+                                    ? DEFAULT_AVATAR
+                                    : donor.avatar || DEFAULT_AVATAR
+                                }
                                 alt={donor.name}
                                 fill
                                 sizes="48px"
                                 quality={70}
                                 className="object-cover"
+                                onError={() =>
+                                  setFailedAvatars((prev) => ({
+                                    ...prev,
+                                    [donor.id]: true,
+                                  }))
+                                }
                               />
                             </div>
                           </div>

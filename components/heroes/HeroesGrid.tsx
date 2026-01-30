@@ -1,7 +1,8 @@
 // components/heroes/HeroesGrid.tsx
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import HeroesFilters from "./HeroesFilters";
 import HeroesTopThree from "./HeroesTopThree";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
@@ -41,6 +42,8 @@ interface HeroesGridProps {
   observerTargetRef: React.RefObject<HTMLDivElement | null>;
 }
 
+const DEFAULT_AVATAR = "/default-avatar.png";
+
 export default function HeroesGrid({
   heroes,
   topThree,
@@ -53,6 +56,9 @@ export default function HeroesGrid({
   loadingMore,
   observerTargetRef,
 }: HeroesGridProps) {
+  const [failedAvatars, setFailedAvatars] = useState<Record<string, boolean>>(
+    {},
+  );
   const openExternal = (raw?: string | null) => {
     if (!raw) return;
     // API уже санитизирует, но на всякий — запретим javascript:
@@ -202,15 +208,25 @@ export default function HeroesGrid({
 
                   {/* Аватар и имя */}
                   <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4 min-w-0">
-                    <div
-                      className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-lg sm:text-xl font-bold flex-shrink-0"
-                      style={{
-                        backgroundImage: `url(${hero.avatar || "/default-avatar.png"})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        color: "transparent",
-                      }}
-                    ></div>
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 flex-shrink-0 relative">
+                      <Image
+                        src={
+                          failedAvatars[hero.id]
+                            ? DEFAULT_AVATAR
+                            : hero.avatar || DEFAULT_AVATAR
+                        }
+                        alt={hero.name}
+                        fill
+                        sizes="(max-width: 640px) 48px, 56px"
+                        className="object-cover"
+                        onError={() =>
+                          setFailedAvatars((prev) => ({
+                            ...prev,
+                            [hero.id]: true,
+                          }))
+                        }
+                      />
+                    </div>
                     <div className="min-w-0 flex-1">
                       <h3
                         className="text-base sm:text-lg font-bold truncate"

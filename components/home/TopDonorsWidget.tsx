@@ -20,9 +20,14 @@ interface Donor {
  * Компактный виджет «Топ‑донатёры» для правой колонки / небольших вставок.
  * Не такой детализированный, как большой блок TopDonors.
  */
+const DEFAULT_AVATAR = "/default-avatar.png";
+
 export default function TopDonorsWidget() {
   const [donors, setDonors] = useState<Donor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [failedAvatars, setFailedAvatars] = useState<Record<string, boolean>>(
+    {},
+  );
 
   useEffect(() => {
     const fetchDonors = async () => {
@@ -93,13 +98,23 @@ export default function TopDonorsWidget() {
                     <div className="relative flex-shrink-0">
                       <div className="h-9 w-9 rounded-full overflow-hidden border border-[#abd1c6]/40">
                         <Image
-                          src={donor.avatar || "/default-avatar.png"}
+                          src={
+                            failedAvatars[donor.id]
+                              ? DEFAULT_AVATAR
+                              : donor.avatar || DEFAULT_AVATAR
+                          }
                           alt={donor.name}
                           width={36}
                           height={36}
                           sizes="36px"
                           quality={70}
                           className="h-full w-full object-cover"
+                          onError={() =>
+                            setFailedAvatars((prev) => ({
+                              ...prev,
+                              [donor.id]: true,
+                            }))
+                          }
                         />
                       </div>
                     </div>

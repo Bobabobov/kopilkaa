@@ -1,6 +1,8 @@
 // components/heroes/HeroesTopThree.tsx
 "use client";
+import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
@@ -28,7 +30,12 @@ interface HeroesTopThreeProps {
   heroes: Hero[];
 }
 
+const DEFAULT_AVATAR = "/default-avatar.png";
+
 export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
+  const [failedAvatars, setFailedAvatars] = useState<Record<string, boolean>>(
+    {},
+  );
   const topThree = heroes
     .filter((hero) => hero.rank <= 3)
     .sort((a, b) => a.rank - b.rank);
@@ -104,15 +111,25 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               }}
             >
               <div className="text-2xl sm:text-3xl mb-2">{getRankIcon(2)}</div>
-              <div
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-lg sm:text-xl font-bold mx-auto mb-2 sm:mb-3"
-                style={{
-                  backgroundImage: `url(${topThree[1].avatar || "/default-avatar.png"})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  color: "transparent",
-                }}
-              ></div>
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 mx-auto mb-2 sm:mb-3 relative">
+                <Image
+                  src={
+                    failedAvatars[topThree[1].id]
+                      ? DEFAULT_AVATAR
+                      : topThree[1].avatar || DEFAULT_AVATAR
+                  }
+                  alt={topThree[1].name}
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                  onError={() =>
+                    setFailedAvatars((prev) => ({
+                      ...prev,
+                      [topThree[1].id]: true,
+                    }))
+                  }
+                />
+              </div>
               <h4
                 className="text-base sm:text-lg font-bold mb-2 break-words"
                 style={{ color: "#fffffe" }}
@@ -193,15 +210,25 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">
                 {getRankIcon(1)}
               </div>
-              <div
-                className="w-16 h-16 sm:w-[72px] sm:h-[72px] md:w-20 md:h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-xl sm:text-2xl font-bold mx-auto mb-3 sm:mb-4"
-                style={{
-                  backgroundImage: `url(${topThree[0].avatar || "/default-avatar.png"})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  color: "transparent",
-                }}
-              ></div>
+              <div className="w-16 h-16 sm:w-[72px] sm:h-[72px] md:w-20 md:h-20 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 mx-auto mb-3 sm:mb-4 relative">
+                <Image
+                  src={
+                    failedAvatars[topThree[0].id]
+                      ? DEFAULT_AVATAR
+                      : topThree[0].avatar || DEFAULT_AVATAR
+                  }
+                  alt={topThree[0].name}
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                  onError={() =>
+                    setFailedAvatars((prev) => ({
+                      ...prev,
+                      [topThree[0].id]: true,
+                    }))
+                  }
+                />
+              </div>
               <h4
                 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 break-words"
                 style={{ color: "#fffffe" }}
@@ -281,14 +308,26 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
             >
               <div className="text-2xl sm:text-3xl mb-2">{getRankIcon(3)}</div>
               <div
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-lg sm:text-xl font-bold mx-auto mb-2 sm:mb-3"
-                style={{
-                  backgroundImage: `url(${topThree[2].avatar || "/default-avatar.png"})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  color: "transparent",
-                }}
-              ></div>
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500 mx-auto mb-2 sm:mb-3 relative"
+              >
+                <Image
+                  src={
+                    failedAvatars[topThree[2].id]
+                      ? DEFAULT_AVATAR
+                      : topThree[2].avatar || DEFAULT_AVATAR
+                  }
+                  alt={topThree[2].name}
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                  onError={() =>
+                    setFailedAvatars((prev) => ({
+                      ...prev,
+                      [topThree[2].id]: true,
+                    }))
+                  }
+                />
+              </div>
               <h4
                 className="text-base sm:text-lg font-bold mb-2 break-words"
                 style={{ color: "#fffffe" }}

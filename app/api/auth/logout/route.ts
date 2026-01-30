@@ -3,7 +3,15 @@ import { NextResponse } from "next/server";
 import { attachClearSessionToResponse } from "@/lib/auth";
 
 export async function POST() {
-  const res = NextResponse.json({ ok: true });
-  attachClearSessionToResponse(res);
-  return res;
+  try {
+    const res = NextResponse.json({ ok: true });
+    attachClearSessionToResponse(res);
+    return res;
+  } catch (error) {
+    console.error("Error during logout:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }

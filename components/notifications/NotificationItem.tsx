@@ -7,8 +7,6 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Notification } from "./types";
 import {
   getNotificationIcon,
-  getRarityColor,
-  getRarityLabel,
   getNotificationBackgroundColor,
   isNotificationUnread,
 } from "./utils";
@@ -149,24 +147,6 @@ export default function NotificationItem({
           >
             {notification.message}
           </p>
-
-          {/* Индикатор достижения */}
-          {notification.type === "achievement" && notification.rarity && (
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className={`inline-flex items-center gap-1 ${isDropdown ? "gap-1 mt-1 px-1.5 py-0.5 text-[9px] sm:text-[10px]" : "gap-1.5 mt-2 px-2 py-1 text-xs"} rounded-full font-medium`}
-              style={{
-                backgroundColor: getRarityColor(notification.rarity) + "15",
-                color: getRarityColor(notification.rarity),
-              }}
-            >
-              <LucideIcons.Star
-                className={isDropdown ? "w-2.5 h-2.5" : "w-3 h-3"}
-              />
-              {getRarityLabel(notification.rarity)}
-            </motion.div>
-          )}
         </div>
       </div>
     </motion.div>

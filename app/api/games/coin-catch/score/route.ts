@@ -11,7 +11,9 @@ function getWeekKey(date: Date = new Date()): string {
   const monday = new Date(d.setDate(diff));
   const year = monday.getFullYear();
   const weekStart = new Date(year, 0, 1);
-  const days = Math.floor((monday.getTime() - weekStart.getTime()) / (24 * 60 * 60 * 1000));
+  const days = Math.floor(
+    (monday.getTime() - weekStart.getTime()) / (24 * 60 * 60 * 1000),
+  );
   const weekNumber = Math.ceil((days + weekStart.getDay() + 1) / 7);
   return `${year}-W${weekNumber.toString().padStart(2, "0")}`;
 }

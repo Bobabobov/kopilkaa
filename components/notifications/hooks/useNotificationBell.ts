@@ -110,7 +110,6 @@ export function useNotificationBell() {
   // Первичная загрузка
   useEffect(() => {
     fetchNotifications(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Загружаем уведомления при открытии меню
@@ -123,7 +122,6 @@ export function useNotificationBell() {
     if (!isOpen) {
       hasFetchedOnOpenRef.current = false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   // Обновляем счетчик
@@ -176,7 +174,6 @@ export function useNotificationBell() {
     window.addEventListener("friends-updated", handleFriendsUpdated);
     return () =>
       window.removeEventListener("friends-updated", handleFriendsUpdated);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleNotificationClick = useCallback(

@@ -6,19 +6,8 @@ import type { NewsItem } from "./types";
 import { NewsMediaGallery } from "./NewsMediaGallery";
 import { NewsReactions } from "./NewsReactions";
 import Link from "next/link";
+import { formatDateTimeShort } from "@/lib/time";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-
-function formatDate(value: string) {
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleString("ru-RU", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 // Функция для подсчета текста без HTML тегов
 function getTextLength(html: string): number {
@@ -30,7 +19,10 @@ function getTextLength(html: string): number {
 
 export function NewsPostCard({ item }: { item: NewsItem }) {
   const authorName = item.author?.name || "Администратор";
-  const created = useMemo(() => formatDate(item.createdAt), [item.createdAt]);
+  const created = useMemo(
+    () => formatDateTimeShort(item.createdAt),
+    [item.createdAt],
+  );
   const isOfficial = (item.author?.role || "").toUpperCase() === "ADMIN";
   const [expanded, setExpanded] = useState(false);
   const textLength = useMemo(() => getTextLength(item.content), [item.content]);

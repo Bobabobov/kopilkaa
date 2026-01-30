@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { formatRelativeDate } from "@/lib/time";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 type StoryData = {
@@ -49,21 +50,6 @@ export default function ProfileStoriesSection({
 
     fetchStories();
   }, [userId]);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return "Сегодня";
-    if (diffDays === 1) return "Вчера";
-    if (diffDays < 7) return `${diffDays} дн. назад`;
-    return date.toLocaleDateString("ru-RU", {
-      day: "numeric",
-      month: "short",
-    });
-  };
 
   if (loading) {
     return (
@@ -208,7 +194,7 @@ export default function ProfileStoriesSection({
                     )}
                     <div className="flex items-center gap-2 text-xs text-white/60">
                       <LucideIcons.Calendar className="w-3 h-3" />
-                      <span>{formatDate(story.createdAt)}</span>
+                      <span>{formatRelativeDate(story.createdAt)}</span>
                       {story._count.likes > 0 && (
                         <>
                           <span>•</span>

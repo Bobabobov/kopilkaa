@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AdminHeader } from "../components/AdminHeader";
+import { AdminHeader } from "../_components/AdminHeader";
 
 type BalanceData = {
   totalSupport: number;

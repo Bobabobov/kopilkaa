@@ -15,24 +15,6 @@ enum ApplicationStatus {
   CONTEST
 }
 
-enum AchievementRarity {
-  COMMON
-  RARE
-  EPIC
-  LEGENDARY
-  EXCLUSIVE
-}
-
-enum AchievementType {
-  STREAK
-  APPLICATIONS
-  GAMES
-  SOCIAL
-  SPECIAL
-  COMMUNITY
-  CREATIVITY
-}
-
 model User {
   id                  String    @id @default(cuid())
   email               String?   @unique
@@ -69,7 +51,6 @@ model User {
 
   applications         Application[]
   userTree             UserTree?
-  userAchievements     UserAchievement[]
   friendshipsSent      Friendship[]          @relation("FriendshipRequester")
   friendshipsReceived  Friendship[]          @relation("FriendshipReceiver")
   pageVisits           PageVisit[]
@@ -149,52 +130,6 @@ model UserTree {
   @@index([userId])
 }
 
-// Модель для достижений
-model Achievement {
-  id          String            @id @default(cuid())
-  slug        String?           @unique
-  name        String
-  description String
-  icon        String
-  rarity      AchievementRarity @default(COMMON)
-  type        AchievementType   @default(SPECIAL)
-  kind        AchievementKind   @default(NORMAL)
-  isExclusive Boolean           @default(false)
-  isHidden    Boolean           @default(false)
-  isSeasonal  Boolean           @default(false)
-  maxCount    Int               @default(1) // Максимальное количество раз, которое можно получить
-  isActive    Boolean           @default(true)
-  validFrom   DateTime? // Дата начала действия
-  validTo     DateTime? // Дата окончания действия
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-
-  userAchievements UserAchievement[]
-
-  @@index([rarity])
-  @@index([type])
-  @@index([isActive])
-  @@index([validFrom])
-  @@index([validTo])
-}
-
-// Модель для связи пользователей с достижениями
-model UserAchievement {
-  id            String      @id @default(cuid())
-  userId        String
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  achievementId String
-  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-  unlockedAt    DateTime    @default(now())
-  grantedBy     String? // ID администратора, который выдал достижение
-  grantedByName String? // Имя администратора для отображения
-
-  @@unique([userId, achievementId])
-  @@index([userId])
-  @@index([achievementId])
-  @@index([unlockedAt])
-}
-
 // Модель для дружбы между пользователями
 model Friendship {
   id          String           @id @default(cuid())
@@ -218,12 +153,6 @@ enum FriendshipStatus {
   ACCEPTED
   DECLINED
   BLOCKED
-}
-
-// Тип достижения: обычное или мета
-enum AchievementKind {
-  NORMAL
-  META
 }
 
 enum DonationType {

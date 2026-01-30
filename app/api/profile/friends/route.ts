@@ -6,16 +6,16 @@ import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export async function GET(request: Request) {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
-  }
-
-  const { searchParams } = new URL(request.url);
-  const type = searchParams.get("type") || "friends";
-
   try {
-    let whereClause: any = {};
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get("type") || "friends";
+
+    let whereClause: Parameters<typeof prisma.friendship.findMany>[0]["where"] = {};
 
     switch (type) {
       case "friends":
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
         break;
       default:
         return NextResponse.json(
-          { message: "Неверный тип запроса" },
+          { error: "Неверный тип запроса" },
           { status: 400 },
         );
     }
@@ -113,32 +113,31 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("Get friendships error:", error);
     return NextResponse.json(
-      { message: "Ошибка получения списка друзей" },
+      { error: "Ошибка получения списка друзей" },
       { status: 500 },
     );
   }
 }
 
 export async function POST(request: Request) {
-  const session = await getSession();
-
-  if (!session) {
-    return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
-  }
-
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
+    }
+
     const { receiverId } = await request.json();
 
     if (!receiverId) {
       return NextResponse.json(
-        { message: "ID получателя обязателен" },
+        { error: "ID получателя обязателен" },
         { status: 400 },
       );
     }
 
     if (receiverId === session.uid) {
       return NextResponse.json(
-        { message: "Нельзя добавить себя в друзья" },
+        { error: "Нельзя добавить себя в друзья" },
         { status: 400 },
       );
     }
@@ -151,7 +150,7 @@ export async function POST(request: Request) {
 
     if (!receiver) {
       return NextResponse.json(
-        { message: "Пользователь не найден" },
+        { error: "Пользователь не найден" },
         { status: 404 },
       );
     }
@@ -176,7 +175,7 @@ export async function POST(request: Request) {
         if (blockerId === receiverId && blockedId === session.uid) {
           // Пользователь заблокировал вас - нельзя отправить заявку
           return NextResponse.json(
-            { message: "Вы заблокированы этим пользователем" },
+            { error: "Вы заблокированы этим пользователем" },
             { status: 403 },
           );
         } else if (blockerId === session.uid && blockedId === receiverId) {
@@ -189,7 +188,7 @@ export async function POST(request: Request) {
         } else {
           // Неизвестная ситуация с блокировкой
           return NextResponse.json(
-            { message: "Заявка уже существует" },
+            { error: "Заявка уже существует" },
             { status: 400 },
           );
         }
@@ -199,7 +198,7 @@ export async function POST(request: Request) {
       ) {
         // Заявка уже существует или пользователи уже друзья
         return NextResponse.json(
-          { message: "Заявка уже существует" },
+          { error: "Заявка уже существует" },
           { status: 400 },
         );
       } else if (existingFriendship.status === "DECLINED") {
@@ -222,7 +221,7 @@ export async function POST(request: Request) {
 
     if (reverseBlock) {
       return NextResponse.json(
-        { message: "Вы заблокированы этим пользователем" },
+        { error: "Вы заблокированы этим пользователем" },
         { status: 403 },
       );
     }
@@ -293,12 +292,8 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Create friendship error:", error);
-    console.error(
-      "Error details:",
-      error instanceof Error ? error.message : "Unknown error",
-    );
     return NextResponse.json(
-      { message: "Ошибка создания заявки в друзья" },
+      { error: "Ошибка создания заявки в друзья" },
       { status: 500 },
     );
   }

@@ -16,7 +16,10 @@ export class MenuScene {
     this.app = app;
     this.onStart = onStart;
     app.stage.addChild(this.container);
-    this.buildUI(this.app.screen?.width || 1280, this.app.screen?.height || 720);
+    this.buildUI(
+      this.app.screen?.width || 1280,
+      this.app.screen?.height || 720,
+    );
   }
 
   private getScale(width: number, height: number): number {
@@ -119,7 +122,12 @@ export class MenuScene {
     });
     buttonText.anchor.set(0.5);
 
-    const maxTextWidth = Math.max(title.width, subtitle.width, line1.width, line2.width);
+    const maxTextWidth = Math.max(
+      title.width,
+      subtitle.width,
+      line1.width,
+      line2.width,
+    );
     const buttonWidth = Math.max(
       Math.ceil(buttonText.width + 40 * scale),
       Math.ceil(maxTextWidth),
@@ -128,12 +136,24 @@ export class MenuScene {
     const btnRadius = Math.max(6, Math.floor(10 * scale));
 
     const buttonBg = new PIXI.Graphics();
-    buttonBg.roundRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, btnRadius);
+    buttonBg.roundRect(
+      -buttonWidth / 2,
+      -buttonHeight / 2,
+      buttonWidth,
+      buttonHeight,
+      btnRadius,
+    );
     buttonBg.fill({ color: 0xf9bc60, alpha: 1 });
     buttonBg.stroke({ width: 2, color: 0x001e1d });
 
     const buttonHighlight = new PIXI.Graphics();
-    buttonHighlight.roundRect(-buttonWidth / 2 + 4, -buttonHeight / 2 + 4, buttonWidth - 8, Math.floor(buttonHeight * 0.4), btnRadius - 4);
+    buttonHighlight.roundRect(
+      -buttonWidth / 2 + 4,
+      -buttonHeight / 2 + 4,
+      buttonWidth - 8,
+      Math.floor(buttonHeight * 0.4),
+      btnRadius - 4,
+    );
     buttonHighlight.fill({ color: 0xffffff, alpha: 0.2 });
     buttonBg.addChild(buttonHighlight);
 
@@ -148,11 +168,23 @@ export class MenuScene {
     buttonContainer.on("pointerenter", () => {
       playButtonSound();
       buttonBg.clear();
-      buttonBg.roundRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, btnRadius);
+      buttonBg.roundRect(
+        -buttonWidth / 2,
+        -buttonHeight / 2,
+        buttonWidth,
+        buttonHeight,
+        btnRadius,
+      );
       buttonBg.fill({ color: 0xffd700, alpha: 1 });
       buttonBg.stroke({ width: 2, color: 0x001e1d });
       const hl = new PIXI.Graphics();
-      hl.roundRect(-buttonWidth / 2 + 4, -buttonHeight / 2 + 4, buttonWidth - 8, Math.floor(buttonHeight * 0.4), btnRadius - 4);
+      hl.roundRect(
+        -buttonWidth / 2 + 4,
+        -buttonHeight / 2 + 4,
+        buttonWidth - 8,
+        Math.floor(buttonHeight * 0.4),
+        btnRadius - 4,
+      );
       hl.fill({ color: 0xffffff, alpha: 0.25 });
       buttonBg.addChild(hl);
       buttonContainer.scale.set(1.02);
@@ -160,11 +192,23 @@ export class MenuScene {
     buttonContainer.on("pointerleave", () => {
       buttonBg.removeChildren();
       buttonBg.clear();
-      buttonBg.roundRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, btnRadius);
+      buttonBg.roundRect(
+        -buttonWidth / 2,
+        -buttonHeight / 2,
+        buttonWidth,
+        buttonHeight,
+        btnRadius,
+      );
       buttonBg.fill({ color: 0xf9bc60, alpha: 1 });
       buttonBg.stroke({ width: 2, color: 0x001e1d });
       const hl = new PIXI.Graphics();
-      hl.roundRect(-buttonWidth / 2 + 4, -buttonHeight / 2 + 4, buttonWidth - 8, Math.floor(buttonHeight * 0.4), btnRadius - 4);
+      hl.roundRect(
+        -buttonWidth / 2 + 4,
+        -buttonHeight / 2 + 4,
+        buttonWidth - 8,
+        Math.floor(buttonHeight * 0.4),
+        btnRadius - 4,
+      );
       hl.fill({ color: 0xffffff, alpha: 0.2 });
       buttonBg.addChild(hl);
       buttonContainer.scale.set(1);
@@ -199,7 +243,13 @@ export class MenuScene {
     this.uiRoot.addChild(panel);
 
     const inner = new PIXI.Graphics();
-    inner.roundRect(panelX + 4, panelY + 4, panelW - 8, panelH - 8, Math.max(4, radius - 4));
+    inner.roundRect(
+      panelX + 4,
+      panelY + 4,
+      panelW - 8,
+      panelH - 8,
+      Math.max(4, radius - 4),
+    );
     inner.stroke({ width: 1, color: 0xf9bc60, alpha: 0.4 });
     this.uiRoot.addChild(inner);
 

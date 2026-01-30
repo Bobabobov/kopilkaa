@@ -9,7 +9,6 @@ interface PersonalStatsOverviewProps {
 export function PersonalStatsOverview({ vm }: PersonalStatsOverviewProps) {
   const {
     stats,
-    achievementsLabel,
     friendsLabel,
     totalApplications,
     approvedPercent,
@@ -38,12 +37,6 @@ export function PersonalStatsOverview({ vm }: PersonalStatsOverviewProps) {
           value={stats.activity.friendsCount}
           icon="Users"
           color="#8B5CF6"
-        />
-        <PersonalStatCard
-          label={achievementsLabel}
-          value={stats.achievements.total}
-          icon="Award"
-          color="#F59E0B"
         />
       </div>
 

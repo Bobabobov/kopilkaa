@@ -1,6 +1,6 @@
 "use client";
 
-import { useOnlineStatus } from "@/lib/useOnlineStatus";
+import { useOnlineStatus } from "@/hooks/ui/useOnlineStatus";
 import { getHeaderTheme } from "@/lib/header-customization";
 
 interface User {

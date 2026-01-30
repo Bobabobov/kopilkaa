@@ -230,7 +230,6 @@ export function useStories(): UseStoriesReturn {
       setStories([]);
       loadStories(1, query, true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]); // Зависимость только от query
 
   // Очистка при размонтировании

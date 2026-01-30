@@ -3,14 +3,14 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { useApplications } from "@/lib/useApplications";
+import { useApplications } from "@/hooks/applications/useApplications";
 import { StatsCards } from "@/components/applications/StatsCards";
 import { FiltersAndSearch } from "@/components/applications/FiltersAndSearch";
 import { ApplicationCard } from "@/components/applications/ApplicationCard";
 import { Pagination } from "@/components/applications/Pagination";
 import { EmptyState } from "@/components/applications/EmptyState";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
-import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
+import { useAutoHideScrollbar } from "@/hooks/ui/useAutoHideScrollbar";
 
 interface ApplicationsModalProps {
   isOpen: boolean;

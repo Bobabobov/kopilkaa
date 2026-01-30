@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import HeaderNavigation from "./HeaderNavigation";
-import NavAuth from "@/app/components/NavAuth";
+import NavAuth from "@/components/layout/NavAuth";
 
 export default function HeaderMobileMenu() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

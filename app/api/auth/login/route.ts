@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { attachSessionToResponse } from "@/lib/auth";
 import bcrypt from "bcryptjs";
-import { AchievementService } from "@/lib/achievements/service";
 import { checkUserBan } from "@/lib/ban-check";
 
 export async function POST(req: Request) {
@@ -67,15 +66,6 @@ export async function POST(req: Request) {
         { status: 403 },
       );
     }
-
-    // Проверяем и выдаём достижения при входе (в фоне)
-    AchievementService.checkAndGrantAutomaticAchievements(user.id)
-      .then((granted) => {
-        return granted;
-      })
-      .catch((error) => {
-        console.error("Error checking achievements on login:", error);
-      });
 
     const res = NextResponse.json({
       ok: true,

@@ -7,7 +7,14 @@ import type { Viewport } from "../systems/adaptive";
 
 const BG_PATH = "/coin/bg.png";
 /** Кадры анимации монеты: /coin/co/1.png … 6.png */
-const COIN_FRAME_PATHS = ["/coin/co/1.png", "/coin/co/2.png", "/coin/co/3.png", "/coin/co/4.png", "/coin/co/5.png", "/coin/co/6.png"] as const;
+const COIN_FRAME_PATHS = [
+  "/coin/co/1.png",
+  "/coin/co/2.png",
+  "/coin/co/3.png",
+  "/coin/co/4.png",
+  "/coin/co/5.png",
+  "/coin/co/6.png",
+] as const;
 const COIN_ANIMATION_SPEED = 0.2;
 
 export class PlayScene {
@@ -69,7 +76,9 @@ export class PlayScene {
 
     // Загрузка кадров монеты /coin/co/1.png … 6.png
     try {
-      const textures = await Promise.all(COIN_FRAME_PATHS.map((p) => PIXI.Assets.load(p)));
+      const textures = await Promise.all(
+        COIN_FRAME_PATHS.map((p) => PIXI.Assets.load(p)),
+      );
       if (textures.length > 0 && textures.every((t) => t?.width)) {
         this.coinFrames = textures as PIXI.Texture[];
         this.coinFrameSize = this.coinFrames[0].width;
@@ -100,7 +109,10 @@ export class PlayScene {
     const pad = Math.max(8, Math.floor(14 * scale));
     const radius = Math.max(6, Math.floor(10 * scale));
 
-    const panelWidth = Math.min(width - pad * 2, Math.max(300, Math.floor(360 * scale)));
+    const panelWidth = Math.min(
+      width - pad * 2,
+      Math.max(300, Math.floor(360 * scale)),
+    );
     const panelHeight = Math.max(64, Math.min(88, Math.floor(72 * scale)));
     const px = Math.floor(pad);
     const py = Math.floor(pad);
@@ -110,7 +122,13 @@ export class PlayScene {
     panel.fill({ color: 0x001e1d, alpha: 0.65 });
     panel.stroke({ width: 2, color: 0xf9bc60, alpha: 0.9 });
     const inner = new PIXI.Graphics();
-    inner.roundRect(px + 2, py + 2, panelWidth - 4, panelHeight - 4, Math.max(2, radius - 2));
+    inner.roundRect(
+      px + 2,
+      py + 2,
+      panelWidth - 4,
+      panelHeight - 4,
+      Math.max(2, radius - 2),
+    );
     inner.stroke({ width: 1, color: 0xf9bc60, alpha: 0.35 });
     panel.addChild(inner);
 
@@ -223,7 +241,11 @@ export class PlayScene {
       graphics.circle(coin.x, coin.y, innerRadius);
       graphics.fill(0xffd700);
       const highlightRadius = coin.radius * 0.3;
-      graphics.circle(coin.x - coin.radius * 0.3, coin.y - coin.radius * 0.3, highlightRadius);
+      graphics.circle(
+        coin.x - coin.radius * 0.3,
+        coin.y - coin.radius * 0.3,
+        highlightRadius,
+      );
       graphics.fill({ color: 0xffffff, alpha: 0.4 });
       graphics.circle(coin.x, coin.y, coin.radius + 2);
       graphics.stroke({ width: 1, color: 0xf9bc60, alpha: 0.5 });
@@ -234,7 +256,11 @@ export class PlayScene {
     display.y = coin.y;
     display.eventMode = "static";
     display.cursor = "pointer";
-    (display as PIXI.Container & { userData?: { x: number; y: number; radius: number } }).userData = {
+    (
+      display as PIXI.Container & {
+        userData?: { x: number; y: number; radius: number };
+      }
+    ).userData = {
       x: coin.x,
       y: coin.y,
       radius: coin.radius,
@@ -257,7 +283,11 @@ export class PlayScene {
     const display = this.coins.get(coinId);
     if (!display) return;
     playCoinCollectSound();
-    const data = (display as PIXI.Container & { userData?: { x: number; y: number; radius: number } }).userData;
+    const data = (
+      display as PIXI.Container & {
+        userData?: { x: number; y: number; radius: number };
+      }
+    ).userData;
     const cx = data?.x ?? 0;
     const cy = data?.y ?? 0;
     const coinRadius = data?.radius ?? 30;
@@ -272,20 +302,20 @@ export class PlayScene {
     // Анимация кольца
     const startTime = Date.now();
     const duration = 300;
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        if (elapsed < duration) {
-          const progress = elapsed / duration;
-          const scale = 1 + progress * 2;
-          const alpha = 1 - progress;
-          ring.scale.set(scale);
-          ring.alpha = alpha;
-          requestAnimationFrame(animate);
-        } else {
-          ring.removeAllListeners?.();
-          ring.destroy({ children: true, texture: false });
-        }
-      };
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      if (elapsed < duration) {
+        const progress = elapsed / duration;
+        const scale = 1 + progress * 2;
+        const alpha = 1 - progress;
+        ring.scale.set(scale);
+        ring.alpha = alpha;
+        requestAnimationFrame(animate);
+      } else {
+        ring.removeAllListeners?.();
+        ring.destroy({ children: true, texture: false });
+      }
+    };
     animate();
 
     // Простые частицы

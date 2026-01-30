@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
-import NavAuth from "@/app/components/NavAuth";
+import NavAuth from "@/components/layout/NavAuth";
 import HeaderLogo from "./HeaderLogo";
 import HeaderNavigation from "./HeaderNavigation";
 import HeaderMobileButton from "./HeaderMobileButton";

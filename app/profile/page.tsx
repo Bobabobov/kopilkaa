@@ -11,7 +11,7 @@ import ProfileErrorState from "@/components/profile/ProfileErrorState";
 import ProfileUnauthorizedState from "@/components/profile/ProfileUnauthorizedState";
 import ProfileLayout from "@/components/profile/ProfileLayout";
 import { SettingsModal } from "@/components/profile/ProfileDynamicImports";
-import { useProfileDashboard } from "@/lib/useProfileDashboard";
+import { useProfileDashboard } from "@/hooks/profile/useProfileDashboard";
 import { useProfileUrlParams } from "@/hooks/profile/useProfileUrlParams";
 import { useTrustLevel } from "@/hooks/profile/useTrustLevel";
 import { useProfileUpdates } from "@/hooks/profile/useProfileUpdates";

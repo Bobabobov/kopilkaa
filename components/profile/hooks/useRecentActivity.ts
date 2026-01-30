@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 export type ActivityItem = {
   id: string;
-  type: "application" | "donation" | "achievement" | "friend";
+  type: "application" | "donation" | "friend";
   title: string;
   description: string;
   date: string;
@@ -25,18 +25,14 @@ export function useRecentActivity() {
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const [applicationsRes, donationsRes, achievementsRes] =
-          await Promise.all([
-            fetch("/api/applications/mine?limit=3", {
-              cache: "no-store",
-            }).catch(() => null),
-            fetch("/api/profile/donations", { cache: "no-store" }).catch(
-              () => null,
-            ),
-            fetch("/api/achievements/user", { cache: "no-store" }).catch(
-              () => null,
-            ),
-          ]);
+        const [applicationsRes, donationsRes] = await Promise.all([
+          fetch("/api/applications/mine?limit=3", {
+            cache: "no-store",
+          }).catch(() => null),
+          fetch("/api/profile/donations", { cache: "no-store" }).catch(
+            () => null,
+          ),
+        ]);
 
         const activitiesList: ActivityItem[] = [];
 
@@ -84,26 +80,6 @@ export function useRecentActivity() {
                 color: "#f9bc60",
               });
             });
-          }
-        }
-
-        if (achievementsRes?.ok) {
-          const achievementsData = await achievementsRes.json();
-          if (achievementsData.success && achievementsData.data?.achievements) {
-            achievementsData.data.achievements
-              .filter((a: any) => a.unlockedAt)
-              .slice(0, 2)
-              .forEach((achievement: any) => {
-                activitiesList.push({
-                  id: `achievement-${achievement.id}`,
-                  type: "achievement",
-                  title: achievement.achievement?.name || "Достижение",
-                  description: "Получено новое достижение",
-                  date: achievement.unlockedAt,
-                  icon: "Award",
-                  color: "#f9bc60",
-                });
-              });
           }
         }
 

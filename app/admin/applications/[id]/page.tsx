@@ -5,15 +5,15 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import UniversalBackground from "@/components/ui/UniversalBackground";
-import ApplicationHeader from "./components/ApplicationHeader";
-import ApplicationTitle from "./components/ApplicationTitle";
-import ApplicationMetaInfo from "./components/ApplicationMetaInfo";
-import ApplicationPaymentDetails from "./components/ApplicationPaymentDetails";
-import ApplicationImages from "./components/ApplicationImages";
-import ApplicationStory from "./components/ApplicationStory";
-import ApplicationAdminComment from "./components/ApplicationAdminComment";
-import ApplicationFooter from "./components/ApplicationFooter";
-import ApplicationImageLightbox from "./components/ApplicationImageLightbox";
+import ApplicationHeader from "./_components/ApplicationHeader";
+import ApplicationTitle from "./_components/ApplicationTitle";
+import ApplicationMetaInfo from "./_components/ApplicationMetaInfo";
+import ApplicationPaymentDetails from "./_components/ApplicationPaymentDetails";
+import ApplicationImages from "./_components/ApplicationImages";
+import ApplicationStory from "./_components/ApplicationStory";
+import ApplicationAdminComment from "./_components/ApplicationAdminComment";
+import ApplicationFooter from "./_components/ApplicationFooter";
+import ApplicationImageLightbox from "./_components/ApplicationImageLightbox";
 import type { ApplicationItem } from "./types";
 
 export default function AdminApplicationPage({

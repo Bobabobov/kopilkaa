@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
-import { AchievementService } from "@/lib/achievements/service";
-
 export const dynamic = "force-dynamic";
 
 function normalizeIdentifier(raw: unknown): string {
@@ -141,13 +139,6 @@ export async function POST(request: Request) {
         }),
       ),
     );
-
-    // Optional: trigger auto achievements (best-effort)
-    try {
-      await AchievementService.checkAndGrantAutomaticAchievements(user.id);
-    } catch {
-      // ignore
-    }
 
     return NextResponse.json({
       success: true,

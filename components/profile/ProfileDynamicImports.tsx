@@ -59,27 +59,6 @@ const ProfileFriendsSectionLoading = () => (
   </div>
 );
 
-// Loading компонент для ProfileAchievements
-const ProfileAchievementsLoading = () => (
-  <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[250px]">
-    <div className="animate-pulse space-y-4">
-      <div className="flex items-center gap-2 sm:gap-3">
-        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#abd1c6]/20 rounded-lg"></div>
-        <div className="h-6 bg-[#abd1c6]/20 rounded w-1/2"></div>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
-        <div className="h-16 bg-[#abd1c6]/10 rounded-lg"></div>
-      </div>
-      <div className="h-12 bg-[#abd1c6]/10 rounded-lg"></div>
-      <div className="space-y-2">
-        <div className="h-14 bg-[#abd1c6]/10 rounded-lg"></div>
-        <div className="h-14 bg-[#abd1c6]/10 rounded-lg"></div>
-      </div>
-    </div>
-  </div>
-);
-
 // Loading компонент для ProfileDonations
 const ProfileDonationsLoading = () => (
   <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[280px]">
@@ -152,14 +131,6 @@ export const ProfileFriendsSection = dynamicComponent(
   () => import("@/components/profile/sections/ProfileFriendsSection"),
   {
     loading: ProfileFriendsSectionLoading,
-    ssr: false,
-  },
-);
-
-export const ProfileAchievements = dynamicComponent(
-  () => import("@/components/profile/sections/ProfileAchievements"),
-  {
-    loading: ProfileAchievementsLoading,
     ssr: false,
   },
 );

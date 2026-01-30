@@ -28,7 +28,8 @@ export class GameEngine {
   private gameOverScene: GameOverScene | null = null;
   private onGameOver?: (score: number) => void;
   private onLeaderboardClick?: () => void;
-  private clickHandler: ((event: PIXI.FederatedPointerEvent) => void) | null = null;
+  private clickHandler: ((event: PIXI.FederatedPointerEvent) => void) | null =
+    null;
   private resizeHandler: (() => void) | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private bgAudio: HTMLAudioElement | null = null;
@@ -38,7 +39,8 @@ export class GameEngine {
   }
 
   applyMusicVolume(): void {
-    const base = this.gameState.isPlaying && !this.gameState.isGameOver ? 0.2 : 0.08;
+    const base =
+      this.gameState.isPlaying && !this.gameState.isGameOver ? 0.2 : 0.08;
     this.setMusicVolume(base);
   }
 
@@ -293,7 +295,9 @@ export class GameEngine {
     const activeCount = this.coins.size;
     if (activeCount >= maxCoins) return;
 
-    const wantCount = mobile ? 2 + Math.floor(Math.random() * 4) : 1 + Math.floor(Math.random() * 4);
+    const wantCount = mobile
+      ? 2 + Math.floor(Math.random() * 4)
+      : 1 + Math.floor(Math.random() * 4);
     const count = Math.min(wantCount, maxCoins - activeCount);
     const w = this.app.screen.width;
     const h = this.app.screen.height;

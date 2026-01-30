@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { formatTimeAgo } from "@/lib/time";
 import { createHash } from "crypto";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { getHeroBadgeForUser, getHeroBadgesForUsers } from "@/lib/heroBadges";
@@ -24,7 +25,6 @@ export async function GET(request: NextRequest) {
       user,
       friendsData,
       receivedRequestsData,
-      achievements,
       applications,
       notifications,
     ] = await Promise.all([
@@ -130,18 +130,6 @@ export async function GET(request: NextRequest) {
         })
         .catch(() => []),
 
-      // Достижения пользователя
-      prisma.userAchievement
-        .findMany({
-          where: { userId },
-          include: {
-            achievement: true,
-          },
-          orderBy: { unlockedAt: "desc" },
-          take: 5, // Показываем только последние 5
-        })
-        .catch(() => []),
-
       // Статистика заявок
       prisma.application
         .findMany({
@@ -193,7 +181,6 @@ export async function GET(request: NextRequest) {
         user: null,
         friends: [],
         receivedRequests: [],
-        achievements: [],
         stats: {
           totalApplications: 0,
           approvedApplications: 0,
@@ -204,7 +191,6 @@ export async function GET(request: NextRequest) {
           approvedAmount: 0,
           friendsCount: 0,
           pendingFriendRequests: 0,
-          achievementsCount: 0,
         },
         notifications: [],
       });
@@ -248,7 +234,6 @@ export async function GET(request: NextRequest) {
         .reduce((sum, app) => sum + (app.amount || 0), 0),
       friendsCount: friendsData.length,
       pendingFriendRequests: receivedRequestsData.length,
-      achievementsCount: achievements.length,
     };
     const trust = await computeUserTrustSnapshot(userId);
 
@@ -285,7 +270,7 @@ export async function GET(request: NextRequest) {
       ),
       application: like.application,
       createdAt: like.createdAt,
-      timestamp: getTimeAgo(like.createdAt),
+      timestamp: formatTimeAgo(like.createdAt),
     }));
 
     // Стабильный ETag: зависит от реально важных кусочков данных (а не от Date.now()).
@@ -310,9 +295,6 @@ export async function GET(request: NextRequest) {
           : 0,
         request: receivedRequestsData[0]?.createdAt
           ? new Date(receivedRequestsData[0].createdAt).getTime()
-          : 0,
-        achievement: achievements[0]?.unlockedAt
-          ? new Date(achievements[0].unlockedAt).getTime()
           : 0,
         notification: notifications[0]?.createdAt
           ? new Date(notifications[0].createdAt).getTime()
@@ -346,13 +328,6 @@ export async function GET(request: NextRequest) {
             )
           : req.requester,
       })),
-      achievements: achievements.map((ua) => ({
-        id: ua.id,
-        unlockedAt: ua.unlockedAt,
-        grantedBy: ua.grantedBy,
-        grantedByName: ua.grantedByName,
-        achievement: ua.achievement,
-      })),
       stats: { ...stats, trust },
       notifications: formattedNotifications,
       trust,
@@ -373,20 +348,4 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     );
   }
-}
-
-// Вспомогательная функция для форматирования времени
-function getTimeAgo(date: Date | string): string {
-  const now = new Date();
-  const past = new Date(date);
-  const diffMs = now.getTime() - past.getTime();
-  const diffMinutes = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMinutes < 1) return "только что";
-  if (diffMinutes < 60) return `${diffMinutes} мин назад`;
-  if (diffHours < 24) return `${diffHours} ч назад`;
-  if (diffDays < 7) return `${diffDays} дн назад`;
-  return past.toLocaleDateString("ru-RU");
 }

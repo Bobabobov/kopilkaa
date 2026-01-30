@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { setupProfilePreloading } from "@/lib/profilePreloader";
+import { setupProfilePreloading } from "@/hooks/profile/profilePreloader";
 
 export default function ProfilePreloadInitializer() {
   useEffect(() => {

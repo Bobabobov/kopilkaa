@@ -16,13 +16,6 @@ export interface DetailedStats {
     friendsCount: number;
     daysActive: number;
   };
-  achievements: {
-    total: number;
-    common: number;
-    rare: number;
-    epic: number;
-    legendary: number;
-  };
   user: {
     createdAt: string;
   };
@@ -45,11 +38,7 @@ const getRussianPlural = (
   return forms[2];
 };
 
-export type StatsTabId =
-  | "overview"
-  | "applications"
-  | "social"
-  | "achievements";
+export type StatsTabId = "overview" | "applications" | "social";
 
 export type PersonalTabs = {
   id: StatsTabId;
@@ -59,7 +48,6 @@ export type PersonalTabs = {
 
 export interface PersonalStatsViewModel {
   stats: DetailedStats;
-  achievementsLabel: string;
   friendsLabel: string;
   totalApplications: number;
   approvedPercent: number;
@@ -106,15 +94,9 @@ export function usePersonalStats() {
     const stats = {
       applications: data.applications,
       activity: data.activity,
-      achievements: data.achievements,
       user: data.user,
     };
 
-    const achievementsLabel = getRussianPlural(stats.achievements.total, [
-      "Достижение",
-      "Достижения",
-      "Достижений",
-    ]);
     const friendsLabel = getRussianPlural(stats.activity.friendsCount, [
       "Друг",
       "Друга",
@@ -161,16 +143,10 @@ export function usePersonalStats() {
         icon: LucideIcons.FileText,
       },
       { id: "social" as const, label: "Социальное", icon: LucideIcons.Users },
-      {
-        id: "achievements" as const,
-        label: "Достижения",
-        icon: LucideIcons.Award,
-      },
     ];
 
     return {
       stats,
-      achievementsLabel,
       friendsLabel,
       totalApplications,
       approvedPercent,

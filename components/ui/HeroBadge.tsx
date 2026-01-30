@@ -24,9 +24,9 @@ export function HeroBadge({
   size?: HeroBadgeSize;
   className?: string;
 }) {
+  const reduceMotion = useReducedMotion();
   if (!badge) return null;
 
-  const reduceMotion = useReducedMotion();
   const { wrap, icon, text } = sizeMap[size];
 
   const common =

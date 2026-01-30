@@ -1,11 +1,11 @@
 "use client";
 
-import { StandardsHero } from "./components/StandardsHero";
-import { StandardsQuickNav } from "./components/StandardsQuickNav";
-import { TelegramBotCard } from "./components/TelegramBotCard";
-import { AdFormatsSection } from "./components/AdFormatsSection";
-import { SizesTable } from "./components/SizesTable";
-import { ActionButtons } from "./components/ActionButtons";
+import { StandardsHero } from "./_components/StandardsHero";
+import { StandardsQuickNav } from "./_components/StandardsQuickNav";
+import { TelegramBotCard } from "./_components/TelegramBotCard";
+import { AdFormatsSection } from "./_components/AdFormatsSection";
+import { SizesTable } from "./_components/SizesTable";
+import { ActionButtons } from "./_components/ActionButtons";
 
 export default function StandardsPage() {
   return (

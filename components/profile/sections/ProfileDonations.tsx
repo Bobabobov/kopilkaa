@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { formatRelativeDate } from "@/lib/time";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface Donation {
@@ -71,21 +72,6 @@ export default function ProfileDonations() {
       .format(amount)
       .replace(/\u00A0/g, " ");
     return `${n} ₽`;
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return "Сегодня";
-    if (diffDays === 1) return "Вчера";
-    if (diffDays < 7) return `${diffDays} дн. назад`;
-    return date.toLocaleDateString("ru-RU", {
-      day: "numeric",
-      month: "short",
-    });
   };
 
   if (loading) {
@@ -245,7 +231,7 @@ export default function ProfileDonations() {
                     </div>
                   )}
                   <div className="text-[9px] xs:text-[10px] sm:text-xs text-[#abd1c6]/60 mt-0.5 xs:mt-1">
-                    {formatDate(donation.createdAt)}
+                    {formatRelativeDate(donation.createdAt)}
                   </div>
                 </div>
               </div>

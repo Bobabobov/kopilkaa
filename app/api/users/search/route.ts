@@ -8,19 +8,18 @@ import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
-  }
-
-  const { searchParams } = new URL(request.url);
-  const query = searchParams.get("q") || "";
-  const limit = Math.min(
-    50,
-    Math.max(1, parseInt(searchParams.get("limit") || "20")),
-  );
-
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.get("q") || "";
+    const limit = Math.min(
+      50,
+      Math.max(1, parseInt(searchParams.get("limit") || "20")),
+    );
     const whereClause: any = {
       id: { not: session.uid }, // Исключаем текущего пользователя
     };
@@ -97,10 +96,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("Search users error:", error);
     return NextResponse.json(
-      {
-        message: "Ошибка поиска пользователей",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
+      { error: "Ошибка поиска пользователей" },
       { status: 500 },
     );
   }

@@ -8,7 +8,6 @@ export type FilterType =
   | "all"
   | "unread"
   | "like"
-  | "achievement"
   | "friend_request"
   | "application_status";
 
@@ -26,7 +25,6 @@ const filters: {
   { type: "all", label: "Все", icon: "List" },
   { type: "unread", label: "Непрочитанные", icon: "Bell" },
   { type: "like", label: "Лайки", icon: "Heart" },
-  { type: "achievement", label: "Достижения", icon: "Star" },
   { type: "friend_request", label: "Друзья", icon: "UserPlus" },
   { type: "application_status", label: "Заявки", icon: "FileText" },
 ];

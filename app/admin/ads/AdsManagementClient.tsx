@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import AdsPlacementsSection from "./components/AdsPlacementsSection";
-import AdsRequestsSection from "./components/AdsRequestsSection";
+import AdsPlacementsSection from "./_components/AdsPlacementsSection";
+import AdsRequestsSection from "./_components/AdsRequestsSection";
 
 type Tab = "placements" | "requests";
 

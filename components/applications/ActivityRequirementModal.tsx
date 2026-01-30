@@ -19,11 +19,11 @@ export default function ActivityRequirementModal({
   activityType,
   message,
 }: ActivityRequirementModalProps) {
-  if (typeof window === "undefined") return null;
+  const isBrowser = typeof window !== "undefined";
 
   // Правильная блокировка скролла
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !isBrowser) return;
 
     const scrollY = window.scrollY;
     const originalOverflow = document.body.style.overflow;
@@ -55,7 +55,9 @@ export default function ActivityRequirementModal({
       document.documentElement.style.overflow = originalHtmlOverflow;
       window.scrollTo(0, scrollY);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, isBrowser]);
+
+  if (!isBrowser) return null;
 
   const getActivityConfig = () => {
     switch (activityType) {
@@ -63,8 +65,7 @@ export default function ActivityRequirementModal({
         return {
           icon: <LucideIcons.Heart className="w-8 h-8" />,
           title: "Лайк истории",
-          description:
-            "Поставьте лайк любой истории, которая вам понравится.",
+          description: "Поставьте лайк любой истории, которая вам понравится.",
           helperText: "Начиная с 3-й заявки — лайк нужен каждый раз.",
           buttonText: "Открыть истории",
           buttonLink: "/stories",
@@ -77,8 +78,7 @@ export default function ActivityRequirementModal({
         return {
           icon: <LucideIcons.User className="w-8 h-8" />,
           title: "Смена аватара",
-          description:
-            "Установите аватар в профиле.",
+          description: "Установите аватар в профиле.",
           helperText: "Нужно сделать один раз.",
           buttonText: "Открыть профиль",
           buttonLink: "/profile?settings=avatar",
@@ -94,8 +94,7 @@ export default function ActivityRequirementModal({
         return {
           icon: <LucideIcons.Image className="w-8 h-8" />,
           title: "Смена обложки",
-          description:
-            "Установите обложку профиля.",
+          description: "Установите обложку профиля.",
           helperText: "Нужно сделать один раз.",
           buttonText: "Выбрать обложку",
           buttonLink: "/profile",

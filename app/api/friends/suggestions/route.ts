@@ -7,15 +7,14 @@ import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
-  }
-
-  const limitParam = new URL(request.url).searchParams.get("limit");
-  const limit = Math.min(Math.max(Number(limitParam) || 5, 1), 20);
-
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
+    }
+
+    const limitParam = new URL(request.url).searchParams.get("limit");
+    const limit = Math.min(Math.max(Number(limitParam) || 5, 1), 20);
     const links = await prisma.friendship.findMany({
       where: {
         OR: [{ requesterId: session.uid }, { receiverId: session.uid }],
@@ -61,7 +60,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("GET /api/friends/suggestions error:", error);
     return NextResponse.json(
-      { message: "Ошибка получения рекомендаций" },
+      { error: "Ошибка получения рекомендаций" },
       { status: 500 },
     );
   }

@@ -10,6 +10,7 @@ import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
+import { formatDateFull } from "@/lib/time";
 
 interface Hero {
   id: string;
@@ -52,14 +53,6 @@ export default function HeroesGrid({
   loadingMore,
   observerTargetRef,
 }: HeroesGridProps) {
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("ru-RU", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }).format(new Date(date));
-  };
-
   const openExternal = (raw?: string | null) => {
     if (!raw) return;
     // API уже санитизирует, но на всякий — запретим javascript:
@@ -229,7 +222,7 @@ export default function HeroesGrid({
                         className="text-xs sm:text-sm truncate"
                         style={{ color: "#abd1c6" }}
                       >
-                        С {formatDate(new Date(hero.joinedAt))}
+                        С {formatDateFull(hero.joinedAt)}
                       </p>
                     </div>
                     <div className="hidden sm:block">

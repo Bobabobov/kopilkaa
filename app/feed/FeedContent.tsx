@@ -16,7 +16,6 @@ const filters = [
   { type: "all" as FilterType, label: "Все" },
   { type: "unread" as FilterType, label: "Непрочитанные" },
   { type: "like" as FilterType, label: "Лайки" },
-  { type: "achievement" as FilterType, label: "Достижения" },
   { type: "friend_request" as FilterType, label: "Друзья" },
   { type: "application_status" as FilterType, label: "Заявки" },
 ];

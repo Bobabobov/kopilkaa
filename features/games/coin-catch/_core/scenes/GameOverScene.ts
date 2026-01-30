@@ -11,7 +11,11 @@ export class GameOverScene {
   private onRestart: () => void;
   private onLeaderboard?: () => void;
 
-  constructor(app: PIXI.Application, onRestart: () => void, onLeaderboard?: () => void) {
+  constructor(
+    app: PIXI.Application,
+    onRestart: () => void,
+    onLeaderboard?: () => void,
+  ) {
     this.container = new PIXI.Container();
     this.app = app;
     this.onRestart = onRestart;
@@ -29,8 +33,14 @@ export class GameOverScene {
 
     const pixelFont = "'Press Start 2P', monospace";
     const titleFontSize = Math.max(14, Math.min(22, Math.floor(18 * scale)));
-    const scoreValueFontSize = Math.max(18, Math.min(28, Math.floor(24 * scale)));
-    const scoreLabelFontSize = Math.max(10, Math.min(14, Math.floor(12 * scale)));
+    const scoreValueFontSize = Math.max(
+      18,
+      Math.min(28, Math.floor(24 * scale)),
+    );
+    const scoreLabelFontSize = Math.max(
+      10,
+      Math.min(14, Math.floor(12 * scale)),
+    );
     const buttonFontSize = Math.max(10, Math.min(14, Math.floor(12 * scale)));
     const pad = Math.max(12, Math.floor(18 * scale));
     const radius = Math.max(8, Math.floor(12 * scale));
@@ -66,7 +76,13 @@ export class GameOverScene {
     const scoreBlockH = Math.max(72, Math.floor(80 * scale));
 
     const scoreBg = new PIXI.Graphics();
-    scoreBg.roundRect(-scoreBlockW / 2, 0, scoreBlockW, scoreBlockH, Math.max(6, Math.floor(10 * scale)));
+    scoreBg.roundRect(
+      -scoreBlockW / 2,
+      0,
+      scoreBlockW,
+      scoreBlockH,
+      Math.max(6, Math.floor(10 * scale)),
+    );
     scoreBg.fill({ color: 0x001e1d, alpha: 0.55 });
     scoreBg.stroke({ width: 2, color: 0xf9bc60, alpha: 0.6 });
     content.addChild(scoreBg);
@@ -165,21 +181,48 @@ export class GameOverScene {
     this.container.addChild(card);
 
     const cardInner = new PIXI.Graphics();
-    cardInner.roundRect(cardX + 3, cardY + 3, cardW - 6, cardH - 6, Math.max(4, radius - 4));
+    cardInner.roundRect(
+      cardX + 3,
+      cardY + 3,
+      cardW - 6,
+      cardH - 6,
+      Math.max(4, radius - 4),
+    );
     cardInner.stroke({ width: 1, color: 0xf9bc60, alpha: 0.35 });
     this.container.addChild(cardInner);
 
     const topHighlight = new PIXI.Graphics();
-    topHighlight.roundRect(cardX + 6, cardY + 6, cardW - 12, 6, Math.max(3, radius - 6));
+    topHighlight.roundRect(
+      cardX + 6,
+      cardY + 6,
+      cardW - 12,
+      6,
+      Math.max(3, radius - 6),
+    );
     topHighlight.fill({ color: 0xffffff, alpha: 0.06 });
     this.container.addChild(topHighlight);
 
     const cornerSize = Math.max(4, Math.floor(6 * scale));
     const corners = new PIXI.Graphics();
     corners.rect(cardX + 6, cardY + 6, cornerSize, cornerSize);
-    corners.rect(cardX + cardW - 6 - cornerSize, cardY + 6, cornerSize, cornerSize);
-    corners.rect(cardX + 6, cardY + cardH - 6 - cornerSize, cornerSize, cornerSize);
-    corners.rect(cardX + cardW - 6 - cornerSize, cardY + cardH - 6 - cornerSize, cornerSize, cornerSize);
+    corners.rect(
+      cardX + cardW - 6 - cornerSize,
+      cardY + 6,
+      cornerSize,
+      cornerSize,
+    );
+    corners.rect(
+      cardX + 6,
+      cardY + cardH - 6 - cornerSize,
+      cornerSize,
+      cornerSize,
+    );
+    corners.rect(
+      cardX + cardW - 6 - cornerSize,
+      cardY + cardH - 6 - cornerSize,
+      cornerSize,
+      cornerSize,
+    );
     corners.fill({ color: 0xf9bc60, alpha: 0.55 });
     this.container.addChild(corners);
 

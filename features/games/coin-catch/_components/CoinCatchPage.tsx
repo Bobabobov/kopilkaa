@@ -30,7 +30,9 @@ export function CoinCatchPage() {
           className="w-10 h-10 rounded-full border-3 border-[#f9bc60]/30 border-t-[#f9bc60] animate-spin"
           style={{ borderWidth: 3 }}
         />
-        <p className="text-[#abd1c6] text-sm sm:text-base font-medium">Загрузка...</p>
+        <p className="text-[#abd1c6] text-sm sm:text-base font-medium">
+          Загрузка...
+        </p>
       </div>
     );
   }
@@ -44,13 +46,16 @@ export function CoinCatchPage() {
         <div className="w-full max-w-md rounded-2xl overflow-hidden bg-[#001e1d]/95 border-2 border-[#f9bc60]/40 shadow-lg shadow-black/20">
           <div className="p-6 sm:p-8 text-center">
             <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#f9bc60]/20 flex items-center justify-center">
-              <span className="text-2xl" aria-hidden>🪙</span>
+              <span className="text-2xl" aria-hidden>
+                🪙
+              </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-[#fffffe] mb-2">
               Нужно войти, чтобы играть
             </h2>
             <p className="text-[#abd1c6] text-sm sm:text-base mb-6">
-              Войдите в аккаунт, чтобы играть в «Монеткосбор 90-х» и попасть в таблицу лидеров.
+              Войдите в аккаунт, чтобы играть в «Монеткосбор 90-х» и попасть в
+              таблицу лидеров.
             </p>
             <Link
               href="/?modal=auth"

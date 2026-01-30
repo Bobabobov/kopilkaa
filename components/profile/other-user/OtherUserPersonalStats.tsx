@@ -19,13 +19,6 @@ interface DetailedStats {
     friendsCount: number;
     daysActive: number;
   };
-  achievements: {
-    total: number;
-    common: number;
-    rare: number;
-    epic: number;
-    legendary: number;
-  };
   user: {
     createdAt: string;
   };

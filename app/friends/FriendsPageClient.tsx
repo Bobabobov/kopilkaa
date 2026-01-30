@@ -4,17 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFriends } from "@/components/profile/hooks/useFriends";
-import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
+import { useAutoHideScrollbar } from "@/hooks/ui/useAutoHideScrollbar";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { FriendsList } from "@/components/friends/FriendsList";
 import { FriendsSearch } from "@/components/friends/FriendsSearch";
 import { FriendsSidebar } from "@/components/friends/FriendsSidebar";
-import { FriendsPageHeader } from "@/app/friends/components/FriendsPageHeader";
-import { FriendsSummaryCards } from "@/app/friends/components/FriendsSummaryCards";
+import { FriendsPageHeader } from "@/app/friends/_components/FriendsPageHeader";
+import { FriendsSummaryCards } from "@/app/friends/_components/FriendsSummaryCards";
 import {
   FriendsTabsBar,
   FriendsTabId,
-} from "@/app/friends/components/FriendsTabsBar";
+} from "@/app/friends/_components/FriendsTabsBar";
 
 export default function FriendsPageClient() {
   const router = useRouter();

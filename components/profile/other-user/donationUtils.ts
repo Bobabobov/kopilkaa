@@ -7,19 +7,10 @@ export function formatAmount(amount: number): string {
   return `${n} ₽`;
 }
 
-export function formatDonationDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+import { formatRelativeDate } from "@/lib/time";
 
-  if (diffDays === 0) return "Сегодня";
-  if (diffDays === 1) return "Вчера";
-  if (diffDays < 7) return `${diffDays} дн. назад`;
-  return date.toLocaleDateString("ru-RU", {
-    day: "numeric",
-    month: "short",
-  });
+export function formatDonationDate(dateString: string): string {
+  return formatRelativeDate(dateString);
 }
 
 export function formatServiceLabel(comment?: string | null): string | null {

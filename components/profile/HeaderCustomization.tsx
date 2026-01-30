@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
-import { useAutoHideScrollbar } from "@/lib/useAutoHideScrollbar";
+import { useAutoHideScrollbar } from "@/hooks/ui/useAutoHideScrollbar";
 import { getAllHeaderThemes, getHeaderTheme } from "@/lib/header-customization";
 import ColorWheel from "./ColorWheel";
 

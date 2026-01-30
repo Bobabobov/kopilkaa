@@ -28,13 +28,11 @@ export async function getAllPossibleRequirements(
     },
     {
       type: "CHANGE_AVATAR",
-      message:
-        "Для создания заявки установите аватар в профиле.",
+      message: "Для создания заявки установите аватар в профиле.",
     },
     {
       type: "CHANGE_HEADER",
-      message:
-        "Для создания заявки установите обложку профиля.",
+      message: "Для создания заявки установите обложку профиля.",
     },
   ];
 

@@ -2,18 +2,15 @@
 "use client";
 
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { RARITY_NAMES, AchievementRarity } from "@/lib/achievements/types";
 
 export function getNotificationIcon(
   type: string,
-  rarity?: string,
+  _rarity?: string,
   status?: string,
 ) {
   switch (type) {
     case "like":
       return <LucideIcons.Heart className="text-red-500" size="sm" />;
-    case "achievement":
-      return <LucideIcons.Star className="text-yellow-500" size="sm" />;
     case "friend_request":
       return <LucideIcons.UserPlus className="text-[#f9bc60]" size="sm" />;
     case "application_status":
@@ -32,28 +29,6 @@ export function getNotificationIcon(
   }
 }
 
-export function getRarityColor(rarity?: string): string {
-  switch (rarity) {
-    case "COMMON":
-      return "#94a1b2";
-    case "RARE":
-      return "#abd1c6";
-    case "EPIC":
-      return "#e16162";
-    case "LEGENDARY":
-      return "#f9bc60";
-    case "EXCLUSIVE":
-      return "#ff6b6b";
-    default:
-      return "#abd1c6";
-  }
-}
-
-export function getRarityLabel(rarity?: string): string {
-  if (!rarity) return "";
-  return RARITY_NAMES[rarity as AchievementRarity] || rarity;
-}
-
 export function getNotificationBackgroundColor(
   type: string,
   status?: string,
@@ -66,9 +41,6 @@ export function getNotificationBackgroundColor(
   }
   if (type === "application_status" && status === "CONTEST") {
     return "bg-[#9b87f5]/20";
-  }
-  if (type === "achievement") {
-    return "bg-[#f9bc60]/20";
   }
   return "bg-[#abd1c6]/20";
 }

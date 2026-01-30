@@ -65,22 +65,6 @@ export async function GET() {
             createdAt: true,
           },
         },
-        userAchievements: {
-          select: {
-            unlockedAt: true,
-            grantedBy: true,
-            grantedByName: true,
-            achievement: {
-              select: {
-                name: true,
-                description: true,
-                icon: true,
-                rarity: true,
-                type: true,
-              },
-            },
-          },
-        },
         friendshipsSent: {
           select: {
             status: true,
@@ -127,7 +111,6 @@ export async function GET() {
       applications: user.applications,
       gameScores: user.gameScores,
       tree: user.userTree,
-      achievements: user.userAchievements,
       friendships: {
         sent: user.friendshipsSent,
         received: user.friendshipsReceived,

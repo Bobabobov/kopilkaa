@@ -30,7 +30,6 @@ type User = {
   telegramLink?: string | null;
   youtubeLink?: string | null;
   lastSeen?: string | null;
-  achievementsCount?: number;
   applicationsCount?: number;
   approvedApplications?: number;
   friendsCount?: number;

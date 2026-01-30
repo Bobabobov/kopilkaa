@@ -2,8 +2,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { AchievementService } from "@/lib/achievements/service";
-
 // Создать запись оплаты (цифровая услуга / тестовый режим)
 export async function POST(request: NextRequest) {
   try {
@@ -31,17 +29,6 @@ export async function POST(request: NextRequest) {
         userId: session?.uid ?? null,
       },
     });
-
-    // Автоматически проверяем/выдаём достижения после оплаты (важно для /heroes статусов)
-    if (session?.uid && type === "SUPPORT") {
-      try {
-        await AchievementService.checkAndGrantAutomaticAchievements(
-          session.uid,
-        );
-      } catch {
-        // не блокируем ответ по оплате из‑за достижений
-      }
-    }
 
     return NextResponse.json({ success: true, donation });
   } catch (error) {

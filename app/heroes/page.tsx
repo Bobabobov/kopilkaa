@@ -71,7 +71,6 @@ export default function HeroesPage() {
     setPage(1);
     setHeroes([]);
     loadPage(1, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, effectiveQuery]);
 
   // Lazy load next pages

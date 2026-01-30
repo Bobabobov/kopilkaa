@@ -1,6 +1,6 @@
 "use client";
 
-import { useMetrika } from "@/lib/useMetrika";
+import { useMetrika } from "@/hooks/analytics/useMetrika";
 
 export default function MetrikaSpaTracker() {
   useMetrika();

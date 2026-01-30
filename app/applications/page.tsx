@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { usePageTimeTracking } from "@/lib/usePageTimeTracking";
+import { usePageTimeTracking } from "@/hooks/ui/usePageTimeTracking";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import TrustLevelsInfo from "@/components/applications/TrustLevelsInfo";

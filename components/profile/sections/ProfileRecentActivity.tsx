@@ -3,29 +3,11 @@
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useRecentActivity } from "../hooks/useRecentActivity";
+import { formatTimeAgo } from "@/lib/time";
 import { RecentActivityItem } from "./RecentActivityItem";
 
 export default function ProfileRecentActivity() {
   const { activities, loading } = useRecentActivity();
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMinutes / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMinutes < 1) return "Только что";
-    if (diffMinutes < 60) return `${diffMinutes} мин назад`;
-    if (diffHours < 24) return `${diffHours} ч назад`;
-    if (diffDays === 1) return "Вчера";
-    if (diffDays < 7) return `${diffDays} дн. назад`;
-    return date.toLocaleDateString("ru-RU", {
-      day: "numeric",
-      month: "short",
-    });
-  };
 
   if (loading) {
     return (
@@ -109,7 +91,7 @@ export default function ProfileRecentActivity() {
           {activities.map((activity, index) => (
             <RecentActivityItem
               key={activity.id}
-              activity={{ ...activity, date: formatDate(activity.date) }}
+              activity={{ ...activity, date: formatTimeAgo(activity.date) }}
               index={index}
             />
           ))}

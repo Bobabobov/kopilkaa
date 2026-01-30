@@ -1,7 +1,6 @@
 // app/api/applications/route.ts
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { AchievementService } from "@/lib/achievements/service";
 import { publish } from "@/lib/sse";
 import {
   getPlainTextLenFromHtml,
@@ -25,11 +24,13 @@ function getWhitelistEmails(): string[] {
 }
 
 export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session)
-    return Response.json({ error: "Требуется вход" }, { status: 401 });
+  try {
+    const session = await getSession();
+    if (!session) {
+      return Response.json({ error: "Требуется вход" }, { status: 401 });
+    }
 
-  const requester = await prisma.user.findUnique({
+    const requester = await prisma.user.findUnique({
     where: { id: session.uid },
     select: { email: true, avatar: true, headerTheme: true },
   });
@@ -59,7 +60,6 @@ export async function POST(req: Request) {
     );
   }
 
-  try {
     const {
       title,
       summary,
@@ -315,14 +315,6 @@ export async function POST(req: Request) {
 
       return app;
     });
-
-    // Проверяем и выдаём достижения (после создания заявки)
-    try {
-      await AchievementService.checkAndGrantAutomaticAchievements(session.uid);
-    } catch (error) {
-      console.error("Error checking achievements:", error);
-      // Не прерываем создание заявки из-за ошибки достижений
-    }
 
     // SSE уведомления для админки
     await new Promise((resolve) => setTimeout(resolve, 50));

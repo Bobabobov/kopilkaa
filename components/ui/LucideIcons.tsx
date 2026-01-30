@@ -92,7 +92,7 @@ import {
   Gamepad2,
   Code,
   MoreVertical,
-  Infinity,
+  Infinity as InfinityIcon,
   FlaskConical,
 } from "lucide-react";
 
@@ -479,7 +479,7 @@ export const LucideIcons = {
   ),
 
   Infinity: ({ className = "", size = "md" }: IconProps) => (
-    <Infinity className={`${sizeClasses[size]} ${className}`} />
+    <InfinityIcon className={`${sizeClasses[size]} ${className}`} />
   ),
 
   Building2: ({ className = "", size = "md" }: IconProps) => (

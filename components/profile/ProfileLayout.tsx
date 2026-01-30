@@ -10,7 +10,6 @@ import {
   ProfileHeaderCard,
   ProfilePersonalStats,
   ProfileFriendsSection,
-  ProfileAchievements,
   ProfileRecentActivity,
   MotivationalCard,
 } from "./ProfileDynamicImports";
@@ -95,7 +94,6 @@ export default function ProfileLayout({
                 progressTotal={trustProgressTotal}
               />
               <ProfileFriendsSection />
-              <ProfileAchievements />
               <ProfileStoriesSection userId={user.id} isOwner />
             </aside>
           </main>

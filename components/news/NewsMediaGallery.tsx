@@ -11,11 +11,11 @@ export function NewsMediaGallery({ media }: { media: NewsMedia[] }) {
     [media],
   );
 
-  if (!sorted.length) return null;
-
   const imagesOnly = sorted.filter((m) => m.type === "IMAGE");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  if (!sorted.length) return null;
 
   const isSingle = sorted.length === 1;
   const gridClass = isSingle

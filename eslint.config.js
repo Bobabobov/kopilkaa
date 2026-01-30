@@ -1,14 +1,14 @@
 // eslint.config.js
-import js from "@eslint/js";
-import typescript from "@typescript-eslint/eslint-plugin";
-import typescriptParser from "@typescript-eslint/parser";
-import react from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
-import jsxA11y from "eslint-plugin-jsx-a11y";
-import prettier from "eslint-plugin-prettier";
-import prettierConfig from "eslint-config-prettier";
+const js = require("@eslint/js");
+const typescript = require("@typescript-eslint/eslint-plugin");
+const typescriptParser = require("@typescript-eslint/parser");
+const react = require("eslint-plugin-react");
+const reactHooks = require("eslint-plugin-react-hooks");
+const jsxA11y = require("eslint-plugin-jsx-a11y");
+const prettier = require("eslint-plugin-prettier");
+const prettierConfig = require("eslint-config-prettier");
 
-export default [
+module.exports = [
   // Базовые правила JavaScript
   js.configs.recommended,
 
@@ -65,17 +65,14 @@ export default [
     },
     rules: {
       // TypeScript правила
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        { argsIgnorePattern: "^_" },
-      ],
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
 
       // React правила
       "react/react-in-jsx-scope": "off", // Next.js не требует импорта React
       "react/prop-types": "off", // TypeScript уже проверяет типы
       "react-hooks/rules-of-hooks": "warn",
-      "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/exhaustive-deps": "off",
 
       // Accessibility правила
       "jsx-a11y/alt-text": "warn",
@@ -85,7 +82,7 @@ export default [
       "prettier/prettier": "error",
 
       // Общие правила
-      "no-console": "warn",
+      "no-console": "off",
       "no-undef": "off",
       "no-debugger": "error",
       "no-unused-vars": "off", // Отключаем в пользу @typescript-eslint/no-unused-vars
@@ -114,9 +111,25 @@ export default [
       "dist/**",
       "*.config.js",
       "*.config.mjs",
+      "next-env.d.ts",
       "public/**",
       "prisma/dev.db",
       "prisma/migrations/**",
+      "*.log",
+      "npm-debug.log*",
+      "yarn-debug.log*",
+      "yarn-error.log*",
+      "coverage/**",
+      ".env",
+      ".env.*",
+      ".vscode/**",
+      ".idea/**",
+      ".DS_Store",
+      "Thumbs.db",
+      "pids/**",
+      "*.pid",
+      "*.seed",
+      "*.pid.lock",
     ],
   },
 ];

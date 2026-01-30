@@ -246,7 +246,6 @@ export default function ApplicationStatusModalGate() {
         pollingRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Блокируем скролл страницы пока модалка открыта
@@ -276,7 +275,6 @@ export default function ApplicationStatusModalGate() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   return (
@@ -307,9 +305,7 @@ export default function ApplicationStatusModalGate() {
               }`}
               onClick={(e) => e.stopPropagation()}
             >
-              {isContest && (
-                <ContestConfetti key={notification.id} />
-              )}
+              {isContest && <ContestConfetti key={notification.id} />}
 
               <div className="flex items-start justify-between gap-3 relative z-10">
                 <div className="flex items-start gap-3 min-w-0">

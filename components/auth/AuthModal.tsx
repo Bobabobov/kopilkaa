@@ -85,7 +85,6 @@ export function AuthModal({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   // Accessibility: focus trap inside dialog + restore focus on unmount

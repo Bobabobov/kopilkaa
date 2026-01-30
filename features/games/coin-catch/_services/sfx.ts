@@ -20,7 +20,8 @@ export function loadAudioSettings(): { muted: boolean; volume: number } | null {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as { muted?: boolean; volume?: number };
-    if (typeof parsed.volume === "number") settings.volume = clampVolume(parsed.volume);
+    if (typeof parsed.volume === "number")
+      settings.volume = clampVolume(parsed.volume);
     if (typeof parsed.muted === "boolean") settings.muted = parsed.muted;
     return { muted: settings.muted, volume: settings.volume };
   } catch {
@@ -28,7 +29,10 @@ export function loadAudioSettings(): { muted: boolean; volume: number } | null {
   }
 }
 
-export function setAudioSettings(next: { muted: boolean; volume: number }): void {
+export function setAudioSettings(next: {
+  muted: boolean;
+  volume: number;
+}): void {
   settings = { muted: next.muted, volume: clampVolume(next.volume) };
   if (typeof window !== "undefined") {
     try {
@@ -49,7 +53,9 @@ export function playButtonSound(): void {
   if (now - lastButtonPlayAt < 120) return;
   lastButtonPlayAt = now;
   if (!cachedButtonAudio) {
-    cachedButtonAudio = new Audio("/coin/muzaka/knopki/cassette-player-button.mp3");
+    cachedButtonAudio = new Audio(
+      "/coin/muzaka/knopki/cassette-player-button.mp3",
+    );
     cachedButtonAudio.preload = "auto";
     cachedButtonAudio.load();
   } else {

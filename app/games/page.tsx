@@ -53,7 +53,8 @@ export default function GamesPage() {
   }> = [
     {
       title: "Монеткосбор 90-х",
-      description: "Собирай монеты за 30 секунд! Клик мимо монеты = -1 жизнь. У тебя 3 жизни.",
+      description:
+        "Собирай монеты за 30 секунд! Клик мимо монеты = -1 жизнь. У тебя 3 жизни.",
       href: "/games/coin-catch",
       badge: "30 секунд / 3 жизни / недельный топ",
       image: "/game.png",
@@ -134,7 +135,9 @@ export default function GamesPage() {
                       </span>
                     </div>
                     <div className="mt-4">
-                      <div className="text-sm text-[#abd1c6]">Игра ещё разрабатывается</div>
+                      <div className="text-sm text-[#abd1c6]">
+                        Игра ещё разрабатывается
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -152,8 +155,12 @@ export default function GamesPage() {
                     Скоро
                   </div>
                   <div className="mt-4">
-                    <div className="text-xl font-bold text-[#fffffe]">{game.title}</div>
-                    <div className="text-sm text-[#abd1c6] mt-1">{game.description}</div>
+                    <div className="text-xl font-bold text-[#fffffe]">
+                      {game.title}
+                    </div>
+                    <div className="text-sm text-[#abd1c6] mt-1">
+                      {game.description}
+                    </div>
                   </div>
                 </motion.div>
               ))}

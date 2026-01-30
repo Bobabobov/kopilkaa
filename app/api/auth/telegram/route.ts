@@ -130,7 +130,6 @@ export async function POST(req: NextRequest) {
 
       // гарантируем уникальность логина
       let suffix = 1;
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const exists = await prisma.user.findUnique({
           where: { username },

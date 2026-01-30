@@ -28,7 +28,6 @@ export async function GET(
     let likesGiven = 0;
     let likesReceived = 0;
     let friendsCount = 0;
-    let achievements: any[] = [];
     let userData: { createdAt: Date } | null = null;
 
     try {
@@ -69,18 +68,6 @@ export async function GET(
           },
         }),
 
-        // Достижения пользователя
-        prisma.userAchievement.findMany({
-          where: { userId },
-          include: {
-            achievement: {
-              select: {
-                rarity: true,
-              },
-            },
-          },
-        }),
-
         // Дата регистрации пользователя
         prisma.user.findUnique({
           where: { id: userId },
@@ -106,11 +93,7 @@ export async function GET(
       }
 
       if (results[4].status === "fulfilled") {
-        achievements = results[4].value;
-      }
-
-      if (results[5].status === "fulfilled") {
-        userData = results[5].value;
+        userData = results[4].value;
       }
     } catch (dbError) {
       // Database error - using default values
@@ -154,23 +137,6 @@ export async function GET(
       daysActive,
     };
 
-    // Статистика достижений по редкости
-    const achievementStats = {
-      total: achievements.length,
-      legendary: achievements.filter(
-        (ua) => ua.achievement && ua.achievement.rarity === "LEGENDARY",
-      ).length,
-      epic: achievements.filter(
-        (ua) => ua.achievement && ua.achievement.rarity === "EPIC",
-      ).length,
-      rare: achievements.filter(
-        (ua) => ua.achievement && ua.achievement.rarity === "RARE",
-      ).length,
-      common: achievements.filter(
-        (ua) => ua.achievement && ua.achievement.rarity === "COMMON",
-      ).length,
-    };
-
     // Игровая статистика (пока заглушка)
     const gameStats = {
       gamesPlayed: 0,
@@ -182,7 +148,6 @@ export async function GET(
     const detailedStats = {
       applications: applicationStats,
       activity: activityStats,
-      achievements: achievementStats,
       games: gameStats,
       user: {
         createdAt: userData?.createdAt || new Date(),
@@ -218,13 +183,6 @@ export async function GET(
         likesReceived: 0,
         friendsCount: 0,
         daysActive: 0,
-      },
-      achievements: {
-        total: 0,
-        legendary: 0,
-        epic: 0,
-        rare: 0,
-        common: 0,
       },
       games: {
         gamesPlayed: 0,

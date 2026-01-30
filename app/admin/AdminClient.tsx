@@ -2,19 +2,19 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import StatsCards from "./components/StatsCards";
-import ControlPanel from "./components/ControlPanel";
-import ApplicationsGrid from "./components/ApplicationsGrid";
-import StatusModal from "./components/StatusModal";
-import ImageLightbox from "./components/ImageLightbox";
-import AdminLoading from "./components/AdminLoading";
-import { AdminHeader } from "./components/AdminHeader";
-import { DeleteModal } from "./components/DeleteModal";
-import { AdminLoadingIndicator } from "./components/AdminLoadingIndicator";
-import { AdminEndMessage } from "./components/AdminEndMessage";
+import StatsCards from "./_components/StatsCards";
+import ControlPanel from "./_components/ControlPanel";
+import ApplicationsGrid from "./_components/ApplicationsGrid";
+import StatusModal from "./_components/StatusModal";
+import ImageLightbox from "./_components/ImageLightbox";
+import AdminLoading from "./_components/AdminLoading";
+import { AdminHeader } from "./_components/AdminHeader";
+import { DeleteModal } from "./_components/DeleteModal";
+import { AdminLoadingIndicator } from "./_components/AdminLoadingIndicator";
+import { AdminEndMessage } from "./_components/AdminEndMessage";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
-import { useAdminApplications } from "./hooks/useAdminApplications";
-import { useAdminActions } from "./hooks/useAdminActions";
+import { useAdminApplications } from "@/hooks/admin/useAdminApplications";
+import { useAdminActions } from "@/hooks/admin/useAdminActions";
 
 export default function AdminClient() {
   const {

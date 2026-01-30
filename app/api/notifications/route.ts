@@ -1,44 +1,36 @@
 // app/api/notifications/route.ts
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { NextResponse } from "next/server";
+import { formatTimeAgo } from "@/lib/time";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
-
-function formatTimeAgo(date: Date): string {
-  const now = new Date();
-  const diffInMilliseconds = now.getTime() - date.getTime();
-  const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  const diffInDays = Math.floor(diffInHours / 24);
-
-  if (diffInMinutes < 1) {
-    return "только что";
-  } else if (diffInMinutes < 60) {
-    return `${diffInMinutes} ${diffInMinutes === 1 ? "минуту" : diffInMinutes < 5 ? "минуты" : "минут"} назад`;
-  } else if (diffInHours < 24) {
-    return `${diffInHours} ${diffInHours === 1 ? "час" : diffInHours < 5 ? "часа" : "часов"} назад`;
-  } else if (diffInDays < 7) {
-    return `${diffInDays} ${diffInDays === 1 ? "день" : diffInDays < 5 ? "дня" : "дней"} назад`;
-  } else {
-    return date.toLocaleDateString("ru-RU", {
-      day: "numeric",
-      month: "long",
-    });
-  }
-}
 
 export async function GET() {
   try {
     const session = await getSession();
     if (!session) {
-      return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
+      return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
     }
 
     const userId = session.uid;
-    // Явно указываем тип, чтобы TypeScript не ругался на implicit any[]
-    const notifications: any[] = [];
+    type NotificationItem = {
+      id: string;
+      type: string;
+      title: string;
+      message: string;
+      avatar?: string | null;
+      createdAt: Date;
+      timestamp: string;
+      isRead: boolean;
+      applicationId?: string;
+      friendshipId?: string;
+      requesterId?: string;
+      adminComment?: string | null;
+      status?: string;
+    };
+    const notifications: NotificationItem[] = [];
 
     // Получаем новые лайки (последние 20 для группировки) с обработкой ошибок
     const recentLikes = await prisma.storyLike
@@ -107,39 +99,6 @@ export async function GET() {
           applicationId: like.applicationId,
         });
       });
-
-    // Получаем новые достижения с обработкой ошибок
-    const recentAchievements = await prisma.userAchievement
-      .findMany({
-        where: { userId },
-        orderBy: { unlockedAt: "desc" },
-        take: 5,
-        include: {
-          achievement: {
-            select: {
-              name: true,
-              description: true,
-              rarity: true,
-            },
-          },
-        },
-      })
-      .catch(() => []);
-
-    // Добавляем достижения как уведомления
-    recentAchievements.forEach((achievement) => {
-      notifications.push({
-        id: `achievement_${achievement.id}`,
-        type: "achievement",
-        title: "Получено достижение",
-        message: `Вы получили достижение "${achievement.achievement.name}"`,
-        avatar: null,
-        createdAt: achievement.unlockedAt,
-        timestamp: formatTimeAgo(new Date(achievement.unlockedAt)),
-        isRead: false,
-        rarity: achievement.achievement.rarity,
-      });
-    });
 
     // Получаем входящие заявки в друзья
     const pendingFriendRequests = await prisma.friendship

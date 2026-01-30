@@ -5,7 +5,6 @@ import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { publish } from "@/lib/sse";
 import { sendStatusEmail } from "@/lib/email";
-import { AchievementService } from "@/lib/achievements/service";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
 export async function GET(
@@ -110,18 +109,6 @@ export async function PATCH(
         status, // здесь status уже PENDING | APPROVED | REJECTED
         comment: item.adminComment ?? "",
       }).catch((e) => console.error("mail error:", e));
-    }
-
-    // Проверяем и выдаём достижения только при одобрении заявки
-    if (status === "APPROVED" && item.user?.id) {
-      try {
-        await AchievementService.checkAndGrantAutomaticAchievements(
-          item.user.id,
-        );
-      } catch (error) {
-        console.error("Error checking achievements:", error);
-        // Не прерываем обновление статуса из-за ошибки достижений
-      }
     }
 
     // 🛰️ SSE для админки

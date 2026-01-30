@@ -6,8 +6,6 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Notification } from "@/components/notifications/types";
 import {
   getNotificationIcon,
-  getRarityColor,
-  getRarityLabel,
   isNotificationUnread,
 } from "@/components/notifications/utils";
 
@@ -29,15 +27,6 @@ const getNotificationAccent = (
 
   if (type === "like") {
     return `bg-gradient-to-r from-red-500/${opacity} to-pink-500/${opacity}`;
-  }
-  if (type === "achievement") {
-    if (rarity === "EPIC") {
-      return `bg-gradient-to-r from-purple-500/${opacity} to-pink-500/${opacity}`;
-    }
-    if (rarity === "RARE") {
-      return `bg-gradient-to-r from-blue-500/${opacity} to-cyan-500/${opacity}`;
-    }
-    return `bg-gradient-to-r from-yellow-500/${opacity} to-orange-500/${opacity}`;
   }
   if (type === "friend_request") {
     return `bg-gradient-to-r from-[#f9bc60]/${opacity} to-[#e16162]/${opacity}`;
@@ -233,41 +222,6 @@ export default function NotificationCard({
                           {storyTitle}
                         </span>
                       </div>
-                    )}
-                  </>
-                )}
-
-                {/* Достижения */}
-                {notification.type === "achievement" && (
-                  <>
-                    <p className="text-sm sm:text-base text-[#abd1c6]/70 leading-relaxed">
-                      {notification.message}
-                    </p>
-                    {notification.rarity && (
-                      <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.8 + index * 0.08 }}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border"
-                        style={{
-                          backgroundColor:
-                            getRarityColor(notification.rarity) + "20",
-                          borderColor:
-                            getRarityColor(notification.rarity) + "40",
-                        }}
-                      >
-                        <span
-                          style={{ color: getRarityColor(notification.rarity) }}
-                        >
-                          <LucideIcons.Star className="w-4 h-4" />
-                        </span>
-                        <span
-                          className="text-xs sm:text-sm font-medium"
-                          style={{ color: getRarityColor(notification.rarity) }}
-                        >
-                          {getRarityLabel(notification.rarity)}
-                        </span>
-                      </motion.div>
                     )}
                   </>
                 )}

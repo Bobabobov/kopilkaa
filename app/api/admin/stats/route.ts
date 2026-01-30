@@ -37,19 +37,6 @@ export async function GET() {
           .catch(() => 0),
       ]);
 
-    // Статистика по достижениям с обработкой ошибок
-    const [
-      totalAchievements,
-      activeAchievements,
-      inactiveAchievements,
-      exclusiveAchievements,
-    ] = await Promise.all([
-      prisma.achievement.count().catch(() => 0),
-      prisma.achievement.count({ where: { isActive: true } }).catch(() => 0),
-      prisma.achievement.count({ where: { isActive: false } }).catch(() => 0),
-      prisma.achievement.count({ where: { isExclusive: true } }).catch(() => 0),
-    ]);
-
     // Статистика по пользователям с обработкой ошибок
     const [totalUsers, adminUsers] = await Promise.all([
       prisma.user.count().catch(() => 0),
@@ -67,12 +54,6 @@ export async function GET() {
             contest,
             total,
             totalAmount,
-          },
-          achievements: {
-            total: totalAchievements,
-            active: activeAchievements,
-            inactive: inactiveAchievements,
-            exclusive: exclusiveAchievements,
           },
           users: {
             total: totalUsers,

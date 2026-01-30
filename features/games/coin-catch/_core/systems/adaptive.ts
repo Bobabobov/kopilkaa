@@ -50,7 +50,12 @@ export function getVisibleViewport(): { width: number; height: number } {
   if (vv) {
     width = vv.width;
     height = vv.height;
-    if (width < 1 || height < 1 || Number.isNaN(width) || Number.isNaN(height)) {
+    if (
+      width < 1 ||
+      height < 1 ||
+      Number.isNaN(width) ||
+      Number.isNaN(height)
+    ) {
       width = window.innerWidth;
       height = window.innerHeight;
     }

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { AdminHeader } from "../components/AdminHeader";
+import { AdminHeader } from "../_components/AdminHeader";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import Link from "next/link";
 import { getPublicProfilePath } from "@/lib/profileUrl";

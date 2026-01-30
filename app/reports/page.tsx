@@ -156,7 +156,7 @@ export default function ReportsPage() {
               onPageChange={setPage}
               isAdmin={isAdmin}
               onStatusUpdate={updateStatus}
-              onDeleteReport={deleteReport}
+              onDeleteReport={isAdmin ? deleteReport : undefined}
             />
           </div>
         </div>

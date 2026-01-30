@@ -223,6 +223,26 @@ export default function StoryPage() {
     }
   };
 
+  useEffect(() => {
+    if (!story || story.id === "ad") return;
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem("stories-read-ids");
+      const parsed = raw ? JSON.parse(raw) : [];
+      const current = Array.isArray(parsed)
+        ? parsed.filter((id) => typeof id === "string")
+        : [];
+      if (!current.includes(story.id)) {
+        window.localStorage.setItem(
+          "stories-read-ids",
+          JSON.stringify([...current, story.id]),
+        );
+      }
+    } catch {
+      // ignore malformed storage
+    }
+  }, [story?.id]);
+
   const handleLike = async () => {
     if (!story) return;
 

@@ -60,6 +60,15 @@ export function useRestoreForm(params: RestoreParams): void {
     if (loadingAuth) return;
     try {
       const saved = loadFormFromStorage(saveKey);
+      const hasSavedData = !!(
+        saved &&
+        (saved.title ||
+          saved.summary ||
+          saved.story ||
+          saved.amount ||
+          saved.payment ||
+          saved.bankName)
+      );
       if (saved) {
         setTitle(saved.title);
         setSummary(saved.summary);
@@ -77,20 +86,21 @@ export function useRestoreForm(params: RestoreParams): void {
       }
 
       const savedStart = loadFormStartTime(formStartKey);
-      if (savedStart != null) {
-        formStartedAtRef.current = savedStart;
-      } else {
-        formStartedAtRef.current = Date.now();
-        if (typeof window !== "undefined") {
-          try {
-            localStorage.setItem(
-              formStartKey,
-              String(formStartedAtRef.current),
-            );
-          } catch {
-            // ignore
-          }
+      const now = Date.now();
+      const maxIdleMs = 6 * 60 * 60 * 1000; // 6 часов: отсеиваем "залипшие" формы
+      const shouldResetStart =
+        !hasSavedData ||
+        savedStart == null ||
+        (typeof savedStart === "number" && now - savedStart > maxIdleMs);
+      if (shouldResetStart) {
+        formStartedAtRef.current = null;
+        try {
+          localStorage.removeItem(formStartKey);
+        } catch {
+          // ignore
         }
+      } else {
+        formStartedAtRef.current = savedStart;
       }
 
       setTrustAcknowledged(loadTrustAck(trustAckKey));
@@ -168,6 +178,17 @@ export function usePersistForm(params: PersistParams): void {
   useEffect(() => {
     const t = window.setTimeout(() => {
       try {
+        const hasInput =
+          title ||
+          summary ||
+          story ||
+          amount ||
+          payment ||
+          bankName;
+        if (hasInput && formStartedAtRef.current == null) {
+          formStartedAtRef.current = Date.now();
+          saveFormStartTime(formStartKey, formStartedAtRef.current);
+        }
         saveFormToStorage(saveKey, {
           title,
           summary,

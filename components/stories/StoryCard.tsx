@@ -13,6 +13,7 @@ interface Story {
   id: string;
   title: string;
   summary: string;
+  amount?: number | null;
   createdAt?: string;
   images?: Array<{ url: string; sort: number }>;
   user?: {
@@ -34,6 +35,8 @@ interface StoryCardProps {
   index: number;
   animate?: boolean; // Опциональный проп для управления анимацией
   isAuthenticated: boolean;
+  query?: string;
+  isRead?: boolean;
 }
 
 // Карточка истории в списке /stories с картинкой, автором и лайками
@@ -42,6 +45,8 @@ export function StoryCard({
   index,
   animate = true,
   isAuthenticated,
+  query = "",
+  isRead = false,
 }: StoryCardProps) {
   const router = useRouter();
   const [liked, setLiked] = useState(!!story.userLiked);
@@ -53,6 +58,47 @@ export function StoryCard({
     (story.user?.email ? story.user.email.split("@")[0] : null) ||
     "Неизвестный автор";
   const mainImage = story.images?.[0]?.url || "/stories-preview.jpg";
+  const amountText =
+    typeof story.amount === "number"
+      ? new Intl.NumberFormat("ru-RU").format(story.amount)
+      : null;
+
+  const escapeRegExp = (value: string) =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  const getHighlightTokens = (value: string) =>
+    Array.from(
+      new Set(
+        value
+          .toLowerCase()
+          .split(/\s+/g)
+          .map((token) => token.trim())
+          .filter(Boolean),
+      ),
+    ).filter((token) => token.length >= 2);
+
+  const renderHighlightedText = (text: string) => {
+    if (!query.trim()) return text;
+    const tokens = getHighlightTokens(query);
+    if (!tokens.length) return text;
+    const pattern = new RegExp(
+      `(${tokens.map(escapeRegExp).join("|")})`,
+      "gi",
+    );
+    const parts = text.split(pattern);
+    return parts.map((part, idx) =>
+      idx % 2 === 1 ? (
+        <mark
+          key={`${part}-${idx}`}
+          className="bg-[#f9bc60]/35 text-[#001e1d] px-1 rounded-sm"
+        >
+          {part}
+        </mark>
+      ) : (
+        <span key={`${part}-${idx}`}>{part}</span>
+      ),
+    );
+  };
 
   const handleCardClick = () => {
     if (typeof window !== "undefined") {
@@ -124,13 +170,13 @@ export function StoryCard({
   };
 
   const renderCardContent = () => (
-    <div
+      <div
       role="link"
       tabIndex={0}
       aria-label={`Открыть историю: ${story.title}`}
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
-      className="relative bg-gradient-to-br from-white/98 via-white/95 to-white/90 backdrop-blur-2xl rounded-3xl p-0 shadow-2xl hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] transition-all duration-700 border border-[#abd1c6]/50 hover:border-[#f9bc60]/80 hover:-translate-y-3 hover:scale-[1.03] h-full max-w-full overflow-hidden flex flex-col group cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#f9bc60]/40"
+        className="relative bg-gradient-to-br from-white/98 via-white/95 to-white/90 backdrop-blur-2xl rounded-3xl p-0 shadow-2xl hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] transition-all duration-700 border border-[#abd1c6]/50 hover:border-[#f9bc60]/80 hover:-translate-y-3 hover:scale-[1.03] h-full max-w-full overflow-hidden flex flex-col group cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#f9bc60]/40"
       style={{
         background:
           "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 50%, rgba(249,188,96,0.15) 100%)",
@@ -138,6 +184,12 @@ export function StoryCard({
           "0 20px 25px -5px rgba(0, 70, 67, 0.15), 0 10px 10px -5px rgba(0, 70, 67, 0.1), inset 0 1px 0 rgba(255,255,255,0.6)",
       }}
     >
+      {isRead && (
+        <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#abd1c6] text-[#001e1d] text-xs font-black uppercase tracking-wide shadow-md">
+          Прочитано
+        </div>
+      )}
+
       {/* Декоративный градиент при hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/0 via-[#f9bc60]/0 to-[#f9bc60]/0 group-hover:from-[#f9bc60]/5 group-hover:via-[#f9bc60]/10 group-hover:to-[#f9bc60]/5 transition-all duration-700 rounded-3xl pointer-events-none"></div>
 
@@ -186,7 +238,7 @@ export function StoryCard({
               textShadow: "0 2px 4px rgba(0,0,0,0.08)",
             }}
           >
-            {story.title}
+            {renderHighlightedText(story.title)}
           </h3>
         </div>
 
@@ -196,7 +248,7 @@ export function StoryCard({
             className="text-sm sm:text-base leading-relaxed line-clamp-3 break-words overflow-hidden transition-all duration-500 group-hover:text-[#2d5a4e]"
             style={{ color: "#2d5a4e" }}
           >
-            {story.summary}
+            {renderHighlightedText(story.summary)}
           </p>
         </div>
 
@@ -263,6 +315,19 @@ export function StoryCard({
                 {Math.ceil(story.summary.length / 200)} мин
               </span>
             </div>
+            {amountText && (
+              <div className="flex items-center gap-2 bg-gradient-to-r from-[#f9bc60]/25 to-[#f9bc60]/10 backdrop-blur-sm rounded-2xl px-3 py-2 border border-[#f9bc60]/50 shadow-sm hover:shadow-md hover:border-[#f9bc60]/80 transition-all duration-300 hover:scale-[1.02] flex-shrink-0">
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#f9bc60]/30 border border-[#f9bc60]/50 shadow-inner">
+                  <LucideIcons.Ruble size="xs" className="text-[#8b6b1f]" />
+                </span>
+                <span className="text-xs uppercase tracking-wide text-[#8b6b1f] font-semibold">
+                  сумма
+                </span>
+                <span className="text-sm font-black text-[#001e1d]">
+                  {amountText} ₽
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Нижняя строка: Лайк и дата */}

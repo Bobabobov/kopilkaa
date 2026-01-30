@@ -62,6 +62,11 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
             placeholder="Поиск историй..."
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape" && query) {
+                onQueryChange("");
+              }
+            }}
           />
 
           {query && (
@@ -74,6 +79,9 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
             </button>
           )}
         </div>
+        <p className="mt-3 text-center text-xs sm:text-sm text-[#abd1c6]/80">
+          Умный поиск: несколько слов, автор, текст, сумма
+        </p>
       </div>
     </div>
   );

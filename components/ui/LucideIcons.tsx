@@ -64,6 +64,7 @@ import {
   ZoomIn,
   Edit3,
   Coins,
+  RussianRuble,
   Megaphone,
   Palette,
   Rocket,
@@ -307,6 +308,14 @@ export const LucideIcons = {
 
   Coin: ({ className = "", size = "md" }: IconProps) => (
     <Coins className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Coins: ({ className = "", size = "md" }: IconProps) => (
+    <Coins className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Ruble: ({ className = "", size = "md" }: IconProps) => (
+    <RussianRuble className={`${sizeClasses[size]} ${className}`} />
   ),
 
   Trash: ({ className = "", size = "md" }: IconProps) => (

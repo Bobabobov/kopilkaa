@@ -13,6 +13,7 @@ import { useRef } from "react";
 
 export default function StoriesPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [readStoryIds, setReadStoryIds] = useState<Set<string>>(new Set());
   const restoredRef = useRef(false);
   const {
     stories,
@@ -73,6 +74,61 @@ export default function StoriesPage() {
     restoredRef.current = true;
   }, [loading, stories.length]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = window.localStorage.getItem("stories-read-ids");
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        setReadStoryIds(new Set(parsed.filter((id) => typeof id === "string")));
+      }
+    } catch {
+      // ignore malformed storage
+    }
+  }, []);
+
+  const syncReadFromStorage = () => {
+    if (typeof window === "undefined") return;
+    const raw = window.localStorage.getItem("stories-read-ids");
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        setReadStoryIds(new Set(parsed.filter((id) => typeof id === "string")));
+      }
+    } catch {
+      // ignore malformed storage
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    syncReadFromStorage();
+
+    const handlePageShow = () => syncReadFromStorage();
+    const handleFocus = () => syncReadFromStorage();
+    const handlePopState = () => syncReadFromStorage();
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        syncReadFromStorage();
+      }
+    };
+
+    window.addEventListener("pageshow", handlePageShow);
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("popstate", handlePopState);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      window.removeEventListener("pageshow", handlePageShow);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("popstate", handlePopState);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
   const hasQuery = query.trim().length > 0;
   // Анимируем карточки только при первой загрузке (не при подгрузке следующих страниц)
   const shouldAnimate = isInitialLoad && !loading;
@@ -112,6 +168,8 @@ export default function StoriesPage() {
                     index={index + 1}
                     animate={shouldAnimate}
                     isAuthenticated={isAuthenticated}
+                    query={query}
+                    isRead={readStoryIds.has(story.id)}
                   />
                 ))}
               </div>

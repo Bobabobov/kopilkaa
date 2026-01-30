@@ -5,6 +5,7 @@ export interface Story {
   id: string;
   title: string;
   summary: string;
+  amount: number;
   createdAt: string;
   images: Array<{ url: string; sort: number }>;
   user: {
@@ -48,6 +49,7 @@ export function useStories(): UseStoriesReturn {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
   const observerTargetRef = useRef<HTMLDivElement>(null);
 
   // Отслеживание предыдущего запроса для корректного debounce
@@ -210,27 +212,36 @@ export function useStories(): UseStoriesReturn {
   // Флаг для отслеживания первоначальной загрузки
   const hasInitializedRef = useRef(false);
 
+  // Дебаунс для поискового запроса
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setDebouncedQuery(query.trim());
+    }, 300);
+
+    return () => clearTimeout(handle);
+  }, [query]);
+
   // Обработка первоначальной загрузки и изменений поискового запроса
   useEffect(() => {
     // Первоначальная загрузка (только один раз)
     if (!hasInitializedRef.current) {
       hasInitializedRef.current = true;
-      previousQueryRef.current = query;
-      loadStories(1, query, true);
+      previousQueryRef.current = debouncedQuery;
+      loadStories(1, debouncedQuery, true);
       return;
     }
 
     // Обработка изменения поискового запроса
-    const isNewSearch = query !== previousQueryRef.current;
+    const isNewSearch = debouncedQuery !== previousQueryRef.current;
 
     if (isNewSearch) {
-      previousQueryRef.current = query;
+      previousQueryRef.current = debouncedQuery;
       setCurrentPage(1);
       setHasMore(true);
       setStories([]);
-      loadStories(1, query, true);
+      loadStories(1, debouncedQuery, true);
     }
-  }, [query]); // Зависимость только от query
+  }, [debouncedQuery, loadStories]);
 
   // Очистка при размонтировании
   useEffect(() => {

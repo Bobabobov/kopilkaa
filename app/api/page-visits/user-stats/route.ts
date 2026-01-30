@@ -1,6 +1,7 @@
 // app/api/page-visits/user-stats/route.ts
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
 
 export const dynamic = "force-dynamic";
 
@@ -80,10 +81,10 @@ export async function GET(req: Request) {
       },
     });
 
-    // Получаем информацию о пользователе
+    // Получаем информацию о пользователе (id нужен для sanitizeEmailForViewer)
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, name: true, hideEmail: true },
+      select: { id: true, email: true, name: true, hideEmail: true },
     });
 
     if (!user) {
@@ -92,6 +93,8 @@ export async function GET(req: Request) {
         { status: 404 },
       );
     }
+
+    const safeUser = sanitizeEmailForViewer(user, session.uid);
 
     // Если ищем в день создания заявки, но данных нет - возвращаем 0
     let finalTotalTime = stats._sum.timeSpent || 0;
@@ -106,9 +109,9 @@ export async function GET(req: Request) {
     return Response.json({
       userId,
       user: {
-        email: user.email,
-        name: user.name,
-        hideEmail: user.hideEmail,
+        email: safeUser.email,
+        name: safeUser.name,
+        hideEmail: safeUser.hideEmail,
       },
       page,
       period,

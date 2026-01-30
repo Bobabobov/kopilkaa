@@ -13,7 +13,6 @@ import Image from "next/image";
 interface Donor {
   id: string;
   name: string;
-  email: string;
   avatar?: string | null;
   vkLink?: string | null;
   telegramLink?: string | null;

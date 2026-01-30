@@ -1,6 +1,7 @@
 // app/api/bug-reports/route.ts
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,7 @@ export async function GET(request: Request) {
             id: true,
             name: true,
             email: true,
+            hideEmail: true,
             avatar: true,
           },
         },
@@ -52,13 +54,19 @@ export async function GET(request: Request) {
     });
 
     const total = await prisma.bugReport.count({ where });
+    const session = await getSession();
+    const viewerId = session?.uid ?? "";
 
-    // Подсчитываем лайки и дизлайки
+    // Подсчитываем лайки и дизлайки, скрываем email по настройке пользователя
     const reportsWithStats = reports.map((report) => {
       const likes = report.likes.filter((l) => l.isLike).length;
       const dislikes = report.likes.filter((l) => !l.isLike).length;
+      const safeUser = report.user
+        ? sanitizeEmailForViewer(report.user, viewerId)
+        : report.user;
       return {
         ...report,
+        user: safeUser,
         likesCount: likes,
         dislikesCount: dislikes,
         likes: undefined, // Убираем массив likes из ответа
@@ -154,6 +162,7 @@ export async function POST(request: Request) {
             id: true,
             name: true,
             email: true,
+            hideEmail: true,
             avatar: true,
           },
         },

@@ -67,7 +67,6 @@ export async function GET() {
         return {
           id: user.id,
           name: user.name || fallbackName,
-          email: user.email || "",
           avatar: user.avatar,
           vkLink: getSafeExternalUrl(user.vkLink),
           telegramLink: getSafeExternalUrl(user.telegramLink),

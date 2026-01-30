@@ -1,6 +1,7 @@
 // app/api/bug-reports/[id]/route.ts
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +22,7 @@ export async function GET(
             id: true,
             name: true,
             email: true,
+            hideEmail: true,
             avatar: true,
           },
         },
@@ -47,8 +49,12 @@ export async function GET(
     const likes = report.likes.filter((l) => l.isLike).length;
     const dislikes = report.likes.filter((l) => !l.isLike).length;
 
-    // Проверяем, лайкнул ли текущий пользователь
     const session = await getSession();
+    const viewerId = session?.uid ?? "";
+    const safeUser = report.user
+      ? sanitizeEmailForViewer(report.user, viewerId)
+      : report.user;
+
     let userLike: boolean | null = null;
     if (session) {
       const userLikeData = report.likes.find((l) => l.userId === session.uid);
@@ -60,6 +66,7 @@ export async function GET(
     return NextResponse.json({
       report: {
         ...report,
+        user: safeUser,
         likesCount: likes,
         dislikesCount: dislikes,
         userLike,

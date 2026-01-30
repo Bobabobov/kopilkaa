@@ -26,7 +26,13 @@ export function useSocialHandler(
     async (field: SocialField, link: string) => {
       try {
         setSaving(true);
-        const { user } = await patchProfileApi({ [field]: link });
+        const updates =
+          field === "vkLink"
+            ? { vkLink: link }
+            : field === "telegramLink"
+              ? { telegramLink: link }
+              : { youtubeLink: link };
+        const { user } = await patchProfileApi(updates);
         setUser(user);
         showLocalNotification("success", "Успешно!", SUCCESS_MESSAGES[field]);
       } catch (e) {

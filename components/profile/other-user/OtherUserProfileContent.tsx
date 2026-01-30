@@ -9,6 +9,7 @@ import OtherUserPersonalStats from "./OtherUserPersonalStats";
 import OtherUserActivity from "./OtherUserActivity";
 import { OtherUserProfileBackLink } from "./OtherUserProfileBackLink";
 import type { OtherUserProfileUser } from "./types";
+import type { TrustLevel } from "@/lib/trustLevel";
 
 interface OtherUserProfileContentProps {
   user: OtherUserProfileUser;
@@ -16,7 +17,7 @@ interface OtherUserProfileContentProps {
   friendshipStatus: "none" | "requested" | "incoming" | "friends";
   friendship: { status: string } | null;
   trustDerived: {
-    trustStatus: string;
+    trustStatus: Lowercase<TrustLevel>;
     supportText: string;
     progressText: string | null;
     progressValue: number | null;

@@ -213,7 +213,8 @@ export function useAdminUsers() {
               ...it,
               trustDelta: nextDelta,
               trustLevel: getTrustLevelFromEffectiveApproved(
-                effectiveApproved + nextDelta,
+                effectiveApproved,
+                nextDelta,
               ),
             }
           : it,

@@ -9,6 +9,7 @@ interface UseReportsProps {
   userId: string | null;
   statusFilter: string;
   page: number;
+  isAdmin: boolean;
 }
 
 interface UseReportsReturn {
@@ -41,6 +42,7 @@ export function useReports({
   userId,
   statusFilter,
   page,
+  isAdmin,
 }: UseReportsProps): UseReportsReturn {
   const [reports, setReports] = useState<BugReport[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,9 +119,10 @@ export function useReports({
     async (reportId: string) => {
       setReports((prev) => prev.filter((r) => r.id !== reportId));
       try {
-        const res = await fetch(`/api/admin/bug-reports/${reportId}`, {
-          method: "DELETE",
-        });
+        const endpoint = isAdmin
+          ? `/api/admin/bug-reports/${reportId}`
+          : `/api/bug-reports/${reportId}`;
+        const res = await fetch(endpoint, { method: "DELETE" });
         if (!res.ok) {
           throw new Error(`Не удалось удалить (${res.status})`);
         }
@@ -129,7 +132,7 @@ export function useReports({
         loadReports(page);
       }
     },
-    [loadReports, page],
+    [isAdmin, loadReports, page],
   );
 
   const addReport = useCallback((newReport: any) => {

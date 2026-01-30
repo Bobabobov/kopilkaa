@@ -63,6 +63,7 @@ export default function ReportsPage() {
     userId: user?.id || null,
     statusFilter,
     page,
+    isAdmin,
   });
 
   useEffect(() => {

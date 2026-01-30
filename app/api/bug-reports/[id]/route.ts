@@ -77,3 +77,45 @@ export async function GET(
     );
   }
 }
+
+// DELETE - удалить баг-репорт (только автор)
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const existing = await prisma.bugReport.findUnique({
+      where: { id },
+      select: { id: true, userId: true },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { error: "Баг-репорт не найден" },
+        { status: 404 },
+      );
+    }
+
+    if (existing.userId !== session.uid) {
+      return NextResponse.json(
+        { error: "Недостаточно прав для удаления" },
+        { status: 403 },
+      );
+    }
+
+    await prisma.bugReport.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Delete bug report error:", error);
+    return NextResponse.json(
+      { error: "Ошибка удаления баг-репорта" },
+      { status: 500 },
+    );
+  }
+}

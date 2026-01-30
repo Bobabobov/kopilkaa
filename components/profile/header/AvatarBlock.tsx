@@ -36,9 +36,11 @@ export function AvatarBlock({
   const [avatarSrc, setAvatarSrc] = useState(
     user.avatar || DEFAULT_AVATAR,
   );
+  // Сбрасываем аватар только при переходе на другого пользователя (user.id).
+  // Иначе при ре-рендере затирается fallback на default после 404.
   useEffect(() => {
     setAvatarSrc(user.avatar || DEFAULT_AVATAR);
-  }, [user.avatar]);
+  }, [user.id]);
 
   const statusLabel =
     status.status === "online"

@@ -34,14 +34,12 @@ export function AvatarBlock({
   onOpenCover,
   onTriggerAvatar,
 }: AvatarBlockProps) {
-  const [avatarSrc, setAvatarSrc] = useState(
-    user.avatar || DEFAULT_AVATAR,
-  );
-  // Сбрасываем аватар только при переходе на другого пользователя (user.id).
-  // Иначе при ре-рендере затирается fallback на default после 404.
+  const [avatarSrc, setAvatarSrc] = useState(user.avatar || DEFAULT_AVATAR);
+  const [avatarFailed, setAvatarFailed] = useState(false);
   useEffect(() => {
     setAvatarSrc(user.avatar || DEFAULT_AVATAR);
-  }, [user.id]);
+    setAvatarFailed(false);
+  }, [user.id, user.avatar]);
 
   const statusLabel =
     status.status === "online"
@@ -118,10 +116,10 @@ export function AvatarBlock({
     <div className="flex-shrink-0">
       <div className="relative -mt-16 sm:-mt-20 md:-mt-24 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white/90 shadow-lg transition-none duration-0 transform-none hover:transform-none hover:scale-100">
         <img
-          src={avatarSrc}
+          src={avatarFailed ? DEFAULT_AVATAR : avatarSrc}
           alt=""
           className="w-full h-full object-cover transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:brightness-100"
-          onError={() => setAvatarSrc(DEFAULT_AVATAR)}
+          onError={() => setAvatarFailed(true)}
         />
         <span
           className={`absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${

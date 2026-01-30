@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") || "friends";
 
-    let whereClause: Parameters<typeof prisma.friendship.findMany>[0]["where"] = {};
+    let whereClause: any = {};
 
     switch (type) {
       case "friends":

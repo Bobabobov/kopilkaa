@@ -1,6 +1,11 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import AvatarUpload from "../AvatarUpload";
 import type { UserStatus } from "../hooks/useUserStatus";
+
+const DEFAULT_AVATAR = "/default-avatar.png";
 
 type AvatarUser = {
   name?: string | null;
@@ -28,6 +33,13 @@ export function AvatarBlock({
   onOpenCover,
   onTriggerAvatar,
 }: AvatarBlockProps) {
+  const [avatarSrc, setAvatarSrc] = useState(
+    user.avatar || DEFAULT_AVATAR,
+  );
+  useEffect(() => {
+    setAvatarSrc(user.avatar || DEFAULT_AVATAR);
+  }, [user.avatar]);
+
   const statusLabel =
     status.status === "online"
       ? status.text
@@ -103,12 +115,10 @@ export function AvatarBlock({
     <div className="flex-shrink-0">
       <div className="relative -mt-16 sm:-mt-20 md:-mt-24 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white/90 shadow-lg transition-none duration-0 transform-none hover:transform-none hover:scale-100">
         <img
-          src={user.avatar || "/default-avatar.png"}
+          src={avatarSrc}
           alt=""
           className="w-full h-full object-cover transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:brightness-100"
-          onError={(e) => {
-            e.currentTarget.src = "/default-avatar.png";
-          }}
+          onError={() => setAvatarSrc(DEFAULT_AVATAR)}
         />
         <span
           className={`absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${

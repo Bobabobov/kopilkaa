@@ -1,8 +1,13 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { getAvatarFrame } from "@/lib/header-customization";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
+
+const DEFAULT_AVATAR = "/default-avatar.png";
 
 export interface OtherUserBasic {
   id: string;
@@ -18,6 +23,11 @@ export interface OtherUserBasic {
 }
 
 export function OtherUserAvatar({ user }: { user: OtherUserBasic }) {
+  const [avatarSrc, setAvatarSrc] = useState(user.avatar || DEFAULT_AVATAR);
+  useEffect(() => {
+    setAvatarSrc(user.avatar || DEFAULT_AVATAR);
+  }, [user.avatar]);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
@@ -26,7 +36,10 @@ export function OtherUserAvatar({ user }: { user: OtherUserBasic }) {
       className="text-center mb-5 sm:mb-6"
     >
       <div className="relative inline-block group/avatar">
-        {renderAvatarWithFrame(user)}
+        {renderAvatarWithFrame(
+          { ...user, avatar: avatarSrc },
+          () => setAvatarSrc(DEFAULT_AVATAR),
+        )}
         {!user.avatar && (
           <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-emerald-500/20 to-green-500/20 blur-sm group-hover/avatar:scale-110 transition-transform duration-500 -z-10" />
         )}
@@ -89,7 +102,10 @@ export function OtherUserAvatar({ user }: { user: OtherUserBasic }) {
   );
 }
 
-function renderAvatarWithFrame(user: OtherUserBasic) {
+function renderAvatarWithFrame(
+  user: OtherUserBasic,
+  onAvatarError?: () => void,
+) {
   const frame = getAvatarFrame(user.avatarFrame || "none");
   const frameKey = user.avatarFrame || "none";
 
@@ -99,17 +115,15 @@ function renderAvatarWithFrame(user: OtherUserBasic) {
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat rounded-lg"
           style={{
-            backgroundImage: `url(${(frame as any).imageUrl || "/default-avatar.png"})`,
+            backgroundImage: `url(${(frame as any).imageUrl || DEFAULT_AVATAR})`,
           }}
         />
         <div className="absolute inset-2 rounded-md overflow-hidden">
           <img
-            src={user.avatar || "/default-avatar.png"}
+            src={user.avatar || DEFAULT_AVATAR}
             alt="Аватар"
             className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.src = "/default-avatar.png";
-            }}
+            onError={() => onAvatarError?.()}
           />
         </div>
       </div>
@@ -121,12 +135,10 @@ function renderAvatarWithFrame(user: OtherUserBasic) {
       className={`w-24 h-24 rounded-lg shadow-2xl mx-auto mb-4 group-hover/avatar:scale-105 transition-transform duration-300 ${frame.className}`}
     >
       <img
-        src={user.avatar || "/default-avatar.png"}
+        src={user.avatar || DEFAULT_AVATAR}
         alt="Аватар"
         className={`w-full h-full object-cover rounded-lg ${frameKey === "rainbow" ? "rounded-lg" : ""}`}
-        onError={(e) => {
-          e.currentTarget.src = "/default-avatar.png";
-        }}
+        onError={() => onAvatarError?.()}
       />
     </div>
   );

@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AdminHeader } from "@/app/admin/components/AdminHeader";
+import { AdminHeader } from "@/app/admin/_components/AdminHeader";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import RichTextEditor from "@/components/applications/RichTextEditor";

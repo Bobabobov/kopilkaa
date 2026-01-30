@@ -104,7 +104,9 @@ export function AdminUserCard({
               <div className="text-xs text-[#abd1c6]/80">
                 Доверие:{" "}
                 <span className="text-[#f9bc60] font-semibold">
-                  {getTrustLabel(user.trustLevel)}
+                  {user.trustLevel
+                    ? getTrustLabel(user.trustLevel)
+                    : "Не задано"}
                 </span>
               </div>
               <div className="text-xs text-[#abd1c6]/80">

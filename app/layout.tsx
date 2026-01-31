@@ -13,7 +13,7 @@ import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import MetrikaSpaTracker from "@/components/analytics/MetrikaSpaTracker";
 import GlobalClickSpark from "@/components/ui/GlobalClickSpark";
 
-const inter = Inter({ subsets: ["latin", "cyrillic"] });
+const inter = Inter({ subsets: ["latin", "cyrillic"], preload: false });
 
 const siteUrl = (
   process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru"

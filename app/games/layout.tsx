@@ -5,6 +5,7 @@ const pressStart2P = Press_Start_2P({
   weight: "400",
   subsets: ["latin", "cyrillic"],
   display: "swap",
+  preload: false,
 });
 
 const siteUrl = (

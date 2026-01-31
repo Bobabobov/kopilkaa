@@ -64,6 +64,7 @@ export function useAdminApplications({
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [visibleEmails, setVisibleEmails] = useState<Set<string>>(new Set());
+  const [canStream, setCanStream] = useState(false);
 
   // Загрузка данных. При смене фильтров передать 1, чтобы запросить первую страницу.
   const loadMore = useCallback(
@@ -119,7 +120,12 @@ export function useAdminApplications({
   const refreshStats = useCallback(async () => {
     try {
       const response = await fetch("/api/admin/stats");
+      if (response.status === 401 || response.status === 403) {
+        setCanStream(false);
+        return;
+      }
       if (response.ok) {
+        setCanStream(true);
         const data = await response.json();
         if (data.success && data.data?.applications) {
           // Преобразуем структуру данных в ожидаемый формат
@@ -135,6 +141,7 @@ export function useAdminApplications({
       }
     } catch (err) {
       console.error("Failed to load stats:", err);
+      setCanStream(false);
     }
   }, []);
 
@@ -223,6 +230,9 @@ export function useAdminApplications({
   const eventSourceRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
+    if (!canStream) {
+      return;
+    }
     // Подключаемся к SSE
     const connectSSE = () => {
       if (eventSourceRef.current) {
@@ -267,7 +277,7 @@ export function useAdminApplications({
         refreshTimeoutRef.current = null;
       }
     };
-  }, [refreshApplications, refreshStats]);
+  }, [refreshApplications, refreshStats, canStream]);
 
   return {
     // Состояние

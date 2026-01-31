@@ -41,6 +41,7 @@ export function AdminHeader() {
             <Link
               key={link.href}
               href={link.href}
+              prefetch={false}
               className={`px-3 sm:px-4 py-2 text-xs sm:text-sm md:text-base font-bold rounded-lg sm:rounded-xl transition-all duration-300 ${
                 isActive
                   ? "bg-[#f9bc60] text-[#001e1d] shadow-lg shadow-[#f9bc60]/30"

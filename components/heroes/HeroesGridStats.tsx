@@ -1,6 +1,7 @@
 // components/heroes/HeroesGridStats.tsx
 "use client";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { formatRub } from "@/lib/format";
 
 interface Hero {
   id: string;
@@ -18,12 +19,6 @@ interface HeroesGridStatsProps {
 export default function HeroesGridStats({ stats }: HeroesGridStatsProps) {
   const { totalHeroes, totalDonated, subscribersCount, averageDonation } =
     stats;
-
-  const formatRub = (n: number) => {
-    const s = new Intl.NumberFormat("ru-RU").format(Math.round(n || 0));
-    // normalize NBSP for better wrapping in some UIs
-    return `${s.replace(/\u00A0/g, " ")} ₽`;
-  };
 
   const statsData = [
     {

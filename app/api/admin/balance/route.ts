@@ -4,7 +4,6 @@ import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 async function computeBalance() {
   const donationSums = await prisma.donation

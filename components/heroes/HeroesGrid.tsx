@@ -11,6 +11,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 import { formatDateFull } from "@/lib/time";
+import { formatRub } from "@/lib/format";
 
 interface Hero {
   id: string;
@@ -90,11 +91,6 @@ export default function HeroesGrid({
       default:
         return "rgba(171, 209, 198, 0.3)";
     }
-  };
-
-  const formatRub = (n: number) => {
-    const s = new Intl.NumberFormat("ru-RU").format(Math.round(n || 0));
-    return `${s.replace(/\u00A0/g, " ")} ₽`;
   };
 
   return (

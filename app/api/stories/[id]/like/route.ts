@@ -8,21 +8,21 @@ function isValidStoryId(id: string) {
 }
 
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } },
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
+    return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }
 
   try {
-    const storyId = params.id;
+    const { id: storyId } = await params;
     const userId = session.uid;
 
     if (!isValidStoryId(storyId)) {
       return NextResponse.json(
-        { message: "Invalid ID format" },
+        { error: "Invalid ID format" },
         { status: 400 },
       );
     }
@@ -35,7 +35,7 @@ export async function POST(
 
     if (!story) {
       return NextResponse.json(
-        { message: "История не найдена" },
+        { error: "История не найдена" },
         { status: 404 },
       );
     }
@@ -49,7 +49,7 @@ export async function POST(
     });
 
     if (existingLike) {
-      return NextResponse.json({ message: "Уже лайкнуто" }, { status: 400 });
+      return NextResponse.json({ error: "Уже лайкнуто" }, { status: 400 });
     }
 
     // Создаем лайк
@@ -72,26 +72,26 @@ export async function POST(
     );
   } catch (error) {
     console.error("Error adding like:", error);
-    return NextResponse.json({ message: "Ошибка сервера" }, { status: 500 });
+    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } },
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
+    return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }
 
   try {
-    const storyId = params.id;
+    const { id: storyId } = await params;
     const userId = session.uid;
 
     if (!isValidStoryId(storyId)) {
       return NextResponse.json(
-        { message: "Invalid ID format" },
+        { error: "Invalid ID format" },
         { status: 400 },
       );
     }
@@ -105,7 +105,7 @@ export async function DELETE(
     });
 
     if (deletedLike.count === 0) {
-      return NextResponse.json({ message: "Лайк не найден" }, { status: 404 });
+      return NextResponse.json({ error: "Лайк не найден" }, { status: 404 });
     }
 
     return NextResponse.json(
@@ -120,6 +120,6 @@ export async function DELETE(
     );
   } catch (error) {
     console.error("Error removing like:", error);
-    return NextResponse.json({ message: "Ошибка сервера" }, { status: 500 });
+    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

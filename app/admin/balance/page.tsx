@@ -4,7 +4,6 @@ import { getAllowedAdminUser } from "@/lib/adminAccess";
 import AdminBalanceClient from "./AdminBalanceClient";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export default async function Page() {
   const admin = await getAllowedAdminUser();

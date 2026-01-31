@@ -86,12 +86,14 @@ const nextConfig = {
           },
         ],
       },
+      // По умолчанию API не кешируем: персональные данные и сессия.
+      // Маршруты, которым нужен кеш, задают Cache-Control в самом handler.
       {
         source: "/api/(.*)",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=60, s-maxage=60",
+            value: "private, no-store, must-revalidate",
           },
         ],
       },

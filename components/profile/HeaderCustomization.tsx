@@ -6,9 +6,12 @@ import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useAutoHideScrollbar } from "@/hooks/ui/useAutoHideScrollbar";
+import { useScrollLock } from "@/hooks/ui/useScrollLock";
 import { getAllHeaderThemes, getHeaderTheme } from "@/lib/header-customization";
 import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
-import ColorWheel from "./ColorWheel";
+import { HeaderPreview } from "./header-customization/HeaderPreview";
+import { ColorWheelSection } from "./header-customization/ColorWheelSection";
+import { ThemeGrid } from "./header-customization/ThemeGrid";
 
 interface User {
   id: string;
@@ -221,200 +224,34 @@ export default function HeaderCustomization({
 
         {/* Content */}
         <div className="overflow-y-auto p-6 space-y-6">
-          {/* Preview */}
-          <div className="rounded-2xl border border-[#abd1c6]/20 bg-[#001e1d]/60 overflow-hidden shadow-lg">
-            <div
-              className="h-36 sm:h-40 w-full relative"
-              style={
-                selectedThemeConfig.background === "image"
-                  ? {
-                      backgroundImage: `url(${(selectedThemeConfig as any).image})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center center",
-                      backgroundRepeat: "no-repeat",
-                    }
-                  : selectedThemeConfig.background === "gradient"
-                    ? { backgroundImage: (selectedThemeConfig as any).gradient }
-                    : selectedThemeConfig.background === "color"
-                      ? {
-                          background:
-                            (selectedThemeConfig as any).color || "#004643",
-                        }
-                      : {
-                          background: "linear-gradient(135deg,#1fe0ba,#0a4c43)",
-                        }
-              }
-            >
-              <div className="absolute inset-0 bg-black/12" />
-              <div className="absolute inset-0 px-6 sm:px-8 py-5 flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 text-xs font-semibold text-white">
-                    Предпросмотр
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white drop-shadow">
-                    Мой профиль
-                  </h3>
-                  <p className="text-sm text-white/90 drop-shadow">
-                    Добро пожаловать,{" "}
-                    <span className="font-semibold text-[#f9bc60]">
-                      Пользователь
-                    </span>
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-semibold text-white">
-                    {selectedColor ? "Своя палитра" : themeName}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <HeaderPreview
+            selectedThemeConfig={selectedThemeConfig}
+            themeName={themeName}
+            selectedColor={selectedColor}
+          />
 
-          {/* Цветовой круг */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-[#fffffe]">
-                  Цветовой круг Иттена
-                </h3>
-                <p className="text-sm text-[#abd1c6]">
-                  Создайте собственный цвет заголовка
-                </p>
-              </div>
-              {selectedColor && (
-                <button
-                  onClick={() => {
-                    setSelectedColor(null);
-                    setSelectedTheme("default");
-                  }}
-                  className="text-xs text-[#abd1c6] hover:text-[#fffffe] transition-colors"
-                >
-                  Сбросить цвет
-                </button>
-              )}
-            </div>
-            <div className="flex justify-center bg-[#001e1d]/40 rounded-xl p-6 border border-[#abd1c6]/20">
-              <ColorWheel
-                selectedColor={selectedColorValue || null}
-                onColorChange={(color) => {
-                  setSelectedColor(`color:${color}`);
-                  setSelectedTheme(""); // Сбрасываем выбор готовой темы
-                }}
-              />
-            </div>
-          </div>
+          <ColorWheelSection
+            selectedColor={selectedColor}
+            selectedColorValue={selectedColorValue}
+            onColorChange={(color) => {
+              setSelectedColor(`color:${color}`);
+              setSelectedTheme("");
+            }}
+            onResetColor={() => {
+              setSelectedColor(null);
+              setSelectedTheme("default");
+            }}
+          />
 
-          {/* Готовые темы */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-[#fffffe]">
-                  Готовые темы
-                </h3>
-                <p className="text-sm text-[#abd1c6]">
-                  Подборка готовых пресетов с превью
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {themes.map((theme, index) => {
-                const isSelected =
-                  !selectedColor && selectedTheme === theme.key;
-                const themeConfig = getHeaderTheme(theme.key);
-
-                return (
-                  <motion.div
-                    key={theme.key || `theme-${index}`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      setSelectedTheme(theme.key);
-                      setSelectedColor(null); // Сбрасываем выбор цвета
-                    }}
-                    className={`relative cursor-pointer rounded-xl overflow-hidden border-2 transition-all duration-300 ${
-                      isSelected
-                        ? "border-[#f9bc60] shadow-lg shadow-[#f9bc60]/20"
-                        : "border-[#abd1c6]/20 hover:border-[#f9bc60]/50"
-                    }`}
-                  >
-                    {/* Preview */}
-                    <div
-                      className={`h-32 w-full ${
-                        themeConfig.background === "gradient"
-                          ? `bg-gradient-to-r ${(themeConfig as any).gradient}`
-                          : themeConfig.background === "color"
-                            ? ""
-                            : "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900"
-                      }`}
-                      style={
-                        themeConfig.background === "image"
-                          ? {
-                              backgroundImage: `url(${(themeConfig as any).image})`,
-                              backgroundSize: "cover",
-                              backgroundPosition: "center center",
-                              backgroundRepeat: "no-repeat",
-                            }
-                          : themeConfig.background === "color"
-                            ? {
-                                backgroundColor:
-                                  (themeConfig as any).color || "#004643",
-                              }
-                            : {}
-                      }
-                    >
-                      {/* Overlay for better text visibility */}
-                      <div className="absolute inset-0 bg-black/15"></div>
-
-                      {/* Sample content */}
-                      <div className="absolute inset-0 p-4 flex flex-col justify-center">
-                        <h3
-                          className={`text-lg font-bold ${themeConfig.textColor} mb-1`}
-                        >
-                          Мой профиль
-                        </h3>
-                        <p
-                          className={`text-sm ${themeConfig.textColor} opacity-90`}
-                        >
-                          Добро пожаловать,{" "}
-                          <span className={themeConfig.accentColor}>
-                            Пользователь
-                          </span>
-                          !
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Theme info */}
-                    <div className="p-3 bg-[#001e1d]/80 backdrop-blur-sm">
-                      <h4 className="font-semibold text-[#fffffe]">
-                        {theme.name}
-                      </h4>
-                      <p className="text-sm text-[#abd1c6]">
-                        {theme.description}
-                      </p>
-                    </div>
-
-                    {/* Selection indicator */}
-                    {isSelected && (
-                      <div className="absolute top-2 right-2 w-6 h-6 bg-[#f9bc60] rounded-full flex items-center justify-center">
-                        <svg
-                          className="w-4 h-4 text-[#001e1d]"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
+          <ThemeGrid
+            themes={themes}
+            selectedTheme={selectedTheme}
+            selectedColor={selectedColor}
+            onThemeSelect={(themeKey) => {
+              setSelectedTheme(themeKey);
+              setSelectedColor(null);
+            }}
+          />
         </div>
 
         {/* Footer */}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { formatRub } from "@/lib/format";
 
 export type ActivityItem = {
   id: string;
@@ -9,13 +10,6 @@ export type ActivityItem = {
   link?: string;
   icon: string;
   color: string;
-};
-
-const formatRub = (amount: number) => {
-  const n = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 })
-    .format(amount)
-    .replace(/\u00A0/g, " ");
-  return `${n} ₽`;
 };
 
 export function useRecentActivity() {

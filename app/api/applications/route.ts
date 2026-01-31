@@ -228,61 +228,33 @@ export async function POST(req: Request) {
       }
     }
 
-    // Для 3+ одобренных заявок требуется активность (для всех пользователей, включая админов)
-    if (trust.effectiveApprovedApplications >= 3) {
-      const {
-        getAllPossibleRequirements,
-        isActivityRequirementMet,
-        checkActivityRequirement,
-      } = await import("@/lib/activity/checkActivityRequirement");
-
+    // Для 3+ одобренных заявок требуется лайк истории перед отправкой
+    if (trust.approvedApplications >= 3) {
       const lastApplication = await prisma.application.findFirst({
         where: { userId: session.uid },
         orderBy: { createdAt: "desc" },
         select: { createdAt: true },
       });
       const lastApplicationAt = lastApplication?.createdAt ?? null;
-
-      // Получаем все возможные требования (включая уже выполненные)
-      const allPossible = await getAllPossibleRequirements(session.uid);
-
-      // Если есть возможные требования - проверяем, выполнено ли хотя бы одно
-      if (allPossible.length > 0) {
-        // Проверяем, выполнено ли хотя бы одно из возможных требований
-        const completedRequirements = await Promise.all(
-          allPossible.map(async (req) => ({
-            requirement: req,
-            isMet: await isActivityRequirementMet(
-              session.uid,
-              req,
-              lastApplicationAt,
-            ),
-          })),
+      const requirement = {
+        type: "LIKE_STORY" as const,
+        message:
+          "Для каждой 3-й и последующей заявки поставьте лайк любой истории.",
+      };
+      const isMet = await isActivityRequirementMet(
+        session.uid,
+        requirement,
+        lastApplicationAt,
+      );
+      if (!isMet) {
+        return Response.json(
+          {
+            error: requirement.message,
+            requiresActivity: true,
+            activityType: requirement.type,
+          },
+          { status: 403 },
         );
-
-        const hasCompletedAny = completedRequirements.some((r) => r.isMet);
-
-        // Если ни одно требование не выполнено - выбираем рандомное и блокируем заявку
-        if (!hasCompletedAny) {
-          const activityRequirement = await checkActivityRequirement(
-            session.uid,
-            trust.effectiveApprovedApplications,
-            lastApplicationAt,
-          );
-
-          if (activityRequirement) {
-            return Response.json(
-              {
-                error: activityRequirement.message,
-                requiresActivity: true,
-                activityType: activityRequirement.type,
-              },
-              { status: 403 },
-            );
-          }
-        }
-        // Если хотя бы одно требование выполнено - разрешаем заявку
-        // Для следующей заявки снова потребуется выполнить одно действие
       }
     }
 

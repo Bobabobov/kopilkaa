@@ -1,11 +1,5 @@
-export function formatAmount(amount: number): string {
-  const n = new Intl.NumberFormat("ru-RU", {
-    maximumFractionDigits: 0,
-  })
-    .format(amount)
-    .replace(/\u00A0/g, " ");
-  return `${n} ₽`;
-}
+// Реэкспорт из единой утилиты форматирования
+export { formatRub as formatAmount } from "@/lib/format";
 
 import { formatRelativeDate } from "@/lib/time";
 

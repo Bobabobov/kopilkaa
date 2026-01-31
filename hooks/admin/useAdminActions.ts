@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ApplicationStatus } from "@/app/admin/types";
+import type { ApplicationStatus } from "@/types/admin";
 
 interface UseAdminActionsProps {
   refreshStats: () => Promise<void>;

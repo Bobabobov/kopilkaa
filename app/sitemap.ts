@@ -10,7 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/news",
     "/stories",
     "/applications",
-    "/reports",
     "/games",
     "/heroes",
     "/advertising",

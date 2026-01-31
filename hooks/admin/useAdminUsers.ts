@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
-import type { AdminUser } from "@/app/admin/users/_components/types";
+import type { AdminUser } from "@/types/admin";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 import { getTrustLevelFromEffectiveApproved } from "@/lib/trustLevel";
 

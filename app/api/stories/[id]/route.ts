@@ -6,9 +6,10 @@ import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 import { getHeroBadgeForUser } from "@/lib/heroBadges";
 
 export async function GET(
-  request: Request,
-  { params: { id } }: { params: { id: string } },
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   // Пытаемся декодировать URL на случай, если ID был закодирован
   let decodedId = id;
   try {

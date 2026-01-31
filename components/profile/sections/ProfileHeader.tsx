@@ -2,6 +2,7 @@
 
 import { useOnlineStatus } from "@/hooks/ui/useOnlineStatus";
 import { getHeaderTheme } from "@/lib/header-customization";
+import { getUserStatus } from "@/lib/userStatus";
 
 interface User {
   id: string;
@@ -19,32 +20,6 @@ interface ProfileHeaderProps {
 export default function ProfileHeader({ user }: ProfileHeaderProps) {
   const theme = getHeaderTheme(user.headerTheme || "default");
   useOnlineStatus(); // Автоматически обновляем статус
-
-  // Определяем статус пользователя
-  const getUserStatus = (lastSeen: string | null) => {
-    if (!lastSeen) return { status: "offline", text: "Никогда не был в сети" };
-
-    const date = new Date(lastSeen);
-    const now = new Date();
-    const diffInMinutes = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60),
-    );
-
-    // Если пользователь был активен в последние 5 минут - считаем онлайн
-    if (diffInMinutes <= 5) {
-      return { status: "online", text: "Онлайн" };
-    }
-
-    // Иначе показываем время последнего входа
-    const diffInHours = Math.floor(diffInMinutes / 60);
-
-    if (diffInHours < 1)
-      return { status: "offline", text: `${diffInMinutes}м назад` };
-    if (diffInHours < 24)
-      return { status: "offline", text: `${diffInHours}ч назад` };
-    if (diffInHours < 48) return { status: "offline", text: "Вчера" };
-    return { status: "offline", text: date.toLocaleDateString("ru-RU") };
-  };
 
   const status = getUserStatus(user.lastSeen || null);
   const joinDate = new Date(user.createdAt).toLocaleDateString("ru-RU", {

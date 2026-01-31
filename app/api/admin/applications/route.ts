@@ -4,7 +4,6 @@ import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export async function GET(req: Request) {
   try {

@@ -8,6 +8,7 @@ import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { HeroBadge } from "@/components/ui/HeroBadge";
 import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
+import { formatRub } from "@/lib/format";
 
 interface Hero {
   id: string;
@@ -72,11 +73,6 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
       default:
         return "#f9bc60";
     }
-  };
-
-  const formatRub = (n: number) => {
-    const s = new Intl.NumberFormat("ru-RU").format(Math.round(n || 0));
-    return `${s.replace(/\u00A0/g, " ")} ₽`;
   };
 
   return (

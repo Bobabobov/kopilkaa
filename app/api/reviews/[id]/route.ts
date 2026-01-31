@@ -37,12 +37,12 @@ function buildTrustSnapshot(
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id: reviewId } = await params;
     const session = await getSession();
     const viewerId = session?.uid || null;
-    const reviewId = params.id;
     if (!reviewId) {
       return NextResponse.json({ error: "id required" }, { status: 400 });
     }
@@ -109,9 +109,10 @@ export async function GET(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id: reviewId } = await params;
     const session = await getSession();
     const viewerId = session?.uid ? String(session.uid) : null;
 
@@ -121,8 +122,6 @@ export async function DELETE(
         { status: 401 },
       );
     }
-
-    const reviewId = params.id;
     if (!reviewId) {
       return NextResponse.json({ error: "id required" }, { status: 400 });
     }

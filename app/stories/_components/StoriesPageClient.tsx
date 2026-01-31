@@ -1,0 +1,238 @@
+"use client";
+
+import { useEffect, useState, useRef } from "react";
+import {
+  StoriesHeader,
+  StoriesLoading,
+} from "@/components/stories";
+import { useStories } from "@/hooks/stories/useStories";
+import type { Story as StoryItem } from "@/hooks/stories/useStories";
+import { useAuth } from "@/hooks/useAuth";
+import { StoriesEmptyWithAd } from "./sections/StoriesEmptyWithAd";
+import { TopStoriesSection } from "./sections/TopStoriesSection";
+import { StoriesSummaryBanner } from "./sections/StoriesSummaryBanner";
+import { StoriesGrid } from "./sections/StoriesGrid";
+
+interface StoriesPageClientProps {
+  initialTopStories?: StoryItem[];
+}
+
+export default function StoriesPageClient({
+  initialTopStories = [],
+}: StoriesPageClientProps) {
+  const { isAuthenticated } = useAuth();
+  const [readStoryIds, setReadStoryIds] = useState<Set<string>>(new Set());
+  const [topStories, setTopStories] = useState<StoryItem[]>(initialTopStories);
+  const [topLoading, setTopLoading] = useState(initialTopStories.length === 0);
+  const [totalPaid, setTotalPaid] = useState<number | null>(null);
+  const restoredRef = useRef(false);
+
+  useEffect(() => {
+    setTopStories(initialTopStories);
+    setTopLoading(initialTopStories.length === 0);
+  }, [initialTopStories]);
+
+  const {
+    stories,
+    loading,
+    loadingMore,
+    hasMore,
+    query,
+    setQuery,
+    loadNextPage,
+    observerTargetRef,
+    isInitialLoad,
+  } = useStories();
+
+  // Intersection Observer для бесконечной прокрутки
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingMore && hasMore && !loading) {
+          loadNextPage();
+        }
+      },
+      { threshold: 0.1, rootMargin: "100px" },
+    );
+
+    const currentTarget = observerTargetRef.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [loadingMore, hasMore, loading, loadNextPage, observerTargetRef]);
+
+  // Восстановление скролла после возврата из истории
+  useEffect(() => {
+    if (restoredRef.current) return;
+    if (loading) return;
+    if (!stories.length) return;
+    if (typeof window === "undefined") return;
+    const saved = sessionStorage.getItem("stories-scroll");
+    if (saved) {
+      const y = parseInt(saved, 10);
+      if (Number.isFinite(y)) {
+        window.scrollTo({ top: y, behavior: "auto" });
+      }
+      sessionStorage.removeItem("stories-scroll");
+    }
+    restoredRef.current = true;
+  }, [loading, stories.length]);
+
+  useEffect(() => {
+    if (initialTopStories.length > 0) return;
+    let isMounted = true;
+    const loadTopStories = async () => {
+      try {
+        setTopLoading(true);
+        const response = await fetch("/api/stories/top?limit=3", {
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (isMounted && Array.isArray(data.items)) {
+          setTopStories(data.items);
+        }
+      } catch (error) {
+        console.error("Failed to load top stories:", error);
+      } finally {
+        if (isMounted) {
+          setTopLoading(false);
+        }
+      }
+    };
+
+    loadTopStories();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [initialTopStories.length]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadSummary = async () => {
+      try {
+        const response = await fetch("/api/stories/summary", {
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (isMounted && typeof data.totalPaid === "number") {
+          setTotalPaid(data.totalPaid);
+        }
+      } catch (error) {
+        console.error("Failed to load stories summary:", error);
+      }
+    };
+
+    loadSummary();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = window.localStorage.getItem("stories-read-ids");
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        setReadStoryIds(new Set(parsed.filter((id) => typeof id === "string")));
+      }
+    } catch {
+      // ignore malformed storage
+    }
+  }, []);
+
+  const syncReadFromStorage = () => {
+    if (typeof window === "undefined") return;
+    const raw = window.localStorage.getItem("stories-read-ids");
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        setReadStoryIds(new Set(parsed.filter((id) => typeof id === "string")));
+      }
+    } catch {
+      // ignore malformed storage
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    syncReadFromStorage();
+
+    const handlePageShow = () => syncReadFromStorage();
+    const handleFocus = () => syncReadFromStorage();
+    const handlePopState = () => syncReadFromStorage();
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        syncReadFromStorage();
+      }
+    };
+
+    window.addEventListener("pageshow", handlePageShow);
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("popstate", handlePopState);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      window.removeEventListener("pageshow", handlePageShow);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("popstate", handlePopState);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
+  const hasQuery = query.trim().length > 0;
+  // Анимируем карточки только при первой загрузке (не при подгрузке следующих страниц)
+  const shouldAnimate = isInitialLoad && !loading;
+
+  return (
+    <div className="min-h-screen">
+      {/* Header */}
+      <StoriesHeader query={query} onQueryChange={setQuery} />
+
+      {/* Content */}
+      <div className="relative z-10">
+        {loading ? (
+          <StoriesLoading />
+        ) : stories.length === 0 ? (
+          <StoriesEmptyWithAd hasQuery={hasQuery} />
+        ) : (
+          <>
+            {!hasQuery && !topLoading && topStories.length > 0 && (
+              <TopStoriesSection
+                topStories={topStories}
+                readStoryIds={readStoryIds}
+              />
+            )}
+            {totalPaid !== null && !hasQuery && (
+              <StoriesSummaryBanner totalPaid={totalPaid} />
+            )}
+
+            <StoriesGrid
+              stories={stories}
+              shouldAnimate={shouldAnimate}
+              isAuthenticated={isAuthenticated}
+              query={query}
+              readStoryIds={readStoryIds}
+              loadingMore={loadingMore}
+              hasMore={hasMore}
+              observerTargetRef={observerTargetRef}
+            />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

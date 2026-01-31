@@ -1,31 +1,13 @@
 // app/admin/news/AdminNewsClient.tsx
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { AdminHeader } from "@/app/admin/_components/AdminHeader";
-import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
-import RichTextEditor from "@/components/applications/RichTextEditor";
-
-type MediaDraft = {
-  file: File;
-  previewUrl: string;
-  kind: "IMAGE" | "VIDEO";
-};
-
-type AdminNewsItem = {
-  id: string;
-  title: string | null;
-  badge: NewsBadge;
-  content: string;
-  createdAt: string;
-  likesCount: number;
-  dislikesCount: number;
-  media: { id: string; url: string; type: "IMAGE" | "VIDEO"; sort: number }[];
-};
-
-type NewsBadge = "UPDATE" | "PLANS" | "THOUGHTS" | "IMPORTANT" | null;
+import { AdminNewsForm } from "./_components/AdminNewsForm";
+import { AdminNewsList } from "./_components/AdminNewsList";
+import type { MediaDraft, AdminNewsItem, NewsBadge } from "./_components/types";
 
 export default function AdminNewsClient() {
   const [title, setTitle] = useState("");
@@ -221,222 +203,29 @@ export default function AdminNewsClient() {
             </p>
           </motion.div>
 
-          {/* Create form */}
-          <motion.form
+          <AdminNewsForm
+            title={title}
+            setTitle={setTitle}
+            badge={badge}
+            setBadge={setBadge}
+            content={content}
+            setContent={setContent}
+            media={media}
+            onPickFiles={onPickFiles}
+            removeMedia={removeMedia}
             onSubmit={onSubmit}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-3xl border border-[#abd1c6]/25 bg-gradient-to-br from-[#004643]/55 to-[#001e1d]/45 p-5 sm:p-6 shadow-xl"
-          >
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#f9bc60]/10 rounded-full blur-3xl" />
-            <div className="absolute -bottom-12 -left-12 w-44 h-44 bg-[#abd1c6]/10 rounded-full blur-3xl" />
+            uploading={uploading}
+            submitting={submitting}
+            getTextLength={getTextLength}
+          />
 
-            <div className="relative z-10 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-white/80 mb-1">
-                    Заголовок (необязательно)
-                  </label>
-                  <input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Например: Большое обновление профиля"
-                    className="w-full rounded-2xl border border-white/10 bg-[#001e1d]/40 px-4 py-3 text-sm text-[#fffffe] placeholder:text-white/40 outline-none focus:border-[#f9bc60]/50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-white/80 mb-1">
-                    Бейдж (необязательно)
-                  </label>
-                  <select
-                    value={badge || ""}
-                    onChange={(e) =>
-                      setBadge((e.target.value as NewsBadge) || null)
-                    }
-                    className="w-full rounded-2xl border border-white/10 bg-[#001e1d]/40 px-4 py-3 text-sm text-[#fffffe] outline-none focus:border-[#f9bc60]/50"
-                  >
-                    <option value="">Без бейджа</option>
-                    <option value="UPDATE">Обновление</option>
-                    <option value="PLANS">Планы</option>
-                    <option value="THOUGHTS">Мысли</option>
-                    <option value="IMPORTANT">Важно</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-white/80 mb-1">
-                  Медиа (фото/видео)
-                </label>
-                <input
-                  type="file"
-                  accept="image/*,video/mp4,video/webm"
-                  multiple
-                  onChange={onPickFiles}
-                  className="w-full rounded-2xl border border-white/10 bg-[#001e1d]/40 px-4 py-3 text-sm text-white/80 file:mr-4 file:rounded-xl file:border-0 file:bg-[#f9bc60] file:px-4 file:py-2 file:text-sm file:font-bold file:text-[#001e1d]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-white/80 mb-1">
-                  Текст новости
-                </label>
-                <p className="text-xs text-[#abd1c6]/70 mb-3">
-                  Подробное описание новости (максимум 5000 символов).
-                  Используйте кнопки для форматирования текста.
-                </p>
-                <RichTextEditor
-                  value={content}
-                  onChange={setContent}
-                  placeholder="Пишите текст новости. Можно использовать форматирование: жирный, курсив, списки, выравнивание..."
-                  minLength={1}
-                  maxLength={5000}
-                  rows={8}
-                  allowPaste={true}
-                />
-              </div>
-
-              {media.length > 0 && (
-                <div className="rounded-2xl border border-white/10 bg-[#001e1d]/25 p-3">
-                  <div className="text-xs font-bold text-white/75 mb-2">
-                    Предпросмотр
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                    {media.map((m, idx) => (
-                      <div
-                        key={`${m.previewUrl}-${idx}`}
-                        className="relative group overflow-hidden rounded-2xl border border-white/10 bg-black/20"
-                      >
-                        {m.kind === "VIDEO" ? (
-                          <video
-                            src={m.previewUrl}
-                            className="w-full h-28 object-cover"
-                          />
-                        ) : (
-                          <img
-                            src={m.previewUrl}
-                            alt=""
-                            className="w-full h-28 object-cover"
-                          />
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => removeMedia(idx)}
-                          className="absolute top-2 right-2 w-8 h-8 rounded-xl bg-black/60 border border-white/10 text-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
-                          aria-label="Удалить"
-                          title="Удалить"
-                        >
-                          <LucideIcons.Trash2 size="sm" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center gap-3">
-                <button
-                  type="submit"
-                  disabled={!canSubmit}
-                  className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl font-black transition border ${
-                    canSubmit
-                      ? "bg-[#f9bc60] hover:bg-[#e8a545] text-[#001e1d] border-[#f9bc60]/40"
-                      : "bg-white/10 text-white/50 border-white/10 cursor-not-allowed"
-                  }`}
-                >
-                  <LucideIcons.Rocket size="sm" />
-                  {submitting || uploading ? "Публикуем..." : "Опубликовать"}
-                </button>
-
-                <div className="text-xs text-white/60">
-                  {uploading
-                    ? "Загрузка медиа..."
-                    : submitting
-                      ? "Сохранение..."
-                      : " "}
-                </div>
-              </div>
-            </div>
-          </motion.form>
-
-          {/* List */}
-          <div className="mt-8">
-            <div className="flex items-center justify-between gap-3 mb-3">
-              <h3 className="text-lg font-black text-[#fffffe]">
-                Последние новости
-              </h3>
-              <button
-                onClick={fetchItems}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/85 text-sm font-semibold"
-              >
-                <LucideIcons.RefreshCw size="sm" />
-                Обновить
-              </button>
-            </div>
-
-            {error && !loading && (
-              <div className="mb-3 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-white/85">
-                <span className="font-bold text-white">Ошибка:</span> {error}
-              </div>
-            )}
-
-            {loading ? (
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 animate-pulse">
-                <div className="h-5 bg-white/10 rounded w-52 mb-3" />
-                <div className="h-4 bg-white/10 rounded w-full mb-2" />
-                <div className="h-4 bg-white/10 rounded w-5/6" />
-              </div>
-            ) : items.length === 0 ? (
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center text-[#abd1c6]">
-                Пока новостей нет
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <AnimatePresence>
-                  {items.map((it) => (
-                    <motion.div
-                      key={it.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 8 }}
-                      className="rounded-3xl border border-[#abd1c6]/20 bg-[#001e1d]/30 p-5"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <div className="text-[#fffffe] font-black text-base sm:text-lg truncate">
-                            {it.title || "Без заголовка"}
-                          </div>
-                          <div
-                            className="mt-1 text-sm text-white/75 line-clamp-2 prose prose-sm prose-invert max-w-none"
-                            dangerouslySetInnerHTML={{ __html: it.content }}
-                          />
-                          <div className="mt-2 text-xs text-white/55 flex flex-wrap items-center gap-2">
-                            <span className="inline-flex items-center gap-1">
-                              <LucideIcons.ThumbsUp size="xs" /> {it.likesCount}
-                            </span>
-                            <span className="inline-flex items-center gap-1">
-                              <LucideIcons.ThumbsDown size="xs" />{" "}
-                              {it.dislikesCount}
-                            </span>
-                            <span className="text-[#f9bc60]">•</span>
-                            <span>медиа: {it.media?.length || 0}</span>
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => deletePost(it.id)}
-                          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-red-400/20 bg-red-500/10 hover:bg-red-500/15 text-red-200 text-sm font-bold"
-                        >
-                          <LucideIcons.Trash2 size="sm" />
-                          Удалить
-                        </button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            )}
-          </div>
+          <AdminNewsList
+            items={items}
+            loading={loading}
+            error={error}
+            onRefresh={fetchItems}
+            onDelete={deletePost}
+          />
         </div>
       </div>
     </div>

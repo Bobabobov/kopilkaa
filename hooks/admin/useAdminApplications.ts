@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ApplicationItem, Stats } from "@/app/admin/types";
+import type { ApplicationItem, Stats } from "@/types/admin";
 
 interface UseAdminApplicationsProps {
   initialPage?: number;

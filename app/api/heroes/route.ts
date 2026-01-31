@@ -5,7 +5,6 @@ import { getSafeExternalUrl } from "@/lib/safeExternalUrl";
 import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export async function GET(request: Request) {
   try {
@@ -224,9 +223,9 @@ export async function GET(request: Request) {
       },
       {
         headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
+          // Публичные данные: короткий кеш для снижения нагрузки
+          "Cache-Control":
+            "public, max-age=30, s-maxage=30, stale-while-revalidate=60",
         },
       },
     );

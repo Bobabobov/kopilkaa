@@ -8,7 +8,6 @@ import { getHeroBadgeForUser, getHeroBadgesForUsers } from "@/lib/heroBadges";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 // Объединенный API для загрузки всех данных профиля за один запрос
 export async function GET(request: NextRequest) {

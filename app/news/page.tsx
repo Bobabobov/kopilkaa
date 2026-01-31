@@ -1,11 +1,10 @@
 // app/news/page.tsx
-import NewsPageClient from "./NewsPageClient";
+import NewsPageClient from "./_components/NewsPageClient";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import type { NewsItem } from "@/components/news/types";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 30;

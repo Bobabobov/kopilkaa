@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import FriendsPageClient from "./FriendsPageClient";
+import FriendsPageClient from "./_components/FriendsPageClient";
 
 export default function FriendsPage() {
   return (

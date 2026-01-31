@@ -2,7 +2,6 @@ import StatsLoader from "@/components/home/StatsLoader";
 import HomePageClient from "@/components/home/HomePageClient";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 // Fallback статистика для случая ошибки
 const fallbackStats = {

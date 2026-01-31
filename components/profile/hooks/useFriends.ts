@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
+import { getUserStatus } from "@/lib/userStatus";
 
 interface User {
   id: string;
@@ -93,37 +94,6 @@ export function useFriends(): UseFriendsReturn {
         }),
       );
     }
-  }, []);
-
-  // Утилита для определения статуса пользователя
-  const getUserStatus = useCallback((lastSeen: string | null) => {
-    if (!lastSeen) {
-      return { status: "offline" as const, text: "Никогда не был онлайн" };
-    }
-
-    const date = new Date(lastSeen);
-    const now = new Date();
-    const diffInMinutes = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60),
-    );
-
-    if (diffInMinutes < 5) {
-      return { status: "online" as const, text: "Онлайн" };
-    } else if (diffInMinutes < 60) {
-      return { status: "offline" as const, text: `${diffInMinutes} мин назад` };
-    }
-
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) {
-      return { status: "offline" as const, text: `${diffInHours} ч назад` };
-    }
-
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) {
-      return { status: "offline" as const, text: `${diffInDays} дн назад` };
-    }
-
-    return { status: "offline" as const, text: date.toLocaleDateString() };
   }, []);
 
   // Загрузка данных

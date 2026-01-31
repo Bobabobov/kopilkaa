@@ -27,7 +27,5 @@ export { buildAuthModalUrl } from "../authModalUrl";
 // Ban checking
 export {
   checkUserBan,
-  checkEmailBan,
-  checkIpBan,
   type BanCheckResult,
 } from "../ban-check";

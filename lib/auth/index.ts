@@ -13,7 +13,6 @@ export {
   getSession,
   signSession,
   verifySession,
-  decodeSession,
 } from "../auth";
 
 // Telegram authentication

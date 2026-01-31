@@ -9,7 +9,10 @@
 export { getUserStatus, type UserStatusResult } from "../userStatus";
 
 // User resolving (by id, username, email)
-export { resolveUser } from "../userResolve";
+export {
+  resolveUserIdFromIdentifier,
+  isUsernameIdentifier,
+} from "../userResolve";
 
 // Profile URL building
 export { getPublicProfilePath } from "../profileUrl";

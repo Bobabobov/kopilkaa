@@ -174,8 +174,8 @@ export default function RichTextEditor({
           className={`w-full max-w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ${
             hasError
               ? editor.isFocused
-                ? "border-[#e16162] bg-[#e16162]/5 focus-within:border-[#e16162] focus-within:ring-2 focus-within:ring-[#e16162]/50"
-                : "border-[#e16162] bg-[#e16162]/5"
+                ? "border-[#e16162]/60 bg-[#e16162]/8 focus-within:border-[#e16162] focus-within:ring-2 focus-within:ring-[#e16162]/30"
+                : "border-[#e16162]/60 bg-[#e16162]/8"
               : editor.isFocused
                 ? "border-[#f9bc60] bg-[#abd1c6]/5 focus-within:border-[#f9bc60] focus-within:ring-2 focus-within:ring-[#f9bc60]/50"
                 : "border-[#abd1c6]/30 bg-[#004643]/50"

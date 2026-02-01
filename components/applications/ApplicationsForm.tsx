@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, ReactNode } from "react";
+import { FormEvent, ReactNode, useEffect } from "react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import ApplicationsProgress from "@/components/applications/ApplicationsProgress";
 import ApplicationsConsent from "@/components/applications/ApplicationsConsent";
 import FormField from "@/components/ui/FormField";
@@ -32,6 +33,9 @@ type Props = {
   submitting: boolean;
   left: number | null;
   err: string | null;
+  fieldErrors?: Partial<Record<string, string>>;
+  firstErrorKey?: string;
+  validationScrollTrigger?: number;
   submit: (e?: FormEvent) => Promise<void>;
   hpCompany: string;
   setHpCompany: (v: string) => void;
@@ -79,6 +83,9 @@ export function ApplicationsForm(props: Props) {
     submitting,
     left,
     err,
+    fieldErrors,
+    firstErrorKey,
+    validationScrollTrigger,
     submit,
     hpCompany,
     setHpCompany,
@@ -94,6 +101,12 @@ export function ApplicationsForm(props: Props) {
     ackError,
     trustSupportNotice,
   } = props;
+
+  useEffect(() => {
+    if (!err || !firstErrorKey || typeof document === "undefined") return;
+    const el = document.getElementById(`application-field-${firstErrorKey}`);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [err, firstErrorKey, validationScrollTrigger]);
 
   return (
     <motion.div
@@ -141,33 +154,60 @@ export function ApplicationsForm(props: Props) {
           totalFields={totalFields}
         />
 
-        <FormField
-          type="input"
-          label="Заголовок"
-          icon="Home"
-          value={title}
-          onChange={setTitle}
-          placeholder="Краткое описание вашей ситуации..."
-          hint={`Краткий заголовок, который привлечет внимание (макс. ${limits.titleMax} символов)`}
-          maxLength={limits.titleMax}
-          delay={0.1}
-          required={true}
-        />
+        <div
+          id="application-field-title"
+          className={cn(
+            "rounded-2xl p-4 -mx-1 transition-all duration-300 border border-transparent",
+            fieldErrors?.title &&
+              "border-[#e16162]/50 bg-[#e16162]/8"
+          )}
+        >
+          <FormField
+            type="input"
+            label="Заголовок"
+            icon="Home"
+            value={title}
+            onChange={setTitle}
+            placeholder="Краткое описание вашей ситуации..."
+            hint={`Краткий заголовок, который привлечет внимание (макс. ${limits.titleMax} символов)`}
+            maxLength={limits.titleMax}
+            delay={0.1}
+            required={true}
+            error={fieldErrors?.title}
+          />
+        </div>
 
-        <FormField
-          type="input"
-          label="Краткое описание"
-          icon="MessageCircle"
-          value={summary}
-          onChange={setSummary}
-          placeholder="Короткое название заявки (3–10 слов)"
-          hint={`Краткое описание, видно в списке заявок (макс. ${limits.summaryMax} символов)`}
-          maxLength={limits.summaryMax}
-          delay={0.2}
-          required={true}
-        />
+        <div
+          id="application-field-summary"
+          className={cn(
+            "rounded-2xl p-4 -mx-1 transition-all duration-300 border border-transparent",
+            fieldErrors?.summary &&
+              "border-[#e16162]/50 bg-[#e16162]/8"
+          )}
+        >
+          <FormField
+            type="input"
+            label="Краткое описание"
+            icon="MessageCircle"
+            value={summary}
+            onChange={setSummary}
+            placeholder="Короткое название заявки (3–10 слов)"
+            hint={`Краткое описание, видно в списке заявок (макс. ${limits.summaryMax} символов)`}
+            maxLength={limits.summaryMax}
+            delay={0.2}
+            required={true}
+            error={fieldErrors?.summary}
+          />
+        </div>
 
-        <div>
+        <div
+          id="application-field-story"
+          className={cn(
+            "rounded-2xl p-4 -mx-1 transition-all duration-300 border border-transparent",
+            fieldErrors?.story &&
+              "border-[#e16162]/50 bg-[#e16162]/8"
+          )}
+        >
           <label
             className="block text-sm font-medium mb-2"
             style={{ color: "#abd1c6" }}
@@ -188,64 +228,105 @@ export function ApplicationsForm(props: Props) {
             rows={8}
             allowLinks={false}
             required={true}
+            error={fieldErrors?.story}
           />
         </div>
 
-        <FormField
-          type="input"
-          label="Сумма запроса"
-          icon="DollarSign"
-          value={amountFormatted}
-          onChange={() => {}}
-          placeholder="Укажите сумму в рублях..."
-          hint={trustHint}
-          maxLength={7}
-          inputProps={{
-            type: "tel",
-            inputMode: "numeric",
-            autoComplete: "off",
-            ref: amountInputRef,
-            onChange: handleAmountInputChange,
-            max: trustLimitsMax,
-          }}
-          delay={0.4}
-          required={true}
-        />
+        <div
+          id="application-field-amount"
+          className={cn(
+            "rounded-2xl p-4 -mx-1 transition-all duration-300 border border-transparent",
+            fieldErrors?.amount &&
+              "border-[#e16162]/50 bg-[#e16162]/8"
+          )}
+        >
+          <FormField
+            type="input"
+            label="Сумма запроса"
+            icon="DollarSign"
+            value={amountFormatted}
+            onChange={() => {}}
+            placeholder="Укажите сумму в рублях..."
+            hint={trustHint}
+            maxLength={7}
+            inputProps={{
+              type: "tel",
+              inputMode: "numeric",
+              autoComplete: "off",
+              ref: amountInputRef,
+              onChange: handleAmountInputChange,
+              max: trustLimitsMax,
+            }}
+            delay={0.4}
+            required={true}
+            error={fieldErrors?.amount}
+          />
+        </div>
 
-        <FormField
-          type="input"
-          label="Банк"
-          icon="CreditCard"
-          value={bankName}
-          onChange={setBankName}
-          placeholder="Название банка (например, Тинькофф, Сбер)"
-          hint="Укажите банк получателя отдельно от реквизитов."
-          maxLength={15}
-          delay={0.45}
-          required={true}
-        />
+        <div
+          id="application-field-bankName"
+          className={cn(
+            "rounded-2xl p-4 -mx-1 transition-all duration-300 border border-transparent",
+            fieldErrors?.bankName &&
+              "border-[#e16162]/50 bg-[#e16162]/8"
+          )}
+        >
+          <FormField
+            type="input"
+            label="Банк"
+            icon="CreditCard"
+            value={bankName}
+            onChange={setBankName}
+            placeholder="Название банка (например, Тинькофф, Сбер)"
+            hint="Укажите банк получателя отдельно от реквизитов."
+            maxLength={15}
+            delay={0.45}
+            required={true}
+            error={fieldErrors?.bankName}
+          />
+        </div>
 
-        <FormField
-          type="textarea"
-          label="Реквизиты для получения помощи"
-          icon="CreditCard"
-          value={payment}
-          onChange={setPayment}
-          placeholder="Банковские реквизиты, номер карты или другие способы получения средств"
-          hint={`⚠️ Переводы на карты Visa/Mastercard недоступны — используйте МИР/СБП/счёт. Реквизиты для перевода средств (минимум ${limits.paymentMin}, максимум ${limits.paymentMax} символов).`}
-          minLength={limits.paymentMin}
-          maxLength={limits.paymentMax}
-          compact={true}
-          delay={0.5}
-          required={true}
-        />
+        <div
+          id="application-field-payment"
+          className={cn(
+            "rounded-2xl p-4 -mx-1 transition-all duration-300 border border-transparent",
+            fieldErrors?.payment &&
+              "border-[#e16162]/50 bg-[#e16162]/8"
+          )}
+        >
+          <FormField
+            type="textarea"
+            label="Реквизиты для получения помощи"
+            icon="CreditCard"
+            value={payment}
+            onChange={setPayment}
+            placeholder="Банковские реквизиты, номер карты или другие способы получения средств"
+            hint={`⚠️ Переводы на карты Visa/Mastercard недоступны — используйте МИР/СБП/счёт. Реквизиты для перевода средств (минимум ${limits.paymentMin}, максимум ${limits.paymentMax} символов).`}
+            minLength={limits.paymentMin}
+            maxLength={limits.paymentMax}
+            compact={true}
+            delay={0.5}
+            required={true}
+            error={fieldErrors?.payment}
+          />
+        </div>
 
-        <PhotoUpload
-          photos={photos}
-          onPhotosChange={setPhotos}
-          maxPhotos={limits.maxPhotos}
-          delay={0.5}
-        />
+        <div
+          id="application-field-photos"
+          className={cn(
+            "rounded-2xl p-2 -mx-1 transition-all duration-300 border border-transparent",
+            fieldErrors?.photos &&
+              "border-[#e16162]/50 bg-[#e16162]/8"
+          )}
+        >
+          <PhotoUpload
+            photos={photos}
+            onPhotosChange={setPhotos}
+            maxPhotos={limits.maxPhotos}
+            delay={0.5}
+            error={fieldErrors?.photos}
+          />
+        </div>
 
         <ApplicationsConsent
           trustAcknowledged={trustAcknowledged}
@@ -261,7 +342,11 @@ export function ApplicationsForm(props: Props) {
           submitting={submitting}
           uploading={uploading}
           left={left}
-          err={err}
+          err={
+            err && fieldErrors && Object.keys(fieldErrors).length > 0
+              ? "Исправьте отмеченные поля выше"
+              : err
+          }
           onSubmit={(e) => {
             e.preventDefault();
             submit(e);

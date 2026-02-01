@@ -108,18 +108,14 @@ export default function SubmitSection({
 
       {err && (
         <motion.div
-          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="p-4 border-2 border-[#e16162]/50 rounded-xl bg-gradient-to-br from-[#e16162]/10 to-[#d14d4e]/5 backdrop-blur-sm"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="p-4 border border-[#e16162]/50 rounded-xl bg-[#e16162]/10 backdrop-blur-sm"
         >
           <div className="flex items-center gap-3 text-[#e16162]">
-            <motion.span
-              animate={{ rotate: [0, -10, 10, 0] }}
-              transition={{ duration: 0.5, repeat: 2 }}
-            >
-              <LucideIcons.Alert size="sm" />
-            </motion.span>
-            <span className="font-semibold">{err}</span>
+            <LucideIcons.Alert size="sm" />
+            <span>{err}</span>
           </div>
         </motion.div>
       )}

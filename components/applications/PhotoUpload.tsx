@@ -9,6 +9,7 @@ interface PhotoUploadProps {
   onPhotosChange: (photos: { file: File; url: string }[]) => void;
   maxPhotos: number;
   delay?: number;
+  error?: string;
 }
 
 export default function PhotoUpload({
@@ -16,6 +17,7 @@ export default function PhotoUpload({
   onPhotosChange,
   maxPhotos,
   delay = 0.5,
+  error,
 }: PhotoUploadProps) {
   const prevUrlsRef = useRef<string[]>([]);
 
@@ -87,7 +89,11 @@ export default function PhotoUpload({
       transition={{ duration: 0.5, delay }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={onDrop}
-      className="rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 p-6 bg-transparent hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors duration-300 relative"
+      className={`rounded-2xl border-2 border-dashed p-6 bg-transparent transition-colors duration-300 relative ${
+        error
+          ? "border-[#e16162]/60 bg-[#e16162]/8"
+          : "border-slate-300 dark:border-slate-600 hover:border-emerald-400 dark:hover:border-emerald-500"
+      }`}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -156,6 +162,12 @@ export default function PhotoUpload({
           <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
             Нужно добавить хотя бы одно фото
           </p>
+        </div>
+      )}
+      {error && (
+        <div className="flex items-center gap-2 text-[#e16162] text-sm mt-2">
+          <LucideIcons.Alert size="sm" />
+          <span>{error}</span>
         </div>
       )}
     </motion.div>

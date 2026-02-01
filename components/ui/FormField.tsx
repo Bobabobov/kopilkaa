@@ -133,7 +133,7 @@ export default function FormField({
             {...textareaProps}
             className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50 resize-none ${
               error || isRequiredEmpty
-                ? "border-red-400 bg-red-50/10"
+                ? "border-[#e16162]/60 bg-[#e16162]/8"
                 : value.trim()
                   ? "border-[#abd1c6]/60 bg-[#abd1c6]/5"
                   : "border-[#abd1c6]/30 bg-[#004643]/50"
@@ -142,7 +142,7 @@ export default function FormField({
               color: "#fffffe",
               backgroundColor:
                 error || isRequiredEmpty
-                  ? "rgba(239, 68, 68, 0.05)"
+                  ? "rgba(225, 97, 98, 0.08)"
                   : value.trim()
                     ? "rgba(171, 209, 198, 0.05)"
                     : "rgba(0, 70, 67, 0.5)",
@@ -152,7 +152,7 @@ export default function FormField({
           <input
             className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50 ${
               error || isRequiredEmpty
-                ? "border-red-400 bg-red-50/10"
+                ? "border-[#e16162]/60 bg-[#e16162]/8"
                 : value.trim()
                   ? "border-[#abd1c6]/60 bg-[#abd1c6]/5"
                   : "border-[#abd1c6]/30 bg-[#004643]/50"
@@ -161,7 +161,7 @@ export default function FormField({
               color: "#fffffe",
               backgroundColor:
                 error || isRequiredEmpty
-                  ? "rgba(239, 68, 68, 0.05)"
+                  ? "rgba(225, 97, 98, 0.08)"
                   : value.trim()
                     ? "rgba(171, 209, 198, 0.05)"
                     : "rgba(0, 70, 67, 0.5)",
@@ -182,7 +182,7 @@ export default function FormField({
         )}
         {(error || isRequiredEmpty) && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-            <LucideIcons.XCircle size="sm" className="text-red-400" />
+            <LucideIcons.XCircle size="sm" className="text-[#e16162]" />
           </div>
         )}
       </div>
@@ -205,7 +205,7 @@ export default function FormField({
       {showValidation && value.trim() && !error && !isRequiredEmpty && (
         <div className="flex items-center gap-2 text-sm mt-1">
           {isOverLimit ? (
-            <div className="flex items-center gap-2 text-red-400">
+            <div className="flex items-center gap-2 text-[#e16162]">
               <LucideIcons.XCircle size="sm" />
               <span>Слишком много символов</span>
             </div>
@@ -232,21 +232,21 @@ export default function FormField({
       {showValidation && (
         <>
           {isRequiredEmpty && (
-            <div className="flex items-center gap-2 text-red-400 text-sm mt-2 animate-fadeIn">
+            <div className="flex items-center gap-2 text-[#e16162] text-sm mt-2 animate-fadeIn">
               <LucideIcons.Alert size="sm" />
               <span>Заполните это поле</span>
             </div>
           )}
 
           {isOverLimit && (
-            <div className="flex items-center gap-2 text-red-400 text-sm mt-2 animate-fadeIn">
-              <LucideIcons.XCircle size="sm" />
+            <div className="flex items-center gap-2 text-[#e16162] text-sm mt-2 animate-fadeIn">
+              <LucideIcons.Alert size="sm" />
               <span>Превышен лимит символов</span>
             </div>
           )}
 
           {error && (
-            <div className="flex items-center gap-2 text-red-400 text-sm mt-2 animate-fadeIn">
+            <div className="flex items-center gap-2 text-[#e16162] text-sm mt-2 animate-fadeIn">
               <LucideIcons.Alert size="sm" />
               <span>{error}</span>
             </div>

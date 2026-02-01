@@ -85,6 +85,9 @@ export default function ApplicationsPageClient() {
     totalFields,
     valid,
     exceedsTrustLimit,
+    fieldErrors,
+    firstErrorKey,
+    validationScrollTrigger,
     submit,
     setSubmitted,
     requiresReview,
@@ -219,6 +222,9 @@ export default function ApplicationsPageClient() {
                 submitting={submitting}
                 left={left}
                 err={err}
+                fieldErrors={fieldErrors}
+                firstErrorKey={firstErrorKey}
+                validationScrollTrigger={validationScrollTrigger}
                 submit={submit}
                 hpCompany={hpCompany}
                 setHpCompany={setHpCompany}

@@ -21,6 +21,8 @@ import {
   isApplicationFormValid,
   getFilledFieldsCount,
   getProgressPercentage,
+  getApplicationFormErrors,
+  type ApplicationFieldKey,
 } from "./validation";
 import { formatAmountRu, createHandleAmountInputChange } from "./amountUtils";
 import { uploadApplicationPhotos } from "./upload";
@@ -58,6 +60,7 @@ export function useApplicationFormState() {
     activityType: null,
     message: "",
   });
+  const [validationScrollTrigger, setValidationScrollTrigger] = useState(0);
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
   const formStartedAtRef = useRef<number | null>(null);
@@ -218,6 +221,38 @@ export function useApplicationFormState() {
   const progressPercentage = getProgressPercentage(filledFields);
   const totalFields = TOTAL_FIELDS;
 
+  const fieldErrors = useMemo(
+    () =>
+      getApplicationFormErrors({
+        title,
+        summary,
+        storyTextLen,
+        amount,
+        amountInt,
+        bankName,
+        payment,
+        photosCount: photos.length,
+        isAdmin,
+        withinTrustRange,
+      }),
+    [
+      title,
+      summary,
+      storyTextLen,
+      amount,
+      amountInt,
+      bankName,
+      payment,
+      photos.length,
+      isAdmin,
+      withinTrustRange,
+    ]
+  );
+  const firstErrorKey = useMemo(
+    () => (Object.keys(fieldErrors)[0] as ApplicationFieldKey | undefined),
+    [fieldErrors]
+  );
+
   const handleAmountInputChange = useCallback(
     createHandleAmountInputChange(
       setAmount,
@@ -258,6 +293,7 @@ export function useApplicationFormState() {
       }
       if (!valid) {
         setErr("Проверьте поля — есть ошибки/лимиты");
+        setValidationScrollTrigger((n) => n + 1);
         return;
       }
 
@@ -423,6 +459,9 @@ export function useApplicationFormState() {
     totalFields,
     valid,
     exceedsTrustLimit,
+    fieldErrors,
+    firstErrorKey,
+    validationScrollTrigger,
     submit,
     formStartedAtRef,
     formStartKey,

@@ -7,11 +7,10 @@ import { AdminHeader } from "@/app/admin/_components/AdminHeader";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { AdminNewsForm } from "./_components/AdminNewsForm";
 import { AdminNewsList } from "./_components/AdminNewsList";
-import type { MediaDraft, AdminNewsItem, NewsBadge } from "./_components/types";
+import type { MediaDraft, AdminNewsItem } from "./_components/types";
 
 export default function AdminNewsClient() {
   const [title, setTitle] = useState("");
-  const [badge, setBadge] = useState<NewsBadge>(null);
   const [content, setContent] = useState("");
   const [media, setMedia] = useState<MediaDraft[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -144,7 +143,6 @@ export default function AdminNewsClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: title.trim() || null,
-          badge: badge,
           content: content, // HTML контент от RichTextEditor
           media: uploaded,
         }),
@@ -153,7 +151,6 @@ export default function AdminNewsClient() {
       if (!r.ok) throw new Error(d?.error || "Ошибка создания новости");
       showToast("success", "Готово", "Новость опубликована");
       setTitle("");
-      setBadge(null);
       setContent("");
       setMedia([]);
       await fetchItems();
@@ -206,8 +203,6 @@ export default function AdminNewsClient() {
           <AdminNewsForm
             title={title}
             setTitle={setTitle}
-            badge={badge}
-            setBadge={setBadge}
             content={content}
             setContent={setContent}
             media={media}

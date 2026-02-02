@@ -6,8 +6,6 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import OtherUserFriendsModal from "../OtherUserFriendsModal";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 import { getUserStatus } from "@/lib/userStatus";
 
 type UserLite = {
@@ -16,7 +14,6 @@ type UserLite = {
   email: string | null;
   avatar?: string | null;
   lastSeen?: string | null;
-  heroBadge?: HeroBadgeType | null;
 };
 
 interface MutualFriendsProps {
@@ -189,9 +186,6 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
                         {u.name ||
                           (u.email ? u.email.split("@")[0] : "Пользователь")}
                       </p>
-                      {u.heroBadge && (
-                        <HeroBadge badge={u.heroBadge} size="xs" />
-                      )}
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-white/60">
                       {isOnline ? (

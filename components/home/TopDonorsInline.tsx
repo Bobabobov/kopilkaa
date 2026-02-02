@@ -6,9 +6,6 @@ import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-
 interface Donor {
   id: string;
   name: string;
@@ -17,7 +14,6 @@ interface Donor {
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;
-  heroBadge?: HeroBadgeType | null;
   position?: number;
 }
 
@@ -236,11 +232,6 @@ export default function TopDonorsInline() {
                           >
                             {placeLabel}
                           </p>
-                          {donor.heroBadge && (
-                            <div className="mt-2">
-                              <HeroBadge badge={donor.heroBadge} size="xs" />
-                            </div>
-                          )}
                         </div>
                       </div>
 

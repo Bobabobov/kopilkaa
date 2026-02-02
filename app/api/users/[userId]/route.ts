@@ -3,7 +3,6 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getHeroBadgeForUser } from "@/lib/heroBadges";
 import { isUsernameIdentifier } from "@/lib/userResolve";
 
 export async function GET(
@@ -63,11 +62,7 @@ export async function GET(
       );
     }
 
-    const heroBadge = await getHeroBadgeForUser(user.id);
-    const safeUser = sanitizeEmailForViewer(
-      { ...(user as any), heroBadge },
-      session.uid,
-    );
+    const safeUser = sanitizeEmailForViewer(user as any, session.uid);
 
     return NextResponse.json({ user: safeUser });
   } catch (error) {

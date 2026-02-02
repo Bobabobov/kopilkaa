@@ -8,8 +8,6 @@ import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 import { formatDateFull } from "@/lib/time";
 import { formatRub } from "@/lib/format";
 
@@ -17,7 +15,6 @@ interface Hero {
   id: string;
   name: string;
   avatar?: string;
-  heroBadge?: HeroBadgeType | null;
   totalDonated: number;
   donationCount: number;
   rank: number;
@@ -234,17 +231,10 @@ export default function HeroesGrid({
                         С {formatDateFull(hero.joinedAt)}
                       </p>
                     </div>
-                    <div className="hidden sm:block">
-                      <HeroBadge badge={hero.heroBadge ?? null} size="sm" />
-                    </div>
                     <div className="text-[#94a1b2] opacity-0 group-hover:opacity-100 transition-opacity">
                       <LucideIcons.ChevronRight size="sm" />
                     </div>
                   </div>
-                  <div className="sm:hidden mb-3">
-                    <HeroBadge badge={hero.heroBadge ?? null} size="sm" />
-                  </div>
-
                   {/* Статистика */}
                   <div className="grid grid-cols-2 gap-2 sm:gap-3">
                     <div className="text-center p-2 sm:p-3 rounded-xl border border-white/10 bg-white/5">

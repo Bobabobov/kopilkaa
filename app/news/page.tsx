@@ -59,7 +59,6 @@ export default async function NewsPage() {
   const initialItems: NewsItem[] = page.map((p: any) => ({
     id: p.id,
     title: p.title,
-    badge: p.badge,
     content: p.content,
     createdAt: new Date(p.createdAt).toISOString(),
     updatedAt: new Date(p.updatedAt).toISOString(),

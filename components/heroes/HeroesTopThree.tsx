@@ -6,15 +6,12 @@ import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 import { formatRub } from "@/lib/format";
 
 interface Hero {
   id: string;
   name: string;
   avatar?: string;
-  heroBadge?: HeroBadgeType | null;
   totalDonated: number;
   donationCount: number;
   rank: number;
@@ -129,9 +126,6 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               >
                 {topThree[1].name}
               </h4>
-              <div className="flex justify-center mb-2">
-                <HeroBadge badge={topThree[1].heroBadge ?? null} size="md" />
-              </div>
               <p
                 className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 break-words"
                 style={{ color: getRankColor(2) }}
@@ -226,9 +220,6 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               >
                 {topThree[0].name}
               </h4>
-              <div className="flex justify-center mb-2">
-                <HeroBadge badge={topThree[0].heroBadge ?? null} size="md" />
-              </div>
               <p
                 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 break-words"
                 style={{ color: getRankColor(1) }}
@@ -321,9 +312,6 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               >
                 {topThree[2].name}
               </h4>
-              <div className="flex justify-center mb-2">
-                <HeroBadge badge={topThree[2].heroBadge ?? null} size="md" />
-              </div>
               <p
                 className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 break-words"
                 style={{ color: getRankColor(3) }}

@@ -231,13 +231,6 @@ export default function FormField({
       {/* Сообщения об ошибках */}
       {showValidation && (
         <>
-          {isRequiredEmpty && (
-            <div className="flex items-center gap-2 text-[#e16162] text-sm mt-2 animate-fadeIn">
-              <LucideIcons.Alert size="sm" />
-              <span>Заполните это поле</span>
-            </div>
-          )}
-
           {isOverLimit && (
             <div className="flex items-center gap-2 text-[#e16162] text-sm mt-2 animate-fadeIn">
               <LucideIcons.Alert size="sm" />

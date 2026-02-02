@@ -4,13 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import HeroesHero from "@/components/heroes/HeroesHero";
 import HeroesContent from "@/components/heroes/HeroesContent";
 import HeroesLoading from "@/components/heroes/HeroesLoading";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-
 export interface Hero {
   id: string;
   name: string;
   avatar?: string;
-  heroBadge?: HeroBadgeType | null;
   totalDonated: number;
   donationCount: number;
   rank: number;

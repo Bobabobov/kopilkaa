@@ -3,7 +3,6 @@
 import { AdminHeader } from "../_components/AdminHeader";
 import { AdminUsersHeader } from "./_components/AdminUsersHeader";
 import { AdminUsersList } from "./_components/AdminUsersList";
-import { AdminBadgeModal } from "./_components/AdminBadgeModal";
 import { useAdminUsers } from "@/hooks/admin/useAdminUsers";
 
 export default function AdminUsersClient() {
@@ -17,12 +16,6 @@ export default function AdminUsersClient() {
     observerTarget,
     deletingUserId,
     handleDeleteUser,
-    openBadgeModal,
-    badgeModalUserId,
-    badgeModalBadge,
-    loadingBadge,
-    handleSetBadge,
-    closeBadgeModal,
     trustDeltaSaving,
     setTrustDeltaSaving,
     updateUserTrust,
@@ -65,19 +58,10 @@ export default function AdminUsersClient() {
             setTrustDeltaSaving={setTrustDeltaSaving}
             onTrustUpdated={handleTrustUpdated}
             onDelete={handleDeleteUser}
-            onOpenBadge={openBadgeModal}
             showToast={showToast}
           />
         </div>
       </div>
-
-      <AdminBadgeModal
-        open={!!badgeModalUserId}
-        currentBadge={badgeModalBadge}
-        loading={loadingBadge}
-        onSetBadge={handleSetBadge}
-        onClose={closeBadgeModal}
-      />
     </div>
   );
 }

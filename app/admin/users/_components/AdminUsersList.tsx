@@ -16,7 +16,6 @@ interface AdminUsersListProps {
   setTrustDeltaSaving: (id: string | null) => void;
   onTrustUpdated: (userId: string, nextDelta: number) => void;
   onDelete: (userId: string, userName: string) => void;
-  onOpenBadge: (userId: string) => void;
   showToast: (type: "success" | "error", title: string, desc?: string) => void;
 }
 
@@ -32,7 +31,6 @@ export function AdminUsersList({
   setTrustDeltaSaving,
   onTrustUpdated,
   onDelete,
-  onOpenBadge,
   showToast,
 }: AdminUsersListProps) {
   if (loading) {
@@ -68,7 +66,6 @@ export function AdminUsersList({
             setTrustDeltaSaving={setTrustDeltaSaving}
             onTrustUpdated={onTrustUpdated}
             onDelete={onDelete}
-            onOpenBadge={onOpenBadge}
             showToast={showToast}
           />
         ))}

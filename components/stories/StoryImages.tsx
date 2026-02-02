@@ -1,5 +1,9 @@
 "use client";
 
+import { memo } from "react";
+import Image from "next/image";
+import { LucideIcons } from "@/components/ui/LucideIcons";
+
 interface StoryImage {
   url: string;
   sort: number;
@@ -10,32 +14,44 @@ interface StoryImagesProps {
   title?: string;
 }
 
-export default function StoryImages({ images = [], title }: StoryImagesProps) {
+function StoryImagesInner({ images = [], title }: StoryImagesProps) {
   if (!images || images.length === 0) {
     return null;
   }
 
-  // Сортируем изображения по полю sort
   const sortedImages = [...images].sort((a, b) => a.sort - b.sort);
 
   return (
-    <div className="space-y-4 mb-8">
-      <h3 className="text-xl font-semibold mb-4" style={{ color: "#fffffe" }}>
-        Изображения:
-      </h3>
-      {sortedImages.map((image, index) => (
-        <div
-          key={index}
-          className="relative bg-white/90 backdrop-blur-xl rounded-2xl p-4 shadow-lg"
-          style={{ borderColor: "#abd1c6/30" }}
-        >
-          <img
-            src={image.url}
-            alt={`${title || "Story"} image ${index + 1}`}
-            className="w-full h-auto rounded-lg object-cover"
-          />
-        </div>
-      ))}
-    </div>
+    <section className="mb-10" aria-label="Галерея изображений истории">
+      <h2 className="flex items-center gap-2 text-xl font-bold text-[#fffffe] mb-5">
+        <LucideIcons.Image size="md" className="text-[#f9bc60]" aria-hidden />
+        Изображения
+      </h2>
+      <div className="grid gap-5 sm:gap-6">
+        {sortedImages.map((image, index) => (
+          <figure
+            key={`${image.url}-${index}`}
+            className="relative overflow-hidden rounded-2xl border border-[#abd1c6]/25 bg-[#001e1d]/30 shadow-[0_16px_40px_-20px_rgba(0,0,0,0.2)] aspect-[4/3]"
+          >
+            <Image
+              src={image.url}
+              alt={`${title || "История"} — изображение ${index + 1}`}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 720px"
+              className="object-cover"
+              unoptimized={typeof image.url === "string" && /^https?:\/\//i.test(image.url)}
+              onError={(e) => {
+                e.currentTarget.src = "/stories-preview.jpg";
+              }}
+            />
+            <figcaption className="sr-only">
+              Изображение {index + 1} из {sortedImages.length}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
   );
 }
+
+export default memo(StoryImagesInner);

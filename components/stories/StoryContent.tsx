@@ -10,49 +10,83 @@ export default function StoryContent({
   content,
   isAd = false,
 }: StoryContentProps) {
-  // Для всех историй (обычных и рекламных) используем HTML рендеринг
-  // Теперь рекламные истории тоже поддерживают форматирование через RichTextEditor
   return (
     <div
-      className={`relative backdrop-blur-xl rounded-3xl p-8 sm:p-10 shadow-xl mb-8 overflow-hidden border-2 transition-all duration-500 ${
+      className={`relative rounded-2xl p-6 sm:p-8 md:p-10 mb-8 overflow-hidden border ${
         isAd
-          ? "bg-gradient-to-br from-white/95 via-white/90 to-[#f9bc60]/10 border-[#f9bc60]/40 hover:border-[#f9bc60]/60 hover:shadow-2xl"
-          : "bg-white/90 border-[#abd1c6]/30"
+          ? "border-[#f9bc60]/40 bg-gradient-to-br from-white/95 via-white/90 to-[#f9bc60]/10 shadow-[0_20px_50px_-20px_rgba(249,188,96,0.15)]"
+          : "border-[#abd1c6]/25 bg-white/95 backdrop-blur-sm shadow-[0_20px_50px_-20px_rgba(0,30,29,0.1)]"
       }`}
     >
-      {/* Декоративные элементы */}
-      {isAd ? (
+      {isAd && (
         <>
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-[#f9bc60]/20 to-[#e8a545]/15 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-[#f9bc60]/15 to-[#e8a545]/10 rounded-full blur-2xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-[#f9bc60]/5 to-transparent rounded-full blur-3xl"></div>
+          <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-[#f9bc60]/15 blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-12 -left-12 h-24 w-24 rounded-full bg-[#f9bc60]/10 blur-xl" />
         </>
-      ) : (
+      )}
+      {!isAd && (
         <>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-yellow-400/5 to-yellow-600/5 rounded-full blur-xl"></div>
+          <div className="pointer-events-none absolute top-0 right-0 w-40 h-40 rounded-full bg-[#abd1c6]/10 blur-2xl" />
+          <div className="pointer-events-none absolute bottom-0 left-0 w-32 h-32 rounded-full bg-[#f9bc60]/5 blur-xl" />
         </>
       )}
 
       <div className="relative z-10">
         <div
-          className={`prose prose-lg max-w-none ${isAd ? "prose-headings:text-[#001e1d] prose-p:text-[#2d5a4e] prose-strong:text-[#004643]" : ""}`}
+          className={`prose prose-lg max-w-none ${
+            isAd
+              ? "prose-headings:text-[#001e1d] prose-p:text-[#2d5a4e] prose-strong:text-[#004643]"
+              : "prose-headings:text-[#001e1d] prose-p:text-[#2d5a4e] prose-strong:text-[#004643]"
+          }`}
         >
           <div
             className={`break-words overflow-wrap-anywhere ${
-              isAd ? "text-lg sm:text-xl leading-relaxed" : "text-lg"
+              isAd ? "text-lg sm:text-xl leading-relaxed" : "text-lg leading-relaxed"
             }`}
             dangerouslySetInnerHTML={{ __html: content }}
           />
         </div>
         <style jsx global>{`
           .prose a {
-            color: #3b82f6;
+            color: #004643;
             text-decoration: underline;
-            text-underline-offset: 2px;
+            text-underline-offset: 3px;
+            font-weight: 600;
           }
           .prose a:hover {
-            color: #60a5fa;
+            color: #f9bc60;
+          }
+          .prose blockquote {
+            border-left: 4px solid #f9bc60;
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #2d5a4e;
+            background: rgba(249, 188, 96, 0.06);
+            border-radius: 0 0.5rem 0.5rem 0;
+            padding: 1rem 1rem 1rem 1.25rem;
+          }
+          .prose ul, .prose ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+          }
+          .prose li {
+            margin: 0.35rem 0;
+          }
+          .prose ul li::marker {
+            color: #f9bc60;
+          }
+          .prose ol li::marker {
+            color: #004643;
+            font-weight: 600;
+          }
+          .prose h2, .prose h3 {
+            margin-top: 1.75rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.25rem;
+          }
+          .prose p {
+            margin-bottom: 1rem;
           }
         `}</style>
       </div>

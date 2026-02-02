@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export const dynamic = "force-dynamic";
 
@@ -72,20 +71,7 @@ export async function GET(
       userLiked: likedSet ? likedSet.has(story.id) : false,
     }));
 
-    // Добавляем бейджи
-    const userIds = safeStories
-      .map((s) => s.user?.id)
-      .filter(Boolean) as string[];
-    const badgeMap = await getHeroBadgesForUsers(userIds);
-
-    const withBadges = safeStories.map((story) => ({
-      ...story,
-      user: story.user
-        ? { ...story.user, heroBadge: badgeMap[story.user.id] ?? null }
-        : story.user,
-    }));
-
-    return NextResponse.json({ stories: withBadges });
+    return NextResponse.json({ stories: safeStories });
   } catch (error) {
     console.error("Error fetching user stories:", error);
     return NextResponse.json({ error: "Ошибка загрузки" }, { status: 500 });

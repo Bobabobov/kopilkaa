@@ -2,7 +2,6 @@
  * Общие типы админки. Используются в app/admin и в hooks/admin.
  * Размещение в types/ чтобы hooks не зависели от app/.
  */
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 import type { TrustLevel } from "@/lib/trustLevel";
 
 export type ApplicationStatus =
@@ -65,19 +64,7 @@ export interface AdminUser {
   createdAt: string;
   lastSeen: string | null;
   role: string;
-  badge?: HeroBadgeType | null;
   trustDelta?: number;
   trustLevel?: TrustLevel;
   effectiveApprovedApplications?: number;
 }
-
-export const VALID_BADGES: HeroBadgeType[] = [
-  "observer",
-  "member",
-  "active",
-  "hero",
-  "honor",
-  "legend",
-  "tester",
-  "custom",
-];

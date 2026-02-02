@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
 interface RouteParams {
@@ -57,12 +56,8 @@ export async function GET(_req: Request, { params }: RouteParams) {
       };
     });
 
-    const badgeMap = await getHeroBadgesForUsers(friends.map((f) => f.id));
     const safeFriends = friends.map((u: any) =>
-      sanitizeEmailForViewer(
-        { ...u, heroBadge: badgeMap[u.id] ?? null },
-        viewerId,
-      ),
+      sanitizeEmailForViewer(u, viewerId),
     );
 
     return NextResponse.json({ success: true, friends: safeFriends });

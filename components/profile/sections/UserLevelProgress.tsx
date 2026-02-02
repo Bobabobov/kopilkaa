@@ -142,7 +142,7 @@ export default function UserLevelProgress() {
             <div className="text-lg sm:text-xl font-bold text-[#e16162]">
               {data.currentLevel}
             </div>
-            <div className="text-[10px] sm:text-xs text-[#abd1c6]">Бейджей</div>
+            <div className="text-[10px] sm:text-xs text-[#abd1c6]">Уровень</div>
           </div>
           <div className="text-center">
             <div className="text-lg sm:text-xl font-bold text-[#abd1c6]">

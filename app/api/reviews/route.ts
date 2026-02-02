@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 import {
   getNextLevelRequirement,
   getTrustLevelFromApprovedCount,
@@ -56,8 +55,7 @@ async function mapReviews(raw: any[], viewerId: string | null) {
 
   const userIds = Array.from(new Set(raw.map((r) => r.userId)));
 
-  const [badges, effectiveGroups] = await Promise.all([
-    getHeroBadgesForUsers(userIds),
+  const [effectiveGroups] = await Promise.all([
     prisma.application
       .groupBy({
         by: ["userId"],
@@ -79,7 +77,6 @@ async function mapReviews(raw: any[], viewerId: string | null) {
   return raw.map((item) => {
     const approvedCount = approvedMap.get(item.userId) ?? 0;
     const trust = buildTrustSnapshot(approvedCount);
-    const heroBadge = badges[item.user.id] ?? null;
     const displayName = item.user.name || item.user.username || "Без имени";
 
     return {
@@ -96,7 +93,6 @@ async function mapReviews(raw: any[], viewerId: string | null) {
         username: item.user.username,
         avatar: item.user.avatar,
         avatarFrame: item.user.avatarFrame,
-        heroBadge,
         vkLink: item.user.vkLink,
         telegramLink: item.user.telegramLink,
         youtubeLink: item.user.youtubeLink,

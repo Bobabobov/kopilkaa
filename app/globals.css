@@ -552,6 +552,31 @@
     animation: scaleIn 0.3s ease-out both;
   }
 
+  @keyframes heartPop {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.35);
+    }
+    70% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .animate-heart-pop {
+    animation: heartPop 0.45s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-heart-pop {
+      animation: none;
+    }
+  }
+
   @keyframes float {
     0%,
     100% {

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
 import { getTrustLabel } from "@/lib/trustLevel";
 import { formatDateShort, formatDateTime } from "@/lib/time";
 import { TrustDeltaControl } from "./TrustDeltaControl";
@@ -17,7 +16,6 @@ interface AdminUserCardProps {
   setTrustDeltaSaving: (id: string | null) => void;
   onTrustUpdated: (userId: string, nextDelta: number) => void;
   onDelete: (userId: string, userName: string) => void;
-  onOpenBadge: (userId: string) => void;
   showToast: (type: "success" | "error", title: string, desc?: string) => void;
 }
 
@@ -29,7 +27,6 @@ export function AdminUserCard({
   setTrustDeltaSaving,
   onTrustUpdated,
   onDelete,
-  onOpenBadge,
   showToast,
 }: AdminUserCardProps) {
   const effectiveApproved = user.effectiveApprovedApplications ?? 0;
@@ -52,12 +49,6 @@ export function AdminUserCard({
           ) : (
             <div className="w-14 h-14 rounded-full bg-[#abd1c6]/10 flex items-center justify-center border-2 border-[#abd1c6]/20">
               <LucideIcons.User className="w-6 h-6 text-[#abd1c6]" />
-            </div>
-          )}
-
-          {user.badge && (
-            <div className="absolute -bottom-1 -right-1">
-              <HeroBadge badge={user.badge} size="xs" />
             </div>
           )}
         </div>
@@ -133,15 +124,6 @@ export function AdminUserCard({
           </div>
 
           <div className="mt-4 flex items-center gap-2">
-            <button
-              onClick={() => onOpenBadge(user.id)}
-              className="inline-flex items-center gap-1 text-xs text-[#abd1c6] hover:text-[#f9bc60] transition-colors"
-              title="Управление бейджем"
-            >
-              <LucideIcons.Award className="w-3 h-3" />
-              <span>Бейдж</span>
-            </button>
-
             <button
               onClick={() =>
                 onDelete(user.id, user.name || user.email || "Пользователь")

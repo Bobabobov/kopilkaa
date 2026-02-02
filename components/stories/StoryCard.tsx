@@ -1,7 +1,7 @@
 "use client";
 
+import { memo, useCallback, useState } from "react";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
@@ -11,14 +11,13 @@ import type { Story } from "./story-card/types";
 interface StoryCardProps {
   story: Story;
   index: number;
-  animate?: boolean; // Опциональный проп для управления анимацией
+  animate?: boolean;
   isAuthenticated: boolean;
   query?: string;
   isRead?: boolean;
 }
 
-// Карточка истории в списке /stories с картинкой, автором и лайками
-export function StoryCard({
+function StoryCardInner({
   story,
   index,
   animate = true,
@@ -41,21 +40,24 @@ export function StoryCard({
       ? new Intl.NumberFormat("ru-RU").format(story.amount)
       : null;
 
-  const handleCardClick = () => {
+  const handleCardClick = useCallback(() => {
     if (typeof window !== "undefined") {
       sessionStorage.setItem("stories-scroll", String(window.scrollY));
     }
-    router.push(`/stories/${story.id}`, { scroll: false });
-  };
+    router.push(`/stories/${story.id}`);
+  }, [story.id, router]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleCardClick();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleCardClick();
+      }
+    },
+    [handleCardClick],
+  );
 
-  const handleLike = async (e: React.MouseEvent) => {
+  const handleLike = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -115,7 +117,7 @@ export function StoryCard({
     } finally {
       setIsLiking(false);
     }
-  };
+  }, [story.id, isAuthenticated, liked, router]);
 
   const renderCardContent = () => (
     <StoryCardContent
@@ -156,3 +158,15 @@ export function StoryCard({
     </motion.div>
   );
 }
+
+// Мемоизация по рекомендации React: меньше ререндеров при обновлении родителя
+export const StoryCard = memo(StoryCardInner, (prev, next) => {
+  return (
+    prev.story.id === next.story.id &&
+    prev.index === next.index &&
+    prev.animate === next.animate &&
+    prev.isAuthenticated === next.isAuthenticated &&
+    prev.query === next.query &&
+    prev.isRead === next.isRead
+  );
+});

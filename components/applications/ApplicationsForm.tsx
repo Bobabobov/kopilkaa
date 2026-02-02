@@ -247,7 +247,7 @@ export function ApplicationsForm(props: Props) {
             value={amountFormatted}
             onChange={() => {}}
             placeholder="Укажите сумму в рублях..."
-            hint={trustHint}
+            hint={`Минимальная сумма — ${limits.amountMin} ₽. ${trustHint}`.trim()}
             maxLength={7}
             inputProps={{
               type: "tel",

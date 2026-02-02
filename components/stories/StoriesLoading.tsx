@@ -2,8 +2,8 @@
 
 export function StoriesLoading() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="container mx-auto px-4 py-8" role="status" aria-label="Загрузка списка историй">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 list-none p-0 m-0">
         {[...Array(12)].map((_, index) => {
           const getAnimationClass = () => {
             const delay = index * 0.1;
@@ -16,52 +16,57 @@ export function StoriesLoading() {
           };
 
           return (
-            <div
+            <li
               key={index}
-              className={`bg-white/90 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-white/20 h-full ${getAnimationClass()}`}
-              style={{ borderColor: "#abd1c6/30" }}
+              className={`h-full ${getAnimationClass()}`}
+              aria-hidden
             >
-              {/* Изображение скелетон */}
-              <div className="mb-4 rounded-xl overflow-hidden">
-                <div className="w-full h-48 bg-gray-200 animate-pulse"></div>
-              </div>
+              <div
+                className="h-full rounded-3xl overflow-hidden flex flex-col bg-gradient-to-br from-white/95 via-white/90 to-white/85 backdrop-blur-2xl border border-[#abd1c6]/40 shadow-[0_20px_25px_-5px_rgba(0,70,67,0.08)]"
+                style={{
+                  boxShadow:
+                    "0 20px 25px -5px rgba(0, 70, 67, 0.1), 0 10px 10px -5px rgba(0, 70, 67, 0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
+                }}
+              >
+                {/* Блик по верхнему краю */}
+                <div className="h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent shrink-0" />
 
-              {/* Контент скелетон */}
-              <div className="space-y-4">
-                {/* Заголовок */}
-                <div className="space-y-2">
-                  <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                {/* Изображение скелетон — как у карточки (aspect ~ 4/3) */}
+                <div className="relative w-full aspect-[4/3] shrink-0 overflow-hidden">
+                  <div className="absolute inset-0 bg-[#abd1c6]/25 animate-pulse" />
                 </div>
 
-                {/* Описание */}
-                <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse"></div>
-                </div>
-
-                {/* Метаданные */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
+                {/* Контент скелетон */}
+                <div className="p-5 sm:p-6 flex flex-col flex-1 space-y-4">
+                  {/* Заголовок */}
+                  <div className="space-y-2">
+                    <div className="h-5 bg-[#abd1c6]/30 rounded-lg animate-pulse w-full" />
+                    <div className="h-5 bg-[#abd1c6]/25 rounded-lg animate-pulse w-4/5" />
                   </div>
-                  <div className="h-4 bg-gray-200 rounded w-8 animate-pulse"></div>
-                </div>
 
-                {/* Дата */}
-                <div
-                  className="pt-2 border-t"
-                  style={{ borderColor: "#abd1c6/50" }}
-                >
-                  <div className="h-3 bg-gray-200 rounded w-24 animate-pulse"></div>
+                  {/* Описание */}
+                  <div className="space-y-2 flex-1">
+                    <div className="h-4 bg-[#abd1c6]/20 rounded animate-pulse w-full" />
+                    <div className="h-4 bg-[#abd1c6]/20 rounded animate-pulse w-full" />
+                    <div className="h-4 bg-[#abd1c6]/20 rounded animate-pulse w-2/3" />
+                  </div>
+
+                  {/* Метаданные (автор, лайки) */}
+                  <div className="flex items-center justify-between gap-3 pt-1">
+                    <div className="h-4 bg-[#abd1c6]/25 rounded-full animate-pulse w-24" />
+                    <div className="h-8 w-16 bg-[#abd1c6]/20 rounded-full animate-pulse" />
+                  </div>
+
+                  {/* Нижняя граница и дата */}
+                  <div className="pt-3 border-t border-[#abd1c6]/30">
+                    <div className="h-3 bg-[#abd1c6]/20 rounded w-20 animate-pulse" />
+                  </div>
                 </div>
               </div>
-            </div>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 }

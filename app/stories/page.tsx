@@ -5,17 +5,28 @@ import type { Story } from "@/hooks/stories/useStories";
 const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
+async function fetchWithCookies(
+  url: string,
+  options: RequestInit = {},
+): Promise<Response> {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
+  return fetch(url, {
+    cache: "no-store",
+    ...options,
+    headers: {
+      ...options.headers,
+      ...(cookieHeader ? { Cookie: cookieHeader } : {}),
+    },
+  });
+}
+
 async function fetchTopStories(): Promise<Story[]> {
   try {
-    const cookieStore = await cookies();
-    const cookieHeader = cookieStore
-      .getAll()
-      .map((c) => `${c.name}=${c.value}`)
-      .join("; ");
-    const res = await fetch(`${baseUrl}/api/stories/top?limit=3`, {
-      cache: "no-store",
-      headers: cookieHeader ? { Cookie: cookieHeader } : undefined,
-    });
+    const res = await fetchWithCookies(`${baseUrl}/api/stories/top?limit=3`);
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data.items) ? data.items : [];
@@ -24,7 +35,36 @@ async function fetchTopStories(): Promise<Story[]> {
   }
 }
 
+interface FirstPageResult {
+  items: Story[];
+  hasMore: boolean;
+}
+
+async function fetchFirstStoriesPage(): Promise<FirstPageResult> {
+  try {
+    const res = await fetchWithCookies(
+      `${baseUrl}/api/stories?page=1&limit=12`,
+    );
+    if (!res.ok) return { items: [], hasMore: false };
+    const data = await res.json();
+    const items = Array.isArray(data.items) ? data.items : [];
+    const pages = Number(data.pages) || 0;
+    return { items, hasMore: pages > 1 };
+  } catch {
+    return { items: [], hasMore: false };
+  }
+}
+
 export default async function StoriesPage() {
-  const initialTopStories = await fetchTopStories();
-  return <StoriesPageClient initialTopStories={initialTopStories} />;
+  const [initialTopStories, firstPage] = await Promise.all([
+    fetchTopStories(),
+    fetchFirstStoriesPage(),
+  ]);
+  return (
+    <StoriesPageClient
+      initialTopStories={initialTopStories}
+      initialStories={firstPage.items}
+      initialStoriesHasMore={firstPage.hasMore}
+    />
+  );
 }

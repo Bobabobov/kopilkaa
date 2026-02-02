@@ -15,82 +15,46 @@ export default function StoryActions({
   advertiserLink,
 }: StoryActionsProps) {
   return (
-    <div className="mt-12 flex flex-col sm:flex-row gap-6 justify-center">
+    <div className="mt-12 pt-8 border-t border-[#abd1c6]/20 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
       {isAd && advertiserLink ? (
         <>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
           >
             <a
               href={advertiserLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-10 py-5 text-white font-bold rounded-2xl transition-all duration-300 shadow-2xl hover:shadow-[#f9bc60]/50 transform hover:-translate-y-2 hover:scale-105 group text-lg"
-              style={{
-                background: "linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)",
-              }}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] px-8 py-4 text-[#001e1d] font-bold shadow-[0_8px_24px_rgba(249,188,96,0.35)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(249,188,96,0.4)] hover:-translate-y-1"
             >
-              <LucideIcons.ExternalLink
-                size="lg"
-                className="mr-3 group-hover:rotate-12 transition-transform duration-300"
-              />
+              <LucideIcons.ExternalLink size="md" />
               Перейти на сайт
             </a>
           </motion.div>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
           >
             <Link
               href="/advertising"
-              className="inline-flex items-center px-8 py-4 bg-white/95 backdrop-blur-xl hover:bg-white font-semibold rounded-2xl transition-all duration-300 border-2 border-[#f9bc60]/40 shadow-lg hover:shadow-xl group text-[#001e1d]"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#abd1c6]/40 bg-[#001e1d]/50 px-8 py-4 text-[#abd1c6] font-semibold transition-all duration-300 hover:border-[#f9bc60]/50 hover:text-[#f9bc60] hover:bg-[#f9bc60]/10"
             >
-              <LucideIcons.Megaphone
-                size="md"
-                className="mr-3 group-hover:scale-110 transition-transform duration-300 text-[#f9bc60]"
-              />
+              <LucideIcons.Megaphone size="md" />
               Разместить рекламу
             </Link>
           </motion.div>
         </>
       ) : (
-        <>
-          <div>
-            <Link
-              href="/stories"
-              className="inline-flex items-center px-8 py-4 bg-white/90 backdrop-blur-xl hover:bg-gray-50 font-semibold rounded-2xl transition-all duration-300 border shadow-lg hover:shadow-xl group"
-              style={{
-                borderColor: "#abd1c6/30",
-                color: "#2d5a4e",
-              }}
-            >
-              <LucideIcons.BookOpen
-                size="md"
-                className="mr-3 group-hover:rotate-12 transition-transform duration-300"
-              />
-              Все истории
-            </Link>
-          </div>
-
-          <div>
-            <Link
-              href="/applications"
-              className="inline-flex items-center px-8 py-4 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group"
-              style={{
-                background: "linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)",
-              }}
-            >
-              <LucideIcons.Plus
-                size="md"
-                className="mr-3 group-hover:rotate-90 transition-transform duration-300"
-              />
-              Подать заявку
-            </Link>
-          </div>
-        </>
+        <Link
+          href="/applications"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] px-8 py-4 text-[#001e1d] font-bold shadow-[0_8px_24px_rgba(249,188,96,0.3)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(249,188,96,0.35)] hover:-translate-y-1"
+        >
+          <LucideIcons.Plus size="md" />
+          Подать заявку
+        </Link>
       )}
     </div>
   );

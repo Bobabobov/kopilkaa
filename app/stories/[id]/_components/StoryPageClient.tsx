@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
@@ -18,6 +18,8 @@ import { StoryPageLoading } from "./sections/StoryPageLoading";
 import { StoryPageError } from "./sections/StoryPageError";
 import { StoryPageNotFound } from "./sections/StoryPageNotFound";
 import { StoryAdInfoBanner } from "./sections/StoryAdInfoBanner";
+import { ReadingProgressBar } from "./ReadingProgressBar";
+import { StoryMoreStories } from "./StoryMoreStories";
 
 export interface Story {
   id: string;
@@ -58,15 +60,25 @@ export default function StoryPageClient({
   const [error, setError] = useState<string | null>(initialError);
   const [liked, setLiked] = useState(initialStory?.userLiked ?? false);
   const [likesCount, setLikesCount] = useState(initialStory?._count?.likes ?? 0);
+  const [isLiking, setIsLiking] = useState(false);
 
-  const pushAuth = (mode: "auth" | "signup") => {
-    const href = buildAuthModalUrl({
-      pathname: window.location.pathname,
-      search: window.location.search,
-      modal: mode === "signup" ? "auth/signup" : "auth",
-    });
-    router.push(href);
-  };
+  // При открытии страницы истории всегда показывать сверху (текст, а не низ)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.scrollTo(0, 0);
+  }, [storyId]);
+
+  const pushAuth = useCallback(
+    (mode: "auth" | "signup") => {
+      const href = buildAuthModalUrl({
+        pathname: window.location.pathname,
+        search: window.location.search,
+        modal: mode === "signup" ? "auth/signup" : "auth",
+      });
+      router.push(href);
+    },
+    [router],
+  );
 
   const loadAdStory = async () => {
     try {
@@ -236,7 +248,7 @@ export default function StoryPageClient({
     }
   }, [story?.id]);
 
-  const handleLike = async () => {
+  const handleLike = useCallback(async () => {
     if (!story) return;
 
     if (!isAuthenticated) {
@@ -244,6 +256,7 @@ export default function StoryPageClient({
       return;
     }
 
+    setIsLiking(true);
     try {
       const method = liked ? "DELETE" : "POST";
       const response = await fetch(`/api/stories/${story.id}/like`, {
@@ -278,8 +291,10 @@ export default function StoryPageClient({
       await loadStory(story.id);
     } catch (err) {
       console.error("Error updating like:", err);
+    } finally {
+      setIsLiking(false);
     }
-  };
+  }, [story?.id, liked, isAuthenticated, pushAuth]);
 
   if (loading) {
     return <StoryPageLoading />;
@@ -295,11 +310,16 @@ export default function StoryPageClient({
 
   return (
     <div className="min-h-screen">
+      <ReadingProgressBar />
       <div className="relative z-10">
         <StoryNavigation />
 
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6 sm:py-10">
           <div className="mx-auto max-w-4xl">
+            <article className="relative overflow-hidden rounded-[1.75rem] border border-[#abd1c6]/20 bg-gradient-to-b from-[#004643]/30 via-[#003d3a]/20 to-transparent backdrop-blur-sm p-6 sm:p-8 md:p-10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]">
+              <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#f9bc60]/10 blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-20 -left-20 h-32 w-32 rounded-full bg-[#abd1c6]/10 blur-3xl pointer-events-none" />
+              <div className="relative">
             <StoryHeader
               title={story.title}
               author={
@@ -321,6 +341,9 @@ export default function StoryPageClient({
               onLike={handleLike}
               isAuthenticated={isAuthenticated}
               isAd={story.id === "ad"}
+              storyId={story.id}
+              storyTitle={story.title}
+              isLiking={isLiking}
             />
 
             <StoryContent
@@ -340,6 +363,10 @@ export default function StoryPageClient({
               isAd={story.id === "ad"}
               advertiserLink={story.advertiserLink}
             />
+              </div>
+            </article>
+
+            {story.id !== "ad" && <StoryMoreStories />}
           </div>
         </div>
       </div>

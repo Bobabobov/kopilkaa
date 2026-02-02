@@ -8,7 +8,6 @@ type ReviewUser = {
   username?: string | null;
   avatar?: string | null;
   avatarFrame?: string | null;
-  heroBadge?: any;
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;

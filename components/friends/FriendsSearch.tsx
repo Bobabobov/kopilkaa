@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
 
 interface FriendsSearchProps {
   searchQuery: string;
@@ -90,7 +89,6 @@ export function FriendsSearch({
                           ? user.email.split("@")[0]
                           : "Пользователь")}
                     </p>
-                    <HeroBadge badge={user.heroBadge ?? null} size="xs" />
                   </div>
                   <p className="text-[#abd1c6] text-sm">
                     {getUserStatus(user.lastSeen ?? null).text}

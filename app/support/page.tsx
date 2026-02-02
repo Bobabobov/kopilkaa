@@ -5,7 +5,6 @@ import SupportHero from "@/components/support/SupportHero";
 import OneTimeSupport from "@/components/support/OneTimeSupport";
 import SupportBenefits from "@/components/support/SupportBenefits";
 import WhatYouGet from "@/components/support/WhatYouGet";
-import HeroBadgesShowcase from "@/components/support/HeroBadgesShowcase";
 
 export default function SupportPage() {
   const [customAmount, setCustomAmount] = useState("");
@@ -61,7 +60,6 @@ export default function SupportPage() {
           showSocialPrompt={showSocialPrompt}
         />
 
-        <HeroBadgesShowcase />
         <SupportBenefits />
         <WhatYouGet />
 

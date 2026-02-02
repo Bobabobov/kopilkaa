@@ -11,13 +11,9 @@ type MediaDraft = {
   kind: "IMAGE" | "VIDEO";
 };
 
-type NewsBadge = "UPDATE" | "PLANS" | "THOUGHTS" | "IMPORTANT" | null;
-
 interface AdminNewsFormProps {
   title: string;
   setTitle: (value: string) => void;
-  badge: NewsBadge;
-  setBadge: (value: NewsBadge) => void;
   content: string;
   setContent: (value: string) => void;
   media: MediaDraft[];
@@ -32,8 +28,6 @@ interface AdminNewsFormProps {
 export function AdminNewsForm({
   title,
   setTitle,
-  badge,
-  setBadge,
   content,
   setContent,
   media,
@@ -80,22 +74,6 @@ export function AdminNewsForm({
               placeholder="Например: Большое обновление профиля"
               className="w-full rounded-2xl border border-white/10 bg-[#001e1d]/40 px-4 py-3 text-sm text-[#fffffe] placeholder:text-white/40 outline-none focus:border-[#f9bc60]/50"
             />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-white/80 mb-1">
-              Бейдж (необязательно)
-            </label>
-            <select
-              value={badge || ""}
-              onChange={(e) => setBadge((e.target.value as NewsBadge) || null)}
-              className="w-full rounded-2xl border border-white/10 bg-[#001e1d]/40 px-4 py-3 text-sm text-[#fffffe] outline-none focus:border-[#f9bc60]/50"
-            >
-              <option value="">Без бейджа</option>
-              <option value="UPDATE">Обновление</option>
-              <option value="PLANS">Планы</option>
-              <option value="THOUGHTS">Мысли</option>
-              <option value="IMPORTANT">Важно</option>
-            </select>
           </div>
         </div>
         <div>

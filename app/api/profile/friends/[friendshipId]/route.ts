@@ -3,7 +3,6 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export async function PATCH(
   request: Request,
@@ -72,27 +71,17 @@ export async function PATCH(
       },
     });
 
-    const badgeMap = await getHeroBadgesForUsers([
-      updatedFriendship.requesterId,
-      updatedFriendship.receiverId,
-    ]);
     const safe = {
       ...updatedFriendship,
       requester: updatedFriendship.requester
         ? sanitizeEmailForViewer(
-            {
-              ...(updatedFriendship.requester as any),
-              heroBadge: badgeMap[updatedFriendship.requesterId] ?? null,
-            },
+            updatedFriendship.requester as any,
             session.uid,
           )
         : updatedFriendship.requester,
       receiver: updatedFriendship.receiver
         ? sanitizeEmailForViewer(
-            {
-              ...(updatedFriendship.receiver as any),
-              heroBadge: badgeMap[updatedFriendship.receiverId] ?? null,
-            },
+            updatedFriendship.receiver as any,
             session.uid,
           )
         : updatedFriendship.receiver,

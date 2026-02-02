@@ -3,6 +3,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface StoryHeaderProps {
   title: string;
@@ -24,36 +25,32 @@ export default function StoryHeader({
   authorExternalUrl,
 }: StoryHeaderProps) {
   return (
-    <div className="mb-8">
+    <header className="mb-8 sm:mb-10 min-w-0">
       {isAd && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-xl border-2 border-[#f9bc60] bg-gradient-to-r from-[#f9bc60]/20 via-[#f9bc60]/15 to-[#f9bc60]/20 backdrop-blur-sm text-sm font-black uppercase tracking-wider text-[#f9bc60] shadow-lg shadow-[#f9bc60]/20"
+          className="inline-flex items-center gap-2 px-4 py-2 mb-5 rounded-xl border border-[#f9bc60]/50 bg-[#f9bc60]/10 text-sm font-bold uppercase tracking-wider text-[#f9bc60]"
         >
-          <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse"></span>
-          <span>РЕКЛАМНАЯ ИСТОРИЯ</span>
-          <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse"></span>
+          <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse" />
+          <span>Рекламная история</span>
+          <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse" />
         </motion.div>
       )}
+
       <h1
-        className={`text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4 transition-all duration-500 ${
+        className={`max-w-full break-words text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-5 tracking-tight ${
           isAd
             ? "bg-gradient-to-r from-[#fffffe] via-[#f9bc60] to-[#fffffe] bg-clip-text text-transparent"
-            : ""
+            : "text-[#fffffe]"
         }`}
-        style={isAd ? {} : { color: "#fffffe" }}
       >
         {title}
       </h1>
 
-      {/* Метаданные */}
       {(author || createdAt) && (
-        <div
-          className="flex flex-wrap items-center gap-4 text-sm mb-4"
-          style={{ color: "#abd1c6" }}
-        >
+        <div className="flex flex-wrap items-center gap-4 sm:gap-5 text-sm">
           {author && (
             <div className="flex items-center gap-2">
               {authorExternalUrl ? (
@@ -61,38 +58,31 @@ export default function StoryHeader({
                   href={authorExternalUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 hover:opacity-90 transition-opacity duration-200 group"
+                  className="flex items-center gap-2 rounded-xl border border-[#abd1c6]/30 bg-[#001e1d]/40 px-3 py-2 text-[#abd1c6] transition-all duration-300 hover:border-[#f9bc60]/50 hover:text-[#f9bc60]"
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center shadow-md border border-white/40">
-                    <span className="text-white text-xs">✓</span>
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#abd1c6]/30 to-[#004643]/50 flex items-center justify-center border border-[#abd1c6]/40">
+                    <LucideIcons.ExternalLink size="xs" className="text-[#f9bc60]" />
                   </div>
-                  <span className="group-hover:text-yellow-400 transition-colors duration-200">
-                    {author}
-                  </span>
+                  <span>{author}</span>
                 </a>
               ) : authorId ? (
                 <Link
                   href={`/profile/${authorId}`}
-                  className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 group"
+                  className="flex items-center gap-2 rounded-xl border border-[#abd1c6]/30 bg-[#001e1d]/40 px-3 py-2 text-[#abd1c6] transition-all duration-300 hover:border-[#f9bc60]/50 hover:text-[#f9bc60]"
                 >
-                  <div className="relative">
-                    <img
-                      src={authorAvatar || "/default-avatar.png"}
-                      alt={author}
-                      className="w-6 h-6 rounded-full object-cover border border-white/20 group-hover:border-yellow-400/50 transition-colors duration-200"
-                    />
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                  </div>
-                  <span className="group-hover:text-yellow-400 transition-colors duration-200">
-                    {author}
-                  </span>
-                </Link>
-              ) : (
-                <span className="flex items-center gap-2">
                   <img
                     src={authorAvatar || "/default-avatar.png"}
                     alt={author}
-                    className="w-6 h-6 rounded-full object-cover border border-white/20"
+                    className="h-8 w-8 rounded-full object-cover border border-[#abd1c6]/40 ring-2 ring-[#001e1d]/50"
+                  />
+                  <span>{author}</span>
+                </Link>
+              ) : (
+                <span className="flex items-center gap-2 rounded-xl border border-[#abd1c6]/20 bg-[#001e1d]/30 px-3 py-2 text-[#abd1c6]">
+                  <img
+                    src={authorAvatar || "/default-avatar.png"}
+                    alt={author}
+                    className="h-8 w-8 rounded-full object-cover border border-[#abd1c6]/40"
                   />
                   {author}
                 </span>
@@ -100,8 +90,8 @@ export default function StoryHeader({
             </div>
           )}
           {createdAt && (
-            <span className="flex items-center gap-2">
-              📅{" "}
+            <span className="inline-flex items-center gap-2 rounded-xl border border-[#abd1c6]/20 bg-[#001e1d]/30 px-3 py-2 text-[#abd1c6]">
+              <LucideIcons.Calendar size="sm" />
               {new Date(createdAt).toLocaleDateString("ru-RU", {
                 year: "numeric",
                 month: "long",
@@ -112,8 +102,7 @@ export default function StoryHeader({
         </div>
       )}
 
-      {/* Декоративная линия */}
-      <div className="mt-4 h-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full w-full"></div>
-    </div>
+      <div className="mt-5 h-1 w-full rounded-full bg-gradient-to-r from-[#f9bc60]/60 via-[#abd1c6]/50 to-[#f9bc60]/40" />
+    </header>
   );
 }

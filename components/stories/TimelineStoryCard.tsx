@@ -57,9 +57,9 @@ export function TimelineStoryCard({ story, index }: TimelineStoryCardProps) {
         className={`ml-20 w-full max-w-2xl ${isEven ? "mr-auto" : "ml-auto"}`}
       >
         <motion.div
-          whileHover={{ scale: 1.02, y: -5 }}
+          whileHover={{ scale: 1.02, y: -8 }}
           transition={{ duration: 0.3 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer"
+          className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-[#f9bc60]/50 hover:shadow-[0_20px_50px_-15px_rgba(249,188,96,0.25)]"
           onClick={() => (window.location.href = `/stories/${story.id}`)}
         >
           {/* Image Section */}
@@ -68,7 +68,7 @@ export function TimelineStoryCard({ story, index }: TimelineStoryCardProps) {
               <img
                 src={story.images[0].url}
                 alt={story.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
@@ -79,11 +79,19 @@ export function TimelineStoryCard({ story, index }: TimelineStoryCardProps) {
               </div>
             )}
 
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+            {/* Bottom gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+
+            {/* CTA при наведении */}
+            <div className="absolute inset-0 flex items-center justify-center bg-[#001e1d]/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#f9bc60] px-5 py-2.5 text-sm font-bold text-[#001e1d] shadow-lg">
+                Читать
+                <LucideIcons.ArrowRight size="sm" />
+              </span>
+            </div>
 
             {/* Date Badge */}
-            <div className="absolute top-4 right-4 bg-white/90 dark:bg-gray-800/90 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300">
+            <div className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-gray-800/90 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300">
               {new Date(story.createdAt).toLocaleDateString("ru-RU")}
             </div>
           </div>

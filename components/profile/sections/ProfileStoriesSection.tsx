@@ -163,21 +163,27 @@ export default function ProfileStoriesSection({
             >
               <Link
                 href={`/stories/${story.id}`}
-                className="block p-3 sm:p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#f9bc60]/40 transition-all group"
+                className="block p-3 sm:p-4 rounded-xl border border-white/10 bg-white/5 transition-all duration-300 group hover:bg-white/10 hover:border-[#f9bc60]/50 hover:-translate-y-1 hover:shadow-[0_12px_28px_-8px_rgba(249,188,96,0.25)]"
               >
                 <div className="flex gap-2 xs:gap-3">
                   {/* Image */}
                   {story.images && story.images.length > 0 ? (
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 border-white/20 flex-shrink-0 group-hover:border-[#f9bc60]/50 transition-colors shadow-md">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 border-white/20 flex-shrink-0 group-hover:border-[#f9bc60]/50 transition-all duration-300 shadow-md">
                       <img
                         src={story.images[0].url}
                         alt={story.title}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         loading="lazy"
                       />
+                      <div className="absolute inset-0 flex items-center justify-center bg-[#001e1d]/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f9bc60] px-3 py-1.5 text-xs font-bold text-[#001e1d] shadow-lg">
+                          Читать
+                          <LucideIcons.ArrowRight size="xs" />
+                        </span>
+                      </div>
                     </div>
                   ) : (
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-white/5 border-2 border-white/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-white/5 border-2 border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-[#f9bc60]/30 transition-colors">
                       <LucideIcons.BookOpen className="w-5 h-5 text-white/40" />
                     </div>
                   )}

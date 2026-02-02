@@ -12,12 +12,9 @@ export type NewsAuthor = {
   role?: string | null;
 };
 
-export type NewsBadge = "UPDATE" | "PLANS" | "THOUGHTS" | "IMPORTANT";
-
 export type NewsItem = {
   id: string;
   title: string | null;
-  badge: NewsBadge | null;
   content: string;
   createdAt: string;
   updatedAt: string;

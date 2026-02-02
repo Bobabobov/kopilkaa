@@ -34,7 +34,6 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json().catch(() => ({}))) as {
       title?: string | null;
-      badge?: "UPDATE" | "PLANS" | "THOUGHTS" | "IMPORTANT" | null;
       content?: string;
       media?: MediaInput[];
     };
@@ -86,17 +85,11 @@ export async function POST(request: Request) {
       }
     }
 
-    const badgeValue =
-      body.badge &&
-      ["UPDATE", "PLANS", "THOUGHTS", "IMPORTANT"].includes(body.badge)
-        ? body.badge
-        : null;
-
     const created = await prisma.projectNewsPost.create({
       data: {
         authorId: admin.id,
         title: titleRaw || null,
-        badge: badgeValue,
+        badge: null,
         content: contentRaw,
         isPublished: true,
         media: normalizedMedia.length

@@ -15,10 +15,14 @@ import { StoriesGrid } from "./sections/StoriesGrid";
 
 interface StoriesPageClientProps {
   initialTopStories?: StoryItem[];
+  initialStories?: StoryItem[];
+  initialStoriesHasMore?: boolean;
 }
 
 export default function StoriesPageClient({
   initialTopStories = [],
+  initialStories = [],
+  initialStoriesHasMore = true,
 }: StoriesPageClientProps) {
   const { isAuthenticated } = useAuth();
   const [readStoryIds, setReadStoryIds] = useState<Set<string>>(new Set());
@@ -42,10 +46,16 @@ export default function StoriesPageClient({
     loadNextPage,
     observerTargetRef,
     isInitialLoad,
-  } = useStories();
+  } = useStories({
+    initialStories,
+    initialStoriesHasMore,
+  });
 
-  // Intersection Observer для бесконечной прокрутки
+  // Intersection Observer для бесконечной прокрутки: переподписываемся при
+  // появлении сетки (stories.length > 0), чтобы ref был уже в DOM
   useEffect(() => {
+    if (!stories.length) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !loadingMore && hasMore && !loading) {
@@ -65,24 +75,57 @@ export default function StoriesPageClient({
         observer.unobserve(currentTarget);
       }
     };
-  }, [loadingMore, hasMore, loading, loadNextPage, observerTargetRef]);
+  }, [stories.length, loadingMore, hasMore, loading, loadNextPage, observerTargetRef]);
 
-  // Восстановление скролла после возврата из истории
+  // Восстановление скролла после возврата из истории: повторяем попытку по мере
+  // подгрузки страниц (бесконечный скролл), т.к. при первом рендере контента
+  // может быть мало и браузер ограничит скролл высотой документа.
   useEffect(() => {
     if (restoredRef.current) return;
     if (loading) return;
     if (!stories.length) return;
     if (typeof window === "undefined") return;
+
     const saved = sessionStorage.getItem("stories-scroll");
-    if (saved) {
-      const y = parseInt(saved, 10);
-      if (Number.isFinite(y)) {
-        window.scrollTo({ top: y, behavior: "auto" });
-      }
-      sessionStorage.removeItem("stories-scroll");
+    if (!saved) {
+      restoredRef.current = true;
+      return;
     }
-    restoredRef.current = true;
-  }, [loading, stories.length]);
+
+    const targetY = parseInt(saved, 10);
+    if (!Number.isFinite(targetY) || targetY < 0) {
+      sessionStorage.removeItem("stories-scroll");
+      restoredRef.current = true;
+      return;
+    }
+
+    window.scrollTo({ top: targetY, behavior: "auto" });
+
+    const checkAndMaybeClear = () => {
+      const maxScroll =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const tolerance = 50;
+      const reached = targetY <= maxScroll + tolerance;
+
+      if (reached) {
+        sessionStorage.removeItem("stories-scroll");
+        restoredRef.current = true;
+        return;
+      }
+
+      // Контента ещё мало; если страниц больше нет — сдаёмся и остаёмся где есть
+      if (!hasMore && !loadingMore) {
+        sessionStorage.removeItem("stories-scroll");
+        restoredRef.current = true;
+      }
+    };
+
+    const rafId = requestAnimationFrame(() => {
+      requestAnimationFrame(checkAndMaybeClear);
+    });
+
+    return () => cancelAnimationFrame(rafId);
+  }, [loading, stories.length, hasMore, loadingMore]);
 
   useEffect(() => {
     if (initialTopStories.length > 0) return;
@@ -202,8 +245,8 @@ export default function StoriesPageClient({
       {/* Header */}
       <StoriesHeader query={query} onQueryChange={setQuery} />
 
-      {/* Content */}
-      <div className="relative z-10">
+      {/* Main content */}
+      <main className="relative z-10" id="stories-main" aria-label="Список историй платформы">
         {loading ? (
           <StoriesLoading />
         ) : stories.length === 0 ? (
@@ -232,7 +275,7 @@ export default function StoriesPageClient({
             />
           </>
         )}
-      </div>
+      </main>
     </div>
   );
 }

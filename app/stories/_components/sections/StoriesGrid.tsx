@@ -1,4 +1,4 @@
-import type { RefObject } from "react";
+import { memo, type RefObject } from "react";
 import { AdCard, StoryCard } from "@/components/stories";
 import type { Story as StoryItem } from "@/hooks/stories/useStories";
 
@@ -13,7 +13,7 @@ interface StoriesGridProps {
   observerTargetRef: RefObject<HTMLDivElement | null>;
 }
 
-export function StoriesGrid({
+function StoriesGridInner({
   stories,
   shouldAnimate,
   isAuthenticated,
@@ -25,27 +25,40 @@ export function StoriesGrid({
 }: StoriesGridProps) {
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <AdCard index={0} />
-
+      <ul
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 list-none p-0 m-0"
+        aria-label="Список историй"
+      >
+        <li className="contents">
+          <AdCard index={0} />
+        </li>
         {stories.map((story, index) => (
-          <StoryCard
-            key={story.id}
-            story={story}
-            index={index + 1}
-            animate={shouldAnimate}
-            isAuthenticated={isAuthenticated}
-            query={query}
-            isRead={readStoryIds.has(story.id)}
-          />
+          <li key={story.id} className="contents">
+            <StoryCard
+              story={story}
+              index={index + 1}
+              animate={shouldAnimate}
+              isAuthenticated={isAuthenticated}
+              query={query}
+              isRead={readStoryIds.has(story.id)}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
 
       {loadingMore && (
-        <div className="flex justify-center items-center py-12">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 border-4 border-[#abd1c6] border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-[#abd1c6] font-medium">
+        <div
+          className="flex justify-center items-center py-12"
+          role="status"
+          aria-live="polite"
+          aria-label="Загрузка историй"
+        >
+          <div className="flex flex-col items-center gap-4">
+            <div
+              className="w-12 h-12 rounded-full border-[3px] border-[#abd1c6]/40 border-t-[#f9bc60] animate-spin"
+              aria-hidden
+            />
+            <p className="text-[#abd1c6] font-medium text-sm sm:text-base">
               Загружаем ещё истории...
             </p>
           </div>
@@ -53,18 +66,23 @@ export function StoriesGrid({
       )}
 
       {hasMore && !loadingMore && (
-        <div ref={observerTargetRef} className="h-20" />
+        <div ref={observerTargetRef} className="h-20" aria-hidden />
       )}
 
       {!hasMore && stories.length > 0 && (
-        <div className="text-center py-12">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 transition-all duration-300 hover:scale-110 hover:bg-white/10 hover:border-[#abd1c6]/50 hover:shadow-lg hover:shadow-[#abd1c6]/20 cursor-default">
-            <p className="text-[#abd1c6] font-medium transition-all duration-300 hover:text-[#f9bc60]">
+        <section
+          className="text-center py-12"
+          aria-label="Конец списка историй"
+        >
+          <div className="group inline-flex items-center gap-2 px-6 py-4 bg-gradient-to-r from-white/5 via-[#abd1c6]/10 to-white/5 backdrop-blur-sm rounded-3xl border border-[#abd1c6]/30 transition-all duration-300 hover:border-[#f9bc60]/50 hover:shadow-[0_8px_24px_-8px_rgba(249,188,96,0.25)] cursor-default">
+            <span className="text-[#abd1c6] font-semibold transition-colors duration-300 group-hover:text-[#f9bc60]" aria-hidden>
               А всё!
-            </p>
+            </span>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );
 }
+
+export const StoriesGrid = memo(StoriesGridInner);

@@ -22,7 +22,7 @@
 
 | Модуль | Было | Сделано |
 | ------ | ---- | ------- |
-| AdminUsersClient | ~460 строк | types, useAdminUsers, Header, TrustDelta, UserCard, List, BadgeModal; клиент ~85 строк |
+| AdminUsersClient | ~460 строк | types, useAdminUsers, Header, TrustDelta, UserCard, List; клиент ~85 строк |
 | AdvertisingContact | ~775 строк | валидация, useAdRequestForm, 7 подкомпонентов; оркестратор ~116 строк |
 | TermsContent | ~683 строки | sections/ Section01–13, sectionsConfig; рендер по конфигу ~30 строк |
 | useSettings | ~646 строк | settings/types, api, handlers/, useLocalNotification; useSettings ~115 строк |

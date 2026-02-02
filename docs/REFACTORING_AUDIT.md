@@ -6,13 +6,12 @@
 
 - **Было:** один файл ~460 строк.
 - **Сделано:**
-  - `app/admin/users/_components/types.ts` — `AdminUser`, `VALID_BADGES`
-  - `hooks/admin/useAdminUsers.ts` — загрузка, поиск, пагинация, удаление, бейджи, trust delta
+  - `app/admin/users/_components/types.ts` — `AdminUser`
+  - `hooks/admin/useAdminUsers.ts` — загрузка, поиск, пагинация, удаление, trust delta
   - `AdminUsersHeader.tsx` — заголовок и поиск
   - `TrustDeltaControl.tsx` — кнопки ±1 уровень доверия
   - `AdminUserCard.tsx` — карточка пользователя
   - `AdminUsersList.tsx` — список (loading, empty, сетка, load more)
-  - `AdminBadgeModal.tsx` — модалка выбора бейджа
   - `AdminUsersClient.tsx` — ~85 строк, только композиция
 
 ### 2. AdvertisingContact (форма рекламы)

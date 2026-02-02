@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
 import type { AdminUser } from "@/types/admin";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 import { getTrustLevelFromEffectiveApproved } from "@/lib/trustLevel";
 
 export function useAdminUsers() {
@@ -15,11 +14,6 @@ export function useAdminUsers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
-  const [badgeModalUserId, setBadgeModalUserId] = useState<string | null>(null);
-  const [badgeModalBadge, setBadgeModalBadge] = useState<
-    HeroBadgeType | null | undefined
-  >(undefined);
-  const [loadingBadge, setLoadingBadge] = useState(false);
   const [trustDeltaSaving, setTrustDeltaSaving] = useState<string | null>(null);
   const { showToast } = useBeautifulToast();
   const { confirm } = useBeautifulNotifications();
@@ -135,72 +129,6 @@ export function useAdminUsers() {
     }
   };
 
-  const openBadgeModal = async (userId: string) => {
-    setBadgeModalUserId(userId);
-    setBadgeModalBadge(undefined);
-    setLoadingBadge(true);
-
-    try {
-      const response = await fetch(`/api/admin/users/${userId}/badge`);
-      const data = await response.json();
-      if (response.ok && data.data) {
-        setBadgeModalBadge(data.data.badge || null);
-      }
-    } catch (error) {
-      console.error("Error loading badge:", error);
-    } finally {
-      setLoadingBadge(false);
-    }
-  };
-
-  const handleSetBadge = async (badge: HeroBadgeType | null) => {
-    if (!badgeModalUserId) return;
-
-    setLoadingBadge(true);
-    try {
-      const response = await fetch(
-        `/api/admin/users/${badgeModalUserId}/badge`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ badge }),
-        },
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        showToast(
-          "success",
-          "Бейдж обновлён",
-          data.data?.message || "Бейдж успешно выдан",
-        );
-        setBadgeModalBadge(badge);
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.id === badgeModalUserId ? { ...user, badge } : user,
-          ),
-        );
-      } else {
-        showToast(
-          "error",
-          "Ошибка",
-          data.error || "Не удалось установить бейдж",
-        );
-      }
-    } catch (error) {
-      console.error("Error setting badge:", error);
-      showToast("error", "Ошибка", "Не удалось установить бейдж");
-    } finally {
-      setLoadingBadge(false);
-    }
-  };
-
-  const closeBadgeModal = () => {
-    setBadgeModalUserId(null);
-    setBadgeModalBadge(undefined);
-  };
-
   const updateUserTrust = (
     userId: string,
     nextDelta: number,
@@ -232,12 +160,6 @@ export function useAdminUsers() {
     observerTarget,
     deletingUserId,
     handleDeleteUser,
-    openBadgeModal,
-    badgeModalUserId,
-    badgeModalBadge,
-    loadingBadge,
-    handleSetBadge,
-    closeBadgeModal,
     trustDeltaSaving,
     setTrustDeltaSaving,
     updateUserTrust,

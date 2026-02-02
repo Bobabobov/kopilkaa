@@ -9,14 +9,14 @@ interface StoriesHeaderProps {
 
 export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
   return (
-    <div className="pt-0 sm:pt-1 pb-6">
+    <header className="pt-0 sm:pt-1 pb-6" role="banner" aria-label="Заголовок раздела историй">
       {/* Заголовок */}
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-4 mb-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" aria-hidden>
             <img
               src="/kopibook.png"
-              alt="Истории"
+              alt=""
               className="w-full h-full object-contain"
             />
           </div>
@@ -57,20 +57,29 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
       {/* Поиск */}
       <div className="container mx-auto px-4">
         <div className="relative group max-w-md mx-auto">
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+          <label htmlFor="stories-search" className="sr-only">
+            Поиск историй
+          </label>
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none" aria-hidden>
             <LucideIcons.Search
               size="sm"
               className={`transition-colors duration-300 ${
-                query ? "text-yellow-500" : "text-gray-400"
+                query ? "text-[#f9bc60]" : "text-[#abd1c6]/70"
               }`}
             />
           </div>
 
           <input
-            className="w-full pl-10 pr-10 py-3 backdrop-blur-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all duration-300 text-white placeholder-gray-300 text-sm shadow-lg group-hover:shadow-yellow-500/10 focus:shadow-yellow-500/20"
+            id="stories-search"
+            type="search"
+            role="searchbox"
+            aria-label="Поиск историй"
+            aria-describedby={query ? "stories-search-clear-hint" : undefined}
+            autoComplete="off"
+            className="w-full pl-10 pr-10 py-3 backdrop-blur-xl border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50 focus:border-[#f9bc60]/50 transition-all duration-300 text-[#fffffe] placeholder-[#abd1c6]/60 text-sm shadow-lg group-hover:shadow-[#f9bc60]/10 focus:shadow-[#f9bc60]/20"
             style={{
-              backgroundColor: "rgba(0, 30, 29, 0.8)",
-              borderColor: "rgba(171, 209, 198, 0.3)",
+              backgroundColor: "rgba(0, 30, 29, 0.85)",
+              borderColor: "rgba(171, 209, 198, 0.35)",
             }}
             placeholder="Поиск историй..."
             value={query}
@@ -84,15 +93,17 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
 
           {query && (
             <button
+              type="button"
               onClick={() => onQueryChange("")}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-red-500 transition-all duration-200 rounded-full hover:bg-red-50 hover:scale-110"
-              title="Очистить поиск"
+              id="stories-search-clear-hint"
+              aria-label="Очистить поиск"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 text-[#abd1c6]/80 hover:text-[#e16162] transition-all duration-200 rounded-full hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/50"
             >
               <LucideIcons.Close size="sm" />
             </button>
           )}
         </div>
       </div>
-    </div>
+    </header>
   );
 }

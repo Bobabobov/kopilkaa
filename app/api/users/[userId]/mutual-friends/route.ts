@@ -2,7 +2,6 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 
 export async function GET(
@@ -82,12 +81,8 @@ export async function GET(
       orderBy: { createdAt: "desc" },
     });
 
-    const badgeMap = await getHeroBadgesForUsers(users.map((u) => u.id));
     const safeUsers = users.map((u: any) =>
-      sanitizeEmailForViewer(
-        { ...u, heroBadge: badgeMap[u.id] ?? null },
-        session.uid,
-      ),
+      sanitizeEmailForViewer(u, session.uid),
     );
 
     return NextResponse.json({ users: safeUsers });

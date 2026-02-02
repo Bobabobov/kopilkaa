@@ -5,13 +5,11 @@ import HeroesGridStats from "./HeroesGridStats";
 import HeroesGrid from "./HeroesGrid";
 import HeroesEmptyState from "./HeroesEmptyState";
 import HeroesErrorState from "./HeroesErrorState";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 
 interface Hero {
   id: string;
   name: string;
   avatar?: string;
-  heroBadge?: HeroBadgeType | null;
   totalDonated: number;
   donationCount: number;
   rank: number;

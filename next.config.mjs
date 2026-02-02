@@ -9,7 +9,7 @@ const nextConfig = {
   // Отключение source maps в продакшене для ускорения
   productionBrowserSourceMaps: false,
 
-  // Оптимизация изображений
+  // Оптимизация изображений. Для внешних URL историй/аватаров добавьте hostname в remotePatterns.
   images: {
     formats: ["image/webp", "image/avif"],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 дней
@@ -87,13 +87,22 @@ const nextConfig = {
         ],
       },
       // По умолчанию API не кешируем: персональные данные и сессия.
-      // Маршруты, которым нужен кеш, задают Cache-Control в самом handler.
       {
         source: "/api/(.*)",
         headers: [
           {
             key: "Cache-Control",
             value: "private, no-store, must-revalidate",
+          },
+        ],
+      },
+      // Summary — переопределяем: короткий кеш (последнее правило выигрывает).
+      {
+        source: "/api/stories/summary",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=60, stale-while-revalidate=60",
           },
         ],
       },

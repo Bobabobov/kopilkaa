@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
 
 interface FriendsListProps {
   type: "friends" | "sent" | "received";
@@ -124,7 +123,6 @@ export function FriendsList({
                     {user.name ||
                       (user.email ? user.email.split("@")[0] : "Пользователь")}
                   </p>
-                  <HeroBadge badge={user.heroBadge ?? null} size="xs" />
                   {isAccepted && (
                     <LucideIcons.CheckCircle2
                       size="sm"

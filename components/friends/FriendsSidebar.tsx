@@ -4,9 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-
 const mockActivity = [
   {
     id: "a1",
@@ -36,7 +33,6 @@ export function FriendsSidebar() {
       email?: string | null;
       avatar?: string | null;
       mutual?: string;
-      heroBadge?: HeroBadgeType | null;
     }[]
   >([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
@@ -60,7 +56,6 @@ export function FriendsSidebar() {
           mutual: u.mutualFriends
             ? `${u.mutualFriends} общих друзей`
             : undefined,
-          heroBadge: u.heroBadge ?? null,
         })),
       );
     } finally {
@@ -186,8 +181,6 @@ export function FriendsSidebar() {
                         <span className="text-xs text-[#abd1c6] min-w-0 truncate">
                           {person.mutual || "Общие интересы"}
                         </span>
-
-                        <HeroBadge badge={person.heroBadge} size="xs" />
                       </div>
                     </Link>
 

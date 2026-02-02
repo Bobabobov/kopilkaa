@@ -183,11 +183,11 @@ export default function RichTextEditor({
         />
       </div>
 
-      {/* Сообщение об ошибке */}
-      {hasError && (
+      {/* Сообщение об ошибке — только если передан текст от родителя */}
+      {hasError && error && (
         <div className="flex items-center gap-2 text-sm text-[#e16162] mt-1">
           <LucideIcons.XCircle className="w-4 h-4" />
-          <span>{error || "Заполните это поле"}</span>
+          <span>{error}</span>
         </div>
       )}
 

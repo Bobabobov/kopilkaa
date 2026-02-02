@@ -3,9 +3,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-
 interface Application {
   id: string;
   title: string;
@@ -17,7 +14,6 @@ interface Application {
     id: string;
     name: string | null;
     avatar: string | null;
-    heroBadge?: HeroBadgeType | null;
   };
 }
 
@@ -175,9 +171,6 @@ export default function RecentApplications() {
                         >
                           {app.user ? app.user.name || "Аноним" : "Аноним"}
                         </p>
-                        {app.user?.heroBadge && (
-                          <HeroBadge badge={app.user.heroBadge} size="xs" />
-                        )}
                       </div>
                       <p className="text-xs" style={{ color: "#abd1c6" }}>
                         {new Date(app.createdAt).toLocaleDateString("ru-RU")}

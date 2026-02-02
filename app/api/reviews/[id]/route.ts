@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 import { type TrustLevel } from "@/lib/trustLevel";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 
@@ -78,11 +77,6 @@ export async function GET(
     const trust = buildTrustSnapshot(
       await computeUserTrustSnapshot(review.userId),
     );
-    const heroBadge = review.user
-      ? ((await getHeroBadgesForUsers([review.user.id]))[review.user.id] ??
-        null)
-      : null;
-
     const mapped = {
       id: review.id,
       content: review.content,
@@ -93,7 +87,6 @@ export async function GET(
       user: review.user
         ? {
             ...review.user,
-            heroBadge,
             trust,
             isSelf: viewerId ? viewerId === review.userId : false,
           }

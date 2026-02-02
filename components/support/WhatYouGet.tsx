@@ -20,13 +20,6 @@ const items = [
     color: "#abd1c6",
   },
   {
-    icon: "BarChart3",
-    title: "Бейдж поддержки",
-    description:
-      "Бейдж — знак благодарности. Он зависит от максимальной разовой суммы поддержки.",
-    color: "#e16162",
-  },
-  {
     icon: "Infinity",
     title: "Без подписки и обязательств",
     description:
@@ -61,7 +54,7 @@ export default function WhatYouGet() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {items.map((it, idx) => {
             const Icon =
               LucideIcons[it.icon as keyof typeof LucideIcons] ||

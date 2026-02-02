@@ -1,20 +1,16 @@
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 import type { UserStatus } from "../hooks/useUserStatus";
 
 interface HeaderIdentityProps {
   name?: string | null;
   role: "USER" | "ADMIN";
-  heroBadge?: HeroBadgeType | null;
   status: UserStatus;
 }
 
 export function HeaderIdentity({
   name,
   role,
-  heroBadge,
   status,
 }: HeaderIdentityProps) {
   return (
@@ -33,7 +29,6 @@ export function HeaderIdentity({
           <span className="hidden xs:inline">ADMIN</span>
         </span>
       )}
-      <HeroBadge badge={heroBadge} size="sm" />
     </div>
   );
 }

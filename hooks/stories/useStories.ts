@@ -29,6 +29,11 @@ interface StoriesResponse {
   items: Story[];
 }
 
+interface UseStoriesOptions {
+  initialStories?: Story[];
+  initialStoriesHasMore?: boolean;
+}
+
 interface UseStoriesReturn {
   stories: Story[];
   loading: boolean;
@@ -39,10 +44,12 @@ interface UseStoriesReturn {
   loadNextPage: () => void;
   resetAndSearch: (newQuery: string) => void;
   observerTargetRef: React.RefObject<HTMLDivElement | null>;
-  isInitialLoad: boolean; // Флаг первой загрузки для анимаций
+  isInitialLoad: boolean;
 }
 
-export function useStories(): UseStoriesReturn {
+export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
+  const { initialStories = [], initialStoriesHasMore = true } = options;
+
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -223,15 +230,24 @@ export function useStories(): UseStoriesReturn {
 
   // Обработка первоначальной загрузки и изменений поискового запроса
   useEffect(() => {
-    // Первоначальная загрузка (только один раз)
     if (!hasInitializedRef.current) {
       hasInitializedRef.current = true;
       previousQueryRef.current = debouncedQuery;
+
+      // Первая страница уже с сервера — не дублируем запрос
+      if (initialStories.length > 0 && debouncedQuery === "") {
+        setStories(initialStories);
+        setLoading(false);
+        setCurrentPage(1);
+        setHasMore(initialStoriesHasMore);
+        setIsInitialLoad(true);
+        return;
+      }
+
       loadStories(1, debouncedQuery, true);
       return;
     }
 
-    // Обработка изменения поискового запроса
     const isNewSearch = debouncedQuery !== previousQueryRef.current;
 
     if (isNewSearch) {

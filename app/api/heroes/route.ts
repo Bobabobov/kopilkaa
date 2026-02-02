@@ -2,7 +2,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSafeExternalUrl } from "@/lib/safeExternalUrl";
-import { getHeroBadgesForUsers } from "@/lib/heroBadges";
 
 export const dynamic = "force-dynamic";
 
@@ -99,8 +98,6 @@ export async function GET(request: Request) {
         .catch(() => []);
     }
 
-    const heroBadges = await getHeroBadgesForUsers(userIds);
-
     const byId = new Map(users.map((u) => [u.id, u]));
 
     const heroesRawAll = aggregates
@@ -122,7 +119,6 @@ export async function GET(request: Request) {
           id: user.id,
           name: user.name || fallbackName,
           avatar: user.avatar,
-          heroBadge: heroBadges[user.id] ?? null,
           totalDonated: totalPaid, // backward-compatible field name
           donationCount: paymentsCount, // backward-compatible field name
           joinedAt: user.createdAt,

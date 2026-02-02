@@ -1,5 +1,3 @@
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-
 export interface Story {
   id: string;
   title: string;
@@ -13,7 +11,6 @@ export interface Story {
     email: string | null;
     avatar: string | null;
     hideEmail?: boolean;
-    heroBadge?: HeroBadgeType | null;
   };
   _count?: {
     likes: number;

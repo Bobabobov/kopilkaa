@@ -3,6 +3,7 @@
 
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import LikeButton from "./LikeButton";
+import { ShareStoryButton } from "./ShareStoryButton";
 
 interface StoryMetadataProps {
   story: {
@@ -18,6 +19,9 @@ interface StoryMetadataProps {
   onLike: () => void;
   isAuthenticated?: boolean | null;
   isAd?: boolean;
+  storyId?: string;
+  storyTitle?: string;
+  isLiking?: boolean;
 }
 
 export default function StoryMetadata({
@@ -27,33 +31,31 @@ export default function StoryMetadata({
   onLike,
   isAuthenticated,
   isAd = false,
+  storyId,
+  storyTitle,
+  isLiking = false,
 }: StoryMetadataProps) {
-  const authorName =
-    story.user?.name ||
-    (story.user?.email ? story.user.email.split("@")[0] : null) ||
-    "Неизвестный автор";
-  const readTime = Math.ceil((story.story?.length || 0) / 200);
+  const readTime = Math.max(1, Math.ceil((story.story?.length || 0) / 200));
 
   return (
-    <div
-      className="flex flex-wrap items-center gap-6 text-sm mb-8"
-      style={{ color: "#abd1c6" }}
-    >
-      <span className="flex items-center gap-2">
-        <LucideIcons.Clock size="sm" />
+    <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-8">
+      <span className="inline-flex items-center gap-2 rounded-xl border border-[#abd1c6]/30 bg-[#001e1d]/40 px-4 py-2.5 text-sm font-semibold text-[#abd1c6]">
+        <LucideIcons.Clock size="sm" className="text-[#f9bc60]" />
         {readTime} мин чтения
       </span>
 
       {!isAd && (
-        <>
-          {/* Красивая анимированная кнопка лайка */}
-          <LikeButton
-            liked={liked}
-            likesCount={likesCount}
-            onLike={onLike}
-            isAuthenticated={isAuthenticated}
-          />
-        </>
+        <LikeButton
+          liked={liked}
+          likesCount={likesCount}
+          onLike={onLike}
+          isAuthenticated={isAuthenticated}
+          isLiking={isLiking}
+        />
+      )}
+
+      {storyId && (
+        <ShareStoryButton storyId={storyId} title={storyTitle} />
       )}
     </div>
   );

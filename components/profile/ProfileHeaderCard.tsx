@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import HeaderCustomization from "./HeaderCustomization";
 import ApplicationsModal from "./modals/ApplicationsModal";
 import { getHeaderTheme } from "@/lib/header-customization";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
 import { useFloatingMenu } from "./hooks/useFloatingMenu";
 import { useUserStatus } from "./hooks/useUserStatus";
 import { SocialLinks } from "./header/SocialLinks";
@@ -34,7 +33,6 @@ type User = {
   approvedApplications?: number;
   friendsCount?: number;
   donationsCount?: number;
-  heroBadge?: HeroBadgeType | null;
 };
 
 interface ProfileHeaderCardProps {
@@ -232,7 +230,6 @@ export default function ProfileHeaderCard({
                 <HeaderIdentity
                   name={user.name}
                   role={user.role}
-                  heroBadge={user.heroBadge}
                   status={status}
                 />
 

@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { getHeroBadgesForUsers } from "@/lib/heroBadges";
-
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
@@ -48,12 +46,8 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
-    const badgeMap = await getHeroBadgesForUsers(users.map((u) => u.id));
     const safeUsers = users.map((u: any) =>
-      sanitizeEmailForViewer(
-        { ...u, heroBadge: badgeMap[u.id] ?? null },
-        session.uid,
-      ),
+      sanitizeEmailForViewer(u, session.uid),
     );
 
     return NextResponse.json({ users: safeUsers });

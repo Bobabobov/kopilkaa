@@ -6,7 +6,6 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 type AdminNewsItem = {
   id: string;
   title: string | null;
-  badge: "UPDATE" | "PLANS" | "THOUGHTS" | "IMPORTANT" | null;
   content: string;
   createdAt: string;
   likesCount: number;

@@ -3,16 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { HeroBadge } from "@/components/ui/HeroBadge";
-import type { HeroBadge as HeroBadgeType } from "@/lib/heroBadges";
-
 interface Donor {
   id: string;
   name: string;
   avatar?: string | null;
   amount: string;
   position: number;
-  heroBadge?: HeroBadgeType | null;
 }
 
 /**
@@ -118,9 +114,6 @@ export default function TopDonorsWidget() {
                         <p className="truncate text-[13px] font-semibold min-w-0">
                           {donor.name}
                         </p>
-                        {donor.heroBadge && (
-                          <HeroBadge badge={donor.heroBadge} size="xs" />
-                        )}
                       </div>
                       <p className="text-[11px] font-semibold text-[#f9bc60]">
                         ₽{donor.amount}

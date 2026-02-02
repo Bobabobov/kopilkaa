@@ -75,26 +75,6 @@ export function NewsPostCard({ item }: { item: NewsItem }) {
                   Официально
                 </span>
               )}
-              {item.badge && (
-                <span
-                  className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold ${
-                    item.badge === "UPDATE"
-                      ? "bg-blue-500/20 border border-blue-400/40 text-blue-300"
-                      : item.badge === "PLANS"
-                        ? "bg-green-500/20 border border-green-400/40 text-green-300"
-                        : item.badge === "THOUGHTS"
-                          ? "bg-purple-500/20 border border-purple-400/40 text-purple-300"
-                          : item.badge === "IMPORTANT"
-                            ? "bg-orange-500/20 border border-orange-400/40 text-orange-300"
-                            : "bg-white/8 border border-white/15 text-white/75"
-                  }`}
-                >
-                  {item.badge === "UPDATE" && "Обновление"}
-                  {item.badge === "PLANS" && "Планы"}
-                  {item.badge === "THOUGHTS" && "Мысли"}
-                  {item.badge === "IMPORTANT" && "Важно"}
-                </span>
-              )}
               {item.title && (
                 <h2 className="text-lg sm:text-2xl font-black text-[#fffffe] leading-snug">
                   {item.title}

@@ -237,8 +237,17 @@ export default function StoriesPageClient({
   }, []);
 
   const hasQuery = query.trim().length > 0;
-  // Анимируем карточки только при первой загрузке (не при подгрузке следующих страниц)
-  const shouldAnimate = isInitialLoad && !loading;
+  // Учитываем prefers-reduced-motion: не анимируем карточки, если пользователь просит меньше движения
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mq.matches);
+    const handler = () => setPrefersReducedMotion(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  // Анимируем карточки только при первой загрузке и если пользователь не просит меньше движения
+  const shouldAnimate = !prefersReducedMotion && isInitialLoad && !loading;
 
   return (
     <div className="min-h-screen">

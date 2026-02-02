@@ -1,22 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export function ReadingProgressBar() {
   const [progress, setProgress] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  const tickingRef = useRef(false);
 
   useEffect(() => {
-    const onScroll = () => {
+    const updateProgress = () => {
       const winScroll = document.documentElement.scrollTop;
       const height =
         document.documentElement.scrollHeight -
         document.documentElement.clientHeight;
       setProgress(height > 0 ? (winScroll / height) * 100 : 0);
+      tickingRef.current = false;
+    };
+
+    const onScroll = () => {
+      if (tickingRef.current) return;
+      tickingRef.current = true;
+      rafRef.current = requestAnimationFrame(updateProgress);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    updateProgress();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
   return (
@@ -28,7 +41,7 @@ export function ReadingProgressBar() {
       aria-valuemax={100}
     >
       <div
-        className="h-full rounded-r-full bg-gradient-to-r from-[#f9bc60] to-[#e8a545] transition-all duration-150 ease-out"
+        className="h-full rounded-r-full bg-gradient-to-r from-[#f9bc60] to-[#e8a545] ease-out motion-safe:transition-all motion-safe:duration-150"
         style={{ width: `${progress}%` }}
       />
     </div>

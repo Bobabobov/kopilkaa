@@ -18,7 +18,7 @@ interface StoryCardContentProps {
   amountText: string | null;
   onCardClick: () => void;
   onCardKeyDown: (event: React.KeyboardEvent) => void;
-  onLike: (event: React.MouseEvent) => void;
+  onLike: (event?: React.MouseEvent) => void;
 }
 
 export function StoryCardContent({

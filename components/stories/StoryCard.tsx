@@ -57,9 +57,9 @@ function StoryCardInner({
     [handleCardClick],
   );
 
-  const handleLike = useCallback(async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleLike = useCallback(async (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
 
     if (isLiking) return;
 

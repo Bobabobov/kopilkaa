@@ -1,9 +1,21 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import StoriesPageClient from "./_components/StoriesPageClient";
 import type { Story } from "@/hooks/stories/useStories";
 
 const baseUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+export const metadata: Metadata = {
+  title: "Истории платформы",
+  description:
+    "Истории пользователей, которым платформа Копилка оказала финансовую поддержку.",
+  openGraph: {
+    title: "Истории платформы",
+    description:
+      "Истории пользователей, которым платформа Копилка оказала финансовую поддержку.",
+  },
+};
 
 async function fetchWithCookies(
   url: string,

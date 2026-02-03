@@ -1,5 +1,7 @@
 // app/admin/components/ImageLightbox.tsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 
 interface ImageLightboxProps {
   isOpen: boolean;
@@ -16,6 +18,7 @@ export default function ImageLightbox({
   onClose,
   onIndexChange,
 }: ImageLightboxProps) {
+  const [failedUrls, setFailedUrls] = useState<Record<string, boolean>>({});
   useEffect(() => {
     if (!isOpen) return;
 
@@ -32,6 +35,11 @@ export default function ImageLightbox({
   }, [isOpen, currentIndex, images.length, onClose, onIndexChange]);
 
   if (!isOpen) return null;
+
+  const fullUrl = buildUploadUrl(images[currentIndex], { variant: "full" });
+  const shouldBypassOptimization =
+    isUploadUrl(fullUrl) || isExternalUrl(fullUrl);
+  const isFailed = failedUrls[fullUrl];
 
   return (
     <div
@@ -72,12 +80,24 @@ export default function ImageLightbox({
           </button>
         )}
 
-        <img
-          src={images[currentIndex]}
-          alt=""
-          className="w-full h-full object-contain select-none"
-          draggable={false}
-        />
+        {isFailed ? (
+          <div className="flex h-full w-full items-center justify-center text-white/70">
+            Изображение недоступно
+          </div>
+        ) : (
+          <Image
+            src={fullUrl}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1200px) 90vw, 1200px"
+            className="object-contain select-none"
+            draggable={false}
+            unoptimized={shouldBypassOptimization}
+            onError={() =>
+              setFailedUrls((prev) => ({ ...prev, [fullUrl]: true }))
+            }
+          />
+        )}
 
         {images.length > 1 && (
           <div className="absolute bottom-2 left-0 right-0 text-center text-white/80 text-sm">

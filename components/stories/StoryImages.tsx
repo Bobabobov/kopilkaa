@@ -27,6 +27,7 @@ function StoryImagesInner({ images = [], title }: StoryImagesProps) {
   const sortedImages = [...images].sort((a, b) => a.sort - b.sort);
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [failedUrls, setFailedUrls] = useState<Record<string, boolean>>({});
 
   const openLightbox = useCallback((index: number) => {
     setCurrentIndex(index);
@@ -58,6 +59,7 @@ function StoryImagesInner({ images = [], title }: StoryImagesProps) {
           const previewUrl = buildPreviewUrl(image.url);
           const shouldBypassOptimization =
             isUploadUrl(previewUrl) || isExternalUrl(previewUrl);
+          const isFailed = failedUrls[previewUrl] || failedUrls[image.url];
           return (
             <figure
               key={`${image.url}-${index}`}
@@ -65,21 +67,36 @@ function StoryImagesInner({ images = [], title }: StoryImagesProps) {
             >
             <button
               type="button"
-              className="relative w-full aspect-[4/3] sm:aspect-[3/2] flex items-center justify-center bg-[#001e1d]/20 cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/60"
-              onClick={() => openLightbox(index)}
-              aria-label={`Открыть изображение ${index + 1} из ${sortedImages.length}`}
-            >
-              <Image
-                src={previewUrl}
-                alt={`${title || "История"} — изображение ${index + 1}`}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 560px"
-                className="object-contain"
-                unoptimized={shouldBypassOptimization}
-                onError={(e) => {
-                  e.currentTarget.src = "/stories-preview.jpg";
+                className="relative w-full aspect-[4/3] sm:aspect-[3/2] flex items-center justify-center bg-[#001e1d]/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/60"
+                onClick={() => {
+                  if (!isFailed) openLightbox(index);
                 }}
-              />
+              aria-label={`Открыть изображение ${index + 1} из ${sortedImages.length}`}
+                disabled={isFailed}
+            >
+                {isFailed ? (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-xs text-white/70">
+                    <LucideIcons.ImageOff size="sm" />
+                    Изображение недоступно
+                  </div>
+                ) : (
+                  <Image
+                    src={previewUrl}
+                    alt={`${title || "История"} — изображение ${index + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 560px"
+                    className="object-contain"
+                    unoptimized={shouldBypassOptimization}
+                    onError={(e) => {
+                      setFailedUrls((prev) => ({
+                        ...prev,
+                        [previewUrl]: true,
+                        [image.url]: true,
+                      }));
+                      e.currentTarget.src = "/stories-preview.jpg";
+                    }}
+                  />
+                )}
               <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
                 <LucideIcons.ZoomIn size="xs" />
                 Открыть

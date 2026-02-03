@@ -39,6 +39,7 @@ interface UseStoriesReturn {
   loading: boolean;
   loadingMore: boolean;
   hasMore: boolean;
+  currentPage: number;
   query: string;
   setQuery: (query: string) => void;
   loadNextPage: () => void;
@@ -273,6 +274,7 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
     loading,
     loadingMore,
     hasMore,
+    currentPage,
     query,
     setQuery,
     loadNextPage,

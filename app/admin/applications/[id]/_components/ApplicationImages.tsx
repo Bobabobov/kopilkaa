@@ -1,6 +1,9 @@
 // app/admin/applications/[id]/components/ApplicationImages.tsx
 "use client";
+import { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
+import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 
 interface ApplicationImagesProps {
   images: { url: string; sort: number }[];
@@ -11,6 +14,7 @@ export default function ApplicationImages({
   images,
   onImageClick,
 }: ApplicationImagesProps) {
+  const [failedUrls, setFailedUrls] = useState<Record<string, boolean>>({});
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -41,16 +45,41 @@ export default function ApplicationImages({
       {images.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
           {images.map((img, i) => (
+            (() => {
+              const previewUrl = buildUploadUrl(img.url, { variant: "thumb" });
+              const shouldBypassOptimization =
+                isUploadUrl(previewUrl) || isExternalUrl(previewUrl);
+              const isFailed = failedUrls[previewUrl] || failedUrls[img.url];
+              return (
             <div
               key={i}
               className="group relative overflow-hidden rounded-xl cursor-zoom-in aspect-square"
-              onClick={() => onImageClick(i)}
+              onClick={() => {
+                if (!isFailed) onImageClick(i);
+              }}
             >
-              <img
-                src={img.url}
-                alt={`Фото ${i + 1}`}
-                className="w-full h-full object-cover rounded-xl border border-[#abd1c6]/20 group-hover:border-[#f9bc60] group-hover:scale-105 transition-all duration-300"
-              />
+              {isFailed ? (
+                <div className="flex h-full w-full items-center justify-center text-xs text-white/70 rounded-xl border border-[#abd1c6]/20">
+                  Фото недоступно
+                </div>
+              ) : (
+                <Image
+                  src={previewUrl}
+                  alt={`Фото ${i + 1}`}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 160px"
+                  className="object-cover rounded-xl border border-[#abd1c6]/20 group-hover:border-[#f9bc60] group-hover:scale-105 transition-all duration-300"
+                  unoptimized={shouldBypassOptimization}
+                  onError={(e) => {
+                    setFailedUrls((prev) => ({
+                      ...prev,
+                      [previewUrl]: true,
+                      [img.url]: true,
+                    }));
+                    e.currentTarget.src = "/stories-preview.jpg";
+                  }}
+                />
+              )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 rounded-xl flex items-center justify-center">
                 <svg
                   className="w-6 h-6 sm:w-8 sm:h-8 text-white opacity-0 group-hover:opacity-100 transition-all duration-300"
@@ -67,6 +96,8 @@ export default function ApplicationImages({
                 </svg>
               </div>
             </div>
+              );
+            })()
           ))}
         </div>
       ) : (

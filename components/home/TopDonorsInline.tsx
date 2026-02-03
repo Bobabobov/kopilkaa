@@ -100,7 +100,7 @@ export default function TopDonorsInline() {
           </p>
           {formattedTotal && (
             <p className="mt-2 text-sm" style={{ color: "#abd1c6" }}>
-              В сумме они уже собрали{" "}
+              В сумме топ-донатеры собрали{" "}
               <span className="font-semibold text-[#f9bc60]">
                 ₽{formattedTotal}
               </span>

@@ -41,6 +41,7 @@ export default function StoriesPageClient({
     loading,
     loadingMore,
     hasMore,
+    currentPage,
     query,
     setQuery,
     loadNextPage,
@@ -51,10 +52,30 @@ export default function StoriesPageClient({
     initialStoriesHasMore,
   });
 
+  const hasQuery = query.trim().length > 0;
+  // Учитываем prefers-reduced-motion: не анимируем карточки, если пользователь просит меньше движения
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mq.matches);
+    const handler = () => setPrefersReducedMotion(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  // Анимируем карточки только при первой загрузке и если пользователь не просит меньше движения
+  const shouldAnimate =
+    !prefersReducedMotion &&
+    isInitialLoad &&
+    !loading &&
+    stories.length <= 24;
+  const autoLoadLimit = 3;
+  const autoLoadEnabled = currentPage < autoLoadLimit;
+
   // Intersection Observer для бесконечной прокрутки: переподписываемся при
   // появлении сетки (stories.length > 0), чтобы ref был уже в DOM
   useEffect(() => {
     if (!stories.length) return;
+    if (!autoLoadEnabled) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -75,7 +96,15 @@ export default function StoriesPageClient({
         observer.unobserve(currentTarget);
       }
     };
-  }, [stories.length, loadingMore, hasMore, loading, loadNextPage, observerTargetRef]);
+  }, [
+    stories.length,
+    loadingMore,
+    hasMore,
+    loading,
+    loadNextPage,
+    observerTargetRef,
+    autoLoadEnabled,
+  ]);
 
   // Восстановление скролла после возврата из истории: повторяем попытку по мере
   // подгрузки страниц (бесконечный скролл), т.к. при первом рендере контента
@@ -236,19 +265,6 @@ export default function StoriesPageClient({
     };
   }, []);
 
-  const hasQuery = query.trim().length > 0;
-  // Учитываем prefers-reduced-motion: не анимируем карточки, если пользователь просит меньше движения
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mq.matches);
-    const handler = () => setPrefersReducedMotion(mq.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  // Анимируем карточки только при первой загрузке и если пользователь не просит меньше движения
-  const shouldAnimate = !prefersReducedMotion && isInitialLoad && !loading;
-
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -281,6 +297,8 @@ export default function StoriesPageClient({
               loadingMore={loadingMore}
               hasMore={hasMore}
               observerTargetRef={observerTargetRef}
+              autoLoadEnabled={autoLoadEnabled}
+              onLoadMore={loadNextPage}
             />
           </>
         )}

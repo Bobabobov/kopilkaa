@@ -11,6 +11,8 @@ interface StoriesGridProps {
   loadingMore: boolean;
   hasMore: boolean;
   observerTargetRef: RefObject<HTMLDivElement | null>;
+  autoLoadEnabled: boolean;
+  onLoadMore: () => void;
 }
 
 function StoriesGridInner({
@@ -22,6 +24,8 @@ function StoriesGridInner({
   loadingMore,
   hasMore,
   observerTargetRef,
+  autoLoadEnabled,
+  onLoadMore,
 }: StoriesGridProps) {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -65,8 +69,20 @@ function StoriesGridInner({
         </div>
       )}
 
-      {hasMore && !loadingMore && (
+      {hasMore && !loadingMore && autoLoadEnabled && (
         <div ref={observerTargetRef} className="h-20" aria-hidden />
+      )}
+
+      {hasMore && !loadingMore && !autoLoadEnabled && (
+        <div className="flex justify-center py-10">
+          <button
+            type="button"
+            onClick={onLoadMore}
+            className="inline-flex items-center gap-2 rounded-2xl border border-[#abd1c6]/40 bg-[#001e1d]/60 px-6 py-3 text-sm font-semibold text-[#abd1c6] transition-all hover:border-[#f9bc60]/60 hover:text-[#f9bc60] hover:bg-[#001e1d]/80"
+          >
+            Показать ещё
+          </button>
+        </div>
       )}
 
       {!hasMore && stories.length > 0 && (

@@ -1,6 +1,6 @@
 // components/stories/StoryLightbox.tsx
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
@@ -23,6 +23,7 @@ export function StoryLightbox({
   onNext,
 }: StoryLightboxProps) {
   const touchStartXRef = useRef<number | null>(null);
+  const [failedUrls, setFailedUrls] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -84,6 +85,7 @@ export function StoryLightbox({
   const fullUrl = buildUploadUrl(images[currentIndex].url, { variant: "full" });
   const shouldBypassOptimization =
     isUploadUrl(fullUrl) || isExternalUrl(fullUrl);
+  const isFailed = failedUrls[fullUrl];
 
   return (
     <div
@@ -130,19 +132,26 @@ export function StoryLightbox({
         )}
 
         {/* Изображение */}
-        <div
-          className="relative w-[94vw] h-[86vh] max-w-6xl max-h-[90vh]"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Image
-            src={fullUrl}
-            alt={`Фото ${currentIndex + 1}`}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1200px) 95vw, 1400px"
-            className="object-contain"
-            draggable={false}
-            unoptimized={shouldBypassOptimization}
-          />
+        <div className="relative w-[94vw] h-[86vh] max-w-6xl max-h-[90vh]">
+          {isFailed ? (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-white/80">
+              <LucideIcons.ImageOff size="lg" />
+              Изображение недоступно
+            </div>
+          ) : (
+            <Image
+              src={fullUrl}
+              alt={`Фото ${currentIndex + 1}`}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1200px) 95vw, 1400px"
+              className="object-contain"
+              draggable={false}
+              unoptimized={shouldBypassOptimization}
+              onError={() =>
+                setFailedUrls((prev) => ({ ...prev, [fullUrl]: true }))
+              }
+            />
+          )}
         </div>
 
         {/* Визуальные стрелки (без клика) */}

@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { Story as StoryItem } from "@/hooks/stories/useStories";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { formatAmount } from "@/lib/format";
-import { buildUploadUrl } from "@/lib/uploads/url";
+import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 
 interface TopStoriesSectionProps {
   topStories: StoryItem[];
@@ -112,6 +113,10 @@ export function TopStoriesSection({
                 story.user?.avatar || "/default-avatar.png",
                 { variant: "thumb" },
               );
+              const imageUnoptimized =
+                isUploadUrl(imageUrl) || isExternalUrl(imageUrl);
+              const avatarUnoptimized =
+                isUploadUrl(avatarUrl) || isExternalUrl(avatarUrl);
               const authorName =
                 story.user?.name || story.user?.email || "Неизвестный автор";
               const rank = RANK_CONFIG[Math.min(index, 2)];
@@ -146,11 +151,13 @@ export function TopStoriesSection({
 
                   {/* Область изображения */}
                   <div className="relative h-44 sm:h-52 overflow-hidden">
-                    <img
+                    <Image
                       src={imageUrl}
                       alt={story.title}
-                      loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      unoptimized={imageUnoptimized}
                       onError={(e) => {
                         e.currentTarget.src = "/stories-preview.jpg";
                       }}
@@ -173,11 +180,13 @@ export function TopStoriesSection({
                           onClick={(e) => e.stopPropagation()}
                           className="flex items-center gap-2 text-sm font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] hover:text-[#f9bc60] transition-colors truncate min-w-0"
                         >
-                          <img
+                          <Image
                             src={avatarUrl}
                             alt=""
-                            loading="lazy"
+                            width={32}
+                            height={32}
                             className="h-8 w-8 shrink-0 rounded-full object-cover ring-2 ring-[#001e1d]/90"
+                            unoptimized={avatarUnoptimized}
                             onError={(e) => {
                               e.currentTarget.src = "/default-avatar.png";
                             }}
@@ -186,11 +195,13 @@ export function TopStoriesSection({
                         </Link>
                       ) : (
                         <>
-                          <img
+                          <Image
                             src={avatarUrl}
                             alt=""
-                            loading="lazy"
+                            width={32}
+                            height={32}
                             className="h-8 w-8 shrink-0 rounded-full object-cover ring-2 ring-[#001e1d]/90"
+                            unoptimized={avatarUnoptimized}
                             onError={(e) => {
                               e.currentTarget.src = "/default-avatar.png";
                             }}

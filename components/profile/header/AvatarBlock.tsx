@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import AvatarUpload from "../AvatarUpload";
 import type { UserStatus } from "../hooks/useUserStatus";
+import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 
 const DEFAULT_AVATAR = "/default-avatar.png";
 
@@ -40,6 +42,13 @@ export function AvatarBlock({
     setAvatarSrc(user.avatar || DEFAULT_AVATAR);
     setAvatarFailed(false);
   }, [user.id, user.avatar]);
+
+  const resolvedAvatar = buildUploadUrl(
+    avatarFailed ? DEFAULT_AVATAR : avatarSrc || DEFAULT_AVATAR,
+    { variant: "thumb" },
+  );
+  const shouldBypassOptimization =
+    isUploadUrl(resolvedAvatar) || isExternalUrl(resolvedAvatar);
 
   const statusLabel =
     status.status === "online"
@@ -115,10 +124,13 @@ export function AvatarBlock({
   return (
     <div className="flex-shrink-0">
       <div className="relative -mt-16 sm:-mt-20 md:-mt-24 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white/90 shadow-lg transition-none duration-0 transform-none hover:transform-none hover:scale-100">
-        <img
-          src={avatarFailed ? DEFAULT_AVATAR : avatarSrc}
+        <Image
+          src={resolvedAvatar}
           alt=""
-          className="w-full h-full object-cover transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:brightness-100"
+          fill
+          sizes="(max-width: 640px) 96px, 128px"
+          className="object-cover transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:brightness-100"
+          unoptimized={shouldBypassOptimization}
           onError={() => setAvatarFailed(true)}
         />
         <span

@@ -135,7 +135,7 @@ export function StoryLightbox({
         <div className="relative w-[94vw] h-[86vh] max-w-6xl max-h-[90vh]">
           {isFailed ? (
             <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-white/80">
-              <LucideIcons.ImageOff size="lg" />
+              <LucideIcons.Image size="lg" />
               Изображение недоступно
             </div>
           ) : (

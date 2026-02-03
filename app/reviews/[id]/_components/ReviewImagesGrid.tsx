@@ -39,7 +39,7 @@ export function ReviewImagesGrid({
             >
               {isFailed ? (
                 <div className="flex h-40 w-full items-center justify-center text-xs text-white/70 xs:h-44 sm:h-48 md:h-52">
-                  <LucideIcons.ImageOff size="sm" />
+                  <LucideIcons.Image size="sm" />
                   <span className="ml-2">Изображение недоступно</span>
                 </div>
               ) : (

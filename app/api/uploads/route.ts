@@ -3,11 +3,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import { extname } from "path";
 import { randomUUID } from "crypto";
+import sharp from "sharp";
 import { getSession } from "@/lib/auth";
 import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ADMIN_MAX_SIZE = 20 * 1024 * 1024; // 20MB для админов
+
+const IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+
+const VARIANT_SIZES: Record<string, number> = {
+  thumb: 360,
+  medium: 960,
+  full: 2000,
+};
+
+const OUTPUT_FORMATS = ["jpeg", "webp", "avif"] as const;
+
+const buildVariantFilename = (base: string, variant: string, format: string) =>
+  `${base}__${variant}.${format}`;
 
 // POST /api/uploads - загрузить файлы
 export async function POST(req: NextRequest) {
@@ -78,9 +96,44 @@ export async function POST(req: NextRequest) {
         ".bin";
       const id = randomUUID().replace(/-/g, "");
       const filename = `${id}${ext}`;
+      const base = filename.replace(ext, "");
       const filepath = getUploadFilePath(filename);
 
       await writeFile(filepath, buffer);
+
+      // Предгенерация вариантов для изображений (thumb/medium/full + webp/avif)
+      if (IMAGE_TYPES.has(file.type)) {
+        const formats =
+          file.type === "image/png"
+            ? (["png", ...OUTPUT_FORMATS] as const)
+            : OUTPUT_FORMATS;
+
+        for (const [variant, width] of Object.entries(VARIANT_SIZES)) {
+          const transformer = sharp(buffer).rotate().resize({
+            width,
+            height: undefined,
+            fit: "inside",
+            withoutEnlargement: true,
+          });
+
+          for (const format of formats) {
+            let out: Buffer;
+            if (format === "webp") {
+              out = await transformer.webp({ quality: 80 }).toBuffer();
+            } else if (format === "avif") {
+              out = await transformer.avif({ quality: 60 }).toBuffer();
+            } else if (format === "png") {
+              out = await transformer.png({ compressionLevel: 8 }).toBuffer();
+            } else {
+              out = await transformer.jpeg({ quality: 82 }).toBuffer();
+            }
+
+            const variantFilename = buildVariantFilename(base, variant, format);
+            const variantPath = getUploadFilePath(variantFilename);
+            await writeFile(variantPath, out);
+          }
+        }
+      }
 
       const url = `/api/uploads/${filename}`;
       uploadedFiles.push({ url, filename });

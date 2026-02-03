@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Story as StoryItem } from "@/hooks/stories/useStories";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { formatAmount } from "@/lib/format";
+import { buildUploadUrl } from "@/lib/uploads/url";
 
 interface TopStoriesSectionProps {
   topStories: StoryItem[];
@@ -103,8 +104,14 @@ export function TopStoriesSection({
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 list-none p-0 m-0">
             {topStories.map((story, index) => {
               const amountText = formatAmount(story.amount);
-              const imageUrl = story.images?.[0]?.url || "/stories-preview.jpg";
-              const avatarUrl = story.user?.avatar || "/default-avatar.png";
+              const imageUrl = buildUploadUrl(
+                story.images?.[0]?.url || "/stories-preview.jpg",
+                { variant: "thumb" },
+              );
+              const avatarUrl = buildUploadUrl(
+                story.user?.avatar || "/default-avatar.png",
+                { variant: "thumb" },
+              );
               const authorName =
                 story.user?.name || story.user?.email || "Неизвестный автор";
               const rank = RANK_CONFIG[Math.min(index, 2)];

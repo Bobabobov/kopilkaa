@@ -4,6 +4,7 @@ import { memo, useState, useCallback } from "react";
 import Image from "next/image";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { StoryLightbox } from "@/components/stories/StoryLightbox";
+import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
 
 interface StoryImage {
   url: string;
@@ -14,6 +15,9 @@ interface StoryImagesProps {
   images?: StoryImage[];
   title?: string;
 }
+
+const buildPreviewUrl = (url: string) =>
+  buildUploadUrl(url, { variant: "medium" });
 
 function StoryImagesInner({ images = [], title }: StoryImagesProps) {
   if (!images || images.length === 0) {
@@ -50,11 +54,15 @@ function StoryImagesInner({ images = [], title }: StoryImagesProps) {
         Изображения
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-        {sortedImages.map((image, index) => (
-          <figure
-            key={`${image.url}-${index}`}
-            className="relative overflow-hidden rounded-2xl border border-[#abd1c6]/25 bg-[#001e1d]/30 shadow-[0_16px_40px_-20px_rgba(0,0,0,0.2)]"
-          >
+        {sortedImages.map((image, index) => {
+          const previewUrl = buildPreviewUrl(image.url);
+          const shouldBypassOptimization =
+            isUploadUrl(previewUrl) || isExternalUrl(previewUrl);
+          return (
+            <figure
+              key={`${image.url}-${index}`}
+              className="relative overflow-hidden rounded-2xl border border-[#abd1c6]/25 bg-[#001e1d]/30 shadow-[0_16px_40px_-20px_rgba(0,0,0,0.2)]"
+            >
             <button
               type="button"
               className="relative w-full aspect-[4/3] sm:aspect-[3/2] flex items-center justify-center bg-[#001e1d]/20 cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/60"
@@ -62,15 +70,12 @@ function StoryImagesInner({ images = [], title }: StoryImagesProps) {
               aria-label={`Открыть изображение ${index + 1} из ${sortedImages.length}`}
             >
               <Image
-                src={image.url}
+                src={previewUrl}
                 alt={`${title || "История"} — изображение ${index + 1}`}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 560px"
                 className="object-contain"
-                unoptimized={
-                  typeof image.url === "string" &&
-                  /^https?:\/\//i.test(image.url)
-                }
+                unoptimized={shouldBypassOptimization}
                 onError={(e) => {
                   e.currentTarget.src = "/stories-preview.jpg";
                 }}
@@ -83,8 +88,9 @@ function StoryImagesInner({ images = [], title }: StoryImagesProps) {
             <figcaption className="sr-only">
               Изображение {index + 1} из {sortedImages.length}
             </figcaption>
-          </figure>
-        ))}
+            </figure>
+          );
+        })}
       </div>
       <StoryLightbox
         isOpen={isOpen}

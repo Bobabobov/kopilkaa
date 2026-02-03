@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
 
 interface StoryLightboxProps {
   isOpen: boolean;
@@ -33,6 +34,33 @@ export function StoryLightbox({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose, onPrevious, onNext]);
 
+  useEffect(() => {
+    if (!isOpen || images.length === 0) return;
+    const preload = (url?: string) => {
+      if (!url) return;
+      const img = new window.Image();
+      img.src = url;
+    };
+    const current = images[currentIndex]?.url
+      ? buildUploadUrl(images[currentIndex].url, { variant: "full" })
+      : undefined;
+    const prev = images[(currentIndex - 1 + images.length) % images.length]
+      ?.url
+      ? buildUploadUrl(
+          images[(currentIndex - 1 + images.length) % images.length].url,
+          { variant: "full" },
+        )
+      : undefined;
+    const next = images[(currentIndex + 1) % images.length]?.url
+      ? buildUploadUrl(images[(currentIndex + 1) % images.length].url, {
+          variant: "full",
+        })
+      : undefined;
+    preload(current);
+    preload(prev);
+    preload(next);
+  }, [isOpen, images, currentIndex]);
+
   if (!isOpen || images.length === 0) return null;
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -53,6 +81,10 @@ export function StoryLightbox({
     }
   };
 
+  const fullUrl = buildUploadUrl(images[currentIndex].url, { variant: "full" });
+  const shouldBypassOptimization =
+    isUploadUrl(fullUrl) || isExternalUrl(fullUrl);
+
   return (
     <div
       className="fixed inset-0 z-[999] bg-black/95 backdrop-blur-md flex items-center justify-center"
@@ -63,7 +95,6 @@ export function StoryLightbox({
     >
       <div
         className="relative w-full h-full flex items-center justify-center"
-        onClick={(e) => e.stopPropagation()}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -81,30 +112,36 @@ export function StoryLightbox({
           <>
             <button
               className="absolute left-0 top-0 h-full w-1/4 sm:w-1/6 cursor-pointer z-10"
-              onClick={onPrevious}
+              onClick={(e) => {
+                e.stopPropagation();
+                onPrevious();
+              }}
               aria-label="Предыдущее изображение"
             />
             <button
               className="absolute right-0 top-0 h-full w-1/4 sm:w-1/6 cursor-pointer z-10"
-              onClick={onNext}
+              onClick={(e) => {
+                e.stopPropagation();
+                onNext();
+              }}
               aria-label="Следующее изображение"
             />
           </>
         )}
 
         {/* Изображение */}
-        <div className="relative w-[94vw] h-[86vh] max-w-6xl max-h-[90vh]">
+        <div
+          className="relative w-[94vw] h-[86vh] max-w-6xl max-h-[90vh]"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Image
-            src={images[currentIndex].url}
+            src={fullUrl}
             alt={`Фото ${currentIndex + 1}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1200px) 95vw, 1400px"
             className="object-contain"
             draggable={false}
-            unoptimized={
-              typeof images[currentIndex].url === "string" &&
-              /^https?:\/\//i.test(images[currentIndex].url)
-            }
+            unoptimized={shouldBypassOptimization}
           />
         </div>
 

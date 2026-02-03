@@ -96,6 +96,16 @@ const nextConfig = {
           },
         ],
       },
+      // Статика из uploads — долгий кеш в браузере
+      {
+        source: "/api/uploads/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
       // Summary — переопределяем: короткий кеш (последнее правило выигрывает).
       {
         source: "/api/stories/summary",

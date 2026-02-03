@@ -4,6 +4,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import LikeButton from "@/components/stories/LikeButton";
 import { renderHighlightedText } from "./highlight";
 import type { Story } from "./types";
+import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
 
 interface StoryCardContentProps {
   story: Story;
@@ -21,6 +22,9 @@ interface StoryCardContentProps {
   onLike: (event?: React.MouseEvent) => void;
 }
 
+const buildPreviewUrl = (url: string) =>
+  buildUploadUrl(url, { variant: "thumb" });
+
 export function StoryCardContent({
   story,
   isRead,
@@ -36,6 +40,10 @@ export function StoryCardContent({
   onCardKeyDown,
   onLike,
 }: StoryCardContentProps) {
+  const previewImage = buildPreviewUrl(mainImage);
+  const shouldBypassOptimization =
+    isUploadUrl(previewImage) || isExternalUrl(previewImage);
+
   return (
     <article
       role="button"
@@ -66,12 +74,12 @@ export function StoryCardContent({
       <div className="relative mb-5 rounded-t-3xl overflow-hidden flex-shrink-0 shadow-xl group-hover:shadow-2xl transition-all duration-500">
         <div className="relative w-full h-56 overflow-hidden">
           <Image
-            src={mainImage}
+            src={previewImage}
             alt={story.title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-            unoptimized={typeof mainImage === "string" && /^https?:\/\//i.test(mainImage)}
+            unoptimized={shouldBypassOptimization}
             onError={(e) => {
               e.currentTarget.src = "/stories-preview.jpg";
             }}

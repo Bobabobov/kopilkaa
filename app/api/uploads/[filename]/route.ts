@@ -1,9 +1,16 @@
 // app/api/uploads/[filename]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
-import { getUploadFilePath } from "@/lib/uploads/paths";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+function getUploadFilePath(filename: string): string {
+  const uploadDir =
+    process.env.UPLOAD_DIR ?? join(process.cwd(), "uploads");
+  return join(uploadDir, filename);
+}
 
 export async function GET(
   request: NextRequest,

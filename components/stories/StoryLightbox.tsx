@@ -1,5 +1,7 @@
 // components/stories/StoryLightbox.tsx
 "use client";
+import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface StoryLightboxProps {
@@ -19,56 +21,109 @@ export function StoryLightbox({
   onPrevious,
   onNext,
 }: StoryLightboxProps) {
+  const touchStartXRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") onPrevious();
+      if (e.key === "ArrowRight") onNext();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, onPrevious, onNext]);
+
   if (!isOpen || images.length === 0) return null;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0]?.clientX ?? null;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null) return;
+    const endX = e.changedTouches[0]?.clientX ?? null;
+    if (endX === null) return;
+    const delta = endX - touchStartXRef.current;
+    const threshold = 50;
+    if (Math.abs(delta) < threshold) return;
+    if (delta > 0) {
+      onPrevious();
+    } else {
+      onNext();
+    }
+  };
 
   return (
     <div
-      className="fixed inset-0 z-[999] bg-black/90 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[999] bg-black/95 backdrop-blur-md flex items-center justify-center"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Просмотр изображений"
     >
       <div
-        className="relative max-w-6xl w-full h-[90vh]"
+        className="relative w-full h-full flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Кнопка закрытия */}
         <button
-          className="absolute top-4 right-4 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm z-10 transition-colors"
+          className="absolute top-3 right-3 sm:top-5 sm:right-5 p-2.5 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm z-20 transition-colors"
           onClick={onClose}
+          aria-label="Закрыть просмотр"
         >
           <LucideIcons.Close size="lg" />
         </button>
 
-        {/* Кнопки навигации */}
+        {/* Навигация: кликабельные зоны по краям */}
         {images.length > 1 && (
           <>
             <button
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm z-10 transition-colors"
+              className="absolute left-0 top-0 h-full w-1/4 sm:w-1/6 cursor-pointer z-10"
               onClick={onPrevious}
-            >
-              <LucideIcons.ChevronLeft size="lg" />
-            </button>
-
+              aria-label="Предыдущее изображение"
+            />
             <button
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm z-10 transition-colors"
+              className="absolute right-0 top-0 h-full w-1/4 sm:w-1/6 cursor-pointer z-10"
               onClick={onNext}
-            >
-              <LucideIcons.ChevronRight size="lg" />
-            </button>
+              aria-label="Следующее изображение"
+            />
           </>
         )}
 
         {/* Изображение */}
-        <img
-          src={images[currentIndex].url}
-          alt={`Фото ${currentIndex + 1}`}
-          className="w-full h-full object-contain rounded-xl"
-          draggable={false}
-        />
+        <div className="relative w-[94vw] h-[86vh] max-w-6xl max-h-[90vh]">
+          <Image
+            src={images[currentIndex].url}
+            alt={`Фото ${currentIndex + 1}`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1200px) 95vw, 1400px"
+            className="object-contain"
+            draggable={false}
+            unoptimized={
+              typeof images[currentIndex].url === "string" &&
+              /^https?:\/\//i.test(images[currentIndex].url)
+            }
+          />
+        </div>
+
+        {/* Визуальные стрелки (без клика) */}
+        {images.length > 1 && (
+          <>
+            <div className="pointer-events-none absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-white/10 text-white backdrop-blur-sm z-10">
+              <LucideIcons.ChevronLeft size="lg" />
+            </div>
+            <div className="pointer-events-none absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-white/10 text-white backdrop-blur-sm z-10">
+              <LucideIcons.ChevronRight size="lg" />
+            </div>
+          </>
+        )}
 
         {/* Счетчик изображений */}
         {images.length > 1 && (
-          <div className="absolute bottom-4 left-0 right-0 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl text-white text-sm">
+          <div className="absolute bottom-3 sm:bottom-5 left-0 right-0 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm">
               <LucideIcons.Image size="sm" />
               {currentIndex + 1} из {images.length}
             </div>

@@ -76,7 +76,7 @@ function StoryImagesInner({ images = [], title }: StoryImagesProps) {
             >
                 {isFailed ? (
                   <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-xs text-white/70">
-                    <LucideIcons.ImageOff size="sm" />
+                    <LucideIcons.Image size="sm" />
                     Изображение недоступно
                   </div>
                 ) : (

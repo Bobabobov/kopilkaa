@@ -169,7 +169,7 @@ export async function GET(req: Request) {
 
       const candidateItems = await prisma.application
         .findMany({
-          where: { status: "APPROVED" },
+          where: statusFilter,
           orderBy: { createdAt: "desc" },
           take: 500,
           select: {
@@ -195,6 +195,8 @@ export async function GET(req: Request) {
               },
             },
             _count: { select: { likes: true } },
+            status: true,
+            publishInStories: true,
           },
         })
         .catch(() => []);

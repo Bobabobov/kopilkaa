@@ -21,8 +21,8 @@ export async function GET(req: Request) {
 
     const statusFilter = {
       OR: [
-        { status: "APPROVED" },
-        { status: "CONTEST", publishInStories: true },
+        { status: "APPROVED" as const },
+        { status: "CONTEST" as const, publishInStories: true },
       ],
     };
     const where: any = { AND: [statusFilter] };

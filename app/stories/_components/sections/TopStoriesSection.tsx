@@ -144,7 +144,11 @@ export function TopStoriesSection({
                       }
                     }}
                     aria-label={`Открыть историю: ${story.title}`}
-                    className="group relative overflow-hidden rounded-2xl border border-[#abd1c6]/20 bg-[#001e1d]/70 transition-all duration-300 hover:border-[#f9bc60]/50 hover:shadow-[0_20px_50px_-15px_rgba(249,188,96,0.25),0_0_0_1px_rgba(249,188,96,0.1)] hover:-translate-y-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#001e1d]"
+                    className={`group relative overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#001e1d] ${
+                      story.isContestWinner
+                        ? "border-2 border-[#f9bc60] bg-[#001e1d]/80 ring-2 ring-[#f9bc60]/30 hover:border-[#e8a545] hover:ring-[#f9bc60]/50 hover:shadow-[0_20px_50px_-15px_rgba(249,188,96,0.35),0_0_0_1px_rgba(249,188,96,0.2)]"
+                        : "border border-[#abd1c6]/20 bg-[#001e1d]/70 hover:border-[#f9bc60]/50 hover:shadow-[0_20px_50px_-15px_rgba(249,188,96,0.25),0_0_0_1px_rgba(249,188,96,0.1)]"
+                    }`}
                   >
                   {/* Лёгкий блик по верхнему краю карточки */}
                   <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent rounded-t-2xl" />
@@ -172,6 +176,12 @@ export function TopStoriesSection({
                       )}
                       {rank.label}
                     </div>
+                    {story.isContestWinner && (
+                      <div className="absolute top-4 right-4 z-10 inline-flex items-center gap-1.5 rounded-lg bg-[#001e1d]/95 backdrop-blur-sm px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#f9bc60] shadow-lg ring-1 ring-[#f9bc60]/50 border border-[#f9bc60]/30">
+                        <LucideIcons.Trophy size="xs" className="h-3.5 w-3.5 shrink-0" />
+                        Победитель конкурса
+                      </div>
+                    )}
                     {/* Автор поверх изображения */}
                     <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2">
                       {story.user?.id ? (

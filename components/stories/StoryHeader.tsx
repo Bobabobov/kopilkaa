@@ -13,6 +13,7 @@ interface StoryHeaderProps {
   createdAt?: string;
   isAd?: boolean;
   authorExternalUrl?: string;
+  isContestWinner?: boolean;
 }
 
 export default function StoryHeader({
@@ -23,6 +24,7 @@ export default function StoryHeader({
   createdAt,
   isAd = false,
   authorExternalUrl,
+  isContestWinner = false,
 }: StoryHeaderProps) {
   return (
     <header className="mb-8 sm:mb-10 min-w-0">
@@ -36,6 +38,18 @@ export default function StoryHeader({
           <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse" />
           <span>Рекламная история</span>
           <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse" />
+        </motion.div>
+      )}
+
+      {isContestWinner && !isAd && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="inline-flex items-center gap-2 px-4 py-2 mb-5 rounded-xl border border-[#f9bc60]/50 bg-[#f9bc60]/15 text-sm font-bold uppercase tracking-wider text-[#f9bc60]"
+        >
+          <LucideIcons.Trophy size="xs" />
+          <span>Победитель конкурса</span>
         </motion.div>
       )}
 

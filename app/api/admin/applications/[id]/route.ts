@@ -26,6 +26,7 @@ export async function GET(
         amount: true,
         payment: true,
         status: true,
+        publishInStories: true,
         adminComment: true,
         filledMs: true,
         createdAt: true,
@@ -62,6 +63,10 @@ export async function PATCH(
     | "REJECTED"
     | "CONTEST"
     | undefined;
+  const publishInStories =
+    typeof body?.publishInStories === "boolean"
+      ? body.publishInStories
+      : undefined;
   const decreaseTrustOnDecision = Boolean(body?.decreaseTrustOnDecision);
   const adminComment =
     typeof body?.adminComment === "string" ? body.adminComment : undefined;
@@ -75,7 +80,12 @@ export async function PATCH(
     const item = await prisma.$transaction(async (tx) => {
       const updated = await tx.application.update({
         where: { id: params.id },
-        data: { status, adminComment: adminComment ?? null },
+        data: {
+          status,
+          adminComment: adminComment ?? null,
+          publishInStories:
+            status === "CONTEST" ? !!publishInStories : false,
+        },
         include: {
           user: { select: { email: true, id: true } },
           images: {

@@ -8,6 +8,7 @@ interface StatusModalProps {
   onStatusChange: (status: ApplicationStatus) => void;
   onCommentChange: (comment: string) => void;
   onDecreaseTrustChange: (next: boolean) => void;
+  onPublishChange: (next: boolean) => void;
   onSave: () => Promise<void>;
 }
 
@@ -17,6 +18,7 @@ export default function StatusModal({
   onStatusChange,
   onCommentChange,
   onDecreaseTrustChange,
+  onPublishChange,
   onSave,
 }: StatusModalProps) {
   if (!modal.id) return null;
@@ -100,9 +102,13 @@ export default function StatusModal({
             <select
               className="w-full px-4 py-3 bg-[#0e2420] border border-[#2c4f45]/70 rounded-2xl focus:ring-2 focus:ring-[#f9bc60]/50 focus:border-[#2c4f45] transition-all duration-200 text-[#f7fbf9]"
               value={modal.status}
-              onChange={(e) =>
-                onStatusChange(e.target.value as ApplicationStatus)
-              }
+              onChange={(e) => {
+                const nextStatus = e.target.value as ApplicationStatus;
+                onStatusChange(nextStatus);
+                if (nextStatus !== "CONTEST") {
+                  onPublishChange(false);
+                }
+              }}
             >
               <option value="PENDING">⏳ В обработке</option>
               <option value="APPROVED">✅ Одобрено</option>
@@ -110,6 +116,24 @@ export default function StatusModal({
               <option value="CONTEST">🏆 Конкурс</option>
             </select>
           </div>
+
+          {modal.status === "CONTEST" && (
+            <div className="rounded-2xl border border-[#2c4f45]/70 bg-[#0e2420] px-4 py-3">
+              <label className="flex items-center gap-2 text-xs sm:text-sm text-[#cfdcd6]">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4"
+                  checked={modal.publishInStories}
+                  onChange={(e) => onPublishChange(e.target.checked)}
+                />
+                <span>Публиковать в /stories (победитель конкурса)</span>
+              </label>
+              <p className="mt-2 text-xs text-[#9bb3ab]">
+                Если включено — заявка появится в историях и будет выделена
+                как победитель конкурса.
+              </p>
+            </div>
+          )}
 
           <div>
             <label className="block text-xs sm:text-sm font-bold text-[#abd1c6] mb-2 sm:mb-3">

@@ -7,7 +7,12 @@ import type { ApplicationItem } from "../types";
 
 interface ApplicationCardActionsProps {
   application: ApplicationItem;
-  onEdit: (id: string, status: ApplicationStatus, comment: string) => void;
+  onEdit: (
+    id: string,
+    status: ApplicationStatus,
+    comment: string,
+    publishInStories: boolean,
+  ) => void;
   onQuickApprove: (
     id: string,
     status: ApplicationStatus,
@@ -42,7 +47,14 @@ export default function ApplicationCardActions({
       <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
         <button
           className="group px-3 py-2 bg-[#001e1d]/60 hover:bg-[#001e1d]/80 text-[#abd1c6] hover:text-[#fffffe] rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm border border-[#abd1c6]/20 hover:border-[#f9bc60]/40"
-          onClick={() => onEdit(it.id, it.status, it.adminComment || "")}
+          onClick={() =>
+            onEdit(
+              it.id,
+              it.status,
+              it.adminComment || "",
+              it.publishInStories,
+            )
+          }
         >
           <svg
             className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300"

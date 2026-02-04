@@ -19,6 +19,7 @@ export type ApplicationItem = {
   payment: string;
   bankName?: string | null;
   status: ApplicationStatus;
+  publishInStories: boolean;
   adminComment: string | null;
   createdAt: string;
   countTowardsTrust: boolean;
@@ -48,6 +49,7 @@ export type StatusModal = {
   status: ApplicationStatus;
   comment: string;
   decreaseTrustOnDecision: boolean;
+  publishInStories: boolean;
 };
 
 export type LightboxState = {

@@ -81,6 +81,7 @@ model Application {
   amount       Int               @default(0)
   payment      String
   status       ApplicationStatus @default(PENDING)
+  publishInStories Boolean        @default(false)
   countTowardsTrust Boolean      @default(true)
   adminComment String?
   filledMs     Int?

@@ -10,6 +10,7 @@ export type ApplicationItem = {
   payment: string;
   bankName?: string | null;
   status: ApplicationStatus;
+  publishInStories: boolean;
   adminComment: string | null;
   filledMs?: number | null;
   createdAt: string;

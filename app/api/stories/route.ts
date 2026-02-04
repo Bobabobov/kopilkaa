@@ -19,7 +19,13 @@ export async function GET(req: Request) {
     const q = (searchParams.get("q") || "").trim();
     const normalizedQuery = q.replace(/\s+/g, " ").trim();
 
-    const where: any = { status: "APPROVED" };
+    const statusFilter = {
+      OR: [
+        { status: "APPROVED" },
+        { status: "CONTEST", publishInStories: true },
+      ],
+    };
+    const where: any = { AND: [statusFilter] };
     if (normalizedQuery) {
       const tokens = normalizedQuery.split(" ").filter(Boolean).slice(0, 6);
       const synonymMap: Record<string, string[]> = {
@@ -69,7 +75,7 @@ export async function GET(req: Request) {
         combinedOr.push({ amount: { equals: amountFromQuery } });
       }
 
-      where.OR = combinedOr;
+      where.AND.push({ OR: combinedOr });
     }
 
     const skip = (page - 1) * limit;
@@ -103,6 +109,8 @@ export async function GET(req: Request) {
               },
             },
             _count: { select: { likes: true } },
+            status: true,
+            publishInStories: true,
           },
         })
         .catch(() => []),
@@ -262,6 +270,7 @@ export async function GET(req: Request) {
       ...it,
       user: it.user ? sanitizeEmailForViewer(it.user, viewerId || "") : it.user,
       userLiked: likedSet ? likedSet.has(it.id) : false,
+      isContestWinner: it.status === "CONTEST" && it.publishInStories,
     }));
 
     const responseData = {

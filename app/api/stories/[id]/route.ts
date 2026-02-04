@@ -27,13 +27,21 @@ export async function GET(
   const session = await getSession();
 
   const story = await prisma.application.findFirst({
-    where: { id: finalId, status: "APPROVED" },
+    where: {
+      id: finalId,
+      OR: [
+        { status: "APPROVED" },
+        { status: "CONTEST", publishInStories: true },
+      ],
+    },
     select: {
       id: true,
       title: true,
       summary: true,
       story: true,
       createdAt: true,
+      status: true,
+      publishInStories: true,
       images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
       user: {
         select: {
@@ -73,6 +81,7 @@ export async function GET(
   return Response.json(
     {
       ...story,
+      isContestWinner: story.status === "CONTEST" && story.publishInStories,
       story: sanitizeApplicationStoryHtml(story.story || ""),
       user: story.user
         ? sanitizeEmailForViewer(

@@ -17,7 +17,12 @@ export async function GET(req: Request) {
 
     const items = await prisma.application
       .findMany({
-        where: { status: "APPROVED" },
+        where: {
+          OR: [
+            { status: "APPROVED" },
+            { status: "CONTEST", publishInStories: true },
+          ],
+        },
         orderBy: [
           { likes: { _count: "desc" } },
           { createdAt: "desc" },
@@ -45,6 +50,8 @@ export async function GET(req: Request) {
             },
           },
           _count: { select: { likes: true } },
+          status: true,
+          publishInStories: true,
         },
       })
       .catch(() => []);
@@ -68,6 +75,7 @@ export async function GET(req: Request) {
       ...it,
       user: it.user ? sanitizeEmailForViewer(it.user, viewerId || "") : it.user,
       userLiked: likedSet ? likedSet.has(it.id) : false,
+      isContestWinner: it.status === "CONTEST" && it.publishInStories,
     }));
 
     return new Response(JSON.stringify({ items: safeItems }), {

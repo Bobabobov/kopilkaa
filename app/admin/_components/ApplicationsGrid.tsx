@@ -11,7 +11,12 @@ interface ApplicationsGridProps {
   error: string | null;
   visibleEmails: Set<string>;
   onToggleEmail: (id: string) => void;
-  onEdit: (id: string, status: ApplicationStatus, comment: string) => void;
+  onEdit: (
+    id: string,
+    status: ApplicationStatus,
+    comment: string,
+    publishInStories: boolean,
+  ) => void;
   onQuickApprove: (
     id: string,
     status: ApplicationStatus,

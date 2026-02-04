@@ -35,8 +35,9 @@ function StoryCardInner({
     (story.user?.email ? story.user.email.split("@")[0] : null) ||
     "Неизвестный автор";
   const mainImage = story.images?.[0]?.url || "/stories-preview.jpg";
-  const amountText =
-    typeof story.amount === "number"
+  const amountText = story.isContestWinner
+    ? "5 000"
+    : typeof story.amount === "number"
       ? new Intl.NumberFormat("ru-RU").format(story.amount)
       : null;
 

@@ -196,6 +196,7 @@ export default function AdminClient() {
             status: "PENDING",
             comment: "",
             decreaseTrustOnDecision: false,
+            publishInStories: false,
           })
         }
         onStatusChange={(status) =>
@@ -206,6 +207,8 @@ export default function AdminClient() {
               status === "APPROVED" || status === "REJECTED"
                 ? prev.decreaseTrustOnDecision
                 : false, // «Конкурс» не одобряет и не отклоняет
+            publishInStories:
+              status === "CONTEST" ? prev.publishInStories : false,
           }))
         }
         onCommentChange={(comment) =>
@@ -213,6 +216,9 @@ export default function AdminClient() {
         }
         onDecreaseTrustChange={(next) =>
           setModal((prev) => ({ ...prev, decreaseTrustOnDecision: next }))
+        }
+        onPublishChange={(publishInStories) =>
+          setModal((prev) => ({ ...prev, publishInStories }))
         }
         onSave={updateStatus}
       />

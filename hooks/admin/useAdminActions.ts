@@ -17,11 +17,13 @@ export function useAdminActions({
     status: ApplicationStatus;
     comment: string;
     decreaseTrustOnDecision: boolean;
+    publishInStories: boolean;
   }>({
     id: "",
     status: "PENDING",
     comment: "",
     decreaseTrustOnDecision: false,
+    publishInStories: false,
   });
 
   const [deleteModal, setDeleteModal] = useState<{
@@ -90,6 +92,7 @@ export function useAdminActions({
           status: modal.status,
           adminComment: modal.comment,
           decreaseTrustOnDecision: Boolean(modal.decreaseTrustOnDecision),
+          publishInStories: modal.publishInStories,
         }),
       });
 
@@ -105,6 +108,7 @@ export function useAdminActions({
         status: "PENDING",
         comment: "",
         decreaseTrustOnDecision: false,
+        publishInStories: false,
       });
 
       // Обновляем данные
@@ -147,8 +151,15 @@ export function useAdminActions({
     id: string,
     status: ApplicationStatus,
     comment: string,
+    publishInStories: boolean,
   ) => {
-    setModal({ id, status, comment, decreaseTrustOnDecision: false });
+    setModal({
+      id,
+      status,
+      comment,
+      decreaseTrustOnDecision: false,
+      publishInStories,
+    });
   };
 
   const handleQuickApprove = (

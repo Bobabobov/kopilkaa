@@ -27,6 +27,7 @@ export interface Story {
   summary: string;
   story?: string;
   createdAt?: string;
+  isContestWinner?: boolean;
   images?: Array<{ url: string; sort: number }>;
   user?: {
     id: string;
@@ -320,19 +321,20 @@ export default function StoryPageClient({
               <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#f9bc60]/10 blur-3xl pointer-events-none" />
               <div className="absolute -bottom-20 -left-20 h-32 w-32 rounded-full bg-[#abd1c6]/10 blur-3xl pointer-events-none" />
               <div className="relative">
-            <StoryHeader
-              title={story.title}
-              author={
-                story.user?.name || story.user?.email || "Неизвестный автор"
-              }
-              authorId={story.user?.id}
-              authorAvatar={story.user?.avatar}
-              createdAt={story.createdAt}
-              isAd={story.id === "ad"}
-              authorExternalUrl={
-                story.id === "ad" ? story.advertiserLink : undefined
-              }
-            />
+              <StoryHeader
+                title={story.title}
+                author={
+                  story.user?.name || story.user?.email || "Неизвестный автор"
+                }
+                authorId={story.user?.id}
+                authorAvatar={story.user?.avatar}
+                createdAt={story.createdAt}
+                isAd={story.id === "ad"}
+                isContestWinner={!!story.isContestWinner}
+                authorExternalUrl={
+                  story.id === "ad" ? story.advertiserLink : undefined
+                }
+              />
 
             <StoryMetadata
               story={story}

@@ -72,6 +72,7 @@ export async function GET(req: Request) {
           amount: true,
           payment: true,
           status: true,
+          publishInStories: true,
           adminComment: true,
           createdAt: true,
           updatedAt: true,

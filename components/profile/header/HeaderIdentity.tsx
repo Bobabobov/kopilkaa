@@ -14,9 +14,9 @@ export function HeaderIdentity({
   status,
 }: HeaderIdentityProps) {
   return (
-    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-0 -mt-8 sm:-mt-10 md:-mt-12">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-0 mt-0 sm:-mt-10 md:-mt-12 min-w-0">
       <motion.h1
-        className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight"
+        className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight break-words"
         initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}

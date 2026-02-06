@@ -141,7 +141,7 @@ export default function AvatarUpload({
         {/* Аватарка */}
         <div className="relative">
           <motion.div
-            className={`relative w-28 h-28 rounded-2xl flex items-center justify-center text-[#abd1c6] font-bold text-2xl shadow-2xl mx-auto mb-6 overflow-hidden border-2 border-[#abd1c6]/30 group-hover:border-[#f9bc60]/50 group-hover:shadow-[#f9bc60]/30 transition-all duration-300 ${
+            className={`relative w-20 h-20 xs:w-24 xs:h-24 sm:w-28 sm:h-28 rounded-xl xs:rounded-2xl flex items-center justify-center text-[#abd1c6] font-bold text-lg xs:text-xl sm:text-2xl shadow-2xl mx-auto mb-4 xs:mb-5 sm:mb-6 overflow-hidden border-2 border-[#abd1c6]/30 group-hover:border-[#f9bc60]/50 group-hover:shadow-[#f9bc60]/30 transition-all duration-300 ${
               displayAvatar
                 ? "bg-[#001e1d]/40"
                 : "bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d]"
@@ -150,20 +150,20 @@ export default function AvatarUpload({
             transition={{ duration: 0.5 }}
           >
             {/* Декоративное свечение */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/20 via-transparent to-[#abd1c6]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/20 via-transparent to-[#abd1c6]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl xs:rounded-2xl" />
 
             {displayAvatar ? (
               <motion.img
                 src={displayAvatar}
                 alt="Аватарка"
-                className="w-full h-full object-cover rounded-2xl relative z-10"
+                className="w-full h-full object-cover rounded-xl xs:rounded-2xl relative z-10"
                 whileHover={{ scale: 1.05 }}
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                 }}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center rounded-2xl relative z-10">
+              <div className="w-full h-full flex items-center justify-center rounded-xl xs:rounded-2xl relative z-10">
                 <span className="relative z-10">{avatarLetter}</span>
               </div>
             )}
@@ -171,7 +171,7 @@ export default function AvatarUpload({
 
           {/* Индикатор загрузки */}
           {uploading && (
-            <div className="absolute inset-0 bg-[#001e1d]/80 rounded-2xl flex items-center justify-center">
+            <div className="absolute inset-0 bg-[#001e1d]/80 rounded-xl xs:rounded-2xl flex items-center justify-center">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}

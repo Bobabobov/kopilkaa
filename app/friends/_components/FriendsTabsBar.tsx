@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 
-export type FriendsTabId = "friends" | "sent" | "received" | "search";
+export type FriendsTabId = "friends" | "sent" | "received" | "online" | "search";
 
 export type FriendsTabItem = {
   id: FriendsTabId;

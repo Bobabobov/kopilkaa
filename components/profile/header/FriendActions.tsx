@@ -31,10 +31,11 @@ export function FriendActions({
         {onRemoveFriend && (
           <button
             onClick={onRemoveFriend}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 text-sm font-medium text-white transition-all duration-200"
+            className="inline-flex items-center justify-center gap-1.5 xs:gap-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-2.5 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2 text-xs xs:text-sm font-medium text-white transition-all duration-200"
+            title="Удалить из друзей"
           >
-            <LucideIcons.UserMinus size="sm" />
-            Удалить из друзей
+            <LucideIcons.UserMinus size="sm" className="flex-shrink-0" />
+            <span className="hidden sm:inline">Удалить из друзей</span>
           </button>
         )}
       </div>
@@ -50,16 +51,16 @@ export function FriendActions({
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={onAcceptIncoming}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-500/80 hover:bg-emerald-500 border border-emerald-400/50 px-4 py-2 text-sm font-medium text-white transition-all duration-200"
+            className="inline-flex items-center justify-center gap-1 xs:gap-1.5 rounded-lg bg-emerald-500/80 hover:bg-emerald-500 border border-emerald-400/50 px-3 py-1.5 xs:px-4 xs:py-2 text-xs xs:text-sm font-medium text-white transition-all duration-200"
           >
-            <LucideIcons.Check size="sm" />
+            <LucideIcons.Check size="sm" className="flex-shrink-0" />
             Принять
           </button>
           <button
             onClick={onDeclineIncoming}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 text-sm font-medium text-white transition-all duration-200"
+            className="inline-flex items-center justify-center gap-1 xs:gap-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1.5 xs:px-4 xs:py-2 text-xs xs:text-sm font-medium text-white transition-all duration-200"
           >
-            <LucideIcons.X size="sm" />
+            <LucideIcons.X size="sm" className="flex-shrink-0" />
             Отклонить
           </button>
         </div>
@@ -78,12 +79,13 @@ export function FriendActions({
   return (
     <motion.button
       onClick={onSendRequest}
-      className="inline-flex items-center justify-center gap-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 text-sm font-medium text-white transition-all duration-200"
+      className="inline-flex items-center justify-center gap-1.5 xs:gap-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1.5 xs:px-4 xs:py-2 text-xs xs:text-sm font-medium text-white transition-all duration-200"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
+      title="Добавить в друзья"
     >
-      <LucideIcons.UserPlus size="sm" />
-      Добавить в друзья
+      <LucideIcons.UserPlus size="sm" className="flex-shrink-0" />
+      <span className="hidden xs:inline">Добавить в друзья</span>
     </motion.button>
   );
 }

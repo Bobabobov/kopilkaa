@@ -12,9 +12,9 @@ export function useProfileUrlParams() {
     const requestedTab = searchParams.get("friendsTab");
     if (!requestedTab) return;
 
-    const allowedTabs = new Set(["friends", "sent", "received", "search"]);
+    const allowedTabs = new Set(["friends", "sent", "received", "online", "search"]);
     const tab = allowedTabs.has(requestedTab)
-      ? (requestedTab as "friends" | "sent" | "received" | "search")
+      ? (requestedTab as "friends" | "sent" | "received" | "online" | "search")
       : "friends";
 
     const params = new URLSearchParams(searchParams.toString());

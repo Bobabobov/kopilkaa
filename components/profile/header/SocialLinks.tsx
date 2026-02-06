@@ -24,7 +24,7 @@ export function SocialLinks({ user, className }: SocialLinksProps) {
 
   return (
     <motion.div
-      className={`flex items-center gap-2 flex-nowrap ${className ?? ""}`}
+      className={`flex items-center gap-1.5 xs:gap-2 flex-wrap sm:flex-nowrap ${className ?? ""}`}
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}

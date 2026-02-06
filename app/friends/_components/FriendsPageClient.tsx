@@ -7,6 +7,7 @@ import { useFriends } from "@/components/profile/hooks/useFriends";
 import { useAutoHideScrollbar } from "@/hooks/ui/useAutoHideScrollbar";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { FriendsList } from "@/components/friends/FriendsList";
+import { FriendsOnlineList } from "@/components/friends/FriendsOnlineList";
 import { FriendsSearch } from "@/components/friends/FriendsSearch";
 import { FriendsSidebar } from "@/components/friends/FriendsSidebar";
 import { FriendsPageHeader } from "@/app/friends/_components/FriendsPageHeader";
@@ -24,6 +25,7 @@ export default function FriendsPageClient() {
     "friends",
     "sent",
     "received",
+    "online",
     "search",
   ]);
   const initialTab: FriendsTabId = allowedTabs.has(tabParam as FriendsTabId)
@@ -47,6 +49,9 @@ export default function FriendsPageClient() {
     setSearchQuery,
     searchResults,
     searchLoading,
+    onlineUsers,
+    onlineLoading,
+    loadOnlineUsers,
     sendFriendRequest,
     cancelFriendRequest,
     acceptFriendRequest,
@@ -55,6 +60,12 @@ export default function FriendsPageClient() {
     getUserStatus,
     sendingRequests,
   } = useFriends();
+
+  useEffect(() => {
+    if (activeTab === "online") {
+      loadOnlineUsers();
+    }
+  }, [activeTab, loadOnlineUsers]);
 
   useEffect(() => {
     const saved = localStorage.getItem("lastReadFriendRequestId");
@@ -103,6 +114,12 @@ export default function FriendsPageClient() {
       label: "Полученные",
       count: receivedRequests.length,
       icon: <LucideIcons.Inbox size="sm" />,
+    },
+    {
+      id: "online" as const,
+      label: "Онлайн",
+      count: onlineUsers.length,
+      icon: <LucideIcons.Activity size="sm" />,
     },
     {
       id: "search" as const,
@@ -241,6 +258,24 @@ export default function FriendsPageClient() {
                         onAcceptRequest: handleAcceptRequest,
                         onDeclineRequest: handleDeclineRequest,
                       }}
+                    />
+                  </motion.div>
+                )}
+
+                {activeTab === "online" && (
+                  <motion.div
+                    key="online"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <FriendsOnlineList
+                      onlineUsers={onlineUsers}
+                      onlineLoading={onlineLoading}
+                      getUserStatus={getUserStatus}
+                      sendingRequests={sendingRequests}
+                      onSendRequest={handleSendRequest}
+                      onCancelRequest={handleCancelRequest}
                     />
                   </motion.div>
                 )}

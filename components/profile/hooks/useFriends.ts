@@ -46,6 +46,11 @@ interface UseFriendsReturn {
   searchLoading: boolean;
   debouncedQuery: string;
 
+  // Онлайн
+  onlineUsers: User[];
+  onlineLoading: boolean;
+  loadOnlineUsers: () => Promise<void>;
+
   // Действия
   sendFriendRequest: (userId: string) => Promise<void>;
   cancelFriendRequest: (friendshipId: string, userId: string) => Promise<void>;
@@ -74,6 +79,8 @@ export function useFriends(): UseFriendsReturn {
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
+  const [onlineLoading, setOnlineLoading] = useState(false);
   const [sendingRequests, setSendingRequests] = useState<Set<string>>(
     new Set(),
   );
@@ -141,18 +148,23 @@ export function useFriends(): UseFriendsReturn {
     }
   }, [showToast, emitFriendsUpdated, emitFriendRequestsUpdated]);
 
-  // Поиск пользователей
+  const MIN_SEARCH_LENGTH = 2;
+
+  // Поиск пользователей (только при 2+ символах — как в современных соцсетях)
   const searchUsers = useCallback(async (query: string) => {
+    const trimmed = query.trim();
+    if (trimmed.length < MIN_SEARCH_LENGTH) {
+      setSearchResults([]);
+      return;
+    }
+
     try {
       setSearchLoading(true);
 
-      // Если запрос пустой, показываем всех пользователей
-      const url = query.trim()
-        ? `/api/users/search?q=${encodeURIComponent(query)}&limit=50`
-        : "/api/users/search?limit=50";
+      const url = `/api/users/search?q=${encodeURIComponent(trimmed)}&limit=50`;
 
       const response = await fetch(url, {
-        cache: "no-store", // Не кешируем, чтобы всегда получать актуальные данные
+        cache: "no-store",
       });
 
       if (response.ok) {
@@ -180,10 +192,33 @@ export function useFriends(): UseFriendsReturn {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Поиск при изменении debouncedQuery
+  // Поиск только при 2+ символах; при пустом/коротком запросе — пустой список
   useEffect(() => {
+    if (debouncedQuery.trim().length < MIN_SEARCH_LENGTH) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      return;
+    }
     searchUsers(debouncedQuery);
   }, [debouncedQuery, searchUsers]);
+
+  const loadOnlineUsers = useCallback(async () => {
+    try {
+      setOnlineLoading(true);
+      const response = await fetch("/api/users/online", { cache: "no-store" });
+      if (response.ok) {
+        const data = await response.json();
+        setOnlineUsers(data.users || []);
+      } else {
+        setOnlineUsers([]);
+      }
+    } catch (error) {
+      console.error("Error loading online users:", error);
+      setOnlineUsers([]);
+    } finally {
+      setOnlineLoading(false);
+    }
+  }, []);
 
   // Отправка заявки в друзья
   const sendFriendRequest = async (userId: string) => {
@@ -207,14 +242,15 @@ export function useFriends(): UseFriendsReturn {
           setSentRequests((prev) => [...prev, data.friendship]);
         }
 
-        // Обновляем данные параллельно
-        await Promise.all([
-          loadFriends(),
-          // Небольшая задержка перед обновлением поиска, чтобы БД успела обновиться
-          new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
-            searchUsers(debouncedQuery || searchQuery),
-          ),
-        ]);
+        await loadFriends();
+        const q = (debouncedQuery || searchQuery).trim();
+        if (q.length >= MIN_SEARCH_LENGTH) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          searchUsers(debouncedQuery || searchQuery);
+        } else {
+          setSearchResults([]);
+        }
+        loadOnlineUsers();
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
@@ -250,13 +286,15 @@ export function useFriends(): UseFriendsReturn {
         setSentRequests((prev) => prev.filter((f) => f.id !== friendshipId));
 
         // Обновляем данные параллельно
-        await Promise.all([
-          loadFriends(),
-          // Небольшая задержка перед обновлением поиска, чтобы БД успела обновиться
-          new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
-            searchUsers(debouncedQuery || searchQuery),
-          ),
-        ]);
+        await loadFriends();
+        const qCancel = (debouncedQuery || searchQuery).trim();
+        if (qCancel.length >= MIN_SEARCH_LENGTH) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          searchUsers(debouncedQuery || searchQuery);
+        } else {
+          setSearchResults([]);
+        }
+        loadOnlineUsers();
       } else {
         const errorData = await response.json();
         console.error("Cancel error response:", errorData);
@@ -294,13 +332,15 @@ export function useFriends(): UseFriendsReturn {
         );
 
         // Обновляем данные параллельно
-        await Promise.all([
-          loadFriends(),
-          // Небольшая задержка перед обновлением поиска, чтобы БД успела обновиться
-          new Promise((resolve) => setTimeout(resolve, 100)).then(() =>
-            searchUsers(debouncedQuery || searchQuery),
-          ),
-        ]);
+        await loadFriends();
+        const qAccept = (debouncedQuery || searchQuery).trim();
+        if (qAccept.length >= MIN_SEARCH_LENGTH) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          searchUsers(debouncedQuery || searchQuery);
+        } else {
+          setSearchResults([]);
+        }
+        loadOnlineUsers();
       } else {
         const errorData = await response.json();
         showToast("error", errorData.message || "Ошибка принятия заявки");
@@ -362,29 +402,27 @@ export function useFriends(): UseFriendsReturn {
     }
   };
 
-  // Загружаем данные при монтировании
   useEffect(() => {
     loadFriends();
-    // Загружаем всех пользователей для поиска при инициализации
-    searchUsers("");
-  }, []); // Убираем зависимость от loadFriends, чтобы избежать бесконечного цикла
+  }, []);
 
   return {
-    // Состояние
     friends,
     sentRequests,
     receivedRequests,
     loading,
     currentUserId,
 
-    // Поиск
     searchQuery,
     setSearchQuery,
     searchResults,
     searchLoading,
     debouncedQuery,
 
-    // Действия
+    onlineUsers,
+    onlineLoading,
+    loadOnlineUsers,
+
     sendFriendRequest,
     cancelFriendRequest,
     acceptFriendRequest,
@@ -392,7 +430,6 @@ export function useFriends(): UseFriendsReturn {
     removeFriend,
     loadFriends,
 
-    // Утилиты
     getUserStatus,
     sendingRequests,
   };

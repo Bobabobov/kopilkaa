@@ -43,7 +43,7 @@ export function CtaRow({
   setIsGuestActionsOpen,
 }: CtaRowProps) {
   return (
-    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+    <div className="flex flex-wrap items-center gap-1.5 xs:gap-2 sm:gap-3 min-w-0">
       {isOwner ? (
         <>{hasSocialLinks && <SocialLinks user={user} />}</>
       ) : (

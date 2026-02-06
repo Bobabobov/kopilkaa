@@ -55,7 +55,7 @@ export default function ProfileLayout({
 }: ProfileLayoutProps) {
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      className="min-h-screen relative overflow-x-hidden overflow-y-auto"
       role="main"
       aria-label="Профиль пользователя"
     >

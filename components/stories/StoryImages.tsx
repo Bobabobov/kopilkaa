@@ -67,7 +67,7 @@ function StoryImagesInner({ images = [], title }: StoryImagesProps) {
             >
             <button
               type="button"
-                className="relative w-full aspect-[4/3] sm:aspect-[3/2] flex items-center justify-center bg-[#001e1d]/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/60"
+                className="relative w-full min-h-[180px] aspect-[4/3] sm:aspect-[3/2] flex items-center justify-center bg-[#001e1d]/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/60"
                 onClick={() => {
                   if (!isFailed) openLightbox(index);
                 }}

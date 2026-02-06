@@ -1,6 +1,7 @@
 // components/stories/StoryLightbox.tsx
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
@@ -87,32 +88,49 @@ export function StoryLightbox({
     isUploadUrl(fullUrl) || isExternalUrl(fullUrl);
   const isFailed = failedUrls[fullUrl];
 
-  return (
+  const content = (
     <div
-      className="fixed inset-0 z-[999] bg-black/95 backdrop-blur-md flex items-center justify-center"
+      className="fixed inset-0 z-[999] bg-black flex items-center justify-center overflow-hidden min-h-screen"
+      style={{
+        minHeight: "100dvh",
+        paddingTop: "env(safe-area-inset-top)",
+        paddingRight: "env(safe-area-inset-right)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+        paddingLeft: "env(safe-area-inset-left)",
+      }}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Просмотр изображений"
     >
       <div
-        className="relative w-full h-full flex items-center justify-center"
+        className="relative w-full h-full flex items-center justify-center min-h-0"
+        onClick={(e) => e.stopPropagation()}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Кнопка закрытия */}
+        {/* Кнопка закрытия — всегда видна, safe area, крупный тап */}
         <button
-          className="absolute top-3 right-3 sm:top-5 sm:right-5 p-2.5 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm z-20 transition-colors"
-          onClick={onClose}
+          type="button"
+          className="absolute z-[30] p-3 sm:p-3.5 rounded-full bg-black/60 hover:bg-black/80 text-white border border-white/20 shadow-lg min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+          style={{
+            top: "max(0.5rem, env(safe-area-inset-top, 0px))",
+            right: "max(0.5rem, env(safe-area-inset-right, 0px))",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
           aria-label="Закрыть просмотр"
         >
-          <LucideIcons.Close size="lg" />
+          <LucideIcons.X size="lg" className="w-6 h-6 sm:w-7 sm:h-7" />
         </button>
 
         {/* Навигация: кликабельные зоны по краям */}
         {images.length > 1 && (
           <>
             <button
+              type="button"
               className="absolute left-0 top-0 h-full w-1/4 sm:w-1/6 cursor-pointer z-10"
               onClick={(e) => {
                 e.stopPropagation();
@@ -121,6 +139,7 @@ export function StoryLightbox({
               aria-label="Предыдущее изображение"
             />
             <button
+              type="button"
               className="absolute right-0 top-0 h-full w-1/4 sm:w-1/6 cursor-pointer z-10"
               onClick={(e) => {
                 e.stopPropagation();
@@ -131,45 +150,57 @@ export function StoryLightbox({
           </>
         )}
 
-        {/* Изображение */}
-        <div className="relative w-[94vw] h-[86vh] max-w-6xl max-h-[90vh]">
-          {isFailed ? (
-            <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-white/80">
-              <LucideIcons.Image size="lg" />
-              Изображение недоступно
-            </div>
-          ) : (
-            <Image
-              src={fullUrl}
-              alt={`Фото ${currentIndex + 1}`}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1200px) 95vw, 1400px"
-              className="object-contain"
-              draggable={false}
-              unoptimized={shouldBypassOptimization}
-              onError={() =>
-                setFailedUrls((prev) => ({ ...prev, [fullUrl]: true }))
-              }
-            />
-          )}
+        {/* Изображение — родитель с явной высотой для Next/Image fill (Context7/Next.js) */}
+        <div
+          className="relative flex-1 min-w-0 min-h-[50vh] flex items-center justify-center px-2 py-14 sm:py-16"
+          style={{
+            maxHeight: "calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 4rem)",
+          }}
+        >
+          <div className="relative w-full h-full min-h-[40vh] max-w-6xl max-h-full">
+            {isFailed ? (
+              <div className="flex h-full min-h-[200px] w-full flex-col items-center justify-center gap-3 text-white/80">
+                <LucideIcons.Image size="lg" />
+                Изображение недоступно
+              </div>
+            ) : (
+              <Image
+                src={fullUrl}
+                alt={`Фото ${currentIndex + 1}`}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1200px) 95vw, 1400px"
+                className="object-contain pointer-events-none select-none"
+                draggable={false}
+                unoptimized={shouldBypassOptimization}
+                onError={() =>
+                  setFailedUrls((prev) => ({ ...prev, [fullUrl]: true }))
+                }
+              />
+            )}
+          </div>
         </div>
 
         {/* Визуальные стрелки (без клика) */}
         {images.length > 1 && (
           <>
-            <div className="pointer-events-none absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-white/10 text-white backdrop-blur-sm z-10">
+            <div className="pointer-events-none absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-black/50 text-white z-10">
               <LucideIcons.ChevronLeft size="lg" />
             </div>
-            <div className="pointer-events-none absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-white/10 text-white backdrop-blur-sm z-10">
+            <div className="pointer-events-none absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-black/50 text-white z-10">
               <LucideIcons.ChevronRight size="lg" />
             </div>
           </>
         )}
 
-        {/* Счетчик изображений */}
+        {/* Счетчик изображений — с учётом safe area снизу */}
         {images.length > 1 && (
-          <div className="absolute bottom-3 sm:bottom-5 left-0 right-0 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm">
+          <div
+            className="absolute left-0 right-0 text-center z-10"
+            style={{
+              bottom: "max(0.75rem, env(safe-area-inset-bottom))",
+            }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm">
               <LucideIcons.Image size="sm" />
               {currentIndex + 1} из {images.length}
             </div>
@@ -178,4 +209,7 @@ export function StoryLightbox({
       </div>
     </div>
   );
+
+  if (typeof document === "undefined") return null;
+  return createPortal(content, document.body);
 }

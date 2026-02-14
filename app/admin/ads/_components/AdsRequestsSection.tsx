@@ -38,6 +38,9 @@ export default function AdsRequestsSection() {
         const data = await response.json();
         setAdRequests(data.adRequests);
         setStats(data.stats);
+      } else if (response.status === 401) {
+        setAdRequests([]);
+        setStats(null);
       } else {
         console.error("Failed to fetch ad requests:", response.statusText);
       }

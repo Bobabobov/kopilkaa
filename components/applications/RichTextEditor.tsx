@@ -2,7 +2,6 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
@@ -55,7 +54,6 @@ export default function RichTextEditor({
           levels: [3],
         },
       }),
-      Underline,
       ...(allowLinks
         ? [
             Link.configure({

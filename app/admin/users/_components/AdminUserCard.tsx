@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { getTrustLabel } from "@/lib/trustLevel";
 import { formatDateShort, formatDateTime } from "@/lib/time";
 import { TrustDeltaControl } from "./TrustDeltaControl";
+import { ResetPasswordModal } from "./ResetPasswordModal";
 import type { AdminUser } from "./types";
 
 interface AdminUserCardProps {
@@ -29,6 +31,7 @@ export function AdminUserCard({
   onDelete,
   showToast,
 }: AdminUserCardProps) {
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const effectiveApproved = user.effectiveApprovedApplications ?? 0;
 
   return (
@@ -123,7 +126,16 @@ export function AdminUserCard({
             </div>
           </div>
 
-          <div className="mt-4 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setShowResetPassword(true)}
+              className="inline-flex items-center gap-1 text-xs text-[#abd1c6] hover:text-[#f9bc60] transition-colors"
+              title="Сбросить пароль пользователю"
+            >
+              <LucideIcons.Lock className="w-3 h-3" />
+              <span>Сбросить пароль</span>
+            </button>
             <button
               onClick={() =>
                 onDelete(user.id, user.name || user.email || "Пользователь")
@@ -149,6 +161,16 @@ export function AdminUserCard({
               )}
             </button>
           </div>
+
+          {showResetPassword && (
+            <ResetPasswordModal
+              userId={user.id}
+              userName={user.name || user.email || "Пользователь"}
+              onClose={() => setShowResetPassword(false)}
+              onSuccess={() => {}}
+              showToast={showToast}
+            />
+          )}
         </div>
       </div>
     </motion.div>

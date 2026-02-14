@@ -86,7 +86,7 @@ export default function HomeHeroScene({ stats, loading }: HomeHeroSceneProps) {
             >
               <Link href="/applications">Рассказать историю</Link>
             </Button>
-            <DonateButton variant="secondary" className="w-full sm:w-auto" />
+            <DonateButton variant="default" className="w-full sm:w-auto" />
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">

@@ -58,6 +58,12 @@ export type LightboxState = {
   currentIndex: number;
 };
 
+export type AdminUserLinkRef = {
+  id: string;
+  email: string | null;
+  name: string | null;
+};
+
 export interface AdminUser {
   id: string;
   email: string | null;
@@ -69,4 +75,9 @@ export interface AdminUser {
   trustDelta?: number;
   trustLevel?: TrustLevel;
   effectiveApprovedApplications?: number;
+  /** Связи по реквизитам и IP (возможные мультиаккаунты). Есть только при запросе с withLinks=1. */
+  links?: {
+    samePayment: AdminUserLinkRef[];
+    sameIp: AdminUserLinkRef[];
+  };
 }

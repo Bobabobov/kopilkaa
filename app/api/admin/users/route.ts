@@ -7,6 +7,12 @@ import { getTrustLevelFromEffectiveApproved } from "@/lib/trustLevel";
 
 export const dynamic = "force-dynamic";
 
+type UserRef = { id: string; email: string | null; name: string | null };
+
+function paymentDigits(s: string): string {
+  return (s ?? "").replace(/\D/g, "");
+}
+
 // GET /api/admin/users - получить список пользователей для админа
 export async function GET(request: Request) {
   try {
@@ -22,6 +28,7 @@ export async function GET(request: Request) {
       Math.max(1, Number(searchParams.get("limit") || 20)),
     );
     const q = (searchParams.get("q") || "").trim();
+    const withLinks = searchParams.get("withLinks") === "1";
 
     const where: any = {};
     if (q) {
@@ -72,7 +79,7 @@ export async function GET(request: Request) {
       effectiveMap.set(group.userId, group._count?._all ?? 0);
     });
 
-    const usersWithTrust = users.map((user) => {
+    let usersWithTrust = users.map((user) => {
       const effectiveApprovedApplications = effectiveMap.get(user.id) ?? 0;
       const trustDelta = user.trustDelta ?? 0;
       return {
@@ -84,6 +91,101 @@ export async function GET(request: Request) {
         ),
       };
     });
+
+    if (withLinks && userIds.length > 0) {
+      const apps = await prisma.application.findMany({
+        where: { userId: { in: userIds } },
+        select: { userId: true, payment: true, submitterIp: true },
+      });
+
+      const paymentDigitsToUserIds = new Map<string, Set<string>>();
+      const ipToUserIds = new Map<string, Set<string>>();
+      for (const app of apps) {
+        const digits = paymentDigits(app.payment);
+        if (digits.length >= 10) {
+          let set = paymentDigitsToUserIds.get(digits);
+          if (!set) {
+            set = new Set();
+            paymentDigitsToUserIds.set(digits, set);
+          }
+          set.add(app.userId);
+        }
+        if (app.submitterIp && app.submitterIp.trim() !== "") {
+          let set = ipToUserIds.get(app.submitterIp);
+          if (!set) {
+            set = new Set();
+            ipToUserIds.set(app.submitterIp, set);
+          }
+          set.add(app.userId);
+        }
+      }
+
+      const userApps = new Map<string, typeof apps>();
+      for (const app of apps) {
+        const list = userApps.get(app.userId) ?? [];
+        list.push(app);
+        userApps.set(app.userId, list);
+      }
+
+      const linkedIds = new Set<string>();
+      const linksByUserId = new Map<
+        string,
+        { samePayment: string[]; sameIp: string[] }
+      >();
+      for (const user of usersWithTrust) {
+        const userApplications = userApps.get(user.id) ?? [];
+        const myPaymentDigits = new Set<string>();
+        const myIps = new Set<string>();
+        for (const app of userApplications) {
+          const d = paymentDigits(app.payment);
+          if (d.length >= 10) myPaymentDigits.add(d);
+          if (app.submitterIp?.trim()) myIps.add(app.submitterIp);
+        }
+        const samePaymentIds = new Set<string>();
+        const sameIpIds = new Set<string>();
+        for (const d of myPaymentDigits) {
+          const uids = paymentDigitsToUserIds.get(d);
+          if (uids) for (const uid of uids) if (uid !== user.id) samePaymentIds.add(uid);
+        }
+        for (const ip of myIps) {
+          const uids = ipToUserIds.get(ip);
+          if (uids) for (const uid of uids) if (uid !== user.id) sameIpIds.add(uid);
+        }
+        const samePaymentArr = [...samePaymentIds].slice(0, 15);
+        const sameIpArr = [...sameIpIds].slice(0, 15);
+        linksByUserId.set(user.id, {
+          samePayment: samePaymentArr,
+          sameIp: sameIpArr,
+        });
+        samePaymentArr.forEach((id) => linkedIds.add(id));
+        sameIpArr.forEach((id) => linkedIds.add(id));
+      }
+
+      const linkedUsers: UserRef[] =
+        linkedIds.size > 0
+          ? await prisma.user.findMany({
+              where: { id: { in: [...linkedIds] } },
+              select: { id: true, email: true, name: true },
+            })
+          : [];
+      const linkedMap = new Map(linkedUsers.map((u) => [u.id, u]));
+
+      usersWithTrust = usersWithTrust.map((user) => {
+        const links = linksByUserId.get(user.id);
+        if (!links) return { ...user, links: { samePayment: [], sameIp: [] } };
+        return {
+          ...user,
+          links: {
+            samePayment: links.samePayment.map(
+              (id) => linkedMap.get(id) ?? { id, email: null, name: null },
+            ),
+            sameIp: links.sameIp.map(
+              (id) => linkedMap.get(id) ?? { id, email: null, name: null },
+            ),
+          },
+        };
+      });
+    }
 
     return NextResponse.json({
       success: true,

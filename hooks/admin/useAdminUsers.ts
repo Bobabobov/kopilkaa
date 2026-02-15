@@ -58,6 +58,7 @@ export function useAdminUsers() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: "20",
+        withLinks: "1",
         ...(searchQuery && { q: searchQuery }),
       });
 

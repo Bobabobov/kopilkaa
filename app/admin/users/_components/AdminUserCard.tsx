@@ -93,6 +93,87 @@ export function AdminUserCard({
             </div>
           </div>
 
+          {user.links &&
+            (user.links.samePayment.length > 0 ||
+              user.links.sameIp.length > 0) && (
+              <div
+                className="mt-3 p-3 rounded-lg border text-xs"
+                style={{
+                  backgroundColor: "rgba(232, 165, 69, 0.08)",
+                  borderColor: "rgba(232, 165, 69, 0.3)",
+                }}
+              >
+                <p
+                  className="font-semibold mb-2"
+                  style={{ color: "#e8a545" }}
+                >
+                  Возможные дубли (мультиаккаунты)
+                </p>
+                {user.links.samePayment.length > 0 && (
+                  <div className="mb-2">
+                    <span className="text-[#abd1c6]/90">
+                      По реквизитам:{" "}
+                      <span className="font-medium text-[#f9bc60]">
+                        {user.links.samePayment.length} акк.
+                      </span>{" "}
+                      (
+                    </span>
+                    {user.links.samePayment.slice(0, 5).map((u, i) => (
+                      <span key={u.id}>
+                        {i > 0 && ", "}
+                        <Link
+                          href={`/profile/${u.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#abd1c6] hover:text-[#f9bc60] underline underline-offset-1"
+                        >
+                          {u.email ?? u.name ?? u.id.slice(0, 8)}
+                        </Link>
+                      </span>
+                    ))}
+                    {user.links.samePayment.length > 5 && (
+                      <span className="text-[#94a1b2]">
+                        {" "}
+                        +{user.links.samePayment.length - 5}
+                      </span>
+                    )}
+                    <span className="text-[#abd1c6]/90">)</span>
+                  </div>
+                )}
+                {user.links.sameIp.length > 0 && (
+                  <div>
+                    <span className="text-[#abd1c6]/90">
+                      По IP:{" "}
+                      <span className="font-medium text-[#f9bc60]">
+                        {user.links.sameIp.length} акк.
+                      </span>{" "}
+                      (
+                    </span>
+                    {user.links.sameIp.slice(0, 5).map((u, i) => (
+                      <span key={u.id}>
+                        {i > 0 && ", "}
+                        <Link
+                          href={`/profile/${u.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#abd1c6] hover:text-[#f9bc60] underline underline-offset-1"
+                        >
+                          {u.email ?? u.name ?? u.id.slice(0, 8)}
+                        </Link>
+                      </span>
+                    ))}
+                    {user.links.sameIp.length > 5 && (
+                      <span className="text-[#94a1b2]">
+                        {" "}
+                        +{user.links.sameIp.length - 5}
+                      </span>
+                    )}
+                    <span className="text-[#abd1c6]/90">)</span>
+                  </div>
+                )}
+              </div>
+            )}
+
           <div className="mt-3">
             <div className="flex items-center justify-between gap-2">
               <div className="text-xs text-[#abd1c6]/80">

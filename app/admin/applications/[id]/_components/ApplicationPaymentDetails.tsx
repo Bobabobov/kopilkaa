@@ -1,10 +1,13 @@
 // app/admin/applications/[id]/components/ApplicationPaymentDetails.tsx
 "use client";
+import Link from "next/link";
 import { motion } from "framer-motion";
+import type { SameApplicationRef } from "../types";
 
 interface ApplicationPaymentDetailsProps {
   payment: string;
   bankName?: string;
+  samePaymentApplications?: SameApplicationRef[];
   onCopyError: (message: string) => void;
 }
 
@@ -23,9 +26,11 @@ function splitPayment(raw: string, bankName?: string) {
 export default function ApplicationPaymentDetails({
   payment,
   bankName,
+  samePaymentApplications = [],
   onCopyError,
 }: ApplicationPaymentDetailsProps) {
   const parsed = splitPayment(payment, bankName);
+  const hasSamePayment = samePaymentApplications.length > 0;
   const handleCopy = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     navigator.clipboard
@@ -117,6 +122,42 @@ export default function ApplicationPaymentDetails({
               </dd>
             </div>
           </dl>
+          <div className="mt-4 pt-4 border-t border-[#abd1c6]/20">
+            <p
+              className="text-xs font-semibold mb-2"
+              style={{ color: "#e8a545" }}
+            >
+              Повторы реквизитов
+            </p>
+            {hasSamePayment ? (
+              <>
+                <p className="text-xs text-[#94a1b2] mb-2">
+                  Эти реквизиты также использовались в других заявках:
+                </p>
+                <ul className="space-y-1.5 text-sm">
+                  {samePaymentApplications.map((app) => (
+                    <li key={app.id}>
+                      <Link
+                        href={`/admin/applications/${app.id}`}
+                        className="inline-flex items-center gap-2 text-[#abd1c6] hover:text-[#f9bc60] transition-colors underline underline-offset-2"
+                      >
+                        Заявка от{" "}
+                        {new Date(app.createdAt).toLocaleDateString("ru-RU")} —
+                        {app.user.email ?? app.user.name ?? app.user.id}
+                      </Link>
+                      <span className="text-[#94a1b2] ml-1 text-xs">
+                        (id: {app.id.slice(0, 10)}…)
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p className="text-sm text-[#94a1b2]">
+                В других заявках такие реквизиты не встречались.
+              </p>
+            )}
+          </div>
           <button
             onClick={handleCopy}
             className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center gap-1 px-2 sm:px-3 py-1 rounded-lg text-xs bg-[#004643] border border-[#f9bc60]/30 hover:border-[#f9bc60] backdrop-blur-sm shadow-sm"

@@ -15,7 +15,7 @@ interface ProgressBarProps {
 const LIMITS = {
   titleMax: 40,
   summaryMax: 60,
-  storyMin: 10,
+  storyMin: 100,
   storyMax: 3000,
   amountMin: 1,
   amountMax: 1000000,

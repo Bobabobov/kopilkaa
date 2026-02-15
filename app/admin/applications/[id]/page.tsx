@@ -9,6 +9,7 @@ import ApplicationHeader from "./_components/ApplicationHeader";
 import ApplicationTitle from "./_components/ApplicationTitle";
 import ApplicationMetaInfo from "./_components/ApplicationMetaInfo";
 import ApplicationPaymentDetails from "./_components/ApplicationPaymentDetails";
+import ApplicationIpBlock from "./_components/ApplicationIpBlock";
 import ApplicationImages from "./_components/ApplicationImages";
 import ApplicationStory from "./_components/ApplicationStory";
 import ApplicationAdminComment from "./_components/ApplicationAdminComment";
@@ -186,7 +187,13 @@ export default function AdminApplicationPage({
             <ApplicationPaymentDetails
               payment={item.payment}
               bankName={item.bankName || undefined}
+              samePaymentApplications={item.samePaymentApplications}
               onCopyError={handleCopyError}
+            />
+
+            <ApplicationIpBlock
+              submitterIp={item.submitterIp}
+              sameIpApplications={item.sameIpApplications}
             />
 
             <ApplicationImages

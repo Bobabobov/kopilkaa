@@ -85,6 +85,7 @@ model Application {
   countTowardsTrust Boolean      @default(true)
   adminComment String?
   filledMs     Int?
+  submitterIp  String?           // IP при подаче заявки (для админки: поиск дублей)
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 

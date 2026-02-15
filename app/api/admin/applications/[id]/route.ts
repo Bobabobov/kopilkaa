@@ -7,6 +7,12 @@ import { publish } from "@/lib/sse";
 import { sendStatusEmail } from "@/lib/email";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
+type SameRef = {
+  id: string;
+  createdAt: Date;
+  user: { id: string; email: string | null; name: string | null };
+};
+
 export async function GET(
   req: Request,
   { params }: { params: { id: string } },
@@ -29,6 +35,7 @@ export async function GET(
         publishInStories: true,
         adminComment: true,
         filledMs: true,
+        submitterIp: true,
         createdAt: true,
         updatedAt: true,
         countTowardsTrust: true,
@@ -38,10 +45,82 @@ export async function GET(
     });
 
     if (!item) return Response.json({ error: "Not found" }, { status: 404 });
+
+    // Нормализация реквизитов: пробелы/переносы → один пробел, trim
+    const normalizePayment = (s: string) =>
+      (s ?? "").replace(/\s+/g, " ").trim();
+    // Только цифры из реквизитов (для сопоставления, когда в одной заявке "Банк: ...", в другой только номер)
+    const paymentDigits = (s: string) => (s ?? "").replace(/\D/g, "");
+    const paymentNorm = normalizePayment(item.payment);
+    const currentDigits = paymentDigits(item.payment);
+    let samePaymentApplications: SameRef[] = [];
+
+    if (paymentNorm || currentDigits.length >= 10) {
+      const all = await prisma.application.findMany({
+        where: { id: { not: params.id } },
+        orderBy: { createdAt: "desc" },
+        take: 500,
+        select: {
+          id: true,
+          createdAt: true,
+          userId: true,
+          payment: true,
+        },
+      });
+      const matching = all.filter((a) => {
+        const norm = normalizePayment(a.payment);
+        const digits = paymentDigits(a.payment);
+        if (paymentNorm && norm === paymentNorm) return true;
+        if (currentDigits.length >= 10 && digits === currentDigits) return true;
+        return false;
+      });
+      if (matching.length) {
+        const userIds = [...new Set(matching.map((m) => m.userId))];
+        const users = await prisma.user.findMany({
+          where: { id: { in: userIds } },
+          select: { id: true, email: true, name: true },
+        });
+        const userMap = new Map(users.map((u) => [u.id, u]));
+        samePaymentApplications = matching.slice(0, 30).map((m) => ({
+          id: m.id,
+          createdAt: m.createdAt,
+          user: userMap.get(m.userId) ?? {
+            id: m.userId,
+            email: null,
+            name: null,
+          },
+        }));
+      }
+    }
+
+    let sameIpApplications: SameRef[] = [];
+    if (item.submitterIp) {
+      const others = await prisma.application.findMany({
+        where: {
+          id: { not: params.id },
+          submitterIp: item.submitterIp,
+        },
+        orderBy: { createdAt: "desc" },
+        take: 30,
+        select: {
+          id: true,
+          createdAt: true,
+          user: { select: { id: true, email: true, name: true } },
+        },
+      });
+      sameIpApplications = others.map((a) => ({
+        id: a.id,
+        createdAt: a.createdAt,
+        user: a.user,
+      }));
+    }
+
     return Response.json({
       item: {
         ...item,
         story: sanitizeApplicationStoryHtml(item.story),
+        samePaymentApplications,
+        sameIpApplications,
       },
     });
   } catch (error) {

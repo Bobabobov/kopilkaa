@@ -15,6 +15,17 @@ import {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+function getClientIp(req: Request): string | null {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const first = forwarded.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  const realIp = req.headers.get("x-real-ip");
+  if (realIp) return realIp.trim();
+  return null;
+}
+
 function getWhitelistEmails(): string[] {
   const raw = process.env.WHITELIST_EMAILS || "";
   return raw
@@ -125,7 +136,7 @@ export async function POST(req: Request) {
     const titleMax = isAdmin ? 100 : 40;
     const summaryMax = isAdmin ? 300 : 60;
     const storyMax = isAdmin ? 10000 : 3000;
-    const storyMin = 10;
+    const storyMin = 100;
     const paymentMax = isAdmin ? 500 : 200;
 
     if (!title || title.length > titleMax)
@@ -258,6 +269,8 @@ export async function POST(req: Request) {
       }
     }
 
+    const submitterIp = getClientIp(req);
+
     // Используем транзакцию для атомарности
     const result = await prisma.$transaction(async (tx) => {
       // Создаём заявку
@@ -270,6 +283,7 @@ export async function POST(req: Request) {
           amount: amountNumber,
           payment,
           filledMs: clampedFilledMs,
+          submitterIp: submitterIp || undefined,
         },
         select: { id: true },
       });

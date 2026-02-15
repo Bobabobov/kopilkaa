@@ -19,6 +19,11 @@ export function RichTextEditorStyles({ rows, allowLinks }: Props) {
         max-width: 100%;
         overflow-x: hidden;
       }
+      .ProseMirror p + p,
+      .ProseMirror p + ul,
+      .ProseMirror p + ol {
+        margin-top: 0.25rem;
+      }
       .ProseMirror ul,
       .ProseMirror ol {
         margin-left: 1.5rem;

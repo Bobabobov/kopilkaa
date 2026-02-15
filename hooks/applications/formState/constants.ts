@@ -9,7 +9,7 @@ export const FORM_START_KEY_BASE = "application_form_started_at";
 export const LIMITS = {
   titleMax: 40,
   summaryMax: 60,
-  storyMin: 10,
+  storyMin: 100,
   storyMax: 3000,
   amountMin: 50,
   amountMax: 5000,

@@ -165,8 +165,11 @@ export default function RichTextEditor({
         onClose={closeLinkInput}
       />
 
-      {/* Редактор */}
-      <div className="w-full max-w-full overflow-hidden">
+      {/* Редактор: фиксированная высота с самого начала, прокрутка внутри — окно не расширяется */}
+      <div
+        className="w-full max-w-full overflow-x-hidden overflow-y-auto shrink-0"
+        style={{ height: `${rows * 2.5}rem` }}
+      >
         <EditorContent
           editor={editor}
           className={`w-full max-w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ${

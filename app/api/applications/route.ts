@@ -16,13 +16,20 @@ import {
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function getClientIp(req: Request): string | null {
-  const forwarded = req.headers.get("x-forwarded-for");
-  if (forwarded) {
-    const first = forwarded.split(",")[0]?.trim();
-    if (first) return first;
+  const headers = [
+    "x-forwarded-for",
+    "x-real-ip",
+    "cf-connecting-ip",
+    "x-client-ip",
+    "true-client-ip",
+  ];
+  for (const name of headers) {
+    const value = req.headers.get(name);
+    if (value) {
+      const first = value.split(",")[0]?.trim();
+      if (first && first.length > 0) return first;
+    }
   }
-  const realIp = req.headers.get("x-real-ip");
-  if (realIp) return realIp.trim();
   return null;
 }
 

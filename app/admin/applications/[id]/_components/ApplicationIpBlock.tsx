@@ -68,16 +68,24 @@ export default function ApplicationIpBlock({
               </p>
               <ul className="space-y-1.5 text-sm">
                 {sameIpApplications.map((app) => (
-                  <li key={app.id}>
+                  <li key={app.id} className="flex flex-wrap items-baseline gap-1">
                     <Link
                       href={`/admin/applications/${app.id}`}
-                      className="inline-flex items-center gap-2 text-[#abd1c6] hover:text-[#f9bc60] transition-colors underline underline-offset-2"
+                      className="text-[#abd1c6] hover:text-[#f9bc60] transition-colors underline underline-offset-2"
                     >
                       Заявка от{" "}
-                      {new Date(app.createdAt).toLocaleDateString("ru-RU")} —
+                      {new Date(app.createdAt).toLocaleDateString("ru-RU")}
+                    </Link>
+                    <span className="text-[#94a1b2]">—</span>
+                    <Link
+                      href={`/profile/${app.user.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#abd1c6] hover:text-[#f9bc60] transition-colors underline underline-offset-2"
+                    >
                       {app.user.email ?? app.user.name ?? app.user.id}
                     </Link>
-                    <span className="text-[#94a1b2] ml-1 text-xs">
+                    <span className="text-[#94a1b2] text-xs">
                       (id: {app.id.slice(0, 10)}…)
                     </span>
                   </li>

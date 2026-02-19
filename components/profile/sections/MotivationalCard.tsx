@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Separator } from "@/components/ui/separator";
 
 const motivationalQuotes = [
   {
@@ -13,14 +14,14 @@ const motivationalQuotes = [
     gradient: "from-[#f9bc60] to-[#e8a545]",
   },
   {
-    text: "Вместе мы сильнее! Участие делает проект заметнее",
+    text: "Вместе мы сильнее. Участие делает проект заметнее",
     author: "Команда Копилки",
     icon: "Heart",
     color: "#e16162",
     gradient: "from-[#e16162] to-[#d14d4e]",
   },
   {
-    text: "Доброта возвращается. Продолжайте творить добро!",
+    text: "Доброта возвращается. Продолжайте творить добро",
     author: "Неизвестный",
     icon: "Star",
     color: "#abd1c6",
@@ -54,6 +55,48 @@ const motivationalQuotes = [
     color: "#abd1c6",
     gradient: "from-[#abd1c6] to-[#94a1b2]",
   },
+  {
+    text: "Помощь друг другу — это то, что делает нас людьми",
+    author: "Неизвестный",
+    icon: "Heart",
+    color: "#e16162",
+    gradient: "from-[#e16162] to-[#d14d4e]",
+  },
+  {
+    text: "Одна рука помогает другой — так растёт общее дело",
+    author: "Команда Копилки",
+    icon: "Users",
+    color: "#abd1c6",
+    gradient: "from-[#abd1c6] to-[#94a1b2]",
+  },
+  {
+    text: "Доверие зарабатывается поступками, а не словами",
+    author: "Неизвестный",
+    icon: "Shield",
+    color: "#f9bc60",
+    gradient: "from-[#f9bc60] to-[#e8a545]",
+  },
+  {
+    text: "Поддержка в трудную минуту дороже любых подарков",
+    author: "Неизвестный",
+    icon: "Star",
+    color: "#abd1c6",
+    gradient: "from-[#abd1c6] to-[#94a1b2]",
+  },
+  {
+    text: "Ваша история может вдохновить кого-то на первый шаг",
+    author: "Команда Копилки",
+    icon: "MessageCircle",
+    color: "#f9bc60",
+    gradient: "from-[#f9bc60] to-[#e8a545]",
+  },
+  {
+    text: "Не размер помощи важнее, а то, что вы не прошли мимо",
+    author: "Неизвестный",
+    icon: "Heart",
+    color: "#e16162",
+    gradient: "from-[#e16162] to-[#d14d4e]",
+  },
 ];
 
 export default function MotivationalCard() {
@@ -76,129 +119,101 @@ export default function MotivationalCard() {
     LucideIcons[quote.icon as keyof typeof LucideIcons] || LucideIcons.Star;
 
   return (
-    <motion.div
+    <motion.article
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="bg-gradient-to-br from-[#004643] to-[#001e1d] rounded-xl border border-[#abd1c6]/20 p-3 xs:p-4 sm:p-5 md:p-6 relative overflow-hidden group"
+      className="relative overflow-hidden rounded-2xl border border-[#abd1c6]/20 bg-gradient-to-br from-[#004643] via-[#003533] to-[#001e1d] shadow-[0_4px_24px_-8px_rgba(0,30,29,0.5)] group"
+      aria-label="Мотивационная цитата"
     >
-      {/* Анимированные декоративные элементы */}
+      {/* Декоративный фон */}
       <motion.div
         key={currentQuote}
         initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 0.4 }}
+        animate={{ scale: 1, opacity: 0.35 }}
         transition={{ duration: 0.8 }}
-        className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl"
+        className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl pointer-events-none"
         style={{ backgroundColor: quote.color }}
-      ></motion.div>
-      <motion.div
-        key={`${currentQuote}-2`}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 0.2 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#abd1c6]/20 to-transparent rounded-full blur-2xl"
-      ></motion.div>
+      />
+      <div className="absolute bottom-0 left-0 w-36 h-36 bg-gradient-to-tr from-[#abd1c6]/15 to-transparent rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-      {/* Дополнительные световые эффекты */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-      <div className="relative z-10">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentQuote}
-            initial={{ opacity: 0, x: -30, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 30, scale: 0.95 }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="space-y-4"
-          >
-            <div className="flex items-start gap-2.5 xs:gap-3 sm:gap-4">
-              <motion.div
-                initial={{ rotate: -180, scale: 0 }}
-                animate={{ rotate: 0, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className={`w-10 h-10 xs:w-12 xs:h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${quote.gradient} shadow-lg relative overflow-hidden`}
-              >
-                {/* Блестящий эффект на иконке */}
+      <div className="relative z-10 pl-4 sm:pl-5 pr-4 sm:pr-5 pt-4 sm:pt-5 pb-4 sm:pb-5 md:pt-6 md:pb-6">
+        {/* Блок цитаты: левая полоска в стиле blockquote (shadcn/Context7) */}
+        <div
+          className="relative border-l-4 border-[#f9bc60]/70 rounded-r-lg py-1 pl-4 sm:pl-5"
+          style={{ borderLeftColor: quote.color }}
+        >
+          <AnimatePresence mode="wait">
+            <motion.blockquote
+              key={currentQuote}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+              className="space-y-4"
+            >
+              <div className="flex items-start gap-3 sm:gap-4">
                 <motion.div
-                  animate={{ x: ["-100%", "200%"] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatDelay: 3,
-                    ease: "easeInOut",
-                  }}
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                ></motion.div>
-                <IconComponent className="text-white relative z-10" size="md" />
-              </motion.div>
-              <div className="flex-1 min-w-0">
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-xs xs:text-sm sm:text-base text-[#fffffe] font-medium leading-relaxed mb-1.5 xs:mb-2 relative"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className={`flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${quote.gradient} shadow-md`}
                 >
-                  <span className="text-xl xs:text-2xl text-[#abd1c6]/40 absolute -left-1.5 xs:-left-2 -top-0.5 xs:-top-1">
-                    "
-                  </span>
-                  <span className="relative z-10 pl-3 xs:pl-4">
-                    {quote.text}
-                  </span>
-                  <span className="text-xl xs:text-2xl text-[#abd1c6]/40">
-                    "
-                  </span>
-                </motion.p>
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="flex items-center gap-2"
-                >
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent"></div>
-                  <p className="text-[10px] xs:text-xs text-[#abd1c6] font-medium whitespace-nowrap">
-                    — {quote.author}
-                  </p>
-                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent"></div>
+                  <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 text-white" size="md" />
                 </motion.div>
+                <div className="min-w-0 flex-1 pt-0.5">
+                  <p className="text-sm sm:text-base md:text-lg text-[#fffffe] font-medium leading-relaxed tracking-tight">
+                    {quote.text}
+                  </p>
+                  <footer className="mt-3 flex items-center gap-2">
+                    <Separator className="h-px flex-1 max-w-[80px] bg-[#abd1c6]/25" />
+                    <cite className="not-italic text-xs sm:text-sm text-[#abd1c6]/90 font-medium">
+                      — {quote.author}
+                    </cite>
+                  </footer>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+            </motion.blockquote>
+          </AnimatePresence>
+        </div>
 
-        {/* Улучшенные индикаторы */}
-        <div className="flex items-center justify-between mt-4 xs:mt-5 pt-3 xs:pt-4 border-t border-[#abd1c6]/10">
-          <div className="flex items-center gap-1 xs:gap-1.5">
+        {/* Пагинация и счётчик */}
+        <div className="flex items-center justify-between mt-5 sm:mt-6 pt-4 border-t border-[#abd1c6]/15">
+          <div className="flex items-center gap-1.5 sm:gap-2" role="tablist" aria-label="Выбор цитаты">
             {motivationalQuotes.map((_, index) => (
               <button
                 key={index}
+                type="button"
+                role="tab"
+                aria-selected={index === currentQuote}
+                aria-label={`Цитата ${index + 1}`}
                 onClick={() => setCurrentQuote(index)}
-                className={`relative transition-all duration-300 ${
+                className={`relative rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#004643] ${
                   index === currentQuote
-                    ? "w-6 xs:w-8 h-1.5 xs:h-2"
-                    : "w-1.5 xs:w-2 h-1.5 xs:h-2 hover:w-3 xs:hover:w-4"
-                } rounded-full ${
+                    ? "h-2 w-6 sm:w-8"
+                    : "h-1.5 w-1.5 sm:w-2 hover:w-3 sm:hover:w-4"
+                } ${
                   index === currentQuote
-                    ? `bg-gradient-to-r ${quote.gradient} shadow-lg`
+                    ? `bg-gradient-to-r ${quote.gradient} shadow-sm`
                     : "bg-[#abd1c6]/30 hover:bg-[#abd1c6]/50"
                 }`}
-                aria-label={`Цитата ${index + 1}`}
               >
                 {index === currentQuote && (
                   <motion.span
-                    layoutId="activeIndicator"
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    layoutId="motivationActive"
+                    className="absolute inset-0 rounded-full"
+                    transition={{ type: "spring", stiffness: 400, damping: 28 }}
                   />
                 )}
               </button>
             ))}
           </div>
-          <div className="text-[10px] xs:text-xs text-[#abd1c6]/60">
+          <span className="text-xs text-[#abd1c6]/60 tabular-nums">
             {currentQuote + 1} / {motivationalQuotes.length}
-          </div>
+          </span>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }

@@ -6,6 +6,8 @@
   html {
     overflow-x: hidden;
     scroll-behavior: smooth;
+    /* Резервируем место под скроллбар, чтобы ширина не прыгала при переходе между страницами */
+    scrollbar-gutter: stable;
   }
 
   body {

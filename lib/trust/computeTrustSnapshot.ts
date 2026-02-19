@@ -2,6 +2,7 @@ import { ApplicationStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import {
+  getEffectiveApprovedForTrust,
   getNextLevelRequirement,
   getTrustLevelFromEffectiveApproved,
   getTrustLimits,
@@ -42,17 +43,23 @@ export async function computeUserTrustSnapshot(
     ]);
 
   const trustDelta = user?.trustDelta ?? 0;
+  const adjustedApproved = getEffectiveApprovedForTrust(
+    effectiveApprovedApplications,
+    trustDelta,
+  );
+  /* Уровень и лимиты — с учётом trustDelta, чтобы «понизить уровень» в админке реально понижал уровень и лимит (150 вместо 300). */
   const trustLevel = getTrustLevelFromEffectiveApproved(
     effectiveApprovedApplications,
     trustDelta,
   );
   const limits = getTrustLimits(trustLevel);
   const nextRequired = getNextLevelRequirement(trustLevel);
-  const progressCurrent = Math.max(
-    0,
-    Math.floor(effectiveApprovedApplications),
-  );
-  const progressTotal = nextRequired ?? progressCurrent;
+  /* Прогресс «X из Y» — по скорректированному числу, чтобы при понижении уровня отображалось 0 из 3, а не 3 из 3. */
+  const progressCurrent =
+    nextRequired === null
+      ? Math.max(0, adjustedApproved)
+      : Math.min(Math.max(0, adjustedApproved), nextRequired);
+  const progressTotal = nextRequired ?? Math.max(0, adjustedApproved);
   const supportRangeText = `от ${limits.min.toLocaleString(
     "ru-RU",
   )} до ${limits.max.toLocaleString("ru-RU")} ₽`;

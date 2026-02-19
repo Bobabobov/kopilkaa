@@ -42,13 +42,19 @@ export function CtaRow({
   isGuestActionsOpen,
   setIsGuestActionsOpen,
 }: CtaRowProps) {
+  /* Фиксированная ширина под 3 иконки соцсетей (3×36px + 2×gap) — шапка не меняет ширину между профилями */
+  const socialSlotWidth = "8rem";
+
   return (
-    <div className="flex flex-wrap items-center gap-1.5 xs:gap-2 sm:gap-3 min-w-0">
-      {isOwner ? (
-        <>{hasSocialLinks && <SocialLinks user={user} />}</>
-      ) : (
+    <div className="flex flex-wrap items-center gap-1.5 xs:gap-2 sm:gap-3 min-w-0 w-full max-w-full">
+      <div
+        className="shrink-0 overflow-hidden flex items-center"
+        style={{ width: socialSlotWidth, minWidth: socialSlotWidth, maxWidth: socialSlotWidth }}
+      >
+        {hasSocialLinks && <SocialLinks user={user} />}
+      </div>
+      {!isOwner && (
         <>
-          {hasSocialLinks && <SocialLinks user={user} />}
           <FriendActions
             isOwner={isOwner}
             status={friendshipStatus}

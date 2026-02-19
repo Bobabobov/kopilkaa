@@ -64,6 +64,26 @@ function ProfilePageContent() {
     : trustStatus;
   const trustSupportResolved =
     trustSnapshot?.supportRangeText ?? trustSupportText;
+  /* progressCurrent/progressTotal из API учитывают trustDelta (админское понижение уровня) */
+  const progressCurrentResolved =
+    trustSnapshot != null &&
+    typeof trustSnapshot.progressCurrent === "number" &&
+    typeof trustSnapshot.progressTotal === "number"
+      ? trustSnapshot.progressCurrent
+      : progressCurrent;
+  const progressTotalResolved =
+    trustSnapshot != null &&
+    typeof trustSnapshot.progressTotal === "number"
+      ? trustSnapshot.progressTotal
+      : progressTotal;
+  const progressTextResolved =
+    trustSnapshot?.progressText ?? progressText;
+  const progressValueResolved =
+    progressTotalResolved != null &&
+    progressTotalResolved > 0 &&
+    progressCurrentResolved != null
+      ? Math.min(1, Math.max(0, progressCurrentResolved / progressTotalResolved))
+      : progressValue;
 
   // Обработка обновлений профиля
   const { handleThemeChange, handleAvatarChange } = useProfileUpdates({
@@ -82,16 +102,19 @@ function ProfilePageContent() {
     return <ProfileUnauthorizedState />;
   }
 
+  const levelStats = profileData?.levelStats ?? null;
+
   return (
     <>
       <ProfileLayout
         user={user}
         trustStatus={trustStatusResolved}
         trustSupportText={trustSupportResolved}
-        trustProgressText={progressText}
-        trustProgressValue={progressValue}
-        trustProgressCurrent={progressCurrent}
-        trustProgressTotal={progressTotal}
+        trustProgressText={progressTextResolved}
+        trustProgressValue={progressValueResolved}
+        trustProgressCurrent={progressCurrentResolved}
+        trustProgressTotal={progressTotalResolved}
+        levelStats={levelStats}
         onThemeChange={handleThemeChange}
         onAvatarChange={handleAvatarChange}
         onOpenSettings={() => setIsSettingsModalOpen(true)}

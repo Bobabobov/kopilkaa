@@ -152,12 +152,13 @@ export function useAdminActions({
     status: ApplicationStatus,
     comment: string,
     publishInStories: boolean,
+    decreaseTrustOnDecision?: boolean,
   ) => {
     setModal({
       id,
       status,
       comment,
-      decreaseTrustOnDecision: false,
+      decreaseTrustOnDecision: decreaseTrustOnDecision ?? false,
       publishInStories,
     });
   };

@@ -191,6 +191,55 @@ export function AdminUserCard({
                 </span>
               </div>
             </div>
+
+            {user.levelStats && (
+              <div className="mt-2 p-2.5 rounded-lg border border-[#abd1c6]/15 bg-[#001e1d]/50">
+                <p className="text-[10px] uppercase tracking-wider text-[#abd1c6]/70 mb-2">
+                  Уровень профиля — микростатистика
+                </p>
+                <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
+                  <span className="text-[#abd1c6]/80">
+                    Одобрено (в уровень):
+                  </span>
+                  <span className="font-medium text-[#f9bc60] text-right">
+                    {user.levelStats.approvedCounting}
+                  </span>
+                  <span className="text-[#abd1c6]/80">
+                    Одобрено (без уровня):
+                  </span>
+                  <span className="font-medium text-[#94a1b2] text-right">
+                    {user.levelStats.approvedWithoutLevel}
+                  </span>
+                  <span className="text-[#abd1c6]/80">Отклонено:</span>
+                  <span className="font-medium text-[#94a1b2] text-right">
+                    {user.levelStats.rejectedTotal}
+                  </span>
+                  <span className="text-[#abd1c6]/80">
+                    Отклонено с понижением:
+                  </span>
+                  <span className="font-medium text-[#e16162] text-right">
+                    {user.levelStats.rejectedWithLevelDecrease}
+                  </span>
+                </div>
+                <div className="mt-2 pt-2 border-t border-[#abd1c6]/10 flex items-center justify-between">
+                  <span className="text-[10px] text-[#abd1c6]/70">
+                    Рейтинг доверия
+                  </span>
+                  <span
+                    className={`text-sm font-bold tabular-nums ${
+                      user.levelStats.trustScore >= 0
+                        ? "text-[#f9bc60]"
+                        : "text-[#e16162]"
+                    }`}
+                    title="Одобрено в уровень − отклонено с понижением"
+                  >
+                    {user.levelStats.trustScore >= 0 ? "+" : ""}
+                    {user.levelStats.trustScore}
+                  </span>
+                </div>
+              </div>
+            )}
+
             <div className="mt-2">
               <TrustDeltaControl
                 userId={user.id}

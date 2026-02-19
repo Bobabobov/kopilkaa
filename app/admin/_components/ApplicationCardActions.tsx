@@ -53,6 +53,7 @@ export default function ApplicationCardActions({
               it.status,
               it.adminComment || "",
               it.publishInStories,
+              it.trustDecreasedAtDecision,
             )
           }
         >

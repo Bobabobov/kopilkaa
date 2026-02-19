@@ -164,6 +164,12 @@ export async function PATCH(
           adminComment: adminComment ?? null,
           publishInStories:
             status === "CONTEST" ? !!publishInStories : false,
+          // Одобренные заявки всегда учитываются в уровне доверия (админ может потом снять галку)
+          ...(status === "APPROVED" ? { countTowardsTrust: true } : {}),
+          // Для микростатистики: галка «Понизить уровень» — можно и выставить, и снять
+          ...(status === "APPROVED" || status === "REJECTED"
+            ? { trustDecreasedAtDecision: decreaseTrustOnDecision }
+            : {}),
         },
         include: {
           user: { select: { email: true, id: true } },

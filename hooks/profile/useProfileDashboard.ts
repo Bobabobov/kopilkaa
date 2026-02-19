@@ -77,6 +77,16 @@ interface Notification {
   timestamp: string;
 }
 
+export interface LevelStats {
+  approvedTotal: number;
+  approvedCounting: number;
+  approvedWithoutLevel: number;
+  approvedWithLevelDecrease: number;
+  rejectedTotal: number;
+  rejectedWithLevelDecrease: number;
+  pending: number;
+}
+
 interface ProfileDashboardData {
   user: User;
   friends: Friend[];
@@ -84,6 +94,7 @@ interface ProfileDashboardData {
   stats: Stats;
   notifications: Notification[];
   trust?: TrustSnapshot;
+  levelStats?: LevelStats;
 }
 
 interface UseProfileDashboardReturn {

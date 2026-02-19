@@ -151,16 +151,22 @@ export default function StatusModal({
             </p>
           </div>
 
-          <label className="flex items-center gap-2 text-xs sm:text-sm text-[#cfdcd6]">
-            <input
-              type="checkbox"
-              className="h-4 w-4"
-              checked={modal.decreaseTrustOnDecision}
-              onChange={(e) => onDecreaseTrustChange(e.target.checked)}
-              disabled={!canDecrease}
-            />
-            <span>Понизить уровень на 1 (при решении)</span>
-          </label>
+          <div>
+            <label className="flex items-center gap-2 text-xs sm:text-sm text-[#cfdcd6]">
+              <input
+                type="checkbox"
+                className="h-4 w-4"
+                checked={modal.decreaseTrustOnDecision}
+                onChange={(e) => onDecreaseTrustChange(e.target.checked)}
+                disabled={!canDecrease}
+              />
+              <span>Понизить уровень на 1 (при решении)</span>
+            </label>
+            <p className="mt-1 text-[11px] text-[#9bb3ab]">
+              При отказе с галкой у пользователя в профиле будет учтено как
+              «Отклонено с понижением».
+            </p>
+          </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 justify-end pt-2">
             <button

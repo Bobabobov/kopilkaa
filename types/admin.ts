@@ -23,6 +23,7 @@ export type ApplicationItem = {
   adminComment: string | null;
   createdAt: string;
   countTowardsTrust: boolean;
+  trustDecreasedAtDecision?: boolean;
   user: {
     email: string;
     id: string;
@@ -75,6 +76,15 @@ export interface AdminUser {
   trustDelta?: number;
   trustLevel?: TrustLevel;
   effectiveApprovedApplications?: number;
+  /** Микростатистика по заявкам для карточки уровня доверия и рейтинга. */
+  levelStats?: {
+    approvedTotal: number;
+    approvedCounting: number;
+    approvedWithoutLevel: number;
+    rejectedTotal: number;
+    rejectedWithLevelDecrease: number;
+    trustScore: number;
+  };
   /** Связи по реквизитам и IP (возможные мультиаккаунты). Есть только при запросе с withLinks=1. */
   links?: {
     samePayment: AdminUserLinkRef[];

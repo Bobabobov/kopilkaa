@@ -7,6 +7,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import TopBanner from "@/components/layout/TopBanner";
 import { BeautifulNotificationsProvider } from "@/components/ui/BeautifulNotificationsProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import ProfilePreloadInitializer from "@/components/performance/ProfilePreloadInitializer";
 import BanCheck from "@/components/auth/BanCheck";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
@@ -162,11 +163,13 @@ export default function RootLayout({
           <MetrikaSpaTracker />
         </Suspense>
         <BeautifulNotificationsProvider>
-          <GlobalClickSpark />
-          <ProfilePreloadInitializer />
-          <BanCheck>
-            <ProtectedLayout>{children}</ProtectedLayout>
-          </BanCheck>
+          <TooltipProvider delayDuration={300} skipDelayDuration={100}>
+            <GlobalClickSpark />
+            <ProfilePreloadInitializer />
+            <BanCheck>
+              <ProtectedLayout>{children}</ProtectedLayout>
+            </BanCheck>
+          </TooltipProvider>
         </BeautifulNotificationsProvider>
         <noscript>
           <div>

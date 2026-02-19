@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
         })
         .catch(() => []),
 
-      // Статистика заявок
+      // Статистика заявок (включая trustDecreasedAtDecision для микростатистики уровня)
       prisma.application
         .findMany({
           where: { userId },
@@ -137,6 +137,7 @@ export async function GET(request: NextRequest) {
             status: true,
             amount: true,
             countTowardsTrust: true,
+            trustDecreasedAtDecision: true,
           },
         })
         .catch(() => []),
@@ -194,30 +195,49 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    const approvedApps = applications.filter((a) => a.status === "APPROVED");
+    const rejectedApps = applications.filter((a) => a.status === "REJECTED");
+    const pendingApps = applications.filter((a) => a.status === "PENDING");
+    const approvedCounting = approvedApps.filter(
+      (a) => a.countTowardsTrust === true,
+    ).length;
+    const approvedWithoutLevel = approvedApps.filter(
+      (a) => a.countTowardsTrust === false,
+    ).length;
+    const rejectedWithLevelDecrease = rejectedApps.filter(
+      (a) => a.trustDecreasedAtDecision === true,
+    ).length;
+    const approvedWithLevelDecrease = approvedApps.filter(
+      (a) => a.trustDecreasedAtDecision === true,
+    ).length;
+
     // Подсчитываем статистику
     const stats = {
       totalApplications: applications.length,
-      approvedApplications: applications.filter(
-        (app) => app.status === "APPROVED",
-      ).length,
-      effectiveApprovedApplications: applications.filter(
-        (app) => app.status === "APPROVED" && app.countTowardsTrust === true,
-      ).length,
-      pendingApplications: applications.filter(
-        (app) => app.status === "PENDING",
-      ).length,
-      rejectedApplications: applications.filter(
-        (app) => app.status === "REJECTED",
-      ).length,
+      approvedApplications: approvedApps.length,
+      effectiveApprovedApplications: approvedCounting,
+      pendingApplications: pendingApps.length,
+      rejectedApplications: rejectedApps.length,
       totalAmountRequested: applications.reduce(
         (sum, app) => sum + (app.amount || 0),
         0,
       ),
-      approvedAmount: applications
-        .filter((app) => app.status === "APPROVED")
-        .reduce((sum, app) => sum + (app.amount || 0), 0),
+      approvedAmount: approvedApps.reduce(
+        (sum, app) => sum + (app.amount || 0),
+        0,
+      ),
       friendsCount: friendsData.length,
       pendingFriendRequests: receivedRequestsData.length,
+    };
+
+    const levelStats = {
+      approvedTotal: approvedApps.length,
+      approvedCounting,
+      approvedWithoutLevel,
+      approvedWithLevelDecrease,
+      rejectedTotal: rejectedApps.length,
+      rejectedWithLevelDecrease,
+      pending: pendingApps.length,
     };
     const trust = await computeUserTrustSnapshot(userId);
 
@@ -263,6 +283,7 @@ export async function GET(request: NextRequest) {
       },
       stats,
       trust,
+      levelStats,
       latest: {
         friend: friendsData[0]?.createdAt
           ? new Date(friendsData[0].createdAt).getTime()
@@ -299,6 +320,7 @@ export async function GET(request: NextRequest) {
       stats: { ...stats, trust },
       notifications: formattedNotifications,
       trust,
+      levelStats,
     });
 
     // Добавляем заголовки кэширования

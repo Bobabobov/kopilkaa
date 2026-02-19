@@ -168,12 +168,12 @@ export default function ProfileHeaderCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="w-full"
+      className="w-full max-w-full min-w-0"
     >
-      <div className="w-full mx-auto">
+      <div className="w-full max-w-full min-w-0 mx-auto">
         {/* Плоская шапка профиля - баннер как фон всего блока */}
         <div
-          className="relative w-full min-h-[180px] xs:min-h-[200px] sm:min-h-[240px] md:min-h-[280px] overflow-hidden"
+          className="relative w-full max-w-full min-h-[180px] xs:min-h-[200px] sm:min-h-[240px] md:min-h-[280px] overflow-hidden"
           style={coverStyle}
         >
           {isOwner && (
@@ -202,10 +202,10 @@ export default function ProfileHeaderCard({
           {/* Затемняющий градиент для читаемости */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
 
-          {/* Контент поверх баннера */}
-          <div className="relative z-10 px-3 xs:px-4 sm:px-6 md:px-8 pb-4 xs:pb-6 sm:pb-8 pt-16 xs:pt-20 sm:pt-24 md:pt-28 min-w-0">
+          {/* Контент поверх баннера — max-w-full чтобы ширина не зависела от наличия соцсетей */}
+          <div className="relative z-10 w-full max-w-full min-w-0 px-3 xs:px-4 sm:px-6 md:px-8 pb-4 xs:pb-6 sm:pb-8 pt-16 xs:pt-20 sm:pt-24 md:pt-28 box-border">
             {/* Основной контент: Аватар и информация в одну линию */}
-            <div className="flex flex-col sm:flex-row items-start gap-2 xs:gap-3 sm:gap-4 md:gap-5 min-w-0">
+            <div className="flex flex-col sm:flex-row items-start gap-2 xs:gap-3 sm:gap-4 md:gap-5 min-w-0 w-full max-w-full">
               <AvatarBlock
                 isOwner={isOwner}
                 user={user}
@@ -227,7 +227,7 @@ export default function ProfileHeaderCard({
                 }}
               />
 
-              <div className="flex-1 min-w-0 flex flex-col gap-2 xs:gap-3 sm:gap-4 w-full">
+              <div className="flex-1 min-w-0 max-w-full flex flex-col gap-2 xs:gap-3 sm:gap-4 w-full">
                 <HeaderIdentity
                   name={user.name}
                   role={user.role}

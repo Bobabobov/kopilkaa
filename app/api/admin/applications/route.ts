@@ -78,6 +78,7 @@ export async function GET(req: Request) {
           updatedAt: true,
           filledMs: true,
           countTowardsTrust: true,
+          trustDecreasedAtDecision: true,
           user: {
             select: {
               email: true,

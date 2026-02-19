@@ -83,6 +83,8 @@ model Application {
   status       ApplicationStatus @default(PENDING)
   publishInStories Boolean        @default(false)
   countTowardsTrust Boolean      @default(true)
+  /** При решении по заявке админ включил «Понизить уровень на 1» */
+  trustDecreasedAtDecision Boolean @default(false)
   adminComment String?
   filledMs     Int?
   submitterIp  String?           // IP при подаче заявки (для админки: поиск дублей)

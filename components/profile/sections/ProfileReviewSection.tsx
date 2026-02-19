@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 
@@ -67,18 +68,56 @@ export default function ProfileReviewSection({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-4 sm:p-5"
+        className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden p-4 sm:p-5"
       >
-        <div className="flex items-center gap-2 text-white/60">
-          <LucideIcons.Loader2 className="w-4 h-4 animate-spin" />
-          <span className="text-sm">Загрузка отзыва...</span>
+        <div className="flex items-center gap-3 mb-4">
+          <Skeleton className="h-10 w-10 rounded-xl" />
+          <div className="space-y-2 flex-1">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
         </div>
       </motion.div>
     );
   }
 
   if (!review) {
-    return null;
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="rounded-2xl border border-[#abd1c6]/20 bg-[#004643]/40 backdrop-blur-xl overflow-hidden"
+      >
+        <div className="p-6 sm:p-8 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#abd1c6]/15 border border-[#abd1c6]/25">
+            <LucideIcons.MessageCircle className="h-7 w-7 text-[#abd1c6]/70" />
+          </div>
+          <p className="text-sm font-medium text-[#abd1c6] mb-1">
+            Пока нет отзыва
+          </p>
+          <p className="text-xs text-[#94a1b2] mb-4 max-w-xs mx-auto">
+            {isOwner
+              ? "После одобрения заявки вы сможете оставить отзыв о помощи"
+              : "Участник ещё не оставил отзыв"}
+          </p>
+          {isOwner && (
+            <Link
+              href="/reviews"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#abd1c6]/30 bg-[#abd1c6]/10 px-4 py-2 text-sm font-medium text-[#abd1c6] hover:bg-[#abd1c6]/20 transition-colors"
+            >
+              <LucideIcons.ArrowRight className="h-4 w-4" />
+              К отзывам
+            </Link>
+          )}
+        </div>
+      </motion.div>
+    );
   }
 
   const formattedDate = new Date(review.createdAt).toLocaleDateString("ru-RU", {

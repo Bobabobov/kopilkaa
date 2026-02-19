@@ -12,6 +12,7 @@ interface ApplicationCardActionsProps {
     status: ApplicationStatus,
     comment: string,
     publishInStories: boolean,
+    decreaseTrustOnDecision?: boolean,
   ) => void;
   onQuickApprove: (
     id: string,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import {
   StoriesHeader,
   StoriesLoading,
@@ -8,6 +9,8 @@ import {
 import { useStories } from "@/hooks/stories/useStories";
 import type { Story as StoryItem } from "@/hooks/stories/useStories";
 import { useAuth } from "@/hooks/useAuth";
+import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Card, CardContent } from "@/components/ui/Card";
 import { StoriesEmptyWithAd } from "./sections/StoriesEmptyWithAd";
 import { TopStoriesSection } from "./sections/TopStoriesSection";
 import { StoriesSummaryBanner } from "./sections/StoriesSummaryBanner";
@@ -44,6 +47,8 @@ export default function StoriesPageClient({
     currentPage,
     query,
     setQuery,
+    sort,
+    setSort,
     loadNextPage,
     observerTargetRef,
     isInitialLoad,
@@ -266,12 +271,24 @@ export default function StoriesPageClient({
   }, []);
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
+    <div className="min-h-screen relative">
+      {/* Фоновые блики */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#004643]/10 rounded-full blur-3xl" />
+      </div>
+
       <StoriesHeader query={query} onQueryChange={setQuery} />
 
-      {/* Main content */}
-      <main className="relative z-10" id="stories-main" aria-label="Список историй платформы">
+      <div className="relative w-full h-12 sm:h-16 overflow-hidden pointer-events-none" aria-hidden>
+        <svg className="absolute inset-0 w-full h-full text-[#001e1d]" viewBox="0 0 1200 48" fill="none" preserveAspectRatio="none">
+          <path d="M0 24 Q300 0 600 24 T1200 24 V48 H0 Z" fill="currentColor" opacity="0.04" />
+          <path d="M0 32 Q300 8 600 32 T1200 32 V48 H0 Z" fill="currentColor" opacity="0.06" />
+        </svg>
+      </div>
+
+      <main className="relative z-10 -mt-8 sm:-mt-10" id="stories-main" aria-label="Список историй платформы">
         {loading ? (
           <StoriesLoading />
         ) : stories.length === 0 ? (
@@ -288,11 +305,62 @@ export default function StoriesPageClient({
               <StoriesSummaryBanner totalPaid={totalPaid} />
             )}
 
+            {!hasQuery && stories.length > 0 && (
+              <div className="container mx-auto px-4 pb-4 flex flex-wrap items-center justify-center gap-3">
+                {readStoryIds.size > 0 && (
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[#abd1c6]/30 bg-[#004643]/40 backdrop-blur-sm px-4 py-2.5 text-sm">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f9bc60]/20 text-[#f9bc60]" aria-hidden>
+                      <LucideIcons.BookOpen className="h-4 w-4" />
+                    </span>
+                    <span className="text-[#fffffe] font-medium">
+                      Вы прочитали{" "}
+                      <span className="font-bold text-[#f9bc60] tabular-nums">{readStoryIds.size}</span>{" "}
+                      {readStoryIds.size === 1 ? "историю" : readStoryIds.size < 5 ? "истории" : "историй"}
+                    </span>
+                  </div>
+                )}
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#abd1c6]/25 bg-[#001e1d]/40 backdrop-blur-sm px-4 py-2 text-sm text-[#abd1c6]/90">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#e16162]/20 text-[#e16162]" aria-hidden>
+                    <LucideIcons.Heart className="h-3.5 w-3.5 fill-[#e16162]/80" />
+                  </span>
+                  <span>Лайк — это поддержка автора истории</span>
+                </div>
+              </div>
+            )}
+
+            {!hasQuery && (
+              <div className="container mx-auto px-4 pb-6 flex justify-center">
+                <Link
+                  href="/applications"
+                  className="group block w-full max-w-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#001e1d] rounded-2xl"
+                >
+                  <Card variant="glass" padding="sm" className="overflow-hidden border-[#abd1c6]/20 transition-all duration-300 hover:border-[#f9bc60]/40 hover:shadow-[0_12px_40px_-12px_rgba(249,188,96,0.25)]">
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#f9bc60]/30 to-[#e8a545]/20 text-[#f9bc60] transition-transform duration-300 group-hover:scale-110" aria-hidden>
+                        <LucideIcons.Edit3 className="h-6 w-6" />
+                      </span>
+                      <div className="min-w-0 flex-1 text-left">
+                        <p className="font-semibold text-[#fffffe] group-hover:text-[#f9bc60] transition-colors">
+                          Рассказать свою историю
+                        </p>
+                        <p className="text-xs text-[#abd1c6]/90 mt-0.5">
+                          Подать заявку на поддержку
+                        </p>
+                      </div>
+                      <LucideIcons.ArrowRight className="h-5 w-5 shrink-0 text-[#abd1c6]/70 group-hover:text-[#f9bc60] group-hover:translate-x-1 transition-all duration-300" aria-hidden />
+                    </CardContent>
+                  </Card>
+                </Link>
+              </div>
+            )}
+
             <StoriesGrid
               stories={stories}
               shouldAnimate={shouldAnimate}
               isAuthenticated={isAuthenticated}
               query={query}
+              sort={sort}
+              onSortChange={setSort}
               readStoryIds={readStoryIds}
               loadingMore={loadingMore}
               hasMore={hasMore}

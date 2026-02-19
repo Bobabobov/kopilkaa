@@ -30,6 +30,8 @@ interface StoriesResponse {
   items: Story[];
 }
 
+export type StoriesSort = "newest" | "oldest" | "popular";
+
 interface UseStoriesOptions {
   initialStories?: Story[];
   initialStoriesHasMore?: boolean;
@@ -43,6 +45,8 @@ interface UseStoriesReturn {
   currentPage: number;
   query: string;
   setQuery: (query: string) => void;
+  sort: StoriesSort;
+  setSort: (sort: StoriesSort) => void;
   loadNextPage: () => void;
   resetAndSearch: (newQuery: string) => void;
   observerTargetRef: React.RefObject<HTMLDivElement | null>;
@@ -59,10 +63,12 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
   const [hasMore, setHasMore] = useState(true);
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
+  const [sort, setSort] = useState<StoriesSort>("newest");
   const observerTargetRef = useRef<HTMLDivElement>(null);
 
   // Отслеживание предыдущего запроса для корректного debounce
   const previousQueryRef = useRef("");
+  const previousSortRef = useRef<StoriesSort>(sort);
   // Флаг для отслеживания первой загрузки (для анимаций)
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   // AbortController для отмены устаревших запросов
@@ -70,7 +76,12 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
 
   // Загрузка историй с защитой от race conditions
   const loadStories = useCallback(
-    async (page: number, searchQuery: string, isNewSearch: boolean) => {
+    async (
+      page: number,
+      searchQuery: string,
+      sortMode: StoriesSort,
+      isNewSearch: boolean,
+    ) => {
       // НЕ используем AbortController для первой загрузки - это предотвращает отмену запросов
       // Используем AbortController только для пагинации (page > 1)
       let abortController: AbortController | null = null;
@@ -100,6 +111,7 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
           page: page.toString(),
           limit: "12",
           ...(searchQuery && { q: searchQuery }),
+          ...(sortMode !== "newest" && { sort: sortMode }),
         });
 
         const url = `/api/stories?${params}`;
@@ -198,9 +210,9 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
   const loadNextPage = useCallback(() => {
     if (!loadingMore && hasMore && !loading) {
       const nextPage = currentPage + 1;
-      loadStories(nextPage, query, false);
+      loadStories(nextPage, query, sort, false);
     }
-  }, [currentPage, query, hasMore, loading, loadingMore, loadStories]);
+  }, [currentPage, query, sort, hasMore, loading, loadingMore, loadStories]);
 
   // Сброс и новый поиск
   const resetAndSearch = useCallback(
@@ -212,10 +224,10 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
         setCurrentPage(1);
         setHasMore(true);
         setStories([]);
-        loadStories(1, newQuery, true);
+        loadStories(1, newQuery, sort, true);
       }
     },
-    [loadStories],
+    [loadStories, sort],
   );
 
   // Флаг для отслеживания первоначальной загрузки
@@ -230,14 +242,19 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
     return () => clearTimeout(handle);
   }, [query]);
 
-  // Обработка первоначальной загрузки и изменений поискового запроса
+  // Обработка первоначальной загрузки и изменений поискового запроса / сортировки
   useEffect(() => {
     if (!hasInitializedRef.current) {
       hasInitializedRef.current = true;
       previousQueryRef.current = debouncedQuery;
+      previousSortRef.current = sort;
 
-      // Первая страница уже с сервера — не дублируем запрос
-      if (initialStories.length > 0 && debouncedQuery === "") {
+      // Первая страница уже с сервера — не дублируем запрос (только при дефолтной сортировке)
+      if (
+        initialStories.length > 0 &&
+        debouncedQuery === "" &&
+        sort === "newest"
+      ) {
         setStories(initialStories);
         setLoading(false);
         setCurrentPage(1);
@@ -246,20 +263,36 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
         return;
       }
 
-      loadStories(1, debouncedQuery, true);
+      loadStories(1, debouncedQuery, sort, true);
       return;
     }
 
     const isNewSearch = debouncedQuery !== previousQueryRef.current;
+    const isNewSort = sort !== previousSortRef.current;
+
+    if (isNewSort) {
+      previousSortRef.current = sort;
+      setCurrentPage(1);
+      setHasMore(true);
+      setStories([]);
+      loadStories(1, debouncedQuery, sort, true);
+      return;
+    }
 
     if (isNewSearch) {
       previousQueryRef.current = debouncedQuery;
       setCurrentPage(1);
       setHasMore(true);
       setStories([]);
-      loadStories(1, debouncedQuery, true);
+      loadStories(1, debouncedQuery, sort, true);
     }
-  }, [debouncedQuery, loadStories]);
+  }, [
+    debouncedQuery,
+    sort,
+    loadStories,
+    initialStories.length,
+    initialStoriesHasMore,
+  ]);
 
   // Очистка при размонтировании
   useEffect(() => {
@@ -278,6 +311,8 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
     currentPage,
     query,
     setQuery,
+    sort,
+    setSort,
     loadNextPage,
     resetAndSearch,
     observerTargetRef,

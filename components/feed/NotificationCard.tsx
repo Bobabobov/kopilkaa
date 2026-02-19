@@ -8,6 +8,9 @@ import {
   getNotificationIcon,
   isNotificationUnread,
 } from "@/components/notifications/utils";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface NotificationCardProps {
   notification: Notification;
@@ -58,6 +61,13 @@ const extractStoryTitleFromMessage = (message: string): string | null => {
   return match ? match[1] : null;
 };
 
+const TYPE_LABELS: Record<string, string> = {
+  like: "Лайк",
+  friend_request: "Друзья",
+  application_status: "Заявка",
+  system: "Система",
+};
+
 export default function NotificationCard({
   notification,
   index,
@@ -76,69 +86,45 @@ export default function NotificationCard({
       ? extractStoryTitleFromMessage(notification.message)
       : null;
 
+  const typeLabel = TYPE_LABELS[notification.type] ?? notification.type;
+
   return (
     <motion.div
       key={notification.id}
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      initial={{ opacity: 0, y: 20, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        delay: 0.6 + index * 0.08,
-        duration: 0.5,
-        ease: "easeOut",
-      }}
-      whileHover={{
-        y: -8,
-        scale: 1.02,
-        transition: { duration: 0.2 },
-      }}
+      transition={{ delay: 0.15 + index * 0.05, duration: 0.4, ease: "easeOut" }}
+      whileHover={{ y: -4 }}
       className="group relative"
     >
-      {/* Карточка уведомления */}
-      <div
+      <Card
+        variant="default"
+        padding="none"
+        hoverable
         onClick={() => onClick(notification)}
-        className={`
-          relative
-          min-h-[200px] sm:min-h-[220px] lg:min-h-[240px]
-          h-full
-          rounded-2xl sm:rounded-3xl
-          backdrop-blur-xl
-          bg-gradient-to-br from-[#001e1d]/80 via-[#003c3a]/60 to-[#001e1d]/80
-          border border-[#abd1c6]/20
-          shadow-xl
-          overflow-hidden
-          transition-all duration-300
-          cursor-pointer
-          ${
-            isUnread
-              ? "opacity-100 shadow-2xl shadow-[#f9bc60]/10"
-              : "opacity-75 hover:opacity-100"
-          }
-          hover:border-[#abd1c6]/40
-          hover:shadow-2xl
-        `}
+        className={cn(
+          "relative overflow-hidden cursor-pointer h-full min-h-[200px] sm:min-h-[220px] transition-all duration-300",
+          isUnread
+            ? "ring-1 ring-[#f9bc60]/30 shadow-lg shadow-[#f9bc60]/5"
+            : "opacity-90 hover:opacity-100",
+        )}
       >
         {/* Визуальный акцент слева */}
         <div
-          className={`
-            absolute left-0 top-0 bottom-0 w-1.5 sm:w-2
-            ${getNotificationAccent(
+          className={cn(
+            "absolute left-0 top-0 bottom-0 w-1 sm:w-1.5 rounded-l-xl",
+            getNotificationAccent(
               notification.type,
               notification.status,
               notification.rarity,
               !isUnread,
-            )}
-            ${isUnread ? "shadow-lg shadow-[#f9bc60]/30" : ""}
-          `}
+            ),
+            isUnread && "shadow-[0_0_12px_rgba(249,188,96,0.25)]",
+          )}
         />
 
-        {/* Glow эффект для непрочитанных */}
-        {isUnread && (
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 sm:w-2 bg-gradient-to-b from-[#f9bc60]/60 via-[#f9bc60]/40 to-transparent blur-sm" />
-        )}
-
-        {/* Контент карточки */}
-        <div className="p-5 sm:p-6 lg:p-8 h-full flex flex-col">
-          <div className="flex items-start gap-4 sm:gap-5 lg:gap-6 flex-1">
+        <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col">
+          <div className="flex items-start gap-3 sm:gap-4 flex-1">
             {/* Аватар или иконка */}
             <div className="flex-shrink-0">
               {notification.avatar &&
@@ -182,24 +168,35 @@ export default function NotificationCard({
             </div>
 
             {/* Текстовая информация */}
-            <div className="flex-1 min-w-0 space-y-2 sm:space-y-3 flex flex-col">
-              {/* Заголовок и время */}
-              <div className="flex items-start justify-between gap-3">
-                <h3
-                  className={`
-                    text-base sm:text-lg lg:text-xl
-                    font-semibold
-                    text-[#fffffe]
-                    leading-tight
-                    ${isUnread ? "font-bold" : "font-medium"}
-                  `}
+            <div className="flex-1 min-w-0 space-y-2 flex flex-col">
+              {/* Тип, заголовок и время */}
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge
+                  variant="secondary"
+                  className={cn(
+                    "text-[10px] font-medium px-2 py-0 rounded-md",
+                    notification.type === "like" && "bg-red-500/15 text-red-400 border-red-500/30",
+                    notification.type === "friend_request" && "bg-[#f9bc60]/15 text-[#f9bc60] border-[#f9bc60]/30",
+                    notification.type === "application_status" &&
+                      (notification.status === "APPROVED"
+                        ? "bg-green-500/15 text-green-400 border-green-500/30"
+                        : "bg-red-500/15 text-red-400 border-red-500/30"),
+                  )}
                 >
-                  {notification.title}
-                </h3>
-                <span className="flex-shrink-0 text-xs sm:text-sm text-[#abd1c6]/50 whitespace-nowrap mt-0.5">
+                  {typeLabel}
+                </Badge>
+                <span className="text-xs text-[#abd1c6]/50 ml-auto whitespace-nowrap">
                   {notification.timestamp}
                 </span>
               </div>
+              <h3
+                className={cn(
+                  "text-base sm:text-lg font-semibold text-[#fffffe] leading-tight",
+                  isUnread && "font-bold",
+                )}
+              >
+                {notification.title}
+              </h3>
 
               {/* Подробная информация в зависимости от типа */}
               <div className="space-y-2 flex-1">
@@ -279,27 +276,27 @@ export default function NotificationCard({
                 )}
               </div>
 
-              {/* Индикатор непрочитанного */}
-              {isUnread && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.7 + index * 0.08, type: "spring" }}
-                  className="inline-flex items-center gap-2 mt-auto"
-                >
-                  <div className="w-2 h-2 rounded-full bg-[#f9bc60] shadow-lg shadow-[#f9bc60]/50" />
-                  <span className="text-xs text-[#f9bc60]/80 font-medium">
+              {/* Новое + призыв к действию */}
+              <div className="flex items-center justify-between gap-2 mt-auto pt-2">
+                {isUnread && (
+                  <motion.span
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-[#f9bc60]"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#f9bc60]" />
                     Новое
-                  </span>
-                </motion.div>
-              )}
+                  </motion.span>
+                )}
+                <span className="inline-flex items-center gap-1 text-xs text-[#abd1c6]/60 group-hover:text-[#abd1c6]/90 transition-colors ml-auto">
+                  Открыть
+                  <LucideIcons.ChevronRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Декоративный градиент внизу карточки */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#abd1c6]/10 to-transparent" />
-      </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 }

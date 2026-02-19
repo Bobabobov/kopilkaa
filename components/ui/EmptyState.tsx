@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Card } from "@/components/ui/Card";
 
 type EmptyStateProps =
   | {
@@ -81,11 +82,8 @@ export default function EmptyState(props: EmptyStateProps) {
   if (props.variant === "stories") {
     return (
       <div className="text-center py-16 px-4 animate-fade-in-up">
-        <div className="container mx-auto">
-          <div
-            className="bg-white/20 backdrop-blur-xl rounded-2xl p-12 shadow-lg border border-white/10 max-w-2xl mx-auto"
-            style={{ borderColor: "#abd1c6/20" }}
-          >
+        <div className="container mx-auto max-w-2xl">
+          <Card variant="glass" padding="lg" className="border-[#abd1c6]/20 text-center">
             {props.hasQuery ? (
               <>
                 <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -164,7 +162,7 @@ export default function EmptyState(props: EmptyStateProps) {
                 </div>
               </>
             )}
-          </div>
+          </Card>
         </div>
       </div>
     );

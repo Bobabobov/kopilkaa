@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { Story as StoryItem } from "@/hooks/stories/useStories";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { formatAmount } from "@/lib/format";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 
@@ -84,22 +86,18 @@ export function TopStoriesSection({
                 </p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-[#abd1c6]/15 border border-[#abd1c6]/40 px-4 py-2.5 text-sm font-semibold text-[#abd1c6] shadow-[0_2px_8px_rgba(0,30,29,0.2)]">
-              <LucideIcons.Heart
-                size="sm"
-                className="text-[#e16162] fill-[#e16162]/60 shrink-0"
-              />
+            <Badge variant="secondary" className="gap-1.5 text-xs font-semibold">
+              <LucideIcons.Heart size="sm" className="text-[#e16162] fill-[#e16162]/60 shrink-0" />
               по лайкам
-            </span>
+            </Badge>
           </header>
 
-          {/* Декоративная линия под заголовком */}
           <div className="flex items-center justify-center gap-3 mb-8 sm:mb-10">
-            <span className="h-px flex-1 max-w-[80px] sm:max-w-[120px] bg-gradient-to-r from-transparent to-[#abd1c6]/40 rounded-full" />
-            <span className="text-[#abd1c6]/50">
+            <Separator className="flex-1 max-w-[80px] sm:max-w-[120px]" />
+            <span className="text-[#abd1c6]/50" aria-hidden>
               <LucideIcons.Star size="xs" className="w-4 h-4" />
             </span>
-            <span className="h-px flex-1 max-w-[80px] sm:max-w-[120px] bg-gradient-to-l from-transparent to-[#abd1c6]/40 rounded-full" />
+            <Separator className="flex-1 max-w-[80px] sm:max-w-[120px]" />
           </div>
 
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 list-none p-0 m-0">

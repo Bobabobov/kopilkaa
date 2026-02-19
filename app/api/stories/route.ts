@@ -18,6 +18,20 @@ export async function GET(req: Request) {
     );
     const q = (searchParams.get("q") || "").trim();
     const normalizedQuery = q.replace(/\s+/g, " ").trim();
+    const sortParam = (searchParams.get("sort") || "newest").toLowerCase();
+    const sortMode =
+      sortParam === "oldest"
+        ? "oldest"
+        : sortParam === "popular"
+          ? "popular"
+          : "newest";
+
+    const orderBy =
+      sortMode === "popular"
+        ? [{ likes: { _count: "desc" as const } }, { createdAt: "desc" as const }]
+        : sortMode === "oldest"
+          ? { createdAt: "asc" as const }
+          : { createdAt: "desc" as const };
 
     const statusFilter = {
       OR: [
@@ -84,7 +98,7 @@ export async function GET(req: Request) {
       prisma.application
         .findMany({
           where,
-          orderBy: { createdAt: "desc" },
+          orderBy,
           skip,
           take: limit,
           select: {

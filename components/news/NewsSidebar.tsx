@@ -4,6 +4,9 @@ import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import type { NewsItem } from "./types";
 import { useMemo } from "react";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 function formatShortDate(value: string) {
   const d = new Date(value);
@@ -70,122 +73,106 @@ export function NewsSidebar({
 
   return (
     <div className={containerClass}>
-      <div className="rounded-3xl border border-[#abd1c6]/20 bg-[#001e1d]/35 p-5">
-        <div className="flex items-center justify-between">
-          <div className="text-[#fffffe] font-black text-lg">Сводка</div>
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 border border-white/10 text-xs font-bold text-white/75">
-            <LucideIcons.Activity size="xs" />
-            live
-          </span>
-        </div>
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="text-xs text-white/60">
-              {getPostWord(stats.total)}
-            </div>
-            <div className="text-xl font-black text-[#fffffe]">
-              {stats.total}
-            </div>
+      <Card variant="default" padding="md">
+        <CardContent className="p-0">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-base font-bold text-[#fffffe]">Сводка</h3>
+            <Badge variant="muted" className="gap-1.5 text-[10px] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+              live
+            </Badge>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="text-xs text-white/60">Лайков</div>
-            <div className="text-xl font-black text-[#10B981]">
-              {stats.likes}
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="min-w-0 rounded-xl border border-[#abd1c6]/15 bg-[#004643]/30 p-2 sm:p-3 text-center">
+              <div className="text-[10px] sm:text-xs text-[#abd1c6]/70 uppercase tracking-wide break-words leading-tight">{getPostWord(stats.total)}</div>
+              <div className="text-lg font-bold text-[#fffffe] mt-0.5">{stats.total}</div>
             </div>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-            <div className="text-xs text-white/60">Дизлайков</div>
-            <div className="text-xl font-black text-red-300">
-              {stats.dislikes}
+            <div className="min-w-0 rounded-xl border border-[#abd1c6]/15 bg-[#004643]/30 p-2 sm:p-3 text-center">
+              <div className="text-[10px] sm:text-xs text-[#abd1c6]/70 uppercase tracking-wide break-words leading-tight">Лайков</div>
+              <div className="text-lg font-bold text-[#10B981] mt-0.5">{stats.likes}</div>
+            </div>
+            <div className="min-w-0 rounded-xl border border-[#abd1c6]/15 bg-[#004643]/30 p-2 sm:p-3 text-center">
+              <div className="text-[10px] sm:text-xs text-[#abd1c6]/70 uppercase tracking-wide break-words leading-tight" title="Дизлайков">Дизл.</div>
+              <div className="text-lg font-bold text-red-400 mt-0.5">{stats.dislikes}</div>
             </div>
           </div>
-        </div>
-        {lastUpdatedAt && (
-          <div className="mt-3 text-xs text-white/55">
-            Обновлено:{" "}
-            <span className="text-white/75">
-              {new Date(lastUpdatedAt).toLocaleTimeString("ru-RU", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
-          </div>
-        )}
-      </div>
-
-      <div className="rounded-3xl border border-[#abd1c6]/20 bg-[#001e1d]/35 p-5">
-        <div className="text-[#fffffe] font-black text-lg">Топ новости</div>
-        <div className="mt-3 space-y-2">
-          {top.length === 0 ? (
-            <div className="text-sm text-[#abd1c6]">Пока нечего показывать</div>
-          ) : (
-            top.map((it) => (
-              <Link
-                key={it.id}
-                href={`/news#${it.id}`}
-                className="block rounded-2xl border border-white/10 bg-white/5 p-3 hover:bg-white/10 transition-colors cursor-pointer"
-              >
-                <div className="text-xs text-white/55 flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center gap-1">
-                    <LucideIcons.Calendar size="xs" className="text-white/55" />
-                    {formatShortDate(it.createdAt)}
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 text-[#10B981]">
-                      <LucideIcons.ThumbsUp size="xs" /> {it.likesCount}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-red-300">
-                      <LucideIcons.ThumbsDown size="xs" /> {it.dislikesCount}
-                    </span>
-                  </span>
-                </div>
-                <div className="mt-1 text-sm font-bold text-[#fffffe] line-clamp-2">
-                  {it.title || "Без заголовка"}
-                </div>
-              </Link>
-            ))
+          {lastUpdatedAt && (
+            <p className="mt-3 text-[10px] text-[#abd1c6]/60">
+              Обновлено: {new Date(lastUpdatedAt).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}
+            </p>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <div className="rounded-3xl border border-[#abd1c6]/20 bg-[#001e1d]/35 p-5">
-        <div className="text-[#fffffe] font-black text-lg">Полезное</div>
-        <div className="mt-3 space-y-2">
-          <Link
-            href="/support"
-            className="group flex items-center gap-3 p-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-200 cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110 flex-shrink-0 bg-[#f9bc60]/15 group-hover:bg-[#f9bc60]/25">
-              <LucideIcons.Heart size="sm" className="text-[#f9bc60]" />
-            </div>
-            <span className="text-sm font-semibold text-[#abd1c6] group-hover:text-[#fffffe] transition-colors duration-200 flex-1">
-              Поддержать проект
-            </span>
-          </Link>
-          <Link
-            href="/stories"
-            className="group flex items-center gap-3 p-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-200 cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110 flex-shrink-0 bg-[#abd1c6]/15 group-hover:bg-[#abd1c6]/25">
-              <LucideIcons.BookOpen size="sm" className="text-[#abd1c6]" />
-            </div>
-            <span className="text-sm font-semibold text-[#abd1c6] group-hover:text-[#fffffe] transition-colors duration-200 flex-1">
-              Истории
-            </span>
-          </Link>
-          <Link
-            href="/applications"
-            className="group flex items-center gap-3 p-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-200 cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110 flex-shrink-0 bg-white/10 group-hover:bg-white/15">
-              <LucideIcons.FileText size="sm" className="text-white/80" />
-            </div>
-            <span className="text-sm font-semibold text-[#abd1c6] group-hover:text-[#fffffe] transition-colors duration-200 flex-1">
-              Подать заявку
-            </span>
-          </Link>
-        </div>
-      </div>
+      <Card variant="default" padding="md" className="mt-4">
+        <CardContent className="p-0">
+          <h3 className="text-base font-bold text-[#fffffe]">Топ новости</h3>
+          {top.length === 0 ? (
+            <p className="mt-3 text-sm text-[#abd1c6]/70">Пока нечего показывать</p>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {top.map((it) => (
+                <li key={it.id}>
+                  <Link
+                    href={`/news#${it.id}`}
+                    className="block rounded-xl border border-[#abd1c6]/15 bg-[#004643]/30 p-3 hover:bg-[#004643]/50 hover:border-[#abd1c6]/25 transition-colors"
+                  >
+                    <div className="flex items-center justify-between gap-2 text-[10px] text-[#abd1c6]/70">
+                      <span className="inline-flex items-center gap-1">
+                        <LucideIcons.Calendar className="w-3 h-3" />
+                        {formatShortDate(it.createdAt)}
+                      </span>
+                      <span className="inline-flex items-center gap-2">
+                        <span className="text-[#10B981]">{it.likesCount}</span>
+                        <span className="text-red-400">{it.dislikesCount}</span>
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm font-semibold text-[#fffffe] line-clamp-2">
+                      {it.title || "Без заголовка"}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card variant="default" padding="md" className="mt-4">
+        <CardContent className="p-0">
+          <h3 className="text-base font-bold text-[#fffffe]">Полезное</h3>
+          <Separator className="my-3 bg-[#abd1c6]/15" />
+          <div className="space-y-2">
+            <Link
+              href="/support"
+              className="group flex items-center gap-3 p-3 rounded-xl border border-[#abd1c6]/15 bg-[#004643]/20 hover:bg-[#004643]/40 hover:border-[#abd1c6]/25 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#f9bc60]/15 group-hover:bg-[#f9bc60]/25">
+                <LucideIcons.Heart className="w-4 h-4 text-[#f9bc60]" />
+              </div>
+              <span className="text-sm font-semibold text-[#abd1c6] group-hover:text-[#fffffe]">Поддержать проект</span>
+            </Link>
+            <Link
+              href="/stories"
+              className="group flex items-center gap-3 p-3 rounded-xl border border-[#abd1c6]/15 bg-[#004643]/20 hover:bg-[#004643]/40 hover:border-[#abd1c6]/25 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#abd1c6]/15 group-hover:bg-[#abd1c6]/25">
+                <LucideIcons.BookOpen className="w-4 h-4 text-[#abd1c6]" />
+              </div>
+              <span className="text-sm font-semibold text-[#abd1c6] group-hover:text-[#fffffe]">Истории</span>
+            </Link>
+            <Link
+              href="/applications"
+              className="group flex items-center gap-3 p-3 rounded-xl border border-[#abd1c6]/15 bg-[#004643]/20 hover:bg-[#004643]/40 hover:border-[#abd1c6]/25 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/10 group-hover:bg-white/15">
+                <LucideIcons.FileText className="w-4 h-4 text-[#abd1c6]" />
+              </div>
+              <span className="text-sm font-semibold text-[#abd1c6] group-hover:text-[#fffffe]">Подать заявку</span>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

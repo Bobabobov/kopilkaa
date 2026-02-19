@@ -3,6 +3,9 @@
 
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 
 export type FilterType =
   | "all"
@@ -36,48 +39,46 @@ export default function FeedFilters({
 }: FeedFiltersProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5, duration: 0.4 }}
-      className="mb-8 sm:mb-10"
+      transition={{ delay: 0.3, duration: 0.35 }}
+      className="mb-6 sm:mb-8"
     >
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-center">
-        {filters.map((filter) => {
-          const Icon = LucideIcons[filter.icon];
-          const isActive = activeFilter === filter.type;
-          const showBadge = filter.type === "unread" && unreadCount > 0;
+      <Tabs
+        value={activeFilter}
+        onValueChange={(v) => onFilterChange(v as FilterType)}
+        className="w-full"
+      >
+        <TabsList className="w-full flex flex-wrap h-auto gap-1 p-1.5 bg-[#004643]/50 border border-[#abd1c6]/20 rounded-xl">
+          {filters.map((filter) => {
+            const Icon = LucideIcons[filter.icon];
+            const isActive = activeFilter === filter.type;
+            const showBadge = filter.type === "unread" && unreadCount > 0;
 
-          return (
-            <motion.button
-              key={filter.type}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onFilterChange(filter.type)}
-              className={`
-                relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl
-                text-sm font-medium transition-all duration-200
-                ${
-                  isActive
-                    ? "bg-gradient-to-r from-[#f9bc60]/30 to-[#e16162]/30 border-2 border-[#f9bc60]/50 text-[#f9bc60] shadow-lg shadow-[#f9bc60]/20"
-                    : "bg-[#001e1d]/60 border border-[#abd1c6]/20 text-[#abd1c6] hover:bg-[#001e1d]/80 hover:border-[#abd1c6]/40"
-                }
-              `}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{filter.label}</span>
-              {showBadge && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#f9bc60] text-[#001e1d] text-[10px] font-bold flex items-center justify-center border-2 border-[#001e1d]"
-                >
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </motion.span>
-              )}
-            </motion.button>
-          );
-        })}
-      </div>
+            return (
+              <TabsTrigger
+                key={filter.type}
+                value={filter.type}
+                className={cn(
+                  "flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium data-[state=active]:bg-[#f9bc60]/20 data-[state=active]:text-[#f9bc60] data-[state=active]:border-[#f9bc60]/40 data-[state=active]:border",
+                  !isActive && "border border-transparent",
+                )}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                <span className="hidden sm:inline">{filter.label}</span>
+                {showBadge && (
+                  <Badge
+                    variant="default"
+                    className="ml-0.5 h-5 min-w-[20px] px-1.5 text-[10px] font-bold border-0"
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+      </Tabs>
     </motion.div>
   );
 }

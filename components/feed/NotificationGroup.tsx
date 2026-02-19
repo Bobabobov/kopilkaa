@@ -4,6 +4,8 @@
 import { motion } from "framer-motion";
 import { Notification } from "@/components/notifications/types";
 import { formatDateGroup } from "@/lib/time";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import NotificationCard from "./NotificationCard";
 
 interface NotificationGroupProps {
@@ -22,22 +24,32 @@ export default function NotificationGroup({
   startIndex,
 }: NotificationGroupProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
+    <motion.section
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+      aria-labelledby={`group-${date}`}
       className="mb-8 sm:mb-10"
     >
-      {/* Заголовок группы */}
-      <div className="flex items-center gap-3 mb-4 sm:mb-6">
-        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent" />
-        <h2 className="text-sm sm:text-base font-semibold text-[#abd1c6]/80 px-4 py-1.5 rounded-full bg-[#001e1d]/60 border border-[#abd1c6]/20">
+      <Separator className="mb-5 bg-[#abd1c6]/15" />
+
+      <div className="flex items-center gap-3 mb-4 sm:mb-5">
+        <Badge
+          variant="secondary"
+          className="text-xs font-medium px-3 py-1 rounded-full border-[#abd1c6]/25"
+        >
           {formatDateGroup(date)}
-        </h2>
-        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent" />
+        </Badge>
+        <span className="text-xs text-[#abd1c6]/50">
+          {notifications.length}{" "}
+          {notifications.length === 1 ? "уведомление" : "уведомлений"}
+        </span>
       </div>
 
-      {/* Карточки уведомлений */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+      <div
+        id={`group-${date}`}
+        className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 lg:gap-6"
+      >
         {notifications.map((notification, index) => (
           <NotificationCard
             key={notification.id}
@@ -48,6 +60,6 @@ export default function NotificationGroup({
           />
         ))}
       </div>
-    </motion.div>
+    </motion.section>
   );
 }

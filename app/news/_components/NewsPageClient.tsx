@@ -11,6 +11,9 @@ import {
 } from "@/components/news/NewsControlsBar";
 import { NewsSidebar } from "@/components/news/NewsSidebar";
 import { NewsFeedSkeleton } from "@/components/news/NewsFeedSkeleton";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 type ApiResponse = { items: NewsItem[]; nextCursor: string | null };
 
@@ -185,82 +188,76 @@ export default function NewsPageClient({
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      {/* Фоновые блики */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+      </div>
+
       <div className="relative z-10 w-full px-3 sm:px-4 md:px-6 pt-6 sm:pt-8 md:pt-10 pb-12">
         <div className="max-w-6xl mx-auto">
-          {/* Hero */}
+          {/* Hero — Card (shadcn-style) */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
-            className="relative overflow-hidden rounded-3xl border border-[#abd1c6]/20 bg-gradient-to-br from-[#004643]/55 to-[#001e1d]/35 p-6 sm:p-8 mb-5 sm:mb-6"
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="mb-6 sm:mb-8"
           >
-            <div className="absolute -top-14 -right-14 w-52 h-52 bg-[#f9bc60]/10 rounded-full blur-3xl" />
-            <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-[#abd1c6]/10 rounded-full blur-3xl" />
-            <div className="relative z-10">
-              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 lg:gap-6">
-                <div className="min-w-0 flex-1">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 border border-white/10 text-xs font-bold text-white/80">
-                    <LucideIcons.Megaphone size="xs" />
-                    Лента обновлений
+            <Card variant="glass" padding="lg" className="relative overflow-hidden border-[#abd1c6]/25 shadow-xl shadow-[#001e1d]/30">
+              <CardContent className="p-0">
+                <div className="relative p-5 sm:p-6 lg:p-8">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-[#f9bc60]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                  <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#abd1c6]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                  <div className="relative z-10 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5 lg:gap-8">
+                    <div className="min-w-0 flex-1">
+                      <Badge variant="secondary" className="gap-1.5 mb-3">
+                        <LucideIcons.Megaphone className="w-3.5 h-3.5" />
+                        Лента обновлений
+                      </Badge>
+                      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#fffffe] leading-tight">
+                        Новости проекта
+                      </h1>
+                      <p className="mt-2 text-sm sm:text-base text-[#abd1c6]/90 max-w-2xl">
+                        Обновления, фичи, важные объявления и изменения на
+                        платформе.
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-3 flex-shrink-0 w-full sm:w-auto">
+                      <a
+                        href="https://t.me/kkopilka"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[#004643]/40 hover:bg-[#004643]/60 border border-[#abd1c6]/20 hover:border-[#abd1c6]/35 transition-all duration-200 w-full sm:w-auto"
+                        title="Телеграм канал"
+                      >
+                        <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-[#abd1c6]/20">
+                          <img src="/logo12.png" alt="Telegram" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 sm:flex-initial text-left sm:text-right min-w-0">
+                          <div className="text-xs font-semibold text-[#fffffe] truncate">@kkopilka</div>
+                          <div className="text-[10px] text-[#abd1c6]/80">Подписывайся</div>
+                        </div>
+                      </a>
+                      <a
+                        href="https://kick.com/koponline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[#004643]/40 hover:bg-[#004643]/60 border border-[#abd1c6]/20 hover:border-[#abd1c6]/35 transition-all duration-200 w-full sm:w-auto"
+                        title="Kick стрим"
+                      >
+                        <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-[#abd1c6]/20">
+                          <img src="/kick.png" alt="Kick" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 sm:flex-initial text-left sm:text-right min-w-0">
+                          <div className="text-xs font-semibold text-[#fffffe] truncate">koponline</div>
+                          <div className="text-[10px] text-[#abd1c6]/80">Стримы</div>
+                        </div>
+                      </a>
+                    </div>
                   </div>
-                  <h1 className="mt-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#fffffe] leading-tight">
-                    Новости проекта
-                  </h1>
-                  <p className="mt-2 text-sm sm:text-base text-[#abd1c6] max-w-2xl">
-                    Обновления, фичи, важные объявления и изменения на
-                    платформе.
-                  </p>
                 </div>
-                <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-3 flex-shrink-0 w-full sm:w-auto">
-                  <a
-                    href="https://t.me/kkopilka"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 transition-all duration-200 w-full sm:w-auto"
-                    title="Телеграм канал"
-                  >
-                    <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                      <img
-                        src="/logo12.png"
-                        alt="Telegram"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 sm:flex-initial text-left sm:text-right">
-                      <div className="text-xs font-semibold text-white/90 group-hover:text-white transition-colors">
-                        @kkopilka
-                      </div>
-                      <div className="text-[10px] sm:text-[10px] text-white/60 group-hover:text-white/80 transition-colors">
-                        Подписывайся, чтобы быть в курсе
-                      </div>
-                    </div>
-                  </a>
-                  <a
-                    href="https://kick.com/koponline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 transition-all duration-200 w-full sm:w-auto"
-                    title="Kick стрим"
-                  >
-                    <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                      <img
-                        src="/kick.png"
-                        alt="Kick"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 sm:flex-initial text-left sm:text-right">
-                      <div className="text-xs font-semibold text-white/90 group-hover:text-white transition-colors">
-                        koponline
-                      </div>
-                      <div className="text-[10px] sm:text-[10px] text-white/60 group-hover:text-white/80 transition-colors">
-                        Подписывайся, чтобы не пропустить стримы
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </motion.div>
 
           <div className="mb-4 sm:mb-5">
@@ -271,6 +268,7 @@ export default function NewsPageClient({
               onSortChange={setSort}
               onRefresh={load}
               refreshing={loading}
+              resultCount={!loading && !error ? filtered.length : undefined}
             />
           </div>
 
@@ -280,70 +278,102 @@ export default function NewsPageClient({
               {loading ? (
                 <NewsFeedSkeleton count={3} />
               ) : error ? (
-                <div className="rounded-3xl border border-red-400/20 bg-red-500/10 p-6 text-white">
-                  <div className="flex items-center gap-2 font-bold">
-                    <LucideIcons.AlertTriangle
-                      size="sm"
-                      className="text-red-300"
-                    />
-                    Ошибка загрузки
-                  </div>
-                  <div className="mt-2 text-white/80">{error}</div>
-                  <button
-                    onClick={load}
-                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-sm font-semibold"
-                  >
-                    <LucideIcons.RefreshCw size="sm" />
-                    Повторить
-                  </button>
-                </div>
-              ) : items.length === 0 ? (
-                <div className="rounded-3xl border border-[#abd1c6]/20 bg-[#004643]/35 p-8 text-center">
-                  <div className="text-[#fffffe] font-bold text-lg">
-                    Пока новостей нет
-                  </div>
-                  <div className="mt-2 text-[#abd1c6]">
-                    Загляните чуть позже.
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-5">
-                  {grouped.map((g) => (
-                    <div key={g.key} className="space-y-3 sm:space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h2 className="text-sm sm:text-base font-black text-white/85">
-                          {g.label}
-                        </h2>
-                        <span className="text-xs text-white/45">
-                          {g.items.length} {getPostWord(g.items.length)}
-                        </span>
-                      </div>
-                      <div className="space-y-4 sm:space-y-5">
-                        {g.items.map((it) => (
-                          <NewsPostCard key={it.id} item={it} />
-                        ))}
-                      </div>
+                <Card variant="default" padding="lg" className="border-red-400/30 bg-red-500/10">
+                  <CardContent>
+                    <div className="flex items-center gap-2 font-bold text-[#fffffe]">
+                      <LucideIcons.AlertTriangle size="sm" className="text-red-300" />
+                      Ошибка загрузки
                     </div>
-                  ))}
+                    <p className="mt-2 text-[#abd1c6]">{error}</p>
+                    <button
+                      onClick={load}
+                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#f9bc60]/20 hover:bg-[#f9bc60]/30 border border-[#f9bc60]/40 text-[#f9bc60] text-sm font-semibold transition-colors"
+                    >
+                      <LucideIcons.RefreshCw size="sm" />
+                      Повторить
+                    </button>
+                  </CardContent>
+                </Card>
+              ) : items.length === 0 ? (
+                <Card variant="glass" padding="lg" className="text-center max-w-md mx-auto">
+                  <CardContent className="pt-2 pb-6">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#f9bc60]/10 border border-[#f9bc60]/20 mb-4">
+                      <LucideIcons.Megaphone className="w-8 h-8 text-[#f9bc60]/80" />
+                    </div>
+                    <h3 className="text-xl font-bold text-[#fffffe]">Пока новостей нет</h3>
+                    <p className="mt-2 text-sm text-[#abd1c6]/80">
+                      Здесь появятся анонсы и обновления. Подпишитесь на канал, чтобы не пропустить.
+                    </p>
+                    <a
+                      href="https://t.me/kkopilka"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#004643]/60 hover:bg-[#004643]/80 border border-[#abd1c6]/25 text-[#abd1c6] hover:text-[#f9bc60] text-sm font-semibold transition-colors"
+                    >
+                      <LucideIcons.Megaphone className="w-4 h-4" />
+                      Telegram-канал
+                    </a>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-8 sm:space-y-10">
+                  {grouped.map((g, groupIdx) => {
+                    const isFirstGroup = groupIdx === 0;
+                    const isToday = g.label === "Сегодня";
+                    const featuredId = sort === "new" && isFirstGroup && isToday && g.items[0]?.id;
+
+                    return (
+                      <motion.section
+                        key={g.key}
+                        aria-labelledby={`news-group-${g.key}`}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: groupIdx * 0.08, ease: "easeOut" }}
+                      >
+                        <Separator className="mb-4 bg-[#abd1c6]/15" />
+                        <div className="flex items-center gap-3 mb-4">
+                          <Badge variant="secondary" id={`news-group-${g.key}`} className="text-xs font-semibold px-3 py-1">
+                            {g.label}
+                          </Badge>
+                          <span className="text-xs text-[#abd1c6]/60">
+                            {g.items.length} {getPostWord(g.items.length)}
+                          </span>
+                        </div>
+                        <div className="space-y-5 sm:space-y-6">
+                          {g.items.map((it, idx) => (
+                            <NewsPostCard
+                              key={it.id}
+                              item={it}
+                              featured={it.id === featuredId}
+                            />
+                          ))}
+                        </div>
+                      </motion.section>
+                    );
+                  })}
 
                   {nextCursor && (
-                    <div className="pt-2 flex justify-center">
+                    <div className="pt-4 flex justify-center">
                       <button
                         onClick={loadMore}
                         disabled={loadingMore}
-                        className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl border border-[#abd1c6]/25 bg-[#001e1d]/35 hover:bg-[#001e1d]/45 text-[#fffffe] font-bold transition ${
-                          loadingMore ? "opacity-70 cursor-wait" : ""
-                        }`}
+                        className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-[#abd1c6]/25 bg-[#004643]/50 hover:bg-[#004643]/70 text-[#fffffe] font-semibold text-sm transition-colors disabled:opacity-60 disabled:cursor-wait"
                       >
-                        <LucideIcons.ChevronDown size="sm" />
-                        {loadingMore ? "Загрузка..." : "Показать ещё"}
+                        {loadingMore ? (
+                          <LucideIcons.Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <LucideIcons.ChevronDown size="sm" />
+                        )}
+                        {loadingMore ? "Загрузка…" : "Показать ещё"}
                       </button>
                     </div>
                   )}
 
                   {!nextCursor && items.length > 0 && (
-                    <div className="pt-2 text-center text-xs text-white/45">
-                      Конец ленты
+                    <div className="pt-4 flex items-center justify-center gap-2">
+                      <Separator className="flex-1 max-w-[80px]" />
+                      <span className="text-xs text-[#abd1c6]/50">Конец ленты</span>
+                      <Separator className="flex-1 max-w-[80px]" />
                     </div>
                   )}
                 </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useMemo, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useNotifications } from "@/components/notifications/hooks/useNotifications";
@@ -10,6 +10,7 @@ import { isNotificationUnread } from "@/components/notifications/utils";
 import FeedHeader from "@/components/feed/FeedHeader";
 import FeedFilters, { FilterType } from "@/components/feed/FeedFilters";
 import NotificationGroup from "@/components/feed/NotificationGroup";
+import { Card, CardContent, CardSkeleton } from "@/components/ui/Card";
 
 // Импортируем список фильтров для отображения текста
 const filters = [
@@ -22,9 +23,21 @@ const filters = [
 
 export default function FeedContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const section = searchParams.get("section");
+  const isNotificationsSection = section === "notifications";
+
   const { notifications, loading, lastViewedTimestamp, refetch, markAsViewed } =
     useNotifications();
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+
+  // При открытии /feed?section=notifications прокрутить к списку после загрузки
+  useEffect(() => {
+    if (!loading && isNotificationsSection && notifications.length > 0) {
+      const el = document.getElementById("feed-notifications-list");
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [loading, isNotificationsSection, notifications.length]);
 
   // Фильтрация и группировка уведомлений
   const { filteredNotifications, groupedNotifications, unreadCount } =
@@ -62,8 +75,8 @@ export default function FeedContent() {
         );
       });
 
-      // Ограничиваем до 15 уведомлений максимум
-      filtered = filtered.slice(0, 15);
+      // Ограничиваем до 25 уведомлений
+      filtered = filtered.slice(0, 25);
 
       // Подсчет непрочитанных из всех уведомлений
       const unread = notifications.filter((n) =>
@@ -146,8 +159,9 @@ export default function FeedContent() {
       </div>
 
       <div className="relative z-10 px-4 sm:px-6 lg:px-8 xl:px-12 pt-12 sm:pt-16 lg:pt-20 pb-16 sm:pb-20 lg:pb-24">
-        {/* Заголовок */}
+        {/* Заголовок: компактный для section=notifications */}
         <FeedHeader
+          variant={isNotificationsSection ? "notifications" : "default"}
           unreadCount={unreadCount}
           totalCount={notifications.length}
           onMarkAllAsRead={handleMarkAllAsRead}
@@ -155,21 +169,19 @@ export default function FeedContent() {
         />
 
         {/* Основная область с уведомлениями */}
-        <div className="max-w-6xl mx-auto">
+        <div id="feed-notifications-list" className="max-w-6xl mx-auto">
           {loading ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-20 sm:py-24 lg:py-32"
+              className="space-y-6"
             >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-[#abd1c6]/10 border border-[#abd1c6]/20 mb-6"
-              >
-                <LucideIcons.Loader2 className="text-[#f9bc60]" size="lg" />
-              </motion.div>
-              <p className="text-sm sm:text-base text-[#abd1c6]/60">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <CardSkeleton key={i} lines={4} className="min-h-[180px]" />
+                ))}
+              </div>
+              <p className="text-center text-sm text-[#abd1c6]/50">
                 Загрузка уведомлений...
               </p>
             </motion.div>
@@ -185,27 +197,31 @@ export default function FeedContent() {
               {/* Результаты фильтрации */}
               {filteredNotifications.length === 0 ? (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-20 sm:py-24 lg:py-32"
+                  className="py-16 sm:py-20"
                 >
-                  <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-[#abd1c6]/10 border border-[#abd1c6]/20 mb-6">
-                    <LucideIcons.Bell className="text-[#abd1c6]/60" size="xl" />
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-semibold text-[#fffffe] mb-2">
-                    {activeFilter === "unread"
-                      ? "Нет непрочитанных уведомлений"
-                      : activeFilter === "all"
-                        ? "Нет уведомлений"
-                        : `Нет уведомлений типа "${filters.find((f) => f.type === activeFilter)?.label || activeFilter}"`}
-                  </h3>
-                  <p className="text-sm sm:text-base text-[#abd1c6]/60">
-                    {activeFilter === "unread"
-                      ? "Все уведомления прочитаны"
-                      : activeFilter === "all"
-                        ? "Здесь будут появляться новые уведомления"
-                        : "Попробуйте выбрать другой фильтр"}
-                  </p>
+                  <Card variant="glass" padding="lg" className="max-w-md mx-auto text-center">
+                    <CardContent className="pt-2">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#abd1c6]/10 border border-[#abd1c6]/20 mb-4">
+                        <LucideIcons.Bell className="text-[#abd1c6]/70" size="lg" />
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-semibold text-[#fffffe] mb-2">
+                        {activeFilter === "unread"
+                          ? "Нет непрочитанных"
+                          : activeFilter === "all"
+                            ? "Пока пусто"
+                            : `Нет: ${filters.find((f) => f.type === activeFilter)?.label ?? activeFilter}`}
+                      </h3>
+                      <p className="text-sm text-[#abd1c6]/70">
+                        {activeFilter === "unread"
+                          ? "Все уведомления прочитаны"
+                          : activeFilter === "all"
+                            ? "Здесь появятся лайки, заявки и заявки в друзья"
+                            : "Попробуйте другой фильтр"}
+                      </p>
+                    </CardContent>
+                  </Card>
                 </motion.div>
               ) : (
                 /* Группированные уведомления */

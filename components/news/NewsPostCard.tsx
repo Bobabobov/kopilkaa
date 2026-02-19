@@ -8,6 +8,11 @@ import { NewsReactions } from "./NewsReactions";
 import Link from "next/link";
 import { formatDateTimeShort } from "@/lib/time";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Card, CardContent, CardFooter } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 // Функция для подсчета текста без HTML тегов
 function getTextLength(html: string): number {
@@ -17,7 +22,28 @@ function getTextLength(html: string): number {
   return (div.textContent || div.innerText || "").length;
 }
 
-export function NewsPostCard({ item }: { item: NewsItem }) {
+/** Примерное время чтения в минутах (~200 слов/мин) */
+function getReadingMinutes(charCount: number): number {
+  const words = charCount / 5;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
+function getInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+interface NewsPostCardProps {
+  item: NewsItem;
+  /** Выделенная карточка (первая новость дня): крупнее, с превью сверху */
+  featured?: boolean;
+}
+
+export function NewsPostCard({ item, featured = false }: NewsPostCardProps) {
   const authorName = item.author?.name || "Администратор";
   const created = useMemo(
     () => formatDateTimeShort(item.createdAt),
@@ -27,6 +53,12 @@ export function NewsPostCard({ item }: { item: NewsItem }) {
   const [expanded, setExpanded] = useState(false);
   const textLength = useMemo(() => getTextLength(item.content), [item.content]);
   const isLong = textLength > 520;
+  const readingMin = useMemo(() => getReadingMinutes(textLength), [textLength]);
+  const firstImage = useMemo(
+    () => item.media?.find((m) => m.type === "IMAGE")?.url,
+    [item.media],
+  );
+  const showFeaturedImage = featured && firstImage;
 
   const handleShare = async () => {
     const url = `${window.location.origin}/news#${item.id}`;
@@ -56,54 +88,86 @@ export function NewsPostCard({ item }: { item: NewsItem }) {
   return (
     <motion.article
       id={item.id}
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-      className="relative overflow-hidden rounded-3xl border border-[#abd1c6]/25 bg-gradient-to-br from-[#004643]/55 to-[#001e1d]/40 shadow-xl scroll-mt-24 mb-6"
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="scroll-mt-24"
     >
-      {/* декор */}
-      <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#f9bc60]/10 rounded-full blur-3xl" />
-      <div className="absolute -bottom-12 -left-12 w-44 h-44 bg-[#abd1c6]/10 rounded-full blur-3xl" />
+      <Card
+        variant="default"
+        padding="none"
+        hoverable
+        className={cn(
+          "overflow-hidden",
+          featured && "ring-1 ring-[#f9bc60]/25 shadow-xl shadow-[#f9bc60]/5",
+        )}
+      >
+        {showFeaturedImage && (
+          <div className="relative w-full aspect-video overflow-hidden bg-[#001e1d]">
+            <img
+              src={firstImage}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#001e1d]/80 via-transparent to-transparent" />
+          </div>
+        )}
+        <CardContent className={cn("p-5 sm:p-6 relative", featured && "sm:p-7")}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#f9bc60]/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-28 h-28 bg-[#abd1c6]/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
 
-      <div className="relative z-10 p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              {isOfficial && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f9bc60]/15 border border-[#f9bc60]/30 text-[11px] font-black text-[#f9bc60]">
-                  <LucideIcons.Shield size="xs" />
-                  Официально
-                </span>
-              )}
-              {item.title && (
-                <h2 className="text-lg sm:text-2xl font-black text-[#fffffe] leading-snug">
-                  {item.title}
-                </h2>
-              )}
-            </div>
+          <div className="relative z-10">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  {isOfficial && (
+                    <Badge variant="default" className="gap-1.5 text-[10px] font-bold px-2 py-0">
+                      <LucideIcons.Shield className="w-3 h-3" />
+                      Официально
+                    </Badge>
+                  )}
+                  {featured && (
+                    <Badge variant="secondary" className="text-[10px] font-semibold">
+                      Главная
+                    </Badge>
+                  )}
+                  {item.title && (
+                    <h2
+                      className={cn(
+                        "font-black text-[#fffffe] leading-snug mt-0.5",
+                        featured ? "text-xl sm:text-3xl md:text-4xl" : "text-lg sm:text-2xl",
+                      )}
+                    >
+                      {item.title}
+                    </h2>
+                  )}
+                </div>
 
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/70">
-              <span className="inline-flex items-center gap-2">
-                <img
-                  src={item.author?.avatar || "/default-avatar.png"}
-                  alt={`Аватар ${authorName}`}
-                  className="w-6 h-6 rounded-full object-cover border border-white/15"
-                  onError={(e) => {
-                    e.currentTarget.src = "/default-avatar.png";
-                  }}
-                />
-                <span className="font-semibold text-white/80 truncate max-w-[220px]">
+                <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#abd1c6]/80">
+              <span className="inline-flex items-center gap-2 min-w-0">
+                <Avatar className="h-6 w-6 border border-[#abd1c6]/20 ring-1 ring-[#001e1d]/50">
+                  <AvatarImage src={item.author?.avatar || "/default-avatar.png"} alt={authorName} />
+                  <AvatarFallback className="bg-[#004643] text-[#abd1c6] text-[10px]">
+                    {getInitials(authorName)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="font-semibold text-[#abd1c6] truncate max-w-[200px]">
                   {authorName}
                 </span>
               </span>
-              <span className="text-[#f9bc60]">•</span>
-              <span>{created}</span>
-              <span className="text-[#f9bc60]">•</span>
+              <span aria-hidden className="text-[#abd1c6]/40">·</span>
+              <time dateTime={item.createdAt} className="whitespace-nowrap">{created}</time>
+              <span aria-hidden className="text-[#abd1c6]/40">·</span>
+              <span className="inline-flex items-center gap-1 text-[#abd1c6]/70 whitespace-nowrap">
+                <LucideIcons.Clock className="w-3 h-3" />
+                {readingMin} мин
+              </span>
+              <span aria-hidden className="text-[#abd1c6]/40">·</span>
               <Link
                 href="/support"
                 className="text-[#abd1c6] hover:text-[#fffffe] underline-offset-2 hover:underline"
               >
-                Поддержать проект
+                Поддержать
               </Link>
             </div>
           </div>
@@ -206,18 +270,21 @@ export function NewsPostCard({ item }: { item: NewsItem }) {
           initialMyReaction={item.myReaction}
         />
 
-        {/* Разделитель и кнопка "Поделиться" */}
-        <div className="mt-4 pt-4 border-t border-white/10">
+        <Separator className="my-4 bg-[#abd1c6]/15" />
+
+        <CardFooter className="p-0 border-0">
           <button
             type="button"
             onClick={handleShare}
-            className="inline-flex items-center gap-2 text-xs font-medium text-white/60 hover:text-white/90 transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-medium text-[#abd1c6]/80 hover:text-[#f9bc60] transition-colors"
           >
             <LucideIcons.Share size="xs" />
             Поделиться
           </button>
-        </div>
-      </div>
+        </CardFooter>
+          </div>
+        </CardContent>
+      </Card>
     </motion.article>
   );
 }

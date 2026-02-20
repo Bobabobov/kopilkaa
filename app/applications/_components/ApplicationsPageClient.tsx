@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { usePageTimeTracking } from "@/hooks/ui/usePageTimeTracking";
@@ -14,26 +13,8 @@ import {
 } from "@/hooks/applications/useApplicationFormState";
 import TrustIntroModal from "@/components/applications/TrustIntroModal";
 import ActivityRequirementModal from "@/components/applications/ActivityRequirementModal";
-
-const SuccessScreen = dynamic(
-  () => import("@/components/applications/SuccessScreen"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
-    ),
-  },
-);
-
-const PageHeader = dynamic(
-  () => import("@/components/applications/PageHeader"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-24 bg-[#004643]/30 animate-pulse rounded-2xl" />
-    ),
-  },
-);
+import SuccessScreen from "@/components/applications/SuccessScreen";
+import PageHeader from "@/components/applications/PageHeader";
 
 export default function ApplicationsPageClient() {
   usePageTimeTracking({
@@ -132,8 +113,12 @@ export default function ApplicationsPageClient() {
         onCheckedChange={setIntroChecked}
         onConfirm={() => {
           setIntroOpen(false);
-          sessionStorage.setItem(introAckKey, "true");
-          localStorage.setItem(introAckKey, "true");
+          try {
+            sessionStorage.setItem(introAckKey, "true");
+            localStorage.setItem(introAckKey, "true");
+          } catch {
+            // storage может быть недоступен в in-app браузере (Telegram и др.)
+          }
         }}
       />
 

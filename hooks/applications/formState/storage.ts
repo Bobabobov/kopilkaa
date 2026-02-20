@@ -32,20 +32,32 @@ export function saveFormToStorage(saveKey: string, data: StoredFormData): void {
 
 export function loadTrustAck(trustAckKey: string): boolean {
   if (typeof window === "undefined") return false;
-  return sessionStorage.getItem(trustAckKey) === "true";
+  try {
+    return sessionStorage.getItem(trustAckKey) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export function loadPolicyAck(policyAckKey: string): boolean {
   if (typeof window === "undefined") return false;
-  return sessionStorage.getItem(policyAckKey) === "true";
+  try {
+    return sessionStorage.getItem(policyAckKey) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export function loadIntroAck(introAckKey: string): boolean {
   if (typeof window === "undefined") return false;
-  return (
-    sessionStorage.getItem(introAckKey) === "true" ||
-    localStorage.getItem(introAckKey) === "true"
-  );
+  try {
+    return (
+      sessionStorage.getItem(introAckKey) === "true" ||
+      localStorage.getItem(introAckKey) === "true"
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function loadFormStartTime(formStartKey: string): number | null {

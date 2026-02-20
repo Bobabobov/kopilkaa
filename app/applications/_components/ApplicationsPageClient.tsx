@@ -92,7 +92,14 @@ export default function ApplicationsPageClient() {
   }
 
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <p className="text-[#abd1c6] text-center">
+          Войдите в аккаунт, чтобы подать заявку. Окно входа должно открыться
+          автоматически.
+        </p>
+      </div>
+    );
   }
 
   if (submitted) {

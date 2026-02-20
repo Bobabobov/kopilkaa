@@ -3,6 +3,9 @@
 import { UPLOAD_LIMITS } from "./constants";
 import type { LocalImage } from "./types";
 
+/** Таймаут загрузки фото: в браузере Telegram и на мобильном интернете может быть медленно */
+const UPLOAD_TIMEOUT_MS = 120_000; // 2 минуты
+
 function getFilesFromPhotos(photos: LocalImage[]): File[] {
   const files: File[] = [];
   photos.forEach((item) => {
@@ -43,7 +46,26 @@ export async function uploadApplicationPhotos(
   const fd = new FormData();
   filesToUpload.forEach((file) => fd.append("files", file));
 
-  const r = await fetch("/api/uploads", { method: "POST", body: fd });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT_MS);
+  let r: Response;
+  try {
+    r = await fetch("/api/uploads", {
+      method: "POST",
+      body: fd,
+      signal: controller.signal,
+    });
+  } catch (e) {
+    clearTimeout(timeoutId);
+    if (e instanceof Error && e.name === "AbortError") {
+      throw new Error(
+        "Загрузка заняла слишком много времени. Проверьте интернет и попробуйте снова. Либо откройте сайт в обычном браузере.",
+      );
+    }
+    throw e;
+  }
+  clearTimeout(timeoutId);
+
   const contentType = r.headers.get("content-type") || "";
 
   if (r.status === 413) {

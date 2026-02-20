@@ -83,6 +83,13 @@ export default function SubmitSection({
         </span>
       </motion.button>
 
+      {(uploading || submitting) && (
+        <p className="text-center text-sm text-[#abd1c6]/90">
+          В браузере Telegram и на мобильном интернете это может занять 1–2
+          минуты. Не закрывайте страницу.
+        </p>
+      )}
+
       {left !== null && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

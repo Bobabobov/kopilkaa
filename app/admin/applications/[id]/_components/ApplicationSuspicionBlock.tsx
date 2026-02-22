@@ -30,7 +30,7 @@ export default function ApplicationSuspicionBlock({
             borderColor: "rgba(171, 209, 198, 0.35)",
           }}
         >
-          <LucideIcons.CheckCircle size="sm" style={{ color: "#abd1c6" }} />
+          <LucideIcons.CheckCircle size="sm" className="text-[#abd1c6]" />
           <span className="text-sm font-medium" style={{ color: "#abd1c6" }}>
             Всё хорошо, заявка чистая
           </span>

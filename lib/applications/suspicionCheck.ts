@@ -7,9 +7,9 @@ function getPlainTextFromHtml(html: string): string {
   }).trim();
 }
 
-/** ~3–5 симв/сек — печать, 15+ — подозрение на вставку, 25+ — почти наверняка */
-const CHARS_PER_SEC_SUSPICIOUS = 15;
-const CHARS_PER_SEC_HIGH = 25;
+/** ~3–5 симв/сек — печать, 10+ — подозрение на вставку, 20+ — почти наверняка */
+const CHARS_PER_SEC_SUSPICIOUS = 10;
+const CHARS_PER_SEC_HIGH = 20;
 
 /** Типичные фразы в AI-текстах (рус.) — эвристика */
 const AI_LIKE_PHRASES = [

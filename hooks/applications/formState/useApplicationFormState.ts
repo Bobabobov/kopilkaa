@@ -87,32 +87,31 @@ export function useApplicationFormState() {
     [storageSuffix],
   );
 
+  useEffect(() => {
+    if (loadingAuth) return;
+    try {
+      localStorage.removeItem(saveKey);
+      localStorage.removeItem(formStartKey);
+    } catch {
+      // ignore
+    }
+  }, [loadingAuth, saveKey, formStartKey]);
+
   useRestoreForm({
-    saveKey,
     trustAckKey,
     policyAckKey,
     introAckKey,
-    formStartKey,
     loadingAuth,
-    setTitle,
-    setSummary,
-    setStory,
-    setAmount,
-    setPayment,
-    setBankName,
     setTrustAcknowledged,
     setPoliciesAccepted,
     setIntroOpen,
     setIntroChecked,
-    formStartedAtRef,
   });
 
   usePersistForm({
-    saveKey,
     trustAckKey,
     policyAckKey,
     introAckKey,
-    formStartKey,
     title,
     summary,
     story,

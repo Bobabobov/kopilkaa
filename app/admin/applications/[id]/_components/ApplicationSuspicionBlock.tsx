@@ -15,7 +15,29 @@ export default function ApplicationSuspicionBlock({
 }: ApplicationSuspicionBlockProps) {
   const suspicion = checkApplicationSuspicion(story, filledMs);
 
-  if (!suspicion.hasSuspicion) return null;
+  if (!suspicion.hasSuspicion) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+        className="mb-6"
+      >
+        <div
+          className="rounded-xl sm:rounded-2xl p-4 sm:p-5 border inline-flex items-center gap-2"
+          style={{
+            backgroundColor: "rgba(171, 209, 198, 0.12)",
+            borderColor: "rgba(171, 209, 198, 0.35)",
+          }}
+        >
+          <LucideIcons.CheckCircle size="sm" style={{ color: "#abd1c6" }} />
+          <span className="text-sm font-medium" style={{ color: "#abd1c6" }}>
+            Всё хорошо, заявка чистая
+          </span>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

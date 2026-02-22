@@ -84,7 +84,6 @@ export default function RichTextEditor({
       },
       handlePaste: () => {
         if (allowPaste) return false;
-        // Запрещаем вставку — только ручной ввод
         setPasteBlocked(true);
         if (typeof window !== "undefined") {
           try {
@@ -93,6 +92,12 @@ export default function RichTextEditor({
             // ignore
           }
         }
+        return true;
+      },
+      handleDrop: (view, event) => {
+        if (allowPaste) return false;
+        setPasteBlocked(true);
+        event.preventDefault();
         return true;
       },
     },

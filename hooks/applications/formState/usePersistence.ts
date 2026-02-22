@@ -87,7 +87,7 @@ export function useRestoreForm(params: RestoreParams): void {
 
       const savedStart = loadFormStartTime(formStartKey);
       const now = Date.now();
-      const maxIdleMs = 6 * 60 * 60 * 1000; // 6 часов: отсеиваем "залипшие" формы
+      const maxIdleMs = 15 * 60 * 1000; // 15 мин: если черновик старше — не считать время от старого старта
       const shouldResetStart =
         !hasSavedData ||
         savedStart == null ||

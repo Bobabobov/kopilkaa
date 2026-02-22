@@ -94,11 +94,39 @@ export default function RichTextEditor({
         }
         return true;
       },
-      handleDrop: (view, event) => {
+      handleDrop: (_view, event) => {
         if (allowPaste) return false;
         setPasteBlocked(true);
         event.preventDefault();
         return true;
+      },
+      handleDOMEvents: {
+        paste: (_view, event) => {
+          if (allowPaste) return false;
+          event.preventDefault();
+          setPasteBlocked(true);
+          return true;
+        },
+        drop: (_view, event) => {
+          if (allowPaste) return false;
+          event.preventDefault();
+          setPasteBlocked(true);
+          return true;
+        },
+        beforeinput: (_view, event: InputEvent) => {
+          if (allowPaste) return false;
+          const t = event.inputType;
+          if (
+            t === "insertFromPaste" ||
+            t === "insertFromDrop" ||
+            t === "insertFromClipboard"
+          ) {
+            event.preventDefault();
+            setPasteBlocked(true);
+            return true;
+          }
+          return false;
+        },
       },
     },
   });

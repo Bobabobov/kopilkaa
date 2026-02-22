@@ -12,6 +12,7 @@ import ApplicationPaymentDetails from "./_components/ApplicationPaymentDetails";
 import ApplicationIpBlock from "./_components/ApplicationIpBlock";
 import ApplicationImages from "./_components/ApplicationImages";
 import ApplicationStory from "./_components/ApplicationStory";
+import ApplicationSuspicionBlock from "./_components/ApplicationSuspicionBlock";
 import ApplicationAdminComment from "./_components/ApplicationAdminComment";
 import ApplicationFooter from "./_components/ApplicationFooter";
 import ApplicationImageLightbox from "./_components/ApplicationImageLightbox";
@@ -199,6 +200,11 @@ export default function AdminApplicationPage({
             <ApplicationImages
               images={item.images}
               onImageClick={handleImageClick}
+            />
+
+            <ApplicationSuspicionBlock
+              story={item.story}
+              filledMs={item.filledMs}
             />
 
             <ApplicationStory story={item.story} />

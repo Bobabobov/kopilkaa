@@ -27,9 +27,10 @@ if npx prisma migrate resolve --applied 20260103090000_add_hero_badge_override >
 else
   echo "ℹ️  Миграция 20260103090000_add_hero_badge_override уже была отмечена как применённая"
 fi
-# На проде filledMs уже есть — помечаем миграцию filledMs как применённую, снимаем failed с storyEditMs.
-npx prisma migrate resolve --rolled-back 20260220120000_add_filled_ms_and_story_edit_ms 2>/dev/null || true
-npx prisma migrate resolve --applied 20260220110000_add_filled_ms 2>/dev/null || true
+# На проде filledMs уже есть — снимаем failed с упавшей миграции, помечаем filledMs как применённую.
+# Без --rolled-back migrate deploy отказывается применять новые миграции (P3009).
+npx prisma migrate resolve --rolled-back 20260220120000_add_filled_ms_and_story_edit_ms || true
+npx prisma migrate resolve --applied 20260220110000_add_filled_ms || true
 
 echo "🗄️  Применяем миграции базы данных..."
 npx prisma migrate deploy

@@ -63,11 +63,18 @@ export async function POST(req: Request) {
   };
 
   try {
-    const requester = await prisma.user.findUnique({
-      where: { id: session.uid },
-      select: { email: true },
-    });
     const whitelistEmails = getWhitelistEmails();
+    const [requester, lastByUser] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: session.uid },
+        select: { email: true },
+      }),
+      prisma.application.findFirst({
+        where: { userId: session.uid },
+        orderBy: { createdAt: "desc" },
+        select: { createdAt: true },
+      }),
+    ]);
     const isWhitelisted =
       requester?.email &&
       whitelistEmails.includes(requester.email.toLowerCase());
@@ -186,13 +193,8 @@ export async function POST(req: Request) {
 
     // Лимит раз в 24 часа (только для обычных пользователей)
     if (session.role !== "ADMIN" && !isWhitelisted) {
-      const last = await prisma.application.findFirst({
-        where: { userId: session.uid },
-        orderBy: { createdAt: "desc" },
-        select: { createdAt: true },
-      });
-      if (last) {
-        const diff = Date.now() - last.createdAt.getTime();
+      if (lastByUser) {
+        const diff = Date.now() - lastByUser.createdAt.getTime();
         const left = DAY_MS - diff;
         if (left > 0) {
           return Response.json(
@@ -207,23 +209,27 @@ export async function POST(req: Request) {
     const trust = await computeUserTrustSnapshot(session.uid);
 
     if (session.role !== "ADMIN" && !isWhitelisted) {
-      // Если есть одобренная заявка, проверяем наличие отзыва
-      if (trust.approvedApplications > 0) {
-        const review = await prisma.review.findUnique({
-          where: { userId: session.uid },
-          select: { id: true },
-        });
+      const needReview = trust.approvedApplications > 0;
+      const needActivity = trust.approvedApplications >= 3;
+      const [review, lastForActivity] = await Promise.all([
+        needReview
+          ? prisma.review.findUnique({
+              where: { userId: session.uid },
+              select: { id: true },
+            })
+          : Promise.resolve(null),
+        needActivity ? lastByUser : Promise.resolve(null),
+      ]);
 
-        if (!review) {
-          return Response.json(
-            {
-              error:
-                "Для создания новой заявки необходимо сначала оставить отзыв о предыдущей одобренной заявке. Перейдите на страницу /reviews и оставьте отзыв.",
-              requiresReview: true,
-            },
-            { status: 403 },
-          );
-        }
+      if (needReview && !review) {
+        return Response.json(
+          {
+            error:
+              "Для создания новой заявки необходимо сначала оставить отзыв о предыдущей одобренной заявке. Перейдите на страницу /reviews и оставьте отзыв.",
+            requiresReview: true,
+          },
+          { status: 403 },
+        );
       }
 
       if (amountNumber < trust.limits.min || amountNumber > trust.limits.max) {
@@ -236,35 +242,29 @@ export async function POST(req: Request) {
           { status: 400 },
         );
       }
-    }
 
-    // Для 3+ одобренных заявок требуется лайк истории перед отправкой
-    if (trust.approvedApplications >= 3) {
-      const lastApplication = await prisma.application.findFirst({
-        where: { userId: session.uid },
-        orderBy: { createdAt: "desc" },
-        select: { createdAt: true },
-      });
-      const lastApplicationAt = lastApplication?.createdAt ?? null;
-      const requirement = {
-        type: "LIKE_STORY" as const,
-        message:
-          "Для каждой 3-й и последующей заявки поставьте лайк любой истории.",
-      };
-      const isMet = await isActivityRequirementMet(
-        session.uid,
-        requirement,
-        lastApplicationAt,
-      );
-      if (!isMet) {
-        return Response.json(
-          {
-            error: requirement.message,
-            requiresActivity: true,
-            activityType: requirement.type,
-          },
-          { status: 403 },
+      if (needActivity) {
+        const lastApplicationAt = lastForActivity?.createdAt ?? null;
+        const requirement = {
+          type: "LIKE_STORY" as const,
+          message:
+            "Для каждой 3-й и последующей заявки поставьте лайк любой истории.",
+        };
+        const isMet = await isActivityRequirementMet(
+          session.uid,
+          requirement,
+          lastApplicationAt,
         );
+        if (!isMet) {
+          return Response.json(
+            {
+              error: requirement.message,
+              requiresActivity: true,
+              activityType: requirement.type,
+            },
+            { status: 403 },
+          );
+        }
       }
     }
 
@@ -302,9 +302,7 @@ export async function POST(req: Request) {
       return app;
     });
 
-    // SSE уведомления для админки
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
+    // SSE уведомления для админки (без задержки — ответ отдаём сразу)
     publish("application:created", {
       id: result.id,
       userId: session.uid,

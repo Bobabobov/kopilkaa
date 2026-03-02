@@ -123,14 +123,26 @@ export async function GET(
       }));
     }
 
-    return Response.json({
+    const toIso = (d: Date) => (d instanceof Date ? d.toISOString() : d);
+
+    const payload = {
       item: {
         ...item,
+        createdAt: toIso(item.createdAt),
+        updatedAt: item.updatedAt ? toIso(item.updatedAt) : null,
         story: sanitizeApplicationStoryHtml(item.story ?? ""),
-        samePaymentApplications,
-        sameIpApplications,
+        samePaymentApplications: samePaymentApplications.map((s) => ({
+          ...s,
+          createdAt: toIso(s.createdAt),
+        })),
+        sameIpApplications: sameIpApplications.map((s) => ({
+          ...s,
+          createdAt: toIso(s.createdAt),
+        })),
       },
-    });
+    };
+
+    return Response.json(payload);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack : undefined;

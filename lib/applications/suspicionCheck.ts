@@ -50,6 +50,7 @@ export type SuspicionResult = {
 export function checkApplicationSuspicion(
   storyHtml: string,
   filledMs: number | null | undefined,
+  storyEditMs?: number | null,
 ): SuspicionResult {
   const text = getPlainTextFromHtml(storyHtml);
   const chars = text.length;
@@ -62,18 +63,26 @@ export function checkApplicationSuspicion(
   let fastFillHigh = false;
   let fastFillDetails: SuspicionResult["fastFillDetails"];
 
+  // Приоритет: время редактирования поля истории (не общее время на странице)
+  const effectiveMs =
+    typeof storyEditMs === "number" &&
+    Number.isFinite(storyEditMs) &&
+    storyEditMs >= 0
+      ? storyEditMs
+      : filledMs;
+
   if (
-    typeof filledMs === "number" &&
-    Number.isFinite(filledMs) &&
-    filledMs > 0 &&
+    typeof effectiveMs === "number" &&
+    Number.isFinite(effectiveMs) &&
+    effectiveMs > 0 &&
     chars >= 100
   ) {
-    const seconds = Math.max(0.1, filledMs / 1000);
+    const seconds = Math.max(0.1, effectiveMs / 1000);
     const charsPerSec = chars / seconds;
     fastFillDetails = { chars, seconds, charsPerSec };
     fastFill =
       charsPerSec >= CHARS_PER_SEC_SUSPICIOUS ||
-      (filledMs < 60_000 && chars >= 100); // < 1 мин на всю форму при 100+ сим — подозрительно
+      (effectiveMs < 60_000 && chars >= 100);
     fastFillHigh = charsPerSec >= CHARS_PER_SEC_HIGH;
   }
 

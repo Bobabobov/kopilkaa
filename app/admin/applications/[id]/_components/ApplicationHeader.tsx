@@ -31,7 +31,7 @@ export default function ApplicationHeader({
     >
       <button
         onClick={onBack}
-        className="group flex items-center gap-2 px-4 py-2 bg-[#001e1d]/60 backdrop-blur-sm border border-[#abd1c6]/20 rounded-xl hover:bg-[#001e1d] hover:border-[#f9bc60] transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+        className="group flex items-center gap-2 min-h-[44px] px-4 py-2.5 bg-[#001e1d]/60 backdrop-blur-sm border border-[#abd1c6]/20 rounded-xl hover:bg-[#001e1d] hover:border-[#f9bc60] transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl touch-manipulation"
         style={{ color: "#abd1c6" }}
       >
         <svg

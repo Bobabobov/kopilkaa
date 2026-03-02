@@ -47,7 +47,12 @@ export default function ApplicationsPageClient() {
     left,
     submitted,
     trustAcknowledged,
-    setTrustAcknowledged,
+    trustAck1,
+    setTrustAck1,
+    trustAck2,
+    setTrustAck2,
+    trustAck3,
+    setTrustAck3,
     policiesAccepted,
     setPoliciesAccepted,
     ackError,
@@ -235,7 +240,12 @@ export default function ApplicationsPageClient() {
                 }}
                 amountInputRef={amountInputRef}
                 trustAcknowledged={trustAcknowledged}
-                setTrustAcknowledged={setTrustAcknowledged}
+                trustAck1={trustAck1}
+                setTrustAck1={setTrustAck1}
+                trustAck2={trustAck2}
+                setTrustAck2={setTrustAck2}
+                trustAck3={trustAck3}
+                setTrustAck3={setTrustAck3}
                 policiesAccepted={policiesAccepted}
                 setPoliciesAccepted={setPoliciesAccepted}
                 ackError={ackError}

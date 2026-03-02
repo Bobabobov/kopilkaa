@@ -9,7 +9,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 interface ActivityRequirementModalProps {
   isOpen: boolean;
   onClose: () => void;
-  activityType: "LIKE_STORY" | "CHANGE_AVATAR" | "CHANGE_HEADER";
+  activityType: "LIKE_STORY";
   message: string;
 }
 
@@ -59,57 +59,18 @@ export default function ActivityRequirementModal({
 
   if (!isBrowser) return null;
 
-  const getActivityConfig = () => {
-    switch (activityType) {
-      case "LIKE_STORY":
-        return {
-          icon: <LucideIcons.Heart className="w-8 h-8" />,
-          title: "Лайк истории",
-          description: "Поставьте лайк любой истории, которая вам понравится.",
-          helperText: "Начиная с 3-й заявки — лайк нужен каждый раз.",
-          buttonText: "Открыть истории",
-          buttonLink: "/stories",
-          buttonIcon: <LucideIcons.BookOpen className="w-5 h-5" />,
-          accentColor: "bg-[#e16162]",
-          accentGradient: "from-[#e16162] to-[#d14d4e]",
-          onButtonClick: null,
-        };
-      case "CHANGE_AVATAR":
-        return {
-          icon: <LucideIcons.User className="w-8 h-8" />,
-          title: "Смена аватара",
-          description: "Установите аватар в профиле.",
-          helperText: "Нужно сделать один раз.",
-          buttonText: "Открыть профиль",
-          buttonLink: "/profile?settings=avatar",
-          buttonIcon: <LucideIcons.User className="w-5 h-5" />,
-          accentColor: "bg-[#1f6a4d]",
-          accentGradient: "from-[#1f6a4d] to-[#1a5a40]",
-          onButtonClick: () => {
-            onClose();
-            window.location.href = "/profile?settings=avatar";
-          },
-        };
-      case "CHANGE_HEADER":
-        return {
-          icon: <LucideIcons.Image className="w-8 h-8" />,
-          title: "Смена обложки",
-          description: "Установите обложку профиля.",
-          helperText: "Нужно сделать один раз.",
-          buttonText: "Выбрать обложку",
-          buttonLink: "/profile",
-          buttonIcon: <LucideIcons.Palette className="w-5 h-5" />,
-          accentColor: "bg-[#f9bc60]",
-          accentGradient: "from-[#f9bc60] to-[#e8a545]",
-          onButtonClick: () => {
-            onClose();
-            window.location.href = "/profile?headerTheme=open";
-          },
-        };
-    }
+  const config = {
+    icon: <LucideIcons.Heart className="w-8 h-8" />,
+    title: "Лайк истории",
+    description: "Поставьте лайк любой истории, которая вам понравится.",
+    helperText: "Начиная с 3-й заявки — лайк нужен каждый раз.",
+    buttonText: "Открыть истории",
+    buttonLink: "/stories",
+    buttonIcon: <LucideIcons.BookOpen className="w-5 h-5" />,
+    accentColor: "bg-[#e16162]",
+    accentGradient: "from-[#e16162] to-[#d14d4e]",
+    onButtonClick: null as (() => void) | null,
   };
-
-  const config = getActivityConfig();
 
   const modalContent = (
     <AnimatePresence>

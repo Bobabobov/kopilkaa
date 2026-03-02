@@ -41,13 +41,13 @@ export default function ApplicationCardActions({
   const [decreaseOnDecision, setDecreaseOnDecision] = useState(false);
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 w-full lg:w-auto">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full lg:w-auto">
       <Badge status={it.status} />
 
       {/* Кнопки действий */}
-      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+      <div className="flex flex-wrap gap-2 w-full sm:w-auto">
         <button
-          className="group px-3 py-2 bg-[#001e1d]/60 hover:bg-[#001e1d]/80 text-[#abd1c6] hover:text-[#fffffe] rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm border border-[#abd1c6]/20 hover:border-[#f9bc60]/40"
+          className="group min-h-[44px] px-3 py-2.5 sm:py-2 bg-[#001e1d]/60 hover:bg-[#001e1d]/80 text-[#abd1c6] hover:text-[#fffffe] rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 touch-manipulation"
           onClick={() =>
             onEdit(
               it.id,
@@ -75,7 +75,7 @@ export default function ApplicationCardActions({
         </button>
 
         <button
-          className="group px-3 py-2 bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm"
+          className="group min-h-[44px] px-3 py-2.5 sm:py-2 bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm touch-manipulation"
           onClick={() => {
             onQuickApprove(
               it.id,
@@ -103,7 +103,7 @@ export default function ApplicationCardActions({
         </button>
 
         <button
-          className="group px-3 py-2 bg-gradient-to-r from-[#e16162] to-[#dc2626] hover:from-[#dc2626] hover:to-[#b91c1c] text-white rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm"
+          className="group min-h-[44px] px-3 py-2.5 sm:py-2 bg-gradient-to-r from-[#e16162] to-[#dc2626] hover:from-[#dc2626] hover:to-[#b91c1c] text-white rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm touch-manipulation"
           onClick={() => {
             onQuickReject(
               it.id,
@@ -135,7 +135,7 @@ export default function ApplicationCardActions({
             type="button"
             onClick={() => onToggleTrust(it.id, !it.countTowardsTrust)}
             className={[
-              "px-3 py-2 rounded-lg sm:rounded-xl border text-xs font-semibold transition-all duration-300",
+              "min-h-[44px] px-3 py-2.5 sm:py-2 rounded-lg sm:rounded-xl border text-xs font-semibold transition-all duration-300 touch-manipulation",
               "flex items-center justify-center gap-2",
               it.countTowardsTrust
                 ? "bg-[#10B981]/15 text-[#abd1c6] border-[#10B981]/30 hover:border-[#10B981]/60"
@@ -159,10 +159,10 @@ export default function ApplicationCardActions({
           </button>
         )}
 
-        <label className="flex items-center gap-2 text-xs text-[#abd1c6]">
+        <label className="flex items-center gap-2 text-xs text-[#abd1c6] min-h-[44px] py-1 cursor-pointer touch-manipulation">
           <input
             type="checkbox"
-            className="h-4 w-4"
+            className="h-4 w-4 shrink-0"
             checked={decreaseOnDecision}
             onChange={(e) => setDecreaseOnDecision(e.target.checked)}
           />
@@ -170,7 +170,7 @@ export default function ApplicationCardActions({
         </label>
 
         <button
-          className="group px-3 py-2 bg-[#001e1d]/60 hover:bg-[#001e1d]/80 text-[#abd1c6] hover:text-[#e16162] rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm border border-[#abd1c6]/20 hover:border-[#e16162]/40"
+          className="group min-h-[44px] px-3 py-2.5 sm:py-2 bg-[#001e1d]/60 hover:bg-[#001e1d]/80 text-[#abd1c6] hover:text-[#e16162] rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm border border-[#abd1c6]/20 hover:border-[#e16162]/40 touch-manipulation"
           onClick={() => onDelete(it.id, it.title)}
           title="Удалить заявку"
         >

@@ -126,9 +126,9 @@ export default function AdminClient() {
   }
 
   return (
-    <div className="min-h-screen relative">
-      <div className="relative z-10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">
+    <div className="min-h-screen relative overflow-x-hidden">
+      <div className="relative z-10 min-w-0">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12 min-w-0">
           <AdminHeader />
 
           {/* Статистика */}

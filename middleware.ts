@@ -156,6 +156,8 @@ export function middleware(req: NextRequest) {
         // Telegram widget внутри использует eval, поэтому держим unsafe-eval включенным в PROD,
         // но максимально ограничиваем источники скриптов.
         "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://telegram.org https://accounts.google.com https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://an.yandex.ru https://yastatic.net",
+        // Игра (PIXI/coin-catch) создаёт Web Worker — без worker-src браузер блокирует создание воркера
+        "worker-src 'self' blob:",
         "style-src 'self' 'unsafe-inline' https://accounts.google.com", // Tailwind/Google OAuth
         "img-src 'self' data: blob: https:",
         "font-src 'self' data: https://yastatic.net",

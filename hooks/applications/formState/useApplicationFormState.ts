@@ -49,8 +49,11 @@ export function useApplicationFormState() {
   const [err, setErr] = useState<string | null>(null);
   const [left, setLeft] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
-  const [trustAcknowledged, setTrustAcknowledged] = useState(false);
+  const [trustAck1, setTrustAck1] = useState(false);
+  const [trustAck2, setTrustAck2] = useState(false);
+  const [trustAck3, setTrustAck3] = useState(false);
   const [policiesAccepted, setPoliciesAccepted] = useState(false);
+  const trustAcknowledged = trustAck1 && trustAck2 && trustAck3;
   const [ackError, setAckError] = useState(false);
   const [introOpen, setIntroOpen] = useState(false);
   const [introChecked, setIntroChecked] = useState(false);
@@ -64,6 +67,8 @@ export function useApplicationFormState() {
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
   const formStartedAtRef = useRef<number | null>(null);
+  const storyFirstEditAtRef = useRef<number | null>(null);
+  const storyLastEditAtRef = useRef<number | null>(null);
 
   const storageSuffix = user?.id ?? "anon";
   const saveKey = useMemo(
@@ -102,7 +107,9 @@ export function useApplicationFormState() {
     policyAckKey,
     introAckKey,
     loadingAuth,
-    setTrustAcknowledged,
+    setTrustAck1,
+    setTrustAck2,
+    setTrustAck3,
     setPoliciesAccepted,
     setIntroOpen,
     setIntroChecked,
@@ -118,7 +125,9 @@ export function useApplicationFormState() {
     amount,
     payment,
     bankName,
-    trustAcknowledged,
+    trustAck1,
+    trustAck2,
+    trustAck3,
     policiesAccepted,
     introChecked,
     formStartedAtRef,
@@ -138,7 +147,9 @@ export function useApplicationFormState() {
     setAmount("");
     setPayment("");
     setBankName("");
-    setTrustAcknowledged(false);
+    setTrustAck1(false);
+    setTrustAck2(false);
+    setTrustAck3(false);
     setPoliciesAccepted(false);
     setAckError(false);
     setErr(null);
@@ -167,6 +178,16 @@ export function useApplicationFormState() {
   } = trust;
 
   const storyTextLen = useMemo(() => getStoryTextLen(story), [story]);
+
+  useEffect(() => {
+    if (storyTextLen > 0) {
+      const now = Date.now();
+      if (storyFirstEditAtRef.current == null) {
+        storyFirstEditAtRef.current = now;
+      }
+      storyLastEditAtRef.current = now;
+    }
+  }, [story, storyTextLen]);
   const valid = useMemo(
     () =>
       isApplicationFormValid({
@@ -309,6 +330,15 @@ export function useApplicationFormState() {
           formStartedAtRef.current != null
             ? Math.max(0, Date.now() - formStartedAtRef.current)
             : null;
+        const storyEditMs =
+          storyFirstEditAtRef.current != null &&
+          storyLastEditAtRef.current != null &&
+          storyTextLen > 0
+            ? Math.max(
+                0,
+                storyLastEditAtRef.current - storyFirstEditAtRef.current,
+              )
+            : null;
         const paymentPayload = bankName
           ? `Банк: ${bankName}\n${payment}`
           : payment;
@@ -322,7 +352,7 @@ export function useApplicationFormState() {
           images: urls,
           hpCompany,
           acknowledgedRules: trustAcknowledged && policiesAccepted,
-          clientMeta: { filledMs },
+          clientMeta: { filledMs, storyEditMs },
         };
 
         const { response: r, data: d } = await postApplication(pendingPayload);
@@ -379,7 +409,9 @@ export function useApplicationFormState() {
         setAmount("");
         setPayment("");
         setBankName("");
-        setTrustAcknowledged(false);
+        setTrustAck1(false);
+        setTrustAck2(false);
+        setTrustAck3(false);
         setPoliciesAccepted(false);
         setAckError(false);
         clearFormStorage(saveKey, trustAckKey, policyAckKey, formStartKey);
@@ -398,6 +430,7 @@ export function useApplicationFormState() {
       title,
       summary,
       story,
+      storyTextLen,
       amount,
       bankName,
       payment,
@@ -435,7 +468,12 @@ export function useApplicationFormState() {
     submitted,
     setSubmitted,
     trustAcknowledged,
-    setTrustAcknowledged,
+    trustAck1,
+    setTrustAck1,
+    trustAck2,
+    setTrustAck2,
+    trustAck3,
+    setTrustAck3,
     policiesAccepted,
     setPoliciesAccepted,
     ackError,

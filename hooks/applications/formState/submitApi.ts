@@ -11,7 +11,10 @@ export interface SubmitApplicationPayload {
   images: string[];
   hpCompany: string;
   acknowledgedRules: boolean;
-  clientMeta: { filledMs: number | null };
+  clientMeta: {
+    filledMs: number | null;
+    storyEditMs?: number | null;
+  };
 }
 
 export async function postApplication(

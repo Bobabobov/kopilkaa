@@ -30,12 +30,25 @@ export function saveFormToStorage(saveKey: string, data: StoredFormData): void {
   }
 }
 
-export function loadTrustAck(trustAckKey: string): boolean {
-  if (typeof window === "undefined") return false;
+/** Возвращает [чекбокс1, чекбокс2, чекбокс3]. Старый формат "true"/"false" → все три одинаковы. */
+export function loadTrustAck(trustAckKey: string): [boolean, boolean, boolean] {
+  if (typeof window === "undefined") return [false, false, false];
   try {
-    return sessionStorage.getItem(trustAckKey) === "true";
+    const raw = sessionStorage.getItem(trustAckKey);
+    if (!raw) return [false, false, false];
+    if (raw === "true") return [true, true, true];
+    if (raw === "false") return [false, false, false];
+    const arr = JSON.parse(raw) as unknown;
+    if (Array.isArray(arr) && arr.length >= 3) {
+      return [
+        Boolean(arr[0]),
+        Boolean(arr[1]),
+        Boolean(arr[2]),
+      ];
+    }
+    return [false, false, false];
   } catch {
-    return false;
+    return [false, false, false];
   }
 }
 
@@ -72,10 +85,13 @@ export function loadFormStartTime(formStartKey: string): number | null {
   }
 }
 
-export function saveTrustAck(trustAckKey: string, value: boolean): void {
+export function saveTrustAck(
+  trustAckKey: string,
+  value: [boolean, boolean, boolean],
+): void {
   if (typeof window === "undefined") return;
   try {
-    sessionStorage.setItem(trustAckKey, value ? "true" : "false");
+    sessionStorage.setItem(trustAckKey, JSON.stringify(value));
   } catch (e) {
     console.error("Ошибка при сохранении данных:", e);
   }

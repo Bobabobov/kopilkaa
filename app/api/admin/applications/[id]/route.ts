@@ -35,6 +35,7 @@ export async function GET(
         publishInStories: true,
         adminComment: true,
         filledMs: true,
+        storyEditMs: true,
         submitterIp: true,
         createdAt: true,
         updatedAt: true,

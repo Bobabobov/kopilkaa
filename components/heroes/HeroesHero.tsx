@@ -17,6 +17,7 @@ export default function HeroesHero() {
                 src="/hero.png"
                 alt=""
                 fill
+                sizes="(max-width: 768px) 50vw, 520px"
                 className="object-contain object-right-bottom"
                 priority={false}
               />

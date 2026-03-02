@@ -214,7 +214,7 @@ export default function StatsCards({ variant, stats }: StatsCardsProps) {
   };
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12">
       {cards.map((card, index) => {
         const style = getCardStyle(index);
         return (
@@ -223,21 +223,21 @@ export default function StatsCards({ variant, stats }: StatsCardsProps) {
             initial={{ opacity: 0, y: 30, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, delay: card.delay }}
-            className={`group relative overflow-hidden bg-gradient-to-br ${style.bg} rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border ${style.border}`}
+            className={`group relative overflow-hidden bg-gradient-to-br ${style.bg} rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border ${style.border} min-w-0`}
           >
-            <div className="relative">
+            <div className="relative min-w-0">
               <div
-                className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-r ${style.icon} rounded-lg sm:rounded-xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
+                className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-r ${style.icon} rounded-lg sm:rounded-xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg flex-shrink-0`}
               >
                 <span className="text-xl sm:text-2xl md:text-3xl">
                   {card.icon}
                 </span>
               </div>
-              <div className="text-xs sm:text-sm font-bold text-[#abd1c6] mb-1 sm:mb-2 uppercase tracking-wide">
+              <div className="text-xs sm:text-sm font-bold text-[#abd1c6] mb-1 sm:mb-2 uppercase tracking-wide truncate">
                 {card.title}
               </div>
               <div
-                className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black ${style.value} mb-1 sm:mb-2`}
+                className={`text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black ${style.value} mb-1 sm:mb-2 break-all`}
               >
                 {card.value}
               </div>

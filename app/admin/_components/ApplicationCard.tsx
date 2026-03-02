@@ -66,7 +66,7 @@ export default function ApplicationCard({
         scale: 1.02,
         transition: { duration: 0.2 },
       }}
-      className="group relative overflow-hidden bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40"
+      className="group relative overflow-hidden bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 min-w-0"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-[#f9bc60]/5 via-[#abd1c6]/5 to-[#f9bc60]/5 group-hover:from-[#f9bc60]/10 group-hover:via-[#abd1c6]/10 group-hover:to-[#f9bc60]/10 transition-all duration-500"></div>
 

@@ -50,35 +50,13 @@ export async function POST(req: Request) {
 
     const requester = await prisma.user.findUnique({
     where: { id: session.uid },
-    select: { email: true, avatar: true, headerTheme: true },
+    select: { email: true },
   });
   const whitelistEmails = getWhitelistEmails();
   const isWhitelisted =
     requester?.email && whitelistEmails.includes(requester.email.toLowerCase());
 
-  if (!requester?.avatar || requester.avatar.trim() === "") {
-    return Response.json(
-      {
-        error: "Для создания заявки нужно установить аватар в профиле.",
-        requiresActivity: true,
-        activityType: "CHANGE_AVATAR",
-      },
-      { status: 403 },
-    );
-  }
-
-  if (!requester?.headerTheme || requester.headerTheme === "default") {
-    return Response.json(
-      {
-        error: "Для создания заявки нужно установить обложку профиля.",
-        requiresActivity: true,
-        activityType: "CHANGE_HEADER",
-      },
-      { status: 403 },
-    );
-  }
-
-    const {
+  const {
       title,
       summary,
       story,
@@ -96,7 +74,10 @@ export async function POST(req: Request) {
       payment: string;
       images: string[];
       hpCompany?: string;
-      clientMeta?: { filledMs?: number | null };
+      clientMeta?: {
+      filledMs?: number | null;
+      storyEditMs?: number | null;
+    };
       acknowledgedRules?: boolean;
     };
 
@@ -109,6 +90,14 @@ export async function POST(req: Request) {
     const clampedFilledMs =
       typeof filledMs === "number" && Number.isFinite(filledMs) && filledMs >= 0
         ? Math.min(Math.round(filledMs), 24 * 60 * 60 * 1000) // до 24 часов
+        : null;
+
+    const storyEditMsRaw = clientMeta?.storyEditMs;
+    const clampedStoryEditMs =
+      typeof storyEditMsRaw === "number" &&
+      Number.isFinite(storyEditMsRaw) &&
+      storyEditMsRaw >= 0
+        ? Math.min(Math.round(storyEditMsRaw), 24 * 60 * 60 * 1000)
         : null;
     const isAdmin = session.role === "ADMIN";
     if (
@@ -290,6 +279,7 @@ export async function POST(req: Request) {
           amount: amountNumber,
           payment,
           filledMs: clampedFilledMs,
+          storyEditMs: clampedStoryEditMs,
           submitterIp: submitterIp || undefined,
         },
         select: { id: true },

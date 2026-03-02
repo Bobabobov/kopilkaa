@@ -39,10 +39,10 @@ export default function StatusModal({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.97, y: 8 }}
         transition={{ duration: 0.22, ease: "easeOut" }}
-        className="relative w-full max-w-[720px] rounded-2xl border border-[#2c4f45]/70 bg-[#0f2622] shadow-xl p-6 sm:p-7"
+        className="relative w-full max-w-[720px] max-h-[90vh] flex flex-col rounded-2xl border border-[#2c4f45]/70 bg-[#0f2622] shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-3 mb-6">
+        <div className="flex items-start justify-between gap-3 p-4 sm:p-6 lg:p-7 flex-shrink-0">
           <div className="flex items-start gap-3 min-w-0">
             <div className="w-10 h-10 bg-[#004643]/60 rounded-xl flex items-center justify-center border border-[#abd1c6]/20 flex-shrink-0">
               <svg
@@ -94,7 +94,7 @@ export default function StatusModal({
           </button>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 overflow-y-auto flex-1 min-h-0 p-4 sm:p-6 lg:p-7 pt-0 sm:pt-0">
           <div>
             <label className="block text-xs sm:text-sm font-bold text-[#abd1c6] mb-2 sm:mb-3">
               Новый статус

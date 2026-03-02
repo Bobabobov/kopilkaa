@@ -165,9 +165,9 @@ export default function AdminApplicationPage({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative z-10 pt-24 pb-12 px-4 sm:px-6 lg:px-8"
+        className="relative z-10 pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 min-w-0"
       >
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto min-w-0">
           <ApplicationHeader
             status={item.status}
             onBack={() => router.back()}
@@ -205,6 +205,7 @@ export default function AdminApplicationPage({
             <ApplicationSuspicionBlock
               story={item.story}
               filledMs={item.filledMs}
+              storyEditMs={item.storyEditMs}
             />
 
             <ApplicationStory story={item.story} />

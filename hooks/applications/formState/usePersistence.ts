@@ -17,7 +17,9 @@ interface RestoreParams {
   policyAckKey: string;
   introAckKey: string;
   loadingAuth: boolean;
-  setTrustAcknowledged: (v: boolean) => void;
+  setTrustAck1: (v: boolean) => void;
+  setTrustAck2: (v: boolean) => void;
+  setTrustAck3: (v: boolean) => void;
   setPoliciesAccepted: (v: boolean) => void;
   setIntroOpen: (v: boolean) => void;
   setIntroChecked: (v: boolean) => void;
@@ -29,7 +31,9 @@ export function useRestoreForm(params: RestoreParams): void {
     policyAckKey,
     introAckKey,
     loadingAuth,
-    setTrustAcknowledged,
+    setTrustAck1,
+    setTrustAck2,
+    setTrustAck3,
     setPoliciesAccepted,
     setIntroOpen,
     setIntroChecked,
@@ -38,7 +42,10 @@ export function useRestoreForm(params: RestoreParams): void {
   useEffect(() => {
     if (loadingAuth) return;
     try {
-      setTrustAcknowledged(loadTrustAck(trustAckKey));
+      const [t1, t2, t3] = loadTrustAck(trustAckKey);
+      setTrustAck1(t1);
+      setTrustAck2(t2);
+      setTrustAck3(t3);
       setPoliciesAccepted(loadPolicyAck(policyAckKey));
       const introAck = loadIntroAck(introAckKey);
       if (introAck) {
@@ -56,7 +63,9 @@ export function useRestoreForm(params: RestoreParams): void {
     policyAckKey,
     introAckKey,
     loadingAuth,
-    setTrustAcknowledged,
+    setTrustAck1,
+    setTrustAck2,
+    setTrustAck3,
     setPoliciesAccepted,
     setIntroOpen,
     setIntroChecked,
@@ -73,7 +82,9 @@ interface PersistParams {
   amount: string;
   payment: string;
   bankName: string;
-  trustAcknowledged: boolean;
+  trustAck1: boolean;
+  trustAck2: boolean;
+  trustAck3: boolean;
   policiesAccepted: boolean;
   introChecked: boolean;
   formStartedAtRef: React.MutableRefObject<number | null>;
@@ -90,7 +101,9 @@ export function usePersistForm(params: PersistParams): void {
     amount,
     payment,
     bankName,
-    trustAcknowledged,
+    trustAck1,
+    trustAck2,
+    trustAck3,
     policiesAccepted,
     introChecked,
     formStartedAtRef,
@@ -109,7 +122,7 @@ export function usePersistForm(params: PersistParams): void {
         if (hasInput && formStartedAtRef.current == null) {
           formStartedAtRef.current = Date.now();
         }
-        saveTrustAck(trustAckKey, trustAcknowledged);
+        saveTrustAck(trustAckKey, [trustAck1, trustAck2, trustAck3]);
         savePolicyAck(policyAckKey, policiesAccepted);
         if (introChecked) {
           saveIntroAck(introAckKey);
@@ -129,7 +142,9 @@ export function usePersistForm(params: PersistParams): void {
     amount,
     payment,
     bankName,
-    trustAcknowledged,
+    trustAck1,
+    trustAck2,
+    trustAck3,
     policiesAccepted,
     introChecked,
     formStartedAtRef,

@@ -3,46 +3,21 @@ import { prisma } from "@/lib/db";
 
 export type ActivityRequirement =
   | { type: "LIKE_STORY"; message: string }
-  | { type: "CHANGE_AVATAR"; message: string }
-  | { type: "CHANGE_HEADER"; message: string }
   | null; // null = все требования выполнены или не требуется
 
 /**
- * Получает список всех возможных требований активности (всегда проверяем все три)
+ * Получает список всех возможных требований активности (только лайк истории)
  */
 export async function getAllPossibleRequirements(
-  userId: string,
+  _userId: string,
 ): Promise<ActivityRequirement[]> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { avatar: true, headerTheme: true },
-  });
-  const hasAvatar = !!user?.avatar && user.avatar.trim() !== "";
-  const hasHeader = !!user?.headerTheme && user.headerTheme !== "default";
-
-  const allRequirements: ActivityRequirement[] = [
+  return [
     {
       type: "LIKE_STORY",
       message:
         "Для каждой 3-й и последующей заявки поставьте лайк любой истории.",
     },
-    {
-      type: "CHANGE_AVATAR",
-      message: "Для создания заявки установите аватар в профиле.",
-    },
-    {
-      type: "CHANGE_HEADER",
-      message: "Для создания заявки установите обложку профиля.",
-    },
   ];
-
-  return allRequirements.filter((req) => {
-    if (!req) return false;
-    if (req.type === "LIKE_STORY") return true;
-    if (req.type === "CHANGE_AVATAR") return !hasAvatar;
-    if (req.type === "CHANGE_HEADER") return !hasHeader;
-    return false;
-  });
 }
 
 /**
@@ -113,34 +88,12 @@ export async function isActivityRequirementMet(
   if (!requirement) return true;
   const since = lastApplicationAt ?? new Date(0);
 
-  switch (requirement.type) {
-    case "LIKE_STORY": {
-      const userLikesCount = await prisma.storyLike.count({
-        where: { userId, createdAt: { gt: since } },
-      });
-      // Требование выполнено, если пользователь лайкнул хотя бы одну историю
-      return userLikesCount > 0;
-    }
-
-    case "CHANGE_AVATAR": {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { avatar: true },
-      });
-      if (!user?.avatar) return false;
-      return user.avatar.trim() !== "";
-    }
-
-    case "CHANGE_HEADER": {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { headerTheme: true },
-      });
-      if (!user?.headerTheme) return false;
-      return user.headerTheme !== "default";
-    }
-
-    default:
-      return true;
+  if (requirement.type === "LIKE_STORY") {
+    const userLikesCount = await prisma.storyLike.count({
+      where: { userId, createdAt: { gt: since } },
+    });
+    return userLikesCount > 0;
   }
+
+  return true;
 }

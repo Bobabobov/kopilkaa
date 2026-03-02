@@ -7,13 +7,15 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 interface ApplicationSuspicionBlockProps {
   story: string;
   filledMs?: number | null;
+  storyEditMs?: number | null;
 }
 
 export default function ApplicationSuspicionBlock({
   story,
   filledMs,
+  storyEditMs,
 }: ApplicationSuspicionBlockProps) {
-  const suspicion = checkApplicationSuspicion(story, filledMs);
+  const suspicion = checkApplicationSuspicion(story, filledMs, storyEditMs);
 
   if (!suspicion.hasSuspicion) {
     return (

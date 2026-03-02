@@ -19,6 +19,7 @@ export type ApplicationItem = {
   publishInStories: boolean;
   adminComment: string | null;
   filledMs?: number | null;
+  storyEditMs?: number | null;
   submitterIp?: string | null;
   createdAt: string;
   user: { email: string; id: string };

@@ -1,65 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import GamesLoading from "./components/GamesLoading";
 
 export default function GamesPage() {
-  const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch("/api/profile/me", { cache: "no-store" });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.user) {
-            setIsAuthorized(true);
-          } else {
-            router.push("/login");
-          }
-        } else {
-          router.push("/login");
-        }
-      } catch (error) {
-        router.push("/login");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [router]);
-
-  if (loading) {
-    return <GamesLoading />;
-  }
-
-  if (!isAuthorized) {
-    return null;
-  }
-
+  // Игра доступна только по прямой ссылке /games/coin-catch, в списке не показываем
   const games: Array<{
     title: string;
     description: string;
     href: string;
     badge: string;
     image: string;
-  }> = [
-    {
-      title: "Монеткосбор 90-х",
-      description:
-        "Собирай монеты за 30 секунд! Клик мимо монеты = -1 жизнь. У тебя 3 жизни.",
-      href: "/games/coin-catch",
-      badge: "30 секунд / 3 жизни / недельный топ",
-      image: "/game.png",
-    },
-  ];
+  }> = [];
 
   const comingSoon = [
     {
@@ -121,7 +74,10 @@ export default function GamesPage() {
                   transition={{ delay: 0.2, duration: 0.6 }}
                   className="rounded-2xl bg-gradient-to-br from-[#001e1d]/40 to-[#004643]/40 border border-[#f9bc60]/20 p-4"
                 >
-                  <div className="block rounded-xl overflow-hidden cursor-not-allowed">
+                  <Link
+                    href={game.href}
+                    className="block rounded-xl overflow-hidden hover:border-[#f9bc60]/40 border border-transparent transition-colors"
+                  >
                     <div className="rounded-xl overflow-hidden relative">
                       <Image
                         src={game.image}
@@ -130,16 +86,19 @@ export default function GamesPage() {
                         height={480}
                         className="w-full h-44 sm:h-48 object-cover"
                       />
-                      <span className="absolute inset-0 flex items-center justify-center bg-[#001e1d]/70 rounded-xl text-[#f9bc60] font-semibold text-lg">
-                        Игра ещё разрабатывается
-                      </span>
                     </div>
                     <div className="mt-4">
-                      <div className="text-sm text-[#abd1c6]">
-                        Игра ещё разрабатывается
+                      <div className="text-lg font-bold text-[#fffffe]">
+                        {game.title}
+                      </div>
+                      <div className="text-sm text-[#abd1c6] mt-1">
+                        {game.description}
+                      </div>
+                      <div className="text-xs text-[#f9bc60]/90 mt-2">
+                        {game.badge}
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </motion.div>
               ))}
 

@@ -54,7 +54,12 @@ type Props = {
   };
   amountInputRef: React.RefObject<HTMLInputElement | null>;
   trustAcknowledged: boolean;
-  setTrustAcknowledged: (v: boolean) => void;
+  trustAck1: boolean;
+  setTrustAck1: (v: boolean) => void;
+  trustAck2: boolean;
+  setTrustAck2: (v: boolean) => void;
+  trustAck3: boolean;
+  setTrustAck3: (v: boolean) => void;
   policiesAccepted: boolean;
   setPoliciesAccepted: (v: boolean) => void;
   ackError: boolean;
@@ -95,7 +100,12 @@ export function ApplicationsForm(props: Props) {
     limits,
     amountInputRef,
     trustAcknowledged,
-    setTrustAcknowledged,
+    trustAck1,
+    setTrustAck1,
+    trustAck2,
+    setTrustAck2,
+    trustAck3,
+    setTrustAck3,
     policiesAccepted,
     setPoliciesAccepted,
     ackError,
@@ -329,8 +339,12 @@ export function ApplicationsForm(props: Props) {
         </div>
 
         <ApplicationsConsent
-          trustAcknowledged={trustAcknowledged}
-          setTrustAcknowledged={setTrustAcknowledged}
+          trustAck1={trustAck1}
+          setTrustAck1={setTrustAck1}
+          trustAck2={trustAck2}
+          setTrustAck2={setTrustAck2}
+          trustAck3={trustAck3}
+          setTrustAck3={setTrustAck3}
           policiesAccepted={policiesAccepted}
           setPoliciesAccepted={setPoliciesAccepted}
           ackError={ackError}

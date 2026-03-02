@@ -8,7 +8,7 @@ export type UserShape = {
   role?: "USER" | "ADMIN";
 };
 
-export type ActivityType = "LIKE_STORY" | "CHANGE_AVATAR" | "CHANGE_HEADER";
+export type ActivityType = "LIKE_STORY";
 
 export interface ActivityModalState {
   isOpen: boolean;

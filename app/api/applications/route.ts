@@ -42,45 +42,27 @@ function getWhitelistEmails(): string[] {
 }
 
 export async function POST(req: Request) {
-  try {
-    let session;
-    try {
-      session = await getSession();
-    } catch (e) {
-      console.error("[POST /api/applications] getSession failed", e);
-      return Response.json(
-        { error: "Ошибка проверки сессии" },
-        { status: 500 },
-      );
-    }
-    if (!session) {
-      return Response.json({ error: "Требуется вход" }, { status: 401 });
-    }
+  const session = await getSession();
+  if (!session) {
+    return Response.json({ error: "Требуется вход" }, { status: 401 });
+  }
 
-    let body: {
-      title: string;
-      summary: string;
-      story: string;
-      amount: string;
-      payment: string;
-      images: string[];
-      hpCompany?: string;
-      clientMeta?: {
-        filledMs?: number | null;
-        storyEditMs?: number | null;
-      };
-      acknowledgedRules?: boolean;
+  const body = (await req.json()) as {
+    title: string;
+    summary: string;
+    story: string;
+    amount: string;
+    payment: string;
+    images: string[];
+    hpCompany?: string;
+    clientMeta?: {
+      filledMs?: number | null;
+      storyEditMs?: number | null;
     };
-    try {
-      body = (await req.json()) as typeof body;
-    } catch (e) {
-      console.error("[POST /api/applications] invalid JSON", e);
-      return Response.json(
-        { error: "Неверный формат данных" },
-        { status: 400 },
-      );
-    }
+    acknowledgedRules?: boolean;
+  };
 
+  try {
     const requester = await prisma.user.findUnique({
       where: { id: session.uid },
       select: { email: true },

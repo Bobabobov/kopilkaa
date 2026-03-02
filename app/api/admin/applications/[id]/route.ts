@@ -13,55 +13,16 @@ type SameRef = {
   user: { id: string; email: string | null; name: string | null };
 };
 
-/** Всегда берём id из URL — так работает и локально, и на сервере. */
-function getApplicationIdFromRequest(req: Request): string | null {
-  try {
-    const raw = typeof req.url === "string" ? req.url : "";
-    let pathname: string;
-    if (raw.includes("://")) {
-      pathname = new URL(raw).pathname;
-    } else {
-      pathname = raw.startsWith("/") ? raw : `/${raw}`;
-    }
-    const segments = pathname.split("/").filter(Boolean);
-    const i = segments.indexOf("applications");
-    const id =
-      i >= 0 && segments[i + 1] ? segments[i + 1] : segments[segments.length - 1];
-    if (!id || id.length < 1 || id.length > 60) return null;
-    if (!/^[a-zA-Z0-9_-]+$/.test(id)) return null;
-    return id;
-  } catch {
-    return null;
-  }
-}
-
 export async function GET(
   req: Request,
-  context?: { params?: { id: string } | Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  let id: string | null = getApplicationIdFromRequest(req);
-  if (!id && context?.params) {
-    try {
-      const p = await Promise.resolve(context.params);
-      id = p?.id ?? null;
-    } catch {
-      // ignore
-    }
-  }
-  if (!id) {
-    return Response.json({ error: "Bad request" }, { status: 400 });
-  }
-
-  let admin;
-  try {
-    admin = await getAllowedAdminUser();
-  } catch (e) {
-    console.error("[admin applications GET] getAllowedAdminUser failed", e);
-    return Response.json({ error: "Forbidden" }, { status: 503 });
-  }
+  const admin = await getAllowedAdminUser();
   if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {
+    const { id } = await params;
+
     const item = await prisma.application.findUnique({
       where: { id },
       select: {
@@ -91,7 +52,6 @@ export async function GET(
     // Нормализация реквизитов: пробелы/переносы → один пробел, trim
     const normalizePayment = (s: string) =>
       (s ?? "").replace(/\s+/g, " ").trim();
-    // Только цифры из реквизитов (для сопоставления, когда в одной заявке "Банк: ...", в другой только номер)
     const paymentDigits = (s: string) => (s ?? "").replace(/\D/g, "");
     const paymentNorm = normalizePayment(item.payment);
     const currentDigits = paymentDigits(item.payment);
@@ -157,61 +117,28 @@ export async function GET(
       }));
     }
 
-    const toIso = (d: Date) => (d instanceof Date ? d.toISOString() : d);
-
-    let storySafe = "";
-    try {
-      storySafe = sanitizeApplicationStoryHtml(String(item.story ?? ""));
-    } catch {
-      storySafe = String(item.story ?? "");
-    }
-
-    const payload = {
+    return Response.json({
       item: {
         ...item,
-        createdAt: toIso(item.createdAt),
-        updatedAt: item.updatedAt ? toIso(item.updatedAt) : null,
-        story: storySafe,
-        samePaymentApplications: samePaymentApplications.map((s) => ({
-          ...s,
-          createdAt: toIso(s.createdAt),
-        })),
-        sameIpApplications: sameIpApplications.map((s) => ({
-          ...s,
-          createdAt: toIso(s.createdAt),
-        })),
+        story: sanitizeApplicationStoryHtml(item.story ?? ""),
+        samePaymentApplications,
+        sameIpApplications,
       },
-    };
-
-    return Response.json(payload);
+    });
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    const stack = error instanceof Error ? error.stack : undefined;
-    console.error("[admin applications GET]", id, message, stack ?? "");
+    console.error("[admin applications GET]", error);
     return Response.json({ error: "Server error" }, { status: 500 });
   }
 }
 
 export async function PATCH(
   req: Request,
-  context?: { params?: { id: string } | Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  let id: string | null = getApplicationIdFromRequest(req);
-  if (!id && context?.params) {
-    try {
-      const p = await Promise.resolve(context.params);
-      id = p?.id ?? null;
-    } catch {
-      // ignore
-    }
-  }
-  if (!id) {
-    return Response.json({ error: "Bad request" }, { status: 400 });
-  }
-
   const admin = await getAllowedAdminUser();
   if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
+  const { id } = await params;
   const body = await req.json().catch(() => ({}));
   const status = body?.status as
     | "PENDING"
@@ -241,9 +168,7 @@ export async function PATCH(
           adminComment: adminComment ?? null,
           publishInStories:
             status === "CONTEST" ? !!publishInStories : false,
-          // Одобренные заявки всегда учитываются в уровне доверия (админ может потом снять галку)
           ...(status === "APPROVED" ? { countTowardsTrust: true } : {}),
-          // Для микростатистики: галка «Понизить уровень» — можно и выставить, и снять
           ...(status === "APPROVED" || status === "REJECTED"
             ? { trustDecreasedAtDecision: decreaseTrustOnDecision }
             : {}),
@@ -271,19 +196,17 @@ export async function PATCH(
       return updated;
     });
 
-    // 🔔 Письмо только при одобрении/отклонении. «Конкурс» — только пометка для админа.
     if (
       item.user?.email &&
       (status === "APPROVED" || status === "REJECTED" || status === "PENDING")
     ) {
       sendStatusEmail(item.user.email, {
         title: item.title,
-        status, // здесь status уже PENDING | APPROVED | REJECTED
+        status,
         comment: item.adminComment ?? "",
       }).catch((e) => console.error("mail error:", e));
     }
 
-    // 🛰️ SSE для админки
     publish("application:update", {
       id: item.id,
       status: item.status,
@@ -299,31 +222,17 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  context?: { params?: { id: string } | Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  let id: string | null = getApplicationIdFromRequest(req);
-  if (!id && context?.params) {
-    try {
-      const p = await Promise.resolve(context.params);
-      id = p?.id ?? null;
-    } catch {
-      // ignore
-    }
-  }
-  if (!id) {
-    return Response.json({ error: "Bad request" }, { status: 400 });
-  }
-
   const admin = await getAllowedAdminUser();
   if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {
-    // Удаляем заявку (изображения удалятся автоматически из-за onDelete: Cascade)
+    const { id } = await params;
     await prisma.application.delete({
       where: { id },
     });
 
-    // 🛰️ SSE для админки
     publish("application:delete", { id });
     publish("stats:dirty", {});
 

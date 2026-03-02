@@ -165,7 +165,8 @@ export function middleware(req: NextRequest) {
         "media-src 'self' blob: data: https:",
         // Разрешаем запросы к Telegram OAuth и Google OAuth (для виджета входа)
         // Google Identity Services иногда делает запросы на play.google.com/log (телеметрия).
-        "connect-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com https://play.google.com https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://an.yandex.ru wss://mc.yandex.ru wss://mc.yandex.com",
+        // data: / blob: — для проверки изображений и воркеров; тот же хост для WebSocket (если домен отличается — kopilka.online).
+        "connect-src 'self' data: blob: https://kopilka.online https://kopilka-online.ru wss://kopilka.online wss://kopilka-online.ru https://oauth.telegram.org https://telegram.org https://accounts.google.com https://play.google.com https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://an.yandex.ru wss://mc.yandex.ru wss://mc.yandex.com",
         // Разрешаем встраивать iframe Telegram OAuth и Google OAuth
         "frame-src 'self' https://oauth.telegram.org https://telegram.org https://accounts.google.com https://yandex.ru https://an.yandex.ru",
         "frame-ancestors 'self'",

@@ -13,29 +13,23 @@ type SameRef = {
   user: { id: string; email: string | null; name: string | null };
 };
 
-/** Извлекает id заявки из params или из URL (fallback для разных окружений). */
-async function getApplicationId(
-  req: Request,
-  context: { params?: { id: string } | Promise<{ id: string }> },
-): Promise<string | null> {
+/** Всегда берём id из URL — так работает и локально, и на сервере. */
+function getApplicationIdFromRequest(req: Request): string | null {
   try {
-    const params = context?.params;
-    if (params != null) {
-      const resolved = await Promise.resolve(params);
-      if (resolved?.id) return resolved.id;
+    const raw = typeof req.url === "string" ? req.url : "";
+    let pathname: string;
+    if (raw.includes("://")) {
+      pathname = new URL(raw).pathname;
+    } else {
+      pathname = raw.startsWith("/") ? raw : `/${raw}`;
     }
-  } catch {
-    // params недоступен или выбросил — пробуем из URL
-  }
-  try {
-    const url = new URL(req.url);
-    const segments = url.pathname.split("/").filter(Boolean);
-    const applicationsIndex = segments.indexOf("applications");
+    const segments = pathname.split("/").filter(Boolean);
+    const i = segments.indexOf("applications");
     const id =
-      applicationsIndex >= 0 && segments[applicationsIndex + 1]
-        ? segments[applicationsIndex + 1]
-        : null;
-    return id && /^[a-z0-9]+$/i.test(id) ? id : null;
+      i >= 0 && segments[i + 1] ? segments[i + 1] : segments[segments.length - 1];
+    if (!id || id.length < 10 || id.length > 50) return null;
+    if (!/^[a-zA-Z0-9]+$/.test(id)) return null;
+    return id;
   } catch {
     return null;
   }
@@ -43,15 +37,23 @@ async function getApplicationId(
 
 export async function GET(
   req: Request,
-  context: { params?: { id: string } | Promise<{ id: string }> },
+  context?: { params?: { id: string } | Promise<{ id: string }> },
 ) {
-  const admin = await getAllowedAdminUser();
-  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
-
-  const id = await getApplicationId(req, context);
+  let id: string | null = getApplicationIdFromRequest(req);
+  if (!id && context?.params) {
+    try {
+      const p = await Promise.resolve(context.params);
+      id = p?.id ?? null;
+    } catch {
+      // ignore
+    }
+  }
   if (!id) {
     return Response.json({ error: "Bad request" }, { status: 400 });
   }
+
+  const admin = await getAllowedAdminUser();
+  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {
     const item = await prisma.application.findUnique({
@@ -151,12 +153,19 @@ export async function GET(
 
     const toIso = (d: Date) => (d instanceof Date ? d.toISOString() : d);
 
+    let storySafe = "";
+    try {
+      storySafe = sanitizeApplicationStoryHtml(String(item.story ?? ""));
+    } catch {
+      storySafe = String(item.story ?? "");
+    }
+
     const payload = {
       item: {
         ...item,
         createdAt: toIso(item.createdAt),
         updatedAt: item.updatedAt ? toIso(item.updatedAt) : null,
-        story: sanitizeApplicationStoryHtml(item.story ?? ""),
+        story: storySafe,
         samePaymentApplications: samePaymentApplications.map((s) => ({
           ...s,
           createdAt: toIso(s.createdAt),
@@ -172,22 +181,30 @@ export async function GET(
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack : undefined;
-    console.error("[admin applications GET]", message, stack ?? "");
+    console.error("[admin applications GET]", id, message, stack ?? "");
     return Response.json({ error: "Server error" }, { status: 500 });
   }
 }
 
 export async function PATCH(
   req: Request,
-  context: { params?: { id: string } | Promise<{ id: string }> },
+  context?: { params?: { id: string } | Promise<{ id: string }> },
 ) {
-  const admin = await getAllowedAdminUser();
-  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
-
-  const id = await getApplicationId(req, context);
+  let id: string | null = getApplicationIdFromRequest(req);
+  if (!id && context?.params) {
+    try {
+      const p = await Promise.resolve(context.params);
+      id = p?.id ?? null;
+    } catch {
+      // ignore
+    }
+  }
   if (!id) {
     return Response.json({ error: "Bad request" }, { status: 400 });
   }
+
+  const admin = await getAllowedAdminUser();
+  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json().catch(() => ({}));
   const status = body?.status as
@@ -276,15 +293,23 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  context: { params?: { id: string } | Promise<{ id: string }> },
+  context?: { params?: { id: string } | Promise<{ id: string }> },
 ) {
-  const admin = await getAllowedAdminUser();
-  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
-
-  const id = await getApplicationId(req, context);
+  let id: string | null = getApplicationIdFromRequest(req);
+  if (!id && context?.params) {
+    try {
+      const p = await Promise.resolve(context.params);
+      id = p?.id ?? null;
+    } catch {
+      // ignore
+    }
+  }
   if (!id) {
     return Response.json({ error: "Bad request" }, { status: 400 });
   }
+
+  const admin = await getAllowedAdminUser();
+  if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {
     // Удаляем заявку (изображения удалятся автоматически из-за onDelete: Cascade)

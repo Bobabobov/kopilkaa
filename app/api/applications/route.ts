@@ -43,20 +43,54 @@ function getWhitelistEmails(): string[] {
 
 export async function POST(req: Request) {
   try {
-    const session = await getSession();
+    let session;
+    try {
+      session = await getSession();
+    } catch (e) {
+      console.error("[POST /api/applications] getSession failed", e);
+      return Response.json(
+        { error: "Ошибка проверки сессии" },
+        { status: 500 },
+      );
+    }
     if (!session) {
       return Response.json({ error: "Требуется вход" }, { status: 401 });
     }
 
-    const requester = await prisma.user.findUnique({
-    where: { id: session.uid },
-    select: { email: true },
-  });
-  const whitelistEmails = getWhitelistEmails();
-  const isWhitelisted =
-    requester?.email && whitelistEmails.includes(requester.email.toLowerCase());
+    let body: {
+      title: string;
+      summary: string;
+      story: string;
+      amount: string;
+      payment: string;
+      images: string[];
+      hpCompany?: string;
+      clientMeta?: {
+        filledMs?: number | null;
+        storyEditMs?: number | null;
+      };
+      acknowledgedRules?: boolean;
+    };
+    try {
+      body = (await req.json()) as typeof body;
+    } catch (e) {
+      console.error("[POST /api/applications] invalid JSON", e);
+      return Response.json(
+        { error: "Неверный формат данных" },
+        { status: 400 },
+      );
+    }
 
-  const {
+    const requester = await prisma.user.findUnique({
+      where: { id: session.uid },
+      select: { email: true },
+    });
+    const whitelistEmails = getWhitelistEmails();
+    const isWhitelisted =
+      requester?.email &&
+      whitelistEmails.includes(requester.email.toLowerCase());
+
+    const {
       title,
       summary,
       story,
@@ -66,20 +100,7 @@ export async function POST(req: Request) {
       hpCompany,
       clientMeta,
       acknowledgedRules,
-    } = (await req.json()) as {
-      title: string;
-      summary: string;
-      story: string;
-      amount: string;
-      payment: string;
-      images: string[];
-      hpCompany?: string;
-      clientMeta?: {
-      filledMs?: number | null;
-      storyEditMs?: number | null;
-    };
-      acknowledgedRules?: boolean;
-    };
+    } = body;
 
     // Anti-spam (no captcha): honeypot + "too fast submit"
     if (typeof hpCompany === "string" && hpCompany.trim().length > 0) {
@@ -315,7 +336,9 @@ export async function POST(req: Request) {
 
     return Response.json({ ok: true, id: result.id });
   } catch (error) {
-    console.error("Error creating application:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : "";
+    console.error("[POST /api/applications]", msg, stack);
     return Response.json(
       { error: "Ошибка сохранения заявки" },
       { status: 500 },

@@ -27,8 +27,8 @@ function getApplicationIdFromRequest(req: Request): string | null {
     const i = segments.indexOf("applications");
     const id =
       i >= 0 && segments[i + 1] ? segments[i + 1] : segments[segments.length - 1];
-    if (!id || id.length < 10 || id.length > 50) return null;
-    if (!/^[a-zA-Z0-9]+$/.test(id)) return null;
+    if (!id || id.length < 1 || id.length > 60) return null;
+    if (!/^[a-zA-Z0-9_-]+$/.test(id)) return null;
     return id;
   } catch {
     return null;
@@ -52,7 +52,13 @@ export async function GET(
     return Response.json({ error: "Bad request" }, { status: 400 });
   }
 
-  const admin = await getAllowedAdminUser();
+  let admin;
+  try {
+    admin = await getAllowedAdminUser();
+  } catch (e) {
+    console.error("[admin applications GET] getAllowedAdminUser failed", e);
+    return Response.json({ error: "Forbidden" }, { status: 503 });
+  }
   if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
   try {

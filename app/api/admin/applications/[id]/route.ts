@@ -13,16 +13,23 @@ type SameRef = {
   user: { id: string; email: string | null; name: string | null };
 };
 
+function resolveId(params: { id: string } | Promise<{ id: string }>): Promise<string> {
+  return Promise.resolve(params).then((p) => p.id);
+}
+
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } | Promise<{ id: string }> },
 ) {
   const admin = await getAllowedAdminUser();
   if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
+  const id = await resolveId(params);
+  if (!id) return Response.json({ error: "Bad request" }, { status: 400 });
+
   try {
     const item = await prisma.application.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         userId: true,
@@ -58,7 +65,7 @@ export async function GET(
 
     if (paymentNorm || currentDigits.length >= 10) {
       const all = await prisma.application.findMany({
-        where: { id: { not: params.id } },
+        where: { id: { not: id } },
         orderBy: { createdAt: "desc" },
         take: 500,
         select: {
@@ -98,7 +105,7 @@ export async function GET(
     if (item.submitterIp) {
       const others = await prisma.application.findMany({
         where: {
-          id: { not: params.id },
+          id: { not: id },
           submitterIp: item.submitterIp,
         },
         orderBy: { createdAt: "desc" },
@@ -119,22 +126,26 @@ export async function GET(
     return Response.json({
       item: {
         ...item,
-        story: sanitizeApplicationStoryHtml(item.story),
+        story: sanitizeApplicationStoryHtml(item.story ?? ""),
         samePaymentApplications,
         sameIpApplications,
       },
     });
   } catch (error) {
+    console.error("[admin applications GET]", error);
     return Response.json({ error: "Server error" }, { status: 500 });
   }
 }
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } | Promise<{ id: string }> },
 ) {
   const admin = await getAllowedAdminUser();
   if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
+
+  const id = await resolveId(params);
+  if (!id) return Response.json({ error: "Bad request" }, { status: 400 });
 
   const body = await req.json().catch(() => ({}));
   const status = body?.status as
@@ -159,7 +170,7 @@ export async function PATCH(
   try {
     const item = await prisma.$transaction(async (tx) => {
       const updated = await tx.application.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           status,
           adminComment: adminComment ?? null,
@@ -223,19 +234,22 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } | Promise<{ id: string }> },
 ) {
   const admin = await getAllowedAdminUser();
   if (!admin) return Response.json({ error: "Forbidden" }, { status: 403 });
 
+  const id = await resolveId(params);
+  if (!id) return Response.json({ error: "Bad request" }, { status: 400 });
+
   try {
     // Удаляем заявку (изображения удалятся автоматически из-за onDelete: Cascade)
     await prisma.application.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     // 🛰️ SSE для админки
-    publish("application:delete", { id: params.id });
+    publish("application:delete", { id });
     publish("stats:dirty", {});
 
     return Response.json({ ok: true });

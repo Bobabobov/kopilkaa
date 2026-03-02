@@ -4,6 +4,9 @@ import { useCoinCatchGame } from "./useCoinCatchGame";
 import { LeaderboardPanel } from "./LeaderboardPanel";
 import { AudioSetupOverlay } from "./AudioSetupOverlay";
 import { playButtonSound } from "../_services/sfx";
+import { Button } from "@/components/ui/button";
+import { GAME_THEME } from "../_constants/theme";
+import { cn } from "@/lib/utils";
 
 interface GameCanvasProps {
   onLeaderboardClick?: () => void;
@@ -17,6 +20,8 @@ export function GameCanvas({ onLeaderboardClick }: GameCanvasProps) {
     setShowLeaderboard,
     showAudioSetup,
     audioVolume,
+    initError,
+    retryInit,
     handleVolumeChange,
     applyAudioSettings,
     handleShowLeaderboard,
@@ -44,24 +49,43 @@ export function GameCanvas({ onLeaderboardClick }: GameCanvasProps) {
         onMute={() => applyAudioSettings(true)}
         onStart={() => applyAudioSettings(false)}
       />
-      {showLeaderboard && (
-        <LeaderboardPanel
-          entries={leaderboard}
-          onClose={() => setShowLeaderboard(false)}
-        />
+      {initError && (
+        <div
+          className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 p-4 bg-black/60 backdrop-blur-sm"
+          role="alert"
+        >
+          <p className={cn("text-sm sm:text-base text-center max-w-sm", GAME_THEME.text.primary)}>
+            {initError}
+          </p>
+          <Button
+            className={cn("rounded-xl", GAME_THEME.button.primary)}
+            onClick={retryInit}
+          >
+            Повторить
+          </Button>
+        </div>
       )}
-      {!showLeaderboard && (
-        <button
+      {showLeaderboard && (
+        <LeaderboardPanel entries={leaderboard} onClose={() => setShowLeaderboard(false)} />
+      )}
+      {!showLeaderboard && !initError && (
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
+          className={cn(
+            "absolute top-2 right-2 sm:top-4 sm:right-4 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold z-10 shadow-md backdrop-blur-sm",
+            GAME_THEME.button.outline
+          )}
           onClick={handleShowLeaderboard}
           onPointerDown={() => playButtonSound()}
           onPointerEnter={() => playButtonSound()}
           onTouchStart={() => playButtonSound()}
-          className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-[#001e1d]/95 border-2 border-[#f9bc60]/40 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold text-[#f9bc60] hover:bg-[#001e1d] hover:border-[#f9bc60]/60 transition-colors backdrop-blur-sm z-10 shadow-md"
+          aria-label="Открыть топ недели"
         >
           <span className="hidden sm:inline">Топ недели</span>
           <span className="sm:hidden">Топ</span>
-        </button>
+        </Button>
       )}
     </div>
   );

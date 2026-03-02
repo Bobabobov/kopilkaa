@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { GameEngine } from "../_core/engine";
 import type { LeaderboardEntry } from "../_types";
 import { submitScore, getLeaderboard } from "../_services/api";
@@ -14,6 +14,8 @@ export function useCoinCatchGame(onLeaderboardClick?: () => void) {
   const [showAudioSetup, setShowAudioSetup] = useState(true);
   const [audioMuted, setAudioMuted] = useState(false);
   const [audioVolume, setAudioVolume] = useState(0.6);
+  const [initError, setInitError] = useState<string | null>(null);
+  const [retryTrigger, setRetryTrigger] = useState(0);
   const scoreSubmittedRef = useRef(false);
   const onLeaderboardClickRef = useRef(onLeaderboardClick);
 
@@ -27,11 +29,7 @@ export function useCoinCatchGame(onLeaderboardClick?: () => void) {
     const container = containerRef.current;
 
     const initGame = () => {
-      if (
-        !container ||
-        container.clientWidth === 0 ||
-        container.clientHeight === 0
-      ) {
+      if (!container || container.clientWidth === 0 || container.clientHeight === 0) {
         setTimeout(initGame, 100);
         return;
       }
@@ -46,29 +44,25 @@ export function useCoinCatchGame(onLeaderboardClick?: () => void) {
       };
 
       const handleLeaderboardClick = () => {
-        if (onLeaderboardClickRef.current) {
-          onLeaderboardClickRef.current();
-        }
+        onLeaderboardClickRef.current?.();
         setShowLeaderboard(true);
       };
 
-      const engine = new GameEngine(
-        container,
-        handleGameOver,
-        handleLeaderboardClick,
-      );
+      const engine = new GameEngine(container, handleGameOver, handleLeaderboardClick);
       engineRef.current = engine;
 
-      engine.init().catch((error) => {
-        console.error("Error initializing game:", error);
-      });
+      engine
+        .init()
+        .then(() => setInitError(null))
+        .catch((err) => {
+          console.error("Error initializing game:", err);
+          setInitError("Игру не удалось загрузить. Проверьте соединение и попробуйте ещё раз.");
+        });
     };
 
     const timeoutId = setTimeout(initGame, 50);
 
-    getLeaderboard()
-      .then(setLeaderboard)
-      .catch(() => {});
+    getLeaderboard().then(setLeaderboard).catch(() => {});
 
     return () => {
       clearTimeout(timeoutId);
@@ -78,30 +72,36 @@ export function useCoinCatchGame(onLeaderboardClick?: () => void) {
       }
       scoreSubmittedRef.current = false;
     };
+  }, [retryTrigger]);
+
+  const retryInit = useCallback(() => {
+    setInitError(null);
+    setRetryTrigger((n) => n + 1);
   }, []);
 
-  const handleVolumeChange = (next: number) => {
+  const handleVolumeChange = useCallback((next: number) => {
     setAudioVolume(next);
     setAudioSettings({ muted: false, volume: next });
     engineRef.current?.applyMusicVolume();
     engineRef.current?.previewMusic();
-  };
+  }, []);
 
-  const applyAudioSettings = (nextMuted: boolean) => {
-    setAudioMuted(nextMuted);
-    setAudioSettings({ muted: nextMuted, volume: audioVolume });
-    engineRef.current?.applyMusicVolume();
-    playButtonSound();
-    setShowAudioSetup(false);
-  };
+  const applyAudioSettings = useCallback(
+    (nextMuted: boolean) => {
+      setAudioMuted(nextMuted);
+      setAudioSettings({ muted: nextMuted, volume: audioVolume });
+      engineRef.current?.applyMusicVolume();
+      playButtonSound();
+      setShowAudioSetup(false);
+    },
+    [audioVolume]
+  );
 
-  const handleShowLeaderboard = () => {
+  const handleShowLeaderboard = useCallback(() => {
     playButtonSound();
     setShowLeaderboard(true);
-    if (onLeaderboardClick) {
-      onLeaderboardClick();
-    }
-  };
+    onLeaderboardClickRef.current?.();
+  }, []);
 
   return {
     containerRef,
@@ -110,6 +110,8 @@ export function useCoinCatchGame(onLeaderboardClick?: () => void) {
     setShowLeaderboard,
     showAudioSetup,
     audioVolume,
+    initError,
+    retryInit,
     handleVolumeChange,
     applyAudioSettings,
     handleShowLeaderboard,

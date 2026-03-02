@@ -132,7 +132,9 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("[admin applications GET]", error);
+    const message = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : undefined;
+    console.error("[admin applications GET]", message, stack ?? "");
     return Response.json({ error: "Server error" }, { status: 500 });
   }
 }

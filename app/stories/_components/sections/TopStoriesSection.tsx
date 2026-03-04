@@ -7,6 +7,7 @@ import type { Story as StoryItem } from "@/hooks/stories/useStories";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { formatAmount } from "@/lib/format";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface TopStoriesSectionProps {
   topStories: StoryItem[];
@@ -109,7 +110,7 @@ export function TopStoriesSection({
                 { variant: "thumb" },
               );
               const avatarUrl = buildUploadUrl(
-                story.user?.avatar || "/default-avatar.png",
+                resolveAvatarUrl(story.user?.avatar),
                 { variant: "thumb" },
               );
               const imageUnoptimized =
@@ -197,7 +198,7 @@ export function TopStoriesSection({
                             className="h-8 w-8 shrink-0 rounded-full object-cover ring-2 ring-[#001e1d]/90"
                             unoptimized={avatarUnoptimized}
                             onError={(e) => {
-                              e.currentTarget.src = "/default-avatar.png";
+                              e.currentTarget.src = DEFAULT_AVATAR;
                             }}
                           />
                           <span className="truncate">{authorName}</span>
@@ -212,7 +213,7 @@ export function TopStoriesSection({
                             className="h-8 w-8 shrink-0 rounded-full object-cover ring-2 ring-[#001e1d]/90"
                             unoptimized={avatarUnoptimized}
                             onError={(e) => {
-                              e.currentTarget.src = "/default-avatar.png";
+                              e.currentTarget.src = DEFAULT_AVATAR;
                             }}
                           />
                           <span className="text-sm font-semibold text-white truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">

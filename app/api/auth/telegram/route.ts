@@ -69,7 +69,9 @@ export async function POST(req: NextRequest) {
       // Если Телеграм прислал аватар — сохраняем его как аватар профиля
       if (telegramPhoto) {
         const saved = await saveRemoteImageAsAvatar(telegramPhoto, telegramId);
-        updateData.avatar = saved || telegramPhoto;
+        if (saved) {
+          updateData.avatar = saved;
+        }
       }
 
       // Автоматически добавляем публичную ссылку на Telegram-профиль
@@ -157,7 +159,9 @@ export async function POST(req: NextRequest) {
       // Сохраняем аватар из Telegram, если есть
       if (telegramPhoto) {
         const saved = await saveRemoteImageAsAvatar(telegramPhoto, telegramId);
-        createData.avatar = saved || telegramPhoto;
+        if (saved) {
+          createData.avatar = saved;
+        }
       }
 
       // Автоматически выставляем публичную ссылку на Telegram
@@ -188,7 +192,10 @@ export async function POST(req: NextRequest) {
       }
 
       if (telegramPhoto && !user.avatar) {
-        updateData.avatar = telegramPhoto;
+        const saved = await saveRemoteImageAsAvatar(telegramPhoto, telegramId);
+        if (saved) {
+          updateData.avatar = saved;
+        }
       }
 
       if (Object.keys(updateData).length > 0) {

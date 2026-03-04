@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { getAvatarFrame } from "@/lib/header-customization";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface TimelineStoryCardProps {
   story: {
@@ -29,6 +30,7 @@ interface TimelineStoryCardProps {
 
 export function TimelineStoryCard({ story, index }: TimelineStoryCardProps) {
   const isEven = index % 2 === 0;
+  const safeAuthorAvatar = resolveAvatarUrl(story.user.avatar);
 
   return (
     <motion.div
@@ -114,11 +116,11 @@ export function TimelineStoryCard({ story, index }: TimelineStoryCardProps) {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
                   <img
-                    src={story.user.avatar || "/default-avatar.png"}
+                    src={safeAuthorAvatar}
                     alt="Аватар"
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = "/default-avatar.png";
+                      e.currentTarget.src = DEFAULT_AVATAR;
                     }}
                   />
                 </div>

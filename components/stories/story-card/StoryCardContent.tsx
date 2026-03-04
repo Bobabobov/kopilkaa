@@ -5,6 +5,7 @@ import LikeButton from "@/components/stories/LikeButton";
 import { renderHighlightedText } from "./highlight";
 import type { Story } from "./types";
 import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface StoryCardContentProps {
   story: Story;
@@ -45,6 +46,7 @@ export function StoryCardContent({
     isUploadUrl(previewImage) || isExternalUrl(previewImage);
 
   const isWinner = story.isContestWinner;
+  const safeAuthorAvatar = resolveAvatarUrl(story.user?.avatar);
 
   return (
     <article
@@ -191,12 +193,12 @@ export function StoryCardContent({
               >
                 <div className="relative flex-shrink-0">
                   <img
-                    src={story.user.avatar || "/default-avatar.png"}
+                    src={safeAuthorAvatar}
                     alt={authorName}
                     loading="lazy"
                     className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60 group-hover/author:border-[#f9bc60] transition-all duration-300 shadow-sm"
                     onError={(e) => {
-                      e.currentTarget.src = "/default-avatar.png";
+                      e.currentTarget.src = DEFAULT_AVATAR;
                     }}
                   />
                   <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-[#f9bc60]/30 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-300 blur-sm"></div>
@@ -208,12 +210,12 @@ export function StoryCardContent({
             ) : (
               <div className="flex items-center gap-2 bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 flex-shrink-0">
                 <img
-                  src={story.user?.avatar || "/default-avatar.png"}
+                  src={safeAuthorAvatar}
                   alt={authorName}
                   loading="lazy"
                   className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60"
                   onError={(e) => {
-                    e.currentTarget.src = "/default-avatar.png";
+                    e.currentTarget.src = DEFAULT_AVATAR;
                   }}
                 />
                 <span className="text-sm font-bold text-[#001e1d] whitespace-nowrap">

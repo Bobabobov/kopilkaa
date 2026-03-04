@@ -4,6 +4,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface StoryHeaderProps {
   title: string;
@@ -26,6 +27,8 @@ export default function StoryHeader({
   authorExternalUrl,
   isContestWinner = false,
 }: StoryHeaderProps) {
+  const safeAuthorAvatar = resolveAvatarUrl(authorAvatar);
+
   return (
     <header className="mb-8 sm:mb-10 min-w-0">
       {isAd && (
@@ -85,18 +88,24 @@ export default function StoryHeader({
                   className="flex items-center gap-2 rounded-xl border border-[#abd1c6]/30 bg-[#001e1d]/40 px-3 py-2 text-[#abd1c6] transition-all duration-300 hover:border-[#f9bc60]/50 hover:text-[#f9bc60]"
                 >
                   <img
-                    src={authorAvatar || "/default-avatar.png"}
+                    src={safeAuthorAvatar}
                     alt={author}
                     className="h-8 w-8 rounded-full object-cover border border-[#abd1c6]/40 ring-2 ring-[#001e1d]/50"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_AVATAR;
+                    }}
                   />
                   <span>{author}</span>
                 </Link>
               ) : (
                 <span className="flex items-center gap-2 rounded-xl border border-[#abd1c6]/20 bg-[#001e1d]/30 px-3 py-2 text-[#abd1c6]">
                   <img
-                    src={authorAvatar || "/default-avatar.png"}
+                    src={safeAuthorAvatar}
                     alt={author}
                     className="h-8 w-8 rounded-full object-cover border border-[#abd1c6]/40"
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_AVATAR;
+                    }}
                   />
                   {author}
                 </span>

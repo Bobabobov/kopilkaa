@@ -51,7 +51,7 @@ export function PreSupportContent({
               size="sm"
               className="group-hover:scale-110 transition-transform"
             />
-            💚 Поддержать проект
+            Поддержать проект
             <LucideIcons.ExternalLink size="sm" />
           </a>
 
@@ -111,7 +111,7 @@ export function PreSupportContent({
               size="sm"
               className="group-hover:scale-110 transition-transform"
             />
-            💚 Поддержать проект
+            Поддержать проект
             <LucideIcons.ExternalLink size="sm" />
           </a>
           <a
@@ -161,7 +161,7 @@ export function PreSupportContent({
               size="sm"
               className="group-hover:scale-110 transition-transform"
             />
-            💚 Поддержать проект
+            Поддержать проект
             <LucideIcons.ExternalLink size="sm" />
           </a>
           <a
@@ -197,7 +197,7 @@ export function PreSupportContent({
             size="sm"
             className="group-hover:scale-110 transition-transform"
           />
-          💚 Поддержать проект
+          Поддержать проект
           <LucideIcons.ExternalLink size="sm" />
         </a>
       </div>

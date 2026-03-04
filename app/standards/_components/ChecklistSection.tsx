@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 const basicInfo = [
   "Название компании заполнено",
@@ -51,7 +52,7 @@ export function ChecklistSection() {
           <div className="absolute -inset-0.5 bg-gradient-to-br from-[#f9bc60]/0 to-[#f9bc60]/10 rounded-3xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div className="relative p-6 bg-[#001e1d]/60 backdrop-blur-sm rounded-3xl border border-[#abd1c6]/10">
             <h3 className="text-xl font-semibold text-[#f9bc60] mb-4 flex items-center gap-2">
-              <span>📋</span>
+              <LucideIcons.ClipboardList className="w-5 h-5 flex-shrink-0" />
               Основная информация
             </h3>
             <div className="space-y-3">
@@ -87,7 +88,7 @@ export function ChecklistSection() {
           <div className="absolute -inset-0.5 bg-gradient-to-br from-[#f9bc60]/0 to-[#f9bc60]/10 rounded-3xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div className="relative p-6 bg-[#001e1d]/60 backdrop-blur-sm rounded-3xl border border-[#abd1c6]/10">
             <h3 className="text-xl font-semibold text-[#f9bc60] mb-4 flex items-center gap-2">
-              <span>🎨</span>
+              <LucideIcons.Palette className="w-5 h-5 flex-shrink-0" />
               Контент и медиа
             </h3>
             <div className="space-y-3">

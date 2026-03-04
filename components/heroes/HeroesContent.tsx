@@ -1,6 +1,7 @@
 // components/heroes/HeroesContent.tsx
 "use client";
 import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/Card";
 import HeroesGridStats from "./HeroesGridStats";
 import HeroesGrid from "./HeroesGrid";
 import HeroesEmptyState from "./HeroesEmptyState";
@@ -72,35 +73,22 @@ export default function HeroesContent({
     >
       <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10 md:space-y-12">
         {/* Статистика */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="rounded-[28px] border border-white/10 bg-white/5/60 backdrop-blur-xl p-5 sm:p-6 md:p-7 shadow-[0_18px_48px_rgba(0,0,0,0.28)]"
-        >
-          <div className="flex items-center justify-between gap-4 mb-4 sm:mb-5">
-            <div>
-              <div className="text-xs text-[#94a1b2]">Сводка раздела</div>
-              <div className="text-xl sm:text-2xl font-bold text-[#fffffe]">
-                Статистика
+        <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+          <Card variant="darkGlass" padding="lg">
+            <div className="flex items-center justify-between gap-4 mb-4 sm:mb-5">
+              <div>
+                <div className="text-xs text-[#94a1b2]">Сводка раздела</div>
+                <div className="text-xl sm:text-2xl font-bold text-[#fffffe]">Статистика</div>
               </div>
+              <div className="hidden sm:block text-sm text-[#abd1c6]">Данные обновляются при загрузке списка</div>
             </div>
-            <div className="hidden sm:block text-sm text-[#abd1c6]">
-              Данные обновляются при загрузке списка
-            </div>
-          </div>
-          <HeroesGridStats stats={stats} />
+            <HeroesGridStats stats={stats} />
+          </Card>
         </motion.div>
 
         {/* Список героев */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.55, delay: 0.05 }}
-          className="rounded-[28px] border border-white/10 bg-white/5/60 backdrop-blur-xl p-5 sm:p-6 md:p-7 shadow-[0_18px_48px_rgba(0,0,0,0.28)]"
-        >
+        <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.55, delay: 0.05 }}>
+          <Card variant="darkGlass" padding="lg">
           <HeroesGrid
             heroes={heroes}
             topThree={topThree}
@@ -113,6 +101,7 @@ export default function HeroesContent({
             loadingMore={loadingMore}
             observerTargetRef={observerTargetRef}
           />
+          </Card>
         </motion.div>
       </div>
     </div>

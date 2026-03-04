@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export function ActionButtons() {
   return (
@@ -50,7 +51,7 @@ export function ActionButtons() {
           whileTap={{ scale: 0.95 }}
           className="inline-flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-[#abd1c6] text-[#001e1d] font-bold rounded-lg sm:rounded-xl hover:bg-[#d0e3dd] transition-all shadow-lg hover:shadow-xl text-sm sm:text-base"
         >
-          <span className="text-lg sm:text-xl">📝</span>
+          <LucideIcons.Document className="w-5 h-5 sm:w-6 sm:h-6" />
           <span className="whitespace-nowrap">Оставить заявку на сайте</span>
         </motion.a>
         <motion.a

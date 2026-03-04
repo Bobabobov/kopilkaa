@@ -56,7 +56,8 @@ export default function HeroesGridStats({ stats }: HeroesGridStatsProps) {
         return (
           <div
             key={stat.label}
-            className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/6 to-white/3 px-4 py-4 sm:px-5 sm:py-5 shadow-[0_14px_34px_rgba(0,0,0,0.22)]"
+            className="rounded-2xl border border-white/[0.08] px-4 py-4 sm:px-5 sm:py-5 shadow-[0_4px_24px_rgba(0,0,0,0.15)]"
+            style={{ background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)" }}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">

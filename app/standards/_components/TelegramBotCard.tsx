@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export function TelegramBotCard() {
   const features = [
@@ -91,7 +92,7 @@ export function TelegramBotCard() {
                         className="text-[#f9bc60] text-lg sm:text-xl mt-0.5 flex-shrink-0"
                         whileHover={{ scale: 1.2, rotate: 15 }}
                       >
-                        ✓
+                        <LucideIcons.Check className="w-5 h-5 text-[#f9bc60]" />
                       </motion.span>
                       <span className="text-xs sm:text-sm text-[#abd1c6] group-hover/feature:text-[#fffffe] transition-colors break-words">
                         {feature}

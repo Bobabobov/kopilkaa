@@ -198,7 +198,12 @@ export async function GET(
         },
       });
     } catch (error) {
-      console.error("File not found:", filePath);
+      // Файл удалён или не найден — редирект на дефолтный аватар, чтобы не было 404 в консоли и картинка отображалась
+      const isAvatar = /^avatar_/i.test(filename);
+      if (isAvatar) {
+        const base = request.nextUrl.origin;
+        return NextResponse.redirect(`${base}/default-avatar.png`, 302);
+      }
       return new NextResponse("File not found", { status: 404 });
     }
   } catch (error) {

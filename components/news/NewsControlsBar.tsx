@@ -26,7 +26,7 @@ export function NewsControlsBar({
   resultCount?: number;
 }) {
   return (
-    <Card variant="default" padding="none" className="overflow-hidden">
+    <Card variant="darkGlass" padding="none" className="overflow-hidden">
       <CardContent className="p-3 sm:p-4">
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
           <div className="flex-1 min-w-0">

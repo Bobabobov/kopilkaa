@@ -5,8 +5,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { Story as StoryItem } from "@/hooks/stories/useStories";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { formatAmount } from "@/lib/format";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 
@@ -86,18 +84,21 @@ export function TopStoriesSection({
                 </p>
               </div>
             </div>
-            <Badge variant="secondary" className="gap-1.5 text-xs font-semibold">
+            <span
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg"
+              style={{ background: "rgba(249, 188, 96, 0.12)", color: "#f9bc60" }}
+            >
               <LucideIcons.Heart size="sm" className="text-[#e16162] fill-[#e16162]/60 shrink-0" />
               по лайкам
-            </Badge>
+            </span>
           </header>
 
           <div className="flex items-center justify-center gap-3 mb-8 sm:mb-10">
-            <Separator className="flex-1 max-w-[80px] sm:max-w-[120px]" />
-            <span className="text-[#abd1c6]/50" aria-hidden>
+            <span className="flex-1 max-w-[80px] sm:max-w-[120px] h-px bg-white/10" aria-hidden />
+            <span className="text-[#abd1c6]/60" aria-hidden>
               <LucideIcons.Star size="xs" className="w-4 h-4" />
             </span>
-            <Separator className="flex-1 max-w-[80px] sm:max-w-[120px]" />
+            <span className="flex-1 max-w-[80px] sm:max-w-[120px] h-px bg-white/10" aria-hidden />
           </div>
 
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 list-none p-0 m-0">

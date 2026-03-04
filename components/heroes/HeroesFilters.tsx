@@ -1,6 +1,7 @@
 // components/heroes/HeroesFilters.tsx
 "use client";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Card } from "@/components/ui/Card";
 
 interface HeroesFiltersProps {
   searchTerm: string;
@@ -23,7 +24,7 @@ export default function HeroesFilters({
 
   return (
     <div className="mb-6 sm:mb-8">
-      <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-5 sm:py-5">
+      <Card variant="darkGlass" padding="md">
         <div className="flex flex-col md:flex-row gap-3 sm:gap-4 md:gap-6">
           {/* Поиск */}
           <div className="flex-1 min-w-0">
@@ -69,7 +70,7 @@ export default function HeroesFilters({
             ))}
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

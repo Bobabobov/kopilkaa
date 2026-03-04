@@ -4,9 +4,16 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { GameEngine } from "../_core/engine";
 import type { LeaderboardEntry } from "../_types";
 import { submitScore, getLeaderboard } from "../_services/api";
+import type { CoinCatchStatus } from "../_services/api";
 import { playButtonSound, setAudioSettings } from "../_services/sfx";
 
-export function useCoinCatchGame(onLeaderboardClick?: () => void) {
+export function useCoinCatchGame(
+  onLeaderboardClick?: () => void,
+  onRealGamePlayed?: () => void,
+  onStatusChange?: () => void,
+  onRealGameFinished?: () => void,
+  onStatusFromSubmit?: (status: CoinCatchStatus) => void,
+) {
   const containerRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<GameEngine | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -18,10 +25,26 @@ export function useCoinCatchGame(onLeaderboardClick?: () => void) {
   const [retryTrigger, setRetryTrigger] = useState(0);
   const scoreSubmittedRef = useRef(false);
   const onLeaderboardClickRef = useRef(onLeaderboardClick);
+  const onRealGamePlayedRef = useRef(onRealGamePlayed);
+  const onStatusChangeRef = useRef(onStatusChange);
+  const onRealGameFinishedRef = useRef(onRealGameFinished);
+  const onStatusFromSubmitRef = useRef(onStatusFromSubmit);
 
   useEffect(() => {
     onLeaderboardClickRef.current = onLeaderboardClick;
   }, [onLeaderboardClick]);
+  useEffect(() => {
+    onRealGamePlayedRef.current = onRealGamePlayed;
+  }, [onRealGamePlayed]);
+  useEffect(() => {
+    onStatusChangeRef.current = onStatusChange;
+  }, [onStatusChange]);
+  useEffect(() => {
+    onRealGameFinishedRef.current = onRealGameFinished;
+  }, [onRealGameFinished]);
+  useEffect(() => {
+    onStatusFromSubmitRef.current = onStatusFromSubmit;
+  }, [onStatusFromSubmit]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !containerRef.current) return;
@@ -37,9 +60,19 @@ export function useCoinCatchGame(onLeaderboardClick?: () => void) {
       const handleGameOver = async (score: number) => {
         if (!scoreSubmittedRef.current) {
           scoreSubmittedRef.current = true;
-          await submitScore(score);
-          const updated = await getLeaderboard();
-          setLeaderboard(updated);
+          const result = await submitScore(score);
+          if (result.success) {
+            if (result.status) {
+              onStatusFromSubmitRef.current?.(result.status);
+            }
+            if (!result.isTest) {
+              const updated = await getLeaderboard();
+              setLeaderboard(updated);
+              onRealGameFinishedRef.current?.();
+              onRealGamePlayedRef.current?.();
+            }
+            onStatusChangeRef.current?.();
+          }
         }
       };
 
@@ -48,7 +81,16 @@ export function useCoinCatchGame(onLeaderboardClick?: () => void) {
         setShowLeaderboard(true);
       };
 
-      const engine = new GameEngine(container, handleGameOver, handleLeaderboardClick);
+      const handleRoundStart = () => {
+        scoreSubmittedRef.current = false;
+      };
+
+      const engine = new GameEngine(
+        container,
+        handleGameOver,
+        handleLeaderboardClick,
+        handleRoundStart,
+      );
       engineRef.current = engine;
 
       engine

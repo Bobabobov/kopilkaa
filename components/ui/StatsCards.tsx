@@ -104,7 +104,7 @@ export default function StatsCards({ variant, stats }: StatsCardsProps) {
 
   const cards = [
     {
-      icon: "📊",
+      icon: "BarChart3",
       title: "Всего заявок",
       value: stats.total,
       description: "За всё время",
@@ -115,7 +115,7 @@ export default function StatsCards({ variant, stats }: StatsCardsProps) {
       delay: 0.3,
     },
     {
-      icon: "💰",
+      icon: "DollarSign",
       title: "Общая сумма",
       value: `₽${stats.totalAmount?.toLocaleString() || "0"}`,
       description: "Запрошено всего",
@@ -126,7 +126,7 @@ export default function StatsCards({ variant, stats }: StatsCardsProps) {
       delay: 0.35,
     },
     {
-      icon: "⏳",
+      icon: "Clock",
       title: "В обработке",
       value: stats.pending,
       description: "Требуют внимания",
@@ -137,7 +137,7 @@ export default function StatsCards({ variant, stats }: StatsCardsProps) {
       delay: 0.4,
     },
     {
-      icon: "✅",
+      icon: "CheckCircle",
       title: "Одобрено",
       value: stats.approved,
       description: "Успешно обработано",
@@ -148,7 +148,7 @@ export default function StatsCards({ variant, stats }: StatsCardsProps) {
       delay: 0.5,
     },
     {
-      icon: "❌",
+      icon: "XCircle",
       title: "Отказано",
       value: stats.rejected,
       description: "Не прошли модерацию",
@@ -159,7 +159,7 @@ export default function StatsCards({ variant, stats }: StatsCardsProps) {
       delay: 0.6,
     },
     {
-      icon: "🏆",
+      icon: "Trophy",
       title: "Конкурс",
       value: stats.contest ?? 0,
       description: "Помечены для конкурса",
@@ -227,11 +227,12 @@ export default function StatsCards({ variant, stats }: StatsCardsProps) {
           >
             <div className="relative min-w-0">
               <div
-                className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-r ${style.icon} rounded-lg sm:rounded-xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg flex-shrink-0`}
+                className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-r ${style.icon} rounded-lg sm:rounded-xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg flex-shrink-0 text-white`}
               >
-                <span className="text-xl sm:text-2xl md:text-3xl">
-                  {card.icon}
-                </span>
+                {(() => {
+                  const Icon = LucideIcons[card.icon as keyof typeof LucideIcons];
+                  return Icon ? <Icon size="lg" className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" /> : null;
+                })()}
               </div>
               <div className="text-xs sm:text-sm font-bold text-[#abd1c6] mb-1 sm:mb-2 uppercase tracking-wide truncate">
                 {card.title}

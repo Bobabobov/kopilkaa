@@ -1,10 +1,16 @@
 "use client";
+
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUp } from "lucide-react";
 
 export default function ScrollToTop() {
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
   const [isNearFooter, setIsNearFooter] = useState(false);
+
+  const isGamePage = pathname?.startsWith("/games/") && pathname !== "/games";
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -12,16 +18,9 @@ export default function ScrollToTop() {
         window.pageYOffset || document.documentElement.scrollTop;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-
-      // Расстояние до конца страницы
       const distanceToBottom = documentHeight - (scrollTop + windowHeight);
-
-      // Определяем, близко ли к футеру (менее 250px) - для изменения позиции
       const nearFooter = distanceToBottom < 250;
       setIsNearFooter(nearFooter);
-
-      // Показываем кнопку если прокрутили больше 300px от верха
-      // НЕ скрываем при приближении к футеру - кнопка должна быть доступна всегда
       if (scrollTop > 300) {
         setIsVisible(true);
       } else {
@@ -31,87 +30,43 @@ export default function ScrollToTop() {
 
     window.addEventListener("scroll", toggleVisibility, { passive: true });
     toggleVisibility();
-
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {isVisible && !isGamePage && (
         <motion.button
-          initial={{ opacity: 0, x: 30, scale: 0.8 }}
-          animate={{
-            opacity: 1,
-            x: 0,
-            scale: 1,
-          }}
-          exit={{ opacity: 0, x: 30, scale: 0.8 }}
-          whileHover={{
-            scale: 1.08,
-            y: -2,
-            transition: { duration: 0.2 },
-          }}
-          whileTap={{ scale: 0.95 }}
+          type="button"
+          initial={{ opacity: 0, y: 12, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 12, scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
           onClick={scrollToTop}
-          className={`fixed right-3 xs:right-4 sm:right-5 md:right-6 lg:right-8 xl:right-10 z-40 flex items-center gap-1.5 xs:gap-2 sm:gap-2.5 px-2.5 py-2 xs:px-3 xs:py-2.5 sm:px-4 sm:py-3 md:px-5 md:py-3 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#001e1d] via-[#003c3a] to-[#001e1d] backdrop-blur-lg border border-[#abd1c6]/30 hover:border-[#f9bc60]/60 shadow-xl hover:shadow-2xl hover:shadow-[#f9bc60]/20 transition-all duration-300 group overflow-hidden ${
+          className={`fixed right-4 sm:right-6 md:right-8 z-40 flex items-center gap-2 px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl font-semibold transition-all duration-300 ${
             isNearFooter
-              ? "bottom-32 xs:bottom-36 sm:bottom-40 md:bottom-44 lg:bottom-16 xl:bottom-20"
-              : "bottom-20 xs:bottom-24 sm:bottom-28 md:bottom-32 lg:bottom-8 xl:bottom-10"
+              ? "bottom-32 sm:bottom-36 md:bottom-40 lg:bottom-20"
+              : "bottom-24 sm:bottom-28 md:bottom-8 lg:bottom-8"
           }`}
+          style={{
+            background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+            color: "#001e1d",
+            border: "2px solid rgba(0, 30, 29, 0.5)",
+            boxShadow:
+              "0 4px 14px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.15), 0 10px 30px rgba(249, 188, 96, 0.4)",
+          }}
           aria-label="Прокрутить наверх"
           title="Наверх"
         >
-          {/* Декоративный градиент при hover */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/10 via-transparent to-[#abd1c6]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            initial={false}
-          />
-
-          {/* Иконка стрелки */}
-          <motion.div
-            animate={{
-              y: [0, -3, 0],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="relative z-10"
-          >
-            <svg
-              className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5 md:w-5 md:h-5 text-[#abd1c6] group-hover:text-[#f9bc60] transition-colors duration-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-          </motion.div>
-
-          {/* Текст - скрыт на очень маленьких экранах, виден на sm+ */}
-          <motion.span
-            initial={{ opacity: 0, width: 0 }}
-            animate={{ opacity: 1, width: "auto" }}
-            className="text-[10px] xs:text-xs sm:text-sm md:text-base font-semibold text-[#abd1c6] group-hover:text-[#f9bc60] transition-colors duration-300 hidden xs:inline-block relative z-10 whitespace-nowrap"
-          >
+          <ArrowUp className="w-5 h-5 flex-shrink-0" strokeWidth={2.5} />
+          <span className="hidden xs:inline text-sm sm:text-base whitespace-nowrap">
             Наверх
-          </motion.span>
-
-          {/* Свечение при hover */}
-          <motion.div
-            className="absolute inset-0 rounded-xl sm:rounded-2xl bg-[#f9bc60]/0 group-hover:bg-[#f9bc60]/5 blur-xl transition-all duration-300"
-            initial={false}
-          />
+          </span>
         </motion.button>
       )}
     </AnimatePresence>

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Card } from "@/components/ui/Card";
 import { AdRequestSuccessScreen } from "./AdRequestSuccessScreen";
 import { AdRequestFormHeader } from "./AdRequestFormHeader";
 import { AdRequestContactFields } from "./AdRequestContactFields";
@@ -43,20 +44,21 @@ export function AdvertisingContact() {
   }
 
   return (
-    <section id="contact" className="py-24 px-4 relative">
+    <section className="py-24 px-4 relative z-10">
       <div className="container mx-auto max-w-3xl">
         <AdRequestFormHeader />
 
-        <motion.form
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          onSubmit={handleSubmit}
-          className="relative space-y-10"
-          noValidate
-        >
-          <div className="space-y-10">
+        <Card variant="darkGlass" padding="lg">
+          <motion.form
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            onSubmit={handleSubmit}
+            className="relative space-y-10"
+            noValidate
+          >
+            <div className="space-y-10">
             <AdRequestContactFields
               formData={formData}
               errors={errors}
@@ -107,8 +109,9 @@ export function AdvertisingContact() {
               isSubmitting={isSubmitting}
               isUploading={isUploading}
             />
-          </div>
-        </motion.form>
+            </div>
+          </motion.form>
+        </Card>
       </div>
     </section>
   );

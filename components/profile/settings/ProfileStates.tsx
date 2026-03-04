@@ -1,5 +1,7 @@
 "use client";
 
+import { LucideIcons } from "@/components/ui/LucideIcons";
+
 // Loading States Component
 export function ProfileLoading() {
   return (
@@ -55,9 +57,9 @@ export function NotificationMessage({
     >
       <div className="flex items-center gap-3">
         <div className="flex-shrink-0">
-          {type === "success" && <span className="text-lg">✓</span>}
-          {type === "error" && <span className="text-lg">✗</span>}
-          {type === "info" && <span className="text-lg">ℹ</span>}
+          {type === "success" && <LucideIcons.Check className="w-5 h-5 text-green-400" />}
+          {type === "error" && <LucideIcons.XCircle className="w-5 h-5 text-red-400" />}
+          {type === "info" && <LucideIcons.Info className="w-5 h-5 text-[#abd1c6]" />}
         </div>
         <p className="text-sm font-medium">{message}</p>
       </div>
@@ -65,7 +67,7 @@ export function NotificationMessage({
         onClick={onClose}
         className="flex-shrink-0 p-1 hover:bg-white/10 rounded transition-colors"
       >
-        <span className="text-sm">✕</span>
+        <LucideIcons.X className="w-4 h-4" />
       </button>
     </div>
   );
@@ -86,7 +88,7 @@ export function ErrorState({
   return (
     <div className="text-center py-12">
       <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
-        <span className="text-2xl text-red-400">⚠</span>
+        <LucideIcons.AlertTriangle className="w-8 h-8 text-red-400" />
       </div>
       <h3 className="text-lg font-semibold text-[#fffffe] mb-2">{title}</h3>
       <p className="text-[#abd1c6] mb-6">{message}</p>
@@ -104,7 +106,7 @@ export function ErrorState({
 
 // Empty State Component
 interface EmptyStateProps {
-  icon?: string;
+  icon?: string | React.ReactNode;
   title: string;
   message: string;
   actionLabel?: string;
@@ -112,7 +114,7 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  icon = "📭",
+  icon,
   title,
   message,
   actionLabel,
@@ -120,7 +122,9 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="text-center py-12">
-      <div className="text-4xl mb-4">{icon}</div>
+      <div className="mb-4 flex justify-center">
+        {icon ? (typeof icon === "string" ? <span className="text-4xl">{icon}</span> : icon) : <LucideIcons.Inbox className="w-12 h-12 text-[#abd1c6]" />}
+      </div>
       <h3 className="text-lg font-semibold text-[#fffffe] mb-2">{title}</h3>
       <p className="text-[#abd1c6] mb-6">{message}</p>
       {actionLabel && onAction && (
@@ -155,7 +159,9 @@ export function SettingsUnauthorized({ message }: { message?: string }) {
   return (
     <div className="text-center py-12 space-y-4">
       <div className="w-16 h-16 mx-auto bg-red-500/20 rounded-full flex items-center justify-center">
-        <div className="text-2xl">🔒</div>
+        <div className="flex justify-center">
+          <LucideIcons.Lock className="w-8 h-8 text-[#abd1c6]" />
+        </div>
       </div>
       <div className="space-y-2">
         <p className="text-[#fffffe] font-medium">Доступ запрещен</p>

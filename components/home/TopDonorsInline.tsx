@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { Trophy, Heart, ArrowRight, Link2Off } from "lucide-react";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+
 interface Donor {
   id: string;
   name: string;
@@ -71,10 +74,6 @@ export default function TopDonorsInline() {
     return null;
   }
 
-  const top1 = donors[0];
-  const top2 = donors[1];
-  const top3 = donors[2];
-
   const totalAmount = donors.reduce((sum, donor) => {
     const numeric = parseInt(donor.amount.replace(/\D/g, ""), 10);
     if (Number.isNaN(numeric)) return sum;
@@ -85,58 +84,47 @@ export default function TopDonorsInline() {
     totalAmount > 0 ? totalAmount.toLocaleString("ru-RU") : null;
 
   return (
-    <section className="pt-10 pb-20 px-4">
+    <section className="pt-10 pb-20 px-4" id="top-donors">
       <div className="max-w-6xl mx-auto">
-        {/* Заголовок секции */}
-        <div className="text-center mb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
+        >
+          <span
+            className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider mb-4"
+            style={{ color: "#f9bc60", letterSpacing: "0.12em" }}
+          >
+            <Trophy className="w-4 h-4" />
+            Наши герои
+          </span>
           <h2
-            className="text-4xl md:text-5xl font-bold mb-4"
+            className="text-4xl md:text-5xl font-bold mb-3 tracking-tight"
             style={{ color: "#fffffe" }}
           >
             Топ-донатеры
           </h2>
-          <p className="text-xl" style={{ color: "#abd1c6" }}>
-            Люди, которые уже поддержали эксперимент
+          <p className="text-lg md:text-xl mb-4" style={{ color: "#abd1c6" }}>
+            Люди, которые уже поддержали проект
           </p>
           {formattedTotal && (
-            <p className="mt-2 text-sm" style={{ color: "#abd1c6" }}>
-              В сумме топ-донатеры собрали{" "}
-              <span className="font-semibold text-[#f9bc60]">
+            <div
+              className="inline-flex items-baseline gap-1.5 rounded-xl px-4 py-2"
+              style={{ background: "rgba(249, 188, 96, 0.12)" }}
+            >
+              <span className="text-lg font-bold tabular-nums" style={{ color: "#f9bc60" }}>
                 ₽{formattedTotal}
               </span>
-            </p>
+              <span className="text-sm" style={{ color: "#abd1c6" }}>
+                собрали в сумме
+              </span>
+            </div>
           )}
-        </div>
+        </motion.div>
 
-        {/* Короткая строка с именами первых мест */}
-        <div
-          className="mb-8 flex flex-wrap items-center justify-center gap-2 text-[12px]"
-          style={{ color: "#abd1c6" }}
-        >
-          {top1 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#001e1d]/80 px-3 py-1 border border-[#f9bc60]/60 text-[#f9bc60]">
-              <span className="text-[11px] font-semibold">1 место:</span>
-              <span className="font-semibold">{top1.name}</span>
-            </span>
-          )}
-          {top2 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#001e1d]/80 px-3 py-1 border border-[#abd1c6]/60 text-[#abd1c6]">
-              <span className="text-[11px] font-semibold">2 место:</span>
-              <span className="font-semibold">{top2.name}</span>
-            </span>
-          )}
-          {top3 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#001e1d]/80 px-3 py-1 border border-[#e16162]/60 text-[#e16162]">
-              <span className="text-[11px] font-semibold">3 место:</span>
-              <span className="font-semibold">{top3.name}</span>
-            </span>
-          )}
-        </div>
-
-        {/* Сетка донатёров в стиле карточек, как «Истории успеха», но с более
-            аккуратным, «виджетным» оформлением и акцентом на 1–3 места */}
-        <div className="relative">
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {donors.map((donor, index) => {
               const numericAmount = parseInt(
                 donor.amount.replace(/\D/g, ""),
@@ -150,16 +138,6 @@ export default function TopDonorsInline() {
               const placeLabel =
                 place === 1 ? "Главный герой" : `${place}-е место`;
 
-              // Разные акценты для 1, 2 и 3 места
-              const cardBorder =
-                place === 1
-                  ? "border-[#f9bc60]/80"
-                  : place === 2
-                    ? "border-[#abd1c6]/70"
-                    : place === 3
-                      ? "border-[#e16162]/70"
-                      : "border-[#abd1c6]/25";
-
               const badgeBg =
                 place === 1
                   ? "bg-[#f9bc60] text-[#001e1d]"
@@ -170,99 +148,87 @@ export default function TopDonorsInline() {
                       : "bg-[#94a1b2] text-[#001e1d]";
 
               return (
-                <Link
+                <motion.div
                   key={donor.id}
-                  href={`/profile/${donor.id}`}
-                  className="block h-full"
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.08 }}
                 >
-                  <div
-                    className={`rounded-2xl overflow-hidden border ${cardBorder} bg-[#001e1d]/90 shadow-lg shadow-black/35 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl h-full`}
-                  >
-                    <div className="p-6 flex flex-col h-full">
-                      {/* Верхняя часть: место + имя + аватар */}
+                  <Link href={`/profile/${donor.id}`} className="block h-full group">
+                    <div
+                      className="h-full rounded-2xl p-6 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                      style={{
+                        background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                        boxShadow: "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
+                      }}
+                    >
                       <div className="flex items-center gap-4 mb-4">
                         <div className="relative flex-shrink-0">
                           <div
-                            className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center ${
-                              place === 1
-                                ? "bg-gradient-to-br from-[#f9bc60] via-[#f97316] to-[#e16162] p-[2px]"
-                                : "bg-[#004643]"
+                            className={`w-14 h-14 rounded-full overflow-hidden flex items-center justify-center ring-2 transition-all group-hover:ring-[#f9bc60]/50 ${
+                              place === 1 ? "ring-[#f9bc60]/60" : "ring-white/10"
                             }`}
                           >
-                            <div className="w-full h-full rounded-full overflow-hidden bg-[#004643]">
-                              <img
-                                src={
-                                  failedAvatars[donor.id]
-                                    ? DEFAULT_AVATAR
-                                    : donor.avatar || DEFAULT_AVATAR
-                                }
-                                alt={donor.name}
-                                className="w-full h-full object-cover"
-                                onError={() =>
-                                  setFailedAvatars((prev) => ({
-                                    ...prev,
-                                    [donor.id]: true,
-                                  }))
-                                }
-                              />
-                            </div>
+                            <img
+                              src={
+                                failedAvatars[donor.id]
+                                  ? DEFAULT_AVATAR
+                                  : donor.avatar || DEFAULT_AVATAR
+                              }
+                              alt={donor.name}
+                              className="w-full h-full object-cover"
+                              onError={() =>
+                                setFailedAvatars((prev) => ({
+                                  ...prev,
+                                  [donor.id]: true,
+                                }))
+                              }
+                            />
+                          </div>
+                          <div
+                            className={`absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold shadow ${badgeBg}`}
+                          >
+                            {place}
                           </div>
                           {place === 1 && (
-                            <div className="absolute -top-2 -left-1 flex items-center gap-1 rounded-full bg-[#f9bc60] px-2 py-0.5 text-[10px] font-semibold text-[#001e1d] shadow-md shadow-[#f9bc60]/60">
+                            <div className="absolute -top-1 -right-1 flex items-center gap-1 rounded-full bg-[#f9bc60] px-2 py-0.5 text-[10px] font-bold text-[#001e1d]">
                               <LucideIcons.Crown size="xs" />
                               <span>Легенда</span>
                             </div>
                           )}
-                          <div
-                            className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-[#001e1d]/80 text-[11px] font-semibold shadow-sm ${badgeBg}`}
-                          >
-                            {place}
-                          </div>
                         </div>
-                        <div className="min-w-0 text-left">
-                          <p
-                            className="text-lg font-semibold truncate"
-                            style={{ color: "#fffffe" }}
-                          >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-lg font-bold truncate" style={{ color: "#fffffe" }}>
                             {donor.name}
                           </p>
-                          <p
-                            className="text-[11px] font-medium"
-                            style={{ color: "#f9bc60" }}
-                          >
+                          <p className="text-sm font-medium" style={{ color: "#f9bc60" }}>
                             {placeLabel}
                           </p>
                         </div>
                       </div>
 
-                      {/* Сумма */}
-                      <div className="mb-4 text-left">
-                        <span className="text-2xl font-bold">
-                          <span style={{ color: "#f9bc60" }}>
-                            {formattedAmount}
-                          </span>
-                          <span
-                            style={{ color: "#ffffff", fontWeight: 900 }}
-                          >{` руб`}</span>
+                      <div
+                        className="inline-flex items-baseline gap-1 rounded-xl px-3 py-1.5 mb-4"
+                        style={{ background: "rgba(249, 188, 96, 0.12)" }}
+                      >
+                        <span className="text-xl font-bold tabular-nums" style={{ color: "#f9bc60" }}>
+                          {formattedAmount}
+                        </span>
+                        <span className="text-sm font-semibold" style={{ color: "#f9bc60" }}>
+                          руб
                         </span>
                       </div>
 
-                      {/* Соцсети донатера / сообщение, если их нет */}
-                      {donor.vkLink ||
-                      donor.telegramLink ||
-                      donor.youtubeLink ? (
-                        <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-center gap-4">
+                      {donor.vkLink || donor.telegramLink || donor.youtubeLink ? (
+                        <div className="pt-4 border-t border-white/10 flex items-center justify-center gap-3">
                           {donor.vkLink && (
                             <button
                               type="button"
-                              onClick={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                window.open(
-                                  donor.vkLink!,
-                                  "_blank",
-                                  "noopener,noreferrer",
-                                );
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                window.open(donor.vkLink!, "_blank", "noopener,noreferrer");
                               }}
                               className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#4c75a3]/70 bg-transparent text-[#4c75a3] hover:bg-[#4c75a3]/20 transition-colors"
                               aria-label="VK"
@@ -273,14 +239,10 @@ export default function TopDonorsInline() {
                           {donor.telegramLink && (
                             <button
                               type="button"
-                              onClick={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                window.open(
-                                  donor.telegramLink!,
-                                  "_blank",
-                                  "noopener,noreferrer",
-                                );
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                window.open(donor.telegramLink!, "_blank", "noopener,noreferrer");
                               }}
                               className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#229ED9]/70 bg-transparent text-[#229ED9] hover:bg-[#229ED9]/20 transition-colors"
                               aria-label="Telegram"
@@ -291,14 +253,10 @@ export default function TopDonorsInline() {
                           {donor.youtubeLink && (
                             <button
                               type="button"
-                              onClick={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                window.open(
-                                  donor.youtubeLink!,
-                                  "_blank",
-                                  "noopener,noreferrer",
-                                );
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                window.open(donor.youtubeLink!, "_blank", "noopener,noreferrer");
                               }}
                               className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#ff4f45]/70 bg-transparent text-[#ff4f45] hover:bg-[#ff4f45]/20 transition-colors"
                               aria-label="YouTube"
@@ -309,44 +267,51 @@ export default function TopDonorsInline() {
                         </div>
                       ) : (
                         <div
-                          className="mt-auto pt-4 border-t border-white/10 text-[12px] text-center"
-                          style={{ color: "#abd1c6" }}
+                          className="pt-4 border-t border-white/10 flex items-center justify-center gap-2 text-xs"
+                          style={{ color: "#94a1b2" }}
                         >
-                          Человечек не привязал свои соц.сети
+                          <Link2Off className="w-3.5 h-3.5" />
+                          Соцсети не указаны
                         </div>
                       )}
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                </motion.div>
               );
             })}
-          </div>
         </div>
 
-        {/* CTA-блок: стать героем + посмотреть всех */}
-        <div className="text-center mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="text-center mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
+        >
           <Link
             href="/support"
-            className="inline-flex items-center gap-2 px-8 py-3 text-base font-semibold rounded-xl transition-all duration-300 hover:scale-105"
+            className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
             style={{
-              background: "linear-gradient(135deg, #f9bc60 0%, #e8a545 100%)",
+              background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
               color: "#001e1d",
+              boxShadow: "0 8px 32px rgba(249, 188, 96, 0.25)",
             }}
           >
-            <LucideIcons.Heart size="sm" />
+            <Heart className="w-5 h-5" />
             Стать героем
           </Link>
           <Link
             href="/heroes"
-            className="inline-flex items-center gap-2 px-8 py-3 text-base font-semibold rounded-xl border-2 transition-all duration-300 hover:scale-105"
+            className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl border-2 transition-all duration-300 hover:scale-[1.02] hover:bg-white/[0.06]"
             style={{
               borderColor: "#abd1c6",
               color: "#abd1c6",
             }}
           >
             Посмотреть всех героев
+            <ArrowRight className="w-5 h-5" />
           </Link>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,12 +1,4 @@
 import type { Metadata } from "next";
-import { Press_Start_2P } from "next/font/google";
-
-const pressStart2P = Press_Start_2P({
-  weight: "400",
-  subsets: ["latin", "cyrillic"],
-  display: "swap",
-  preload: false,
-});
 
 const siteUrl = (
   process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru"
@@ -49,5 +41,5 @@ export default function GamesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className={pressStart2P.className}>{children}</div>;
+  return <>{children}</>;
 }

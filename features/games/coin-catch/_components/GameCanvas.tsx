@@ -4,15 +4,26 @@ import { useCoinCatchGame } from "./useCoinCatchGame";
 import { LeaderboardPanel } from "./LeaderboardPanel";
 import { AudioSetupOverlay } from "./AudioSetupOverlay";
 import { playButtonSound } from "../_services/sfx";
+import type { CoinCatchStatus } from "../_services/api";
 import { Button } from "@/components/ui/button";
 import { GAME_THEME } from "../_constants/theme";
 import { cn } from "@/lib/utils";
 
 interface GameCanvasProps {
   onLeaderboardClick?: () => void;
+  onRealGamePlayed?: () => void;
+  onStatusChange?: () => void;
+  onRealGameFinished?: () => void;
+  onStatusFromSubmit?: (status: CoinCatchStatus) => void;
 }
 
-export function GameCanvas({ onLeaderboardClick }: GameCanvasProps) {
+export function GameCanvas({
+  onLeaderboardClick,
+  onRealGamePlayed,
+  onStatusChange,
+  onRealGameFinished,
+  onStatusFromSubmit,
+}: GameCanvasProps) {
   const {
     containerRef,
     leaderboard,
@@ -25,7 +36,13 @@ export function GameCanvas({ onLeaderboardClick }: GameCanvasProps) {
     handleVolumeChange,
     applyAudioSettings,
     handleShowLeaderboard,
-  } = useCoinCatchGame(onLeaderboardClick);
+  } = useCoinCatchGame(
+    onLeaderboardClick,
+    onRealGamePlayed,
+    onStatusChange,
+    onRealGameFinished,
+    onStatusFromSubmit
+  );
 
   return (
     <div

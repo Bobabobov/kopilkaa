@@ -65,6 +65,7 @@ model User {
   projectNewsReactions ProjectNewsReaction[]
   reviews              Review[]
   gameScores           GameScore[]
+  coinCatchTrial       CoinCatchTrial?
   isBanned             Boolean               @default(false)
   bannedUntil          DateTime?
   bannedReason         String?
@@ -438,6 +439,21 @@ model BugReportLike {
   @@index([userId])
   @@index([bugReportId])
   @@index([isLike])
+}
+
+// Тестовые попытки и бан для игры coin-catch: 3 теста, затем 1 зачётная игра, затем бан на неделю
+model CoinCatchTrial {
+  id                 String    @id @default(cuid())
+  userId             String    @unique
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testAttemptsUsed   Int       @default(0) // 0..3
+  realGamePlayedAt   DateTime? // когда сыграл зачётную игру
+  bannedUntil        DateTime? // после зачётной — нельзя играть до этой даты
+  createdAt          DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([bannedUntil])
 }
 
 // Модель для результатов игр

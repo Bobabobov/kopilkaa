@@ -2,8 +2,6 @@
 
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 interface StoriesHeaderProps {
@@ -15,34 +13,37 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
   return (
     <header className="pt-0 sm:pt-2 pb-6 sm:pb-8" role="banner" aria-label="Заголовок раздела историй">
       <div className="relative mx-auto max-w-4xl px-4 mb-6 sm:mb-8">
-        <div className="relative rounded-2xl border border-[#abd1c6]/15 bg-[#001e1d]/30 backdrop-blur-sm py-8 sm:py-10 px-6 sm:px-10 shadow-[0_0_60px_-20px_rgba(249,188,96,0.08),inset_0_1px_0_rgba(255,255,255,0.03)]">
+        <Card variant="darkGlass" padding="lg" className="relative py-8 sm:py-10 px-6 sm:px-10">
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[#f9bc60]/5 via-transparent to-[#abd1c6]/5 pointer-events-none" aria-hidden />
           <div className="relative text-center">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4">
-              <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl bg-[#004643]/40 border border-[#abd1c6]/20 p-1" aria-hidden>
+              <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl bg-[#004643]/40 border border-white/10 p-1" aria-hidden>
                 <img src="/kopibook.png" alt="" className="w-full h-full object-contain" />
               </div>
               <div>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#fffffe] leading-tight tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.2)]">
                   Истории платформы
                 </h1>
-                <Badge variant="secondary" className="mt-2 gap-1.5 text-[10px] font-semibold">
+                <span
+                  className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-lg"
+                  style={{ background: "rgba(249, 188, 96, 0.15)", color: "#f9bc60" }}
+                >
                   <LucideIcons.BookOpen className="w-3 h-3" />
                   Истории поддержки
-                </Badge>
+                </span>
               </div>
             </div>
-            <p className="mx-auto max-w-2xl text-base sm:text-lg leading-relaxed text-[#abd1c6]/95">
+            <p className="mx-auto max-w-2xl text-base sm:text-lg leading-relaxed text-[#abd1c6]">
               Истории пользователей, получивших{" "}
               <span className="text-[#f9bc60] font-semibold">финансовую поддержку</span> через платформу.
             </p>
           </div>
-        </div>
+        </Card>
       </div>
 
       <div className="container mx-auto px-4 mt-6 max-w-lg">
-        <Separator className="mb-6 max-w-[120px] mx-auto opacity-60" />
-        <Card variant="glass" padding="none" className="overflow-hidden">
+        <div className="mb-6 max-w-[120px] mx-auto h-px bg-white/10" aria-hidden />
+        <Card variant="darkGlass" padding="none" className="overflow-hidden">
           <CardContent className="p-2 sm:p-3">
             <label htmlFor="stories-search" className="sr-only">Поиск историй</label>
             <div className="relative group">

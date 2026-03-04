@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Card, CardContent } from "@/components/ui/Card";
 import { usePageTimeTracking } from "@/hooks/ui/usePageTimeTracking";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -85,24 +86,44 @@ export default function ApplicationsPageClient() {
 
   if (loadingAuth) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="mx-auto max-w-3xl card p-6 text-center"
-      >
-        <div>Проверка авторизации...</div>
-      </motion.div>
+      <div className="min-h-screen relative flex items-center justify-center px-4">
+        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <Card variant="darkGlass" padding="lg" className="max-w-md text-center">
+            <CardContent>
+              <div className="flex items-center justify-center gap-2 text-[#abd1c6]">
+                <LucideIcons.Loader2 className="h-5 w-5 animate-spin text-[#f9bc60]" />
+                <span>Проверка авторизации...</span>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <p className="text-[#abd1c6] text-center">
-          Войдите в аккаунт, чтобы подать заявку. Окно входа должно открыться
-          автоматически.
-        </p>
+      <div className="min-h-screen relative flex items-center justify-center px-4">
+        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+        </div>
+        <Card variant="darkGlass" padding="lg" className="max-w-md text-center">
+          <CardContent>
+            <p className="text-[#abd1c6]">
+              Войдите в аккаунт, чтобы подать заявку. Окно входа должно открыться
+              автоматически.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -110,6 +131,10 @@ export default function ApplicationsPageClient() {
   if (submitted) {
     return (
       <div className="min-h-screen relative overflow-hidden">
+        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+        </div>
         <div className="container-p mx-auto pt-0 sm:pt-1 pb-8 relative z-10">
           <SuccessScreen onNewApplication={() => setSubmitted(false)} />
         </div>
@@ -119,6 +144,10 @@ export default function ApplicationsPageClient() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+      </div>
       <TrustIntroModal
         open={introOpen}
         checked={introChecked}
@@ -166,36 +195,41 @@ export default function ApplicationsPageClient() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="rounded-3xl border border-[#f9bc60]/40 bg-gradient-to-br from-[#f9bc60]/15 via-[#001e1d]/60 to-[#001e1d]/70 backdrop-blur-xl p-6 sm:p-8 text-white shadow-[0_20px_50px_-28px_rgba(249,188,96,0.3)] relative overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-40 h-40 bg-[#f9bc60]/20 blur-3xl rounded-full pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#e16162]/10 blur-2xl rounded-full pointer-events-none" />
-
-                <div className="relative z-10 space-y-4">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#f9bc60] to-[#e16162] flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                <Card variant="darkGlass" padding="lg" className="relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full pointer-events-none" aria-hidden />
+                  <CardContent className="relative flex items-start gap-4 p-0">
+                    <div
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-[#001e1d] flex-shrink-0"
+                      style={{ background: "linear-gradient(135deg, #f9bc60 0%, #e8a545 100%)" }}
+                    >
                       <LucideIcons.MessageCircle size="sm" />
                     </div>
                     <div className="flex-1 space-y-2">
-                      <h2 className="text-xl sm:text-2xl font-semibold text-white">
+                      <h2 className="text-xl sm:text-2xl font-semibold text-[#fffffe]">
                         Необходимо оставить отзыв
                       </h2>
-                      <p className="text-sm sm:text-base text-white/80 leading-relaxed">
+                      <p className="text-sm sm:text-base text-[#abd1c6] leading-relaxed">
                         У вас есть одобренная заявка, но вы ещё не оставили
                         отзыв. Чтобы создать новую заявку, пожалуйста, сначала
                         поделитесь своим опытом на странице отзывов.
                       </p>
                       <Link
                         href="/reviews"
-                        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#f9bc60] to-[#e16162] hover:from-[#f9bc60] hover:to-[#e16162] px-5 py-3 text-sm font-semibold text-[#001e1d] transition-all hover:shadow-xl hover:shadow-[#f9bc60]/30 hover:-translate-y-0.5 active:translate-y-0"
+                        className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all hover:opacity-90"
+                        style={{
+                          background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+                          color: "#001e1d",
+                          boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
+                        }}
                       >
                         <LucideIcons.MessageCircle size="sm" />
                         <span>Перейти к отзывам</span>
                         <LucideIcons.ArrowRight size="xs" />
                       </Link>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               </motion.div>
             ) : (
               <ApplicationsForm

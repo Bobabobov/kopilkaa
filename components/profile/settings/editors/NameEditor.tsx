@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 import type { BaseEditorProps } from "./types";
 
 interface NameEditorProps extends BaseEditorProps {
@@ -46,14 +47,14 @@ export function NameEditor({ currentName, onSave, disabled }: NameEditorProps) {
             disabled={disabled || !value.trim() || value.trim() === currentName}
             className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#10B981] hover:bg-[#059669] disabled:bg-[#6B7280] text-white font-semibold rounded-xl transition-colors"
           >
-            ✓
+            <LucideIcons.Check className="w-4 h-4" />
           </button>
           <button
             onClick={handleCancel}
             disabled={disabled}
             className="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 bg-[#6B7280] hover:bg-[#4B5563] text-white font-semibold rounded-xl transition-colors"
           >
-            ✗
+            <LucideIcons.X className="w-4 h-4" />
           </button>
         </div>
       </div>

@@ -1,8 +1,10 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Heart, ArrowRight } from "lucide-react";
+
 interface Application {
   id: string;
   title: string;
@@ -62,7 +64,7 @@ export default function RecentApplications() {
   }
 
   return (
-    <section className="py-24 px-4" id="recent-applications">
+    <section className="pt-10 pb-24 px-4" id="recent-applications">
       <div className="max-w-6xl mx-auto">
         {/* Заголовок секции */}
         <motion.div
@@ -70,35 +72,46 @@ export default function RecentApplications() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-14"
         >
+          <span
+            className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider mb-4"
+            style={{ color: "#f9bc60", letterSpacing: "0.12em" }}
+          >
+            <Heart className="w-4 h-4" />
+            Реальные истории
+          </span>
           <h2
-            className="text-4xl md:text-5xl font-bold mb-4"
+            className="text-4xl md:text-5xl font-bold mb-3 tracking-tight"
             style={{ color: "#fffffe" }}
           >
             Истории людей
           </h2>
-          <p className="text-xl" style={{ color: "#abd1c6" }}>
+          <p className="text-lg md:text-xl max-w-xl mx-auto" style={{ color: "#abd1c6" }}>
             Люди, которым уже помогли
           </p>
         </motion.div>
 
         {/* Сетка заявок */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {applications.map((app, index) => (
             <motion.div
               key={app.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
             >
               <Link
                 href={`/stories/${app.id}`}
-                className="block bg-white/[0.04] backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-[1.02] h-full"
+                className="group block h-full rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                style={{
+                  background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
+                }}
               >
                 {/* Изображение */}
-                <div className="relative h-48 overflow-hidden bg-gray-800">
+                <div className="relative h-44 sm:h-52 overflow-hidden">
                   <img
                     src={
                       app.images && app.images.length > 0
@@ -107,48 +120,50 @@ export default function RecentApplications() {
                     }
                     alt={app.title}
                     loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     onError={(e) => {
                       e.currentTarget.src = "/stories-preview.jpg";
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <span
+                    className="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-semibold"
+                    style={{ background: "rgba(249, 188, 96, 0.95)", color: "#001e1d" }}
+                  >
+                    Помогли
+                  </span>
                 </div>
 
                 {/* Контент */}
-                <div className="p-6">
-                  {/* Заголовок */}
+                <div className="p-5 sm:p-6">
                   <h3
-                    className="text-xl font-bold mb-2 line-clamp-2"
+                    className="text-lg font-bold mb-2 line-clamp-2 leading-snug transition-colors group-hover:text-[#f9bc60]"
                     style={{ color: "#fffffe" }}
                   >
                     {app.title}
                   </h3>
-
-                  {/* Описание */}
                   <p
-                    className="text-sm mb-4 line-clamp-3"
+                    className="text-sm mb-4 line-clamp-3 leading-relaxed"
                     style={{ color: "#abd1c6" }}
                   >
                     {app.summary}
                   </p>
 
                   {/* Сумма */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl font-bold">
-                      <span style={{ color: "#f9bc60" }}>
-                        {app.amount.toLocaleString("ru-RU")}
-                      </span>
-                      <span style={{ color: "#ffffff", fontWeight: "900" }}>
-                        {" "}
-                        руб
-                      </span>
+                  <div className="inline-flex items-baseline gap-1 rounded-xl px-3 py-1.5 mb-4" style={{ background: "rgba(249, 188, 96, 0.12)" }}>
+                    <span className="text-xl font-bold tabular-nums" style={{ color: "#f9bc60" }}>
+                      {app.amount.toLocaleString("ru-RU")}
+                    </span>
+                    <span className="text-sm font-semibold" style={{ color: "#f9bc60" }}>
+                      руб
                     </span>
                   </div>
 
                   {/* Автор */}
                   <div className="flex items-center gap-3 pt-4 border-t border-white/10">
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
+                    <div
+                      className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-white/10 group-hover:ring-[#f9bc60]/40 transition-all"
+                    >
                       <img
                         src={
                           app.user && app.user.avatar
@@ -164,16 +179,18 @@ export default function RecentApplications() {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap min-w-0">
-                        <p
-                          className="text-sm font-medium truncate min-w-0"
-                          style={{ color: "#fffffe" }}
-                        >
-                          {app.user ? app.user.name || "Аноним" : "Аноним"}
-                        </p>
-                      </div>
-                      <p className="text-xs" style={{ color: "#abd1c6" }}>
-                        {new Date(app.createdAt).toLocaleDateString("ru-RU")}
+                      <p
+                        className="text-sm font-medium truncate"
+                        style={{ color: "#fffffe" }}
+                      >
+                        {app.user ? app.user.name || "Аноним" : "Аноним"}
+                      </p>
+                      <p className="text-xs" style={{ color: "#94a1b2" }}>
+                        {new Date(app.createdAt).toLocaleDateString("ru-RU", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
                       </p>
                     </div>
                   </div>
@@ -185,22 +202,23 @@ export default function RecentApplications() {
 
         {/* Кнопка "Смотреть все" */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
           className="text-center mt-12"
         >
           <Link
             href="/stories"
-            className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold rounded-lg border-2 transition-all duration-300 hover:scale-105"
+            className="inline-flex items-center gap-2 px-8 py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
             style={{
-              borderColor: "#abd1c6",
-              color: "#abd1c6",
+              background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+              color: "#001e1d",
+              boxShadow: "0 8px 32px rgba(249, 188, 96, 0.25)",
             }}
           >
             Смотреть все истории
-            <LucideIcons.ArrowRight size="sm" />
+            <ArrowRight className="w-5 h-5" />
           </Link>
         </motion.div>
       </div>

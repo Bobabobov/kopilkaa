@@ -13,9 +13,9 @@ export function StoriesSummaryBanner({ totalPaid }: StoriesSummaryBannerProps) {
   return (
     <section className="container mx-auto px-4 pb-6 flex justify-center" aria-label={ariaLabel}>
       <Card
-        variant="glass"
+        variant="darkGlass"
         padding="none"
-        className="relative w-full max-w-md overflow-hidden border-[#f9bc60]/30 bg-gradient-to-r from-[#004643]/50 via-[#f9bc60]/15 to-[#abd1c6]/15 shadow-[0_20px_50px_-20px_rgba(249,188,96,0.2)]"
+        className="relative w-full max-w-md overflow-hidden"
       >
         <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#f9bc60]/70 to-transparent" aria-hidden />
         <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-[#f9bc60]/15 blur-2xl pointer-events-none" aria-hidden />

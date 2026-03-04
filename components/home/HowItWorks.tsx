@@ -11,11 +11,11 @@ export default function HowItWorks() {
   const { loading, handleStartClick } = useHowItWorksAuth();
 
   return (
-    <section className="py-24 px-4" id="how-it-works">
+    <section className="py-20 px-4" id="how-it-works">
       <div className="max-w-6xl mx-auto">
         <HowItWorksHeader />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-6">
           {HOW_IT_WORKS_STEPS.map((step, index) => (
             <HowItWorksStepCard
               key={index}

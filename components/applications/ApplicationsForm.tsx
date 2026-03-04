@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import ApplicationsProgress from "@/components/applications/ApplicationsProgress";
 import ApplicationsConsent from "@/components/applications/ApplicationsConsent";
 import FormField from "@/components/ui/FormField";
+import { Card } from "@/components/ui/Card";
 import RichTextEditor from "@/components/applications/RichTextEditor";
 import PhotoUpload from "@/components/applications/PhotoUpload";
 import SubmitSection from "@/components/applications/SubmitSection";
@@ -123,11 +124,11 @@ export function ApplicationsForm(props: Props) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="space-y-6 sm:space-y-8"
     >
-      <form
-        className="grid gap-6"
-        onSubmit={(e) => {
+      <Card variant="darkGlass" padding="lg" className="overflow-hidden">
+        <form
+          className="grid gap-6"
+          onSubmit={(e) => {
           e.preventDefault();
           submit(e);
         }}
@@ -311,7 +312,7 @@ export function ApplicationsForm(props: Props) {
             value={payment}
             onChange={setPayment}
             placeholder="Банковские реквизиты, номер карты или другие способы получения средств"
-            hint={`⚠️ Переводы на карты Visa/Mastercard недоступны — используйте МИР/СБП/счёт. Реквизиты для перевода средств (минимум ${limits.paymentMin}, максимум ${limits.paymentMax} символов).`}
+            hint={`Переводы на карты Visa/Mastercard недоступны — используйте МИР/СБП/счёт. Реквизиты для перевода средств (минимум ${limits.paymentMin}, максимум ${limits.paymentMax} символов).`}
             minLength={limits.paymentMin}
             maxLength={limits.paymentMax}
             compact={true}
@@ -367,6 +368,7 @@ export function ApplicationsForm(props: Props) {
           }}
         />
       </form>
+      </Card>
     </motion.div>
   );
 }

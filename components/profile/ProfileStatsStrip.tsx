@@ -46,7 +46,7 @@ export function ProfileStatsStrip({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="flex flex-wrap items-center gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border border-[#abd1c6]/25 bg-[#004643]/50 backdrop-blur-sm shadow-[0_4px_24px_-8px_rgba(0,30,29,0.4)]"
+      className="flex flex-wrap items-center gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border border-white/[0.08] bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
       role="region"
       aria-label="Краткая статистика профиля"
     >

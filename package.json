@@ -15,7 +15,9 @@
     "test": "vitest",
     "test:run": "vitest run",
     "prisma:generate": "prisma generate",
-    "prisma:generate:winfix": "taskkill /IM node.exe /F >NUL 2>NUL || exit /b 0 && prisma generate"
+    "prisma:generate:winfix": "taskkill /IM node.exe /F >NUL 2>NUL || exit /b 0 && prisma generate",
+    "prisma:create-coin-catch-trial": "prisma db execute --schema prisma/schema.prisma --file prisma/scripts/create-coin-catch-trial.sql",
+    "prisma:reset-coin-catch-trials": "prisma db execute --schema prisma/schema.prisma --file prisma/scripts/reset-coin-catch-trials.sql"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",

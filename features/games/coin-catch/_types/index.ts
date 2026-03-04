@@ -1,4 +1,4 @@
-// Типы для игры "Монеткосбор 90-х"
+// Типы для игры "Монетка"
 
 export interface GameState {
   score: number;

@@ -1,5 +1,7 @@
 "use client";
 
+import { LucideIcons } from "@/components/ui/LucideIcons";
+
 export default function FooterCopyright() {
   return (
     <div
@@ -28,10 +30,10 @@ export default function FooterCopyright() {
             Сделано с
           </span>
           <span
-            className="text-base animate-pulse transition-transform duration-300 group-hover:scale-125"
+            className="inline-flex text-base animate-pulse transition-transform duration-300 group-hover:scale-125"
             style={{ color: "#f9bc60", animationDuration: "1.5s" }}
           >
-            ❤️
+            <LucideIcons.Heart className="w-4 h-4" />
           </span>
           <span className="transition-colors duration-300 group-hover:text-[#fffffe]">
             для помощи людям

@@ -1,19 +1,20 @@
 // components/heroes/HeroesLoading.tsx
 "use client";
 import { motion } from "framer-motion";
+import { Card } from "@/components/ui/Card";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function HeroesLoading() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 pt-10 sm:pt-12 md:pt-14 pb-16">
       <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10 md:space-y-12">
-        {/* Hero skeleton */}
-        <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5/60 backdrop-blur-xl p-6 sm:p-8 md:p-10 shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
+        <Card variant="darkGlass" padding="lg" className="overflow-hidden">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="text-5xl mb-6"
+            className="mb-6 flex justify-center"
           >
-            ⭐
+            <LucideIcons.Star className="w-12 h-12 text-[#f9bc60]" />
           </motion.div>
           <div className="animate-pulse space-y-4">
             <div className="h-10 sm:h-12 w-[70%] rounded-2xl bg-white/10" />
@@ -24,10 +25,9 @@ export default function HeroesLoading() {
               <div className="h-11 w-40 rounded-full bg-white/10" />
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Stats skeleton */}
-        <div className="rounded-[28px] border border-white/10 bg-white/5/60 backdrop-blur-xl p-6 sm:p-7 shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
+        <Card variant="darkGlass" padding="lg">
           <div className="animate-pulse">
             <div className="h-7 w-44 rounded-xl bg-white/10 mb-5" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
@@ -42,10 +42,9 @@ export default function HeroesLoading() {
               ))}
             </div>
           </div>
-        </div>
+        </Card>
 
-        {/* Grid skeleton */}
-        <div className="rounded-[28px] border border-white/10 bg-white/5/60 backdrop-blur-xl p-6 sm:p-7 shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
+        <Card variant="darkGlass" padding="lg">
           <div className="animate-pulse space-y-5">
             <div className="h-12 rounded-2xl bg-white/8" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
@@ -70,7 +69,7 @@ export default function HeroesLoading() {
               ))}
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

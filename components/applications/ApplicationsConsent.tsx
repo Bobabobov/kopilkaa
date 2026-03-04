@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -41,19 +42,16 @@ export function ApplicationsConsent({
   const allTrustAcked = trustAck1 && trustAck2 && trustAck3;
 
   return (
-    <div
-      className={cn(
-        "rounded-2xl border shadow-lg overflow-hidden",
-        "bg-gradient-to-b from-[#0d2e28] via-[#0b2a24] to-[#082420]",
-        ackError
-          ? "border-[#e16162]/60 ring-2 ring-[#e16162]/25"
-          : "border-[#2c4f45]/70",
-      )}
+    <Card
+      variant="darkGlass"
+      padding="none"
+      className={cn("overflow-hidden", ackError && "border-[#e16162]/40 ring-2 ring-[#e16162]/20")}
     >
       {/* Заголовок блока */}
       <div className="flex items-center gap-3 px-5 sm:px-6 pt-5 sm:pt-6 pb-2">
         <span
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f9bc60]/20 text-[#f9bc60] shadow-inner"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[#f9bc60]"
+          style={{ background: "rgba(249, 188, 96, 0.15)" }}
           aria-hidden
         >
           <svg
@@ -70,19 +68,19 @@ export function ApplicationsConsent({
             />
           </svg>
         </span>
-        <span className="text-sm font-bold uppercase tracking-widest text-[#abd1c6]">
+        <span className="text-sm font-bold uppercase tracking-widest text-[#94a1b2]">
           Перед отправкой заявки
         </span>
       </div>
 
-      <div className="space-y-5 px-5 sm:px-6 pb-5 sm:pb-6">
+      <CardContent className="space-y-5 px-5 sm:px-6 pb-5 sm:pb-6 pt-0">
         {/* Блок 1: три чекбокса про уровень доверия */}
         <div
           className={cn(
-            "rounded-xl border p-5 transition-all duration-300 space-y-4 shadow-inner",
-            allTrustAcked
-              ? "border-[#f9bc60]/50 bg-[#f9bc60]/8"
-              : "border-[#2c4f45]/60 bg-[#001e1d]/40",
+            "rounded-2xl border p-5 transition-all duration-300 space-y-4",
+            "border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.15)]",
+            "bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)]",
+            allTrustAcked && "border-[#f9bc60]/30",
           )}
         >
           <p className="text-base sm:text-lg font-bold text-[#fffffe] pb-0.5">
@@ -139,10 +137,10 @@ export function ApplicationsConsent({
         {/* Блок 2: согласие с документами */}
         <div
           className={cn(
-            "rounded-xl border p-5 transition-all duration-300 shadow-inner",
-            policiesAccepted
-              ? "border-[#f9bc60]/50 bg-[#f9bc60]/8"
-              : "border-[#2c4f45]/60 bg-[#001e1d]/40",
+            "rounded-2xl border p-5 transition-all duration-300",
+            "border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.15)]",
+            "bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)]",
+            policiesAccepted && "border-[#f9bc60]/30",
           )}
         >
           <label className="flex cursor-pointer select-none items-start gap-3 py-1">
@@ -174,8 +172,8 @@ export function ApplicationsConsent({
             </span>
           </label>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 

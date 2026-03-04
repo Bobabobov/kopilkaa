@@ -47,9 +47,10 @@ export function PreSupportModal({ onClose, children }: PreSupportModalProps) {
                 </div>
                 <h3
                   id="pre-support-title"
-                  className="mt-3 text-xl sm:text-2xl font-black text-[#fffffe] leading-tight"
+                  className="mt-3 text-xl sm:text-2xl font-black text-[#fffffe] leading-tight inline-flex items-center gap-2"
                 >
-                  💚 Поддержать «Копилку»
+                  <LucideIcons.Heart className="text-[#f9bc60] flex-shrink-0" size="lg" />
+                  Поддержать «Копилку»
                 </h3>
                 <p
                   id="pre-support-desc"

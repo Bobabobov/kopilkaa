@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Card } from "@/components/ui/Card";
 import { StoryLightbox } from "@/components/stories/StoryLightbox";
 import type { ReviewItem } from "@/hooks/reviews/useReviews";
 import { ReviewHero } from "./ReviewHero";
@@ -42,18 +43,18 @@ export default function ReviewDetailClient({
   if (initialError) {
     return (
       <main className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
-        <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-white/80 shadow-2xl backdrop-blur-lg">
-          Отзыв не найден
-        </div>
+        <Card variant="darkGlass" padding="lg" className="max-w-md text-center">
+          <p className="text-[#abd1c6]">Отзыв не найден</p>
+        </Card>
       </main>
     );
   }
 
   if (!review) {
     return (
-      <main className="flex min-h-screen items-center justify-center px-4 py-10 text-[#abd1c6] sm:px-6 lg:px-10">
-        <div className="flex items-center gap-2 text-sm">
-          <LucideIcons.Loader2 className="h-5 w-5 animate-spin" />
+      <main className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
+        <div className="flex items-center gap-2 text-sm text-[#abd1c6]">
+          <LucideIcons.Loader2 className="h-5 w-5 animate-spin text-[#f9bc60]" />
           Загружаем отзыв...
         </div>
       </main>
@@ -65,20 +66,23 @@ export default function ReviewDetailClient({
   return (
     <main className="min-h-screen overflow-x-hidden px-3 py-4 xs:px-4 sm:px-6 sm:py-6 md:py-8 lg:px-10">
       <div className="mx-auto max-w-6xl w-full space-y-3 sm:space-y-4 md:space-y-5">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-white/80 transition-colors hover:border-white/30 hover:bg-white/10 hover:text-white sm:px-3 sm:py-2 sm:text-sm"
-        >
-          <LucideIcons.ArrowLeft size="sm" />
-          <span className="hidden xs:inline">Назад к отзывам</span>
-          <span className="xs:hidden">Назад</span>
-        </button>
+        <Card variant="darkGlass" padding="sm" className="inline-block">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 rounded-lg text-xs text-[#abd1c6] transition-colors hover:text-[#f9bc60] sm:text-sm"
+          >
+            <LucideIcons.ArrowLeft size="sm" />
+            <span className="hidden xs:inline">Назад к отзывам</span>
+            <span className="xs:hidden">Назад</span>
+          </button>
+        </Card>
 
-        <article className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.85)] backdrop-blur-2xl sm:rounded-3xl">
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute -left-20 top-10 h-40 w-40 bg-[#f9bc60]/15 blur-3xl sm:h-60 sm:w-60" />
-            <div className="absolute -bottom-16 right-0 h-48 w-48 bg-[#abd1c6]/20 blur-3xl sm:h-72 sm:w-72" />
+        <article className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl">
+          <Card variant="darkGlass" padding="none" className="overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden" aria-hidden>
+            <div className="absolute -left-20 top-10 h-40 w-40 bg-[#f9bc60]/10 blur-3xl sm:h-60 sm:w-60" />
+            <div className="absolute -bottom-16 right-0 h-48 w-48 bg-[#abd1c6]/15 blur-3xl sm:h-72 sm:w-72" />
           </div>
 
           <ReviewHero
@@ -107,6 +111,7 @@ export default function ReviewDetailClient({
               youtubeLink={user?.youtubeLink}
             />
           </div>
+          </Card>
         </article>
       </div>
 

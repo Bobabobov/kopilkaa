@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 import { AdFormatData } from "./adFormatsData";
 
 interface AdFormatCardProps {
@@ -41,7 +42,7 @@ export function AdFormatCard({ format, index }: AdFormatCardProps) {
             {/* Размер контейнера */}
             <div className="p-3 sm:p-4 md:p-5 bg-[#004643]/30 rounded-xl sm:rounded-2xl border border-[#abd1c6]/5 hover:border-[#f9bc60]/20 transition-colors">
               <h4 className="text-sm sm:text-base font-semibold text-[#f9bc60] mb-2 sm:mb-3 flex items-center gap-2">
-                <span className="text-base sm:text-lg">📐</span>
+                <LucideIcons.Ruler className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-[#f9bc60]" />
                 <span className="break-words">
                   {format.containerSize.title}
                 </span>
@@ -61,7 +62,7 @@ export function AdFormatCard({ format, index }: AdFormatCardProps) {
             {/* Изображения */}
             <div className="p-3 sm:p-4 md:p-5 bg-[#004643]/30 rounded-xl sm:rounded-2xl border border-[#abd1c6]/5 hover:border-[#f9bc60]/20 transition-colors">
               <h4 className="text-sm sm:text-base font-semibold text-[#f9bc60] mb-2 sm:mb-3 flex items-center gap-2">
-                <span className="text-base sm:text-lg">🖼️</span>
+                <LucideIcons.Image className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-[#f9bc60]" />
                 <span className="break-words">{format.images.title}</span>
               </h4>
               <ul className="space-y-1.5 sm:space-y-2 text-[#abd1c6] text-xs sm:text-sm">
@@ -80,7 +81,7 @@ export function AdFormatCard({ format, index }: AdFormatCardProps) {
           {/* Примечание */}
           <div className="p-3 sm:p-4 bg-[#f9bc60]/5 border border-[#f9bc60]/20 rounded-lg sm:rounded-xl">
             <p className="text-xs sm:text-sm text-[#abd1c6] leading-relaxed break-words">
-              <strong className="text-[#f9bc60]">💡</strong> {format.note}
+              <LucideIcons.Lightbulb className="inline-block w-4 h-4 align-middle text-[#f9bc60] mr-1" /> {format.note}
             </p>
           </div>
         </div>

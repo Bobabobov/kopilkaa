@@ -24,7 +24,11 @@ export function AdRequestSubmitButton({
         whileHover={{ scale: 1.02, y: -2 }}
         whileTap={{ scale: 0.98 }}
         disabled={isSubmitting || isUploading}
-        className="relative w-full bg-gradient-to-r from-[#f9bc60] to-[#e8a545] text-[#001e1d] py-6 text-xl font-bold rounded-xl shadow-lg shadow-[#f9bc60]/30 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group transition-all duration-300"
+        className="relative w-full text-[#001e1d] py-6 text-xl font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group transition-all duration-300 hover:opacity-90"
+        style={{
+          background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+          boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
+        }}
       >
         <div
           className="absolute inset-0 bg-gradient-to-r from-[#f9bc60] via-[#fff] to-[#f9bc60] opacity-0 group-hover:opacity-20 transition-opacity duration-500"

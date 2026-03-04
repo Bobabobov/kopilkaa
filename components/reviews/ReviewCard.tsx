@@ -70,14 +70,17 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       whileHover={{ y: -4 }}
-      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-[#fdfbf7] to-[#f5f1ea] shadow-[0_20px_45px_-18px_rgba(0,0,0,0.35)] border border-[#e7ede9] hover:shadow-[0_28px_60px_-20px_rgba(0,0,0,0.4)] transition-all duration-300 group"
+      className="relative overflow-hidden rounded-2xl border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-all duration-300 group hover:border-white/15 hover:shadow-lg hover:shadow-black/20"
+      style={{
+        background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+      }}
     >
       <Link
         href={href}
-        className="block focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/70 rounded-3xl"
+        className="block focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/70 rounded-2xl"
       >
         {/* Cover image or avatar */}
-        <div className="relative h-48 w-full overflow-hidden rounded-t-3xl">
+        <div className="relative h-48 w-full overflow-hidden rounded-t-2xl">
           <img
             src={review.images?.[0]?.url || "/stories-preview.jpg"}
             alt={review.content.slice(0, 40)}
@@ -156,14 +159,17 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
 
         {/* Body */}
         <div className="p-5 sm:p-6 space-y-4">
-          <div className="flex flex-wrap items-center gap-2 text-xs text-[#4f615a]">
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#f9bc60]/15 border border-[#f9bc60]/40 px-2.5 py-1 text-[#8a5b00] font-semibold">
-              <LucideIcons.Shield size="xs" className="text-[#d88a0d]" />
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <div
+              className="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 font-semibold"
+              style={{ background: "rgba(249, 188, 96, 0.15)", color: "#f9bc60" }}
+            >
+              <LucideIcons.Shield size="xs" />
               {trustTitle}
             </div>
           </div>
 
-          <p className="text-base leading-relaxed text-[#0f2d25] whitespace-pre-line line-clamp-3 group-hover:text-[#001e1d] transition-colors duration-200">
+          <p className="text-base leading-relaxed text-[#abd1c6] whitespace-pre-line line-clamp-3 group-hover:text-[#fffffe] transition-colors duration-200">
             {review.content}
           </p>
 
@@ -172,7 +178,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
               {review.images.slice(0, 2).map((img) => (
                 <div
                   key={img.url}
-                  className="relative overflow-hidden rounded-2xl border border-[#e7ede9] group/image"
+                  className="relative overflow-hidden rounded-xl border border-white/10 group/image"
                 >
                   <img
                     src={img.url}
@@ -188,7 +194,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
           )}
 
           {(user.vkLink || user.telegramLink || user.youtubeLink) && (
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-[#eef3f0]">
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
               {user.vkLink && (
                 <SocialChip href={user.vkLink} label="VK" color="#4c75a3">
                   <VKIcon className="w-4 h-4" />
@@ -215,9 +221,9 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
             </div>
           )}
 
-          <div className="pt-1 border-t border-[#eef3f0]">
-            <div className="flex items-center gap-2 text-xs text-[#4f615a]">
-              <LucideIcons.Clock size="xs" className="text-[#e68b2e]" />
+          <div className="pt-1 border-t border-white/10">
+            <div className="flex items-center gap-2 text-xs text-[#94a1b2]">
+              <LucideIcons.Clock size="xs" className="text-[#f9bc60]" />
               <span>
                 {new Date(review.createdAt).toLocaleDateString("ru-RU", {
                   day: "2-digit",

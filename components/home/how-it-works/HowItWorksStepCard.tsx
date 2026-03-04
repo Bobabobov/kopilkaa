@@ -1,8 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LucideIcons } from "@/components/ui/LucideIcons";
+import { User, FileText, Clock, Banknote } from "lucide-react";
 import type { HowItWorksStep } from "./config";
+
+const STEP_ICONS = {
+  User,
+  FileText,
+  Clock,
+  DollarSign: Banknote,
+} as const;
 
 interface HowItWorksStepCardProps {
   step: HowItWorksStep;
@@ -15,79 +22,65 @@ export function HowItWorksStepCard({
   index,
   steps,
 }: HowItWorksStepCardProps) {
-  const Icon = LucideIcons[step.icon as keyof typeof LucideIcons];
+  const Icon = STEP_ICONS[step.icon as keyof typeof STEP_ICONS];
   const nextStep = steps[index + 1];
+  const accent = "#f9bc60";
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="relative"
+      transition={{ duration: 0.5, delay: index * 0.08 }}
+      className="relative h-full"
     >
       {index < steps.length - 1 && nextStep && (
         <div
-          className="hidden lg:block absolute top-12 left-full w-full h-0.5 -z-10"
+          className="hidden lg:block absolute top-14 left-full w-full h-0.5 -z-10"
           style={{
-            background: `linear-gradient(to right, ${step.color}, ${nextStep.color})`,
-            opacity: 0.3,
+            background: "linear-gradient(to right, rgba(249,188,96,0.35), transparent)",
           }}
         />
       )}
 
-      <div className="relative bg-white/[0.04] backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-[1.02] h-full group overflow-hidden">
+      <div
+        className="relative h-full rounded-2xl p-6 sm:p-7 overflow-hidden transition-all duration-300 hover:scale-[1.02] group"
+        style={{
+          background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
+        }}
+      >
         <div
-          className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity"
-          style={{ backgroundColor: step.color }}
+          className="absolute top-0 right-0 w-28 h-28 rounded-full blur-2xl opacity-25 group-hover:opacity-40 transition-opacity"
+          style={{ backgroundColor: accent }}
         />
 
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex flex-col items-start gap-2">
+        <div className="relative flex items-start gap-4 mb-5">
+          <span
+            className="flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0 transition-colors"
+            style={{
+              background: "rgba(249, 188, 96, 0.15)",
+              color: accent,
+            }}
+          >
+            {Icon ? <Icon className="w-6 h-6" /> : null}
+          </span>
+          <div className="min-w-0">
             <span
-              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border"
-              style={{
-                backgroundColor: `${step.color}20`,
-                borderColor: `${step.color}55`,
-                color: step.color,
-              }}
+              className="inline-block text-xs font-bold uppercase tracking-wider mb-1"
+              style={{ color: accent }}
             >
               Шаг {index + 1}
             </span>
-            <div
-              className="text-5xl font-black leading-none"
-              style={{
-                color: step.color,
-                textShadow: `0 0 20px ${step.color}40`,
-              }}
-            >
-              {index + 1}
-            </div>
-          </div>
-
-          <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
-            style={{
-              backgroundColor: `${step.color}30`,
-              boxShadow: `0 4px 20px ${step.color}20`,
-            }}
-          >
-            {Icon && (
-              <div style={{ color: step.color }}>
-                <Icon size="lg" />
-              </div>
-            )}
+            <h3 className="text-lg font-bold leading-tight" style={{ color: "#fffffe" }}>
+              {step.title}
+            </h3>
           </div>
         </div>
 
-        <h3 className="text-xl font-bold mb-2" style={{ color: "#fffffe" }}>
-          {step.title}
-        </h3>
-
-        <p className="text-lg font-semibold mb-2" style={{ color: step.color }}>
+        <p className="text-sm font-semibold mb-2" style={{ color: accent }}>
           {step.description}
         </p>
-
         <p className="text-sm leading-relaxed" style={{ color: "#abd1c6" }}>
           {step.details}
         </p>

@@ -43,7 +43,12 @@ export function SupportDalinkCard({
                 e.preventDefault();
                 onOpenPreSupport();
               }}
-              className="inline-flex items-center justify-center gap-2 mt-4 px-6 py-3 rounded-full bg-[#f9bc60] text-[#001e1d] font-semibold hover:bg-[#e8a545] transition-all duration-200 hover:scale-[1.02] shadow-lg"
+              className="inline-flex items-center justify-center gap-2 mt-4 px-6 py-3 rounded-xl font-semibold transition-all hover:opacity-90"
+              style={{
+                background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+                color: "#001e1d",
+                boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
+              }}
             >
               <LucideIcons.Heart className="w-5 h-5" />
               <span>Поддержать</span>

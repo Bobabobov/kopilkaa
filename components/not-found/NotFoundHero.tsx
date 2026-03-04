@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function NotFoundHero() {
   const [imageError, setImageError] = useState(false);
@@ -46,9 +47,9 @@ export default function NotFoundHero() {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="text-9xl sm:text-[12rem] md:text-[14rem] mb-4"
+                className="mb-4 flex justify-center"
               >
-                🐷
+                <LucideIcons.Help className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 text-[#f9bc60]" />
               </motion.div>
               <div className="text-7xl sm:text-8xl md:text-9xl font-black text-[#f9bc60] mb-2">
                 404

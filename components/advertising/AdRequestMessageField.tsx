@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 import { getAdRequestInputClassName } from "./adRequestValidation";
 import type { AdRequestFormData } from "./adRequestValidation";
 
@@ -52,7 +53,7 @@ export function AdRequestMessageField({
           animate={{ opacity: 1, y: 0 }}
           className="text-red-400 text-sm mt-3 flex items-center gap-2"
         >
-          <span>⚠</span> {errors.message}
+          <LucideIcons.AlertTriangle className="w-4 h-4 flex-shrink-0" /> {errors.message}
         </motion.p>
       )}
       {!errors.message && formData.message.length > 400 && (
@@ -61,7 +62,7 @@ export function AdRequestMessageField({
           animate={{ opacity: 1, y: 0 }}
           className="text-red-400 text-sm mt-3 flex items-center gap-2"
         >
-          <span>⚠</span> Превышено максимальное количество символов (400)
+          <LucideIcons.AlertTriangle className="w-4 h-4 flex-shrink-0" /> Превышено максимальное количество символов (400)
         </motion.p>
       )}
     </motion.div>

@@ -16,7 +16,6 @@ import {
 } from "./ProfileDynamicImports";
 import { ProfileStatsStrip } from "./ProfileStatsStrip";
 import { ProfileSectionTitle } from "./ProfileSectionTitle";
-import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/Card";
 
 interface ProfileLayoutProps {
@@ -64,12 +63,16 @@ export default function ProfileLayout({
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: { staggerChildren: 0.06 },
+      transition: { staggerChildren: 0.08, delayChildren: 0.05 },
     },
   };
   const item = {
-    hidden: { opacity: 0, y: 12 },
-    show: { opacity: 1, y: 0 },
+    hidden: { opacity: 0, y: 20 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+    },
   };
 
   return (
@@ -98,7 +101,7 @@ export default function ProfileLayout({
             joinedAt={user.createdAt}
           />
 
-          <Separator className="my-2 sm:my-4" />
+          <div className="my-4 sm:my-5 h-px bg-white/10" aria-hidden />
 
           <main
             className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-5 sm:gap-6 lg:gap-7"
@@ -119,7 +122,7 @@ export default function ProfileLayout({
               >
                 <motion.div variants={item} className="space-y-2">
                   <ProfileSectionTitle icon="Lightbulb" title="Мотивация" />
-                  <Card variant="glass" padding="lg" hoverable>
+                  <Card variant="darkGlass" padding="lg" hoverable>
                     <MotivationalCard />
                   </Card>
                 </motion.div>

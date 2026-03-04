@@ -28,7 +28,7 @@ export async function GET() {
       orderBy: {
         score: "desc",
       },
-      take: 20,
+      take: 10,
       select: {
         userId: true,
         displayName: true,

@@ -26,7 +26,7 @@ export function FriendActions({
     return (
       <div className="flex flex-wrap items-center gap-2">
         <span className="inline-flex items-center justify-center gap-2 rounded-lg bg-white/10 border border-white/20 px-4 py-2 text-sm font-medium text-white">
-          ✓ Друзья
+          <LucideIcons.Check className="w-4 h-4 mr-1" /> Друзья
         </span>
         {onRemoveFriend && (
           <button

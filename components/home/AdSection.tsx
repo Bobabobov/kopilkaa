@@ -1,6 +1,7 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Megaphone } from "lucide-react";
 
 interface Advertisement {
   id: string;
@@ -72,8 +73,8 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
     return (
       <div className="xl:order-4 order-4">
         <div className="rounded-3xl border border-[#abd1c6]/25 bg-[#001e1d]/60 px-5 py-5 shadow-xl shadow-black/30 flex flex-col items-center justify-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-[#f9bc60] flex items-center justify-center text-sm text-[#001e1d] shadow-md shadow-[#f9bc60]/50">
-            <LucideIcons.Megaphone size="sm" />
+          <div className="w-11 h-11 rounded-2xl bg-[#f9bc60] flex items-center justify-center text-[#001e1d]">
+            <Megaphone className="w-5 h-5" />
           </div>
           <p className="text-sm text-[#abd1c6]">Загружаем рекламный блок…</p>
         </div>
@@ -186,6 +187,11 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
     }
   };
 
+  const cardStyle = {
+    background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+    boxShadow: "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
+  };
+
   return (
     <div className="w-full">
       <div
@@ -193,75 +199,68 @@ export default function AdSection({ variant = "sidebar" }: AdSectionProps) {
         onClick={displayAd.linkUrl ? handleBlockClick : undefined}
       >
         <div
-          className={`relative rounded-3xl border border-[#abd1c6]/30 bg-[#001e1d]/90 shadow-2xl shadow-black/40 overflow-hidden transition-all duration-300 ${
+          className={`relative rounded-2xl overflow-hidden transition-all duration-300 ${
             displayAd.linkUrl
-              ? "cursor-pointer hover:border-[#f9bc60]/50 hover:shadow-[#f9bc60]/20"
+              ? "hover:shadow-[0 8px 32px rgba(0,0,0,0.25)]"
               : ""
           }`}
-          style={{ height: "260px" }}
+          style={{
+            ...cardStyle,
+            height: "260px",
+          }}
         >
-          {/* Фон: картинка на весь блок (ДЕСКТОПНАЯ версия - только imageUrl) */}
           {desktopImageUrl && (
             <img
               src={desktopImageUrl}
               alt={desktopTitle}
-              className="absolute inset-0 w-full h-full object-contain object-center"
-              style={{ objectFit: "contain" }}
+              className="absolute inset-0 w-full h-full object-cover opacity-40"
               loading="lazy"
               decoding="async"
             />
           )}
+          {desktopImageUrl && (
+            <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
+          )}
 
-          {/* Лёгкий градиент поверх фона, чтобы текст читался, но картинка не была сильно затемнена */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
-
-          {/* Метка «Реклама» в левом верхнем углу */}
-          <div className="absolute top-3 left-4 z-20">
-            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#004643]/90 border border-[#0b3b33]/80 text-[10px] text-[#abd1c6]/90 uppercase tracking-[0.12em]">
-              <LucideIcons.Megaphone size="xs" />
-              <span>Реклама</span>
+          <div className="relative z-10 h-full p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <span
+                className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wider"
+                style={{ background: "rgba(249, 188, 96, 0.15)", color: "#f9bc60" }}
+              >
+                <Megaphone className="w-3.5 h-3.5" />
+                Реклама
+              </span>
+              <div className="min-w-0">
+                {desktopTitle && (
+                  <h3 className="text-base font-semibold text-[#fffffe] mb-0.5 line-clamp-2">
+                    {desktopTitle}
+                  </h3>
+                )}
+                <p className="text-sm text-[#abd1c6] leading-snug line-clamp-2 max-w-xl">
+                  {desktopContent}
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Контент поверх баннера */}
-          <div className="relative z-10 h-full flex flex-col md:flex-row items-center justify-between gap-4 px-5 md:px-8">
-            {/* Слева: текст (ДЕСКТОПНАЯ версия) */}
-            <div className="flex-1 text-left">
-              <h3 className="text-base md:text-lg font-semibold text-[#fffffe] mb-1 line-clamp-2">
-                {desktopTitle}
-              </h3>
-              <p className="text-xs md:text-sm text-[#abd1c6] leading-snug line-clamp-2 md:line-clamp-3 max-w-2xl">
-                {desktopContent}
-              </p>
-            </div>
-
-            {/* Справа: кнопка */}
-            <div className="flex flex-col items-stretch md:items-end gap-2 text-right">
+            <div className="flex flex-col sm:items-end gap-3">
               <div
-                className={`inline-flex items-center justify-center rounded-lg px-5 py-2 text-xs md:text-sm font-semibold transition-colors ${
+                className={`inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition-all ${
                   displayAd.linkUrl
-                    ? "bg-[#f9bc60] text-[#001e1d]"
-                    : "bg-transparent text-[#abd1c6]/80 border border-[#abd1c6]/60"
+                    ? "bg-[#f9bc60] text-[#001e1d] hover:opacity-90"
+                    : "border-2 border-[#f9bc60]/50 text-[#f9bc60] hover:bg-[#f9bc60]/10"
                 }`}
               >
                 {displayAd.linkUrl
                   ? "Перейти"
                   : "Скоро здесь может быть ваша реклама"}
               </div>
-            </div>
-
-            {/* Контакт в правом нижнем углу */}
-            <div
-              className="absolute right-5 bottom-3 text-[11px] text-[#abd1c6]/85"
-              onClick={(e) => e.stopPropagation()}
-            >
-              Написать:{" "}
               <a
                 href="mailto:support@kopilka-online.ru"
-                className="underline hover:text-[#f9bc60] transition-colors"
+                className="text-xs text-[#abd1c6] hover:text-[#f9bc60] transition-colors underline underline-offset-2"
                 onClick={(e) => e.stopPropagation()}
               >
-                support@kopilka-online.ru
+                Написать: support@kopilka-online.ru
               </a>
             </div>
           </div>

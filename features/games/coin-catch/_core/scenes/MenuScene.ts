@@ -24,7 +24,7 @@ export class MenuScene {
 
   private getScale(width: number, height: number): number {
     const minSide = Math.min(width, height);
-    return Math.max(0.6, Math.min(2.5, minSide / 400));
+    return Math.max(0.5, Math.min(2.5, minSide / 380));
   }
 
   private buildUI(width: number, height: number): void {
@@ -35,226 +35,208 @@ export class MenuScene {
     this.uiRoot = new PIXI.Container();
 
     const scale = this.getScale(width, height);
-    const pad = Math.max(8, Math.floor(12 * scale));
-    const radius = Math.max(5, Math.floor(8 * scale));
+    const isSmall = Math.min(width, height) < 420;
 
-    const pixelFont = "'Press Start 2P', monospace";
-    const titleSize = Math.max(14, Math.min(22, Math.floor(18 * scale)));
-    const subtitleSize = Math.max(10, Math.min(14, Math.floor(12 * scale)));
-    const descSize = Math.max(10, Math.min(14, Math.floor(12 * scale)));
-    const buttonFontSize = Math.max(10, Math.min(14, Math.floor(12 * scale)));
+    const FONT = "'Press Start 2P', monospace";
+    const PAD = Math.max(20, Math.floor(24 * scale));
+    const R = Math.max(10, Math.floor(14 * scale));
+    const SPACE_S = Math.floor(6 * scale);
+    const SPACE_M = Math.floor(12 * scale);
+    const SPACE_L = Math.floor(20 * scale);
 
     const content = new PIXI.Container();
     let y = 0;
 
+    const coinSize = Math.max(36, Math.min(56, Math.floor(46 * scale)));
+    const coinBox = new PIXI.Container();
+    coinBox.x = 0;
+    coinBox.y = y;
+
+    let coinTexture: PIXI.Texture | undefined;
+    try {
+      coinTexture = PIXI.Assets.get("/coin/co/1.png") ?? PIXI.Texture.from("/coin/co/1.png");
+    } catch {
+      coinTexture = undefined;
+    }
+    const tw = Number(coinTexture?.width) || coinSize;
+    const th = Number(coinTexture?.height) || coinSize;
+    const w = tw > 0 ? tw : coinSize;
+    const h = th > 0 ? th : coinSize;
+
+    if (coinTexture && w > 0 && h > 0) {
+      const coin = new PIXI.Sprite(coinTexture);
+      coin.anchor.set(0.5, 0);
+      const s = Math.min(coinSize / w, coinSize / h, 2);
+      coin.scale.set(s);
+      coinBox.addChild(coin);
+    } else {
+      const coin = new PIXI.Graphics();
+      coin.circle(0, coinSize / 2, coinSize / 2);
+      coin.fill({ color: 0xf9bc60, alpha: 1 });
+      coin.stroke({ width: 2, color: 0xe8a545 });
+      const inner = new PIXI.Graphics();
+      inner.circle(0, coinSize / 2, coinSize / 6);
+      inner.fill({ color: 0x0c1f1e, alpha: 0.6 });
+      coin.addChild(inner);
+      coinBox.addChild(coin);
+    }
+
+    content.addChild(coinBox);
+    y += coinSize + SPACE_M;
+
+    const titleSize = Math.max(12, Math.min(20, Math.floor(16 * scale)));
     const title = new PIXI.Text({
-      text: "Монеткосбор 90-х",
+      text: "Монетка",
       style: {
-        fontFamily: pixelFont,
+        fontFamily: FONT,
         fontSize: titleSize,
-        fill: 0xfffffe,
+        fill: 0xffffff,
         align: "center",
-        dropShadow: { color: 0x001e1d, blur: 3, distance: 2, alpha: 0.9 },
-        stroke: { color: 0xf9bc60, width: 1 },
+        dropShadow: { color: 0x001e1d, blur: 2, distance: 0, alpha: 0.8 },
       },
     });
     title.anchor.set(0.5, 0);
     title.x = 0;
     title.y = y;
     content.addChild(title);
-    y += title.height + Math.floor(6 * scale);
+    y += title.height + SPACE_S;
 
-    const subtitle = new PIXI.Text({
+    const metaSize = Math.max(8, Math.min(12, Math.floor(10 * scale)));
+    const stats = new PIXI.Text({
       text: "30 СЕК • 3 ЖИЗНИ",
       style: {
-        fontFamily: pixelFont,
-        fontSize: subtitleSize,
+        fontFamily: FONT,
+        fontSize: metaSize,
         fill: 0xf9bc60,
         align: "center",
-        dropShadow: { color: 0x001e1d, blur: 2, distance: 1, alpha: 0.8 },
+        dropShadow: { color: 0x001e1d, blur: 1, distance: 0, alpha: 0.6 },
       },
     });
-    subtitle.anchor.set(0.5, 0);
-    subtitle.x = 0;
-    subtitle.y = y;
-    content.addChild(subtitle);
-    y += subtitle.height + Math.floor(8 * scale);
+    stats.anchor.set(0.5, 0);
+    stats.x = 0;
+    stats.y = y;
+    content.addChild(stats);
+    y += stats.height + SPACE_L;
 
-    const line1 = new PIXI.Text({
+    const descSize = Math.max(8, Math.min(11, Math.floor(10 * scale)));
+    const rule1 = new PIXI.Text({
       text: "СОБИРАЙ МОНЕТЫ КЛИКОМ.",
       style: {
-        fontFamily: pixelFont,
+        fontFamily: FONT,
         fontSize: descSize,
-        fill: 0xabd1c6,
+        fill: 0x9bb5ad,
         align: "center",
-        dropShadow: { color: 0x001e1d, blur: 2, distance: 1, alpha: 0.8 },
       },
     });
-    line1.anchor.set(0.5, 0);
-    line1.x = 0;
-    line1.y = y;
-    content.addChild(line1);
-    y += line1.height + Math.floor(4 * scale);
+    rule1.anchor.set(0.5, 0);
+    rule1.x = 0;
+    rule1.y = y;
+    content.addChild(rule1);
+    y += rule1.height + SPACE_S;
 
-    const line2 = new PIXI.Text({
+    const rule2 = new PIXI.Text({
       text: "КЛИК МИМО — МИНУС ЖИЗНЬ.",
       style: {
-        fontFamily: pixelFont,
+        fontFamily: FONT,
         fontSize: descSize,
-        fill: 0xabd1c6,
+        fill: 0x9bb5ad,
         align: "center",
-        dropShadow: { color: 0x001e1d, blur: 2, distance: 1, alpha: 0.8 },
       },
     });
-    line2.anchor.set(0.5, 0);
-    line2.x = 0;
-    line2.y = y;
-    content.addChild(line2);
-    y += line2.height + Math.floor(10 * scale);
+    rule2.anchor.set(0.5, 0);
+    rule2.x = 0;
+    rule2.y = y;
+    content.addChild(rule2);
+    y += rule2.height;
 
-    const buttonText = new PIXI.Text({
+    const btnFontSize = Math.max(8, Math.min(12, Math.floor(10 * scale)));
+    const buttonLabel = new PIXI.Text({
       text: "НАЧАТЬ ИГРУ",
       style: {
-        fontFamily: pixelFont,
-        fontSize: buttonFontSize,
-        fill: 0x001e1d,
+        fontFamily: FONT,
+        fontSize: btnFontSize,
+        fill: 0x0c1f1e,
+        align: "center",
       },
     });
-    buttonText.anchor.set(0.5);
+    buttonLabel.anchor.set(0.5);
 
-    const maxTextWidth = Math.max(
-      title.width,
-      subtitle.width,
-      line1.width,
-      line2.width,
+    const btnPadH = Math.floor(24 * scale);
+    const btnPadV = Math.floor(12 * scale);
+    const btnW = Math.ceil(buttonLabel.width) + btnPadH * 2;
+    const btnH = Math.max(32, Math.min(44, Math.floor(38 * scale)));
+    const btnR = Math.max(8, Math.floor(10 * scale));
+
+    const gapBeforeBtn = Math.max(
+      SPACE_L,
+      Math.ceil(btnH * 0.5) + (isSmall ? Math.max(12, Math.floor(14 * scale)) : Math.floor(12 * scale)),
     );
-    const buttonWidth = Math.max(
-      Math.ceil(buttonText.width + 40 * scale),
-      Math.ceil(maxTextWidth),
-    );
-    const buttonHeight = Math.max(42, Math.min(52, Math.floor(48 * scale)));
-    const btnRadius = Math.max(6, Math.floor(10 * scale));
+    y += gapBeforeBtn;
 
-    const buttonBg = new PIXI.Graphics();
-    buttonBg.roundRect(
-      -buttonWidth / 2,
-      -buttonHeight / 2,
-      buttonWidth,
-      buttonHeight,
-      btnRadius,
-    );
-    buttonBg.fill({ color: 0xf9bc60, alpha: 1 });
-    buttonBg.stroke({ width: 2, color: 0x001e1d });
+    const btn = new PIXI.Container();
+    const btnBg = new PIXI.Graphics();
+    btnBg.roundRect(-btnW / 2, -btnH / 2, btnW, btnH, btnR);
+    btnBg.fill({ color: 0xf9bc60, alpha: 1 });
+    btnBg.stroke({ width: 1, color: 0xe8a545 });
+    const btnTop = new PIXI.Graphics();
+    btnTop.roundRect(-btnW / 2 + 2, -btnH / 2 + 2, btnW - 4, Math.floor(btnH * 0.32), btnR - 2);
+    btnTop.fill({ color: 0xffffff, alpha: 0.15 });
+    btnBg.addChild(btnTop);
+    btn.addChild(btnBg);
+    btn.addChild(buttonLabel);
+    btn.x = 0;
+    btn.y = y;
+    btn.eventMode = "static";
+    btn.cursor = "pointer";
 
-    const buttonHighlight = new PIXI.Graphics();
-    buttonHighlight.roundRect(
-      -buttonWidth / 2 + 4,
-      -buttonHeight / 2 + 4,
-      buttonWidth - 8,
-      Math.floor(buttonHeight * 0.4),
-      btnRadius - 4,
-    );
-    buttonHighlight.fill({ color: 0xffffff, alpha: 0.2 });
-    buttonBg.addChild(buttonHighlight);
+    const redrawBtn = (hover: boolean) => {
+      btnBg.removeChildren();
+      btnBg.clear();
+      btnBg.roundRect(-btnW / 2, -btnH / 2, btnW, btnH, btnR);
+      btnBg.fill({ color: hover ? 0xffd166 : 0xf9bc60, alpha: 1 });
+      btnBg.stroke({ width: 1, color: hover ? 0xf0c050 : 0xe8a545 });
+      const top = new PIXI.Graphics();
+      top.roundRect(-btnW / 2 + 2, -btnH / 2 + 2, btnW - 4, Math.floor(btnH * 0.32), btnR - 2);
+      top.fill({ color: 0xffffff, alpha: hover ? 0.2 : 0.15 });
+      btnBg.addChild(top);
+    };
 
-    const buttonContainer = new PIXI.Container();
-    buttonContainer.addChild(buttonBg);
-    buttonContainer.addChild(buttonText);
-    buttonContainer.x = 0;
-    buttonContainer.y = y;
-    buttonContainer.eventMode = "static";
-    buttonContainer.cursor = "pointer";
-
-    buttonContainer.on("pointerenter", () => {
+    btn.on("pointerenter", () => {
       playButtonSound();
-      buttonBg.clear();
-      buttonBg.roundRect(
-        -buttonWidth / 2,
-        -buttonHeight / 2,
-        buttonWidth,
-        buttonHeight,
-        btnRadius,
-      );
-      buttonBg.fill({ color: 0xffd700, alpha: 1 });
-      buttonBg.stroke({ width: 2, color: 0x001e1d });
-      const hl = new PIXI.Graphics();
-      hl.roundRect(
-        -buttonWidth / 2 + 4,
-        -buttonHeight / 2 + 4,
-        buttonWidth - 8,
-        Math.floor(buttonHeight * 0.4),
-        btnRadius - 4,
-      );
-      hl.fill({ color: 0xffffff, alpha: 0.25 });
-      buttonBg.addChild(hl);
-      buttonContainer.scale.set(1.02);
+      redrawBtn(true);
+      btn.scale.set(1.02);
     });
-    buttonContainer.on("pointerleave", () => {
-      buttonBg.removeChildren();
-      buttonBg.clear();
-      buttonBg.roundRect(
-        -buttonWidth / 2,
-        -buttonHeight / 2,
-        buttonWidth,
-        buttonHeight,
-        btnRadius,
-      );
-      buttonBg.fill({ color: 0xf9bc60, alpha: 1 });
-      buttonBg.stroke({ width: 2, color: 0x001e1d });
-      const hl = new PIXI.Graphics();
-      hl.roundRect(
-        -buttonWidth / 2 + 4,
-        -buttonHeight / 2 + 4,
-        buttonWidth - 8,
-        Math.floor(buttonHeight * 0.4),
-        btnRadius - 4,
-      );
-      hl.fill({ color: 0xffffff, alpha: 0.2 });
-      buttonBg.addChild(hl);
-      buttonContainer.scale.set(1);
+    btn.on("pointerleave", () => {
+      redrawBtn(false);
+      btn.scale.set(1);
     });
-    buttonContainer.on("pointerdown", () => {
+    btn.on("pointerdown", () => {
       playButtonSound();
-      buttonContainer.scale.set(0.98);
+      btn.scale.set(0.98);
     });
-    buttonContainer.on("pointerup", () => {
-      buttonContainer.scale.set(1.02);
-    });
-    buttonContainer.on("pointerupoutside", () => {
-      buttonContainer.scale.set(1);
-    });
-    buttonContainer.on("pointertap", () => {
+    btn.on("pointerup", () => btn.scale.set(1.02));
+    btn.on("pointerupoutside", () => btn.scale.set(1));
+    btn.on("pointertap", () => {
       playButtonSound();
       this.onStart();
     });
 
-    content.addChild(buttonContainer);
+    content.addChild(btn);
 
     const bounds = content.getLocalBounds();
-    const panelW = Math.ceil(bounds.width + pad * 2);
-    const panelH = Math.ceil(bounds.height + pad * 2);
-    const panelX = Math.floor((width - panelW) / 2);
-    const panelY = Math.floor((height - panelH) / 2);
+    const panelW = Math.ceil(bounds.width + PAD * 2);
+    const panelH = Math.ceil(bounds.height + PAD * 2);
+    const px = Math.floor((width - panelW) / 2);
+    const py = Math.floor((height - panelH) / 2);
 
-    const panel = new PIXI.Graphics();
-    panel.roundRect(panelX, panelY, panelW, panelH, radius);
-    panel.fill({ color: 0x001e1d, alpha: 0.5 });
-    panel.stroke({ width: 3, color: 0xf9bc60, alpha: 0.9 });
-    this.uiRoot.addChild(panel);
+    const card = new PIXI.Graphics();
+    card.roundRect(px, py, panelW, panelH, R);
+    card.fill({ color: 0x0c1f1e, alpha: 0.98 });
+    card.stroke({ width: 1, color: 0x1e4a47 });
+    this.uiRoot.addChild(card);
 
-    const inner = new PIXI.Graphics();
-    inner.roundRect(
-      panelX + 4,
-      panelY + 4,
-      panelW - 8,
-      panelH - 8,
-      Math.max(4, radius - 4),
-    );
-    inner.stroke({ width: 1, color: 0xf9bc60, alpha: 0.4 });
-    this.uiRoot.addChild(inner);
-
-    content.x = panelX + pad - bounds.x;
-    content.y = panelY + pad - bounds.y;
+    content.x = px + PAD - bounds.x;
+    content.y = py + PAD - bounds.y;
     this.uiRoot.addChild(content);
     this.container.addChild(this.uiRoot);
   }

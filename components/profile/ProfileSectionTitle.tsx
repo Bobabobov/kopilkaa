@@ -24,12 +24,18 @@ export function ProfileSectionTitle({
       aria-hidden
     >
       {Icon && (
-        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-[#abd1c6]/25 bg-[#abd1c6]/15 text-[#f9bc60]">
+        <div
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-[#f9bc60]"
+          style={{ background: "rgba(249, 188, 96, 0.15)" }}
+        >
           <Icon className="h-4 w-4" />
         </div>
       )}
       <div>
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#abd1c6]/90">
+        <h3
+          className="text-sm font-semibold uppercase tracking-wider"
+          style={{ color: "#f9bc60", letterSpacing: "0.1em" }}
+        >
           {title}
         </h3>
         {subtitle && (

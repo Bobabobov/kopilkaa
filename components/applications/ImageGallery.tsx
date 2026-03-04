@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface ImageGalleryProps {
   images: { url: string; sort: number }[];
@@ -86,7 +87,9 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
               onClick={() => openLightbox(5)}
             >
               <div className="text-center">
-                <div className="w-6 h-6 mx-auto mb-1 text-slate-400">📷</div>
+                <div className="w-6 h-6 mx-auto mb-1 text-slate-400">
+                  <LucideIcons.Camera className="w-full h-full" />
+                </div>
                 <span className="text-xs text-slate-500 dark:text-slate-400">
                   +{images.length - 5}
                 </span>
@@ -111,10 +114,11 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
               {/* Close button */}
               <button
                 onClick={closeLightbox}
-                className="absolute top-4 right-4 w-12 h-12 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-colors text-xl font-bold z-20"
+                className="absolute top-4 right-4 w-12 h-12 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-colors z-20"
                 style={{ zIndex: 20 }}
+                aria-label="Закрыть"
               >
-                ✕
+                <LucideIcons.X className="w-6 h-6" />
               </button>
 
               {/* Image */}
@@ -152,7 +156,9 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg">
                       <div className="text-center">
-                        <div className="text-4xl mb-2">📷</div>
+                        <div className="mb-2 flex justify-center">
+                          <LucideIcons.Camera className="w-12 h-12 text-gray-400" />
+                        </div>
                         <div className="text-gray-500">
                           Изображение не найдено
                         </div>

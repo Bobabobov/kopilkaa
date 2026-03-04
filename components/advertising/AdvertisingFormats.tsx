@@ -1,5 +1,7 @@
 "use client";
 
+import { LucideIcons } from "@/components/ui/LucideIcons";
+
 const formats = [
   {
     id: "top-banner",
@@ -90,7 +92,9 @@ export function AdvertisingFormats() {
         {/* Честное предложение */}
         <div className="mt-16 border-2 border-[#f9bc60]/30 p-8 bg-[#004643]/30">
           <div className="flex items-start gap-4">
-            <div className="text-4xl">💡</div>
+            <div className="flex-shrink-0">
+              <LucideIcons.Lightbulb className="w-10 h-10 text-[#f9bc60]" />
+            </div>
             <div>
               <div className="text-xl font-bold text-[#fffffe] mb-2">
                 Не знаете, что выбрать?

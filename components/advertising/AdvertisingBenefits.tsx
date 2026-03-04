@@ -1,5 +1,7 @@
 "use client";
 
+import { LucideIcons } from "@/components/ui/LucideIcons";
+
 export function AdvertisingBenefits() {
   return (
     <section className="py-24 px-4 relative overflow-hidden">
@@ -149,7 +151,7 @@ export function AdvertisingBenefits() {
                 </div>
                 <div className="bg-gradient-to-r from-[#004643]/60 to-[#001e1d]/60 border border-[#f9bc60]/30 rounded-2xl p-8 backdrop-blur-sm">
                   <div className="text-[#f9bc60] font-bold mb-3 flex items-center gap-3">
-                    <span className="text-3xl">💡</span>
+                    <LucideIcons.Lightbulb className="w-8 h-8 flex-shrink-0" />
                     <span className="text-2xl">Ориентир по результатам</span>
                   </div>
                   <div className="text-[#fffffe] text-3xl font-bold mb-2">
@@ -285,7 +287,7 @@ export function AdvertisingBenefits() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="bg-gradient-to-br from-[#004643]/60 to-[#001e1d]/60 border border-[#f9bc60]/30 rounded-2xl p-6 backdrop-blur-sm">
                     <div className="text-[#f9bc60] font-bold mb-3 flex items-center gap-3">
-                      <span className="text-2xl">⚡</span>
+                      <LucideIcons.Zap className="w-6 h-6 flex-shrink-0" />
                       <span className="text-xl">Быстро</span>
                     </div>
                     <div className="text-[#abd1c6] text-lg">
@@ -294,7 +296,7 @@ export function AdvertisingBenefits() {
                   </div>
                   <div className="bg-gradient-to-br from-[#004643]/60 to-[#001e1d]/60 border border-[#f9bc60]/30 rounded-2xl p-6 backdrop-blur-sm">
                     <div className="text-[#f9bc60] font-bold mb-3 flex items-center gap-3">
-                      <span className="text-2xl">📊</span>
+                      <LucideIcons.BarChart3 className="w-6 h-6 flex-shrink-0" />
                       <span className="text-xl">Прозрачно</span>
                     </div>
                     <div className="text-[#abd1c6] text-lg">

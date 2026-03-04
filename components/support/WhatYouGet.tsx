@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Card } from "@/components/ui/Card";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 const items = [
@@ -39,11 +40,9 @@ export default function WhatYouGet() {
           transition={{ duration: 0.5 }}
           className="text-center mb-8 sm:mb-10"
         >
-          <h3
-            className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 sm:mb-4"
-            style={{ color: "#fffffe" }}
-          >
-            🎁 Что даёт поддержка проекта
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 sm:mb-4 text-[#fffffe] inline-flex items-center justify-center gap-2 flex-wrap">
+            <LucideIcons.Gift className="text-[#f9bc60] flex-shrink-0" size="lg" />
+            Что даёт поддержка проекта
           </h3>
           <p
             className="text-sm sm:text-base max-w-2xl mx-auto px-2"
@@ -66,31 +65,26 @@ export default function WhatYouGet() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: idx * 0.05 }}
-                className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/15 rounded-2xl p-5 sm:p-6 hover:border-[#abd1c6]/30 transition-all duration-300"
               >
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
-                  style={{
-                    backgroundColor: `${it.color}20`,
-                    border: `2px solid ${it.color}`,
-                  }}
-                >
-                  <span style={{ color: it.color }}>
-                    <Icon className="w-6 h-6 text-current" />
-                  </span>
-                </div>
-                <h4
-                  className="text-base sm:text-lg font-semibold mb-2"
-                  style={{ color: "#fffffe" }}
-                >
-                  {it.title}
-                </h4>
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: "#abd1c6" }}
-                >
-                  {it.description}
-                </p>
+                <Card variant="darkGlass" padding="lg" className="h-full transition-all hover:border-[#f9bc60]/25">
+                  <div
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
+                    style={{
+                      backgroundColor: `${it.color}20`,
+                      border: `2px solid ${it.color}`,
+                    }}
+                  >
+                    <span style={{ color: it.color }}>
+                      <Icon className="w-6 h-6 text-current" />
+                    </span>
+                  </div>
+                  <h4 className="text-base sm:text-lg font-semibold mb-2 text-[#fffffe]">
+                    {it.title}
+                  </h4>
+                  <p className="text-sm leading-relaxed text-[#abd1c6]">
+                    {it.description}
+                  </p>
+                </Card>
               </motion.div>
             );
           })}
@@ -99,7 +93,12 @@ export default function WhatYouGet() {
         <div className="text-center mt-7 sm:mt-9">
           <Link
             href="/heroes"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#f9bc60] text-[#001e1d] font-semibold hover:bg-[#e8a545] transition-all duration-300 hover:scale-105 shadow-lg text-sm sm:text-base"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all hover:opacity-90 text-sm sm:text-base"
+            style={{
+              background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+              color: "#001e1d",
+              boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
+            }}
           >
             <LucideIcons.Trophy className="w-5 h-5" />
             Открыть раздел «Герои»

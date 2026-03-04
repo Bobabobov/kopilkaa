@@ -160,7 +160,11 @@ export default function HeroesPageClient({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+      </div>
       <div className="relative z-10">
         <HeroesHero />
         <HeroesContent

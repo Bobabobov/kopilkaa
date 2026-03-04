@@ -201,10 +201,10 @@ export default function ApplicationsModal({
                 <div className="flex items-center gap-2">
                   <span className="text-base sm:text-lg flex-shrink-0">
                     {localNotification.type === "success"
-                      ? "✅"
+                      ? <LucideIcons.CheckCircle className="w-5 h-5" />
                       : localNotification.type === "error"
-                        ? "❌"
-                        : "ℹ️"}
+                        ? <LucideIcons.XCircle className="w-5 h-5" />
+                        : <LucideIcons.Info className="w-5 h-5" />}
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="font-bold break-words">
@@ -234,8 +234,8 @@ export default function ApplicationsModal({
               </div>
             ) : err ? (
               <div className="text-center py-12">
-                <div className="text-4xl mb-4" style={{ color: "#f9bc60" }}>
-                  ⚠️
+                <div className="mb-4 flex justify-center">
+                  <LucideIcons.AlertTriangle className="w-12 h-12 text-[#f9bc60]" />
                 </div>
                 <h3
                   className="text-xl font-bold mb-2"

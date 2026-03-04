@@ -132,7 +132,12 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               >
                 {formatRub(topThree[1].totalDonated)}
               </p>
-              <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto">
+              <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto items-center">
+                {!topThree[1].vkLink && !topThree[1].telegramLink && !topThree[1].youtubeLink && (
+                  <span className="text-xs text-[#94a1b2]" title="Пользователь не указал ссылки в профиле">
+                    Соц. сети не привязаны
+                  </span>
+                )}
                 {topThree[1].vkLink && (
                   <button
                     type="button"
@@ -226,7 +231,12 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               >
                 {formatRub(topThree[0].totalDonated)}
               </p>
-              <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto">
+              <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto items-center">
+                {!topThree[0].vkLink && !topThree[0].telegramLink && !topThree[0].youtubeLink && (
+                  <span className="text-xs text-[#94a1b2]" title="Пользователь не указал ссылки в профиле">
+                    Соц. сети не привязаны
+                  </span>
+                )}
                 {topThree[0].vkLink && (
                   <button
                     type="button"
@@ -318,7 +328,12 @@ export default function HeroesTopThree({ heroes }: HeroesTopThreeProps) {
               >
                 {formatRub(topThree[2].totalDonated)}
               </p>
-              <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto">
+              <div className="mt-1 min-h-[36px] sm:min-h-[40px] flex justify-center gap-1.5 sm:gap-2 flex-wrap mt-auto items-center">
+                {!topThree[2].vkLink && !topThree[2].telegramLink && !topThree[2].youtubeLink && (
+                  <span className="text-xs text-[#94a1b2]" title="Пользователь не указал ссылки в профиле">
+                    Соц. сети не привязаны
+                  </span>
+                )}
                 {topThree[2].vkLink && (
                   <button
                     type="button"

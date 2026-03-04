@@ -1,9 +1,6 @@
 import { memo, type RefObject } from "react";
 import { AdCard, StoryCard } from "@/components/stories";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Separator } from "@/components/ui/separator";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import type {
   Story as StoryItem,
@@ -53,16 +50,19 @@ function StoriesGridInner({
     <div className="container mx-auto px-4 py-8 relative">
       <div className="absolute left-0 top-8 bottom-8 w-px hidden xl:block bg-gradient-to-b from-transparent via-[#abd1c6]/20 to-transparent rounded-full" aria-hidden />
       <header className="flex flex-wrap items-center gap-3 mb-6">
-        <Badge variant="secondary" className="gap-1.5 text-xs font-semibold">
+        <span
+          className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider px-3 py-1.5 rounded-lg"
+          style={{ background: "rgba(249, 188, 96, 0.15)", color: "#f9bc60" }}
+        >
           <LucideIcons.BookOpen className="w-3.5 h-3.5" />
           {sectionTitle}
-        </Badge>
+        </span>
         {showCount && (
-          <Badge variant="outline" className="text-[#abd1c6] border-[#abd1c6]/40 font-mono tabular-nums">
+          <span className="text-xs text-[#94a1b2] font-mono tabular-nums">
             {stories.length}
-          </Badge>
+          </span>
         )}
-        <Separator className="flex-1 min-w-[80px]" />
+        <span className="flex-1 min-w-[80px] h-px bg-white/10" aria-hidden />
         <div className="flex items-center gap-2">
           <LucideIcons.SortAsc className="w-4 h-4 text-[#abd1c6]/70 shrink-0" aria-hidden />
           <label htmlFor="stories-sort" className="sr-only">
@@ -137,25 +137,27 @@ function StoriesGridInner({
 
       {hasMore && !loadingMore && !autoLoadEnabled && (
         <div className="flex justify-center py-10">
-          <Button
+          <button
             type="button"
-            variant="outline"
             onClick={onLoadMore}
-            className="rounded-2xl border-[#abd1c6]/40 bg-[#001e1d]/60 px-6 py-3 text-sm font-semibold text-[#abd1c6] hover:border-[#f9bc60]/60 hover:text-[#f9bc60] hover:bg-[#001e1d]/80"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
+            style={{
+              background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+              color: "#001e1d",
+              boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
+            }}
           >
             Показать ещё
-          </Button>
+          </button>
         </div>
       )}
 
       {!hasMore && stories.length > 0 && (
         <section className="text-center py-12" aria-label="Конец списка историй">
-          <Card variant="outline" padding="sm" className="inline-flex border-[#abd1c6]/30 bg-[#001e1d]/30 transition-colors hover:border-[#f9bc60]/50">
+          <Card variant="darkGlass" padding="sm" className="inline-flex">
             <CardContent className="flex items-center justify-center gap-2 py-3 px-6">
-              <LucideIcons.CheckCircle2 className="w-5 h-5 text-[#abd1c6]" aria-hidden />
-              <Badge variant="secondary" className="font-semibold">
-                Все загружены
-              </Badge>
+              <LucideIcons.CheckCircle2 className="w-5 h-5 text-[#f9bc60]" aria-hidden />
+              <span className="text-sm font-semibold text-[#abd1c6]">Все загружены</span>
             </CardContent>
           </Card>
         </section>

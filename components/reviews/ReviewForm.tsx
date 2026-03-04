@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Card } from "@/components/ui/Card";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import type { ReviewItem } from "@/hooks/reviews/useReviews";
 
@@ -141,19 +142,17 @@ export function ReviewForm({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="relative max-w-6xl mx-auto"
+      className="max-w-6xl mx-auto"
     >
-      {/* Фон с эффектами */}
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#001e1d]/80 via-[#001e1d]/70 to-[#0b2f2c]/70 backdrop-blur-xl border border-[#abd1c6]/20 shadow-[0_25px_60px_-20px_rgba(0,0,0,0.9)]" />
-      <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full" />
-        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-[#abd1c6]/10 blur-3xl rounded-full" />
-      </div>
-
-      <form
-        onSubmit={handleSubmit}
-        className="relative z-10 space-y-6 p-6 sm:p-8"
-      >
+      <Card variant="darkGlass" padding="none" className="relative overflow-hidden">
+        <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none" aria-hidden>
+          <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#f9bc60]/8 blur-3xl rounded-full" />
+          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-[#abd1c6]/8 blur-3xl rounded-full" />
+        </div>
+        <form
+          onSubmit={handleSubmit}
+          className="relative z-10 space-y-6 p-6 sm:p-8"
+        >
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center text-[#f9bc60] shadow-lg flex-shrink-0">
             <LucideIcons.MessageCircle size="sm" />
@@ -425,6 +424,7 @@ export function ReviewForm({
           </button>
         </div>
       </form>
+      </Card>
 
       <ToastComponent />
     </motion.div>

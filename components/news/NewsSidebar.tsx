@@ -6,7 +6,6 @@ import type { NewsItem } from "./types";
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 
 function formatShortDate(value: string) {
   const d = new Date(value);
@@ -73,7 +72,7 @@ export function NewsSidebar({
 
   return (
     <div className={containerClass}>
-      <Card variant="default" padding="md">
+      <Card variant="darkGlass" padding="md">
         <CardContent className="p-0">
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-base font-bold text-[#fffffe]">Сводка</h3>
@@ -104,7 +103,7 @@ export function NewsSidebar({
         </CardContent>
       </Card>
 
-      <Card variant="default" padding="md" className="mt-4">
+      <Card variant="darkGlass" padding="md" className="mt-4">
         <CardContent className="p-0">
           <h3 className="text-base font-bold text-[#fffffe]">Топ новости</h3>
           {top.length === 0 ? (
@@ -138,10 +137,10 @@ export function NewsSidebar({
         </CardContent>
       </Card>
 
-      <Card variant="default" padding="md" className="mt-4">
+      <Card variant="darkGlass" padding="md" className="mt-4">
         <CardContent className="p-0">
           <h3 className="text-base font-bold text-[#fffffe]">Полезное</h3>
-          <Separator className="my-3 bg-[#abd1c6]/15" />
+          <div className="my-3 h-px bg-white/10" aria-hidden />
           <div className="space-y-2">
             <Link
               href="/support"

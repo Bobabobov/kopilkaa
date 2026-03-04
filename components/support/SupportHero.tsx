@@ -1,7 +1,8 @@
 "use client";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Card } from "@/components/ui/Card";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 type Stats = {
   collected: number;
@@ -85,7 +86,7 @@ export default function SupportHero() {
           transition={{ duration: 0.6 }}
         >
           <motion.h1
-            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-semibold mb-4 sm:mb-5 leading-tight"
+            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-semibold mb-4 sm:mb-5 leading-tight inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3"
             animate={{
               textShadow: [
                 "0 0 20px rgba(249, 188, 96, 0.3)",
@@ -96,8 +97,8 @@ export default function SupportHero() {
             transition={{ duration: 3, repeat: Infinity }}
             style={{ color: "#fffffe" }}
           >
-            💚 Поддержка проекта «Копилка»
-            <br />
+            <LucideIcons.Heart className="text-[#f9bc60] flex-shrink-0" size="xl" />
+            Поддержка проекта «Копилка»
           </motion.h1>
 
           <p
@@ -114,68 +115,44 @@ export default function SupportHero() {
             Поддержка добровольная. Это не инвестиция и не финансовая услуга.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-4xl mx-auto">
-            <motion.div
-              whileHover={{ scale: 1.03, y: -2 }}
-              className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/20 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg hover:border-[#abd1c6]/30 transition-all duration-300"
-            >
-              <div
-                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2"
-                style={{ color: "#f9bc60" }}
+          <Card variant="darkGlass" padding="lg" className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
+              <motion.div
+                whileHover={{ scale: 1.02, y: -2 }}
+                className="text-center p-4 sm:p-5 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:border-[#f9bc60]/20 transition-all"
               >
-                {loading ? "0" : <AnimatedNumber value={stats.approved} />}
-              </div>
-              <div
-                className="text-sm sm:text-base opacity-80"
-                style={{ color: "#abd1c6" }}
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-[#f9bc60]">
+                  {loading ? "0" : <AnimatedNumber value={stats.approved} />}
+                </div>
+                <div className="text-sm sm:text-base text-[#abd1c6]">Одобрено заявок</div>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.02, y: -2 }}
+                className="text-center p-4 sm:p-5 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:border-[#f9bc60]/20 transition-all"
               >
-                Одобрено заявок
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.03, y: -2 }}
-              className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/20 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg hover:border-[#abd1c6]/30 transition-all duration-300"
-            >
-              <div
-                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2"
-                style={{ color: "#f9bc60" }}
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-[#f9bc60]">
+                  {loading ? "0" : <AnimatedNumber value={stats.supporters} />}
+                </div>
+                <div className="text-sm sm:text-base text-[#abd1c6]">Поддержали проект</div>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.02, y: -2 }}
+                className="text-center p-4 sm:p-5 rounded-xl border border-[#f9bc60]/20 bg-[#f9bc60]/5 hover:border-[#f9bc60]/30 transition-all sm:col-span-2 md:col-span-1"
               >
-                {loading ? "0" : <AnimatedNumber value={stats.supporters} />}
-              </div>
-              <div
-                className="text-sm sm:text-base opacity-80"
-                style={{ color: "#abd1c6" }}
-              >
-                Поддержали проект
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.03, y: -2 }}
-              className="bg-[#f9bc60]/10 backdrop-blur-sm border border-[#f9bc60]/30 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg transition-all duration-300 sm:col-span-2 md:col-span-1"
-            >
-              <div
-                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2"
-                style={{ color: "#f9bc60" }}
-              >
-                {loading ? (
-                  "0"
-                ) : (
-                  <span>
-                    <AnimatedNumber value={Math.floor(stats.balance / 1000)} />
-                    <span className="text-xl sm:text-2xl">К</span>
-                  </span>
-                )}
-              </div>
-              <div
-                className="text-sm sm:text-base opacity-80"
-                style={{ color: "#abd1c6" }}
-              >
-                Баланс проекта
-              </div>
-            </motion.div>
-          </div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-[#f9bc60]">
+                  {loading ? (
+                    "0"
+                  ) : (
+                    <span>
+                      <AnimatedNumber value={Math.floor(stats.balance / 1000)} />
+                      <span className="text-xl sm:text-2xl">К</span>
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm sm:text-base text-[#abd1c6]">Баланс проекта</div>
+              </motion.div>
+            </div>
+          </Card>
         </motion.div>
       </div>
     </section>

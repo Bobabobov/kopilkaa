@@ -94,12 +94,12 @@ export function NewsPostCard({ item, featured = false }: NewsPostCardProps) {
       className="scroll-mt-24"
     >
       <Card
-        variant="default"
+        variant="darkGlass"
         padding="none"
         hoverable
         className={cn(
           "overflow-hidden",
-          featured && "ring-1 ring-[#f9bc60]/25 shadow-xl shadow-[#f9bc60]/5",
+          featured && "ring-1 ring-[#f9bc60]/30 shadow-lg",
         )}
       >
         {showFeaturedImage && (

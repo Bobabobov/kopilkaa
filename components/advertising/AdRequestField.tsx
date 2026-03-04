@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface AdRequestFieldProps {
   label: string;
@@ -38,7 +39,7 @@ export function AdRequestField({
           animate={{ opacity: 1, y: 0 }}
           className="text-red-400 text-sm mt-3 flex items-center gap-2"
         >
-          <span>⚠</span> {error}
+          <LucideIcons.AlertTriangle className="w-4 h-4 flex-shrink-0" /> {error}
         </motion.p>
       )}
     </motion.div>

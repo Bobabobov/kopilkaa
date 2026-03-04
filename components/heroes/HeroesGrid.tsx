@@ -2,6 +2,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { Card } from "@/components/ui/Card";
 import HeroesFilters from "./HeroesFilters";
 import HeroesTopThree from "./HeroesTopThree";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
@@ -120,21 +121,20 @@ export default function HeroesGrid({
 
       {/* Сетка героев */}
       {heroes.length === 0 ? (
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 sm:p-10 text-center">
-          <div className="text-4xl mb-3">🔎</div>
-          <div className="text-lg font-semibold text-[#fffffe]">
-            Ничего не найдено
+        <Card variant="darkGlass" padding="lg" className="text-center">
+          <div className="mb-3 flex justify-center">
+            <LucideIcons.Search className="w-10 h-10 text-[#abd1c6]" />
           </div>
-          <div className="mt-2 text-sm text-[#abd1c6]">
-            Попробуйте изменить запрос или сортировку.
-          </div>
+          <div className="text-lg font-semibold text-[#fffffe]">Ничего не найдено</div>
+          <div className="mt-2 text-sm text-[#abd1c6]">Попробуйте изменить запрос или сортировку.</div>
           {(searchTerm || sortBy !== "total") && (
             <div className="mt-4 flex flex-col sm:flex-row gap-2 justify-center">
               {searchTerm && (
                 <button
                   type="button"
                   onClick={() => onSearchChange("")}
-                  className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[#c7d4d0] hover:bg-white/10 hover:border-white/20 transition-colors text-sm font-semibold"
+                  className="px-4 py-2 rounded-xl border border-white/10 text-[#abd1c6] hover:border-[#f9bc60]/30 hover:text-[#f9bc60] transition-colors text-sm font-semibold"
+                  style={{ background: "rgba(255,255,255,0.05)" }}
                 >
                   Очистить поиск
                 </button>
@@ -143,14 +143,15 @@ export default function HeroesGrid({
                 <button
                   type="button"
                   onClick={() => onSortChange("total")}
-                  className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[#c7d4d0] hover:bg-white/10 hover:border-white/20 transition-colors text-sm font-semibold"
+                  className="px-4 py-2 rounded-xl border border-white/10 text-[#abd1c6] hover:border-[#f9bc60]/30 transition-colors text-sm font-semibold"
+                  style={{ background: "rgba(255,255,255,0.05)" }}
                 >
                   Сортировать по объёму поддержки
                 </button>
               )}
             </div>
           )}
-        </div>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
           {heroes.map((hero) => {
@@ -163,7 +164,7 @@ export default function HeroesGrid({
                 href={`/profile/${hero.id}`}
                 className="block focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 rounded-2xl"
               >
-                <div className="group relative p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-white/6 to-white/3 hover:from-white/8 hover:to-white/4 transition-all cursor-pointer shadow-[0_18px_48px_rgba(0,0,0,0.28)] hover:-translate-y-1">
+                <div className="group relative p-4 sm:p-5 rounded-2xl border border-white/[0.08] transition-all cursor-pointer hover:-translate-y-1 hover:border-[#f9bc60]/25 hover:shadow-lg hover:shadow-black/20" style={{ background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)", boxShadow: "0 4px 24px rgba(0,0,0,0.2)" }}>
                   {/* Accent glow */}
                   <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute -left-10 -top-10 w-44 h-44 rounded-full blur-3xl bg-[#f9bc60]/10" />
@@ -256,6 +257,11 @@ export default function HeroesGrid({
                   </div>
                   {/* Соцсети: фиксированное место, чтобы все карточки были одной высоты */}
                   <div className="mt-3 sm:mt-4 min-h-[32px] sm:min-h-[36px] flex flex-wrap gap-1.5 sm:gap-2 items-center">
+                    {!hasSocialLinks && (
+                      <span className="text-xs text-[#94a1b2]" title="Пользователь не указал ссылки в профиле">
+                        Соц. сети не привязаны
+                      </span>
+                    )}
                     {hasSocialLinks && hero.vkLink && (
                       <button
                         type="button"
@@ -309,7 +315,7 @@ export default function HeroesGrid({
       {/* Lazy load */}
       {loadingMore && (
         <div className="flex justify-center items-center py-10">
-          <div className="w-10 h-10 border-4 border-[#abd1c6] border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-white/20 border-t-[#f9bc60] rounded-full animate-spin" />
         </div>
       )}
       {hasMore && !loadingMore && (

@@ -80,62 +80,56 @@ export default function EmptyState(props: EmptyStateProps) {
   }
 
   if (props.variant === "stories") {
+    const ctaStyle = {
+      background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+      color: "#001e1d",
+      boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
+    };
     return (
       <div className="text-center py-16 px-4 animate-fade-in-up">
         <div className="container mx-auto max-w-2xl">
-          <Card variant="glass" padding="lg" className="border-[#abd1c6]/20 text-center">
+          <Card variant="darkGlass" padding="lg" className="text-center">
             {props.hasQuery ? (
               <>
-                <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <LucideIcons.Search size="xl" className="text-[#abd1c6]" />
+                <div
+                  className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
+                  style={{ background: "rgba(249, 188, 96, 0.12)" }}
+                >
+                  <LucideIcons.Search size="xl" className="text-[#f9bc60]" />
                 </div>
 
-                <h3
-                  className="text-2xl font-bold mb-4"
-                  style={{ color: "#fffffe" }}
-                >
+                <h3 className="text-2xl font-bold mb-4 text-[#fffffe]">
                   Ничего не найдено
                 </h3>
 
-                <p
-                  className="mb-8 leading-relaxed"
-                  style={{ color: "#abd1c6" }}
-                >
+                <p className="mb-8 leading-relaxed text-[#abd1c6]">
                   По вашему запросу не найдено ни одной истории. Попробуйте
                   изменить поисковый запрос или посмотрите все доступные
                   истории.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="px-6 py-3 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)",
-                    }}
-                  >
-                    Показать все истории
-                  </button>
-                </div>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-6 py-3 font-semibold rounded-xl transition-all hover:opacity-90"
+                  style={ctaStyle}
+                >
+                  Показать все истории
+                </button>
               </>
             ) : (
               <>
-                <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div
+                  className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
+                  style={{ background: "rgba(249, 188, 96, 0.12)" }}
+                >
                   <LucideIcons.BookOpen size="xl" className="text-[#f9bc60]" />
                 </div>
 
-                <h3
-                  className="text-2xl font-bold mb-4"
-                  style={{ color: "#fffffe" }}
-                >
+                <h3 className="text-2xl font-bold mb-4 text-[#fffffe]">
                   Истории скоро появятся
                 </h3>
 
-                <p
-                  className="mb-8 leading-relaxed"
-                  style={{ color: "#abd1c6" }}
-                >
+                <p className="mb-8 leading-relaxed text-[#abd1c6]">
                   Мы работаем над созданием вдохновляющих историй о помощи.
                   Скоро здесь появятся первые истории людей, которые получили
                   поддержку через нашу платформу.
@@ -144,18 +138,14 @@ export default function EmptyState(props: EmptyStateProps) {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a
                     href="/applications"
-                    className="px-6 py-3 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #f9bc60 0%, #e8a94a 100%)",
-                    }}
+                    className="inline-flex items-center justify-center px-6 py-3 font-semibold rounded-xl transition-all hover:opacity-90"
+                    style={ctaStyle}
                   >
                     Подать заявку
                   </a>
                   <a
                     href="/profile"
-                    className="px-6 py-3 bg-white/20 backdrop-blur-xl hover:bg-white/30 text-white font-semibold rounded-xl transition-all duration-300 border border-white/20 shadow-lg hover:shadow-xl"
-                    style={{ borderColor: "#abd1c6/30" }}
+                    className="inline-flex items-center justify-center px-6 py-3 font-semibold rounded-xl border border-white/20 text-[#abd1c6] hover:text-[#fffffe] hover:border-white/30 rounded-xl transition-all bg-white/5"
                   >
                     Мой профиль
                   </a>
@@ -172,57 +162,39 @@ export default function EmptyState(props: EmptyStateProps) {
     return (
       <div className="py-12 px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="p-12 rounded-3xl backdrop-blur-sm border"
-            style={{
-              backgroundColor: "rgba(0, 70, 67, 0.6)",
-              borderColor: "rgba(171, 209, 198, 0.3)",
-            }}
-          >
-            <div className="text-6xl mb-6">🌟</div>
-
-            <h3
-              className="text-3xl font-bold mb-4"
-              style={{ color: "#fffffe" }}
-            >
-              Пока здесь пусто
-            </h3>
-
-            <p
-              className="text-lg mb-8 leading-relaxed"
-              style={{ color: "#abd1c6" }}
-            >
-              В этом разделе отображаются пользователи, которые добровольно
-              поддержали развитие проекта. Здесь мы публично говорим “спасибо”
-              за вклад и участие.
-            </p>
-
-            <div className="space-y-4">
-              <Link
-                href="/support"
-                className="inline-block px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-200 hover:scale-105"
-                style={{
-                  backgroundColor: "#f9bc60",
-                  color: "#001e1d",
-                }}
-              >
-                💛 Поддержать проект
-              </Link>
-
-              <div>
-                <Link
-                  href="/"
-                  className="text-sm transition-colors duration-200 hover:underline"
-                  style={{ color: "#abd1c6" }}
-                >
-                  ← Вернуться на главную
-                </Link>
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+            <Card variant="darkGlass" padding="lg">
+              <div className="mb-6 flex justify-center">
+                <LucideIcons.Star className="w-14 h-14 sm:w-16 sm:h-16 text-[#f9bc60]" />
               </div>
-            </div>
+              <h3 className="text-3xl font-bold mb-4 text-[#fffffe]">Пока здесь пусто</h3>
+
+              <p className="text-lg mb-8 leading-relaxed text-[#abd1c6]">
+                В этом разделе отображаются пользователи, которые добровольно
+                поддержали развитие проекта. Здесь мы публично говорим “спасибо”
+                за вклад и участие.
+              </p>
+
+              <div className="space-y-4">
+                <Link
+                  href="/support"
+                  className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl transition-all hover:opacity-90"
+                  style={{
+                    background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+                    color: "#001e1d",
+                    boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
+                  }}
+                >
+                  <LucideIcons.Heart className="w-5 h-5 mr-2" />
+                  Поддержать проект
+                </Link>
+                <div>
+                  <Link href="/" className="text-sm text-[#abd1c6] hover:text-[#f9bc60] transition-colors hover:underline">
+                    ← Вернуться на главную
+                  </Link>
+                </div>
+              </div>
+            </Card>
           </motion.div>
         </div>
       </div>
@@ -235,7 +207,9 @@ export default function EmptyState(props: EmptyStateProps) {
       animate={{ opacity: 1, y: 0 }}
       className="card p-12 text-center"
     >
-      <div className="text-8xl mb-6">📝</div>
+      <div className="mb-6 flex justify-center">
+        <LucideIcons.Document className="w-16 h-16 sm:w-20 sm:h-20 text-gray-500 dark:text-gray-400" />
+      </div>
       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
         Заявки не найдены
       </h3>

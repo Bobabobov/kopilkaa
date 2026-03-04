@@ -22,44 +22,36 @@ export function StoriesLoading() {
               aria-hidden
             >
               <div
-                className="h-full rounded-3xl overflow-hidden flex flex-col bg-gradient-to-br from-white/95 via-white/90 to-white/85 backdrop-blur-2xl border border-[#abd1c6]/40 shadow-[0_20px_25px_-5px_rgba(0,70,67,0.08)]"
+                className="h-full rounded-2xl overflow-hidden flex flex-col border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
                 style={{
-                  boxShadow:
-                    "0 20px 25px -5px rgba(0, 70, 67, 0.1), 0 10px 10px -5px rgba(0, 70, 67, 0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
+                  background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
                 }}
               >
-                {/* Блик по верхнему краю */}
-                <div className="h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent shrink-0" />
+                <div className="h-px bg-white/10 shrink-0" aria-hidden />
 
-                {/* Изображение скелетон — как у карточки (aspect ~ 4/3) */}
                 <div className="relative w-full aspect-[4/3] shrink-0 overflow-hidden">
-                  <div className="absolute inset-0 bg-[#abd1c6]/25 animate-pulse" />
+                  <div className="absolute inset-0 bg-white/10 animate-pulse" />
                 </div>
 
-                {/* Контент скелетон */}
                 <div className="p-5 sm:p-6 flex flex-col flex-1 space-y-4">
-                  {/* Заголовок */}
                   <div className="space-y-2">
-                    <div className="h-5 bg-[#abd1c6]/30 rounded-lg animate-pulse w-full" />
-                    <div className="h-5 bg-[#abd1c6]/25 rounded-lg animate-pulse w-4/5" />
+                    <div className="h-5 bg-white/15 rounded-lg animate-pulse w-full" />
+                    <div className="h-5 bg-white/10 rounded-lg animate-pulse w-4/5" />
                   </div>
 
-                  {/* Описание */}
                   <div className="space-y-2 flex-1">
-                    <div className="h-4 bg-[#abd1c6]/20 rounded animate-pulse w-full" />
-                    <div className="h-4 bg-[#abd1c6]/20 rounded animate-pulse w-full" />
-                    <div className="h-4 bg-[#abd1c6]/20 rounded animate-pulse w-2/3" />
+                    <div className="h-4 bg-white/10 rounded animate-pulse w-full" />
+                    <div className="h-4 bg-white/10 rounded animate-pulse w-full" />
+                    <div className="h-4 bg-white/10 rounded animate-pulse w-2/3" />
                   </div>
 
-                  {/* Метаданные (автор, лайки) */}
                   <div className="flex items-center justify-between gap-3 pt-1">
-                    <div className="h-4 bg-[#abd1c6]/25 rounded-full animate-pulse w-24" />
-                    <div className="h-8 w-16 bg-[#abd1c6]/20 rounded-full animate-pulse" />
+                    <div className="h-4 bg-white/15 rounded-full animate-pulse w-24" />
+                    <div className="h-8 w-16 bg-white/10 rounded-full animate-pulse" />
                   </div>
 
-                  {/* Нижняя граница и дата */}
-                  <div className="pt-3 border-t border-[#abd1c6]/30">
-                    <div className="h-3 bg-[#abd1c6]/20 rounded w-20 animate-pulse" />
+                  <div className="pt-3 border-t border-white/10">
+                    <div className="h-3 bg-white/10 rounded w-20 animate-pulse" />
                   </div>
                 </div>
               </div>

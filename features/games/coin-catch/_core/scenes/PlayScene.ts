@@ -104,58 +104,50 @@ export class PlayScene {
     const height = this.sceneHeight;
     const minSide = Math.min(width, height);
     const scale = Math.max(0.5, Math.min(2, minSide / 400));
-    const baseFontSize = Math.max(16, Math.min(22, Math.floor(18 * scale)));
-    const labelFontSize = Math.max(10, Math.min(14, Math.floor(12 * scale)));
-    const pad = Math.max(8, Math.floor(14 * scale));
-    const radius = Math.max(6, Math.floor(10 * scale));
+    const valueFontSize = Math.max(14, Math.min(20, Math.floor(17 * scale)));
+    const labelFontSize = Math.max(8, Math.min(11, Math.floor(10 * scale)));
+    const pad = Math.max(10, Math.floor(14 * scale));
+    const radius = Math.max(8, Math.floor(12 * scale));
 
     const panelWidth = Math.min(
       width - pad * 2,
-      Math.max(300, Math.floor(360 * scale)),
+      Math.max(280, Math.floor(340 * scale)),
     );
-    const panelHeight = Math.max(64, Math.min(88, Math.floor(72 * scale)));
+    const panelHeight = Math.max(56, Math.min(76, Math.floor(64 * scale)));
     const px = Math.floor(pad);
     const py = Math.floor(pad);
 
     const panel = new PIXI.Graphics();
     panel.roundRect(px, py, panelWidth, panelHeight, radius);
-    panel.fill({ color: 0x001e1d, alpha: 0.65 });
-    panel.stroke({ width: 2, color: 0xf9bc60, alpha: 0.9 });
-    const inner = new PIXI.Graphics();
-    inner.roundRect(
-      px + 2,
-      py + 2,
-      panelWidth - 4,
-      panelHeight - 4,
-      Math.max(2, radius - 2),
-    );
-    inner.stroke({ width: 1, color: 0xf9bc60, alpha: 0.35 });
-    panel.addChild(inner);
+    panel.fill({ color: 0x0c1f1e, alpha: 0.95 });
+    panel.stroke({ width: 1, color: 0x1e4a47 });
 
     const colW = panelWidth / 3;
     const center1 = px + colW * 0.5;
     const center2 = px + colW * 1.5;
     const center3 = px + colW * 2.5;
     const rowY = py + panelHeight / 2;
-    const labelY = Math.floor(rowY - panelHeight * 0.2);
-    const valueY = Math.floor(rowY + panelHeight * 0.12);
+    const labelY = Math.floor(rowY - panelHeight * 0.22);
+    const valueY = Math.floor(rowY + panelHeight * 0.18);
 
+    const divW = 1;
+    const divInset = Math.floor(10 * scale);
     const divider1 = new PIXI.Graphics();
-    divider1.rect(Math.floor(px + colW - 1), py + 8, 2, panelHeight - 16);
-    divider1.fill({ color: 0xf9bc60, alpha: 0.45 });
+    divider1.rect(Math.floor(px + colW - divW / 2), py + divInset, divW, panelHeight - divInset * 2);
+    divider1.fill({ color: 0x2d4a47, alpha: 0.8 });
     panel.addChild(divider1);
     const divider2 = new PIXI.Graphics();
-    divider2.rect(Math.floor(px + colW * 2 - 1), py + 8, 2, panelHeight - 16);
-    divider2.fill({ color: 0xf9bc60, alpha: 0.45 });
+    divider2.rect(Math.floor(px + colW * 2 - divW / 2), py + divInset, divW, panelHeight - divInset * 2);
+    divider2.fill({ color: 0x2d4a47, alpha: 0.8 });
     panel.addChild(divider2);
 
     this.uiContainer.addChild(panel);
 
-    const pixelFont = "'Press Start 2P', monospace";
+    const FONT = "'Press Start 2P', monospace";
     const labelStyle = {
-      fontFamily: pixelFont,
+      fontFamily: FONT,
       fontSize: labelFontSize,
-      fill: 0xabd1c6,
+      fill: 0x9bb5ad,
     };
 
     const scoreLabel = new PIXI.Text({ text: "ОЧКИ", style: labelStyle });
@@ -167,9 +159,10 @@ export class PlayScene {
     this.scoreText = new PIXI.Text({
       text: "0",
       style: {
-        fontFamily: pixelFont,
-        fontSize: baseFontSize,
-        fill: 0xfffffe,
+        fontFamily: FONT,
+        fontSize: valueFontSize,
+        fill: 0xffffff,
+        dropShadow: { color: 0x001e1d, blur: 1, distance: 0, alpha: 0.6 },
       },
     });
     this.scoreText.resolution = 2;
@@ -187,9 +180,10 @@ export class PlayScene {
     this.livesText = new PIXI.Text({
       text: "3",
       style: {
-        fontFamily: pixelFont,
-        fontSize: baseFontSize,
+        fontFamily: FONT,
+        fontSize: valueFontSize,
         fill: 0xff6b6b,
+        dropShadow: { color: 0x001e1d, blur: 1, distance: 0, alpha: 0.5 },
       },
     });
     this.livesText.resolution = 2;
@@ -207,9 +201,10 @@ export class PlayScene {
     this.timeText = new PIXI.Text({
       text: "30",
       style: {
-        fontFamily: pixelFont,
-        fontSize: baseFontSize,
+        fontFamily: FONT,
+        fontSize: valueFontSize,
         fill: 0xf9bc60,
+        dropShadow: { color: 0x001e1d, blur: 1, distance: 0, alpha: 0.5 },
       },
     });
     this.timeText.resolution = 2;
@@ -303,6 +298,7 @@ export class PlayScene {
     const startTime = Date.now();
     const duration = 300;
     const animate = () => {
+      if (!ring.parent) return;
       const elapsed = Date.now() - startTime;
       if (elapsed < duration) {
         const progress = elapsed / duration;
@@ -336,6 +332,7 @@ export class PlayScene {
       const duration = 500;
 
       const animateParticle = () => {
+        if (!particle.parent) return;
         const elapsed = Date.now() - startTime;
         if (elapsed < duration) {
           const progress = elapsed / duration;
@@ -371,6 +368,7 @@ export class PlayScene {
     const startTime = Date.now();
     const duration = 260;
     const animate = () => {
+      if (!ring.parent) return;
       const elapsed = Date.now() - startTime;
       if (elapsed < duration) {
         const t = elapsed / duration;

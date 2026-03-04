@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { Card } from "@/components/ui/Card";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import { useScrollLock } from "@/hooks/ui/useScrollLock";
 import { PreSupportModal } from "./PreSupportModal";
@@ -109,11 +110,8 @@ export default function OneTimeSupport({
       <div className="max-w-4xl mx-auto">
         <SupportHeader />
 
-        <div className="bg-[#004643]/20 backdrop-blur-sm border border-[#abd1c6]/15 rounded-xl sm:rounded-2xl p-5 sm:p-6">
-          <h3
-            className="text-lg sm:text-xl font-semibold mb-5 sm:mb-6 text-center"
-            style={{ color: "#abd1c6" }}
-          >
+        <Card variant="darkGlass" padding="lg">
+          <h3 className="text-lg sm:text-xl font-semibold mb-5 sm:mb-6 text-center text-[#abd1c6]">
             Выберите сумму поддержки
           </h3>
 
@@ -141,7 +139,7 @@ export default function OneTimeSupport({
           <CustomAmountInput value={customAmount} onChange={onAmountChange} />
 
           {showSocialPrompt && <SupportSocialPrompt />}
-        </div>
+        </Card>
       </div>
     </section>
   );

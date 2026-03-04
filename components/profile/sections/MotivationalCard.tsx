@@ -192,7 +192,7 @@ export default function MotivationalCard() {
                 className={`relative rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#004643] ${
                   index === currentQuote
                     ? "h-2 w-6 sm:w-8"
-                    : "h-1.5 w-1.5 sm:w-2 hover:w-3 sm:hover:w-4"
+                    : "h-1.5 w-1.5 sm:w-2 hover:w-4"
                 } ${
                   index === currentQuote
                     ? `bg-gradient-to-r ${quote.gradient} shadow-sm`

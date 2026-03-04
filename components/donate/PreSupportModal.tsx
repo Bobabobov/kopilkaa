@@ -61,9 +61,10 @@ export function PreSupportModal({
 
                 <h3
                   id="pre-support-title"
-                  className="mt-3 text-xl sm:text-2xl font-black text-[#fffffe] leading-tight"
+                  className="mt-3 text-xl sm:text-2xl font-black text-[#fffffe] leading-tight inline-flex items-center gap-2"
                 >
-                  💚 Поддержать «Копилку»
+                  <LucideIcons.Heart className="text-[#f9bc60] flex-shrink-0" size="lg" />
+                  Поддержать «Копилку»
                 </h3>
                 <p
                   id="pre-support-desc"
@@ -136,7 +137,7 @@ export function PreSupportModal({
                         size="sm"
                         className="group-hover:scale-110 transition-transform"
                       />
-                      💚 Поддержать проект
+                      Поддержать проект
                       <LucideIcons.ExternalLink size="sm" />
                     </a>
 
@@ -192,7 +193,7 @@ export function PreSupportModal({
                         size="sm"
                         className="group-hover:scale-110 transition-transform"
                       />
-                      💚 Поддержать проект
+                      Поддержать проект
                       <LucideIcons.ExternalLink size="sm" />
                     </a>
                     <a
@@ -238,7 +239,7 @@ export function PreSupportModal({
                         size="sm"
                         className="group-hover:scale-110 transition-transform"
                       />
-                      💚 Поддержать проект
+                      Поддержать проект
                       <LucideIcons.ExternalLink size="sm" />
                     </a>
                     <a
@@ -271,7 +272,7 @@ export function PreSupportModal({
                         size="sm"
                         className="group-hover:scale-110 transition-transform"
                       />
-                      💚 Поддержать проект
+                      Поддержать проект
                       <LucideIcons.ExternalLink size="sm" />
                     </a>
                   </div>

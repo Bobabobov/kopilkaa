@@ -28,6 +28,7 @@ export class GameEngine {
   private gameOverScene: GameOverScene | null = null;
   private onGameOver?: (score: number) => void;
   private onLeaderboardClick?: () => void;
+  private onRoundStart?: () => void;
   private clickHandler: ((event: PIXI.FederatedPointerEvent) => void) | null =
     null;
   private resizeHandler: (() => void) | null = null;
@@ -66,11 +67,13 @@ export class GameEngine {
     container: HTMLElement,
     onGameOver?: (score: number) => void,
     onLeaderboardClick?: () => void,
+    onRoundStart?: () => void,
   ) {
     this.container = container;
     this.config = GAME_CONFIG;
     this.onGameOver = onGameOver;
     this.onLeaderboardClick = onLeaderboardClick;
+    this.onRoundStart = onRoundStart;
     this.gameState = {
       score: 0,
       lives: this.config.maxLives,
@@ -123,6 +126,7 @@ export class GameEngine {
       this.resizeObserver.observe(this.container);
     }
 
+    await PIXI.Assets.load("/coin/co/1.png").catch(() => null);
     this.menuScene = new MenuScene(this.app, () => this.startGame());
     this.playScene = new PlayScene(this.app, this.config);
     await this.playScene.initBackground();
@@ -212,6 +216,8 @@ export class GameEngine {
   startGame(): void {
     if (!this.app) return;
 
+    this.onRoundStart?.();
+
     if (!this.bgAudio && typeof Audio !== "undefined") {
       this.bgAudio = new Audio("/coin/muzaka/lost-eon-along-in-the-night.mp3");
       this.bgAudio.loop = true;
@@ -297,7 +303,7 @@ export class GameEngine {
 
     const wantCount = mobile
       ? 2 + Math.floor(Math.random() * 4)
-      : 1 + Math.floor(Math.random() * 4);
+      : 2 + Math.floor(Math.random() * 5);
     const count = Math.min(wantCount, maxCoins - activeCount);
     const w = this.app.screen.width;
     const h = this.app.screen.height;

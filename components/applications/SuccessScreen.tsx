@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Card, CardContent } from "@/components/ui/Card";
 import Link from "next/link";
 
 interface SuccessScreenProps {
@@ -96,148 +97,89 @@ export default function SuccessScreen({
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10 max-w-6xl mx-auto px-4"
       >
         {/* Модерация */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 hover:shadow-3xl transition-all duration-500 group"
-        >
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-[#f9bc60]/15 to-[#abd1c6]/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
-            <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-[#abd1c6]/10 to-[#f9bc60]/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
-          </div>
-          <div className="relative z-10">
-            <motion.div
-              whileHover={{ scale: 1.15, rotate: 5 }}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#f9bc60]/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300"
-            >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+          <Card variant="darkGlass" padding="md" className="h-full transition-all duration-300 hover:border-[#f9bc60]/30 group">
+            <CardContent className="text-center">
               <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                whileHover={{ scale: 1.1 }}
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl mx-auto mb-4 flex items-center justify-center"
+                style={{ background: "rgba(249, 188, 96, 0.15)" }}
               >
                 <LucideIcons.Clock size="lg" className="text-[#f9bc60]" />
               </motion.div>
-            </motion.div>
-            <h3 className="font-bold text-[#fffffe] mb-2 text-center text-base sm:text-lg group-hover:text-[#f9bc60] transition-colors duration-300">
-              Модерация
-            </h3>
-            <p className="text-xs sm:text-sm text-center text-[#abd1c6] leading-relaxed">
-              Ваша заявка проверяется.
-            </p>
-          </div>
+              <h3 className="font-bold text-[#fffffe] mb-2 text-base sm:text-lg group-hover:text-[#f9bc60] transition-colors">
+                Модерация
+              </h3>
+              <p className="text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
+                Ваша заявка проверяется.
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
 
         {/* Уведомления */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.65 }}
-          className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 hover:shadow-3xl transition-all duration-500 group"
-        >
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-[#f9bc60]/15 to-[#abd1c6]/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
-            <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-[#abd1c6]/10 to-[#f9bc60]/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
-          </div>
-          <div className="relative z-10">
-            <motion.div
-              whileHover={{ scale: 1.15, y: -2 }}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#f9bc60]/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300"
-            >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}>
+          <Card variant="darkGlass" padding="md" className="h-full transition-all duration-300 hover:border-[#f9bc60]/30 group">
+            <CardContent className="text-center">
               <motion.div
-                animate={{ y: [0, -3, 0] }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                whileHover={{ scale: 1.1 }}
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl mx-auto mb-4 flex items-center justify-center"
+                style={{ background: "rgba(249, 188, 96, 0.15)" }}
               >
                 <LucideIcons.Mail size="lg" className="text-[#f9bc60]" />
               </motion.div>
-            </motion.div>
-            <h3 className="font-bold text-[#fffffe] mb-2 text-center text-base sm:text-lg group-hover:text-[#f9bc60] transition-colors duration-300">
-              Уведомления
-            </h3>
-            <p className="text-xs sm:text-sm text-center text-[#abd1c6] leading-relaxed">
-              Мы сообщим о результате.
-            </p>
-          </div>
+              <h3 className="font-bold text-[#fffffe] mb-2 text-base sm:text-lg group-hover:text-[#f9bc60] transition-colors">
+                Уведомления
+              </h3>
+              <p className="text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
+                Мы сообщим о результате.
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
 
         {/* Следующая заявка */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 hover:shadow-3xl transition-all duration-500 group"
-        >
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-[#f9bc60]/15 to-[#abd1c6]/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
-            <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-[#abd1c6]/10 to-[#f9bc60]/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
-          </div>
-          <div className="relative z-10">
-            <motion.div
-              whileHover={{ scale: 1.15 }}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-[#abd1c6]/15 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300"
-            >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
+          <Card variant="darkGlass" padding="md" className="h-full transition-all duration-300 hover:border-white/15 group">
+            <CardContent className="text-center">
               <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                whileHover={{ scale: 1.1 }}
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white/10 mx-auto mb-4 flex items-center justify-center"
               >
-                <LucideIcons.Clock size="lg" className="text-[#d7e9e0]" />
+                <LucideIcons.Clock size="lg" className="text-[#abd1c6]" />
               </motion.div>
-            </motion.div>
-            <h3 className="font-bold text-[#fffffe] mb-2 text-center text-base sm:text-lg group-hover:text-[#abd1c6] transition-colors duration-300">
-              Следующая заявка
-            </h3>
-            <p className="text-xs sm:text-sm text-center text-[#c8ddd6] leading-relaxed">
-              Новую заявку можно подать через 24 часа — это помогает сохранять
-              честность и порядок
-            </p>
-          </div>
+              <h3 className="font-bold text-[#fffffe] mb-2 text-base sm:text-lg group-hover:text-[#abd1c6] transition-colors">
+                Следующая заявка
+              </h3>
+              <p className="text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
+                Новую заявку можно подать через 24 часа — это помогает сохранять
+                честность и порядок
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
 
         {/* Поддержка */}
-        <Link href="/support">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.75 }}
-            whileHover={{ y: -5 }}
-            className="relative overflow-hidden bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] backdrop-blur-xl rounded-2xl p-5 sm:p-6 shadow-2xl border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 hover:shadow-3xl transition-all duration-500 group cursor-pointer"
-          >
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-red-500/15 to-[#abd1c6]/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
-              <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-[#abd1c6]/10 to-red-500/10 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
-            </div>
-            <div className="relative z-10">
-              <motion.div
-                whileHover={{ scale: 1.15 }}
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-red-500/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300"
-              >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}>
+          <Link href="/support">
+            <Card variant="darkGlass" padding="md" className="h-full transition-all duration-300 hover:border-[#f9bc60]/30 cursor-pointer group">
+              <CardContent className="text-center">
                 <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
+                  whileHover={{ scale: 1.1 }}
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-red-500/20 mx-auto mb-4 flex items-center justify-center"
                 >
                   <LucideIcons.Heart size="lg" className="text-red-400" />
                 </motion.div>
-              </motion.div>
-              <h3 className="font-bold text-[#fffffe] mb-2 text-center text-base sm:text-lg group-hover:text-red-400 transition-colors duration-300">
-                Поддержка
-              </h3>
-              <p className="text-xs sm:text-sm text-center text-[#abd1c6] leading-relaxed">
-                Если нужна помощь, обращайтесь в поддержку
-              </p>
-            </div>
-          </motion.div>
-        </Link>
+                <h3 className="font-bold text-[#fffffe] mb-2 text-base sm:text-lg group-hover:text-red-400 transition-colors">
+                  Поддержка
+                </h3>
+                <p className="text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
+                  Если нужна помощь, обращайтесь в поддержку
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+        </motion.div>
       </motion.div>
 
       <motion.div
@@ -246,18 +188,17 @@ export default function SuccessScreen({
         transition={{ duration: 0.5, delay: 0.8 }}
         className="flex justify-center px-4"
       >
-        <Link href="/profile">
-          <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 sm:px-10 py-3 bg-[#abd1c6]/10 hover:bg-[#abd1c6]/20 text-[#fffffe] font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl border border-[#abd1c6]/20 hover:border-[#abd1c6]/40 flex items-center justify-center gap-2 group"
-          >
-            <LucideIcons.User
-              className="group-hover:scale-110 transition-transform duration-300"
-              size="sm"
-            />
-            Мой профиль
-          </motion.button>
+        <Link
+          href="/profile"
+          className="inline-flex items-center justify-center gap-2 px-8 sm:px-10 py-3 font-semibold rounded-xl transition-all hover:opacity-90"
+          style={{
+            background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+            color: "#001e1d",
+            boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
+          }}
+        >
+          <LucideIcons.User size="sm" />
+          Мой профиль
         </Link>
       </motion.div>
     </motion.div>

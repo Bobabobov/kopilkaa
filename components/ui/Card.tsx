@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Вариант стиля карточки */
-  variant?: "default" | "glass" | "solid" | "outline";
+  variant?: "default" | "glass" | "darkGlass" | "solid" | "outline";
   /** Отступы внутри карточки */
   padding?: "none" | "sm" | "md" | "lg";
   /** Анимация при наведении */
@@ -24,6 +24,9 @@ const paddingStyles = {
 const variantStyles = {
   default: "bg-[#004643]/60 backdrop-blur-sm border-[#abd1c6]/20",
   glass: "bg-[#004643]/40 backdrop-blur-md border-[#abd1c6]/15",
+  /** Как на главной: градиент + тень, для профиля и ленты */
+  darkGlass:
+    "border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2)]",
   solid: "bg-[#004643] border-[#abd1c6]/25",
   outline: "bg-transparent border-[#abd1c6]/30",
 };
@@ -52,10 +55,13 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          "rounded-xl border",
+          "rounded-2xl border",
           variantStyles[variant],
+          variant === "darkGlass" &&
+            "bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)]",
           paddingStyles[padding],
-          hoverable && "transition-all duration-200 hover:border-[#abd1c6]/40 hover:shadow-lg",
+          hoverable &&
+            "transition-all duration-200 hover:border-white/15 hover:shadow-lg hover:shadow-black/20",
           className
         )}
         {...props}

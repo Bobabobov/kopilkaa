@@ -1,12 +1,37 @@
 "use client";
+
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { LucideIcons } from "@/components/ui/LucideIcons";
+import {
+  HelpCircle,
+  FileText,
+  Clock,
+  User,
+  CheckCircle,
+  DollarSign,
+  Coins,
+  Shield,
+  ChevronDown,
+  MessageCircle,
+  ArrowRight,
+} from "lucide-react";
+const FAQ_ICONS = {
+  HelpCircle,
+  FileText,
+  Clock,
+  User,
+  CheckCircle,
+  DollarSign,
+  Coin: Coins,
+  Coins,
+  Shield,
+} as const;
 
 interface FAQItem {
   question: string;
   answer: string;
-  icon: keyof typeof LucideIcons;
+  icon: keyof typeof FAQ_ICONS;
 }
 
 const faqs: FAQItem[] = [
@@ -68,91 +93,100 @@ export default function FAQ() {
   };
 
   return (
-    <section className="py-24 px-4" id="faq">
+    <section className="py-20 px-4" id="faq">
       <div className="max-w-4xl mx-auto">
-        {/* Заголовок секции */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
         >
+          <span
+            className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider mb-4"
+            style={{ color: "#f9bc60", letterSpacing: "0.12em" }}
+          >
+            <MessageCircle className="w-4 h-4" />
+            Ответы на вопросы
+          </span>
           <h2
-            className="text-4xl md:text-5xl font-bold mb-4"
+            className="text-4xl md:text-5xl font-bold mb-3 tracking-tight"
             style={{ color: "#fffffe" }}
           >
             Частые вопросы
           </h2>
-          <p className="text-xl" style={{ color: "#abd1c6" }}>
+          <p className="text-lg md:text-xl" style={{ color: "#abd1c6" }}>
             Как работает платформа и на каких условиях
           </p>
         </motion.div>
 
-        {/* FAQ Items */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqs.map((faq, index) => {
-            const Icon = LucideIcons[faq.icon];
+            const IconComponent = FAQ_ICONS[faq.icon as keyof typeof FAQ_ICONS];
             const isOpen = openIndex === index;
 
             return (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.05 }}
+                transition={{ duration: 0.45, delay: index * 0.04 }}
               >
                 <button
+                  type="button"
                   onClick={() => toggleFAQ(index)}
-                  className="w-full text-left bg-white/[0.04] backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
+                  className="w-full text-left rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-lg group"
+                  style={{
+                    background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                    boxShadow: isOpen
+                      ? "0 4px 24px rgba(0,0,0,0.25), 0 0 0 1px rgba(249,188,96,0.2)"
+                      : "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
+                  }}
                 >
                   <div className="flex items-start gap-4">
-                    {/* Иконка */}
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: "#f9bc6020" }}
+                    <span
+                      className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-colors"
+                      style={{
+                        background: "rgba(249, 188, 96, 0.15)",
+                        color: "#f9bc60",
+                      }}
                     >
-                      {Icon && (
-                        <div style={{ color: "#f9bc60" }}>
-                          <Icon size="md" />
-                        </div>
+                      {IconComponent ? (
+                        <IconComponent className="w-5 h-5" />
+                      ) : (
+                        <HelpCircle className="w-5 h-5" />
                       )}
-                    </div>
+                    </span>
 
-                    {/* Контент */}
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3">
                         <h3
-                          className="text-lg md:text-xl font-bold"
+                          className="text-base sm:text-lg font-bold leading-snug pt-0.5"
                           style={{ color: "#fffffe" }}
                         >
                           {faq.question}
                         </h3>
-                        <motion.div
+                        <motion.span
                           animate={{ rotate: isOpen ? 180 : 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="flex-shrink-0"
+                          transition={{ duration: 0.25 }}
+                          className="flex-shrink-0 text-[#abd1c6] group-hover:text-[#f9bc60] transition-colors"
                         >
-                          <LucideIcons.ChevronDown
-                            size="md"
-                            className="text-[#abd1c6]"
-                          />
-                        </motion.div>
+                          <ChevronDown className="w-5 h-5" />
+                        </motion.span>
                       </div>
 
-                      {/* Ответ */}
                       <AnimatePresence>
                         {isOpen && (
                           <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: 0.25 }}
                             className="overflow-hidden"
                           >
                             <div
-                              className="mt-4 text-base leading-relaxed space-y-3"
+                              className="mt-4 pt-4 border-t border-white/10 text-sm sm:text-base leading-relaxed space-y-3"
                               style={{ color: "#abd1c6" }}
                             >
                               {faq.answer.split("\n\n").map((para, i) => (
@@ -170,28 +204,28 @@ export default function FAQ() {
           })}
         </div>
 
-        {/* CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
           className="text-center mt-12"
         >
           <p className="text-lg mb-4" style={{ color: "#abd1c6" }}>
             Готовы рассказать свою историю?
           </p>
-          <a
+          <Link
             href="/applications"
-            className="inline-flex items-center gap-2 px-6 py-3 text-base font-semibold rounded-lg border-2 transition-all duration-300 hover:scale-105"
+            className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
             style={{
-              borderColor: "#abd1c6",
-              color: "#abd1c6",
+              background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+              color: "#001e1d",
+              boxShadow: "0 8px 32px rgba(249, 188, 96, 0.25)",
             }}
           >
-            <LucideIcons.FileText size="sm" />
             Рассказать историю
-          </a>
+            <ArrowRight className="w-5 h-5" />
+          </Link>
         </motion.div>
       </div>
     </section>

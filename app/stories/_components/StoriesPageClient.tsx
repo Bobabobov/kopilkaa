@@ -334,7 +334,7 @@ export default function StoriesPageClient({
                   href="/applications"
                   className="group block w-full max-w-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#001e1d] rounded-2xl"
                 >
-                  <Card variant="glass" padding="sm" className="overflow-hidden border-[#abd1c6]/20 transition-all duration-300 hover:border-[#f9bc60]/40 hover:shadow-[0_12px_40px_-12px_rgba(249,188,96,0.25)]">
+                  <Card variant="darkGlass" padding="sm" className="overflow-hidden transition-all duration-300 hover:border-[#f9bc60]/30 hover:shadow-[0_12px_40px_-12px_rgba(249,188,96,0.2)]">
                     <CardContent className="flex items-center gap-4 p-4">
                       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#f9bc60]/30 to-[#e8a545]/20 text-[#f9bc60] transition-transform duration-300 group-hover:scale-110" aria-hidden>
                         <LucideIcons.Edit3 className="h-6 w-6" />

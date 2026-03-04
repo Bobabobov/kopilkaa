@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export function RequirementsSection() {
   return (
@@ -24,8 +25,8 @@ export function RequirementsSection() {
           <div className="absolute -inset-0.5 bg-gradient-to-br from-[#f9bc60]/0 to-[#f9bc60]/10 rounded-3xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div className="relative p-8 bg-[#001e1d]/60 backdrop-blur-sm rounded-3xl border border-[#abd1c6]/10">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-2xl">
-                📋
+              <div className="w-12 h-12 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-[#001e1d]">
+                <LucideIcons.ClipboardList className="w-6 h-6" />
               </div>
               <h2 className="text-2xl font-bold text-[#fffffe]">
                 Общие требования
@@ -35,7 +36,7 @@ export function RequirementsSection() {
             <div className="space-y-4">
               <div className="p-4 bg-[#004643]/30 rounded-xl border border-[#abd1c6]/5">
                 <h3 className="text-base font-semibold text-[#f9bc60] mb-2 flex items-center gap-2">
-                  <span>📝</span>
+                  <LucideIcons.Document className="w-4 h-4 flex-shrink-0" />
                   Текстовый контент
                 </h3>
                 <ul className="space-y-1.5 text-[#abd1c6] text-sm">
@@ -57,7 +58,7 @@ export function RequirementsSection() {
 
               <div className="p-4 bg-[#004643]/30 rounded-xl border border-[#abd1c6]/5">
                 <h3 className="text-base font-semibold text-[#f9bc60] mb-2 flex items-center gap-2">
-                  <span>🖼️</span>
+                  <LucideIcons.Image className="w-4 h-4 flex-shrink-0" />
                   Изображения
                 </h3>
                 <ul className="space-y-1.5 text-[#abd1c6] text-sm">
@@ -77,7 +78,7 @@ export function RequirementsSection() {
 
               <div className="p-4 bg-[#004643]/30 rounded-xl border border-[#abd1c6]/5">
                 <h3 className="text-base font-semibold text-[#f9bc60] mb-2 flex items-center gap-2">
-                  <span>🎬</span>
+                  <LucideIcons.Play className="w-4 h-4 flex-shrink-0" />
                   Видео (для большого баннера)
                 </h3>
                 <ul className="space-y-1.5 text-[#abd1c6] text-sm">
@@ -110,8 +111,8 @@ export function RequirementsSection() {
           <div className="absolute -inset-0.5 bg-gradient-to-br from-[#f9bc60]/0 to-[#f9bc60]/10 rounded-3xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div className="relative p-8 bg-[#001e1d]/60 backdrop-blur-sm rounded-3xl border border-[#abd1c6]/10">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-2xl">
-                💡
+              <div className="w-12 h-12 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-[#001e1d]">
+                <LucideIcons.Lightbulb className="w-6 h-6" />
               </div>
               <h2 className="text-2xl font-bold text-[#fffffe]">
                 Рекомендации
@@ -121,7 +122,7 @@ export function RequirementsSection() {
             <div className="space-y-4">
               <div className="p-4 bg-[#004643]/30 rounded-xl border border-[#abd1c6]/5">
                 <h3 className="text-base font-semibold text-[#f9bc60] mb-2 flex items-center gap-2">
-                  <span>✍️</span>
+                  <LucideIcons.Edit3 className="w-4 h-4 flex-shrink-0" />
                   Заголовок
                 </h3>
                 <ul className="space-y-1.5 text-[#abd1c6] text-sm">
@@ -133,7 +134,7 @@ export function RequirementsSection() {
 
               <div className="p-4 bg-[#004643]/30 rounded-xl border border-[#abd1c6]/5">
                 <h3 className="text-base font-semibold text-[#f9bc60] mb-2 flex items-center gap-2">
-                  <span>🎨</span>
+                  <LucideIcons.Palette className="w-4 h-4 flex-shrink-0" />
                   Изображения
                 </h3>
                 <ul className="space-y-1.5 text-[#abd1c6] text-sm">

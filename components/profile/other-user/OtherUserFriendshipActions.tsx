@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export type FriendshipStatus = "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED";
 
@@ -128,7 +129,7 @@ export function OtherUserFriendshipActions({
 
       {friendship && friendship.status === "ACCEPTED" && (
         <div className="w-full text-center px-4 py-3 rounded-2xl text-sm font-semibold bg-[#10B981]/20 text-[#10B981]">
-          ✓ Друзья
+          <LucideIcons.Check className="w-4 h-4 mr-1 inline-block" /> Друзья
         </div>
       )}
 

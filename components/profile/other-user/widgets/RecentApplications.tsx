@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 type Application = {
   id: string;
@@ -67,8 +68,8 @@ export default function RecentApplications({
 
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-[#001e1d] text-lg shadow-lg">
-            📝
+          <div className="w-10 h-10 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] rounded-xl flex items-center justify-center text-[#001e1d] shadow-lg">
+            <LucideIcons.Document className="w-5 h-5" />
           </div>
           <h3 className="text-base font-bold text-[#fffffe]">Одобренные</h3>
         </div>
@@ -85,7 +86,7 @@ export default function RecentApplications({
         ) : items.length === 0 ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 bg-[#f9bc60]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📝</span>
+              <LucideIcons.Document className="w-8 h-8 text-[#f9bc60]" />
             </div>
             <p className="text-[#abd1c6] text-sm">Заявок пока нет</p>
           </div>

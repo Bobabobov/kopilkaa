@@ -42,7 +42,7 @@ const messages = [
   },
   {
     threshold: 95,
-    text: "Готово к отправке! 🎉",
+    text: "Готово к отправке!",
     icon: "CheckCircle",
     color: "#10B981",
   },

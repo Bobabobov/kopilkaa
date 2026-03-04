@@ -2,8 +2,8 @@
 
 import type { Coin, GameConfig } from "../../_types";
 
-/** Максимум монет на экране: desktop 14, mobile 12 (чтобы не было завала и мисскликов) */
-export const MAX_COINS_ON_SCREEN_DESKTOP = 14;
+/** Максимум монет на экране: на больших экранах больше, на мобилке чуть меньше (площадь экрана) */
+export const MAX_COINS_ON_SCREEN_DESKTOP = 22;
 export const MAX_COINS_ON_SCREEN_MOBILE = 18;
 
 export function getMaxCoinsOnScreen(isMobile: boolean): number {

@@ -12,8 +12,8 @@ const links: { href: Route; label: string }[] = [
   { href: "/reviews", label: "Отзывы" },
   { href: "/applications", label: "Заявка" },
   { href: "/games", label: "Игры" },
-  { href: "/heroes", label: "⭐ Герои" },
-  { href: "/advertising", label: "📢 Реклама" },
+  { href: "/heroes", label: "Герои" },
+  { href: "/advertising", label: "Реклама" },
 ];
 
 interface HeaderNavigationProps {

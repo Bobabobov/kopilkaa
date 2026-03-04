@@ -95,6 +95,11 @@ import {
   MoreVertical,
   Infinity as InfinityIcon,
   FlaskConical,
+  Gift,
+  Sparkles,
+  ClipboardList,
+  Play,
+  Ruler,
 } from "lucide-react";
 
 interface IconProps {
@@ -248,6 +253,26 @@ export const LucideIcons = {
   // Тестировщик
   TestTube: ({ className = "", size = "md" }: IconProps) => (
     <FlaskConical className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Gift: ({ className = "", size = "md" }: IconProps) => (
+    <Gift className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Sparkles: ({ className = "", size = "md" }: IconProps) => (
+    <Sparkles className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  ClipboardList: ({ className = "", size = "md" }: IconProps) => (
+    <ClipboardList className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Play: ({ className = "", size = "md" }: IconProps) => (
+    <Play className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Ruler: ({ className = "", size = "md" }: IconProps) => (
+    <Ruler className={`${sizeClasses[size]} ${className}`} />
   ),
 
   // Бизнес/портфель

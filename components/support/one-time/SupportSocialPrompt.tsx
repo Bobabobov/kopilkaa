@@ -34,7 +34,12 @@ export function SupportSocialPrompt() {
       <div className="flex-shrink-0">
         <Link
           href="/profile?settings=socials"
-          className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-[#f9bc60] text-[#001e1d] text-xs sm:text-sm font-semibold hover:bg-[#e8a545] transition-colors w-full md:w-auto justify-center"
+          className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all hover:opacity-90 w-full md:w-auto"
+          style={{
+            background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+            color: "#001e1d",
+            boxShadow: "0 6px 20px rgba(249, 188, 96, 0.25)",
+          }}
         >
           <LucideIcons.User size="xs" />
           Привязать соцсети

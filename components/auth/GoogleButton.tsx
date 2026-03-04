@@ -158,13 +158,13 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
       )}
 
       {loading && !error && (
-        <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] text-[#abd1c6] flex items-center justify-center gap-2.5 border border-[#1f2937]/50">
-          <div className="w-4 h-4 border-2 border-[#abd1c6] border-t-transparent rounded-full animate-spin" />
+        <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm border border-white/20 text-[#abd1c6] flex items-center justify-center gap-2.5" style={{ background: "rgba(255,255,255,0.05)" }}>
+          <div className="w-4 h-4 border-2 border-[#f9bc60] border-t-transparent rounded-full animate-spin" />
           <span>Загрузка Google...</span>
         </div>
       )}
       {error && (
-        <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] text-[#6b7280] flex items-center justify-center gap-2.5 border border-[#1f2937]/50">
+        <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm border border-red-400/30 text-red-400 flex items-center justify-center gap-2.5 bg-red-500/10">
           <LucideIcons.AlertCircle size="sm" />
           <span>{error}</span>
         </div>
@@ -205,12 +205,12 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
           }}
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] hover:from-[#374151] hover:to-[#4b5563] text-[#abd1c6] flex items-center justify-center gap-2.5 transition-all shadow-lg border border-[#1f2937]/50 relative z-10 group"
+          className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm border border-white/20 text-[#fffffe] hover:border-[#f9bc60]/50 hover:text-[#f9bc60] flex items-center justify-center gap-2.5 transition-all relative z-10"
+          style={{ background: "rgba(255,255,255,0.05)" }}
         >
-          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#f9bc60]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           {/* Google логотип */}
           <svg
-            className="w-5 h-5 relative z-10 flex-shrink-0"
+            className="w-5 h-5 flex-shrink-0"
             viewBox="0 0 24 24"
           >
             <path
@@ -230,7 +230,7 @@ export function GoogleButton({ onAuth, checkingAuth }: GoogleButtonProps) {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          <span className="relative z-10">Войти через Google</span>
+          <span>Войти через Google</span>
         </motion.button>
       )}
 

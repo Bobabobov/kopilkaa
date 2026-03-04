@@ -111,19 +111,34 @@ export default function ApplicationsPageClient() {
 
   if (!user) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center px-4">
+      <div className="min-h-screen relative flex items-center justify-center px-4 py-12">
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
         </div>
-        <Card variant="darkGlass" padding="lg" className="max-w-md text-center">
-          <CardContent>
-            <p className="text-[#abd1c6]">
-              Войдите в аккаунт, чтобы подать заявку. Окно входа должно открыться
-              автоматически.
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-lg"
+        >
+          <Card variant="darkGlass" padding="lg" className="text-center">
+            <div className="mb-6 flex justify-center">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#f9bc60]/15 border border-[#f9bc60]/30">
+                <LucideIcons.User className="w-7 h-7 text-[#f9bc60]" />
+              </div>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#fffffe] mb-3">
+              Войдите, чтобы подать заявку
+            </h1>
+            <p className="text-[#abd1c6] mb-6 leading-relaxed">
+              Окно входа или регистрации должно открыться автоматически. Если этого не произошло — обновите страницу.
             </p>
-          </CardContent>
-        </Card>
+            <p className="text-sm text-[#94a1b2]">
+              После входа вы вернётесь на эту страницу и сможете заполнить заявку.
+            </p>
+          </Card>
+        </motion.div>
       </div>
     );
   }

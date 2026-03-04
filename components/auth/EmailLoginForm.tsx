@@ -61,11 +61,11 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
         transition={{ delay: 0.2, duration: 0.3 }}
         className="flex items-center gap-3 my-6"
       >
-        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#1f2937] to-[#1f2937]" />
-        <span className="text-xs text-[#6b7280] uppercase tracking-wider font-semibold px-2">
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-white/20" />
+        <span className="text-xs text-[#abd1c6] uppercase tracking-wider font-semibold px-2">
           по почте
         </span>
-        <div className="flex-1 h-px bg-gradient-to-l from-transparent via-[#1f2937] to-[#1f2937]" />
+        <div className="flex-1 h-px bg-gradient-to-l from-transparent via-white/20 to-white/20" />
       </motion.div>
 
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
@@ -81,12 +81,10 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
             Email или логин
           </label>
           <input
-            className={`w-full px-4 py-3.5 rounded-xl border text-base bg-[#020617]/80 backdrop-blur-sm placeholder:text-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 transition-all ${
+            className={`w-full px-4 py-3.5 rounded-xl border text-base bg-white/5 backdrop-blur-sm placeholder:text-[#94a1b2] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 transition-all ${
               validationErrors.identifier
                 ? "border-red-500/70 focus:border-red-500/70"
-                : identifier.trim()
-                  ? "border-[#4b5563] focus:border-[#f9bc60]/40"
-                  : "border-[#1f2937] focus:border-[#f9bc60]/40"
+                : "border-white/10 focus:border-[#f9bc60]/40"
             }`}
             style={{ color: "#fffffe" }}
             type="text"
@@ -126,12 +124,10 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
             Пароль
           </label>
           <input
-            className={`w-full px-4 py-3.5 rounded-xl border text-base bg-[#020617]/80 backdrop-blur-sm placeholder:text-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 transition-all ${
+            className={`w-full px-4 py-3.5 rounded-xl border text-base bg-white/5 backdrop-blur-sm placeholder:text-[#94a1b2] focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/60 transition-all ${
               validationErrors.password
                 ? "border-red-500/70 focus:border-red-500/70"
-                : password.trim()
-                  ? "border-[#4b5563] focus:border-[#f9bc60]/40"
-                  : "border-[#1f2937] focus:border-[#f9bc60]/40"
+                : "border-white/10 focus:border-[#f9bc60]/40"
             }`}
             style={{ color: "#fffffe" }}
             type="password"
@@ -178,13 +174,13 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
           whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={busy}
-          className="w-full py-3.5 px-4 rounded-xl font-semibold text-base transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-xl relative overflow-hidden"
+          className="w-full py-3.5 px-4 rounded-xl font-semibold text-base transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden hover:opacity-90"
           style={{
-            backgroundColor: "#f9bc60",
+            background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
             color: "#001e1d",
+            boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-[#e8a545] to-[#f9bc60] opacity-0 hover:opacity-100 transition-opacity" />
           {busy ? (
             <span className="flex items-center justify-center gap-2 relative z-10">
               <div className="w-4 h-4 border-2 border-[#001e1d] border-t-transparent rounded-full animate-spin" />

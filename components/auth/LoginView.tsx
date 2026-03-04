@@ -47,7 +47,7 @@ export function LoginView({
             transition={{ delay: 0.3 }}
             className="mb-6"
           >
-            <p className="text-xs mb-4 text-center text-[#6b7280] uppercase tracking-wider font-semibold">
+            <p className="text-xs mb-4 text-center text-[#abd1c6] uppercase tracking-wider font-semibold">
               Через Telegram
             </p>
             <TelegramWidget
@@ -62,7 +62,7 @@ export function LoginView({
             transition={{ delay: 0.32 }}
             className="mb-6"
           >
-            <p className="text-xs mb-4 text-center text-[#6b7280] uppercase tracking-wider font-semibold">
+            <p className="text-xs mb-4 text-center text-[#abd1c6] uppercase tracking-wider font-semibold">
               Через Google
             </p>
             <GoogleButton onAuth={onGoogleAuth} checkingAuth={checkingAuth} />
@@ -77,11 +77,11 @@ export function LoginView({
           >
             <Link
               href={emailHref}
-              className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] hover:from-[#374151] hover:to-[#4b5563] text-[#abd1c6] flex items-center justify-center gap-2.5 transition-all shadow-lg border border-[#1f2937]/50 relative z-10 block"
+              className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm border border-white/20 text-[#fffffe] hover:border-[#f9bc60]/50 hover:text-[#f9bc60] flex items-center justify-center gap-2.5 transition-all relative z-10 block"
+              style={{ background: "rgba(255,255,255,0.05)" }}
             >
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#f9bc60]/5 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
-              <LucideIcons.Mail size="sm" className="relative z-10" />
-              <span className="relative z-10">Войти по почте</span>
+              <LucideIcons.Mail size="sm" />
+              <span>Войти по почте</span>
             </Link>
           </motion.div>
         </>

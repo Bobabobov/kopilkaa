@@ -172,7 +172,7 @@ export function AuthModal({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
         onClick={closeModal}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-lg p-4"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 30 }}
@@ -191,18 +191,21 @@ export function AuthModal({
           aria-labelledby="auth-modal-title"
           aria-describedby="auth-modal-desc"
           tabIndex={-1}
-          className="relative w-full max-w-[520px] rounded-3xl bg-[#001e1d] border border-[#1f2937]/50 shadow-2xl flex flex-col overflow-hidden"
+          className="relative w-full max-w-[520px] rounded-3xl border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden"
+          style={{
+            background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 50%, rgba(0,30,29,0.95) 100%)",
+          }}
         >
           {/* Декоративные элементы */}
-          <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-[#f9bc60]/10 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-          <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-[#abd1c6]/10 to-transparent rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
+          <div className="absolute top-0 left-0 w-32 h-32 bg-[#f9bc60]/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-40 h-40 bg-[#abd1c6]/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
           {/* Кнопка закрытия */}
           <motion.button
             whileHover={{ scale: 1.1, rotate: 90 }}
             whileTap={{ scale: 0.9 }}
             onClick={closeModal}
-            className="absolute right-4 top-4 w-9 h-9 flex items-center justify-center text-[#9ca3af] hover:text-[#f9bc60] hover:bg-[#1f2937]/80 rounded-xl transition-all backdrop-blur-sm z-20"
+            className="absolute right-4 top-4 w-9 h-9 flex items-center justify-center text-[#abd1c6] hover:text-[#f9bc60] hover:bg-white/10 rounded-xl transition-all z-20"
             aria-label="Закрыть"
           >
             <LucideIcons.X size="sm" />
@@ -241,7 +244,7 @@ export function AuthModal({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="text-sm text-[#6b7280] leading-relaxed"
+              className="text-sm text-[#abd1c6] leading-relaxed"
             >
               {showEmailForm
                 ? isSignup

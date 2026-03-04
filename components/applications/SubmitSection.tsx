@@ -34,13 +34,17 @@ export default function SubmitSection({
         disabled={submitting || uploading}
         onClick={onSubmit}
         className={cn(
-          "relative w-full px-8 py-4 bg-gradient-to-r from-[#f9bc60] via-[#e8a545] to-[#f9bc60]",
-          "hover:from-[#e8a545] hover:via-[#f9bc60] hover:to-[#e8a545]",
-          "text-[#001e1d] font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-[#f9bc60]/40 overflow-hidden group",
-          "disabled:cursor-not-allowed disabled:opacity-90",
-          "disabled:bg-gradient-to-r disabled:from-[#8b969f] disabled:via-[#9aa3ab] disabled:to-[#8b969f]",
-          "disabled:text-[#0f1f1c] disabled:shadow-[0_0_0_1px_rgba(249,188,96,0.28)] disabled:border disabled:border-[#f9bc60]/30",
+          "relative w-full px-8 py-4 text-[#001e1d] font-bold rounded-xl transition-all overflow-hidden group",
+          "hover:opacity-90",
+          "disabled:cursor-not-allowed disabled:opacity-60",
+          "disabled:from-[#8b969f] disabled:via-[#9aa3ab] disabled:to-[#8b969f] disabled:text-[#0f1f1c]",
         )}
+        style={{
+          background: submitting || uploading
+            ? "linear-gradient(135deg, #8b969f 0%, #9aa3ab 100%)"
+            : "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+          boxShadow: submitting || uploading ? "none" : "0 8px 24px rgba(249, 188, 96, 0.25)",
+        }}
       >
         {/* Анимированный фон */}
         <motion.span

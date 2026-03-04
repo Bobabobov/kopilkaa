@@ -10,6 +10,7 @@ import {
 } from "@/components/notifications/utils";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/badge";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { cn } from "@/lib/utils";
 
 interface NotificationCardProps {
@@ -132,13 +133,13 @@ export default function NotificationCard({
                 notification.type === "friend_request") ? (
                 <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl overflow-hidden border-2 border-[#abd1c6]/30 shadow-lg">
                   <img
-                    src={notification.avatar}
+                    src={resolveAvatarUrl(notification.avatar)}
                     alt={userName || "Пользователь"}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       const target = e.currentTarget;
-                      if (target.src !== "/default-avatar.png") {
-                        target.src = "/default-avatar.png";
+                      if (!target.src.endsWith(DEFAULT_AVATAR)) {
+                        target.src = DEFAULT_AVATAR;
                       }
                     }}
                   />

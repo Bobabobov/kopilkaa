@@ -6,6 +6,7 @@ import { getAvatarFrame } from "@/lib/header-customization";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
+import { resolveAvatarUrl } from "@/lib/avatar";
 
 const DEFAULT_AVATAR = "/default-avatar.png";
 
@@ -23,9 +24,11 @@ export interface OtherUserBasic {
 }
 
 export function OtherUserAvatar({ user }: { user: OtherUserBasic }) {
-  const [avatarSrc, setAvatarSrc] = useState(user.avatar || DEFAULT_AVATAR);
+  const [avatarSrc, setAvatarSrc] = useState(
+    resolveAvatarUrl(user.avatar || DEFAULT_AVATAR),
+  );
   useEffect(() => {
-    setAvatarSrc(user.avatar || DEFAULT_AVATAR);
+    setAvatarSrc(resolveAvatarUrl(user.avatar || DEFAULT_AVATAR));
   }, [user.avatar]);
 
   return (
@@ -120,7 +123,7 @@ function renderAvatarWithFrame(
         />
         <div className="absolute inset-2 rounded-md overflow-hidden">
           <img
-            src={user.avatar || DEFAULT_AVATAR}
+            src={resolveAvatarUrl(user.avatar)}
             alt="Аватар"
             className="w-full h-full object-cover"
             onError={() => onAvatarError?.()}
@@ -135,7 +138,7 @@ function renderAvatarWithFrame(
       className={`w-24 h-24 rounded-lg shadow-2xl mx-auto mb-4 group-hover/avatar:scale-105 transition-transform duration-300 ${frame.className}`}
     >
       <img
-        src={user.avatar || DEFAULT_AVATAR}
+        src={resolveAvatarUrl(user.avatar)}
         alt="Аватар"
         className={`w-full h-full object-cover rounded-lg ${frameKey === "rainbow" ? "rounded-lg" : ""}`}
         onError={() => onAvatarError?.()}

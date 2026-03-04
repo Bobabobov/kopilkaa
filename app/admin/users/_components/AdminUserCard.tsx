@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { getTrustLabel } from "@/lib/trustLevel";
 import { formatDateShort, formatDateTime } from "@/lib/time";
 import { TrustDeltaControl } from "./TrustDeltaControl";
@@ -45,9 +46,12 @@ export function AdminUserCard({
         <div className="relative shrink-0">
           {user.avatar ? (
             <img
-              src={user.avatar}
+              src={resolveAvatarUrl(user.avatar)}
               alt={user.name || "User"}
               className="w-14 h-14 rounded-full object-cover border-2 border-[#abd1c6]/40"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_AVATAR;
+              }}
             />
           ) : (
             <div className="w-14 h-14 rounded-full bg-[#abd1c6]/10 flex items-center justify-center border-2 border-[#abd1c6]/20">

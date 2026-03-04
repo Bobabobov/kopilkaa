@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 const mockActivity = [
   {
     id: "a1",
@@ -155,11 +156,11 @@ export function FriendsSidebar() {
                       prefetch={false}
                     >
                       <img
-                        src={person.avatar || "/default-avatar.png"}
+                        src={resolveAvatarUrl(person.avatar)}
                         alt=""
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.src = "/default-avatar.png";
+                          e.currentTarget.src = DEFAULT_AVATAR;
                         }}
                       />
                     </Link>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 interface Donor {
   id: string;
   name: string;
@@ -15,8 +16,6 @@ interface Donor {
  * Компактный виджет «Топ‑донатёры» для правой колонки / небольших вставок.
  * Не такой детализированный, как большой блок TopDonors.
  */
-const DEFAULT_AVATAR = "/default-avatar.png";
-
 export default function TopDonorsWidget() {
   const [donors, setDonors] = useState<Donor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,7 +95,7 @@ export default function TopDonorsWidget() {
                           src={
                             failedAvatars[donor.id]
                               ? DEFAULT_AVATAR
-                              : donor.avatar || DEFAULT_AVATAR
+                              : resolveAvatarUrl(donor.avatar)
                           }
                           alt={donor.name}
                           className="h-full w-full object-cover"

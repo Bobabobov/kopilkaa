@@ -6,6 +6,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 interface Donor {
   id: string;
   name: string;
@@ -17,8 +18,6 @@ interface Donor {
   position: number;
   isTop: boolean;
 }
-
-const DEFAULT_AVATAR = "/default-avatar.png";
 
 export default function TopDonors() {
   const [donors, setDonors] = useState<Donor[]>([]);
@@ -181,7 +180,7 @@ export default function TopDonors() {
                           src={
                             failedAvatars[topDonor.id]
                               ? DEFAULT_AVATAR
-                              : topDonor.avatar || DEFAULT_AVATAR
+                              : resolveAvatarUrl(topDonor.avatar)
                           }
                           alt={topDonor.name}
                           className="h-full w-full object-cover"
@@ -317,7 +316,7 @@ export default function TopDonors() {
                                 src={
                                   failedAvatars[donor.id]
                                     ? DEFAULT_AVATAR
-                                    : donor.avatar || DEFAULT_AVATAR
+                                    : resolveAvatarUrl(donor.avatar)
                                 }
                                 alt={donor.name}
                                 className="h-full w-full object-cover"

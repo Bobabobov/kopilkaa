@@ -9,6 +9,7 @@ import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { cn } from "@/lib/utils";
 import type { ReviewItem } from "@/hooks/reviews/useReviews";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 function SocialChip({
   href,
@@ -43,7 +44,7 @@ function SocialChip({
 export function ReviewCard({ review }: { review: ReviewItem }) {
   const router = useRouter();
   const { user } = review;
-  const avatarUrl = user.avatar || "/default-avatar.png";
+  const avatarUrl = resolveAvatarUrl(user.avatar);
   const trust = user.trust;
   const trustLevelNumber = trust.status.split("_")[1] || "";
   const trustTitle = trustLevelNumber
@@ -107,7 +108,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
-                        e.currentTarget.src = "/default-avatar.png";
+                        e.currentTarget.src = DEFAULT_AVATAR;
                       }}
                     />
                   </div>
@@ -121,7 +122,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                     loading="lazy"
                     decoding="async"
                     onError={(e) => {
-                      e.currentTarget.src = "/default-avatar.png";
+                      e.currentTarget.src = DEFAULT_AVATAR;
                     }}
                   />
                 </div>

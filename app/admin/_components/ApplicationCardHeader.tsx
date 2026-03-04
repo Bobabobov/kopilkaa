@@ -2,6 +2,7 @@
 "use client";
 import Link from "next/link";
 import { useCallback } from "react";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { getAvatarFrame } from "@/lib/header-customization";
 import type { ApplicationItem } from "../types";
 
@@ -68,11 +69,11 @@ export default function ApplicationCardHeader({
                     {/* Аватар поверх рамки */}
                     <div className="absolute inset-0.5 rounded-full overflow-hidden">
                       <img
-                        src={it.user.avatar || "/default-avatar.png"}
+                        src={resolveAvatarUrl(it.user.avatar)}
                         alt={it.user.name || "Автор"}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.src = "/default-avatar.png";
+                          e.currentTarget.src = DEFAULT_AVATAR;
                         }}
                       />
                     </div>
@@ -85,11 +86,11 @@ export default function ApplicationCardHeader({
                     className={`w-full h-full rounded-full ${frame.className}`}
                   >
                     <img
-                      src={it.user.avatar || "/default-avatar.png"}
+                      src={resolveAvatarUrl(it.user.avatar)}
                       alt={it.user.name || "Автор"}
                       className={`w-full h-full object-cover rounded-full ${frameKey === "rainbow" ? "rounded-full" : ""}`}
                       onError={(e) => {
-                        e.currentTarget.src = "/default-avatar.png";
+                        e.currentTarget.src = DEFAULT_AVATAR;
                       }}
                     />
                   </div>

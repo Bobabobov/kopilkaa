@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { getUserStatus } from "@/lib/userStatus";
 import type { Friendship } from "./types";
 
@@ -36,11 +37,11 @@ export function FriendPreviewCard({
       <div className="relative">
         <div className="w-10 h-10 xs:w-12 xs:h-12 rounded-lg overflow-hidden bg-[#004643] flex items-center justify-center">
           <img
-            src={friend.avatar || "/default-avatar.png"}
+            src={resolveAvatarUrl(friend.avatar)}
             alt={friend.name || "Аватар"}
             className="w-full h-full object-cover"
             onError={(e) => {
-              e.currentTarget.src = "/default-avatar.png";
+              e.currentTarget.src = DEFAULT_AVATAR;
             }}
           />
         </div>

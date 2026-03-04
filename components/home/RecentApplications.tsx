@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Heart, ArrowRight } from "lucide-react";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface Application {
   id: string;
@@ -165,16 +166,12 @@ export default function RecentApplications() {
                       className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-white/10 group-hover:ring-[#f9bc60]/40 transition-all"
                     >
                       <img
-                        src={
-                          app.user && app.user.avatar
-                            ? app.user.avatar
-                            : "/default-avatar.png"
-                        }
+                        src={resolveAvatarUrl(app.user?.avatar)}
                         alt={app.user ? app.user.name || "User" : "User"}
                         loading="lazy"
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.src = "/default-avatar.png";
+                          e.currentTarget.src = DEFAULT_AVATAR;
                         }}
                       />
                     </div>

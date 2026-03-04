@@ -8,6 +8,7 @@ import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface Donor {
   id: string;
@@ -24,8 +25,6 @@ interface Donor {
  * Блок «Топ‑донатёры» в стиле секции «Истории успеха».
  * Показывается между статистикой и блоком «Как это работает».
  */
-const DEFAULT_AVATAR = "/default-avatar.png";
-
 export default function TopDonorsInline() {
   const [donors, setDonors] = useState<Donor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -174,7 +173,7 @@ export default function TopDonorsInline() {
                               src={
                                 failedAvatars[donor.id]
                                   ? DEFAULT_AVATAR
-                                  : donor.avatar || DEFAULT_AVATAR
+                                  : resolveAvatarUrl(donor.avatar)
                               }
                               alt={donor.name}
                               className="w-full h-full object-cover"

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import AvatarUpload from "../AvatarUpload";
 import type { UserStatus } from "../hooks/useUserStatus";
+import { resolveAvatarUrl } from "@/lib/avatar";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 
 const DEFAULT_AVATAR = "/default-avatar.png";
@@ -36,10 +37,12 @@ export function AvatarBlock({
   onOpenCover,
   onTriggerAvatar,
 }: AvatarBlockProps) {
-  const [avatarSrc, setAvatarSrc] = useState(user.avatar || DEFAULT_AVATAR);
+  const [avatarSrc, setAvatarSrc] = useState(
+    resolveAvatarUrl(user.avatar || DEFAULT_AVATAR),
+  );
   const [avatarFailed, setAvatarFailed] = useState(false);
   useEffect(() => {
-    setAvatarSrc(user.avatar || DEFAULT_AVATAR);
+    setAvatarSrc(resolveAvatarUrl(user.avatar || DEFAULT_AVATAR));
     setAvatarFailed(false);
   }, [user.id, user.avatar]);
 

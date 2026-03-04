@@ -1,4 +1,5 @@
 import type { SettingsUser } from "../hooks/useSettings";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface SettingsAvatarSectionProps {
   user: SettingsUser;
@@ -21,9 +22,12 @@ export function SettingsAvatarSection({
         <div className="w-20 h-20 rounded-full border border-white/10 bg-[#001e1d]/30 overflow-hidden flex items-center justify-center">
           {user.avatar ? (
             <img
-              src={user.avatar}
+              src={resolveAvatarUrl(user.avatar)}
               alt="Аватар"
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_AVATAR;
+              }}
             />
           ) : (
             <span className="text-[#f9bc60] text-2xl font-bold">

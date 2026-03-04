@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 type UserLite = {
   id: string;
@@ -152,9 +153,12 @@ export default function OtherUserFriendsModal({
                 >
                   {u.avatar ? (
                     <img
-                      src={u.avatar}
+                      src={resolveAvatarUrl(u.avatar)}
                       alt=""
                       className="w-8 h-8 rounded-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = DEFAULT_AVATAR;
+                      }}
                     />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#004643] to-[#001e1d] text-[#f9bc60] flex items-center justify-center text-xs font-bold border border-[#f9bc60]/40">

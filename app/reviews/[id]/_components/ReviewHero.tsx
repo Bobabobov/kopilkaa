@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import type { ReviewItem } from "@/hooks/reviews/useReviews";
 
 interface ReviewHeroProps {
@@ -14,7 +15,7 @@ export function ReviewHero({
   onOpenLightbox,
 }: ReviewHeroProps) {
   const { user } = review;
-  const avatar = user?.avatar || "/default-avatar.png";
+  const avatar = resolveAvatarUrl(user?.avatar);
   const heroImage = review.images?.[0]?.url;
   const trustLevelNumber = user?.trust?.status?.split("_")[1];
   const trustTitle = trustLevelNumber
@@ -74,7 +75,7 @@ export function ReviewHero({
                   alt={user?.name}
                   className="h-full w-full object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = "/default-avatar.png";
+                    e.currentTarget.src = DEFAULT_AVATAR;
                   }}
                 />
               </div>
@@ -87,7 +88,7 @@ export function ReviewHero({
                   alt={user?.name}
                   className="h-full w-full object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = "/default-avatar.png";
+                    e.currentTarget.src = DEFAULT_AVATAR;
                   }}
                 />
               </div>

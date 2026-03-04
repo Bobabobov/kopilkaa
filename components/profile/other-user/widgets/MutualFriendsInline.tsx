@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 type Friend = {
   id: string;
@@ -30,11 +31,11 @@ export function MutualFriendsInline({ friends }: MutualFriendsInlineProps) {
         >
           <Link href={`/profile/${f.id}`} prefetch={false}>
             <img
-              src={f.avatar || "/default-avatar.png"}
+              src={resolveAvatarUrl(f.avatar)}
               alt=""
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.currentTarget.src = "/default-avatar.png";
+                e.currentTarget.src = DEFAULT_AVATAR;
               }}
             />
           </Link>

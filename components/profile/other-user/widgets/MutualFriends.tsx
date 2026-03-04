@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import OtherUserFriendsModal from "../OtherUserFriendsModal";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { getUserStatus } from "@/lib/userStatus";
 
 type UserLite = {
@@ -165,12 +166,12 @@ export default function MutualFriends({ userId }: MutualFriendsProps) {
                   <div className="relative flex-shrink-0">
                     <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 group-hover:border-[#f9bc60]/50 transition-colors shadow-md">
                       <img
-                        src={u.avatar || "/default-avatar.png"}
+                        src={resolveAvatarUrl(u.avatar)}
                         alt={u.name || "Пользователь"}
                         className="w-full h-full object-cover"
                         loading="lazy"
                         onError={(e) => {
-                          e.currentTarget.src = "/default-avatar.png";
+                          e.currentTarget.src = DEFAULT_AVATAR;
                         }}
                       />
                     </div>

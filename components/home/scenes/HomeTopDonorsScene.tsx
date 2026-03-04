@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface Donor {
   id: string;
@@ -17,8 +18,6 @@ interface Donor {
   youtubeLink?: string | null;
   position?: number;
 }
-
-const DEFAULT_AVATAR = "/default-avatar.png";
 
 export default function HomeTopDonorsScene() {
   const [donors, setDonors] = useState<Donor[]>([]);
@@ -110,7 +109,7 @@ export default function HomeTopDonorsScene() {
                     src={
                       failedAvatars[donor.id]
                         ? DEFAULT_AVATAR
-                        : donor.avatar || DEFAULT_AVATAR
+                        : resolveAvatarUrl(donor.avatar)
                     }
                     alt={donor.name}
                     className="h-full w-full object-cover"

@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface UserCardProps {
   userId: string;
@@ -37,9 +38,12 @@ export default function UserCard({
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f9bc60] to-[#e8a545] flex items-center justify-center flex-shrink-0">
           {avatar ? (
             <img
-              src={avatar}
+              src={resolveAvatarUrl(avatar)}
               alt=""
               className="w-full h-full rounded-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_AVATAR;
+              }}
             />
           ) : (
             <span className="text-[#001e1d] font-bold">{getInitial()}</span>

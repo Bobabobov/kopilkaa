@@ -4,6 +4,7 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { Notification } from "./types";
 import {
   getNotificationIcon,
@@ -100,14 +101,14 @@ export default function NotificationItem({
         >
           {notification.avatar ? (
             <img
-              src={notification.avatar}
+              src={resolveAvatarUrl(notification.avatar)}
               alt="Аватар"
               className="w-full h-full object-cover"
               loading="lazy"
               onError={(e) => {
                 const target = e.currentTarget;
-                if (target.src !== "/default-avatar.png") {
-                  target.src = "/default-avatar.png";
+                if (!target.src.endsWith(DEFAULT_AVATAR)) {
+                  target.src = DEFAULT_AVATAR;
                 }
               }}
             />

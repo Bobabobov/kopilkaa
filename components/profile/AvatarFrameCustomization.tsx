@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { getAllAvatarFrames, getAvatarFrame } from "@/lib/header-customization";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import ColorWheel from "./ColorWheel";
 
 interface User {
@@ -69,17 +70,11 @@ export default function AvatarFrameCustomization({
           <div className="absolute inset-2 rounded-md overflow-hidden">
             {user.avatar ? (
               <img
-                src={user.avatar}
+                src={resolveAvatarUrl(user.avatar)}
                 alt="Аватар"
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  // Скрываем изображение при ошибке и показываем fallback
-                  e.currentTarget.style.display = "none";
-                  const fallback = e.currentTarget
-                    .nextElementSibling as HTMLElement;
-                  if (fallback) {
-                    fallback.style.display = "flex";
-                  }
+                  e.currentTarget.src = DEFAULT_AVATAR;
                 }}
               />
             ) : null}
@@ -111,17 +106,11 @@ export default function AvatarFrameCustomization({
       >
         {user.avatar ? (
           <img
-            src={user.avatar}
+            src={resolveAvatarUrl(user.avatar)}
             alt="Аватар"
             className="w-full h-full object-cover rounded-lg"
             onError={(e) => {
-              // Скрываем изображение при ошибке и показываем fallback
-              e.currentTarget.style.display = "none";
-              const fallback = e.currentTarget
-                .nextElementSibling as HTMLElement;
-              if (fallback) {
-                fallback.style.display = "flex";
-              }
+              e.currentTarget.src = DEFAULT_AVATAR;
             }}
           />
         ) : null}

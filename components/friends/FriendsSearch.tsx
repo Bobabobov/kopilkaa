@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 const MIN_SEARCH_LENGTH = 2;
 
@@ -118,11 +119,11 @@ export function FriendsSearch({
                 <div className="relative flex-shrink-0">
                   <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#004643] rounded-full flex items-center justify-center group-hover:ring-2 group-hover:ring-[#f9bc60]/40 transition overflow-hidden">
                     <img
-                      src={user.avatar || "/default-avatar.png"}
+                      src={resolveAvatarUrl(user.avatar)}
                       alt=""
                       className="w-full h-full rounded-full object-cover"
                       onError={(e) => {
-                        e.currentTarget.src = "/default-avatar.png";
+                        e.currentTarget.src = DEFAULT_AVATAR;
                       }}
                     />
                   </div>

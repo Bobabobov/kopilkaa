@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface FriendsListProps {
   type: "friends" | "sent" | "received";
@@ -95,11 +96,11 @@ export function FriendsList({
             >
               <div className="relative w-16 h-16 sm:w-[72px] sm:h-[72px] bg-[#004643] rounded-full flex items-center justify-center group-hover:ring-2 group-hover:ring-[#f9bc60]/40 transition flex-shrink-0">
                 <img
-                  src={user.avatar || "/default-avatar.png"}
+                  src={resolveAvatarUrl(user.avatar)}
                   alt=""
                   className="w-full h-full rounded-full object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = "/default-avatar.png";
+                    e.currentTarget.src = DEFAULT_AVATAR;
                   }}
                 />
                 <span

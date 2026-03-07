@@ -12,6 +12,10 @@ import {
   checkActivityRequirement,
   isActivityRequirementMet,
 } from "@/lib/activity/checkActivityRequirement";
+import {
+  APPLICATIONS_SUBMISSION_DISABLED_MESSAGE,
+  APPLICATIONS_SUBMISSION_ENABLED,
+} from "@/lib/applications/submissionControl";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -42,6 +46,16 @@ function getWhitelistEmails(): string[] {
 }
 
 export async function POST(req: Request) {
+  if (!APPLICATIONS_SUBMISSION_ENABLED) {
+    return Response.json(
+      {
+        error: APPLICATIONS_SUBMISSION_DISABLED_MESSAGE,
+        submissionsDisabled: true,
+      },
+      { status: 503 },
+    );
+  }
+
   const session = await getSession();
   if (!session) {
     return Response.json({ error: "Требуется вход" }, { status: 401 });

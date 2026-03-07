@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
+import { APPLICATIONS_SUBMISSION_ENABLED } from "@/lib/applications/submissionControl";
 import ApplicationsPageClient from "./_components/ApplicationsPageClient";
 
 /**
@@ -16,6 +17,10 @@ export default async function ApplicationsPage({
 }) {
   const session = await getSession();
   const modal = searchParams?.modal ?? "";
+
+  if (!APPLICATIONS_SUBMISSION_ENABLED) {
+    return <ApplicationsPageClient />;
+  }
 
   if (!session) {
     if (modal.startsWith("auth")) {

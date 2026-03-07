@@ -13,7 +13,7 @@ import { ApplicationStatus } from "@prisma/client";
 export const dynamic = "force-dynamic";
 
 // С этой даты — "Что купили на помощь", раньше — "Отзывы (ранее)" (архив).
-const REVIEWS_NEW_FROM = new Date("2025-03-08T00:00:00.000Z");
+const REVIEWS_NEW_FROM = new Date("2026-03-08T00:00:00.000Z");
 
 const MAX_IMAGES = 5;
 const MIN_IMAGES = 1;

@@ -12,15 +12,8 @@ import { ApplicationStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
-/** Граница: отзывы с createdAt >= этой даты — "Что купили на помощь", строго раньше — "Отзывы (ранее)" (архив). Задай REVIEWS_NEW_CUTOFF_DATE: только дата ГГГГ-ММ-ДД = 00:00 UTC того дня; с временем ГГГГ-ММ-ДДТЧЧ:ММ:00.000Z = точный момент. По умолчанию 2099 — всё в архиве. */
-function getReviewsNewCutoff(): Date {
-  const raw = process.env.REVIEWS_NEW_CUTOFF_DATE;
-  if (typeof raw === "string" && raw.trim()) {
-    const s = raw.trim();
-    return new Date(s.includes("T") ? s : s + "T00:00:00.000Z");
-  }
-  return new Date("2099-01-01T00:00:00.000Z");
-}
+// С этой даты — "Что купили на помощь", раньше — "Отзывы (ранее)" (архив).
+const REVIEWS_NEW_FROM = new Date("2025-03-08T00:00:00.000Z");
 
 const MAX_IMAGES = 5;
 const MIN_IMAGES = 1;
@@ -154,15 +147,13 @@ export async function GET(req: NextRequest) {
       },
     };
 
-    // "Что купили на помощь" — отзывы по заявкам с датой >= порога. "Отзывы (ранее)" — остальные по заявкам (до порога).
-    const reviewsNewCutoff = getReviewsNewCutoff();
     const whereNew = {
       applicationId: { not: null },
-      createdAt: { gte: reviewsNewCutoff },
+      createdAt: { gte: REVIEWS_NEW_FROM },
     };
     const whereOld = {
       applicationId: { not: null },
-      createdAt: { lt: reviewsNewCutoff },
+      createdAt: { lt: REVIEWS_NEW_FROM },
     };
     const orderBy = { createdAt: "desc" as const } as const;
 

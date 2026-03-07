@@ -12,10 +12,10 @@ import { ApplicationStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
-/** Отзывы с createdAt >= этой даты — "Что купили на помощь", раньше — только архив "Отзывы (ранее)" (туда новое не попадает). По умолчанию старая дата, чтобы все текущие отзывы были в "Что купили на помощь". */
+/** Граница: отзывы с createdAt >= этой даты — "Что купили на помощь", строго раньше — "Отзывы (ранее)" (архив). По умолчанию 2099 — всё в архиве. Задай REVIEWS_NEW_CUTOFF_DATE=ГГГГ-ММ-ДД (дата, с которой новые отзывы идут в "Что купили на помощь"). */
 function getReviewsNewCutoff(): Date {
   const raw = process.env.REVIEWS_NEW_CUTOFF_DATE;
-  if (typeof raw !== "string" || !raw.trim()) return new Date("2020-01-01T00:00:00.000Z");
+  if (typeof raw !== "string" || !raw.trim()) return new Date("2099-01-01T00:00:00.000Z");
   const s = raw.trim();
   return new Date(s.includes("T") ? s : s + "T00:00:00.000Z");
 }

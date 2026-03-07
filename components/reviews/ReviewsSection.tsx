@@ -214,7 +214,7 @@ export function ReviewsSection() {
                     border: "2px solid rgba(249, 188, 96, 0.4)",
                   }}
                 >
-                  <LucideIcons.Gift className="w-7 h-7" style={{ color: "#f9bc60" }} />
+                  <LucideIcons.Gift className="w-7 h-7 text-[#f9bc60]" />
                 </div>
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-[#fffffe]">

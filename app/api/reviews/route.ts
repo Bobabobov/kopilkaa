@@ -145,8 +145,8 @@ export async function GET(req: NextRequest) {
     };
 
     // Оба раздела — отзывы по заявкам: "новые" = первые по дате, "ранее" = следующие (старше)
-    const whereWithApp = { applicationId: { not: null as const } };
-    const order = { orderBy: { createdAt: "desc" as const } };
+    const whereWithApp = { applicationId: { not: null } };
+    const order = { orderBy: { createdAt: "desc" } };
 
     const [totalWithApp, viewerApproved, lastApprovedApp] = await Promise.all([
       prisma.review.count({ where: whereWithApp }),

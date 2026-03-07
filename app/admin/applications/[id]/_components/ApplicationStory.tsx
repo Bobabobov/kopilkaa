@@ -12,7 +12,7 @@ export default function ApplicationStory({ story }: ApplicationStoryProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.7 }}
-      className="mb-6"
+      className="mb-6 min-w-0 w-full overflow-hidden"
     >
       <h3
         className="flex items-center gap-2 text-lg sm:text-xl font-semibold mb-4"
@@ -34,7 +34,7 @@ export default function ApplicationStory({ story }: ApplicationStoryProps) {
         История
       </h3>
       <div
-        className="break-words text-[15px] sm:text-base lg:text-[17px] leading-8 sm:leading-8 lg:leading-9 rounded-xl sm:rounded-2xl p-5 sm:p-7 lg:p-9 border prose prose-sm sm:prose-base max-w-none shadow-[0_18px_48px_-30px_rgba(0,0,0,0.9)]"
+        className="break-words text-sm sm:text-[15px] lg:text-base leading-relaxed sm:leading-8 rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-5 lg:p-7 border prose prose-sm sm:prose-base max-w-none min-w-0 overflow-hidden shadow-[0_18px_48px_-30px_rgba(0,0,0,0.9)]"
         style={{
           backgroundColor: "#0e1f1d",
           borderColor: "rgba(171, 209, 198, 0.35)",

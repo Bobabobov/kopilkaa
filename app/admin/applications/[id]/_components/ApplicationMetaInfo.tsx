@@ -33,11 +33,11 @@ export default function ApplicationMetaInfo({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6"
       >
         {/* Сумма запроса */}
         <div
-          className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-4 py-3 rounded-xl border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)]"
+          className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)] min-w-0"
           style={{
             backgroundColor: "#0b1615",
             borderColor: "rgba(249,188,96,0.25)",
@@ -59,7 +59,7 @@ export default function ApplicationMetaInfo({
 
         {/* Автор */}
         <div
-          className="flex items-center gap-2 text-sm rounded-xl p-3 sm:p-4 border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)]"
+          className="flex items-center gap-2 text-sm rounded-lg sm:rounded-xl p-2.5 sm:p-4 border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)] min-w-0 overflow-hidden"
           style={{
             backgroundColor: "#0b1615",
             borderColor: "rgba(171,209,198,0.2)",
@@ -87,8 +87,8 @@ export default function ApplicationMetaInfo({
             className="group relative flex items-center gap-1 px-2 py-1 rounded-lg bg-[#004643]/60 border border-[#abd1c6]/20 hover:border-[#f9bc60] hover:bg-[#004643] transition-all duration-200"
             title="Нажмите чтобы скопировать email"
           >
-            <span
-              className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none"
+          <span
+            className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none"
               style={{ color: "#f9bc60" }}
             >
               {userEmail.replace(/(.{2}).*(@.*)/, "$1***$2")}
@@ -119,11 +119,11 @@ export default function ApplicationMetaInfo({
         {/* Время заполнения */}
         {formattedTime && (
           <div
-            className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-4 py-3 rounded-xl border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)]"
-            style={{
-              backgroundColor: "#0b1615",
-              borderColor: "rgba(171,209,198,0.2)",
-            }}
+        className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)] min-w-0"
+          style={{
+            backgroundColor: "#0b1615",
+            borderColor: "rgba(171,209,198,0.2)",
+          }}
           >
             <span
               className="font-semibold text-lg sm:text-xl"
@@ -149,7 +149,7 @@ export default function ApplicationMetaInfo({
         className="mb-6"
       >
         <div
-          className="text-base sm:text-lg break-words leading-relaxed rounded-xl p-4 sm:p-6 border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)]"
+          className="text-sm sm:text-base lg:text-lg break-words leading-relaxed rounded-lg sm:rounded-xl p-3 sm:p-5 lg:p-6 border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)] min-w-0"
           style={{
             backgroundColor: "#0b1615",
             borderColor: "rgba(171,209,198,0.2)",

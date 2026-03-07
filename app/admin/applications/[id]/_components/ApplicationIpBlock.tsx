@@ -30,7 +30,7 @@ export default function ApplicationIpBlock({
       className="mb-6"
     >
       <div
-        className="rounded-xl border p-4 sm:p-6 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.7)]"
+        className="rounded-lg sm:rounded-xl border p-3 sm:p-5 lg:p-6 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.7)] min-w-0 overflow-hidden"
         style={{
           backgroundColor: "#0b1615",
           borderColor: "rgba(171,209,198,0.25)",
@@ -66,9 +66,9 @@ export default function ApplicationIpBlock({
               <p className="text-xs text-[#94a1b2] mb-2">
                 С этого IP уже подавались заявки:
               </p>
-              <ul className="space-y-1.5 text-sm">
+                <ul className="space-y-1.5 text-sm min-w-0">
                 {sameIpApplications.map((app) => (
-                  <li key={app.id} className="flex flex-wrap items-baseline gap-1">
+                  <li key={app.id} className="flex flex-wrap items-baseline gap-1 min-w-0 break-words">
                     <Link
                       href={`/admin/applications/${app.id}`}
                       className="text-[#abd1c6] hover:text-[#f9bc60] transition-colors underline underline-offset-2"

@@ -71,7 +71,7 @@ export default function ApplicationCard({
       <div className="absolute inset-0 bg-gradient-to-r from-[#f9bc60]/5 via-[#abd1c6]/5 to-[#f9bc60]/5 group-hover:from-[#f9bc60]/10 group-hover:via-[#abd1c6]/10 group-hover:to-[#f9bc60]/10 transition-all duration-500"></div>
 
       <div className="relative">
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4 sm:mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4 sm:mb-6 min-w-0">
           <ApplicationCardHeader
             application={it}
             visibleEmails={visibleEmails}

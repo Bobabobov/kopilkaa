@@ -65,6 +65,9 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
     }
   };
 
+  const hasSocial =
+    user.vkLink || user.telegramLink || user.youtubeLink;
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 16 }}
@@ -78,7 +81,10 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
     >
       <Link
         href={href}
-        className="block focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/70 rounded-2xl"
+        className={cn(
+          "block focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/70 rounded-t-2xl focus:rounded-2xl",
+          hasSocial ? "rounded-b-none" : "rounded-b-2xl",
+        )}
       >
         {/* Cover image or avatar */}
         <div className="relative h-48 w-full overflow-hidden rounded-t-2xl">
@@ -194,48 +200,62 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
             </div>
           )}
 
-          {(user.vkLink || user.telegramLink || user.youtubeLink) && (
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-white/10">
-              {user.vkLink && (
-                <SocialChip href={user.vkLink} label="VK" color="#4c75a3">
-                  <VKIcon className="w-4 h-4" />
-                </SocialChip>
-              )}
-              {user.telegramLink && (
-                <SocialChip
-                  href={user.telegramLink}
-                  label="Telegram"
-                  color="#229ED9"
-                >
-                  <TelegramIcon className="w-4 h-4" />
-                </SocialChip>
-              )}
-              {user.youtubeLink && (
-                <SocialChip
-                  href={user.youtubeLink}
-                  label="YouTube"
-                  color="#ff4f45"
-                >
-                  <YouTubeIcon className="w-4 h-4" />
-                </SocialChip>
-              )}
+          {!hasSocial && (
+            <div className="pt-1 border-t border-white/10">
+              <div className="flex items-center gap-2 text-xs text-[#94a1b2]">
+                <LucideIcons.Clock size="xs" className="text-[#f9bc60]" />
+                <span>
+                  {new Date(review.createdAt).toLocaleDateString("ru-RU", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+              </div>
             </div>
           )}
-
-          <div className="pt-1 border-t border-white/10">
-            <div className="flex items-center gap-2 text-xs text-[#94a1b2]">
-              <LucideIcons.Clock size="xs" className="text-[#f9bc60]" />
-              <span>
-                {new Date(review.createdAt).toLocaleDateString("ru-RU", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
-            </div>
-          </div>
         </div>
       </Link>
+
+      {hasSocial && (
+        <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-2 border-t border-white/10 rounded-b-2xl bg-gradient-to-b from-transparent to-black/5">
+          <div className="flex flex-wrap gap-2">
+            {user.vkLink && (
+              <SocialChip href={user.vkLink} label="VK" color="#4c75a3">
+                <VKIcon className="w-4 h-4" />
+              </SocialChip>
+            )}
+            {user.telegramLink && (
+              <SocialChip
+                href={user.telegramLink}
+                label="Telegram"
+                color="#229ED9"
+              >
+                <TelegramIcon className="w-4 h-4" />
+              </SocialChip>
+            )}
+            {user.youtubeLink && (
+              <SocialChip
+                href={user.youtubeLink}
+                label="YouTube"
+                color="#ff4f45"
+              >
+                <YouTubeIcon className="w-4 h-4" />
+              </SocialChip>
+            )}
+          </div>
+          <div className="flex items-center gap-2 text-xs text-[#94a1b2] mt-3 pt-1 border-t border-white/10">
+            <LucideIcons.Clock size="xs" className="text-[#f9bc60]" />
+            <span>
+              {new Date(review.createdAt).toLocaleDateString("ru-RU", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
+          </div>
+        </div>
+      )}
     </motion.article>
   );
 }

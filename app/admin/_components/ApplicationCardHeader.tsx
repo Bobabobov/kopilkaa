@@ -24,14 +24,14 @@ export default function ApplicationCardHeader({
   }, []);
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4 sm:mb-6">
-      <div className="min-w-0 flex-1 basis-0">
+    <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4 sm:mb-6 min-w-0 flex-1">
+      <div className="min-w-0 flex-1 basis-0 overflow-hidden">
         <Link
           href={`/admin/applications/${it.id}`}
           scroll={false}
           onClick={rememberScroll}
-          className="text-base sm:text-lg md:text-xl font-black clamp-2 break-words max-w-full text-[#fffffe] hover:text-[#f9bc60] hover:underline transition-colors cursor-pointer"
-          title="Открыть полную заявку"
+          className="block text-base sm:text-lg md:text-xl font-black line-clamp-2 break-words text-[#fffffe] hover:text-[#f9bc60] hover:underline transition-colors cursor-pointer"
+          title={it.title.length > 80 ? it.title : "Открыть полную заявку"}
         >
           {it.title}
         </Link>

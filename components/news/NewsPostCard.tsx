@@ -93,6 +93,61 @@ export function NewsPostCard({ item, featured = false }: NewsPostCardProps) {
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="scroll-mt-24"
     >
+      <style jsx global>{`
+        .prose h3 {
+          font-size: 1.25rem;
+          font-weight: bold;
+          margin-top: 1rem;
+          margin-bottom: 0.5rem;
+          color: #fffffe;
+        }
+        .prose p {
+          margin-bottom: 0.5rem;
+          color: rgba(255, 255, 254, 0.9);
+        }
+        .prose ul,
+        .prose ol {
+          margin-left: 1.5rem;
+          margin-top: 0.5rem;
+          margin-bottom: 0.5rem;
+        }
+        .prose ul {
+          list-style-type: disc;
+        }
+        .prose ol {
+          list-style-type: decimal;
+        }
+        .prose li {
+          margin-bottom: 0.25rem;
+        }
+        .prose strong {
+          font-weight: bold;
+          color: #fffffe;
+        }
+        .prose em {
+          font-style: italic;
+        }
+        .prose u {
+          text-decoration: underline;
+        }
+        .prose [style*="text-align: left"] {
+          text-align: left;
+        }
+        .prose [style*="text-align: center"] {
+          text-align: center;
+        }
+        .prose [style*="text-align: right"] {
+          text-align: right;
+        }
+        .prose a {
+          color: #3b82f6;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+        .prose a:hover {
+          color: #60a5fa;
+        }
+      `}</style>
       <Card
         variant="darkGlass"
         padding="none"
@@ -180,61 +235,6 @@ export function NewsPostCard({ item, featured = false }: NewsPostCardProps) {
             }`}
             dangerouslySetInnerHTML={{ __html: item.content }}
           />
-          <style jsx global>{`
-            .prose h3 {
-              font-size: 1.25rem;
-              font-weight: bold;
-              margin-top: 1rem;
-              margin-bottom: 0.5rem;
-              color: #fffffe;
-            }
-            .prose p {
-              margin-bottom: 0.5rem;
-              color: rgba(255, 255, 254, 0.9);
-            }
-            .prose ul,
-            .prose ol {
-              margin-left: 1.5rem;
-              margin-top: 0.5rem;
-              margin-bottom: 0.5rem;
-            }
-            .prose ul {
-              list-style-type: disc;
-            }
-            .prose ol {
-              list-style-type: decimal;
-            }
-            .prose li {
-              margin-bottom: 0.25rem;
-            }
-            .prose strong {
-              font-weight: bold;
-              color: #fffffe;
-            }
-            .prose em {
-              font-style: italic;
-            }
-            .prose u {
-              text-decoration: underline;
-            }
-            .prose [style*="text-align: left"] {
-              text-align: left;
-            }
-            .prose [style*="text-align: center"] {
-              text-align: center;
-            }
-            .prose [style*="text-align: right"] {
-              text-align: right;
-            }
-            .prose a {
-              color: #3b82f6;
-              text-decoration: underline;
-              text-underline-offset: 2px;
-            }
-            .prose a:hover {
-              color: #60a5fa;
-            }
-          `}</style>
           {!expanded && isLong && (
             <div className="mt-2">
               <button

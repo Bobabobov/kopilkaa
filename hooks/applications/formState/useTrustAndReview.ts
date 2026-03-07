@@ -15,9 +15,12 @@ interface TrustSnapshot {
   approvedApplications?: number;
 }
 
+export type PendingReviewApplication = { id: string; title: string } | null;
+
 export function useTrustAndReview(user: UserShape | null, amount: string) {
   const [approvedCount, setApprovedCount] = useState<number | null>(null);
-  const [hasReview, setHasReview] = useState<boolean | null>(null);
+  const [pendingReviewApplication, setPendingReviewApplication] =
+    useState<PendingReviewApplication>(null);
   const [trustSnapshot, setTrustSnapshot] = useState<TrustSnapshot | null>(
     null,
   );
@@ -43,8 +46,12 @@ export function useTrustAndReview(user: UserShape | null, amount: string) {
       fetch("/api/reviews", { cache: "no-store" })
         .then((r) => (r.ok ? r.json() : null))
         .then((d) => {
-          const review = d?.viewer?.review;
-          setHasReview(Boolean(review));
+          const pending = d?.viewer?.pendingReviewApplication ?? null;
+          setPendingReviewApplication(
+            pending && typeof pending.id === "string" && typeof pending.title === "string"
+              ? { id: pending.id, title: pending.title }
+              : null,
+          );
         })
         .catch(() => {}),
     ]);
@@ -81,7 +88,7 @@ export function useTrustAndReview(user: UserShape | null, amount: string) {
 
   return {
     approvedCount,
-    hasReview,
+    pendingReviewApplication,
     trustSnapshot,
     trustLevel,
     trustLimits,

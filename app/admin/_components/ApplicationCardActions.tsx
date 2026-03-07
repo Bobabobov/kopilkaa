@@ -41,7 +41,7 @@ export default function ApplicationCardActions({
   const [decreaseOnDecision, setDecreaseOnDecision] = useState(false);
 
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full lg:w-auto">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0 w-full lg:w-auto lg:min-w-0">
       <Badge status={it.status} />
 
       {/* Кнопки действий */}

@@ -44,10 +44,58 @@ export async function GET(
         countTowardsTrust: true,
         user: { select: { email: true, id: true, trustDelta: true } },
         images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
+        review: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            updatedAt: true,
+            images: {
+              orderBy: { sort: "asc" },
+              select: { url: true, sort: true },
+            },
+          },
+        },
       },
     });
 
     if (!item) return Response.json({ error: "Not found" }, { status: 404 });
+
+    // Отзыв по прошлой одобренной заявке (для проверки админом перед одобрением)
+    const previousApproved = await prisma.application.findFirst({
+      where: {
+        userId: item.userId,
+        id: { not: id },
+        status: "APPROVED",
+        createdAt: { lt: item.createdAt },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 1,
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        review: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            images: {
+              orderBy: { sort: "asc" },
+              select: { url: true, sort: true },
+            },
+          },
+        },
+      },
+    });
+    const previousApprovedWithReview = previousApproved
+      ? {
+          id: previousApproved.id,
+          title: previousApproved.title,
+          createdAt: previousApproved.createdAt,
+          review: previousApproved.review,
+        }
+      : null;
 
     // Нормализация реквизитов: пробелы/переносы → один пробел, trim
     const normalizePayment = (s: string) =>
@@ -123,6 +171,7 @@ export async function GET(
         story: sanitizeApplicationStoryHtml(item.story ?? ""),
         samePaymentApplications,
         sameIpApplications,
+        previousApprovedWithReview,
       },
     });
   } catch (error) {

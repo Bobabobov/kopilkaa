@@ -14,10 +14,10 @@ export default function ApplicationAdminComment({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.8 }}
-      className="mb-6"
+      className="mb-6 min-w-0 overflow-hidden"
     >
       <div
-        className="rounded-xl sm:rounded-2xl border p-4 sm:p-6"
+        className="rounded-xl sm:rounded-2xl border p-3 sm:p-6 min-w-0"
         style={{ backgroundColor: "#f9bc60/10", borderColor: "#f9bc60/30" }}
       >
         <h3

@@ -29,15 +29,23 @@ export type ReviewItem = {
   user: ReviewUser;
 };
 
+type PendingReviewApplication = { id: string; title: string } | null;
+
 type ReviewsResponse = {
-  page: number;
   limit: number;
-  total: number;
-  pages: number;
-  items: ReviewItem[];
-  viewer: {
+  itemsOld?: ReviewItem[];
+  itemsNew?: ReviewItem[];
+  totalOld?: number;
+  totalNew?: number;
+  items?: ReviewItem[];
+  total?: number;
+  page?: number;
+  pages?: number;
+  section?: "old" | "new";
+  viewer?: {
     canReview: boolean;
     approvedApplications: number;
+    pendingReviewApplication: PendingReviewApplication;
     review: ReviewItem | null;
   };
 };
@@ -56,16 +64,15 @@ export function useReviews() {
   }, [showToast]);
 
   const fetchReviews = useCallback(
-    async (page: number = 1, append: boolean = false) => {
-      if (append) {
-        setLoadingMore(true);
-      } else {
-        setLoading(true);
-      }
+    async (page: number = 1, append: boolean = false, section?: "old" | "new") => {
+      if (append) setLoadingMore(true);
+      else if (!section) setLoading(true);
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
+      const params = new URLSearchParams({ page: String(page), limit: "12" });
+      if (section) params.set("section", section);
       try {
-        const res = await fetch(`/api/reviews?page=${page}&limit=12`, {
+        const res = await fetch(`/api/reviews?${params}`, {
           cache: "no-store",
           signal: controller.signal,
         });
@@ -74,25 +81,47 @@ export function useReviews() {
           throw new Error(text || "Не удалось загрузить отзывы");
         }
         const json = (await res.json()) as ReviewsResponse;
-        if (append) {
+        if (section && append && json.items && json.total !== undefined) {
+          const nextPage = json.page ?? 1;
           setData((prev) => {
-            if (!prev) return json;
+            if (!prev) return prev;
+            if (section === "old") {
+              return {
+                ...prev,
+                itemsOld: [...(prev.itemsOld ?? []), ...json.items!],
+                totalOld: json.total ?? prev.totalOld,
+                pageOld: nextPage,
+                pagesOld: json.pages ?? prev.pagesOld,
+              };
+            }
             return {
-              ...json,
-              items: [...prev.items, ...json.items],
+              ...prev,
+              itemsNew: [...(prev.itemsNew ?? []), ...json.items!],
+              totalNew: json.total ?? prev.totalNew,
+              pageNew: nextPage,
+              pagesNew: json.pages ?? prev.pagesNew,
             };
           });
-        } else {
-          setData(json);
+        } else if (!section) {
+          setData({
+            ...json,
+            pageOld: 1,
+            pageNew: 1,
+            pagesOld: Math.ceil((json.totalOld ?? 0) / 12),
+            pagesNew: Math.ceil((json.totalNew ?? 0) / 12),
+          } as ReviewsResponse & {
+            itemsOld: ReviewItem[];
+            itemsNew: ReviewItem[];
+            pageOld: number;
+            pageNew: number;
+            pagesOld: number;
+            pagesNew: number;
+          });
         }
       } catch (error) {
         console.error("Failed to load reviews", error);
-        if (!append) {
-          showToastRef.current?.(
-            "error",
-            "Ошибка",
-            "Не удалось загрузить отзывы",
-          );
+        if (!append && !section) {
+          showToastRef.current?.("error", "Ошибка", "Не удалось загрузить отзывы");
           setData(null);
         }
       } finally {
@@ -106,24 +135,46 @@ export function useReviews() {
 
   useEffect(() => {
     fetchReviews(1, false);
-  }, []);
+  }, [fetchReviews]);
 
-  const loadMore = useCallback(() => {
-    if (loadingMore) return;
-    setData((currentData) => {
-      if (!currentData || currentData.page >= currentData.pages)
-        return currentData;
-      // Запускаем загрузку асинхронно
-      fetchReviews(currentData.page + 1, true).catch(console.error);
-      return currentData;
-    });
-  }, [loadingMore, fetchReviews]);
+  const loadMoreOld = useCallback(() => {
+    if (loadingMore || !data) return;
+    const page = (data as { pageOld?: number }).pageOld ?? 1;
+    const pages = (data as { pagesOld?: number }).pagesOld ?? 1;
+    if (page >= pages) return;
+    fetchReviews(page + 1, true, "old").catch(console.error);
+  }, [loadingMore, data, fetchReviews]);
+
+  const loadMoreNew = useCallback(() => {
+    if (loadingMore || !data) return;
+    const page = (data as { pageNew?: number }).pageNew ?? 1;
+    const pages = (data as { pagesNew?: number }).pagesNew ?? 1;
+    if (page >= pages) return;
+    fetchReviews(page + 1, true, "new").catch(console.error);
+  }, [loadingMore, data, fetchReviews]);
 
   const submitReview = useCallback(
-    async (content: string, files: File[], existingUrls: string[] = []) => {
+    async (
+      applicationId: string,
+      content: string,
+      files: File[],
+      existingUrls: string[] = [],
+    ) => {
       if (submitting) return;
+      if (!applicationId) {
+        showToastRef.current?.("error", "Ошибка", "Не указана заявка для отзыва");
+        return;
+      }
       if (!content.trim()) {
         showToastRef.current?.("error", "Ошибка", "Добавьте текст отзыва");
+        return;
+      }
+      if (content.trim().length < 50) {
+        showToastRef.current?.(
+          "error",
+          "Ошибка",
+          "Опишите опыт подробнее (минимум 50 символов)",
+        );
         return;
       }
       if (content.trim().length > 1200) {
@@ -134,14 +185,22 @@ export function useReviews() {
         );
         return;
       }
-      if (files.length > 5) {
+      if (existingUrls.length + files.length < 1) {
+        showToastRef.current?.(
+          "error",
+          "Ошибка",
+          "Добавьте хотя бы одно фото (чек, товар или результат)",
+        );
+        return;
+      }
+      if (existingUrls.length + files.length > 5) {
         showToastRef.current?.("error", "Можно прикрепить не более 5 фото");
         return;
       }
 
       setSubmitting(true);
       try {
-        const uploadedUrls: string[] = [];
+        const uploadedUrls: string[] = [...existingUrls];
         if (files.length) {
           const fd = new FormData();
           files.forEach((f) => fd.append("files", f));
@@ -154,18 +213,21 @@ export function useReviews() {
             throw new Error(uploadJson?.error || "Ошибка загрузки файлов");
           }
           uploadedUrls.push(
-            ...((uploadJson.files as { url: string }[]) || []).map(
-              (f) => f.url,
-            ),
+            ...((uploadJson.files as { url: string }[]) || []).map((f) => f.url),
           );
+        }
+        const images = uploadedUrls.slice(0, 5);
+        if (images.length < 1) {
+          throw new Error("Добавьте хотя бы одно фото");
         }
 
         const res = await fetch("/api/reviews", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            applicationId,
             content: content.trim(),
-            images: [...existingUrls, ...uploadedUrls].slice(0, 5),
+            images,
           }),
         });
         const json = await res.json();
@@ -178,18 +240,22 @@ export function useReviews() {
         setData((prev) => {
           if (!prev) return prev;
           const updatedReview = json.review as ReviewItem;
-          const items = [
+          const itemsNew = [
             updatedReview,
-            ...prev.items.filter((r) => r.id !== updatedReview.id),
-          ].slice(0, prev.limit);
+            ...(prev.itemsNew ?? []).filter((r) => r.id !== updatedReview.id),
+          ];
           return {
             ...prev,
-            items,
-            viewer: {
-              ...prev.viewer,
-              review: updatedReview,
-              canReview: true,
-            },
+            itemsNew,
+            totalNew: Math.max(prev.totalNew ?? 0, itemsNew.length),
+            viewer: prev.viewer
+              ? {
+                  ...prev.viewer,
+                  pendingReviewApplication: null,
+                  review: updatedReview,
+                  canReview: false,
+                }
+              : prev.viewer,
           };
         });
       } catch (error: any) {
@@ -222,21 +288,8 @@ export function useReviews() {
 
         showToastRef.current?.("success", "Готово", "Отзыв удалён");
 
-        // Обновляем данные: удаляем отзыв из списка и очищаем viewerReview
-        setData((prev) => {
-          if (!prev) return prev;
-          const canReviewAfterDelete = prev.viewer.approvedApplications > 0;
-          return {
-            ...prev,
-            total: Math.max(0, prev.total - 1),
-            items: prev.items.filter((r) => r.id !== reviewId),
-            viewer: {
-              ...prev.viewer,
-              review: null,
-              canReview: canReviewAfterDelete,
-            },
-          };
-        });
+        // Обновляем данные с сервера (чтобы получить актуальный pendingReviewApplication)
+        fetchReviews(1, false);
       } catch (error: any) {
         console.error("Delete review error", error);
         showToastRef.current?.(
@@ -252,26 +305,39 @@ export function useReviews() {
   );
 
   const viewerReview = useMemo(() => data?.viewer?.review ?? null, [data]);
+  const pendingReviewApplication = useMemo(
+    () => data?.viewer?.pendingReviewApplication ?? null,
+    [data],
+  );
 
-  const hasMore = useMemo(() => {
-    if (!data) return false;
-    return data.page < data.pages;
-  }, [data]);
+  const reviewsOld = useMemo(() => data?.itemsOld ?? [], [data]);
+  const reviewsNew = useMemo(() => data?.itemsNew ?? [], [data]);
+  const totalOld = data?.totalOld ?? 0;
+  const totalNew = data?.totalNew ?? 0;
+  const pageOld = (data as { pageOld?: number })?.pageOld ?? 1;
+  const pageNew = (data as { pageNew?: number })?.pageNew ?? 1;
+  const pagesOld = (data as { pagesOld?: number })?.pagesOld ?? 0;
+  const pagesNew = (data as { pagesNew?: number })?.pagesNew ?? 0;
+  const hasMoreOld = pageOld < pagesOld;
+  const hasMoreNew = pageNew < pagesNew;
 
   return {
     loading,
     loadingMore,
     submitting,
-    reviews: data?.items ?? [],
-    total: data?.total ?? 0,
-    currentPage: data?.page ?? 1,
-    totalPages: data?.pages ?? 0,
-    hasMore,
+    reviewsOld,
+    reviewsNew,
+    totalOld,
+    totalNew,
+    hasMoreOld,
+    hasMoreNew,
     canReview: data?.viewer?.canReview ?? false,
     approvedApplications: data?.viewer?.approvedApplications ?? 0,
+    pendingReviewApplication,
     viewerReview,
     refresh: () => fetchReviews(1, false),
-    loadMore,
+    loadMoreOld,
+    loadMoreNew,
     submitReview,
     deleteReview,
     ToastComponent,

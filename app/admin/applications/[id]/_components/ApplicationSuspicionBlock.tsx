@@ -18,15 +18,15 @@ export default function ApplicationSuspicionBlock({
   const suspicion = checkApplicationSuspicion(story, filledMs, storyEditMs);
 
   if (!suspicion.hasSuspicion) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
-        className="mb-6"
-      >
-        <div
-          className="rounded-xl sm:rounded-2xl p-4 sm:p-5 border inline-flex items-center gap-2"
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.6 }}
+      className="mb-6 min-w-0"
+    >
+      <div
+        className="rounded-xl sm:rounded-2xl p-4 sm:p-5 border inline-flex items-center gap-2 min-w-0 max-w-full"
           style={{
             backgroundColor: "rgba(171, 209, 198, 0.12)",
             borderColor: "rgba(171, 209, 198, 0.35)",
@@ -49,7 +49,7 @@ export default function ApplicationSuspicionBlock({
       className="mb-6"
     >
       <div
-        className="rounded-xl sm:rounded-2xl p-4 sm:p-6 border"
+        className="rounded-xl sm:rounded-2xl p-4 sm:p-6 border min-w-0 overflow-hidden"
         style={{
           backgroundColor: suspicion.fastFillHigh
             ? "rgba(225, 97, 98, 0.12)"

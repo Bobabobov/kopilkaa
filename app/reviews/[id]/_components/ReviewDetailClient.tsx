@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Card } from "@/components/ui/Card";
 import { StoryLightbox } from "@/components/stories/StoryLightbox";
@@ -10,6 +11,8 @@ import { ReviewHero } from "./ReviewHero";
 import { ReviewContentSection } from "./ReviewContentSection";
 import { ReviewImagesGrid } from "./ReviewImagesGrid";
 import { ReviewSocialLinks } from "./ReviewSocialLinks";
+import { ReviewReadingProgressBar } from "./ReviewReadingProgressBar";
+import { ReviewMoreBlock } from "./ReviewMoreBlock";
 
 interface ReviewDetailClientProps {
   reviewId: string;
@@ -22,7 +25,6 @@ export default function ReviewDetailClient({
   initialReview,
   initialError,
 }: ReviewDetailClientProps) {
-  const router = useRouter();
   const [review, setReview] = useState<ReviewItem | null>(initialReview);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -65,20 +67,30 @@ export default function ReviewDetailClient({
 
   return (
     <main className="min-h-screen overflow-x-hidden px-3 py-4 xs:px-4 sm:px-6 sm:py-6 md:py-8 lg:px-10">
+      <ReviewReadingProgressBar />
       <div className="mx-auto max-w-6xl w-full space-y-3 sm:space-y-4 md:space-y-5">
-        <Card variant="darkGlass" padding="sm" className="inline-block">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="inline-flex items-center gap-2 rounded-lg text-xs text-[#abd1c6] transition-colors hover:text-[#f9bc60] sm:text-sm"
+        <motion.nav
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          aria-label="Навигация"
+        >
+          <Link
+            href="/reviews"
+            className="inline-flex items-center gap-2 rounded-xl border border-[#abd1c6]/30 bg-[#001e1d]/60 px-4 py-2.5 text-sm font-semibold text-[#abd1c6] transition-all hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/15 hover:text-[#f9bc60]"
           >
             <LucideIcons.ArrowLeft size="sm" />
-            <span className="hidden xs:inline">Назад к отзывам</span>
+            <span className="hidden xs:inline">К списку отзывов</span>
             <span className="xs:hidden">Назад</span>
-          </button>
-        </Card>
+          </Link>
+        </motion.nav>
 
-        <article className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl">
+        <motion.article
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl"
+        >
           <Card variant="darkGlass" padding="none" className="overflow-hidden">
           <div className="pointer-events-none absolute inset-0 rounded-2xl overflow-hidden" aria-hidden>
             <div className="absolute -left-20 top-10 h-40 w-40 bg-[#f9bc60]/10 blur-3xl sm:h-60 sm:w-60" />
@@ -110,9 +122,11 @@ export default function ReviewDetailClient({
               telegramLink={user?.telegramLink}
               youtubeLink={user?.youtubeLink}
             />
+
+            <ReviewMoreBlock />
           </div>
           </Card>
-        </article>
+        </motion.article>
       </div>
 
       {review.images && review.images.length > 0 && (

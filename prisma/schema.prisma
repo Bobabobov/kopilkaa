@@ -81,7 +81,7 @@ model Application {
   story        String
   amount       Int               @default(0)
   payment      String
-  status       ApplicationStatus @default(PENDING)
+  status       ApplicationStatus  @default(PENDING)
   publishInStories Boolean        @default(false)
   countTowardsTrust Boolean      @default(true)
   /** При решении по заявке админ включил «Понизить уровень на 1» */
@@ -96,6 +96,7 @@ model Application {
 
   images ApplicationImage[]
   likes  StoryLike[]
+  review Review?
 
   @@index([userId])
   @@index([status])
@@ -323,14 +324,18 @@ model Advertisement {
 }
 
 model Review {
-  id        String        @id @default(cuid())
-  userId    String        @unique
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  content   String
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  images    ReviewImage[]
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String?    @unique // заявка, по которой оставлен отзыв (обязательный отзыв между заявками)
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  content       String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  images        ReviewImage[]
 
+  @@index([userId])
+  @@index([applicationId])
   @@index([createdAt])
 }
 

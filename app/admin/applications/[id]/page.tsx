@@ -16,6 +16,10 @@ import ApplicationSuspicionBlock from "./_components/ApplicationSuspicionBlock";
 import ApplicationAdminComment from "./_components/ApplicationAdminComment";
 import ApplicationFooter from "./_components/ApplicationFooter";
 import ApplicationImageLightbox from "./_components/ApplicationImageLightbox";
+import ApplicationReviewBlock from "./_components/ApplicationReviewBlock";
+import ApplicationPreviousReviewBlock from "./_components/ApplicationPreviousReviewBlock";
+import AdminSection from "./_components/AdminSection";
+import AdminSectionNav from "./_components/AdminSectionNav";
 import type { ApplicationItem } from "./types";
 
 export default function AdminApplicationPage({
@@ -154,72 +158,172 @@ export default function AdminApplicationPage({
   if (!item) return null;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative w-full min-w-0 max-w-[100vw] overflow-x-hidden box-border">
       {/* Decorative Background */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-[#f9bc60]/5 to-transparent rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-tl from-[#abd1c6]/5 to-transparent rounded-full blur-3xl"></div>
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-[#f9bc60]/5 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-tl from-[#abd1c6]/5 to-transparent rounded-full blur-3xl" />
       </div>
 
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative z-10 pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 min-w-0"
+        className="relative z-10 pt-16 sm:pt-20 lg:pt-24 pb-6 sm:pb-8 lg:pb-12 px-3 sm:px-6 lg:px-8 min-w-0 w-full max-w-full box-border"
       >
-        <div className="max-w-7xl mx-auto min-w-0">
+        <div className="max-w-7xl mx-auto min-w-0 w-full box-border">
           <ApplicationHeader
             status={item.status}
             onBack={() => router.back()}
           />
 
-          {/* Основной контент */}
-          <div className="grid gap-6 lg:gap-8">
-            <ApplicationTitle title={item.title} />
+          <AdminSectionNav />
 
-            <ApplicationMetaInfo
-              amount={item.amount}
-              userEmail={item.user.email}
-              summary={item.summary}
-              filledMs={item.filledMs}
-              onCopyEmail={handleCopyEmail}
-            />
+          {/* Основной контент по секциям */}
+          <div className="space-y-6 sm:space-y-8 lg:space-y-10 min-w-0">
+            {/* 1. Контекст заявки */}
+            <AdminSection
+              id="section-context"
+              number={1}
+              title="Контекст заявки"
+              subtitle="Сумма, автор, краткое описание"
+              plain
+            >
+              <ApplicationTitle title={item.title} />
+              <div className="mt-4">
+                <ApplicationMetaInfo
+                  amount={item.amount}
+                  userEmail={item.user.email}
+                  summary={item.summary}
+                  filledMs={item.filledMs}
+                  onCopyEmail={handleCopyEmail}
+                />
+              </div>
+            </AdminSection>
 
-            <ApplicationPaymentDetails
-              payment={item.payment}
-              bankName={item.bankName || undefined}
-              samePaymentApplications={item.samePaymentApplications}
-              onCopyError={handleCopyError}
-            />
+            {/* 2. Реквизиты */}
+            <AdminSection
+              id="section-payment"
+              number={2}
+              title="Реквизиты"
+              subtitle="Банк и реквизиты для перевода, повторы"
+            >
+              <ApplicationPaymentDetails
+                payment={item.payment}
+                bankName={item.bankName || undefined}
+                samePaymentApplications={item.samePaymentApplications}
+                onCopyError={handleCopyError}
+              />
+            </AdminSection>
 
-            <ApplicationIpBlock
-              submitterIp={item.submitterIp}
-              sameIpApplications={item.sameIpApplications}
-            />
+            {/* 3. Проверка отзыва по прошлой заявке */}
+            <AdminSection
+              id="section-previous-review"
+              number={3}
+              title="Проверка: отзыв по прошлой заявке"
+              subtitle="Перед одобрением проверьте, что отзыв с доказательствами оставлен"
+            >
+              <ApplicationPreviousReviewBlock
+                data={item.previousApprovedWithReview}
+                showTitle={false}
+              />
+            </AdminSection>
 
-            <ApplicationImages
-              images={item.images}
-              onImageClick={handleImageClick}
-            />
+            {/* 4. IP и повторы */}
+            <AdminSection
+              id="section-tech"
+              number={4}
+              title="IP и повторы"
+              subtitle="Адрес при подаче, другие заявки с этого IP"
+            >
+              <ApplicationIpBlock
+                submitterIp={item.submitterIp}
+                sameIpApplications={item.sameIpApplications}
+              />
+            </AdminSection>
 
-            <ApplicationSuspicionBlock
-              story={item.story}
-              filledMs={item.filledMs}
-              storyEditMs={item.storyEditMs}
-            />
+            {/* 5. Фото */}
+            <AdminSection
+              id="section-images"
+              number={5}
+              title="Фотографии заявки"
+              subtitle={`Приложено фото: ${item.images.length}`}
+            >
+              <ApplicationImages
+                images={item.images}
+                onImageClick={handleImageClick}
+                showTitle={false}
+              />
+            </AdminSection>
 
-            <ApplicationStory story={item.story} />
+            {/* 6. История и подозрения */}
+            <AdminSection
+              id="section-story"
+              number={6}
+              title="История и проверка на подозрения"
+              subtitle="Текст от пользователя, время заполнения"
+            >
+              <ApplicationSuspicionBlock
+                story={item.story}
+                filledMs={item.filledMs}
+                storyEditMs={item.storyEditMs}
+              />
+              <div className="mt-6">
+                <ApplicationStory story={item.story} />
+              </div>
+            </AdminSection>
 
-            {item.adminComment && (
-              <ApplicationAdminComment comment={item.adminComment} />
-            )}
+            {/* 7. Отзыв по этой заявке */}
+            <AdminSection
+              id="section-review"
+              number={7}
+              title="Отзыв по этой заявке"
+              subtitle={
+                item.review
+                  ? "Оставлен после одобрения"
+                  : item.status === "APPROVED"
+                    ? "Пока не оставлен"
+                    : "Доступен после одобрения"
+              }
+            >
+              {item.review ? (
+                <ApplicationReviewBlock review={item.review} />
+              ) : (
+                <div
+                  className="rounded-xl p-4 border border-dashed"
+                  style={{
+                    borderColor: "rgba(171, 209, 198, 0.3)",
+                    color: "#94a1b2",
+                  }}
+                >
+                  <span className="text-sm">
+                    {item.status === "APPROVED"
+                      ? "Отзыв по заявке пока не оставлен."
+                      : "Отзыв по заявке оставляется после одобрения заявки."}
+                  </span>
+                </div>
+              )}
+            </AdminSection>
 
-            <ApplicationFooter
-              createdAt={item.createdAt}
-              status={item.status}
-              applicationId={item.id}
-              onDelete={deleteApplication}
-            />
+            {/* 8. Действия */}
+            <AdminSection
+              id="section-actions"
+              number={8}
+              title="Действия"
+              subtitle="Комментарий, ссылки, удаление"
+            >
+              {item.adminComment && (
+                <div className="mb-6">
+                  <ApplicationAdminComment comment={item.adminComment} />
+                </div>
+              )}
+              <ApplicationFooter
+                createdAt={item.createdAt}
+                status={item.status}
+                applicationId={item.id}
+                onDelete={deleteApplication}
+              />
+            </AdminSection>
           </div>
         </div>
       </motion.div>

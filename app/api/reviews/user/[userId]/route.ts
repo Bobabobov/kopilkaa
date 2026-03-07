@@ -51,8 +51,9 @@ export async function GET(
       return NextResponse.json({ error: "userId required" }, { status: 400 });
     }
 
-    const review = await prisma.review.findUnique({
+    const review = await prisma.review.findFirst({
       where: { userId },
+      orderBy: { createdAt: "desc" },
       select: {
         id: true,
         userId: true,

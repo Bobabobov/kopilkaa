@@ -13,7 +13,9 @@ import { ApplicationStatus } from "@prisma/client";
 export const dynamic = "force-dynamic";
 
 const MAX_IMAGES = 5;
+const MIN_IMAGES = 1;
 const MAX_TEXT_LENGTH = 1200;
+const MIN_TEXT_LENGTH = 50;
 
 // Проверка безопасности URL загруженных файлов
 function isSafeUploadUrl(url: string): boolean {
@@ -109,115 +111,150 @@ export async function GET(req: NextRequest) {
     const viewerId = session?.uid ? String(session.uid) : null;
 
     const url = new URL(req.url);
-    const page = Math.max(1, Number(url.searchParams.get("page") || 1));
     const limit = Math.min(
       30,
       Math.max(1, Number(url.searchParams.get("limit") || 12)),
     );
+    const page = Math.max(1, Number(url.searchParams.get("page") || 1));
     const skip = (page - 1) * limit;
+    const section = url.searchParams.get("section") as "old" | "new" | null;
 
-    const [items, total, viewerApproved, viewerReviewRaw] = await Promise.all([
-      prisma.review
-        .findMany({
-          orderBy: { createdAt: "desc" },
-          skip,
-          take: limit,
-          select: {
-            id: true,
-            userId: true,
-            content: true,
-            createdAt: true,
-            updatedAt: true,
-            images: {
-              orderBy: { sort: "asc" },
-              select: { url: true, sort: true },
-            },
-            user: {
-              select: {
-                id: true,
-                name: true,
-                username: true,
-                avatar: true,
-                avatarFrame: true,
-                vkLink: true,
-                telegramLink: true,
-                youtubeLink: true,
-              },
-            },
-          },
-        })
-        .catch(() => []),
-      prisma.review.count().catch(() => 0),
+    const select = {
+      id: true,
+      userId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+      applicationId: true,
+      images: {
+        orderBy: { sort: "asc" as const },
+        select: { url: true, sort: true },
+      },
+      user: {
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          avatar: true,
+          avatarFrame: true,
+          vkLink: true,
+          telegramLink: true,
+          youtubeLink: true,
+        },
+      },
+    };
+
+    const [
+      itemsOld,
+      itemsNew,
+      totalOld,
+      totalNew,
+      viewerApproved,
+      lastApprovedApp,
+    ] = await Promise.all([
+      prisma.review.findMany({
+        where: { applicationId: null },
+        orderBy: { createdAt: "desc" },
+        skip: section === "new" ? 0 : skip,
+        take: section === "new" ? 0 : limit,
+        select,
+      }),
+      prisma.review.findMany({
+        where: { applicationId: { not: null } },
+        orderBy: { createdAt: "desc" },
+        skip: section === "old" ? 0 : skip,
+        take: section === "old" ? 0 : limit,
+        select,
+      }),
+      prisma.review.count({ where: { applicationId: null } }),
+      prisma.review.count({ where: { applicationId: { not: null } } }),
       viewerId
-        ? prisma.application
-            .count({
-              where: {
-                userId: viewerId,
-                status: ApplicationStatus.APPROVED,
-              },
-            })
-            .catch((err) => {
-              console.error("[reviews] Error counting approved apps:", err);
-              return 0;
-            })
+        ? prisma.application.count({
+            where: { userId: viewerId, status: ApplicationStatus.APPROVED },
+          }).catch(() => 0)
         : 0,
       viewerId
-        ? prisma.review.findUnique({
-            where: { userId: viewerId },
-            select: {
-              id: true,
-              userId: true,
-              content: true,
-              createdAt: true,
-              updatedAt: true,
-              images: {
-                orderBy: { sort: "asc" },
-                select: { url: true, sort: true },
-              },
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  username: true,
-                  avatar: true,
-                  avatarFrame: true,
-                  vkLink: true,
-                  telegramLink: true,
-                  youtubeLink: true,
-                },
-              },
+        ? prisma.application.findFirst({
+            where: {
+              userId: viewerId,
+              status: ApplicationStatus.APPROVED,
             },
+            orderBy: { createdAt: "desc" },
+            select: { id: true, title: true },
           })
         : null,
     ]);
 
-    const mappedItems = await mapReviews(items, viewerId);
-    const mappedViewerReview = viewerReviewRaw
-      ? (await mapReviews([viewerReviewRaw], viewerId))[0]
-      : null;
+    let reviewForLastApproved: Awaited<
+      ReturnType<typeof prisma.review.findUnique>
+    > = null;
+    if (lastApprovedApp) {
+      reviewForLastApproved = await prisma.review.findUnique({
+        where: { applicationId: lastApprovedApp.id },
+        select,
+      });
+    }
+
+    const mappedOld = await mapReviews(itemsOld, viewerId);
+    const mappedNew = await mapReviews(itemsNew, viewerId);
+    const pendingReviewApplication =
+      lastApprovedApp && !reviewForLastApproved
+        ? { id: lastApprovedApp.id, title: lastApprovedApp.title }
+        : null;
+    const mappedReviewForPending =
+      reviewForLastApproved
+        ? (await mapReviews([reviewForLastApproved], viewerId))[0]
+        : null;
+
+    if (section === "old") {
+      return NextResponse.json({
+        section: "old",
+        page,
+        limit,
+        total: totalOld,
+        pages: Math.ceil(totalOld / limit),
+        items: mappedOld,
+      });
+    }
+    if (section === "new") {
+      return NextResponse.json({
+        section: "new",
+        page,
+        limit,
+        total: totalNew,
+        pages: Math.ceil(totalNew / limit),
+        items: mappedNew,
+      });
+    }
 
     return NextResponse.json({
-      page,
       limit,
-      total,
-      pages: Math.ceil(total / limit),
-      items: mappedItems,
+      itemsOld: mappedOld,
+      itemsNew: mappedNew,
+      totalOld,
+      totalNew,
       viewer: {
-        canReview: Boolean(viewerId && viewerApproved > 0),
+        canReview: Boolean(viewerId && pendingReviewApplication),
         approvedApplications: viewerApproved,
-        review: mappedViewerReview,
+        pendingReviewApplication,
+        review: mappedReviewForPending ?? null,
       },
     });
   } catch (error) {
     console.error("Error fetching reviews:", error);
     return NextResponse.json(
       {
-        page: 1,
-        limit: 0,
-        total: 0,
-        pages: 0,
-        items: [],
-        viewer: { canReview: false, approvedApplications: 0, review: null },
+        limit: 12,
+        itemsOld: [],
+        itemsNew: [],
+        totalOld: 0,
+        totalNew: 0,
+        viewer: {
+          canReview: false,
+          approvedApplications: 0,
+          pendingReviewApplication: null,
+          review: null,
+        },
       },
       { status: 200 },
     );
@@ -236,12 +273,25 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
+    const applicationId = typeof body?.applicationId === "string" ? body.applicationId.trim() : "";
     const content = String(body?.content || "").trim();
     const images = Array.isArray(body?.images) ? (body.images as string[]) : [];
 
+    if (!applicationId) {
+      return NextResponse.json(
+        { error: "Укажите заявку, по которой оставляете отзыв" },
+        { status: 400 },
+      );
+    }
     if (!content) {
       return NextResponse.json(
         { error: "Текст отзыва пустой" },
+        { status: 400 },
+      );
+    }
+    if (content.length < MIN_TEXT_LENGTH) {
+      return NextResponse.json(
+        { error: `Опишите опыт подробнее (минимум ${MIN_TEXT_LENGTH} символов)` },
         { status: 400 },
       );
     }
@@ -257,37 +307,45 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+    if (images.length < MIN_IMAGES) {
+      return NextResponse.json(
+        { error: "Добавьте хотя бы одно фото (чек, товар или результат помощи)" },
+        { status: 400 },
+      );
+    }
 
-    // Валидация и санитизация URL изображений
     const sanitizedImages: string[] = [];
     for (const img of images) {
       const url = String(img || "").trim();
       if (!url) continue;
-
-      // Проверяем, что URL безопасен (только наши загруженные файлы)
       if (!isSafeUploadUrl(url)) {
         return NextResponse.json(
           { error: "Разрешены только файлы, загруженные через форму" },
           { status: 400 },
         );
       }
-
       sanitizedImages.push(url);
     }
+    if (sanitizedImages.length < MIN_IMAGES) {
+      return NextResponse.json(
+        { error: "Добавьте хотя бы одно фото" },
+        { status: 400 },
+      );
+    }
 
-    const approvedCount = await prisma.application
-      .count({
-        where: {
-          userId: viewerId,
-          status: ApplicationStatus.APPROVED,
-        },
-      })
-      .catch(() => 0);
-    if (approvedCount <= 0) {
+    const application = await prisma.application.findFirst({
+      where: {
+        id: applicationId,
+        userId: viewerId,
+        status: ApplicationStatus.APPROVED,
+      },
+      select: { id: true },
+    });
+    if (!application) {
       return NextResponse.json(
         {
           error:
-            "Оставлять отзыв могут только пользователи с одобренной заявкой",
+            "Заявка не найдена, не одобрена или вы не можете оставить по ней отзыв",
         },
         { status: 403 },
       );
@@ -295,7 +353,7 @@ export async function POST(req: NextRequest) {
 
     const result = await prisma.$transaction(async (tx) => {
       const existing = await tx.review.findUnique({
-        where: { userId: viewerId },
+        where: { applicationId: application.id },
       });
 
       if (existing) {
@@ -338,6 +396,7 @@ export async function POST(req: NextRequest) {
       const created = await tx.review.create({
         data: {
           userId: viewerId,
+          applicationId: application.id,
           content,
           images: {
             create: sanitizedImages.map((url, idx) => ({ url, sort: idx })),

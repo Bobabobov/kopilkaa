@@ -33,7 +33,7 @@ const toastConfig = {
       </svg>
     ),
     gradient: "from-emerald-500 to-green-500",
-    bgColor: "bg-white/95 dark:bg-gray-800/95",
+    bgColor: "bg-white/95 dark:bg-[#0d2b29]/97",
     borderColor: "border-emerald-300 dark:border-emerald-500",
     textColor: "text-emerald-700 dark:text-emerald-300",
   },
@@ -54,7 +54,7 @@ const toastConfig = {
       </svg>
     ),
     gradient: "from-red-500 to-rose-500",
-    bgColor: "bg-red-50 dark:bg-red-900/20",
+    bgColor: "bg-red-50 dark:bg-[#2a1a1a]/97",
     borderColor: "border-red-300 dark:border-red-500",
     textColor: "text-red-600 dark:text-red-400",
   },
@@ -75,7 +75,7 @@ const toastConfig = {
       </svg>
     ),
     gradient: "from-amber-500 to-yellow-500",
-    bgColor: "bg-amber-50 dark:bg-amber-900/20",
+    bgColor: "bg-amber-50 dark:bg-[#001e1d]/98",
     borderColor: "border-amber-300 dark:border-amber-500",
     textColor: "text-amber-600 dark:text-amber-400",
   },
@@ -96,7 +96,7 @@ const toastConfig = {
       </svg>
     ),
     gradient: "from-blue-500 to-indigo-500",
-    bgColor: "bg-blue-50 dark:bg-blue-900/20",
+    bgColor: "bg-blue-50 dark:bg-[#0d1f2b]/97",
     borderColor: "border-blue-300 dark:border-blue-500",
     textColor: "text-blue-600 dark:text-blue-400",
   },
@@ -166,7 +166,7 @@ export default function BeautifulToast({
                     {title}
                   </p>
                   {message && (
-                    <p className="text-xs xs:text-sm sm:text-sm text-gray-600 dark:text-gray-300 mt-1 xs:mt-1.5 leading-relaxed break-words">
+                    <p className="text-xs xs:text-sm sm:text-sm text-gray-900 dark:text-[#e8e8e8] mt-1 xs:mt-1.5 leading-relaxed break-words">
                       {message}
                     </p>
                   )}

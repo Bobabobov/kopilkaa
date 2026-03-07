@@ -12,10 +12,6 @@ import {
   checkActivityRequirement,
   isActivityRequirementMet,
 } from "@/lib/activity/checkActivityRequirement";
-import {
-  APPLICATIONS_SUBMISSION_DISABLED_MESSAGE,
-  APPLICATIONS_SUBMISSION_ENABLED,
-} from "@/lib/applications/submissionControl";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -46,16 +42,6 @@ function getWhitelistEmails(): string[] {
 }
 
 export async function POST(req: Request) {
-  if (!APPLICATIONS_SUBMISSION_ENABLED) {
-    return Response.json(
-      {
-        error: APPLICATIONS_SUBMISSION_DISABLED_MESSAGE,
-        submissionsDisabled: true,
-      },
-      { status: 503 },
-    );
-  }
-
   const session = await getSession();
   if (!session) {
     return Response.json({ error: "Требуется вход" }, { status: 401 });
@@ -78,7 +64,7 @@ export async function POST(req: Request) {
 
   try {
     const whitelistEmails = getWhitelistEmails();
-    const [requester, lastByUser] = await Promise.all([
+    const [requester, lastByUser, lastApprovedByUser] = await Promise.all([
       prisma.user.findUnique({
         where: { id: session.uid },
         select: { email: true },
@@ -87,6 +73,14 @@ export async function POST(req: Request) {
         where: { userId: session.uid },
         orderBy: { createdAt: "desc" },
         select: { createdAt: true },
+      }),
+      prisma.application.findFirst({
+        where: {
+          userId: session.uid,
+          status: ApplicationStatus.APPROVED,
+        },
+        orderBy: { createdAt: "desc" },
+        select: { id: true },
       }),
     ]);
     const isWhitelisted =
@@ -223,28 +217,27 @@ export async function POST(req: Request) {
     const trust = await computeUserTrustSnapshot(session.uid);
 
     if (session.role !== "ADMIN" && !isWhitelisted) {
-      const needReview = trust.approvedApplications > 0;
-      const needActivity = trust.approvedApplications >= 3;
-      const [review, lastForActivity] = await Promise.all([
-        needReview
-          ? prisma.review.findUnique({
-              where: { userId: session.uid },
-              select: { id: true },
-            })
-          : Promise.resolve(null),
-        needActivity ? lastByUser : Promise.resolve(null),
-      ]);
-
-      if (needReview && !review) {
-        return Response.json(
-          {
-            error:
-              "Для создания новой заявки необходимо сначала оставить отзыв о предыдущей одобренной заявке. Перейдите на страницу /reviews и оставьте отзыв.",
-            requiresReview: true,
-          },
-          { status: 403 },
-        );
+      // Блокировка: последняя одобренная заявка без отзыва — нельзя подать новую
+      const lastApproved = lastApprovedByUser;
+      if (lastApproved) {
+        const reviewForLastApproved = await prisma.review.findUnique({
+          where: { applicationId: lastApproved.id },
+          select: { id: true },
+        });
+        if (!reviewForLastApproved) {
+          return Response.json(
+            {
+              error:
+                "Для создания новой заявки необходимо сначала оставить отзыв по предыдущей одобренной заявке. Перейдите на страницу отзывов и оставьте отзыв.",
+              requiresReview: true,
+            },
+            { status: 403 },
+          );
+        }
       }
+
+      const needActivity = trust.approvedApplications >= 3;
+      const lastForActivity = needActivity ? lastByUser : null;
 
       if (amountNumber < trust.limits.min || amountNumber > trust.limits.max) {
         const minText = trust.limits.min.toLocaleString("ru-RU");

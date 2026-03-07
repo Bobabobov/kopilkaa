@@ -10,260 +10,405 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { Card, CardContent } from "@/components/ui/Card";
 
+const sectionVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, delay: i * 0.1, ease: "easeOut" },
+  }),
+};
+
 export function ReviewsSection() {
   const {
     loading,
     loadingMore,
-    reviews,
-    total,
-    currentPage,
-    totalPages,
-    hasMore,
     submitting,
     canReview,
     approvedApplications,
+    pendingReviewApplication,
     viewerReview,
-    refresh,
-    loadMore,
+    reviewsOld,
+    reviewsNew,
+    totalOld,
+    totalNew,
+    hasMoreOld,
+    hasMoreNew,
+    loadMoreOld,
+    loadMoreNew,
     submitReview,
     deleteReview,
     ToastComponent,
   } = useReviews();
 
-  const heroTitle = useMemo(
-    () => ({
-      title: "Отзывы участников",
-      subtitle: "Честные истории тех, кто оформил заявку и получил одобрение",
-    }),
-    [],
+  const totalReviews = totalOld + totalNew;
+  const heroSubtitle = useMemo(
+    () =>
+      totalReviews > 0
+        ? `Уже ${totalReviews.toLocaleString("ru-RU")} отзывов — чеки, фото и истории участников`
+        : "Чеки, фото и истории тех, кто получил помощь",
+    [totalReviews],
   );
 
   return (
-    <div className="min-h-screen relative px-4 sm:px-6 lg:px-10 py-8 space-y-8">
+    <div className="min-h-screen relative px-4 sm:px-6 lg:px-10 py-8 sm:py-12 space-y-12 sm:space-y-16">
+      {/* Фон */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
-        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#f9bc60]/6 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#abd1c6]/6 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#004643]/20 rounded-full blur-3xl" />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
+      {/* Hero */}
+      <motion.header
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-        className="max-w-6xl mx-auto px-1"
+        transition={{ duration: 0.5 }}
+        className="max-w-4xl mx-auto text-center"
       >
-        <Card variant="darkGlass" padding="lg" className="max-w-6xl mx-auto">
-          <CardContent className="p-0">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span
-                className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-lg"
-                style={{ background: "rgba(249, 188, 96, 0.15)", color: "#f9bc60" }}
-              >
-                <LucideIcons.MessageCircle className="w-3 h-3" />
-                Опыт сообщества
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-[#fffffe]">
-              {heroTitle.title}
-            </h1>
-            <p className="text-sm md:text-base text-[#abd1c6] max-w-5xl mt-1">
-              {heroTitle.subtitle}
-            </p>
-          </CardContent>
-        </Card>
-      </motion.div>
+        <div
+          className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6 border"
+          style={{
+            background: "rgba(249, 188, 96, 0.12)",
+            borderColor: "rgba(249, 188, 96, 0.35)",
+            color: "#f9bc60",
+          }}
+        >
+          <LucideIcons.MessageCircle className="w-4 h-4" />
+          <span className="text-sm font-semibold uppercase tracking-wider">
+            Опыт сообщества
+          </span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#fffffe] tracking-tight">
+          Отзывы участников
+        </h1>
+        <p className="mt-4 text-lg sm:text-xl text-[#abd1c6] max-w-2xl mx-auto leading-relaxed">
+          {heroSubtitle}
+        </p>
+        <p className="mt-2 text-sm text-[#94a1b2] max-w-xl mx-auto">
+          Два формата: отзывы по заявкам (с фото) и архивные отзывы
+        </p>
+      </motion.header>
 
+      {/* Форма обязательного отзыва по заявке */}
       {viewerReview ? (
-        <Card variant="darkGlass" padding="lg" className="max-w-6xl mx-auto">
-          <CardContent className="flex items-start gap-4 p-0">
-            <div
-              className="w-11 h-11 rounded-2xl flex items-center justify-center text-[#001e1d] flex-shrink-0"
-              style={{ background: "linear-gradient(135deg, #f9bc60 0%, #e8a545 100%)" }}
-            >
-              <LucideIcons.CheckCircle size="sm" />
-            </div>
-            <div className="space-y-3 flex-1 min-w-0">
-              <p className="text-xs uppercase tracking-[0.08em] text-[#94a1b2]">
-                Отзыв уже оставлен
-              </p>
-              <h2 className="text-lg sm:text-xl font-semibold text-[#fffffe]">
-                Спасибо за ваш отзыв
-              </h2>
-              <p className="text-sm text-[#abd1c6]">
-                Вы можете прочитать свой отзыв в списке ниже или удалить его и
-                написать новый.
-              </p>
-              <button
-                onClick={() => {
-                  if (
-                    confirm(
-                      "Вы уверены, что хотите удалить свой отзыв? После удаления вы сможете написать новый.",
-                    )
-                  ) {
-                    deleteReview(viewerReview.id);
-                  }
-                }}
-                disabled={submitting}
-                className="inline-flex items-center gap-2 rounded-xl border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-300 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          animate="visible"
+          custom={0}
+          className="max-w-6xl mx-auto"
+        >
+          <Card variant="darkGlass" padding="lg" className="border-[#f9bc60]/30">
+            <CardContent className="flex items-start gap-4 p-0">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center text-[#001e1d] flex-shrink-0"
+                style={{ background: "linear-gradient(135deg, #f9bc60 0%, #e8a545 100%)" }}
               >
-                {submitting ? (
-                  <>
-                    <LucideIcons.Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
-                    <span>Удаление...</span>
-                  </>
-                ) : (
-                  <>
+                <LucideIcons.CheckCircle size="sm" />
+              </div>
+              <div className="space-y-3 flex-1 min-w-0">
+                <p className="text-xs uppercase tracking-[0.08em] text-[#94a1b2]">
+                  Отзыв по заявке оставлен
+                </p>
+                <h2 className="text-lg sm:text-xl font-semibold text-[#fffffe]">
+                  Спасибо за отзыв
+                </h2>
+                <p className="text-sm text-[#abd1c6]">
+                  Теперь вы можете подать новую заявку.
+                </p>
+                <button
+                  onClick={() => {
+                    if (
+                      confirm(
+                        "Удалить отзыв? Тогда нужно будет оставить новый, чтобы подать следующую заявку.",
+                      )
+                    ) {
+                      deleteReview(viewerReview.id);
+                    }
+                  }}
+                  disabled={submitting}
+                  className="inline-flex items-center gap-2 rounded-xl border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-300 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold disabled:opacity-50 transition-colors"
+                >
+                  {submitting ? (
+                    <LucideIcons.Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
                     <LucideIcons.Trash2 size="xs" />
-                    <span>Удалить отзыв</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : !canReview ? (
-        <Card variant="darkGlass" padding="lg" className="max-w-6xl mx-auto">
-          <CardContent className="flex items-start gap-4 p-0">
-            <div
-              className="w-11 h-11 rounded-2xl flex items-center justify-center text-[#001e1d] flex-shrink-0"
-              style={{ background: "rgba(249, 188, 96, 0.25)" }}
-            >
-              <LucideIcons.Info size="sm" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.08em] text-[#94a1b2]">
-                Недоступно
-              </p>
-              <h2 className="text-lg sm:text-xl font-semibold text-[#fffffe]">
-                Отзыв можно оставить после одобрения заявки
-              </h2>
-              <p className="text-sm text-[#abd1c6]">
-                Как только ваша заявка будет одобрена, появится возможность
-                поделиться опытом.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
+                  )}
+                  Удалить отзыв
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      ) : !canReview && approvedApplications > 0 ? null : !canReview ? (
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          animate="visible"
+          custom={0}
+          className="max-w-6xl mx-auto"
+        >
+          <Card variant="darkGlass" padding="lg">
+            <CardContent className="flex items-start gap-4 p-0">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ background: "rgba(249, 188, 96, 0.25)" }}
+              >
+                <LucideIcons.Info size="sm" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-[0.08em] text-[#94a1b2]">
+                  Недоступно
+                </p>
+                <h2 className="text-lg sm:text-xl font-semibold text-[#fffffe]">
+                  Отзыв по заявке можно оставить после одобрения
+                </h2>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      ) : canReview ? (
         <ReviewForm
           canReview={canReview}
           approvedApplications={approvedApplications}
+          pendingReviewApplication={pendingReviewApplication}
           viewerReview={viewerReview}
           submitting={submitting}
-          onSubmit={submitReview}
+          onSubmit={(content, files, existingUrls) => {
+            if (pendingReviewApplication) {
+              submitReview(
+                pendingReviewApplication.id,
+                content,
+                files,
+                existingUrls,
+              );
+            }
+          }}
         />
-      )}
+      ) : null}
 
-      <div className="max-w-6xl mx-auto space-y-4">
-        <div className="flex items-center justify-center gap-3 text-center">
-          <span className="h-px flex-1 max-w-[120px] bg-white/10" aria-hidden />
-          <div
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 font-semibold tracking-wide text-[#fffffe]"
-            style={{ background: "rgba(249, 188, 96, 0.15)", color: "#f9bc60" }}
-          >
-            <LucideIcons.MessageCircle size="sm" />
-            <span className="text-base sm:text-lg">Свежие отзывы</span>
-            {total > 0 && (
-              <span className="text-xs opacity-90">({total.toLocaleString("ru-RU")})</span>
-            )}
-            {loading && (
-              <LucideIcons.Loader2 className="h-4 w-4 animate-spin opacity-80" />
-            )}
-          </div>
-          <span className="h-px flex-1 max-w-[120px] bg-white/10" aria-hidden />
-        </div>
-
-        {/* Telegram канал баннер */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          className="relative overflow-hidden rounded-2xl border border-[#229ED9]/40 bg-gradient-to-br from-[#229ED9]/15 via-[#001e1d]/60 to-[#001e1d]/70 backdrop-blur-xl p-4 sm:p-5 shadow-[0_15px_40px_-20px_rgba(34,158,217,0.3)] hover:shadow-[0_20px_50px_-20px_rgba(34,158,217,0.4)] hover:border-[#229ED9]/60 transition-all"
+      {/* ——— Секция 1: Что купили на помощь ——— */}
+      <motion.section
+        id="reviews-new"
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+        custom={1}
+        className="max-w-6xl mx-auto"
+      >
+        <div
+          className="rounded-3xl sm:rounded-[2rem] border-2 overflow-hidden"
+          style={{
+            background: "linear-gradient(180deg, rgba(249,188,96,0.08) 0%, rgba(0,30,29,0.4) 100%)",
+            borderColor: "rgba(249, 188, 96, 0.35)",
+          }}
         >
-          {/* Подсветки */}
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#229ED9]/20 blur-3xl rounded-full" />
-            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#f9bc60]/10 blur-2xl rounded-full" />
+          <div className="p-6 sm:p-8 md:p-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div className="flex items-center gap-4">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(249,188,96,0.25) 0%, rgba(249,188,96,0.1) 100%)",
+                    border: "2px solid rgba(249, 188, 96, 0.4)",
+                  }}
+                >
+                  <LucideIcons.Gift className="w-7 h-7" style={{ color: "#f9bc60" }} />
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-[#fffffe]">
+                    Что купили на помощь
+                  </h2>
+                  <p className="text-sm text-[#abd1c6] mt-0.5">
+                    Отзывы с фото после каждой одобренной заявки
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {loading ? (
+                  <LucideIcons.Loader2 className="w-5 h-5 animate-spin text-[#f9bc60]" />
+                ) : (
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold"
+                    style={{
+                      background: "rgba(249, 188, 96, 0.2)",
+                      color: "#f9bc60",
+                    }}
+                  >
+                    {totalNew.toLocaleString("ru-RU")}
+                  </span>
+                )}
+              </div>
+            </div>
+            <p className="text-sm text-[#94a1b2] mb-8 max-w-2xl">
+              Участники прикрепляют чеки, фото товаров или результата — так видно, на что пошла помощь.
+            </p>
+            <ReviewsList
+              reviews={reviewsNew}
+              loading={loading}
+              emptyTitle="Пока нет отзывов по заявкам"
+              emptyDescription="После одобрения заявки здесь появятся отзывы с фото"
+            />
+            {hasMoreNew && (
+              <div className="flex justify-center pt-8">
+                <button
+                  onClick={loadMoreNew}
+                  disabled={loadingMore}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
+                  style={{
+                    background: "rgba(249, 188, 96, 0.2)",
+                    border: "2px solid rgba(249, 188, 96, 0.45)",
+                    color: "#f9bc60",
+                  }}
+                >
+                  {loadingMore ? (
+                    <LucideIcons.Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <LucideIcons.ChevronDown size="sm" />
+                  )}
+                  Ещё отзывы
+                </button>
+              </div>
+            )}
           </div>
+        </div>
+      </motion.section>
 
-          <Link
-            href="https://t.me/+MVL9z_I6LOVjNmE6"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative z-10 flex flex-col sm:flex-row items-center gap-4 group"
-          >
+      {/* Разделитель */}
+      <div className="max-w-6xl mx-auto flex items-center gap-4">
+        <span className="flex-1 h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent" aria-hidden />
+        <span className="text-[#94a1b2] text-sm font-medium">Архив</span>
+        <span className="flex-1 h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent" aria-hidden />
+      </div>
+
+      {/* ——— Секция 2: Отзывы (ранее) ——— */}
+      <motion.section
+        id="reviews-old"
+        variants={sectionVariants}
+        initial="hidden"
+        animate="visible"
+        custom={2}
+        className="max-w-6xl mx-auto"
+      >
+        <div
+          className="rounded-3xl sm:rounded-[2rem] border-2 overflow-hidden"
+          style={{
+            background: "linear-gradient(180deg, rgba(171,209,198,0.06) 0%, rgba(0,30,29,0.35) 100%)",
+            borderColor: "rgba(171, 209, 198, 0.3)",
+          }}
+        >
+          <div className="p-6 sm:p-8 md:p-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div className="flex items-center gap-4">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: "rgba(171, 209, 198, 0.15)",
+                    border: "2px solid rgba(171, 209, 198, 0.35)",
+                  }}
+                >
+                  <LucideIcons.MessageCircle className="w-7 h-7 text-[#abd1c6]" />
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-[#fffffe]">
+                    Отзывы (ранее)
+                  </h2>
+                  <p className="text-sm text-[#abd1c6] mt-0.5">
+                    Общий опыт участия в прежнем формате
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {loading ? (
+                  <LucideIcons.Loader2 className="w-5 h-5 animate-spin text-[#abd1c6]" />
+                ) : (
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold bg-[#abd1c6]/15 text-[#abd1c6]"
+                  >
+                    {totalOld.toLocaleString("ru-RU")}
+                  </span>
+                )}
+              </div>
+            </div>
+            <p className="text-sm text-[#94a1b2] mb-8 max-w-2xl">
+              Отзывы участников до введения формата «отзыв по заявке».
+            </p>
+            <ReviewsList
+              reviews={reviewsOld}
+              loading={loading}
+              emptyTitle="В этой рубрике пока пусто"
+              emptyDescription="Архивные отзывы отображаются здесь"
+            />
+            {hasMoreOld && (
+              <div className="flex justify-center pt-8">
+                <button
+                  onClick={loadMoreOld}
+                  disabled={loadingMore}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm bg-[#abd1c6]/15 border-2 border-[#abd1c6]/35 text-[#abd1c6] hover:bg-[#abd1c6]/25 disabled:opacity-50 transition-all"
+                >
+                  {loadingMore ? (
+                    <LucideIcons.Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <LucideIcons.ChevronDown size="sm" />
+                  )}
+                  Ещё отзывы
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Telegram баннер */}
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="max-w-6xl mx-auto"
+      >
+        <Link
+          href="https://t.me/+MVL9z_I6LOVjNmE6"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group block relative overflow-hidden rounded-3xl border-2 border-[#229ED9]/40 bg-gradient-to-br from-[#229ED9]/12 via-[#001e1d]/70 to-[#001e1d]/80 p-6 sm:p-8 transition-all hover:border-[#229ED9]/60 hover:shadow-[0_20px_50px_-20px_rgba(34,158,217,0.25)]"
+        >
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#229ED9]/15 blur-3xl rounded-full" />
+            <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-[#f9bc60]/8 blur-2xl rounded-full" />
+          </div>
+          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-6">
             <div className="relative flex-shrink-0">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-[#229ED9]/50 bg-white/5 backdrop-blur-sm shadow-lg group-hover:border-[#229ED9] group-hover:shadow-xl group-hover:shadow-[#229ED9]/30 transition-all group-hover:scale-105">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-[#229ED9]/50 bg-white/5 group-hover:border-[#229ED9] transition-colors">
                 <img
                   src="/logo12.png"
-                  alt="Логотип"
+                  alt=""
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.src = "/logo.png";
                   }}
                 />
               </div>
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#229ED9] rounded-full border-2 border-[#001e1d] flex items-center justify-center shadow-lg">
-                <TelegramIcon className="w-3.5 h-3.5 text-white" />
+              <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#229ED9] rounded-full border-2 border-[#001e1d] flex items-center justify-center shadow-lg">
+                <TelegramIcon className="w-4 h-4 text-white" />
               </div>
             </div>
-
-            <div className="flex-1 text-center sm:text-left space-y-2 min-w-0">
-              <div className="flex items-center justify-center sm:justify-start gap-2">
-                <TelegramIcon className="w-5 h-5 text-[#229ED9] flex-shrink-0" />
-                <h4 className="text-base sm:text-lg font-semibold text-[#fffffe] group-hover:text-[#229ED9] transition-colors">
-                  Больше историй в Telegram
-                </h4>
-              </div>
-              <p className="text-sm text-[#abd1c6]/90">
-                Присоединяйтесь к нашему Telegram-каналу, где собраны все отзывы
-                и истории участников
+            <div className="flex-1 text-center sm:text-left min-w-0">
+              <h3 className="text-lg sm:text-xl font-bold text-[#fffffe] flex items-center justify-center sm:justify-start gap-2">
+                <TelegramIcon className="w-5 h-5 text-[#229ED9]" />
+                Больше историй в Telegram
+              </h3>
+              <p className="text-sm text-[#abd1c6] mt-1">
+                Присоединяйтесь к каналу — отзывы и новости проекта
               </p>
-              <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-[#229ED9] font-medium group-hover:text-[#4ab8e8] transition-colors">
-                <span>Перейти в канал</span>
-                <LucideIcons.ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
+              <span className="inline-flex items-center gap-2 mt-3 text-sm text-[#229ED9] font-semibold group-hover:gap-3 transition-all">
+                Перейти в канал
+                <LucideIcons.ArrowRight className="w-4 h-4" />
+              </span>
             </div>
-          </Link>
-        </motion.div>
-
-        <ReviewsList reviews={reviews} loading={loading} />
-
-        {hasMore && (
-          <div className="flex justify-center pt-6">
-            <button
-              onClick={loadMore}
-              disabled={loadingMore}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
-              style={{
-                background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
-                color: "#001e1d",
-                boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
-              }}
-            >
-              {loadingMore ? (
-                <>
-                  <LucideIcons.Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Загрузка...</span>
-                </>
-              ) : (
-                <>
-                  <LucideIcons.ChevronDown size="sm" />
-                  <span>Загрузить еще</span>
-                </>
-              )}
-            </button>
           </div>
-        )}
-
-        {!loading && !hasMore && reviews.length > 0 && (
-          <div className="text-center py-6">
-            <p className="text-sm text-[#94a1b2]">
-              Показано {reviews.length} из {total.toLocaleString("ru-RU")}{" "}
-              отзывов
-            </p>
-          </div>
-        )}
-      </div>
+        </Link>
+      </motion.section>
 
       <ToastComponent />
     </div>

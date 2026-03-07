@@ -60,9 +60,9 @@ export default function ApplicationPaymentDetails({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.5 }}
-      className="mb-6"
+      className="mb-6 min-w-0 w-full"
     >
-      <details className="toggle">
+      <details className="toggle min-w-0">
         <summary
           className="flex items-center gap-2 cursor-pointer select-none font-medium transition-colors text-base sm:text-lg mb-4 hover:opacity-80"
           style={{ color: "#f9bc60" }}
@@ -84,15 +84,15 @@ export default function ApplicationPaymentDetails({
           <span className="label-open">Скрыть реквизиты</span>
         </summary>
         <div
-          className="open-only rounded-xl border relative group p-4 sm:p-6 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.7)]"
+          className="open-only rounded-lg sm:rounded-xl border relative group p-3 sm:p-5 lg:p-6 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.7)] min-w-0 w-full overflow-hidden"
           style={{
             backgroundColor: "#0b1615",
             borderColor: "rgba(171,209,198,0.25)",
           }}
         >
-          <dl className="space-y-2 break-all text-anywhere pr-12 sm:pr-16">
+          <dl className="space-y-2 pr-12 sm:pr-16 min-w-0">
             {parsed.bankName && (
-              <div>
+              <div className="min-w-0 overflow-hidden">
                 <dt
                   className="font-medium text-sm sm:text-base"
                   style={{ color: "#abd1c6" }}
@@ -100,14 +100,14 @@ export default function ApplicationPaymentDetails({
                   Банк
                 </dt>
                 <dd
-                  className="select-all text-sm sm:text-base"
-                  style={{ color: "#e8f2ef" }}
+                  className="select-all text-sm sm:text-base break-words"
+                  style={{ color: "#e8f2ef", wordBreak: "break-word", overflowWrap: "anywhere" }}
                 >
                   {parsed.bankName}
                 </dd>
               </div>
             )}
-            <div>
+            <div className="min-w-0 overflow-hidden">
               <dt
                 className="font-medium text-sm sm:text-base"
                 style={{ color: "#abd1c6" }}
@@ -115,8 +115,8 @@ export default function ApplicationPaymentDetails({
                 Реквизиты
               </dt>
               <dd
-                className="select-all text-sm sm:text-base"
-                style={{ color: "#e8f2ef" }}
+                className="select-all text-sm sm:text-base break-words whitespace-pre-wrap"
+                style={{ color: "#e8f2ef", wordBreak: "break-word", overflowWrap: "anywhere" }}
               >
                 {parsed.payment || "Не указаны"}
               </dd>
@@ -134,9 +134,9 @@ export default function ApplicationPaymentDetails({
                 <p className="text-xs text-[#94a1b2] mb-2">
                   Эти реквизиты также использовались в других заявках:
                 </p>
-                <ul className="space-y-1.5 text-sm">
+                <ul className="space-y-1.5 text-sm min-w-0">
                   {samePaymentApplications.map((app) => (
-                    <li key={app.id} className="flex flex-wrap items-baseline gap-1">
+                    <li key={app.id} className="flex flex-wrap items-baseline gap-1 min-w-0 break-words">
                       <Link
                         href={`/admin/applications/${app.id}`}
                         className="text-[#abd1c6] hover:text-[#f9bc60] transition-colors underline underline-offset-2"
@@ -168,7 +168,7 @@ export default function ApplicationPaymentDetails({
           </div>
           <button
             onClick={handleCopy}
-            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center gap-1 px-2 sm:px-3 py-1 rounded-lg text-xs bg-[#004643] border border-[#f9bc60]/30 hover:border-[#f9bc60] backdrop-blur-sm shadow-sm"
+            className="absolute top-2 right-2 sm:top-3 sm:right-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs bg-[#004643] border border-[#f9bc60]/30 hover:border-[#f9bc60] backdrop-blur-sm shadow-sm touch-manipulation"
             style={{ color: "#f9bc60" }}
             title="Копировать реквизиты"
           >

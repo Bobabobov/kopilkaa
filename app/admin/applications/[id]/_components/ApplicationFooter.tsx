@@ -20,7 +20,7 @@ export default function ApplicationFooter({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.9 }}
-      className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t"
+      className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 border-t min-w-0"
       style={{ borderColor: "rgba(171,209,198,0.2)" }}
     >
       <div
@@ -43,7 +43,7 @@ export default function ApplicationFooter({
         <span>Отправлено: {new Date(createdAt).toLocaleString()}</span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto min-w-0">
         {/* Кнопка "Посмотреть историю" - только для одобренных заявок */}
         {status === "APPROVED" && (
           <a

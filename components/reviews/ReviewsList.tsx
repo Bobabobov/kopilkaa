@@ -9,9 +9,18 @@ import { ReviewCard } from "./ReviewCard";
 type Props = {
   reviews: ReviewItem[];
   loading?: boolean;
+  /** Заголовок пустого состояния (по умолчанию: «Пока нет отзывов») */
+  emptyTitle?: string;
+  /** Описание пустого состояния */
+  emptyDescription?: string;
 };
 
-export function ReviewsList({ reviews, loading = false }: Props) {
+export function ReviewsList({
+  reviews,
+  loading = false,
+  emptyTitle = "Пока нет отзывов",
+  emptyDescription = "Будьте первым, кто поделится опытом участия в программе",
+}: Props) {
   if (!loading && !reviews.length) {
     return (
       <motion.div
@@ -27,9 +36,9 @@ export function ReviewsList({ reviews, loading = false }: Props) {
             >
               <LucideIcons.MessageCircle className="w-8 h-8 text-[#f9bc60]" />
             </div>
-            <h3 className="text-lg font-semibold text-[#fffffe]">Пока нет отзывов</h3>
+            <h3 className="text-lg font-semibold text-[#fffffe]">{emptyTitle}</h3>
             <p className="text-sm text-[#abd1c6] mt-2">
-              Будьте первым, кто поделится опытом участия в программе
+              {emptyDescription}
             </p>
           </CardContent>
         </Card>

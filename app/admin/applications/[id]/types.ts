@@ -7,6 +7,26 @@ export type SameApplicationRef = {
   user: { id: string; email: string | null; name: string | null };
 };
 
+export type ApplicationReview = {
+  id: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  images: { url: string; sort: number }[];
+};
+
+export type PreviousApprovedWithReview = {
+  id: string;
+  title: string;
+  createdAt: string;
+  review: {
+    id: string;
+    content: string;
+    createdAt: string;
+    images: { url: string; sort: number }[];
+  } | null;
+};
+
 export type ApplicationItem = {
   id: string;
   title: string;
@@ -26,4 +46,7 @@ export type ApplicationItem = {
   images: { url: string; sort: number }[];
   samePaymentApplications?: SameApplicationRef[];
   sameIpApplications?: SameApplicationRef[];
+  review?: ApplicationReview | null;
+  /** Последняя одобренная заявка пользователя и её отзыв (для проверки перед одобрением) */
+  previousApprovedWithReview?: PreviousApprovedWithReview | null;
 };

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 
-export function ReadingProgressBar() {
+export function ReviewReadingProgressBar() {
   const [progress, setProgress] = useState(0);
   const rafRef = useRef<number | null>(null);
   const tickingRef = useRef(false);

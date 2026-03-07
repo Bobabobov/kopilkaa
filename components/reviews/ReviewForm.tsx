@@ -5,11 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Card } from "@/components/ui/Card";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import type { ReviewItem } from "@/hooks/reviews/useReviews";
 
 type Props = {
   canReview: boolean;
   approvedApplications: number;
+  pendingReviewApplication: { id: string; title: string } | null;
   viewerReview: ReviewItem | null;
   submitting?: boolean;
   onSubmit: (
@@ -22,6 +25,7 @@ type Props = {
 export function ReviewForm({
   canReview,
   approvedApplications,
+  pendingReviewApplication,
   viewerReview,
   submitting = false,
   onSubmit,
@@ -33,7 +37,10 @@ export function ReviewForm({
     viewerReview?.images?.map((i) => i.url) ?? [],
   );
   const [isDragging, setIsDragging] = useState(false);
+  const [agreedToProofRule, setAgreedToProofRule] = useState(!!viewerReview);
+  const [highlightProofCheckbox, setHighlightProofCheckbox] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const proofCheckboxRef = useRef<HTMLDivElement>(null);
   const { showToast, ToastComponent } = useBeautifulToast();
 
   const remaining = useMemo(
@@ -125,6 +132,11 @@ export function ReviewForm({
       );
       return;
     }
+    if (!agreedToProofRule) {
+      setHighlightProofCheckbox(true);
+      proofCheckboxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     await onSubmit(content, files, existingUrls);
   };
 
@@ -133,9 +145,16 @@ export function ReviewForm({
     setExistingUrls(viewerReview?.images.map((i) => i.url) ?? []);
     setFiles([]);
     setPreviews([]);
+    setAgreedToProofRule(!!viewerReview);
   }, [viewerReview]);
 
   const totalImages = existingUrls.length + previews.length;
+  const textOk = content.trim().length >= 50;
+  const photosOk = totalImages >= 1;
+  const formFilled = canReview && textOk && photosOk && !submitting;
+  const canSubmit = formFilled && agreedToProofRule;
+  const shouldHighlightCheckbox =
+    !agreedToProofRule && textOk && photosOk && canReview;
 
   return (
     <motion.div
@@ -151,26 +170,39 @@ export function ReviewForm({
         </div>
         <form
           onSubmit={handleSubmit}
-          className="relative z-10 space-y-6 p-6 sm:p-8"
+          className="relative z-10 space-y-8 p-6 sm:p-8"
         >
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center text-[#f9bc60] shadow-lg flex-shrink-0">
+        {/* Заголовок и контекст заявки */}
+        <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#f9bc60]/25 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center text-[#f9bc60] shadow-lg flex-shrink-0">
             <LucideIcons.MessageCircle size="sm" />
           </div>
-          <div className="flex-1 space-y-2 min-w-0">
-            <p className="text-xs uppercase tracking-[0.1em] text-[#94a1b2] font-semibold">
-              Отзывы сообщества
-            </p>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#fffffe] leading-tight">
-              Поделитесь опытом участия
-            </h2>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-[#abd1c6]">
-              <span>Один отзыв на аккаунт</span>
-              <span className="text-[#94a1b2]">•</span>
-              <span>Фото — до 5 штук</span>
+          <div className="flex-1 space-y-4 min-w-0">
+            <div>
+              <p className="text-xs uppercase tracking-[0.1em] text-[#94a1b2] font-semibold mb-1">
+                Отзывы сообщества
+              </p>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#fffffe] leading-tight">
+                {pendingReviewApplication
+                  ? "Оставьте отзыв по прошлой помощи"
+                  : "Поделитесь опытом участия"}
+              </h2>
+            </div>
+            {pendingReviewApplication && (
+              <div className="inline-flex items-center gap-2 rounded-xl border border-[#abd1c6]/30 bg-[#001e1d]/50 px-3 py-2 max-w-full">
+                <LucideIcons.FileText className="w-4 h-4 text-[#f9bc60] flex-shrink-0" />
+                <span className="text-sm text-[#abd1c6] truncate" title={pendingReviewApplication.title}>
+                  По заявке: {pendingReviewApplication.title}
+                </span>
+              </div>
+            )}
+            <div className="flex flex-wrap items-center gap-2 text-sm text-[#94a1b2]">
+              <span>Минимум 1 фото (чек, товар, результат)</span>
+              <span>·</span>
+              <span>До 5 фото</span>
               {approvedApplications > 0 && (
                 <>
-                  <span className="text-[#94a1b2]">•</span>
+                  <span>·</span>
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f9bc60]/15 border border-[#f9bc60]/30 text-[#f9bc60] font-semibold">
                     <LucideIcons.CheckCircle size="xs" />
                     Одобрено заявок: {approvedApplications}
@@ -199,20 +231,29 @@ export function ReviewForm({
           </motion.div>
         )}
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-[#abd1c6]">
-              Текст отзыва
-            </label>
+        {/* Секция: Текст отзыва */}
+        <div
+          className="rounded-2xl border border-[#abd1c6]/20 bg-[#001e1d]/40 p-5 sm:p-6 space-y-4"
+          style={{ boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.03)" }}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[#abd1c6]/15 border border-[#abd1c6]/30 flex items-center justify-center">
+                <LucideIcons.Edit3 className="w-4 h-4 text-[#abd1c6]" />
+              </div>
+              <label className="text-sm font-semibold text-[#fffffe]">
+                Текст отзыва
+              </label>
+            </div>
             <div className="flex items-center gap-2">
               {viewerReview && (
                 <span className="text-xs text-[#f9bc60] font-medium px-2 py-1 rounded-full bg-[#f9bc60]/10 border border-[#f9bc60]/20">
                   Редактирование
                 </span>
               )}
-              <div
+              <span
                 className={cn(
-                  "text-xs font-medium px-2.5 py-1 rounded-full transition-colors",
+                  "text-xs font-medium px-2.5 py-1 rounded-full tabular-nums transition-colors",
                   remaining < 100
                     ? "text-[#e16162] bg-[#e16162]/10 border border-[#e16162]/20"
                     : remaining < 300
@@ -221,25 +262,52 @@ export function ReviewForm({
                 )}
               >
                 {content.length} / 1200
-              </div>
+              </span>
             </div>
           </div>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             maxLength={1200}
-            rows={7}
+            rows={6}
             placeholder="Расскажите, как проходило оформление, взаимодействие с командой и что понравилось/что улучшить..."
             disabled={!canReview}
             className={cn(
-              "w-full rounded-2xl border-2 px-5 py-4 text-[#fffffe] placeholder:text-[#94a1b2]/60",
-              "focus:outline-none transition-all resize-none shadow-inner",
-              "bg-[#001e1d]/60 backdrop-blur-sm",
+              "w-full rounded-xl border-2 px-4 py-3.5 text-[#fffffe] placeholder:text-[#94a1b2]/60",
+              "focus:outline-none transition-all resize-none",
+              "bg-[#001e1d]/70 backdrop-blur-sm",
               canReview
-                ? "border-[#abd1c6]/40 focus:border-[#f9bc60] focus:ring-2 focus:ring-[#f9bc60]/20"
+                ? "border-[#abd1c6]/30 focus:border-[#f9bc60] focus:ring-2 focus:ring-[#f9bc60]/20"
                 : "border-[#abd1c6]/20 cursor-not-allowed opacity-60",
             )}
           />
+          <p className="text-xs text-[#94a1b2]">
+            Не менее 50 символов. Опишите опыт и приложите фото ниже.
+          </p>
+        </div>
+
+        {/* Чеклист требований */}
+        <div className="flex flex-wrap gap-4 rounded-xl border border-[#abd1c6]/15 bg-[#001e1d]/30 px-4 py-3">
+          <div className="flex items-center gap-2">
+            {textOk ? (
+              <LucideIcons.CheckCircle className="w-4 h-4 text-[#abd1c6]" />
+            ) : (
+              <LucideIcons.Circle className="w-4 h-4 text-[#94a1b2]" />
+            )}
+            <span className={cn("text-sm", textOk ? "text-[#abd1c6]" : "text-[#94a1b2]")}>
+              Текст от 50 символов
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {photosOk ? (
+              <LucideIcons.CheckCircle className="w-4 h-4 text-[#abd1c6]" />
+            ) : (
+              <LucideIcons.Circle className="w-4 h-4 text-[#94a1b2]" />
+            )}
+            <span className={cn("text-sm", photosOk ? "text-[#abd1c6]" : "text-[#94a1b2]")}>
+              Минимум 1 фото
+            </span>
+          </div>
         </div>
 
         <div
@@ -265,13 +333,24 @@ export function ReviewForm({
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border border-[#f9bc60]/40 flex items-center justify-center shadow-md">
                   <LucideIcons.Image className="w-4 h-4 text-[#f9bc60]" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <label className="text-sm font-semibold text-[#fffffe] block">
                     Прикрепить фотографии
                   </label>
                   <p className="text-xs text-[#abd1c6]/70">
                     {totalImages > 0 ? `${totalImages} из 5` : "До 5 фото"}
                   </p>
+                  {totalImages > 0 && (
+                    <div className="mt-1.5 h-1.5 w-24 rounded-full bg-[#001e1d]/80 overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full bg-[#f9bc60]"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(totalImages / 5) * 100}%` }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        style={{ maxWidth: "100%" }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
               {canReview && totalImages < 5 && (
@@ -385,19 +464,70 @@ export function ReviewForm({
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2 border-t border-[#abd1c6]/10">
-          <p className="text-xs text-[#94a1b2] leading-relaxed">
-            <LucideIcons.Info className="w-3.5 h-3.5 inline mr-1.5 text-[#abd1c6]" />
-            Отзывы видят все. Уважайте правила сообщества, не публикуйте
-            персональные данные.
-          </p>
+        <div className="space-y-4 pt-4 border-t border-[#abd1c6]/10">
+          <div
+            ref={proofCheckboxRef}
+            className={cn(
+              "rounded-xl p-3 transition-all duration-300",
+              (shouldHighlightCheckbox || highlightProofCheckbox) &&
+                "ring-2 ring-[#f9bc60] bg-[#f9bc60]/10 border border-[#f9bc60]/40",
+            )}
+          >
+            <label
+              className="flex items-start gap-3 cursor-pointer group"
+              onClick={() => setHighlightProofCheckbox(false)}
+            >
+              <input
+                type="checkbox"
+                checked={agreedToProofRule}
+                onChange={(e) => {
+                  setAgreedToProofRule(e.target.checked);
+                  setHighlightProofCheckbox(false);
+                }}
+                disabled={!canReview}
+                className="mt-1 w-4 h-4 shrink-0 rounded border-2 border-[#abd1c6]/40 bg-[#001e1d]/60 accent-[#f9bc60] focus:ring-2 focus:ring-[#f9bc60]/50 focus:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <span className="text-sm text-[#abd1c6] group-hover:text-[#fffffe] transition-colors">
+                Отзыв без доказательств (фото) не будет засчитан для подачи следующей заявки.
+                {(shouldHighlightCheckbox || highlightProofCheckbox) && (
+                  <span className="block mt-1 text-xs text-[#f9bc60] font-medium">
+                    Отметьте для отправки отзыва
+                  </span>
+                )}
+              </span>
+            </label>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex items-center gap-1.5 text-xs text-[#94a1b2] cursor-help">
+                  <LucideIcons.Info className="w-3.5 h-3.5 text-[#abd1c6] flex-shrink-0" />
+                  Правила отзывов
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                Отзывы видят все. Уважайте правила сообщества, не публикуйте
+                персональные данные. Отзыв без доказательств (фото) не засчитывается
+                для подачи следующей заявки.
+              </TooltipContent>
+            </Tooltip>
+            {canSubmit && (
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#abd1c6]">
+                <LucideIcons.CheckCircle2 className="w-3.5 h-3.5" />
+                Готово к отправке
+              </span>
+            )}
+          </div>
           <button
             type="submit"
-            disabled={!canReview || submitting || !content.trim()}
+            disabled={!formFilled}
             className={cn(
-              "inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all shadow-lg",
-              canReview && content.trim()
-                ? "bg-gradient-to-r from-[#f9bc60] via-[#e68b2e] to-[#e16162] text-[#001e1d] hover:shadow-xl hover:shadow-[#f9bc60]/40 hover:-translate-y-0.5 active:translate-y-0"
+              "inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all shadow-lg flex-shrink-0",
+              formFilled
+                ? canSubmit
+                  ? "bg-gradient-to-r from-[#f9bc60] via-[#e68b2e] to-[#e16162] text-[#001e1d] hover:shadow-xl hover:shadow-[#f9bc60]/40 hover:-translate-y-0.5 active:translate-y-0"
+                  : "bg-gradient-to-r from-[#f9bc60]/80 to-[#e68b2e]/80 text-[#001e1d] hover:shadow-lg hover:shadow-[#f9bc60]/30 border-2 border-[#f9bc60]"
                 : "bg-[#001e1d]/40 text-[#5b7068] cursor-not-allowed border border-[#abd1c6]/20",
             )}
           >
@@ -422,6 +552,7 @@ export function ReviewForm({
               </>
             )}
           </button>
+          </div>
         </div>
       </form>
       </Card>
@@ -429,8 +560,4 @@ export function ReviewForm({
       <ToastComponent />
     </motion.div>
   );
-}
-
-function cn(...classes: (string | false | null | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
 }

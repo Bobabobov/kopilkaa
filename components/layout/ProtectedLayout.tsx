@@ -34,7 +34,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
       <ApplicationStatusModalGate />
       <TopBanner />
       <Header />
-      <main className="flex-1 container-p mx-auto">{children}</main>
+      <main className="flex-1 container-p mx-auto w-full min-w-0 overflow-x-hidden">{children}</main>
       <Footer />
       <ScrollToTop />
       <Suspense fallback={null}>

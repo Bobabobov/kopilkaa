@@ -1,14 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export function StoryMoreStories() {
   return (
-    <div className="mx-auto max-w-4xl px-4 mt-10 sm:mt-12">
+    <motion.section
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="mx-auto max-w-4xl px-0 sm:px-4 mt-10 sm:mt-14"
+      aria-label="Ещё истории"
+    >
+      <p className="text-xs font-semibold uppercase tracking-wider text-[#94a1b2] mb-4 px-4 sm:px-0">
+        Продолжить чтение
+      </p>
       <Link
         href="/stories"
-        className="group block rounded-2xl border border-[#abd1c6]/25 bg-gradient-to-r from-[#004643]/40 via-[#003d3a]/30 to-[#004643]/40 p-6 sm:p-8 shadow-[0_16px_48px_-24px_rgba(0,0,0,0.2)] transition-all duration-300 hover:border-[#f9bc60]/40 hover:shadow-[0_20px_56px_-24px_rgba(249,188,96,0.15)]"
+        className="group block rounded-2xl border border-[#abd1c6]/25 bg-gradient-to-r from-[#004643]/50 via-[#003d3a]/35 to-[#004643]/50 p-6 sm:p-8 shadow-[0_16px_48px_-24px_rgba(0,0,0,0.2)] transition-all duration-300 hover:border-[#f9bc60]/40 hover:shadow-[0_20px_56px_-24px_rgba(249,188,96,0.15)]"
       >
         <div className="flex flex-wrap items-center gap-4 sm:gap-6">
           <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#f9bc60]/20 border border-[#f9bc60]/40 text-[#f9bc60] transition-transform duration-300 group-hover:scale-105">
@@ -27,6 +37,6 @@ export function StoryMoreStories() {
           </span>
         </div>
       </Link>
-    </div>
+    </motion.section>
   );
 }

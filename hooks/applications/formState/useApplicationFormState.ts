@@ -166,7 +166,7 @@ export function useApplicationFormState() {
   const trust = useTrustAndReview(user, amount);
   const {
     approvedCount,
-    hasReview,
+    pendingReviewApplication,
     trustSnapshot,
     trustLevel,
     trustLimits,
@@ -482,9 +482,8 @@ export function useApplicationFormState() {
     introChecked,
     setIntroChecked,
     approvedCount,
-    hasReview,
-    requiresReview:
-      approvedCount !== null && approvedCount > 0 && hasReview === false,
+    pendingReviewApplication,
+    requiresReview: Boolean(pendingReviewApplication),
     trustLevel,
     trustLimits,
     trustHint,

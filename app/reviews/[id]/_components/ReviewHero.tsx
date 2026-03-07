@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import type { ReviewItem } from "@/hooks/reviews/useReviews";
@@ -24,7 +25,12 @@ export function ReviewHero({
   const profileHref = user?.id ? `/profile/${user.id}` : null;
 
   return (
-    <div className="relative">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="relative"
+    >
       {review.images && review.images.length > 0 ? (
         <button
           type="button"
@@ -147,6 +153,6 @@ export function ReviewHero({
           </span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

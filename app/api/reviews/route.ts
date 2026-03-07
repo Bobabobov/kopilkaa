@@ -12,12 +12,14 @@ import { ApplicationStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
-/** Отзывы с createdAt >= этой даты попадают в "Что купили на помощь", остальные — в "Отзывы (ранее)". По умолчанию в будущем, чтобы в новом разделе было 0. Задайте REVIEWS_NEW_CUTOFF_DATE (ISO), когда запустите раздел. */
-const REVIEWS_NEW_CUTOFF =
-  typeof process.env.REVIEWS_NEW_CUTOFF_DATE === "string" &&
-  process.env.REVIEWS_NEW_CUTOFF_DATE.trim()
-    ? new Date(process.env.REVIEWS_NEW_CUTOFF_DATE.trim())
-    : new Date("2099-01-01");
+/** Отзывы с createdAt >= этой даты — "Что купили на помощь", раньше — только архив "Отзывы (ранее)" (туда новое не попадает). По умолчанию старая дата, чтобы все текущие отзывы были в "Что купили на помощь". */
+function getReviewsNewCutoff(): Date {
+  const raw = process.env.REVIEWS_NEW_CUTOFF_DATE;
+  if (typeof raw !== "string" || !raw.trim()) return new Date("2020-01-01T00:00:00.000Z");
+  const s = raw.trim();
+  return new Date(s.includes("T") ? s : s + "T00:00:00.000Z");
+}
+const REVIEWS_NEW_CUTOFF = getReviewsNewCutoff();
 
 const MAX_IMAGES = 5;
 const MIN_IMAGES = 1;

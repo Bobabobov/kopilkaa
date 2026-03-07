@@ -244,15 +244,15 @@ export function useReviews() {
         setData((prev) => {
           if (!prev) return prev;
           const updatedReview = json.review as ReviewItem;
-          // Новый отзыв на сервере попадает в "Отзывы (ранее)" (по порогу даты), добавляем туда же в клиенте
-          const itemsOld = [
+          // Новые отзывы всегда в "Что купили на помощь"
+          const itemsNew = [
             updatedReview,
-            ...(prev.itemsOld ?? []).filter((r) => r.id !== updatedReview.id),
+            ...(prev.itemsNew ?? []).filter((r) => r.id !== updatedReview.id),
           ];
           return {
             ...prev,
-            itemsOld,
-            totalOld: Math.max(prev.totalOld ?? 0, itemsOld.length),
+            itemsNew,
+            totalNew: Math.max(prev.totalNew ?? 0, itemsNew.length),
             viewer: prev.viewer
               ? {
                   ...prev.viewer,

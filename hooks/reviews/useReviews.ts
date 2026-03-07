@@ -41,6 +41,10 @@ type ReviewsResponse = {
   total?: number;
   page?: number;
   pages?: number;
+  pageOld?: number;
+  pageNew?: number;
+  pagesOld?: number;
+  pagesNew?: number;
   section?: "old" | "new";
   viewer?: {
     canReview: boolean;

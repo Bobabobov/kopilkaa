@@ -125,6 +125,13 @@ export default function RootLayout({
     <html lang="ru" suppressHydrationWarning className="dark">
       <head></head>
       <body className={inter.className} suppressHydrationWarning>
+        <Script
+          id="polyfill-findLast"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `if (typeof Array.prototype.findLast !== "function") { Array.prototype.findLast = function(predicate) { for (var i = this.length - 1; i >= 0; i--) { if (predicate(this[i], i, this)) return this[i]; } return undefined; }; }`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

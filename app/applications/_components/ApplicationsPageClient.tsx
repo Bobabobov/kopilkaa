@@ -145,7 +145,7 @@ export default function ApplicationsPageClient() {
                       Работы уже идут, скоро снова откроем форму. Спасибо за понимание.
                     </p>
                     <Link
-                      href="https://t.me/+MVL9z_I6LOVjNmE6"
+                      href="https://t.me/kkopilka"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-1 flex items-center gap-3 rounded-xl border border-[#229ED9]/40 bg-[#229ED9]/10 px-3 py-2.5 text-[#abd1c6] transition-all hover:border-[#229ED9]/60 hover:bg-[#229ED9]/15"

@@ -12,6 +12,13 @@ import { ApplicationStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
+/** Отзывы с createdAt >= этой даты попадают в "Что купили на помощь", остальные — в "Отзывы (ранее)". По умолчанию в будущем, чтобы в новом разделе было 0. Задайте REVIEWS_NEW_CUTOFF_DATE (ISO), когда запустите раздел. */
+const REVIEWS_NEW_CUTOFF =
+  typeof process.env.REVIEWS_NEW_CUTOFF_DATE === "string" &&
+  process.env.REVIEWS_NEW_CUTOFF_DATE.trim()
+    ? new Date(process.env.REVIEWS_NEW_CUTOFF_DATE.trim())
+    : new Date("2099-01-01");
+
 const MAX_IMAGES = 5;
 const MIN_IMAGES = 1;
 const MAX_TEXT_LENGTH = 1200;
@@ -144,12 +151,21 @@ export async function GET(req: NextRequest) {
       },
     };
 
-    // Оба раздела — отзывы по заявкам: "новые" = первые по дате, "ранее" = следующие (старше)
-    const whereWithApp = { applicationId: { not: null } };
+    // "Что купили на помощь" — отзывы по заявкам с датой >= порога. "Отзывы (ранее)" — остальные по заявкам (до порога).
+    const whereNew = {
+      applicationId: { not: null },
+      createdAt: { gte: REVIEWS_NEW_CUTOFF },
+    };
+    const whereOld = {
+      applicationId: { not: null },
+      createdAt: { lt: REVIEWS_NEW_CUTOFF },
+    };
     const orderBy = { createdAt: "desc" as const } as const;
 
-    const [totalWithApp, viewerApproved, lastApprovedApp] = await Promise.all([
-      prisma.review.count({ where: whereWithApp }),
+    const [totalNewCount, totalOldCount, viewerApproved, lastApprovedApp] =
+      await Promise.all([
+        prisma.review.count({ where: whereNew }),
+        prisma.review.count({ where: whereOld }),
       viewerId
         ? prisma.application.count({
             where: { userId: viewerId, status: ApplicationStatus.APPROVED },
@@ -177,23 +193,23 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const totalNew = totalWithApp;
-    const totalOld = Math.max(0, totalWithApp - limit);
+    const totalNew = totalNewCount;
+    const totalOld = totalOldCount;
 
     let itemsNew: Awaited<ReturnType<typeof prisma.review.findMany>> = [];
     let itemsOld: Awaited<ReturnType<typeof prisma.review.findMany>> = [];
 
     if (section === "old") {
       itemsOld = await prisma.review.findMany({
-        where: whereWithApp,
+        where: whereOld,
         orderBy,
-        skip: limit * page,
+        skip: (page - 1) * limit,
         take: limit,
         select,
       });
     } else if (section === "new") {
       itemsNew = await prisma.review.findMany({
-        where: whereWithApp,
+        where: whereNew,
         orderBy,
         skip: (page - 1) * limit,
         take: limit,
@@ -202,16 +218,16 @@ export async function GET(req: NextRequest) {
     } else {
       [itemsNew, itemsOld] = await Promise.all([
         prisma.review.findMany({
-          where: whereWithApp,
+          where: whereNew,
           orderBy,
           skip: 0,
           take: limit,
           select,
         }),
         prisma.review.findMany({
-          where: whereWithApp,
+          where: whereOld,
           orderBy,
-          skip: limit,
+          skip: 0,
           take: limit,
           select,
         }),

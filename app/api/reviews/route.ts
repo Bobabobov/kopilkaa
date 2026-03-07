@@ -144,30 +144,12 @@ export async function GET(req: NextRequest) {
       },
     };
 
-    const [
-      itemsOld,
-      itemsNew,
-      totalOld,
-      totalNew,
-      viewerApproved,
-      lastApprovedApp,
-    ] = await Promise.all([
-      prisma.review.findMany({
-        where: { applicationId: null },
-        orderBy: { createdAt: "desc" },
-        skip: section === "new" ? 0 : skip,
-        take: section === "new" ? 0 : limit,
-        select,
-      }),
-      prisma.review.findMany({
-        where: { applicationId: { not: null } },
-        orderBy: { createdAt: "desc" },
-        skip: section === "old" ? 0 : skip,
-        take: section === "old" ? 0 : limit,
-        select,
-      }),
-      prisma.review.count({ where: { applicationId: null } }),
-      prisma.review.count({ where: { applicationId: { not: null } } }),
+    // Оба раздела — отзывы по заявкам: "новые" = первые по дате, "ранее" = следующие (старше)
+    const whereWithApp = { applicationId: { not: null as const } };
+    const order = { orderBy: { createdAt: "desc" as const } };
+
+    const [totalWithApp, viewerApproved, lastApprovedApp] = await Promise.all([
+      prisma.review.count({ where: whereWithApp }),
       viewerId
         ? prisma.application.count({
             where: { userId: viewerId, status: ApplicationStatus.APPROVED },
@@ -195,6 +177,47 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    const totalNew = totalWithApp;
+    const totalOld = Math.max(0, totalWithApp - limit);
+
+    let itemsNew: Awaited<ReturnType<typeof prisma.review.findMany>> = [];
+    let itemsOld: Awaited<ReturnType<typeof prisma.review.findMany>> = [];
+
+    if (section === "old") {
+      itemsOld = await prisma.review.findMany({
+        where: whereWithApp,
+        ...order,
+        skip: limit * page,
+        take: limit,
+        select,
+      });
+    } else if (section === "new") {
+      itemsNew = await prisma.review.findMany({
+        where: whereWithApp,
+        ...order,
+        skip: (page - 1) * limit,
+        take: limit,
+        select,
+      });
+    } else {
+      [itemsNew, itemsOld] = await Promise.all([
+        prisma.review.findMany({
+          where: whereWithApp,
+          ...order,
+          skip: 0,
+          take: limit,
+          select,
+        }),
+        prisma.review.findMany({
+          where: whereWithApp,
+          ...order,
+          skip: limit,
+          take: limit,
+          select,
+        }),
+      ]);
+    }
+
     const mappedOld = await mapReviews(itemsOld, viewerId);
     const mappedNew = await mapReviews(itemsNew, viewerId);
     const pendingReviewApplication =
@@ -212,7 +235,7 @@ export async function GET(req: NextRequest) {
         page,
         limit,
         total: totalOld,
-        pages: Math.ceil(totalOld / limit),
+        pages: Math.ceil(totalOld / limit) || 1,
         items: mappedOld,
       });
     }
@@ -222,7 +245,7 @@ export async function GET(req: NextRequest) {
         page,
         limit,
         total: totalNew,
-        pages: Math.ceil(totalNew / limit),
+        pages: Math.ceil(totalNew / limit) || 1,
         items: mappedNew,
       });
     }

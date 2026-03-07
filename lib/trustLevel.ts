@@ -45,6 +45,18 @@ export function getTrustLimits(level: TrustLevel): {
   return TRUST_LIMITS[level];
 }
 
+const DEFAULT_LIMITS = TRUST_LIMITS.LEVEL_1;
+
+/** Безопасно получить лимиты: при неизвестном level возвращает LEVEL_1. */
+export function getTrustLimitsSafe(
+  level: unknown,
+): { min: number; max: number } {
+  if (level != null && typeof level === "string" && level in TRUST_LIMITS) {
+    return TRUST_LIMITS[level as TrustLevel];
+  }
+  return DEFAULT_LIMITS;
+}
+
 export function getNextLevelRequirement(level: TrustLevel): number | null {
   switch (level) {
     case "LEVEL_1":

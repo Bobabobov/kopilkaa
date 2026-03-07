@@ -3,9 +3,21 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   getTrustLevelFromApprovedCount,
-  getTrustLimits,
+  getTrustLimitsSafe,
   type TrustLevel,
 } from "@/lib/trustLevel";
+
+const VALID_TRUST_LEVELS: TrustLevel[] = [
+  "LEVEL_1",
+  "LEVEL_2",
+  "LEVEL_3",
+  "LEVEL_4",
+  "LEVEL_5",
+  "LEVEL_6",
+];
+function isValidTrustLevel(v: unknown): v is TrustLevel {
+  return typeof v === "string" && VALID_TRUST_LEVELS.includes(v as TrustLevel);
+}
 import type { UserShape } from "./types";
 
 interface TrustSnapshot {
@@ -60,16 +72,24 @@ export function useTrustAndReview(user: UserShape | null, amount: string) {
   const isAdmin = user?.role === "ADMIN";
   const effectiveApproved =
     trustSnapshot?.effectiveApprovedApplications ?? approvedCount ?? 0;
-  const trustLevel: TrustLevel = useMemo(
-    () =>
-      trustSnapshot?.trustLevel ??
-      getTrustLevelFromApprovedCount(effectiveApproved),
-    [effectiveApproved, trustSnapshot],
-  );
-  const trustLimits = useMemo(
-    () => trustSnapshot?.limits ?? getTrustLimits(trustLevel),
-    [trustLevel, trustSnapshot],
-  );
+  const trustLevel: TrustLevel = useMemo(() => {
+    const fromApi = trustSnapshot?.trustLevel;
+    if (isValidTrustLevel(fromApi)) return fromApi;
+    return getTrustLevelFromApprovedCount(effectiveApproved);
+  }, [effectiveApproved, trustSnapshot]);
+
+  const trustLimits = useMemo(() => {
+    const fromApi = trustSnapshot?.limits;
+    if (
+      fromApi &&
+      typeof fromApi.min === "number" &&
+      typeof fromApi.max === "number"
+    ) {
+      return { min: fromApi.min, max: fromApi.max };
+    }
+    return getTrustLimitsSafe(trustLevel);
+  }, [trustLevel, trustSnapshot]);
+
   const trustHint = isAdmin
     ? "Администратор: лимиты суммы не применяются"
     : `Ориентир для вашего уровня: до ${trustLimits.max.toLocaleString("ru-RU")} ₽. Решение принимается индивидуально.`;

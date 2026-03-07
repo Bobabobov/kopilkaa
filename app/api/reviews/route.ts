@@ -146,7 +146,7 @@ export async function GET(req: NextRequest) {
 
     // Оба раздела — отзывы по заявкам: "новые" = первые по дате, "ранее" = следующие (старше)
     const whereWithApp = { applicationId: { not: null } };
-    const order = { orderBy: { createdAt: "desc" } };
+    const orderBy = { createdAt: "desc" as const } as const;
 
     const [totalWithApp, viewerApproved, lastApprovedApp] = await Promise.all([
       prisma.review.count({ where: whereWithApp }),
@@ -186,7 +186,7 @@ export async function GET(req: NextRequest) {
     if (section === "old") {
       itemsOld = await prisma.review.findMany({
         where: whereWithApp,
-        ...order,
+        orderBy,
         skip: limit * page,
         take: limit,
         select,
@@ -194,7 +194,7 @@ export async function GET(req: NextRequest) {
     } else if (section === "new") {
       itemsNew = await prisma.review.findMany({
         where: whereWithApp,
-        ...order,
+        orderBy,
         skip: (page - 1) * limit,
         take: limit,
         select,
@@ -203,14 +203,14 @@ export async function GET(req: NextRequest) {
       [itemsNew, itemsOld] = await Promise.all([
         prisma.review.findMany({
           where: whereWithApp,
-          ...order,
+          orderBy,
           skip: 0,
           take: limit,
           select,
         }),
         prisma.review.findMany({
           where: whereWithApp,
-          ...order,
+          orderBy,
           skip: limit,
           take: limit,
           select,

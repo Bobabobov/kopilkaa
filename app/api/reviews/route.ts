@@ -9,11 +9,9 @@ import {
   type TrustLevel,
 } from "@/lib/trustLevel";
 import { ApplicationStatus } from "@prisma/client";
+import { REVIEWS_NEW_FROM } from "@/lib/reviewsNewFrom";
 
 export const dynamic = "force-dynamic";
-
-// С этой даты — "Что купили на помощь", раньше — "Отзывы (ранее)" (архив).
-const REVIEWS_NEW_FROM = new Date("2026-03-07T00:00:00.000Z");
 
 const MAX_IMAGES = 5;
 const MIN_IMAGES = 1;
@@ -178,12 +176,16 @@ export async function GET(req: NextRequest) {
         : null,
     ]);
 
+    // В зачёт только отзывы с даты REVIEWS_NEW_FROM; старые (из архива) не считаются
     let reviewForLastApproved: Awaited<
-      ReturnType<typeof prisma.review.findUnique>
+      ReturnType<typeof prisma.review.findFirst>
     > = null;
     if (lastApprovedApp) {
-      reviewForLastApproved = await prisma.review.findUnique({
-        where: { applicationId: lastApprovedApp.id },
+      reviewForLastApproved = await prisma.review.findFirst({
+        where: {
+          applicationId: lastApprovedApp.id,
+          createdAt: { gte: REVIEWS_NEW_FROM },
+        },
         select,
       });
     }

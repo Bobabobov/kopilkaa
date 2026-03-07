@@ -13,6 +13,8 @@ import {
   isActivityRequirementMet,
 } from "@/lib/activity/checkActivityRequirement";
 
+import { REVIEWS_NEW_FROM } from "@/lib/reviewsNewFrom";
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function getClientIp(req: Request): string | null {
@@ -217,11 +219,14 @@ export async function POST(req: Request) {
     const trust = await computeUserTrustSnapshot(session.uid);
 
     if (session.role !== "ADMIN" && !isWhitelisted) {
-      // Блокировка: последняя одобренная заявка без отзыва — нельзя подать новую
+      // Блокировка: последняя одобренная заявка без отзыва (после REVIEWS_NEW_FROM) — нельзя подать новую
       const lastApproved = lastApprovedByUser;
       if (lastApproved) {
-        const reviewForLastApproved = await prisma.review.findUnique({
-          where: { applicationId: lastApproved.id },
+        const reviewForLastApproved = await prisma.review.findFirst({
+          where: {
+            applicationId: lastApproved.id,
+            createdAt: { gte: REVIEWS_NEW_FROM },
+          },
           select: { id: true },
         });
         if (!reviewForLastApproved) {

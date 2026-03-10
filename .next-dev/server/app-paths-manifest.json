@@ -1,5 +1,4 @@
 {
-  "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
-  "/icon.png/route": "app/icon.png/route.js",
+  "/api/page-visits/route": "app/api/page-visits/route.js",
   "/applications/page": "app/applications/page.js"
 }

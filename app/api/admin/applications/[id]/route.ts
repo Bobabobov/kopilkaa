@@ -249,11 +249,11 @@ export async function PATCH(
       item.user?.email &&
       (status === "APPROVED" || status === "REJECTED" || status === "PENDING")
     ) {
-      sendStatusEmail(item.user.email, {
+      void sendStatusEmail(item.user.email, {
         title: item.title,
         status,
         comment: item.adminComment ?? "",
-      }).catch((e) => console.error("mail error:", e));
+      });
     }
 
     publish("application:update", {

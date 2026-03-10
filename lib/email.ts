@@ -13,6 +13,8 @@ const MAIL_ON = process.env.MAIL_ON === "1";
 
 // Почта включается только если (вкл) и заданы все ключи
 const MAIL_ENABLED = MAIL_ON && Boolean(host && user && pass);
+let MAIL_RUNTIME_DISABLED = false;
+let MAIL_ERROR_LOGGED = false;
 
 const mailer = MAIL_ENABLED
   ? nodemailer.createTransport({
@@ -68,16 +70,38 @@ export async function sendStatusEmail(
   to: string,
   data: { title: string; status: Status; comment?: string | null },
 ) {
-  if (!MAIL_ENABLED || !mailer) {
+  if (!MAIL_ENABLED || !mailer || MAIL_RUNTIME_DISABLED) {
     return;
   }
 
-  await mailer.sendMail({
-    from,
-    to,
-    subject: statusSubject(data.status),
-    html: statusHtml(data),
-  });
+  try {
+    await mailer.sendMail({
+      from,
+      to,
+      subject: statusSubject(data.status),
+      html: statusHtml(data),
+    });
+  } catch (error: any) {
+    const code = String(error?.code || "");
+    const responseCode = Number(error?.responseCode || 0);
+    const isAuthError = code === "EAUTH" || responseCode === 535;
+
+    if (isAuthError) {
+      MAIL_RUNTIME_DISABLED = true;
+      if (!MAIL_ERROR_LOGGED) {
+        MAIL_ERROR_LOGGED = true;
+        console.error(
+          "[mail] SMTP auth failed (EAUTH/535). Mail is disabled until process restart. Check SMTP_USER/SMTP_PASS (Gmail App Password).",
+        );
+      }
+      return;
+    }
+
+    if (!MAIL_ERROR_LOGGED) {
+      MAIL_ERROR_LOGGED = true;
+      console.error("[mail] sendStatusEmail failed:", error);
+    }
+  }
 }
 
 function escapeHtml(s: string) {

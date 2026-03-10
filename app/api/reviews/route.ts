@@ -145,8 +145,9 @@ export async function GET(req: NextRequest) {
 
     const select = REVIEW_SELECT;
 
-    // Один формат: старые отзывы без привязки к заявке (applicationId == null)
-    const where = { applicationId: null };
+    // Один формат отображения: показываем все существующие отзывы
+    // (включая исторические записи с applicationId != null).
+    const where = {};
     const orderBy = { createdAt: "desc" as const } as const;
 
     const [
@@ -174,13 +175,13 @@ export async function GET(req: NextRequest) {
         : null,
       viewerId
         ? prisma.review.findFirst({
-            where: { userId: viewerId, applicationId: null },
+            where: { userId: viewerId },
             select: { id: true },
           })
         : null,
       viewerId
         ? prisma.review.findFirst({
-            where: { userId: viewerId, applicationId: null },
+            where: { userId: viewerId },
             orderBy: { createdAt: "desc" },
             select,
           })

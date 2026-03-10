@@ -221,7 +221,7 @@ export async function POST(req: Request) {
       // если есть хотя бы 1 одобренная заявка, но ещё ни одного отзыва — блокируем подачу
       if (trust.approvedApplications >= 1) {
         const anyApplicationReview = await prisma.review.findFirst({
-          where: { userId: session.uid, applicationId: null },
+          where: { userId: session.uid },
           select: { id: true },
         });
         if (!anyApplicationReview) {

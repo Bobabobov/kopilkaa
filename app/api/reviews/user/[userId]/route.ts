@@ -72,9 +72,9 @@ export async function GET(
       },
     };
 
-    // Старый формат: показываем последний отзыв без привязки к заявке (applicationId == null)
+    // Показываем последний отзыв пользователя независимо от типа исторической записи.
     const review = await prisma.review.findFirst({
-      where: { userId, applicationId: null },
+      where: { userId },
       orderBy: { createdAt: "desc" },
       select,
     });

@@ -151,6 +151,25 @@
     overflow-wrap: anywhere;
   }
 
+  /* Мобильная оптимизация /applications:
+     убираем тяжёлые эффекты и анимации без изменения структуры UI */
+  @media (max-width: 767px) {
+    [data-applications-mobile-opt="1"] * {
+      animation-duration: 0ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    [data-applications-mobile-opt="1"] .backdrop-blur-sm,
+    [data-applications-mobile-opt="1"] .backdrop-blur-md,
+    [data-applications-mobile-opt="1"] .backdrop-blur-xl,
+    [data-applications-mobile-opt="1"] .backdrop-blur-2xl {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+  }
+
   /* Предотвращение выделения изображений */
   .bulldog-container {
     -webkit-user-select: none;

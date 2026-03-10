@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, ReactNode, useEffect } from "react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import ApplicationsProgress from "@/components/applications/ApplicationsProgress";
 import ApplicationsConsent from "@/components/applications/ApplicationsConsent";
@@ -120,11 +119,7 @@ export function ApplicationsForm(props: Props) {
   }, [err, firstErrorKey, validationScrollTrigger]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.2 }}
-    >
+    <div>
       <Card variant="darkGlass" padding="lg" className="overflow-hidden">
         <form
           className="grid gap-6"
@@ -369,7 +364,7 @@ export function ApplicationsForm(props: Props) {
         />
       </form>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 

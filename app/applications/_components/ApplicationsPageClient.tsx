@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Card, CardContent } from "@/components/ui/Card";
 import { usePageTimeTracking } from "@/hooks/ui/usePageTimeTracking";
@@ -83,19 +83,31 @@ export default function ApplicationsPageClient() {
   } = state;
 
   const { introAckKey } = state;
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobileViewport(mq.matches);
+    update();
+    if (mq.addEventListener) {
+      mq.addEventListener("change", update);
+      return () => mq.removeEventListener("change", update);
+    }
+    mq.addListener(update);
+    return () => mq.removeListener(update);
+  }, []);
 
   if (loadingAuth) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center px-4">
+      <div
+        className="min-h-screen relative flex items-center justify-center px-4"
+        data-applications-mobile-opt={isMobileViewport ? "1" : "0"}
+      >
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+          <div className="hidden sm:block absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
+        <div>
           <Card variant="darkGlass" padding="lg" className="max-w-md text-center">
             <CardContent>
               <div className="flex items-center justify-center gap-2 text-[#abd1c6]">
@@ -104,24 +116,22 @@ export default function ApplicationsPageClient() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center px-4 py-12">
+      <div
+        className="min-h-screen relative flex items-center justify-center px-4 py-12"
+        data-applications-mobile-opt={isMobileViewport ? "1" : "0"}
+      >
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+          <div className="hidden sm:block absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-lg"
-        >
+        <div className="w-full max-w-lg">
           <Card variant="darkGlass" padding="lg" className="text-center">
             <div className="mb-6 flex justify-center">
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#f9bc60]/15 border border-[#f9bc60]/30">
@@ -138,17 +148,20 @@ export default function ApplicationsPageClient() {
               После входа вы вернётесь на эту страницу и сможете заполнить заявку.
             </p>
           </Card>
-        </motion.div>
+        </div>
       </div>
     );
   }
 
   if (submitted) {
     return (
-      <div className="min-h-screen relative overflow-hidden">
+      <div
+        className="min-h-screen relative overflow-hidden"
+        data-applications-mobile-opt={isMobileViewport ? "1" : "0"}
+      >
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+          <div className="hidden sm:block absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
         </div>
         <div className="container-p mx-auto pt-0 sm:pt-1 pb-8 relative z-10">
           <SuccessScreen onNewApplication={() => setSubmitted(false)} />
@@ -158,10 +171,13 @@ export default function ApplicationsPageClient() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div
+      className="min-h-screen relative overflow-hidden"
+      data-applications-mobile-opt={isMobileViewport ? "1" : "0"}
+    >
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+        <div className="hidden sm:block absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
       </div>
       <TrustIntroModal
         open={introOpen}
@@ -206,11 +222,7 @@ export default function ApplicationsPageClient() {
             <TrustLevelsInfo />
 
             {requiresReview ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
+              <div>
                 <Card variant="darkGlass" padding="lg" className="relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full pointer-events-none" aria-hidden />
                   <CardContent className="relative flex items-start gap-4 p-0">
@@ -244,7 +256,7 @@ export default function ApplicationsPageClient() {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ) : (
               <ApplicationsForm
                 title={title}

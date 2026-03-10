@@ -1,11 +1,9 @@
 {
   "/page": "app/page.js",
-  "/api/ads/active/route": "app/api/ads/active/route.js",
-  "/api/top-donors/route": "app/api/top-donors/route.js",
-  "/api/applications/recent/route": "app/api/applications/recent/route.js",
+  "/icon.png/route": "app/icon.png/route.js",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
   "/applications/page": "app/applications/page.js",
   "/news/page": "app/news/page.js",
-  "/stories/page": "app/stories/page.js",
-  "/stories/[id]/page": "app/stories/[id]/page.js"
+  "/stories/[id]/page": "app/stories/[id]/page.js",
+  "/stories/page": "app/stories/page.js"
 }

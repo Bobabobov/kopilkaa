@@ -1,17 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 export function HeroSectionCta() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: 0.15 }}
-      className="text-center mb-10"
-    >
+    <div className="text-center mb-10">
       <div className="flex flex-col sm:flex-row gap-2 items-center justify-center text-sm sm:text-base text-[#abd1c6]">
         <Link
           href="/stories"
@@ -30,6 +23,6 @@ export function HeroSectionCta() {
       <p className="mt-4 text-sm text-[#94a1b2] max-w-2xl mx-auto leading-relaxed">
         Решение по каждой заявке принимаем мы; помощь не гарантирована, но мы помогаем по возможности.
       </p>
-    </motion.div>
+    </div>
   );
 }

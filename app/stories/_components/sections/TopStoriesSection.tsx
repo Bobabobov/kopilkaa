@@ -54,12 +54,12 @@ export function TopStoriesSection({
         <div className="absolute inset-x-0 top-0 h-1 rounded-t-[1.75rem] bg-gradient-to-r from-[#f9bc60]/80 via-[#abd1c6]/60 to-[#f9bc60]/80" />
 
         {/* Фоновые блики */}
-        <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-[#f9bc60]/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -left-16 h-40 w-40 rounded-full bg-[#abd1c6]/10 blur-3xl" />
-        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-96 rounded-full bg-[#004643]/30 blur-3xl" />
+        <div className="hidden sm:block pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-[#f9bc60]/10 blur-3xl" />
+        <div className="hidden sm:block pointer-events-none absolute -bottom-16 -left-16 h-40 w-40 rounded-full bg-[#abd1c6]/10 blur-3xl" />
+        <div className="hidden md:block pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-96 rounded-full bg-[#004643]/30 blur-3xl" />
         {/* Тонкий узор точек */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          className="hidden sm:block pointer-events-none absolute inset-0 opacity-[0.04]"
           style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, #abd1c6 1px, transparent 0)`,
             backgroundSize: "20px 20px",
@@ -160,6 +160,7 @@ export function TopStoriesSection({
                       alt={story.title}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      quality={65}
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                       unoptimized={imageUnoptimized}
                       onError={(e) => {
@@ -195,6 +196,7 @@ export function TopStoriesSection({
                             alt=""
                             width={32}
                             height={32}
+                            quality={65}
                             className="h-8 w-8 shrink-0 rounded-full object-cover ring-2 ring-[#001e1d]/90"
                             unoptimized={avatarUnoptimized}
                             onError={(e) => {
@@ -210,6 +212,7 @@ export function TopStoriesSection({
                             alt=""
                             width={32}
                             height={32}
+                            quality={65}
                             className="h-8 w-8 shrink-0 rounded-full object-cover ring-2 ring-[#001e1d]/90"
                             unoptimized={avatarUnoptimized}
                             onError={(e) => {

@@ -318,8 +318,8 @@ export default function StoryPageClient({
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
           <div className="mx-auto max-w-4xl">
             <article className="relative overflow-hidden rounded-2xl sm:rounded-[1.75rem] border border-[#abd1c6]/20 bg-gradient-to-b from-[#004643]/40 via-[#003d3a]/25 to-transparent backdrop-blur-sm p-5 sm:p-8 md:p-10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)]">
-              <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#f9bc60]/10 blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-20 -left-20 h-32 w-32 rounded-full bg-[#abd1c6]/10 blur-3xl pointer-events-none" />
+              <div className="hidden sm:block absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#f9bc60]/10 blur-3xl pointer-events-none" />
+              <div className="hidden sm:block absolute -bottom-20 -left-20 h-32 w-32 rounded-full bg-[#abd1c6]/10 blur-3xl pointer-events-none" />
               <div className="relative">
               <StoryHeader
                 title={story.title}

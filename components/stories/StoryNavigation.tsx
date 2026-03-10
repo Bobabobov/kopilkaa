@@ -2,18 +2,11 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function StoryNavigation() {
   return (
-    <motion.nav
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-      className="pt-20 sm:pt-24 px-4 sm:px-6"
-      aria-label="Навигация"
-    >
+    <nav className="pt-20 sm:pt-24 px-4 sm:px-6" aria-label="Навигация">
       <div className="max-w-4xl mx-auto">
         <Link
           href="/stories"
@@ -23,6 +16,6 @@ export default function StoryNavigation() {
           К списку историй
         </Link>
       </div>
-    </motion.nav>
+    </nav>
   );
 }

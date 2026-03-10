@@ -20,18 +20,20 @@ interface StoriesPageClientProps {
   initialTopStories?: StoryItem[];
   initialStories?: StoryItem[];
   initialStoriesHasMore?: boolean;
+  initialTotalPaid?: number | null;
 }
 
 export default function StoriesPageClient({
   initialTopStories = [],
   initialStories = [],
   initialStoriesHasMore = true,
+  initialTotalPaid = null,
 }: StoriesPageClientProps) {
   const { isAuthenticated } = useAuth();
   const [readStoryIds, setReadStoryIds] = useState<Set<string>>(new Set());
   const [topStories, setTopStories] = useState<StoryItem[]>(initialTopStories);
   const [topLoading, setTopLoading] = useState(initialTopStories.length === 0);
-  const [totalPaid, setTotalPaid] = useState<number | null>(null);
+  const [totalPaid, setTotalPaid] = useState<number | null>(initialTotalPaid);
   const restoredRef = useRef(false);
 
   useEffect(() => {
@@ -60,20 +62,37 @@ export default function StoriesPageClient({
   const hasQuery = query.trim().length > 0;
   // Учитываем prefers-reduced-motion: не анимируем карточки, если пользователь просит меньше движения
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(mq.matches);
     const handler = () => setPrefersReducedMotion(mq.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
+    if (mq.addEventListener) {
+      mq.addEventListener("change", handler);
+      return () => mq.removeEventListener("change", handler);
+    }
+    mq.addListener(handler);
+    return () => mq.removeListener(handler);
+  }, []);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    setIsMobileViewport(mq.matches);
+    const handler = () => setIsMobileViewport(mq.matches);
+    if (mq.addEventListener) {
+      mq.addEventListener("change", handler);
+      return () => mq.removeEventListener("change", handler);
+    }
+    mq.addListener(handler);
+    return () => mq.removeListener(handler);
   }, []);
   // Анимируем карточки только при первой загрузке и если пользователь не просит меньше движения
   const shouldAnimate =
     !prefersReducedMotion &&
+    !isMobileViewport &&
     isInitialLoad &&
     !loading &&
     stories.length <= 24;
-  const autoLoadLimit = 3;
+  const autoLoadLimit = isMobileViewport ? 2 : 3;
   const autoLoadEnabled = currentPage < autoLoadLimit;
 
   // Intersection Observer для бесконечной прокрутки: переподписываемся при
@@ -192,6 +211,7 @@ export default function StoriesPageClient({
   }, [initialTopStories.length]);
 
   useEffect(() => {
+    if (initialTotalPaid !== null) return;
     let isMounted = true;
     const loadSummary = async () => {
       try {
@@ -213,7 +233,7 @@ export default function StoriesPageClient({
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [initialTotalPaid]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -275,8 +295,8 @@ export default function StoriesPageClient({
       {/* Фоновые блики */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#004643]/10 rounded-full blur-3xl" />
+        <div className="hidden sm:block absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
+        <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#004643]/10 rounded-full blur-3xl" />
       </div>
 
       <StoriesHeader query={query} onQueryChange={setQuery} />

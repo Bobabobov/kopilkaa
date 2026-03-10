@@ -1,15 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export function StoryMoreStories() {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+    <section
       className="mx-auto max-w-4xl px-0 sm:px-4 mt-10 sm:mt-14"
       aria-label="Ещё истории"
     >
@@ -37,6 +33,6 @@ export function StoryMoreStories() {
           </span>
         </div>
       </Link>
-    </motion.section>
+    </section>
   );
 }

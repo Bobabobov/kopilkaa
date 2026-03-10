@@ -1,4 +1,22 @@
 {
+  "components\\home\\HomePageClient.tsx -> ./FAQ": {
+    "id": "components\\home\\HomePageClient.tsx -> ./FAQ",
+    "files": [
+      "static/chunks/_app-pages-browser_components_home_FAQ_tsx.js"
+    ]
+  },
+  "components\\home\\HomePageClient.tsx -> ./HowItWorks": {
+    "id": "components\\home\\HomePageClient.tsx -> ./HowItWorks",
+    "files": [
+      "static/chunks/_app-pages-browser_components_home_HowItWorks_tsx.js"
+    ]
+  },
+  "components\\home\\HomePageClient.tsx -> ./RecentApplications": {
+    "id": "components\\home\\HomePageClient.tsx -> ./RecentApplications",
+    "files": [
+      "static/chunks/_app-pages-browser_components_home_RecentApplications_tsx.js"
+    ]
+  },
   "hooks\\profile\\profilePreloader.ts -> @/components/profile/ProfileHeaderCard": {
     "id": "hooks\\profile\\profilePreloader.ts -> @/components/profile/ProfileHeaderCard",
     "files": [

@@ -2,7 +2,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface StoryActionsProps {
@@ -18,11 +17,7 @@ export default function StoryActions({
     <div className="mt-12 pt-8 border-t border-[#abd1c6]/20 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
       {isAd && advertiserLink ? (
         <>
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
+          <div>
             <a
               href={advertiserLink}
               target="_blank"
@@ -32,12 +27,8 @@ export default function StoryActions({
               <LucideIcons.ExternalLink size="md" />
               Перейти на сайт
             </a>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-          >
+          </div>
+          <div>
             <Link
               href="/advertising"
               className="inline-flex items-center gap-2 rounded-xl border border-[#abd1c6]/40 bg-[#001e1d]/50 px-8 py-4 text-[#abd1c6] font-semibold transition-all duration-300 hover:border-[#f9bc60]/50 hover:text-[#f9bc60] hover:bg-[#f9bc60]/10"
@@ -45,7 +36,7 @@ export default function StoryActions({
               <LucideIcons.Megaphone size="md" />
               Разместить рекламу
             </Link>
-          </motion.div>
+          </div>
         </>
       ) : (
         <Link

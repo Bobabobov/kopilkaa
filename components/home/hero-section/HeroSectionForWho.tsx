@@ -1,19 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { HandHeart, PiggyBank } from "lucide-react";
 import DonateButton from "@/components/donate/DonateButton";
 
 export function HeroSectionForWho() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: 0.1 }}
-      className="mb-10"
-    >
+    <div className="mb-10">
       <p className="text-base sm:text-lg text-[#abd1c6] mb-5">
         Вы здесь, если:
       </p>
@@ -41,6 +34,6 @@ export function HeroSectionForWho() {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

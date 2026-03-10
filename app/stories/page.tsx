@@ -52,6 +52,17 @@ interface FirstPageResult {
   hasMore: boolean;
 }
 
+async function fetchStoriesSummary(): Promise<number | null> {
+  try {
+    const res = await fetchWithCookies(`${baseUrl}/api/stories/summary`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return typeof data.totalPaid === "number" ? data.totalPaid : null;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchFirstStoriesPage(): Promise<FirstPageResult> {
   try {
     const res = await fetchWithCookies(
@@ -68,15 +79,17 @@ async function fetchFirstStoriesPage(): Promise<FirstPageResult> {
 }
 
 export default async function StoriesPage() {
-  const [initialTopStories, firstPage] = await Promise.all([
+  const [initialTopStories, firstPage, initialTotalPaid] = await Promise.all([
     fetchTopStories(),
     fetchFirstStoriesPage(),
+    fetchStoriesSummary(),
   ]);
   return (
     <StoriesPageClient
       initialTopStories={initialTopStories}
       initialStories={firstPage.items}
       initialStoriesHasMore={firstPage.hasMore}
+      initialTotalPaid={initialTotalPaid}
     />
   );
 }

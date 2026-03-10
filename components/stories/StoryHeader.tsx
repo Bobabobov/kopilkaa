@@ -1,7 +1,6 @@
 // components/stories/StoryHeader.tsx
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
@@ -32,28 +31,18 @@ export default function StoryHeader({
   return (
     <header className="mb-8 sm:mb-10 min-w-0">
       {isAd && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-4 py-2 mb-5 rounded-xl border border-[#f9bc60]/50 bg-[#f9bc60]/10 text-sm font-bold uppercase tracking-wider text-[#f9bc60]"
-        >
+        <div className="inline-flex items-center gap-2 px-4 py-2 mb-5 rounded-xl border border-[#f9bc60]/50 bg-[#f9bc60]/10 text-sm font-bold uppercase tracking-wider text-[#f9bc60]">
           <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse" />
           <span>Рекламная история</span>
           <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse" />
-        </motion.div>
+        </div>
       )}
 
       {isContestWinner && !isAd && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="inline-flex items-center gap-2 px-4 py-2 mb-5 rounded-xl border border-[#f9bc60]/50 bg-[#f9bc60]/15 text-sm font-bold uppercase tracking-wider text-[#f9bc60]"
-        >
+        <div className="inline-flex items-center gap-2 px-4 py-2 mb-5 rounded-xl border border-[#f9bc60]/50 bg-[#f9bc60]/15 text-sm font-bold uppercase tracking-wider text-[#f9bc60]">
           <LucideIcons.Trophy size="xs" />
           <span>Победитель конкурса</span>
-        </motion.div>
+        </div>
       )}
 
       <h1

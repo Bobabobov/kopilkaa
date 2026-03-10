@@ -151,15 +151,14 @@ export default function TopBanner({
 
     // Используем matchMedia вместо window.innerWidth
     const desktopQuery = window.matchMedia("(min-width: 768px)");
+    const banner = bannerRef.current;
+    let bannerHeight = banner.offsetHeight || 1;
+    let rafId = 0;
 
-    const handleScroll = () => {
+    const applyScrollTransform = () => {
       // Проверяем через matchMedia, а не через window.innerWidth
       if (!desktopQuery.matches) return;
 
-      const banner = bannerRef.current;
-      if (!banner) return;
-
-      const bannerHeight = banner.offsetHeight;
       const scrollY = window.scrollY;
 
       // Рассчитываем процент скрытия баннера
@@ -170,16 +169,30 @@ export default function TopBanner({
       banner.style.transform = `translateY(${translateY}%)`;
     };
 
-    // Слушаем изменения media query
-    const handleMediaChange = () => {
-      if (!desktopQuery.matches && bannerRef.current) {
-        // На мобильных сбрасываем transform
-        bannerRef.current.style.transform = "";
-      }
-      handleScroll();
+    const scheduleApply = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
+        applyScrollTransform();
+      });
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Слушаем изменения media query
+    const handleMediaChange = () => {
+      if (!desktopQuery.matches) {
+        // На мобильных сбрасываем transform
+        banner.style.transform = "";
+      }
+      bannerHeight = banner.offsetHeight || 1;
+      scheduleApply();
+    };
+    const handleResize = () => {
+      bannerHeight = banner.offsetHeight || 1;
+      scheduleApply();
+    };
+
+    window.addEventListener("scroll", scheduleApply, { passive: true });
+    window.addEventListener("resize", handleResize);
 
     // Современный способ через addEventListener
     if (desktopQuery.addEventListener) {
@@ -188,14 +201,18 @@ export default function TopBanner({
       desktopQuery.addListener(handleMediaChange);
     }
 
-    handleScroll();
+    scheduleApply();
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", scheduleApply);
+      window.removeEventListener("resize", handleResize);
       if (desktopQuery.removeEventListener) {
         desktopQuery.removeEventListener("change", handleMediaChange);
       } else {
         desktopQuery.removeListener(handleMediaChange);
+      }
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
       }
     };
   }, [isVisible]);

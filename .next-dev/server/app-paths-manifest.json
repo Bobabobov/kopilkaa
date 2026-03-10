@@ -2,8 +2,20 @@
   "/page": "app/page.js",
   "/icon.png/route": "app/icon.png/route.js",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
+  "/api/notifications/route": "app/api/notifications/route.js",
+  "/api/ads/route": "app/api/ads/route.js",
+  "/api/profile/me/route": "app/api/profile/me/route.js",
+  "/api/ads/active/route": "app/api/ads/active/route.js",
+  "/api/top-donors/route": "app/api/top-donors/route.js",
+  "/api/applications/recent/route": "app/api/applications/recent/route.js",
+  "/api/reviews/route": "app/api/reviews/route.js",
+  "/api/auth/check/route": "app/api/auth/check/route.js",
+  "/api/uploads/[filename]/route": "app/api/uploads/[filename]/route.js",
+  "/api/page-visits/route": "app/api/page-visits/route.js",
+  "/api/profile/stats/route": "app/api/profile/stats/route.js",
   "/applications/page": "app/applications/page.js",
   "/news/page": "app/news/page.js",
+  "/stories/page": "app/stories/page.js",
   "/stories/[id]/page": "app/stories/[id]/page.js",
-  "/stories/page": "app/stories/page.js"
+  "/reviews/page": "app/reviews/page.js"
 }

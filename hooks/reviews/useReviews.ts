@@ -33,19 +33,10 @@ type PendingReviewApplication = { id: string; title: string } | null;
 
 type ReviewsResponse = {
   limit: number;
-  itemsOld?: ReviewItem[];
-  itemsNew?: ReviewItem[];
-  totalOld?: number;
-  totalNew?: number;
-  items?: ReviewItem[];
-  total?: number;
-  page?: number;
-  pages?: number;
-  pageOld?: number;
-  pageNew?: number;
-  pagesOld?: number;
-  pagesNew?: number;
-  section?: "old" | "new";
+  items: ReviewItem[];
+  total: number;
+  page: number;
+  pages: number;
   viewer?: {
     canReview: boolean;
     approvedApplications: number;
@@ -68,13 +59,12 @@ export function useReviews() {
   }, [showToast]);
 
   const fetchReviews = useCallback(
-    async (page: number = 1, append: boolean = false, section?: "old" | "new") => {
+    async (page: number = 1, append: boolean = false) => {
       if (append) setLoadingMore(true);
-      else if (!section) setLoading(true);
+      else setLoading(true);
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
       const params = new URLSearchParams({ page: String(page), limit: "12" });
-      if (section) params.set("section", section);
       try {
         const res = await fetch(`/api/reviews?${params}`, {
           cache: "no-store",
@@ -85,46 +75,24 @@ export function useReviews() {
           throw new Error(text || "Не удалось загрузить отзывы");
         }
         const json = (await res.json()) as ReviewsResponse;
-        if (section && append && json.items && json.total !== undefined) {
-          const nextPage = json.page ?? 1;
+        if (append) {
           setData((prev) => {
-            if (!prev) return prev;
-            if (section === "old") {
-              return {
-                ...prev,
-                itemsOld: [...(prev.itemsOld ?? []), ...json.items!],
-                totalOld: json.total ?? prev.totalOld,
-                pageOld: nextPage,
-                pagesOld: json.pages ?? prev.pagesOld,
-              };
-            }
+            if (!prev) return json;
             return {
               ...prev,
-              itemsNew: [...(prev.itemsNew ?? []), ...json.items!],
-              totalNew: json.total ?? prev.totalNew,
-              pageNew: nextPage,
-              pagesNew: json.pages ?? prev.pagesNew,
+              items: [...(prev.items ?? []), ...(json.items ?? [])],
+              total: json.total ?? prev.total,
+              page: json.page ?? prev.page,
+              pages: json.pages ?? prev.pages,
+              viewer: json.viewer ?? prev.viewer,
             };
           });
-        } else if (!section) {
-          setData({
-            ...json,
-            pageOld: 1,
-            pageNew: 1,
-            pagesOld: Math.ceil((json.totalOld ?? 0) / 12),
-            pagesNew: Math.ceil((json.totalNew ?? 0) / 12),
-          } as ReviewsResponse & {
-            itemsOld: ReviewItem[];
-            itemsNew: ReviewItem[];
-            pageOld: number;
-            pageNew: number;
-            pagesOld: number;
-            pagesNew: number;
-          });
+        } else {
+          setData(json);
         }
       } catch (error) {
         console.error("Failed to load reviews", error);
-        if (!append && !section) {
+        if (!append) {
           showToastRef.current?.("error", "Ошибка", "Не удалось загрузить отзывы");
           setData(null);
         }
@@ -141,20 +109,10 @@ export function useReviews() {
     fetchReviews(1, false);
   }, [fetchReviews]);
 
-  const loadMoreOld = useCallback(() => {
+  const loadMore = useCallback(() => {
     if (loadingMore || !data) return;
-    const page = (data as { pageOld?: number }).pageOld ?? 1;
-    const pages = (data as { pagesOld?: number }).pagesOld ?? 1;
-    if (page >= pages) return;
-    fetchReviews(page + 1, true, "old").catch(console.error);
-  }, [loadingMore, data, fetchReviews]);
-
-  const loadMoreNew = useCallback(() => {
-    if (loadingMore || !data) return;
-    const page = (data as { pageNew?: number }).pageNew ?? 1;
-    const pages = (data as { pagesNew?: number }).pagesNew ?? 1;
-    if (page >= pages) return;
-    fetchReviews(page + 1, true, "new").catch(console.error);
+    if (data.page >= data.pages) return;
+    fetchReviews(data.page + 1, true).catch(console.error);
   }, [loadingMore, data, fetchReviews]);
 
   const submitReview = useCallback(
@@ -244,15 +202,14 @@ export function useReviews() {
         setData((prev) => {
           if (!prev) return prev;
           const updatedReview = json.review as ReviewItem;
-          // Новые отзывы всегда в "Что купили на помощь"
-          const itemsNew = [
+          const items = [
             updatedReview,
-            ...(prev.itemsNew ?? []).filter((r) => r.id !== updatedReview.id),
+            ...(prev.items ?? []).filter((r) => r.id !== updatedReview.id),
           ];
           return {
             ...prev,
-            itemsNew,
-            totalNew: Math.max(prev.totalNew ?? 0, itemsNew.length),
+            items,
+            total: Math.max(prev.total ?? 0, items.length),
             viewer: prev.viewer
               ? {
                   ...prev.viewer,
@@ -315,34 +272,23 @@ export function useReviews() {
     [data],
   );
 
-  const reviewsOld = useMemo(() => data?.itemsOld ?? [], [data]);
-  const reviewsNew = useMemo(() => data?.itemsNew ?? [], [data]);
-  const totalOld = data?.totalOld ?? 0;
-  const totalNew = data?.totalNew ?? 0;
-  const pageOld = (data as { pageOld?: number })?.pageOld ?? 1;
-  const pageNew = (data as { pageNew?: number })?.pageNew ?? 1;
-  const pagesOld = (data as { pagesOld?: number })?.pagesOld ?? 0;
-  const pagesNew = (data as { pagesNew?: number })?.pagesNew ?? 0;
-  const hasMoreOld = pageOld < pagesOld;
-  const hasMoreNew = pageNew < pagesNew;
+  const reviews = useMemo(() => data?.items ?? [], [data]);
+  const total = data?.total ?? 0;
+  const hasMore = Boolean(data && data.page < data.pages);
 
   return {
     loading,
     loadingMore,
     submitting,
-    reviewsOld,
-    reviewsNew,
-    totalOld,
-    totalNew,
-    hasMoreOld,
-    hasMoreNew,
+    reviews,
+    total,
+    hasMore,
     canReview: data?.viewer?.canReview ?? false,
     approvedApplications: data?.viewer?.approvedApplications ?? 0,
     pendingReviewApplication,
     viewerReview,
     refresh: () => fetchReviews(1, false),
-    loadMoreOld,
-    loadMoreNew,
+    loadMore,
     submitReview,
     deleteReview,
     ToastComponent,

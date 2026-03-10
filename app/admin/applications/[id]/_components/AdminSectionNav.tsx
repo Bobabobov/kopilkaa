@@ -4,11 +4,11 @@
 const sections = [
   { id: "section-context", label: "Контекст", labelShort: "Контекст" },
   { id: "section-payment", label: "Реквизиты", labelShort: "Реквизиты" },
-  { id: "section-previous-review", label: "Отзыв по прошлой", labelShort: "Прошлый отзыв" },
+  { id: "section-previous-review", label: "Прошлый отзыв", labelShort: "Прошлый отзыв" },
   { id: "section-tech", label: "IP и повторы", labelShort: "IP" },
   { id: "section-images", label: "Фото", labelShort: "Фото" },
   { id: "section-story", label: "История", labelShort: "История" },
-  { id: "section-review", label: "Отзыв по заявке", labelShort: "Отзыв" },
+  { id: "section-review", label: "Отзыв", labelShort: "Отзыв" },
   { id: "section-actions", label: "Действия", labelShort: "Действия" },
 ] as const;
 

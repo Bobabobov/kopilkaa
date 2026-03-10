@@ -13,8 +13,6 @@ import {
   isActivityRequirementMet,
 } from "@/lib/activity/checkActivityRequirement";
 
-import { REVIEWS_NEW_FROM } from "@/lib/reviewsNewFrom";
-
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function getClientIp(req: Request): string | null {
@@ -219,21 +217,18 @@ export async function POST(req: Request) {
     const trust = await computeUserTrustSnapshot(session.uid);
 
     if (session.role !== "ADMIN" && !isWhitelisted) {
-      // Блокировка: последняя одобренная заявка без отзыва (после REVIEWS_NEW_FROM) — нельзя подать новую
-      const lastApproved = lastApprovedByUser;
-      if (lastApproved) {
-        const reviewForLastApproved = await prisma.review.findFirst({
-          where: {
-            applicationId: lastApproved.id,
-            createdAt: { gte: REVIEWS_NEW_FROM },
-          },
+      // Требование отзыва ТОЛЬКО перед 2-й заявкой:
+      // если есть хотя бы 1 одобренная заявка, но ещё ни одного отзыва — блокируем подачу
+      if (trust.approvedApplications >= 1) {
+        const anyApplicationReview = await prisma.review.findFirst({
+          where: { userId: session.uid, applicationId: null },
           select: { id: true },
         });
-        if (!reviewForLastApproved) {
+        if (!anyApplicationReview) {
           return Response.json(
             {
               error:
-                "Для создания новой заявки необходимо сначала оставить отзыв по предыдущей одобренной заявке. Перейдите на страницу отзывов и оставьте отзыв.",
+                "Для создания следующей заявки необходимо сначала оставить отзыв по первой одобренной заявке. Перейдите на страницу отзывов и оставьте отзыв.",
               requiresReview: true,
             },
             { status: 403 },

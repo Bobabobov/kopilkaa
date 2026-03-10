@@ -372,7 +372,7 @@ export function useApplicationFormState() {
         if (r.status === 403 && (d?.requiresReview as boolean)) {
           throw new Error(
             (d?.error as string) ||
-              "Необходимо оставить отзыв перед созданием новой заявки",
+              "Необходимо оставить отзыв перед созданием следующей заявки",
           );
         }
         if (r.status === 403 && (d?.requiresActivity as boolean)) {

@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Разделяем кеши dev/build: убирает падения вида "Cannot find module './xxxx.js'"
+  // когда одновременно/по очереди запускаются dev и build (оба пишут в .next).
+  distDir: process.env.NEXT_DIST_DIR || ".next",
+
   // Оптимизация производительности
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],

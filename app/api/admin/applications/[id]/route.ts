@@ -61,7 +61,7 @@ export async function GET(
 
     if (!item) return Response.json({ error: "Not found" }, { status: 404 });
 
-    // Отзыв по прошлой одобренной заявке (для проверки админом перед одобрением)
+    // Прошлый отзыв по одобренной заявке (для проверки админом перед одобрением)
     const previousApproved = await prisma.application.findFirst({
       where: {
         userId: item.userId,

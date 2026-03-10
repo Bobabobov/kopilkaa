@@ -51,29 +51,32 @@ export async function GET(
       return NextResponse.json({ error: "userId required" }, { status: 400 });
     }
 
-    const review = await prisma.review.findFirst({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        userId: true,
-        content: true,
-        createdAt: true,
-        updatedAt: true,
-        images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
-        user: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            avatar: true,
-            avatarFrame: true,
-            vkLink: true,
-            telegramLink: true,
-            youtubeLink: true,
-          },
+    const select = {
+      id: true,
+      userId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+      images: { orderBy: { sort: "asc" as const }, select: { url: true, sort: true } },
+      user: {
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          avatar: true,
+          avatarFrame: true,
+          vkLink: true,
+          telegramLink: true,
+          youtubeLink: true,
         },
       },
+    };
+
+    // Старый формат: показываем последний отзыв без привязки к заявке (applicationId == null)
+    const review = await prisma.review.findFirst({
+      where: { userId, applicationId: null },
+      orderBy: { createdAt: "desc" },
+      select,
     });
 
     if (!review) {

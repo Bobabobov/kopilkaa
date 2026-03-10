@@ -273,11 +273,11 @@ export default function AdminApplicationPage({
               </div>
             </AdminSection>
 
-            {/* 7. Отзыв по этой заявке */}
+            {/* 7. Отзыв */}
             <AdminSection
               id="section-review"
               number={7}
-              title="Отзыв по этой заявке"
+              title="Отзыв"
               subtitle={
                 item.review
                   ? "Оставлен после одобрения"
@@ -298,8 +298,8 @@ export default function AdminApplicationPage({
                 >
                   <span className="text-sm">
                     {item.status === "APPROVED"
-                      ? "Отзыв по заявке пока не оставлен."
-                      : "Отзыв по заявке оставляется после одобрения заявки."}
+                      ? "Отзыв пока не оставлен."
+                      : "Отзыв оставляется после одобрения заявки."}
                   </span>
                 </div>
               )}

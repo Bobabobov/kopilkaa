@@ -9,7 +9,6 @@ import {
   type TrustLevel,
 } from "@/lib/trustLevel";
 import { ApplicationStatus } from "@prisma/client";
-import { REVIEWS_NEW_FROM } from "@/lib/reviewsNewFrom";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +16,31 @@ const MAX_IMAGES = 5;
 const MIN_IMAGES = 1;
 const MAX_TEXT_LENGTH = 1200;
 const MIN_TEXT_LENGTH = 50;
+
+const REVIEW_SELECT = {
+  id: true,
+  userId: true,
+  content: true,
+  createdAt: true,
+  updatedAt: true,
+  applicationId: true,
+  images: {
+    orderBy: { sort: "asc" as const },
+    select: { url: true, sort: true },
+  },
+  user: {
+    select: {
+      id: true,
+      name: true,
+      username: true,
+      avatar: true,
+      avatarFrame: true,
+      vkLink: true,
+      telegramLink: true,
+      youtubeLink: true,
+    },
+  },
+};
 
 // Проверка безопасности URL загруженных файлов
 function isSafeUploadUrl(url: string): boolean {
@@ -118,47 +142,21 @@ export async function GET(req: NextRequest) {
     );
     const page = Math.max(1, Number(url.searchParams.get("page") || 1));
     const skip = (page - 1) * limit;
-    const section = url.searchParams.get("section") as "old" | "new" | null;
 
-    const select = {
-      id: true,
-      userId: true,
-      content: true,
-      createdAt: true,
-      updatedAt: true,
-      applicationId: true,
-      images: {
-        orderBy: { sort: "asc" as const },
-        select: { url: true, sort: true },
-      },
-      user: {
-        select: {
-          id: true,
-          name: true,
-          username: true,
-          avatar: true,
-          avatarFrame: true,
-          vkLink: true,
-          telegramLink: true,
-          youtubeLink: true,
-        },
-      },
-    };
+    const select = REVIEW_SELECT;
 
-    const whereNew = {
-      applicationId: { not: null },
-      createdAt: { gte: REVIEWS_NEW_FROM },
-    };
-    const whereOld = {
-      applicationId: { not: null },
-      createdAt: { lt: REVIEWS_NEW_FROM },
-    };
+    // Один формат: старые отзывы без привязки к заявке (applicationId == null)
+    const where = { applicationId: null };
     const orderBy = { createdAt: "desc" as const } as const;
 
-    const [totalNewCount, totalOldCount, viewerApproved, lastApprovedApp] =
-      await Promise.all([
-        prisma.review.count({ where: whereNew }),
-        prisma.review.count({ where: whereOld }),
+    const [
+      totalCount,
+      viewerApproved,
+      lastApprovedApp,
+      anyReview,
+      viewerSingleReview,
+    ] = await Promise.all([
+      prisma.review.count({ where }),
       viewerId
         ? prisma.application.count({
             where: { userId: viewerId, status: ApplicationStatus.APPROVED },
@@ -174,101 +172,48 @@ export async function GET(req: NextRequest) {
             select: { id: true, title: true },
           })
         : null,
+      viewerId
+        ? prisma.review.findFirst({
+            where: { userId: viewerId, applicationId: null },
+            select: { id: true },
+          })
+        : null,
+      viewerId
+        ? prisma.review.findFirst({
+            where: { userId: viewerId, applicationId: null },
+            orderBy: { createdAt: "desc" },
+            select,
+          })
+        : null,
     ]);
 
-    // В зачёт только отзывы с даты REVIEWS_NEW_FROM; старые (из архива) не считаются
-    let reviewForLastApproved: Awaited<
-      ReturnType<typeof prisma.review.findFirst>
-    > = null;
-    if (lastApprovedApp) {
-      reviewForLastApproved = await prisma.review.findFirst({
-        where: {
-          applicationId: lastApprovedApp.id,
-          createdAt: { gte: REVIEWS_NEW_FROM },
-        },
-        select,
-      });
-    }
+    const items = await prisma.review.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limit,
+      select,
+    });
 
-    const totalNew = totalNewCount;
-    const totalOld = totalOldCount;
-
-    let itemsNew: Awaited<ReturnType<typeof prisma.review.findMany>> = [];
-    let itemsOld: Awaited<ReturnType<typeof prisma.review.findMany>> = [];
-
-    if (section === "old") {
-      itemsOld = await prisma.review.findMany({
-        where: whereOld,
-        orderBy,
-        skip: (page - 1) * limit,
-        take: limit,
-        select,
-      });
-    } else if (section === "new") {
-      itemsNew = await prisma.review.findMany({
-        where: whereNew,
-        orderBy,
-        skip: (page - 1) * limit,
-        take: limit,
-        select,
-      });
-    } else {
-      [itemsNew, itemsOld] = await Promise.all([
-        prisma.review.findMany({
-          where: whereNew,
-          orderBy,
-          skip: 0,
-          take: limit,
-          select,
-        }),
-        prisma.review.findMany({
-          where: whereOld,
-          orderBy,
-          skip: 0,
-          take: limit,
-          select,
-        }),
-      ]);
-    }
-
-    const mappedOld = await mapReviews(itemsOld, viewerId);
-    const mappedNew = await mapReviews(itemsNew, viewerId);
+    const mapped = await mapReviews(items, viewerId);
+    // Требуем отзыв только один раз: если есть одобренная заявка, но ещё нет отзыва
+    const shouldRequireFirstReview =
+      Boolean(viewerId) && viewerApproved >= 1 && !anyReview;
     const pendingReviewApplication =
-      lastApprovedApp && !reviewForLastApproved
+      shouldRequireFirstReview && lastApprovedApp
         ? { id: lastApprovedApp.id, title: lastApprovedApp.title }
         : null;
     const mappedReviewForPending =
-      reviewForLastApproved
-        ? (await mapReviews([reviewForLastApproved], viewerId))[0]
+      viewerSingleReview
+        ? (await mapReviews([viewerSingleReview], viewerId))[0]
         : null;
-
-    if (section === "old") {
-      return NextResponse.json({
-        section: "old",
-        page,
-        limit,
-        total: totalOld,
-        pages: Math.ceil(totalOld / limit) || 1,
-        items: mappedOld,
-      });
-    }
-    if (section === "new") {
-      return NextResponse.json({
-        section: "new",
-        page,
-        limit,
-        total: totalNew,
-        pages: Math.ceil(totalNew / limit) || 1,
-        items: mappedNew,
-      });
-    }
 
     return NextResponse.json({
       limit,
-      itemsOld: mappedOld,
-      itemsNew: mappedNew,
-      totalOld,
-      totalNew,
+      page,
+      pages: Math.ceil(totalCount / limit) || 1,
+      total: totalCount,
+      items: mapped,
       viewer: {
         canReview: Boolean(viewerId && pendingReviewApplication),
         approvedApplications: viewerApproved,
@@ -281,10 +226,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         limit: 12,
-        itemsOld: [],
-        itemsNew: [],
-        totalOld: 0,
-        totalNew: 0,
+        page: 1,
+        pages: 1,
+        items: [],
+        total: 0,
         viewer: {
           canReview: false,
           approvedApplications: 0,
@@ -308,6 +253,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const select = REVIEW_SELECT;
     const body = await req.json();
     const applicationId = typeof body?.applicationId === "string" ? body.applicationId.trim() : "";
     const content = String(body?.content || "").trim();
@@ -388,43 +334,23 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await prisma.$transaction(async (tx) => {
-      const existing = await tx.review.findUnique({
-        where: { applicationId: application.id },
+      // Старый формат: 1 отзыв на пользователя, без привязки к заявке (applicationId == null)
+      const existingByUser = await tx.review.findFirst({
+        where: { userId: viewerId, applicationId: null },
+        select: { id: true },
       });
 
-      if (existing) {
-        await tx.reviewImage.deleteMany({ where: { reviewId: existing.id } });
+      if (existingByUser) {
+        await tx.reviewImage.deleteMany({ where: { reviewId: existingByUser.id } });
         const updated = await tx.review.update({
-          where: { id: existing.id },
+          where: { id: existingByUser.id },
           data: {
             content,
             images: {
               create: sanitizedImages.map((url, idx) => ({ url, sort: idx })),
             },
           },
-          select: {
-            id: true,
-            userId: true,
-            content: true,
-            createdAt: true,
-            updatedAt: true,
-            images: {
-              orderBy: { sort: "asc" },
-              select: { url: true, sort: true },
-            },
-            user: {
-              select: {
-                id: true,
-                name: true,
-                username: true,
-                avatar: true,
-                avatarFrame: true,
-                vkLink: true,
-                telegramLink: true,
-                youtubeLink: true,
-              },
-            },
-          },
+          select,
         });
         return updated;
       }
@@ -432,35 +358,13 @@ export async function POST(req: NextRequest) {
       const created = await tx.review.create({
         data: {
           userId: viewerId,
-          applicationId: application.id,
+          applicationId: null,
           content,
           images: {
             create: sanitizedImages.map((url, idx) => ({ url, sort: idx })),
           },
         },
-        select: {
-          id: true,
-          userId: true,
-          content: true,
-          createdAt: true,
-          updatedAt: true,
-          images: {
-            orderBy: { sort: "asc" },
-            select: { url: true, sort: true },
-          },
-          user: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-              avatar: true,
-              avatarFrame: true,
-              vkLink: true,
-              telegramLink: true,
-              youtubeLink: true,
-            },
-          },
-        },
+        select,
       });
       return created;
     });

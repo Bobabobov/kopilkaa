@@ -28,26 +28,21 @@ export function ReviewsSection() {
     approvedApplications,
     pendingReviewApplication,
     viewerReview,
-    reviewsOld,
-    reviewsNew,
-    totalOld,
-    totalNew,
-    hasMoreOld,
-    hasMoreNew,
-    loadMoreOld,
-    loadMoreNew,
+    reviews,
+    total,
+    hasMore,
+    loadMore,
     submitReview,
     deleteReview,
     ToastComponent,
   } = useReviews();
 
-  const totalReviews = totalOld + totalNew;
   const heroSubtitle = useMemo(
     () =>
-      totalReviews > 0
-        ? `Уже ${totalReviews.toLocaleString("ru-RU")} отзывов — чеки, фото и истории участников`
+      total > 0
+        ? `Уже ${total.toLocaleString("ru-RU")} отзывов — чеки, фото и истории участников`
         : "Чеки, фото и истории тех, кто получил помощь",
-    [totalReviews],
+    [total],
   );
 
   return (
@@ -85,12 +80,9 @@ export function ReviewsSection() {
         <p className="mt-4 text-lg sm:text-xl text-[#abd1c6] max-w-2xl mx-auto leading-relaxed">
           {heroSubtitle}
         </p>
-        <p className="mt-2 text-sm text-[#94a1b2] max-w-xl mx-auto">
-          Два формата: отзывы по заявкам (с фото) и архивные отзывы
-        </p>
       </motion.header>
 
-      {/* Форма обязательного отзыва по заявке */}
+      {/* Форма обязательного отзыва */}
       {viewerReview ? (
         <motion.div
           variants={sectionVariants}
@@ -109,7 +101,7 @@ export function ReviewsSection() {
               </div>
               <div className="space-y-3 flex-1 min-w-0">
                 <p className="text-xs uppercase tracking-[0.08em] text-[#94a1b2]">
-                  Отзыв по заявке оставлен
+                  Отзыв оставлен
                 </p>
                 <h2 className="text-lg sm:text-xl font-semibold text-[#fffffe]">
                   Спасибо за отзыв
@@ -162,7 +154,7 @@ export function ReviewsSection() {
                   Недоступно
                 </p>
                 <h2 className="text-lg sm:text-xl font-semibold text-[#fffffe]">
-                  Отзыв по заявке можно оставить после одобрения
+                  Отзыв можно оставить после одобрения
                 </h2>
               </div>
             </CardContent>
@@ -188,7 +180,7 @@ export function ReviewsSection() {
         />
       ) : null}
 
-      {/* ——— Секция 1: Что купили на помощь ——— */}
+      {/* ——— Секция: Отзывы ——— */}
       <motion.section
         id="reviews-new"
         variants={sectionVariants}
@@ -218,10 +210,10 @@ export function ReviewsSection() {
                 </div>
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-[#fffffe]">
-                    Что купили на помощь
+                    Отзывы
                   </h2>
                   <p className="text-sm text-[#abd1c6] mt-0.5">
-                    Отзывы с фото после каждой одобренной заявки
+                    Отзывы с фото от участников
                   </p>
                 </div>
               </div>
@@ -236,7 +228,12 @@ export function ReviewsSection() {
                       color: "#f9bc60",
                     }}
                   >
-                    {totalNew.toLocaleString("ru-RU")}
+                    {total.toLocaleString("ru-RU")}{" "}
+                    {total % 10 === 1 && total % 100 !== 11
+                      ? "отзыв"
+                      : total % 10 >= 2 && total % 10 <= 4 && (total % 100 < 10 || total % 100 >= 20)
+                        ? "отзыва"
+                        : "отзывов"}
                   </span>
                 )}
               </div>
@@ -245,15 +242,15 @@ export function ReviewsSection() {
               Участники прикрепляют чеки, фото товаров или результата — так видно, на что пошла помощь.
             </p>
             <ReviewsList
-              reviews={reviewsNew}
+              reviews={reviews}
               loading={loading}
-              emptyTitle="Пока нет отзывов по заявкам"
-              emptyDescription="После одобрения заявки здесь появятся отзывы с фото"
+              emptyTitle="Пока нет отзывов"
+              emptyDescription="Когда появятся первые отзывы, они будут отображаться здесь"
             />
-            {hasMoreNew && (
+            {hasMore && (
               <div className="flex justify-center pt-8">
                 <button
-                  onClick={loadMoreNew}
+                  onClick={loadMore}
                   disabled={loadingMore}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
                   style={{
@@ -261,91 +258,6 @@ export function ReviewsSection() {
                     border: "2px solid rgba(249, 188, 96, 0.45)",
                     color: "#f9bc60",
                   }}
-                >
-                  {loadingMore ? (
-                    <LucideIcons.Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <LucideIcons.ChevronDown size="sm" />
-                  )}
-                  Ещё отзывы
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Разделитель */}
-      <div className="max-w-6xl mx-auto flex items-center gap-4">
-        <span className="flex-1 h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent" aria-hidden />
-        <span className="text-[#94a1b2] text-sm font-medium">Архив</span>
-        <span className="flex-1 h-px bg-gradient-to-r from-transparent via-[#abd1c6]/30 to-transparent" aria-hidden />
-      </div>
-
-      {/* ——— Секция 2: Отзывы (ранее) ——— */}
-      <motion.section
-        id="reviews-old"
-        variants={sectionVariants}
-        initial="hidden"
-        animate="visible"
-        custom={2}
-        className="max-w-6xl mx-auto"
-      >
-        <div
-          className="rounded-3xl sm:rounded-[2rem] border-2 overflow-hidden"
-          style={{
-            background: "linear-gradient(180deg, rgba(171,209,198,0.06) 0%, rgba(0,30,29,0.35) 100%)",
-            borderColor: "rgba(171, 209, 198, 0.3)",
-          }}
-        >
-          <div className="p-6 sm:p-8 md:p-10">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: "rgba(171, 209, 198, 0.15)",
-                    border: "2px solid rgba(171, 209, 198, 0.35)",
-                  }}
-                >
-                  <LucideIcons.MessageCircle className="w-7 h-7 text-[#abd1c6]" />
-                </div>
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-[#fffffe]">
-                    Отзывы (ранее)
-                  </h2>
-                  <p className="text-sm text-[#abd1c6] mt-0.5">
-                    Общий опыт участия в прежнем формате
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {loading ? (
-                  <LucideIcons.Loader2 className="w-5 h-5 animate-spin text-[#abd1c6]" />
-                ) : (
-                  <span
-                    className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold bg-[#abd1c6]/15 text-[#abd1c6]"
-                  >
-                    {totalOld.toLocaleString("ru-RU")}
-                  </span>
-                )}
-              </div>
-            </div>
-            <p className="text-sm text-[#94a1b2] mb-8 max-w-2xl">
-              Отзывы участников до введения формата «отзыв по заявке».
-            </p>
-            <ReviewsList
-              reviews={reviewsOld}
-              loading={loading}
-              emptyTitle="В этой рубрике пока пусто"
-              emptyDescription="Архивные отзывы отображаются здесь"
-            />
-            {hasMoreOld && (
-              <div className="flex justify-center pt-8">
-                <button
-                  onClick={loadMoreOld}
-                  disabled={loadingMore}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm bg-[#abd1c6]/15 border-2 border-[#abd1c6]/35 text-[#abd1c6] hover:bg-[#abd1c6]/25 disabled:opacity-50 transition-all"
                 >
                   {loadingMore ? (
                     <LucideIcons.Loader2 className="h-4 w-4 animate-spin" />

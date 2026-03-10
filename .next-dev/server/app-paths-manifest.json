@@ -1,18 +1,11 @@
 {
   "/page": "app/page.js",
-  "/api/stories/summary/route": "app/api/stories/summary/route.js",
-  "/api/stories/top/route": "app/api/stories/top/route.js",
-  "/api/stories/route": "app/api/stories/route.js",
+  "/api/ads/active/route": "app/api/ads/active/route.js",
+  "/api/top-donors/route": "app/api/top-donors/route.js",
+  "/api/applications/recent/route": "app/api/applications/recent/route.js",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
-  "/api/notifications/route": "app/api/notifications/route.js",
-  "/api/ads/route": "app/api/ads/route.js",
-  "/api/profile/me/route": "app/api/profile/me/route.js",
-  "/api/ads/stories/route": "app/api/ads/stories/route.js",
-  "/icon.png/route": "app/icon.png/route.js",
-  "/api/stories/[id]/route": "app/api/stories/[id]/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
   "/applications/page": "app/applications/page.js",
   "/news/page": "app/news/page.js",
-  "/stories/[id]/page": "app/stories/[id]/page.js",
-  "/stories/page": "app/stories/page.js"
+  "/stories/page": "app/stories/page.js",
+  "/stories/[id]/page": "app/stories/[id]/page.js"
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Card, CardContent } from "@/components/ui/Card";
 import { usePageTimeTracking } from "@/hooks/ui/usePageTimeTracking";
@@ -83,25 +82,12 @@ export default function ApplicationsPageClient() {
   } = state;
 
   const { introAckKey } = state;
-  const [isMobileViewport, setIsMobileViewport] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const update = () => setIsMobileViewport(mq.matches);
-    update();
-    if (mq.addEventListener) {
-      mq.addEventListener("change", update);
-      return () => mq.removeEventListener("change", update);
-    }
-    mq.addListener(update);
-    return () => mq.removeListener(update);
-  }, []);
 
   if (loadingAuth) {
     return (
       <div
         className="min-h-screen relative flex items-center justify-center px-4"
-        data-applications-mobile-opt={isMobileViewport ? "1" : "0"}
+        data-applications-mobile-opt="1"
       >
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
@@ -125,7 +111,7 @@ export default function ApplicationsPageClient() {
     return (
       <div
         className="min-h-screen relative flex items-center justify-center px-4 py-12"
-        data-applications-mobile-opt={isMobileViewport ? "1" : "0"}
+        data-applications-mobile-opt="1"
       >
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
@@ -157,7 +143,7 @@ export default function ApplicationsPageClient() {
     return (
       <div
         className="min-h-screen relative overflow-hidden"
-        data-applications-mobile-opt={isMobileViewport ? "1" : "0"}
+        data-applications-mobile-opt="1"
       >
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
@@ -173,7 +159,7 @@ export default function ApplicationsPageClient() {
   return (
     <div
       className="min-h-screen relative overflow-hidden"
-      data-applications-mobile-opt={isMobileViewport ? "1" : "0"}
+      data-applications-mobile-opt="1"
     >
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />

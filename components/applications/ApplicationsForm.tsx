@@ -111,7 +111,6 @@ export function ApplicationsForm(props: Props) {
     ackError,
     trustSupportNotice,
   } = props;
-
   useEffect(() => {
     if (!err || !firstErrorKey || typeof document === "undefined") return;
     const el = document.getElementById(`application-field-${firstErrorKey}`);

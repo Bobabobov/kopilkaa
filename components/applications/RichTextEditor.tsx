@@ -5,7 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import {
   getTextLengthFromHtml,
@@ -45,6 +45,33 @@ export default function RichTextEditor({
   const [linkUrl, setLinkUrl] = useState("");
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [pasteBlocked, setPasteBlocked] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+      return;
+    }
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobileViewport(mq.matches);
+    update();
+    if (mq.addEventListener) {
+      mq.addEventListener("change", update);
+      return () => mq.removeEventListener("change", update);
+    }
+    mq.addListener(update);
+    return () => mq.removeListener(update);
+  }, []);
+
+  const mobileText = useMemo(() => {
+    if (typeof document === "undefined") {
+      return value.replace(/<[^>]*>/g, "");
+    }
+    const div = document.createElement("div");
+    div.innerHTML = value || "";
+    return div.textContent || div.innerText || "";
+  }, [value]);
+
+  const mobileTextLength = mobileText.replace(/\s/g, "").length;
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -149,6 +176,85 @@ export default function RichTextEditor({
     textLength >= minLength && (maxLength ? textLength <= maxLength : true);
   const hasError =
     error || isRequiredEmpty || (textLength > 0 && !isValidLength);
+
+  if (isMobileViewport) {
+    const mobileIsEmpty = mobileTextLength === 0;
+    const mobileIsRequiredEmpty = required && mobileIsEmpty;
+    const mobileIsValidLength =
+      mobileTextLength >= minLength &&
+      (maxLength ? mobileTextLength <= maxLength : true);
+    const mobileHasError =
+      error || mobileIsRequiredEmpty || (mobileTextLength > 0 && !mobileIsValidLength);
+
+    return (
+      <div className={`space-y-2 w-full max-w-full overflow-hidden ${className}`}>
+        {pasteBlocked && !allowPaste && (
+          <div className="text-[12px] text-[#e16162]">
+            Вставка запрещена: введите текст вручную.
+          </div>
+        )}
+
+        <textarea
+          value={mobileText}
+          onChange={(e) => {
+            const text = e.target.value;
+            const escaped = text
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;");
+            const html = escaped.length > 0 ? `<p>${escaped.replace(/\n/g, "<br>")}</p>` : "";
+            onChange(html);
+          }}
+          onPaste={(e) => {
+            if (allowPaste) return;
+            e.preventDefault();
+            setPasteBlocked(true);
+          }}
+          onDrop={(e) => {
+            if (allowPaste) return;
+            e.preventDefault();
+            setPasteBlocked(true);
+          }}
+          placeholder={placeholder}
+          rows={rows + 2}
+          className={`w-full max-w-full px-4 py-3 rounded-xl border-2 transition-colors resize-y appearance-none outline-none text-[#fffffe] placeholder:text-[#94a1b2] ${
+            mobileHasError
+              ? "border-[#e16162]/60"
+              : "border-[#abd1c6]/30 focus:border-[#f9bc60]"
+          }`}
+          style={{
+            backgroundColor: mobileHasError ? "rgba(225, 97, 98, 0.08)" : "rgba(0, 70, 67, 0.85)",
+            color: "#fffffe",
+            WebkitTextFillColor: "#fffffe",
+            caretColor: "#f9bc60",
+          }}
+        />
+
+        {mobileHasError && error && (
+          <div className="flex items-center gap-2 text-sm text-[#e16162] mt-1">
+            <LucideIcons.XCircle className="w-4 h-4" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {maxLength && (
+          <div className="flex justify-end">
+            <span
+              className={`text-sm ${
+                mobileTextLength > maxLength
+                  ? "text-red-400"
+                  : mobileTextLength > maxLength * 0.8
+                    ? "text-[#f9bc60]"
+                    : "text-[#abd1c6]"
+              }`}
+            >
+              {mobileTextLength} / {maxLength}
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const openLinkInput = (href: string) => {
     setLinkUrl(href || "");

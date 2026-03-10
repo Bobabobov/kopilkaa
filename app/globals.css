@@ -49,6 +49,16 @@
     will-change: transform;
   }
 
+  /* На мобильных отключаем "дыхание" фона:
+     постоянный transform на full-screen image вызывает фризы на слабых GPU */
+  @media (max-width: 767px) {
+    .universal-background-animated {
+      animation: none !important;
+      transform: scale(1.06) translate(0, 0) !important;
+      will-change: auto;
+    }
+  }
+
   /* CSS переменные для высот Header и TopBanner */
   :root {
     --top-banner-height: 0px;

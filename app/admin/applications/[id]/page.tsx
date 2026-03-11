@@ -507,7 +507,7 @@ export default function AdminApplicationPage({
             </AdminSection>
 
             {/* 7. Отзыв — показываем только если он реально есть */}
-            {hasReview && (
+            {hasReview && item.review && (
               <AdminSection
                 id="section-review"
                 number={7}

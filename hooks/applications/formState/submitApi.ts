@@ -9,6 +9,8 @@ export interface SubmitApplicationPayload {
   amount: string;
   payment: string;
   images: string[];
+  /** Фото-отчёт по прошлой одобренной заявке (до 5 шт) */
+  reportImages?: string[];
   hpCompany: string;
   acknowledgedRules: boolean;
   clientMeta: {

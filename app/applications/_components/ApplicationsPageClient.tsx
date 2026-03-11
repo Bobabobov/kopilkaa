@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -41,6 +41,8 @@ export default function ApplicationsPageClient() {
     setBankName,
     photos,
     setPhotos,
+    reportPhotos,
+    setReportPhotos,
     uploading,
     submitting,
     err,
@@ -77,6 +79,7 @@ export default function ApplicationsPageClient() {
     submit,
     setSubmitted,
     requiresReview,
+    approvedCount,
     activityModal,
     setActivityModal,
   } = state;
@@ -207,43 +210,54 @@ export default function ApplicationsPageClient() {
           <div className="xl:col-span-4 order-1">
             <TrustLevelsInfo />
 
-            {requiresReview ? (
-              <div>
-                <Card variant="darkGlass" padding="lg" className="relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full pointer-events-none" aria-hidden />
-                  <CardContent className="relative flex items-start gap-4 p-0">
-                    <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-[#001e1d] flex-shrink-0"
-                      style={{ background: "linear-gradient(135deg, #f9bc60 0%, #e8a545 100%)" }}
+            {approvedCount !== null && approvedCount >= 1 && requiresReview && (
+              <Card
+                variant="darkGlass"
+                padding="lg"
+                className="relative overflow-hidden mb-6"
+              >
+                <div
+                  className="absolute top-0 right-0 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full pointer-events-none"
+                  aria-hidden
+                />
+                <CardContent className="relative flex items-start gap-4 p-0">
+                  <div
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-[#001e1d] flex-shrink-0"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #f9bc60 0%, #e8a545 100%)",
+                    }}
+                  >
+                    <LucideIcons.MessageCircle size="sm" />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <h2 className="text-xl sm:text-2xl font-semibold text-[#fffffe]">
+                      Отзыв после первой заявки
+                    </h2>
+                    <p className="text-sm sm:text-base text-[#abd1c6] leading-relaxed">
+                      После первой одобренной заявки нужно один раз оставить
+                      отзыв о проекте. Сделать это можно на отдельной странице.
+                    </p>
+                    <Link
+                      href="/reviews"
+                      className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all hover:opacity-90"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+                        color: "#001e1d",
+                        boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
+                      }}
                     >
-                      <LucideIcons.MessageCircle size="sm" />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <h2 className="text-xl sm:text-2xl font-semibold text-[#fffffe]">
-                        Необходимо оставить отзыв
-                      </h2>
-                      <p className="text-sm sm:text-base text-[#abd1c6] leading-relaxed">
-                        Оставьте отзыв по прошлой одобренной заявке (с фото и
-                        текстом), чтобы подать новую заявку.
-                      </p>
-                      <Link
-                        href="/reviews"
-                        className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all hover:opacity-90"
-                        style={{
-                          background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
-                          color: "#001e1d",
-                          boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
-                        }}
-                      >
-                        <LucideIcons.MessageCircle size="sm" />
-                        <span>Перейти к отзывам</span>
-                        <LucideIcons.ArrowRight size="xs" />
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            ) : (
+                      <LucideIcons.Image size="sm" />
+                      <span>Оставить отзыв</span>
+                      <LucideIcons.ArrowRight size="xs" />
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {!requiresReview && (
               <ApplicationsForm
                 title={title}
                 setTitle={setTitle}
@@ -303,6 +317,9 @@ export default function ApplicationsPageClient() {
                     </p>
                   ) : null
                 }
+                approvedCount={approvedCount}
+                reportPhotos={reportPhotos}
+                setReportPhotos={setReportPhotos}
               />
             )}
           </div>

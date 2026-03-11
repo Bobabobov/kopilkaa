@@ -34,24 +34,26 @@ export default function ApplicationPaymentDetails({
   const handleCopy = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     navigator.clipboard
-      .writeText(payment)
+      .writeText(parsed.payment || "")
       .then(() => {
-        const btn = e.target as HTMLButtonElement;
+        const btn = e.currentTarget as HTMLButtonElement;
         const icon = btn.querySelector(".copy-icon") as HTMLElement;
         const text = btn.querySelector(".copy-text") as HTMLElement;
         if (icon && text) {
           icon.textContent = "✓";
-          text.textContent = "Скопировано";
-          btn.style.backgroundColor = "#10b981";
+          text.textContent = "Скопировано реквизитов";
+          btn.classList.add("bg-emerald-600");
           setTimeout(() => {
             icon.textContent = "📋";
-            text.textContent = "Копировать";
-            btn.style.backgroundColor = "";
+            text.textContent = "Копировать реквизиты";
+            btn.classList.remove("bg-emerald-600");
           }, 1500);
         }
       })
       .catch(() => {
-        onCopyError("Выделите текст вручную");
+        // Некоторые браузеры могут успешно копировать, но при этом отклонять Promise.
+        // В таком случае не показываем ошибку пользователю, просто тихо игнорируем.
+        console.warn("Clipboard copy for payment details was rejected");
       });
   };
 
@@ -64,8 +66,7 @@ export default function ApplicationPaymentDetails({
     >
       <details className="toggle min-w-0">
         <summary
-          className="flex items-center gap-2 cursor-pointer select-none font-medium transition-colors text-base sm:text-lg mb-4 hover:opacity-80"
-          style={{ color: "#f9bc60" }}
+          className="flex items-center gap-2 cursor-pointer select-none font-semibold transition-colors text-base sm:text-lg mb-4 text-[#f9bc60] hover:opacity-90"
         >
           <svg
             className="w-5 h-5 flex-shrink-0"
@@ -83,24 +84,15 @@ export default function ApplicationPaymentDetails({
           <span className="label-closed">Показать реквизиты</span>
           <span className="label-open">Скрыть реквизиты</span>
         </summary>
-        <div
-          className="open-only rounded-lg sm:rounded-xl border relative group p-3 sm:p-5 lg:p-6 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.7)] min-w-0 w-full overflow-hidden"
-          style={{
-            backgroundColor: "#0b1615",
-            borderColor: "rgba(171,209,198,0.25)",
-          }}
-        >
-          <dl className="space-y-2 pr-12 sm:pr-16 min-w-0">
+        <div className="open-only rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl relative group p-3 sm:p-5 lg:p-6 shadow-[0_22px_60px_rgba(0,0,0,0.55)] min-w-0 w-full overflow-hidden">
+          <dl className="space-y-3 pr-12 sm:pr-16 min-w-0">
             {parsed.bankName && (
               <div className="min-w-0 overflow-hidden">
-                <dt
-                  className="font-medium text-sm sm:text-base"
-                  style={{ color: "#abd1c6" }}
-                >
+                <dt className="font-semibold text-xs sm:text-sm uppercase tracking-wide text-[#94a1b2]">
                   Банк
                 </dt>
                 <dd
-                  className="select-all text-sm sm:text-base break-words"
+                  className="select-all text-sm sm:text-base break-words rounded-xl bg-black/10 px-3 py-2"
                   style={{ color: "#e8f2ef", wordBreak: "break-word", overflowWrap: "anywhere" }}
                 >
                   {parsed.bankName}
@@ -108,14 +100,11 @@ export default function ApplicationPaymentDetails({
               </div>
             )}
             <div className="min-w-0 overflow-hidden">
-              <dt
-                className="font-medium text-sm sm:text-base"
-                style={{ color: "#abd1c6" }}
-              >
+              <dt className="font-semibold text-xs sm:text-sm uppercase tracking-wide text-[#94a1b2]">
                 Реквизиты
               </dt>
               <dd
-                className="select-all text-sm sm:text-base break-words whitespace-pre-wrap"
+                className="select-all text-sm sm:text-base break-words whitespace-pre-wrap rounded-xl bg-black/10 px-3 py-2"
                 style={{ color: "#e8f2ef", wordBreak: "break-word", overflowWrap: "anywhere" }}
               >
                 {parsed.payment || "Не указаны"}
@@ -123,10 +112,7 @@ export default function ApplicationPaymentDetails({
             </div>
           </dl>
           <div className="mt-4 pt-4 border-t border-[#abd1c6]/20">
-            <p
-              className="text-xs font-semibold mb-2"
-              style={{ color: "#e8a545" }}
-            >
+            <p className="text-xs font-semibold mb-2 text-[#e8a545]">
               Повторы реквизитов
             </p>
             {hasSamePayment ? (
@@ -168,12 +154,11 @@ export default function ApplicationPaymentDetails({
           </div>
           <button
             onClick={handleCopy}
-            className="absolute top-2 right-2 sm:top-3 sm:right-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs bg-[#004643] border border-[#f9bc60]/30 hover:border-[#f9bc60] backdrop-blur-sm shadow-sm touch-manipulation"
-            style={{ color: "#f9bc60" }}
+            className="absolute top-2 right-2 sm:top-3 sm:right-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs bg-[#004643] border border-[#f9bc60]/30 hover:border-[#f9bc60] backdrop-blur-sm shadow-sm touch-manipulation text-[#f9bc60]"
             title="Копировать реквизиты"
           >
             <span className="copy-icon">📋</span>
-            <span className="copy-text hidden sm:inline">Копировать</span>
+            <span className="copy-text hidden sm:inline">Копировать реквизиты</span>
           </button>
         </div>
       </details>

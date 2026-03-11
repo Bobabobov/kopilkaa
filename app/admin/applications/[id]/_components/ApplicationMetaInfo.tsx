@@ -36,35 +36,17 @@ export default function ApplicationMetaInfo({
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6"
       >
         {/* Сумма запроса */}
-        <div
-          className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)] min-w-0"
-          style={{
-            backgroundColor: "#0b1615",
-            borderColor: "rgba(249,188,96,0.25)",
-          }}
-        >
-          <span
-            className="font-bold text-xl sm:text-2xl"
-            style={{ color: "#f9bc60" }}
-          >
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl border border-[#f9bc60]/40 bg-[#f9bc60]/10 backdrop-blur-sm min-w-0 shadow-[0_12px_30px_rgba(0,0,0,0.28)]">
+          <span className="font-bold text-xl sm:text-2xl text-[#f9bc60]">
             ₽{amount.toLocaleString()}
           </span>
-          <span
-            className="text-xs sm:text-sm font-medium"
-            style={{ color: "#abd1c6" }}
-          >
+          <span className="text-xs sm:text-sm font-medium text-[#abd1c6]">
             Сумма запроса
           </span>
         </div>
 
         {/* Автор */}
-        <div
-          className="flex items-center gap-2 text-sm rounded-lg sm:rounded-xl p-2.5 sm:p-4 border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)] min-w-0 overflow-hidden"
-          style={{
-            backgroundColor: "#0b1615",
-            borderColor: "rgba(171,209,198,0.2)",
-          }}
-        >
+        <div className="flex items-center gap-2 text-sm rounded-2xl p-2.5 sm:p-4 border border-[#abd1c6]/35 bg-[#001e1d]/40 backdrop-blur-sm min-w-0 overflow-hidden shadow-[0_12px_30px_rgba(0,0,0,0.28)]">
           <svg
             className="w-4 h-4 flex-shrink-0"
             fill="none"
@@ -79,26 +61,20 @@ export default function ApplicationMetaInfo({
               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
             />
           </svg>
-          <span className="font-medium" style={{ color: "#abd1c6" }}>
-            Автор:
-          </span>
+          <span className="font-medium text-[#abd1c6]">Автор:</span>
           <button
             onClick={() => onCopyEmail(userEmail)}
-            className="group relative flex items-center gap-1 px-2 py-1 rounded-lg bg-[#004643]/60 border border-[#abd1c6]/20 hover:border-[#f9bc60] hover:bg-[#004643] transition-all duration-200"
+            className="group relative flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:border-[#f9bc60]/40 hover:bg-white/10 transition-all duration-200"
             title="Нажмите чтобы скопировать email"
           >
-          <span
-            className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none"
-              style={{ color: "#f9bc60" }}
-            >
+            <span className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none text-[#f9bc60]">
               {userEmail.replace(/(.{2}).*(@.*)/, "$1***$2")}
             </span>
             <svg
-              className="w-3 h-3 group-hover:scale-110 transition-transform duration-200 flex-shrink-0"
+              className="w-3 h-3 group-hover:scale-110 transition-transform duration-200 flex-shrink-0 text-[#f9bc60]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              style={{ color: "#f9bc60" }}
             >
               <path
                 strokeLinecap="round"
@@ -118,23 +94,11 @@ export default function ApplicationMetaInfo({
 
         {/* Время заполнения */}
         {formattedTime && (
-          <div
-        className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)] min-w-0"
-          style={{
-            backgroundColor: "#0b1615",
-            borderColor: "rgba(171,209,198,0.2)",
-          }}
-          >
-            <span
-              className="font-semibold text-lg sm:text-xl"
-              style={{ color: "#abd1c6" }}
-            >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl border border-[#abd1c6]/35 bg-[#004643]/50 backdrop-blur-sm min-w-0 shadow-[0_12px_30px_rgba(0,0,0,0.28)]">
+            <span className="font-semibold text-lg sm:text-xl text-[#abd1c6]">
               {formattedTime}
             </span>
-            <span
-              className="text-xs sm:text-sm font-medium"
-              style={{ color: "#94a1b2" }}
-            >
+            <span className="text-xs sm:text-sm font-medium text-[#94a1b2]">
               Время заполнения формы
             </span>
           </div>
@@ -148,14 +112,7 @@ export default function ApplicationMetaInfo({
         transition={{ duration: 0.5, delay: 0.4 }}
         className="mb-6"
       >
-        <div
-          className="text-sm sm:text-base lg:text-lg break-words leading-relaxed rounded-lg sm:rounded-xl p-3 sm:p-5 lg:p-6 border shadow-[0_10px_30px_-18px_rgba(0,0,0,0.8)] min-w-0"
-          style={{
-            backgroundColor: "#0b1615",
-            borderColor: "rgba(171,209,198,0.2)",
-            color: "#e8f2ef",
-          }}
-        >
+        <div className="text-sm sm:text-base lg:text-lg break-words leading-relaxed rounded-2xl border border-[#abd1c6]/30 bg-[#004643]/60 backdrop-blur-sm p-3 sm:p-5 lg:p-6 min-w-0 text-[#e8f2ef] shadow-[0_16px_40px_rgba(0,0,0,0.35)]">
           {summary}
         </div>
       </motion.div>

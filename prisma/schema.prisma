@@ -94,9 +94,10 @@ model Application {
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 
-  images ApplicationImage[]
-  likes  StoryLike[]
-  review Review?
+  images       ApplicationImage[]
+  likes        StoryLike[]
+  review       Review?
+  reportImages ApplicationReportImage[]
 
   @@index([userId])
   @@index([status])
@@ -347,6 +348,18 @@ model ReviewImage {
   sort     Int     @default(0)
 
   @@index([reviewId])
+  @@index([sort])
+}
+
+model ApplicationReportImage {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  url  String
+  sort Int    @default(0)
+
+  @@index([applicationId])
   @@index([sort])
 }
 

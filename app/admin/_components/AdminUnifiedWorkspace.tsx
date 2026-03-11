@@ -125,6 +125,7 @@ export default function AdminUnifiedWorkspace({
             <AdminOverviewSection
               stats={stats}
               pendingCount={stats?.pending ?? 0}
+              newestId={newestPending?.id ?? null}
               newestTitle={newestPending?.title ?? null}
               newestAgeHours={newestPendingAge}
             />

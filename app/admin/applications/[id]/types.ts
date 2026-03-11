@@ -5,6 +5,11 @@ export type SameApplicationRef = {
   id: string;
   createdAt: string;
   user: { id: string; email: string | null; name: string | null };
+  /** Необязательные поля для более подробного описания связанных заявок */
+  status?: ApplicationStatus;
+  title?: string | null;
+  amount?: number | null;
+  summary?: string | null;
 };
 
 export type ApplicationReview = {
@@ -25,6 +30,7 @@ export type PreviousApprovedWithReview = {
     createdAt: string;
     images: { url: string; sort: number }[];
   } | null;
+  reportImages?: { url: string; sort: number }[];
 };
 
 export type ApplicationItem = {
@@ -47,6 +53,8 @@ export type ApplicationItem = {
   samePaymentApplications?: SameApplicationRef[];
   sameIpApplications?: SameApplicationRef[];
   review?: ApplicationReview | null;
+  countTowardsTrust?: boolean;
+  trustDecreasedAtDecision?: boolean;
   /** Последняя одобренная заявка пользователя и её отзыв (для проверки перед одобрением) */
   previousApprovedWithReview?: PreviousApprovedWithReview | null;
 };

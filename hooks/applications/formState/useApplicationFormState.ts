@@ -44,6 +44,7 @@ export function useApplicationFormState() {
   const [payment, setPayment] = useState("");
   const [bankName, setBankName] = useState("");
   const [photos, setPhotos] = useState<LocalImage[]>([]);
+  const [reportPhotos, setReportPhotos] = useState<LocalImage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -141,6 +142,7 @@ export function useApplicationFormState() {
     if (!wasSubmitted) return;
     setSubmitted(true);
     setPhotos([]);
+    setReportPhotos([]);
     setTitle("");
     setSummary("");
     setStory("");
@@ -311,6 +313,10 @@ export function useApplicationFormState() {
         setErr("Добавьте хотя бы одну фотографию");
         return;
       }
+      if (approvedCount !== null && approvedCount >= 1 && reportPhotos.length === 0) {
+        setErr("Добавьте хотя бы одно фото-отчёт по прошлой заявке");
+        return;
+      }
       if (!valid) {
         setErr("Проверьте поля — есть ошибки/лимиты");
         setValidationScrollTrigger((n) => n + 1);
@@ -321,6 +327,7 @@ export function useApplicationFormState() {
         setSubmitting(true);
         setUploading(true);
         const urls = await uploadApplicationPhotos(photos);
+        const reportUrls = await uploadApplicationPhotos(reportPhotos);
         setUploading(false);
 
         if (formStartedAtRef.current == null) {
@@ -350,6 +357,7 @@ export function useApplicationFormState() {
           amount,
           payment: paymentPayload,
           images: urls,
+          reportImages: reportUrls,
           hpCompany,
           acknowledgedRules: trustAcknowledged && policiesAccepted,
           clientMeta: { filledMs, storyEditMs },
@@ -403,6 +411,7 @@ export function useApplicationFormState() {
 
         setSubmitted(true);
         setPhotos([]);
+        setReportPhotos([]);
         setTitle("");
         setSummary("");
         setStory("");
@@ -426,6 +435,8 @@ export function useApplicationFormState() {
       trustAcknowledged,
       policiesAccepted,
       photos,
+      reportPhotos,
+      approvedCount,
       valid,
       title,
       summary,
@@ -461,6 +472,8 @@ export function useApplicationFormState() {
     setBankName,
     photos,
     setPhotos,
+    reportPhotos,
+    setReportPhotos,
     uploading,
     submitting,
     err,

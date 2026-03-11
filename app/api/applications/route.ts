@@ -54,6 +54,7 @@ export async function POST(req: Request) {
     amount: string;
     payment: string;
     images: string[];
+    reportImages?: string[];
     hpCompany?: string;
     clientMeta?: {
       filledMs?: number | null;
@@ -94,6 +95,7 @@ export async function POST(req: Request) {
       amount,
       payment,
       images,
+      reportImages,
       hpCompany,
       clientMeta,
       acknowledgedRules,
@@ -305,6 +307,33 @@ export async function POST(req: Request) {
             sort: i,
           })),
         });
+      }
+
+      // Фото-отчёт по прошлой одобренной заявке:
+      // если есть последняя одобренная заявка и переданы reportImages —
+      // сохраняем их как отдельные записи, перезаписывая предыдущий отчёт.
+      if (
+        Array.isArray(reportImages) &&
+        reportImages.length > 0 &&
+        lastApprovedByUser?.id
+      ) {
+        const urls = reportImages.slice(
+          0,
+          session.role === "ADMIN" ? reportImages.length : 5,
+        );
+        const reportModel = (tx as any).applicationReportImage;
+        if (reportModel) {
+          await reportModel.deleteMany({
+            where: { applicationId: lastApprovedByUser.id },
+          });
+          await reportModel.createMany({
+            data: urls.map((url, index) => ({
+              applicationId: lastApprovedByUser.id,
+              url,
+              sort: index,
+            })),
+          });
+        }
       }
 
       return app;

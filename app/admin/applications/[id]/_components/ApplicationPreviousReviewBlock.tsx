@@ -42,16 +42,15 @@ export default function ApplicationPreviousReviewBlock({
               d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
             />
           </svg>
-          Проверка: отзыв по прошлой заявке
+          Проверка: отчёт по прошлой заявке
         </h3>
       )}
 
       {!data ? (
         <div
-          className="rounded-lg sm:rounded-xl p-3 sm:p-4 border min-w-0"
+          className="rounded-2xl p-3 sm:p-4 border min-w-0 bg-gradient-to-br from-[#004643]/80 via-[#004643]/70 to-[#001e1d]/80"
           style={{
-            borderColor: "rgba(171, 209, 198, 0.35)",
-            backgroundColor: "rgba(0, 30, 29, 0.4)",
+            borderColor: "rgba(171, 209, 198, 0.4)",
             color: "#94a1b2",
           }}
         >
@@ -61,10 +60,9 @@ export default function ApplicationPreviousReviewBlock({
         </div>
       ) : !data.review ? (
         <div
-          className="rounded-lg sm:rounded-xl p-3 sm:p-4 border min-w-0"
+          className="rounded-2xl p-3 sm:p-4 border min-w-0 bg-gradient-to-br from-[#f9bc60]/15 via-[#004643]/70 to-[#001e1d]/85"
           style={{
-            borderColor: "rgba(249, 188, 96, 0.5)",
-            backgroundColor: "rgba(249, 188, 96, 0.08)",
+            borderColor: "rgba(249, 188, 96, 0.7)",
             color: "#f9bc60",
           }}
         >
@@ -79,14 +77,45 @@ export default function ApplicationPreviousReviewBlock({
             Открыть прошлую заявку: {data.title.slice(0, 50)}
             {data.title.length > 50 ? "…" : ""}
           </Link>
+
+          {data.reportImages && data.reportImages.length > 0 && (
+            <div className="mt-3">
+              <p
+                className="text-xs sm:text-sm font-medium mb-2"
+                style={{ color: "#abd1c6" }}
+              >
+                Фото-отчёт по прошлой заявке
+              </p>
+              <div className="flex flex-wrap gap-2 sm:gap-3">
+                {data.reportImages
+                  .slice()
+                  .sort((a, b) => a.sort - b.sort)
+                  .map((img, idx) => (
+                    <a
+                      key={`${img.url}-${idx}`}
+                      href={img.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-lg overflow-hidden border-2 hover:opacity-90 transition-opacity shrink-0"
+                      style={{ borderColor: "rgba(171, 209, 198, 0.5)" }}
+                    >
+                      <img
+                        src={img.url}
+                        alt={`Фото-отчёт ${idx + 1}`}
+                        className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 object-cover"
+                      />
+                    </a>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div>
           <div
-            className="rounded-xl p-2.5 sm:p-3 mb-2 sm:mb-3 border flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0"
+            className="rounded-xl p-2.5 sm:p-3 mb-2 sm:mb-3 border flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0 bg-gradient-to-r from-[#004643]/80 to-[#001e1d]/85"
             style={{
-              borderColor: "rgba(171, 209, 198, 0.35)",
-              backgroundColor: "rgba(0, 30, 29, 0.4)",
+              borderColor: "rgba(171, 209, 198, 0.5)",
               color: "#abd1c6",
             }}
           >
@@ -109,10 +138,9 @@ export default function ApplicationPreviousReviewBlock({
             </span>
           </div>
           <div
-            className="rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 border mb-2 sm:mb-3 whitespace-pre-wrap break-words text-sm sm:text-[15px] lg:text-base leading-relaxed min-w-0 overflow-hidden"
+            className="rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 border mb-2 sm:mb-3 whitespace-pre-wrap break-words text-sm sm:text-[15px] lg:text-base leading-relaxed min-w-0 overflow-hidden bg-gradient-to-br from-[#f9bc60]/18 via-[#004643]/80 to-[#001e1d]/90"
             style={{
-              backgroundColor: "rgba(249, 188, 96, 0.08)",
-              borderColor: "rgba(249, 188, 96, 0.35)",
+              borderColor: "rgba(249, 188, 96, 0.7)",
               color: "#f8fbfa",
             }}
           >
@@ -138,6 +166,34 @@ export default function ApplicationPreviousReviewBlock({
                     />
                   </a>
                 ))}
+            </div>
+          )}
+          {data.reportImages && data.reportImages.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs sm:text-sm font-medium mb-2" style={{ color: "#abd1c6" }}>
+                Фото-отчёт по прошлой заявке
+              </p>
+              <div className="flex flex-wrap gap-2 sm:gap-3">
+                {data.reportImages
+                  .slice()
+                  .sort((a, b) => a.sort - b.sort)
+                  .map((img, idx) => (
+                    <a
+                      key={`${img.url}-${idx}`}
+                      href={img.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-lg overflow-hidden border-2 hover:opacity-90 transition-opacity shrink-0"
+                      style={{ borderColor: "rgba(171, 209, 198, 0.5)" }}
+                    >
+                      <img
+                        src={img.url}
+                        alt={`Фото-отчёт ${idx + 1}`}
+                        className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 object-cover"
+                      />
+                    </a>
+                  ))}
+              </div>
             </div>
           )}
         </div>

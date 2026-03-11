@@ -64,6 +64,9 @@ type Props = {
   setPoliciesAccepted: (v: boolean) => void;
   ackError: boolean;
   trustSupportNotice?: ReactNode;
+  approvedCount: number | null;
+  reportPhotos: LocalImage[];
+  setReportPhotos: (v: LocalImage[]) => void;
 };
 
 export function ApplicationsForm(props: Props) {
@@ -110,6 +113,9 @@ export function ApplicationsForm(props: Props) {
     setPoliciesAccepted,
     ackError,
     trustSupportNotice,
+    approvedCount,
+    reportPhotos,
+    setReportPhotos,
   } = props;
   useEffect(() => {
     if (!err || !firstErrorKey || typeof document === "undefined") return;
@@ -330,6 +336,7 @@ export function ApplicationsForm(props: Props) {
             maxPhotos={limits.maxPhotos}
             delay={0.5}
             error={fieldErrors?.photos}
+            inputId="application-photos-upload"
           />
         </div>
 
@@ -346,6 +353,37 @@ export function ApplicationsForm(props: Props) {
         />
 
         {trustSupportNotice}
+
+        {approvedCount !== null && approvedCount >= 1 && (
+          <div
+            id="application-field-report"
+            className="rounded-2xl p-2 -mx-1 transition-all duration-300 border border-transparent"
+          >
+            <div className="mb-2 px-2">
+              <h3
+                className="flex items-center gap-2 text-sm sm:text-base font-semibold"
+                style={{ color: "#fffffe" }}
+              >
+                <span className="inline-flex w-7 h-7 rounded-xl bg-[#f9bc60]/20 border border-[#f9bc60]/40 items-center justify-center">
+                  <span className="text-[#f9bc60]">📷</span>
+                </span>
+                Отчёт по прошлой заявке (до 5 фото)
+              </h3>
+              <p className="text-xs sm:text-sm text-[#abd1c6] mt-1">
+                Прикрепите фото результата прошлой помощи: товар, чек,
+                переписку или другое подтверждение. Эти фото увидит только
+                админ при проверке следующих заявок.
+              </p>
+            </div>
+            <PhotoUpload
+              photos={reportPhotos}
+              onPhotosChange={setReportPhotos}
+              maxPhotos={5}
+              delay={0.55}
+              inputId="report-photos-upload"
+            />
+          </div>
+        )}
 
         <SubmitSection
           submitting={submitting}

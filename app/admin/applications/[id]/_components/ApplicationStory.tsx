@@ -7,6 +7,11 @@ interface ApplicationStoryProps {
 }
 
 export default function ApplicationStory({ story }: ApplicationStoryProps) {
+  const plainText = story.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const charCount = plainText.length;
+  const words = plainText ? plainText.split(" ").length : 0;
+  const readSeconds = words ? Math.max(5, Math.round((words / 180) * 60)) : 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -33,13 +38,18 @@ export default function ApplicationStory({ story }: ApplicationStoryProps) {
         </svg>
         История
       </h3>
+      {plainText && (
+        <div className="mb-2 flex flex-wrap items-center gap-3 text-[11px] sm:text-xs text-[#94a1b2]">
+          <span>
+            {charCount} символов • {words} слов
+          </span>
+          {readSeconds > 0 && (
+            <span>~{readSeconds} сек чтения</span>
+          )}
+        </div>
+      )}
       <div
-        className="break-words text-sm sm:text-[15px] lg:text-base leading-relaxed sm:leading-8 rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-5 lg:p-7 border prose prose-sm sm:prose-base max-w-none min-w-0 overflow-hidden shadow-[0_18px_48px_-30px_rgba(0,0,0,0.9)]"
-        style={{
-          backgroundColor: "#0e1f1d",
-          borderColor: "rgba(171, 209, 198, 0.35)",
-          color: "#f8fbfa",
-        }}
+        className="break-words text-sm sm:text-[15px] lg:text-base leading-relaxed sm:leading-8 rounded-2xl border border-[#abd1c6]/30 bg-gradient-to-br from-[#004643]/85 via-[#004643]/75 to-[#001e1d]/90 backdrop-blur-sm p-3 sm:p-5 lg:p-7 prose prose-sm sm:prose-base max-w-none min-w-0 overflow-hidden text-[#f8fbfa] shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
         dangerouslySetInnerHTML={{ __html: story }}
       />
       <style jsx global>{`

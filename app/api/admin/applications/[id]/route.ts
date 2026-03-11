@@ -11,6 +11,10 @@ type SameRef = {
   id: string;
   createdAt: Date;
   user: { id: string; email: string | null; name: string | null };
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CONTEST";
+  title: string | null;
+  summary: string | null;
+  amount: number | null;
 };
 
 export async function GET(
@@ -42,6 +46,7 @@ export async function GET(
         createdAt: true,
         updatedAt: true,
         countTowardsTrust: true,
+        trustDecreasedAtDecision: true,
         user: { select: { email: true, id: true, trustDelta: true } },
         images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
         review: {
@@ -86,6 +91,10 @@ export async function GET(
             },
           },
         },
+        reportImages: {
+          orderBy: { sort: "asc" },
+          select: { url: true, sort: true },
+        },
       },
     });
     const previousApprovedWithReview = previousApproved
@@ -94,6 +103,7 @@ export async function GET(
           title: previousApproved.title,
           createdAt: previousApproved.createdAt,
           review: previousApproved.review,
+          reportImages: previousApproved.reportImages,
         }
       : null;
 
@@ -115,6 +125,10 @@ export async function GET(
           createdAt: true,
           userId: true,
           payment: true,
+          status: true,
+          title: true,
+          summary: true,
+          amount: true,
         },
       });
       const matching = all.filter((a) => {
@@ -139,6 +153,10 @@ export async function GET(
             email: null,
             name: null,
           },
+          status: m.status,
+          title: m.title,
+          summary: m.summary,
+          amount: m.amount,
         }));
       }
     }
@@ -155,12 +173,20 @@ export async function GET(
         select: {
           id: true,
           createdAt: true,
+          status: true,
+          title: true,
+          summary: true,
+          amount: true,
           user: { select: { id: true, email: true, name: true } },
         },
       });
       sameIpApplications = others.map((a) => ({
         id: a.id,
         createdAt: a.createdAt,
+        status: a.status,
+        title: a.title,
+        summary: a.summary,
+        amount: a.amount,
         user: a.user,
       }));
     }

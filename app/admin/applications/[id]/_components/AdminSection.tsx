@@ -58,12 +58,7 @@ export default function AdminSection({
         <div className="min-w-0">{children}</div>
       ) : (
         <div
-          className="rounded-xl sm:rounded-2xl border p-3 sm:p-5 lg:p-6 min-w-0 overflow-hidden"
-          style={{
-            backgroundColor: "rgba(11, 22, 21, 0.95)",
-            borderColor: "rgba(171, 209, 198, 0.2)",
-            boxShadow: "0 4px 24px -8px rgba(0,0,0,0.3)",
-          }}
+          className="rounded-2xl border border-[#abd1c6]/30 bg-gradient-to-br from-[#004643]/90 via-[#004643]/80 to-[#001e1d]/90 p-3 sm:p-5 lg:p-6 min-w-0 overflow-hidden shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
         >
           {children}
         </div>

@@ -10,6 +10,8 @@ interface PhotoUploadProps {
   maxPhotos: number;
   delay?: number;
   error?: string;
+  /** Уникальный id для input/label, чтобы несколько блоков не конфликтовали */
+  inputId?: string;
 }
 
 export default function PhotoUpload({
@@ -18,6 +20,7 @@ export default function PhotoUpload({
   maxPhotos,
   delay = 0.5,
   error,
+  inputId = "photo-upload",
 }: PhotoUploadProps) {
   const prevUrlsRef = useRef<string[]>([]);
 
@@ -108,12 +111,12 @@ export default function PhotoUpload({
           accept="image/*"
           onChange={handleFileSelect}
           className="hidden"
-          id="photo-upload"
+          id={inputId}
         />
         <motion.label
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          htmlFor="photo-upload"
+          htmlFor={inputId}
           className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm font-medium rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl"
         >
           <LucideIcons.Upload size="sm" className="inline mr-2" />

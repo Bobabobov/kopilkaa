@@ -48,7 +48,8 @@ export default function ApplicationImages({
       )}
 
       {images.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
+        <div className="rounded-2xl border border-[#abd1c6]/25 bg-gradient-to-br from-[#004643]/80 via-[#004643]/70 to-[#001e1d]/80 p-3 sm:p-4 lg:p-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
           {images.map((img, i) => (
             (() => {
               const previewUrl = buildUploadUrl(img.url, { variant: "thumb" });
@@ -104,6 +105,7 @@ export default function ApplicationImages({
               );
             })()
           ))}
+          </div>
         </div>
       ) : (
         <div className="text-center py-8 sm:py-12" style={{ color: "#abd1c6" }}>

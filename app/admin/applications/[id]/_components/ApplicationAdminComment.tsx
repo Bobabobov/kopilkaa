@@ -17,8 +17,8 @@ export default function ApplicationAdminComment({
       className="mb-6 min-w-0 overflow-hidden"
     >
       <div
-        className="rounded-xl sm:rounded-2xl border p-3 sm:p-6 min-w-0"
-        style={{ backgroundColor: "#f9bc60/10", borderColor: "#f9bc60/30" }}
+        className="rounded-2xl border p-3 sm:p-6 min-w-0 bg-gradient-to-br from-[#f9bc60]/18 via-[#004643]/80 to-[#001e1d]/90"
+        style={{ borderColor: "rgba(249, 188, 96, 0.7)" }}
       >
         <h3
           className="flex items-center gap-2 font-semibold mb-3 text-base sm:text-lg"

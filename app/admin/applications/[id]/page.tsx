@@ -401,13 +401,13 @@ export default function AdminApplicationPage({
                     <span>
                       IP:{" "}
                       <span className="font-semibold">
-                        {item.sameIpApplications.length || 0}
+                        {(item.sameIpApplications?.length ?? 0) || 0}
                       </span>
                     </span>
                     <span>
                       Реквизиты:{" "}
                       <span className="font-semibold">
-                        {item.samePaymentApplications.length || 0}
+                        {(item.samePaymentApplications?.length ?? 0) || 0}
                       </span>
                     </span>
                   </div>

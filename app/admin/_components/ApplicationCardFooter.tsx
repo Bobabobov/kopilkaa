@@ -30,8 +30,8 @@ export default function ApplicationCardFooter({
           Отправлено: {new Date(createdAt).toLocaleString("ru-RU")}
         </span>
         <span className="hidden sm:inline text-[#abd1c6]/40">•</span>
-        <span className="text-[#abd1c6]/60">
-          ID: <span className="font-mono">{applicationId.slice(0, 8)}…</span>
+        <span className="text-[#abd1c6]/60 font-mono break-all" title={applicationId}>
+          ID: {applicationId}
         </span>
       </div>
 

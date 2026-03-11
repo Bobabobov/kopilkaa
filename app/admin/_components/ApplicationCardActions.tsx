@@ -41,13 +41,13 @@ export default function ApplicationCardActions({
   const [decreaseOnDecision, setDecreaseOnDecision] = useState(false);
 
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0 w-full lg:w-auto lg:min-w-0">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full min-w-0">
       <Badge status={it.status} />
 
       {/* Кнопки действий */}
-      <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+      <div className="flex flex-wrap gap-2 w-full min-w-0">
         <button
-          className="group min-h-[44px] px-3 py-2.5 sm:py-2 bg-[#001e1d]/60 hover:bg-[#001e1d]/80 text-[#abd1c6] hover:text-[#fffffe] rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm border border-[#abd1c6]/20 hover:border-[#f9bc60]/40 touch-manipulation"
+          className="group min-h-[42px] px-3 py-2 sm:py-2 rounded-xl transition-all duration-200 font-bold shadow-sm flex items-center justify-center gap-2 text-xs sm:text-sm border border-white/10 bg-white/5 text-[#abd1c6] hover:text-[#fffffe] hover:bg-white/10 hover:border-[#f9bc60]/30 touch-manipulation"
           onClick={() =>
             onEdit(
               it.id,
@@ -75,7 +75,7 @@ export default function ApplicationCardActions({
         </button>
 
         <button
-          className="group min-h-[44px] px-3 py-2.5 sm:py-2 bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm touch-manipulation"
+          className="group min-h-[42px] px-3 py-2 sm:py-2 bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white rounded-xl transition-all duration-200 font-bold shadow-sm flex items-center justify-center gap-2 text-xs sm:text-sm touch-manipulation"
           onClick={() => {
             onQuickApprove(
               it.id,
@@ -103,7 +103,7 @@ export default function ApplicationCardActions({
         </button>
 
         <button
-          className="group min-h-[44px] px-3 py-2.5 sm:py-2 bg-gradient-to-r from-[#e16162] to-[#dc2626] hover:from-[#dc2626] hover:to-[#b91c1c] text-white rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm touch-manipulation"
+          className="group min-h-[42px] px-3 py-2 sm:py-2 bg-gradient-to-r from-[#e16162] to-[#dc2626] hover:from-[#dc2626] hover:to-[#b91c1c] text-white rounded-xl transition-all duration-200 font-bold shadow-sm flex items-center justify-center gap-2 text-xs sm:text-sm touch-manipulation"
           onClick={() => {
             onQuickReject(
               it.id,
@@ -135,11 +135,11 @@ export default function ApplicationCardActions({
             type="button"
             onClick={() => onToggleTrust(it.id, !it.countTowardsTrust)}
             className={[
-              "min-h-[44px] px-3 py-2.5 sm:py-2 rounded-lg sm:rounded-xl border text-xs font-semibold transition-all duration-300 touch-manipulation",
+              "min-h-[42px] px-3 py-2 sm:py-2 rounded-xl border text-xs font-semibold transition-all duration-200 touch-manipulation",
               "flex items-center justify-center gap-2",
               it.countTowardsTrust
-                ? "bg-[#10B981]/15 text-[#abd1c6] border-[#10B981]/30 hover:border-[#10B981]/60"
-                : "bg-[#001e1d]/60 text-[#abd1c6] border-[#abd1c6]/20 hover:border-[#f9bc60]/40",
+                ? "bg-[#10B981]/12 text-[#abd1c6] border-[#10B981]/30 hover:border-[#10B981]/55"
+                : "bg-white/5 text-[#abd1c6] border-white/10 hover:border-[#f9bc60]/30 hover:bg-white/10",
             ].join(" ")}
             title="Учитывать ли эту заявку при подсчёте доверия"
           >
@@ -159,10 +159,10 @@ export default function ApplicationCardActions({
           </button>
         )}
 
-        <label className="flex items-center gap-2 text-xs text-[#abd1c6] min-h-[44px] py-1 cursor-pointer touch-manipulation">
+        <label className="flex items-center gap-2 text-xs text-[#abd1c6] min-h-[42px] px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer touch-manipulation">
           <input
             type="checkbox"
-            className="h-4 w-4 shrink-0"
+            className="h-4 w-4 shrink-0 accent-[#f9bc60]"
             checked={decreaseOnDecision}
             onChange={(e) => setDecreaseOnDecision(e.target.checked)}
           />
@@ -170,7 +170,7 @@ export default function ApplicationCardActions({
         </label>
 
         <button
-          className="group min-h-[44px] px-3 py-2.5 sm:py-2 bg-[#001e1d]/60 hover:bg-[#001e1d]/80 text-[#abd1c6] hover:text-[#e16162] rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-bold shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-xs sm:text-sm border border-[#abd1c6]/20 hover:border-[#e16162]/40 touch-manipulation"
+          className="group min-h-[42px] px-3 py-2 sm:py-2 rounded-xl transition-all duration-200 font-bold shadow-sm flex items-center justify-center gap-2 text-xs sm:text-sm border border-white/10 bg-white/5 text-[#abd1c6] hover:text-[#e16162] hover:bg-white/10 hover:border-[#e16162]/35 touch-manipulation"
           onClick={() => onDelete(it.id, it.title)}
           title="Удалить заявку"
         >

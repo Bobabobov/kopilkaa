@@ -15,15 +15,30 @@ interface ApplicationCardHeaderProps {
 function getStatusBadge(status: ApplicationItem["status"]) {
   switch (status) {
     case "PENDING":
-      return { label: "В обработке", className: "bg-[#f9bc60]/15 text-[#f9bc60]" };
+      return {
+        label: "В обработке",
+        className: "bg-[#f9bc60]/12 text-[#f9bc60] border border-[#f9bc60]/35",
+      };
     case "APPROVED":
-      return { label: "Одобрено", className: "bg-[#10B981]/15 text-[#10B981]" };
+      return {
+        label: "Одобрено",
+        className: "bg-[#10B981]/12 text-[#10B981] border border-[#10B981]/35",
+      };
     case "REJECTED":
-      return { label: "Отказано", className: "bg-[#e16162]/15 text-[#e16162]" };
+      return {
+        label: "Отказано",
+        className: "bg-[#e16162]/12 text-[#e16162] border border-[#e16162]/35",
+      };
     case "CONTEST":
-      return { label: "Конкурс", className: "bg-[#9b87f5]/15 text-[#9b87f5]" };
+      return {
+        label: "Конкурс",
+        className: "bg-[#9b87f5]/12 text-[#9b87f5] border border-[#9b87f5]/35",
+      };
     default:
-      return { label: status, className: "bg-[#abd1c6]/15 text-[#abd1c6]" };
+      return {
+        label: status,
+        className: "bg-white/5 text-[#abd1c6] border border-white/10",
+      };
   }
 }
 
@@ -59,22 +74,27 @@ export default function ApplicationCardHeader({
   const ageLabel = useMemo(() => getAgeLabel(it.createdAt), [it.createdAt]);
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 mb-4 sm:mb-6 min-w-0 flex-1 w-full">
+    <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 min-w-0 flex-1 w-full">
       <div className="min-w-0 flex-1 basis-0 w-full overflow-visible flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
           <span
-            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-bold ${statusBadge.className}`}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-bold backdrop-blur-sm ${statusBadge.className}`}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-current" />
             {statusBadge.label}
           </span>
           {it.countTowardsTrust && (
-            <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-bold bg-[#004643] text-[#abd1c6] border border-[#abd1c6]/30">
+            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-bold bg-white/5 text-[#abd1c6] border border-white/10 backdrop-blur-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-[#f9bc60]" />
               Влияет на доверие
             </span>
           )}
-          <span className="text-[#abd1c6]/80">ID: {it.id.slice(0, 6)}…</span>
+          <span
+            className="text-[#abd1c6]/80 font-mono break-all"
+            title={it.id}
+          >
+            ID: {it.id}
+          </span>
           <span className="text-[#abd1c6]/60">Создана: {ageLabel}</span>
         </div>
 

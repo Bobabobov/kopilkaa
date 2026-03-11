@@ -89,13 +89,22 @@ export default function ApplicationCardHeader({
               Влияет на доверие
             </span>
           )}
-          <span
-            className="text-[#abd1c6]/80 font-mono break-all"
-            title={it.id}
-          >
-            ID: {it.id}
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-sm">
+            <span className="text-[#abd1c6]/80 font-semibold">ID</span>
+            <span
+              className="font-mono text-[#fffffe] font-bold break-all"
+              title={it.id}
+            >
+              {it.id}
+            </span>
           </span>
-          <span className="text-[#abd1c6]/60">Создана: {ageLabel}</span>
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[#abd1c6] backdrop-blur-sm">
+            <span className="inline-flex w-5 h-5 items-center justify-center rounded-full bg-white/10 border border-white/10">
+              <span className="block w-2 h-2 rounded-full bg-[#f9bc60]" />
+            </span>
+            <span className="font-semibold">Создана:</span>
+            <span className="text-[#fffffe] font-bold">{ageLabel}</span>
+          </span>
         </div>
 
         <Link
@@ -118,7 +127,7 @@ export default function ApplicationCardHeader({
         </div>
       </div>
 
-      <div className="flex-shrink-0 flex items-start gap-3">
+      <div className="flex-shrink-0 flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-3 sm:p-3.5">
         <div className="w-10 h-10 sm:w-9 sm:h-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-[#abd1c6]/30">
           {(() => {
             const frame = getAvatarFrame(it.user.avatarFrame || "none");
@@ -161,11 +170,13 @@ export default function ApplicationCardHeader({
           })()}
         </div>
         <div className="min-w-0">
-          <div className="text-sm text-[#abd1c6] break-words line-clamp-2 sm:text-xs">
-            <span className="font-bold">Автор:</span>{" "}
+          <div className="text-xs text-[#abd1c6]/80 uppercase tracking-wide">
+            Автор
+          </div>
+          <div className="text-sm text-[#fffffe] break-words line-clamp-2 sm:text-sm font-bold">
             <Link
               href={`/profile/${it.user.id}`}
-              className="text-[#f9bc60] hover:text-[#e8a545] hover:underline transition-colors font-semibold"
+              className="text-[#f9bc60] hover:text-[#e8a545] hover:underline transition-colors"
               target="_blank"
               rel="noopener noreferrer"
             >

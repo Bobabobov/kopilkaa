@@ -1,7 +1,6 @@
 // app/admin/components/ApplicationCardActions.tsx
 "use client";
 import { useState } from "react";
-import Badge from "./Badge";
 import type { ApplicationStatus } from "../types";
 import type { ApplicationItem } from "../types";
 
@@ -42,8 +41,6 @@ export default function ApplicationCardActions({
 
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full min-w-0">
-      <Badge status={it.status} />
-
       {/* Кнопки действий */}
       <div className="flex flex-wrap gap-2 w-full min-w-0">
         <button
@@ -138,39 +135,52 @@ export default function ApplicationCardActions({
               "min-h-[42px] px-3 py-2 sm:py-2 rounded-xl border text-xs font-semibold transition-all duration-200 touch-manipulation",
               "flex items-center justify-center gap-2",
               it.countTowardsTrust
-                ? "bg-[#10B981]/12 text-[#abd1c6] border-[#10B981]/30 hover:border-[#10B981]/55"
+                ? "bg-[#10B981]/12 text-[#fffffe] border-[#10B981]/35 hover:border-[#10B981]/55"
                 : "bg-white/5 text-[#abd1c6] border-white/10 hover:border-[#f9bc60]/30 hover:bg-white/10",
             ].join(" ")}
             title="Учитывать ли эту заявку при подсчёте доверия"
           >
-            <span
-              className={[
-                "inline-flex h-3.5 w-3.5 items-center justify-center rounded border",
-                it.countTowardsTrust
-                  ? "border-[#10B981]/60 bg-[#10B981]/40"
-                  : "border-[#abd1c6]/30 bg-transparent",
-              ].join(" ")}
-            >
-              {it.countTowardsTrust ? (
-                <span className="block h-2 w-2 rounded bg-[#10B981]" />
-              ) : null}
+            <span className="relative inline-flex h-5 w-9 items-center rounded-full border border-white/10 bg-white/10">
+              <span
+                className={[
+                  "absolute h-4 w-4 rounded-full transition-transform",
+                  it.countTowardsTrust
+                    ? "translate-x-[18px] bg-[#10B981]"
+                    : "translate-x-[2px] bg-[#abd1c6]/60",
+                ].join(" ")}
+              />
             </span>
-            <span>Засчитывать для доверия</span>
+            <span className="whitespace-nowrap">Засчитывать для доверия</span>
           </button>
         )}
 
-        <label className="flex items-center gap-2 text-xs text-[#abd1c6] min-h-[42px] px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer touch-manipulation">
-          <input
-            type="checkbox"
-            className="h-4 w-4 shrink-0 accent-[#f9bc60]"
-            checked={decreaseOnDecision}
-            onChange={(e) => setDecreaseOnDecision(e.target.checked)}
-          />
-          <span>Понизить уровень на 1</span>
-        </label>
+        <button
+          type="button"
+          onClick={() => setDecreaseOnDecision((v) => !v)}
+          className={[
+            "min-h-[42px] px-3 py-2 rounded-xl border text-xs font-semibold transition-all duration-200 touch-manipulation",
+            "flex items-center justify-center gap-2",
+            decreaseOnDecision
+              ? "bg-[#e16162]/12 text-[#fffffe] border-[#e16162]/35 hover:border-[#e16162]/55"
+              : "bg-white/5 text-[#abd1c6] border-white/10 hover:border-[#e16162]/30 hover:bg-white/10",
+          ].join(" ")}
+          title="При решении по заявке понизить уровень доверия на 1"
+        >
+          <span className="relative inline-flex h-5 w-9 items-center rounded-full border border-white/10 bg-white/10">
+            <span
+              className={[
+                "absolute h-4 w-4 rounded-full transition-transform",
+                decreaseOnDecision
+                  ? "translate-x-[18px] bg-[#e16162]"
+                  : "translate-x-[2px] bg-[#abd1c6]/60",
+              ].join(" ")}
+            />
+          </span>
+          <span className="whitespace-nowrap">Понизить уровень на 1</span>
+        </button>
 
         <button
-          className="group min-h-[42px] px-3 py-2 sm:py-2 rounded-xl transition-all duration-200 font-bold shadow-sm flex items-center justify-center gap-2 text-xs sm:text-sm border border-white/10 bg-white/5 text-[#abd1c6] hover:text-[#e16162] hover:bg-white/10 hover:border-[#e16162]/35 touch-manipulation"
+          className="group min-h-[42px] px-3 py-2 sm:py-2 rounded-xl transition-all duration-200 font-bold shadow-sm flex items-center justify-center gap-2 text-xs sm:text-sm border border-[#e16162]/35 bg-[#e16162]/10 text-[#e16162] hover:bg-[#e16162]/15 hover:border-[#e16162]/55 touch-manipulation"
           onClick={() => onDelete(it.id, it.title)}
           title="Удалить заявку"
         >

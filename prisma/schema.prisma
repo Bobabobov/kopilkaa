@@ -83,7 +83,7 @@ model Application {
   payment      String
   status       ApplicationStatus  @default(PENDING)
   publishInStories Boolean        @default(false)
-  countTowardsTrust Boolean      @default(true)
+  countTowardsTrust Boolean      @default(false)
   /** При решении по заявке админ включил «Понизить уровень на 1» */
   trustDecreasedAtDecision Boolean @default(false)
   adminComment String?

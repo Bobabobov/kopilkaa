@@ -58,10 +58,6 @@ export default function AdminUnifiedWorkspace({
     () => items.filter((item) => item.status === "PENDING"),
     [items],
   );
-  const urgentPending = useMemo(
-    () => pendingItems.filter((item) => item.amount >= 100_000),
-    [pendingItems],
-  );
   const newestPending = pendingItems[0] ?? null;
   const newestPendingAge = newestPending ? hoursSince(newestPending.createdAt) : null;
 
@@ -129,7 +125,6 @@ export default function AdminUnifiedWorkspace({
             <AdminOverviewSection
               stats={stats}
               pendingCount={stats?.pending ?? 0}
-              urgentCount={urgentPending.length}
               newestTitle={newestPending?.title ?? null}
               newestAgeHours={newestPendingAge}
             />

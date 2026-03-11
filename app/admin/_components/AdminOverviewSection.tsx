@@ -6,7 +6,6 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 interface AdminOverviewSectionProps {
   stats: Stats | null;
   pendingCount: number;
-  urgentCount: number;
   newestTitle: string | null;
   newestAgeHours: number | null;
 }
@@ -14,7 +13,6 @@ interface AdminOverviewSectionProps {
 export function AdminOverviewSection({
   stats,
   pendingCount,
-  urgentCount,
   newestTitle,
   newestAgeHours,
 }: AdminOverviewSectionProps) {
@@ -26,7 +24,7 @@ export function AdminOverviewSection({
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 mb-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-2">
         <div className="rounded-2xl border border-[#f9bc60]/25 bg-[#f9bc60]/10 p-4">
           <div className="mb-1 flex items-center gap-2 text-[#f9bc60]">
             <LucideIcons.Clock size="sm" />
@@ -36,19 +34,6 @@ export function AdminOverviewSection({
           </div>
           <div className="text-2xl font-black text-[#fffffe]">{pendingCount}</div>
           <div className="text-xs text-[#abd1c6]">статус “В обработке”</div>
-        </div>
-
-        <div className="rounded-2xl border border-[#e16162]/25 bg-[#e16162]/10 p-4">
-          <div className="mb-1 flex items-center gap-2 text-[#e16162]">
-            <LucideIcons.AlertTriangle size="sm" />
-            <span className="text-xs font-black uppercase tracking-wide">
-              Приоритет
-            </span>
-          </div>
-          <div className="text-2xl font-black text-[#fffffe]">{urgentCount}</div>
-          <div className="text-xs text-[#abd1c6]">
-            от 100 000 руб. среди “В обработке”
-          </div>
         </div>
 
         <div className="rounded-2xl border border-[#abd1c6]/25 bg-[#abd1c6]/10 p-4">

@@ -30,8 +30,14 @@ export default function ApplicationCardFooter({
           Отправлено: {new Date(createdAt).toLocaleString("ru-RU")}
         </span>
         <span className="hidden sm:inline text-[#abd1c6]/40">•</span>
-        <span className="text-[#abd1c6]/60 font-mono break-all" title={applicationId}>
-          ID: {applicationId}
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-sm">
+          <span className="text-[#abd1c6]/80 font-semibold">ID</span>
+          <span
+            className="font-mono text-[#fffffe] font-bold break-all"
+            title={applicationId}
+          >
+            {applicationId}
+          </span>
         </span>
       </div>
 

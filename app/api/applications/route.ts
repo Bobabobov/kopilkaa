@@ -288,6 +288,7 @@ export async function POST(req: Request) {
           story: sanitizedStory,
           amount: amountNumber,
           payment,
+          countTowardsTrust: false,
           filledMs: clampedFilledMs,
           storyEditMs: clampedStoryEditMs,
           submitterIp: submitterIp || undefined,

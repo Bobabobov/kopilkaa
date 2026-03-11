@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import RichTextEditor from "@/components/applications/RichTextEditor";
 import PhotoUpload from "@/components/applications/PhotoUpload";
 import SubmitSection from "@/components/applications/SubmitSection";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 type LocalImage = { file: File; url: string };
 
@@ -365,7 +366,7 @@ export function ApplicationsForm(props: Props) {
                 style={{ color: "#fffffe" }}
               >
                 <span className="inline-flex w-7 h-7 rounded-xl bg-[#f9bc60]/20 border border-[#f9bc60]/40 items-center justify-center">
-                  <span className="text-[#f9bc60]">📷</span>
+                  <LucideIcons.Image size="xs" className="text-[#f9bc60]" />
                 </span>
                 Отчёт по прошлой заявке (до 5 фото)
               </h3>

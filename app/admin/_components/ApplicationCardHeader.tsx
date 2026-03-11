@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useMemo } from "react";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { getAvatarFrame } from "@/lib/header-customization";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 import type { ApplicationItem } from "../types";
 
 interface ApplicationCardHeaderProps {
@@ -72,6 +73,17 @@ export default function ApplicationCardHeader({
 
   const statusBadge = getStatusBadge(it.status);
   const ageLabel = useMemo(() => getAgeLabel(it.createdAt), [it.createdAt]);
+
+  const deviceLabel =
+    it.clientDevice === "android"
+      ? "Android"
+      : it.clientDevice === "ios"
+        ? "iPhone"
+        : it.clientDevice === "desktop"
+          ? "ПК"
+          : it.clientDevice
+            ? it.clientDevice
+            : null;
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 min-w-0 flex-1 w-full">
@@ -195,6 +207,13 @@ export default function ApplicationCardHeader({
               </button>
             )}
           </div>
+          {deviceLabel && (
+            <div className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-[#abd1c6]">
+              <LucideIcons.Smartphone size="xs" className="opacity-80" />
+              <span className="font-semibold">Устройство:</span>
+              <span className="text-[#fffffe] font-medium">{deviceLabel}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

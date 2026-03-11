@@ -41,6 +41,21 @@ function getWhitelistEmails(): string[] {
     .filter(Boolean);
 }
 
+function getClientDevice(req: Request): string {
+  const ua = (req.headers.get("user-agent") || "").toLowerCase();
+  if (!ua) return "other";
+  if (ua.includes("iphone") || ua.includes("ipad") || ua.includes("ios")) {
+    return "ios";
+  }
+  if (ua.includes("android")) {
+    return "android";
+  }
+  if (ua.includes("windows") || ua.includes("macintosh") || ua.includes("linux")) {
+    return "desktop";
+  }
+  return "other";
+}
+
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session) {
@@ -278,6 +293,7 @@ export async function POST(req: Request) {
     }
 
     const submitterIp = getClientIp(req);
+    const clientDevice = getClientDevice(req);
 
     // Используем транзакцию для атомарности
     const result = await prisma.$transaction(async (tx) => {
@@ -294,6 +310,7 @@ export async function POST(req: Request) {
           filledMs: clampedFilledMs,
           storyEditMs: clampedStoryEditMs,
           submitterIp: submitterIp || undefined,
+          clientDevice,
         },
         select: { id: true },
       });

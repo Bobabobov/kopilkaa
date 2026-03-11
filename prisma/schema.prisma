@@ -91,6 +91,7 @@ model Application {
   /** Время от первого до последнего изменения поля «Подробная история» (мс); для детекции вставки+ожидания */
   storyEditMs  Int?
   submitterIp  String?           // IP при подаче заявки (для админки: поиск дублей)
+  clientDevice String?           // Устройство при подаче: desktop/android/ios/other
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 

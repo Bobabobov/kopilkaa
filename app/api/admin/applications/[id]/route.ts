@@ -43,6 +43,7 @@ export async function GET(
         filledMs: true,
         storyEditMs: true,
         submitterIp: true,
+        clientDevice: true,
         createdAt: true,
         updatedAt: true,
         countTowardsTrust: true,

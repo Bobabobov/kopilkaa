@@ -74,6 +74,7 @@ export async function GET(req: Request) {
           status: true,
           publishInStories: true,
           adminComment: true,
+          clientDevice: true,
           createdAt: true,
           updatedAt: true,
           filledMs: true,

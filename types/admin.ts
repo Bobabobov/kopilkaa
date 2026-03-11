@@ -24,6 +24,7 @@ export type ApplicationItem = {
   createdAt: string;
   countTowardsTrust: boolean;
   trustDecreasedAtDecision?: boolean;
+   clientDevice?: string | null;
   user: {
     email: string;
     id: string;

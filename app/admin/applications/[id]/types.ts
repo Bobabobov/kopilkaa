@@ -47,6 +47,7 @@ export type ApplicationItem = {
   filledMs?: number | null;
   storyEditMs?: number | null;
   submitterIp?: string | null;
+  clientDevice?: string | null;
   createdAt: string;
   user: { email: string; id: string };
   images: { url: string; sort: number }[];

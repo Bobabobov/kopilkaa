@@ -97,8 +97,10 @@ export function middleware(req: NextRequest) {
     windowMs = 60_000;
     retryAfterSec = 60;
   } else if (isPost && isUploadsApi) {
-    // Загрузка файлов: 20 запросов/5 минут на IP
-    limit = 20;
+    // Загрузка файлов: для админских сценариев (отчёты, модерация) лимит делаем
+    // практически неограниченным, чтобы не мешать работе. Оставляем мягкий
+    // upper bound только как защиту от откровенного спама.
+    limit = 200;
     windowMs = 5 * 60_000;
     retryAfterSec = 5 * 60;
   } else if (

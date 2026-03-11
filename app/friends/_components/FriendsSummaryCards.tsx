@@ -20,17 +20,21 @@ export function FriendsSummaryCards({
       {items.map((item) => (
         <div
           key={item.label}
-          className={`rounded-2xl border ${item.color} p-3 sm:p-4 flex items-center gap-3 shadow-md min-w-0`}
+          className={`rounded-2xl border ${item.color} p-4 sm:p-5 flex items-center gap-4 min-w-0 bg-[#004643]/60 backdrop-blur-sm transition-all duration-200 hover:border-opacity-60`}
         >
-          <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 border border-white/10">
             {item.icon}
           </div>
           <div className="min-w-0">
-            <p className="text-sm text-[#abd1c6]">{item.label}</p>
-            <p className="text-xl font-bold text-[#fffffe]">
+            <p className="text-xs sm:text-sm font-semibold text-[#abd1c6] uppercase tracking-wide">
+              {item.label}
+            </p>
+            <p className="text-xl sm:text-2xl font-black text-[#fffffe] mt-0.5">
               {item.value}
               {item.hint && (
-                <span className="ml-2 text-xs text-[#f9bc60]">{item.hint}</span>
+                <span className="ml-2 text-xs font-semibold text-[#f9bc60]">
+                  {item.hint}
+                </span>
               )}
             </p>
           </div>

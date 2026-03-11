@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
 interface FriendsOnlineListProps {
@@ -37,8 +38,14 @@ export function FriendsOnlineList({
 
   if (onlineUsers.length === 0) {
     return (
-      <div className="text-center py-12 rounded-2xl border border-dashed border-[#abd1c6]/30 bg-[#001e1d]/40">
-        <p className="text-[#abd1c6]">Сейчас никого нет в сети</p>
+      <div className="text-center py-12 px-4 rounded-2xl border border-dashed border-white/10 bg-[#004643]/40 backdrop-blur-sm">
+        <div className="inline-flex w-14 h-14 rounded-full bg-[#abd1c6]/10 items-center justify-center mb-4">
+          <LucideIcons.Activity size="lg" className="text-[#abd1c6]" />
+        </div>
+        <p className="text-[#fffffe] font-semibold mb-1">Никого нет в сети</p>
+        <p className="text-[#abd1c6] text-sm">
+          Сейчас никто из пользователей не онлайн. Загляните позже.
+        </p>
       </div>
     );
   }
@@ -52,7 +59,7 @@ export function FriendsOnlineList({
       {onlineUsers.map((user: any) => (
         <div
           key={user.id}
-          className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-[#001e1d]/25 rounded-xl border border-[#abd1c6]/15 hover:border-[#f9bc60]/30 transition-colors w-full min-w-0"
+          className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl border border-white/[0.08] bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] shadow-[0_4px_24px_rgba(0,0,0,0.2)] w-full min-w-0 transition-all duration-200 hover:border-white/15 hover:shadow-lg hover:shadow-black/20"
         >
           <Link
             href={`/profile/${user.id}`}

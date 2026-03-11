@@ -2,8 +2,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import StatsCards from "./_components/StatsCards";
-import ControlPanel from "./_components/ControlPanel";
 import ApplicationsGrid from "./_components/ApplicationsGrid";
 import StatusModal from "./_components/StatusModal";
 import ImageLightbox from "./_components/ImageLightbox";
@@ -12,6 +10,7 @@ import { AdminHeader } from "./_components/AdminHeader";
 import { DeleteModal } from "./_components/DeleteModal";
 import { AdminLoadingIndicator } from "./_components/AdminLoadingIndicator";
 import { AdminEndMessage } from "./_components/AdminEndMessage";
+import AdminUnifiedWorkspace from "./_components/AdminUnifiedWorkspace";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useAdminApplications } from "@/hooks/admin/useAdminApplications";
 import { useAdminActions } from "@/hooks/admin/useAdminActions";
@@ -125,18 +124,25 @@ export default function AdminClient() {
     return <AdminLoading />;
   }
 
+  const handleResetFilters = () => {
+    setQ("");
+    setStatus("ALL");
+    setMinAmount("");
+    setMaxAmount("");
+    setSortBy("date");
+    setSortOrder("desc");
+  };
+
   return (
     <div className="min-h-screen relative overflow-x-hidden">
       <div className="relative z-10 min-w-0">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12 min-w-0">
           <AdminHeader />
 
-          {/* Статистика */}
-          {stats && <StatsCards stats={stats} />}
-
-          {/* Панель управления */}
-          <ControlPanel
-            searchQuery={q}
+          <AdminUnifiedWorkspace
+            stats={stats}
+            items={items}
+            q={q}
             status={status}
             minAmount={minAmount}
             maxAmount={maxAmount}
@@ -148,14 +154,7 @@ export default function AdminClient() {
             onMaxAmountChange={setMaxAmount}
             onSortByChange={setSortBy}
             onSortOrderChange={setSortOrder}
-            onReset={() => {
-              setQ("");
-              setStatus("ALL");
-              setMinAmount("");
-              setMaxAmount("");
-              setSortBy("date");
-              setSortOrder("desc");
-            }}
+            onReset={handleResetFilters}
           />
 
           {/* Список заявок */}

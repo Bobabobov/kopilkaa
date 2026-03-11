@@ -34,7 +34,7 @@ export function SocialLinks({ user, className }: SocialLinksProps) {
           href={vk}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
+          className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10 hover:bg-[#4c75a3]/15 border border-white/20 hover:border-[#4c75a3]/40 text-[#4c75a3] transition-all"
           aria-label="VK"
           whileHover={{ scale: 1.05 }}
         >
@@ -46,7 +46,7 @@ export function SocialLinks({ user, className }: SocialLinksProps) {
           href={tg}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
+          className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10 hover:bg-[#229ED9]/15 border border-white/20 hover:border-[#229ED9]/45 text-[#229ED9] transition-all"
           aria-label="Telegram"
           whileHover={{ scale: 1.05 }}
         >
@@ -58,7 +58,7 @@ export function SocialLinks({ user, className }: SocialLinksProps) {
           href={yt}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
+          className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10 hover:bg-[#ff4f45]/15 border border-white/20 hover:border-[#ff4f45]/45 text-[#ff4f45] transition-all"
           aria-label="YouTube"
           whileHover={{ scale: 1.05 }}
         >

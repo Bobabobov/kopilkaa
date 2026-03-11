@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
@@ -41,6 +41,8 @@ export function FriendsSearch({
   const showNoResults =
     hasEnoughChars && !searchLoading && searchResults.length === 0;
 
+  const [onlineOnly, setOnlineOnly] = useState(false);
+
   // Сначала онлайн, потом остальные
   const sortedResults = useMemo(() => {
     return [...searchResults].sort((a, b) => {
@@ -60,6 +62,16 @@ export function FriendsSearch({
     [searchResults, getUserStatus],
   );
 
+  const visibleResults = useMemo(
+    () =>
+      onlineOnly
+        ? sortedResults.filter(
+            (u) => getUserStatus(u.lastSeen ?? null).status === "online",
+          )
+        : sortedResults,
+    [sortedResults, onlineOnly, getUserStatus],
+  );
+
   let content: React.ReactNode;
   if (searchLoading) {
     content = (
@@ -70,8 +82,8 @@ export function FriendsSearch({
     );
   } else if (showEmptyState) {
     content = (
-      <div className="text-center py-12 px-4 rounded-2xl border border-dashed border-[#abd1c6]/30 bg-[#001e1d]/40">
-        <div className="inline-flex w-14 h-14 rounded-full bg-[#abd1c6]/10 items-center justify-center mb-4">
+      <div className="text-center py-12 px-4 rounded-2xl border border-dashed border-white/10 bg-[#004643]/40 backdrop-blur-sm">
+        <div className="inline-flex w-14 h-14 rounded-full bg-white/10 items-center justify-center mb-4">
           <LucideIcons.Search size="lg" className="w-7 h-7 text-[#abd1c6]" />
         </div>
         <p className="text-[#fffffe] font-medium mb-1">
@@ -86,7 +98,7 @@ export function FriendsSearch({
     );
   } else if (showNoResults) {
     content = (
-      <div className="text-center py-12 rounded-2xl border border-dashed border-[#abd1c6]/30 bg-[#001e1d]/40">
+      <div className="text-center py-12 rounded-2xl border border-dashed border-white/10 bg-[#004643]/40 backdrop-blur-sm">
         <p className="text-[#abd1c6]">Пользователи не найдены</p>
       </div>
     );
@@ -103,13 +115,19 @@ export function FriendsSearch({
             В сети сейчас: {onlineCount}
           </p>
         )}
-        {sortedResults.map((user: any) => {
+        {visibleResults.length === 0 && onlineOnly && (
+          <p className="text-xs text-[#abd1c6]/80">
+            Сейчас никто из найденных не в сети. Снимите фильтр "Только онлайн",
+            чтобы увидеть всех.
+          </p>
+        )}
+        {visibleResults.map((user: any) => {
           const status = getUserStatus(user.lastSeen ?? null);
           const isOnline = status.status === "online";
           return (
             <div
               key={user.id}
-              className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-[#001e1d]/25 rounded-xl border border-[#abd1c6]/15 hover:border-[#f9bc60]/30 transition-colors w-full min-w-0"
+              className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl border border-white/[0.08] bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] shadow-[0_4px_24px_rgba(0,0,0,0.2)] w-full min-w-0 transition-all duration-200 hover:border-white/15 hover:shadow-lg hover:shadow-black/20"
             >
               <Link
                 href={`/profile/${user.id}`}
@@ -218,6 +236,28 @@ export function FriendsSearch({
 
   return (
     <div className="space-y-4 min-w-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#f9bc60] to-[#e8a545] flex items-center justify-center shadow-lg">
+            <LucideIcons.Users size="sm" className="text-[#001e1d]" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm sm:text-base font-semibold text-[#fffffe]">
+              Поиск друзей
+            </p>
+            <p className="text-[11px] sm:text-xs text-[#abd1c6]">
+              Имя, @логин или email. Минимум 2 символа.
+            </p>
+          </div>
+        </div>
+        {onlineCount > 0 && (
+          <div className="hidden sm:flex items-center gap-1 text-[11px] text-[#10B981] bg-[#001e1d]/60 px-2.5 py-1 rounded-full border border-[#10B981]/40">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+            В сети: {onlineCount}
+          </div>
+        )}
+      </div>
+
       <div className="relative">
         <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#abd1c6]">
           <LucideIcons.Search size="sm" className="w-4 h-4" />
@@ -227,9 +267,29 @@ export function FriendsSearch({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Имя или @логин (минимум 2 символа)"
-          className="w-full pl-10 pr-4 py-3 bg-[#001e1d]/25 border border-[#abd1c6]/30 rounded-xl text-[#fffffe] placeholder-[#abd1c6] focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent"
+          className="w-full pl-10 pr-4 py-3 bg-[#001e1d]/40 border border-[#abd1c6]/25 rounded-2xl text-[#fffffe] placeholder-[#abd1c6] focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent shadow-[0_18px_45px_-24px_rgba(0,0,0,0.8)]"
         />
       </div>
+      {searchResults.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-[#abd1c6]">Фильтры:</span>
+          <button
+            type="button"
+            onClick={() => setOnlineOnly((prev) => !prev)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border transition-colors ${
+              onlineOnly
+                ? "bg-[#10B981]/20 border-[#10B981]/60 text-[#e0fdf4]"
+                : "bg-[#001e1d]/40 border-[#abd1c6]/40 text-[#abd1c6] hover:border-[#f9bc60]/60"
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+            Только онлайн
+            {onlineCount > 0 && (
+              <span className="opacity-80">· {onlineCount}</span>
+            )}
+          </button>
+        </div>
+      )}
       {content}
     </div>
   );

@@ -153,20 +153,20 @@ export default function FriendsPageClient() {
       label: "Всего друзей",
       value: friends.length,
       icon: <LucideIcons.Users className="text-[#f9bc60]" size="sm" />,
-      color: "bg-white/5 border-[#f9bc60]/20",
+      color: "border-[#f9bc60]/25",
     },
     {
       label: "Входящие заявки",
       value: receivedRequests.length,
       icon: <LucideIcons.UserPlus className="text-[#10B981]" size="sm" />,
-      color: "bg-white/5 border-[#10B981]/20",
+      color: "border-[#10B981]/25",
       hint: newRequestsCount > 0 ? `${newRequestsCount} новых` : undefined,
     },
     {
       label: "Отправленные",
       value: sentRequests.length,
       icon: <LucideIcons.Send className="text-[#3b82f6]" size="sm" />,
-      color: "bg-white/5 border-[#3b82f6]/20",
+      color: "border-[#3b82f6]/25",
     },
   ];
 
@@ -180,8 +180,8 @@ export default function FriendsPageClient() {
   };
 
   return (
-    <div className="min-h-screen text-[#fffffe]">
-      <div className="w-full max-w-[1280px] mx-auto px-3 sm:px-5 lg:px-8 py-8 sm:py-10 lg:py-12 space-y-6 sm:space-y-8 min-w-0">
+    <div className="min-h-screen text-[#fffffe] relative z-10">
+      <div className="w-full max-w-[1280px] mx-auto px-2 xs:px-3 sm:px-4 md:px-5 lg:px-6 py-6 xs:py-8 sm:py-10 md:pb-12 space-y-5 sm:space-y-6 min-w-0">
         {/* Шапка */}
         <FriendsPageHeader onGoToSearch={goToSearch} onRefresh={refresh} />
 
@@ -190,7 +190,7 @@ export default function FriendsPageClient() {
 
         {/* Контент + боковая панель */}
         <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px] gap-4 lg:gap-6 items-start min-w-0">
-          <div className="bg-[#052d29] rounded-2xl border border-[#abd1c6]/20 shadow-2xl overflow-hidden min-w-0">
+          <div className="rounded-2xl border border-white/[0.08] bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] shadow-[0_4px_24px_rgba(0,0,0,0.2)] overflow-hidden min-w-0">
             <FriendsTabsBar
               tabs={tabs}
               activeTab={activeTab}
@@ -208,7 +208,16 @@ export default function FriendsPageClient() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
+                    className="space-y-4"
                   >
+                    <div className="mb-1">
+                      <h2 className="text-lg font-bold text-[#fffffe]">
+                        Друзья
+                      </h2>
+                      <p className="text-sm text-[#abd1c6] mt-0.5">
+                        Ваш список друзей. Откройте профиль или управляйте дружбой.
+                      </p>
+                    </div>
                     <FriendsList
                       type="friends"
                       data={friends}
@@ -217,6 +226,7 @@ export default function FriendsPageClient() {
                       getUserStatus={getUserStatus}
                       sendingRequests={sendingRequests}
                       actions={{ onRemoveFriend: handleRemoveFriend }}
+                      onGoToSearch={goToSearch}
                     />
                   </motion.div>
                 )}
@@ -227,7 +237,16 @@ export default function FriendsPageClient() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
+                    className="space-y-4"
                   >
+                    <div className="mb-1">
+                      <h2 className="text-lg font-bold text-[#fffffe]">
+                        Отправленные заявки
+                      </h2>
+                      <p className="text-sm text-[#abd1c6] mt-0.5">
+                        Заявки, которые вы отправили. Можно отменить до ответа.
+                      </p>
+                    </div>
                     <FriendsList
                       type="sent"
                       data={sentRequests}
@@ -246,7 +265,16 @@ export default function FriendsPageClient() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
+                    className="space-y-4"
                   >
+                    <div className="mb-1">
+                      <h2 className="text-lg font-bold text-[#fffffe]">
+                        Входящие заявки
+                      </h2>
+                      <p className="text-sm text-[#abd1c6] mt-0.5">
+                        Кто хочет добавить вас в друзья. Примите или отклоните заявку.
+                      </p>
+                    </div>
                     <FriendsList
                       type="received"
                       data={receivedRequests}
@@ -268,7 +296,16 @@ export default function FriendsPageClient() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
+                    className="space-y-4"
                   >
+                    <div className="mb-1">
+                      <h2 className="text-lg font-bold text-[#fffffe]">
+                        Кто сейчас онлайн
+                      </h2>
+                      <p className="text-sm text-[#abd1c6] mt-0.5">
+                        Пользователи в сети. Можно отправить заявку в друзья.
+                      </p>
+                    </div>
                     <FriendsOnlineList
                       onlineUsers={onlineUsers}
                       onlineLoading={onlineLoading}

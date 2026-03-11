@@ -23,6 +23,11 @@ export default function ApplicationCardPayment({
   bankName,
 }: ApplicationCardPaymentProps) {
   const parsed = splitPayment(payment, bankName);
+
+  if (!parsed.payment && !parsed.bankName) {
+    return null;
+  }
+
   return (
     <details className="toggle text-sm mb-4 sm:mb-6">
       <summary className="flex items-center gap-2 cursor-pointer select-none text-[#f9bc60] hover:text-[#e8a545] font-bold transition-colors">
@@ -42,20 +47,21 @@ export default function ApplicationCardPayment({
         Показать реквизиты
       </summary>
       <div className="mt-3 p-3 bg-[#001e1d]/40 rounded-xl border border-[#abd1c6]/20">
-        <div className="text-[#abd1c6] break-words text-sm sm:text-base">
-          <div className="flex flex-col gap-2">
-            {parsed.bankName && (
-              <div>
-                <span className="text-[#f9bc60] font-semibold">Банк:</span>{" "}
-                <span className="text-[#e8f2ef]">{parsed.bankName}</span>
-              </div>
-            )}
+        <p className="text-[10px] uppercase tracking-wide font-bold text-[#abd1c6]/70 mb-2">
+          Платёжные данные
+        </p>
+        <div className="text-[#abd1c6] break-words text-sm sm:text-base space-y-2">
+          {parsed.bankName && (
             <div>
-              <span className="text-[#f9bc60] font-semibold">Реквизиты:</span>{" "}
-              <span className="text-[#e8f2ef]">
-                {parsed.payment || "Не указаны"}
-              </span>
+              <span className="text-[#f9bc60] font-semibold">Банк:</span>{" "}
+              <span className="text-[#e8f2ef]">{parsed.bankName}</span>
             </div>
+          )}
+          <div>
+            <span className="text-[#f9bc60] font-semibold">Реквизиты:</span>{" "}
+            <span className="text-[#e8f2ef]">
+              {parsed.payment || "Не указаны"}
+            </span>
           </div>
         </div>
       </div>

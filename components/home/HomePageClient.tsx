@@ -18,6 +18,13 @@ const RecentApplications = dynamic(() => import("./RecentApplications"), {
   ),
 });
 
+const HomeReviewsSection = dynamic(() => import("./HomeReviewsSection"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+  ),
+});
+
 const FAQ = dynamic(() => import("./FAQ"), {
   ssr: false,
   loading: () => (
@@ -42,6 +49,7 @@ export default function HomePageClient({ initialStats }: HomePageClientProps) {
       <div className="relative z-10">
         <HeroSection stats={initialStats} loading={false} />
         <RecentApplications />
+        <HomeReviewsSection />
         <HowItWorks />
         <TopDonorsInline />
         <FAQ />

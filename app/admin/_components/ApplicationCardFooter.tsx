@@ -12,7 +12,7 @@ export default function ApplicationCardFooter({
 }: ApplicationCardFooterProps) {
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-[#abd1c6]/20">
-      <div className="flex items-center gap-2 text-xs sm:text-sm text-[#abd1c6]/70">
+      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-[#abd1c6]/70">
         <svg
           className="w-4 h-4"
           fill="none"
@@ -26,7 +26,13 @@ export default function ApplicationCardFooter({
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>Отправлено: {new Date(createdAt).toLocaleString("ru-RU")}</span>
+        <span>
+          Отправлено: {new Date(createdAt).toLocaleString("ru-RU")}
+        </span>
+        <span className="hidden sm:inline text-[#abd1c6]/40">•</span>
+        <span className="text-[#abd1c6]/60">
+          ID: <span className="font-mono">{applicationId.slice(0, 8)}…</span>
+        </span>
       </div>
 
       <a

@@ -59,14 +59,16 @@ function SocialChip({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 rounded-full border border-transparent px-2.5 py-1.5 text-[10px] font-semibold tracking-wide text-white transition-colors hover:text-white/90 xs:text-xs sm:gap-2 sm:px-3 sm:py-2 md:px-3.5"
+      className="inline-flex items-center gap-1.5 rounded-full border border-transparent px-2.5 py-1.5 text-[10px] font-semibold tracking-wide text-white/90 transition-colors hover:text-white xs:text-xs sm:gap-2 sm:px-3 sm:py-2 md:px-3.5"
       style={{
         backgroundColor: `${color}22`,
         borderColor: `${color}55`,
         boxShadow: `0 10px 30px -18px ${color}dd`,
       }}
     >
-      {children}
+      <span className="shrink-0" style={{ color }} aria-hidden>
+        {children}
+      </span>
       <span className="whitespace-nowrap">{label}</span>
     </a>
   );

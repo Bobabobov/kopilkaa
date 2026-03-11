@@ -217,7 +217,6 @@ export async function PATCH(
           adminComment: adminComment ?? null,
           publishInStories:
             status === "CONTEST" ? !!publishInStories : false,
-          ...(status === "APPROVED" ? { countTowardsTrust: true } : {}),
           ...(status === "APPROVED" || status === "REJECTED"
             ? { trustDecreasedAtDecision: decreaseTrustOnDecision }
             : {}),

@@ -301,8 +301,8 @@ export function ReviewsSection() {
                   }}
                 />
               </div>
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#229ED9] rounded-full border-2 border-[#001e1d] flex items-center justify-center shadow-lg">
-                <TelegramIcon className="w-4 h-4 text-white" />
+              <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-white/10 rounded-full border border-white/20 flex items-center justify-center shadow-lg backdrop-blur-sm">
+                <TelegramIcon className="w-4 h-4 text-[#229ED9]" />
               </div>
             </div>
             <div className="flex-1 text-center sm:text-left min-w-0">

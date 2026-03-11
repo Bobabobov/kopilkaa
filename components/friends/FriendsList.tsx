@@ -22,6 +22,8 @@ interface FriendsListProps {
     onAcceptRequest?: (id: string) => Promise<void> | void;
     onDeclineRequest?: (id: string) => Promise<void> | void;
   };
+  /** При пустом списке друзей — показать кнопку «Найти друзей» и вызвать при клике */
+  onGoToSearch?: () => void;
 }
 
 export function FriendsList({
@@ -32,6 +34,7 @@ export function FriendsList({
   getUserStatus,
   sendingRequests,
   actions,
+  onGoToSearch,
 }: FriendsListProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
@@ -47,14 +50,44 @@ export function FriendsList({
   const items = Array.isArray(data) ? data : [];
 
   if (items.length === 0) {
-    const messages = {
-      friends: "У вас пока нет друзей",
-      sent: "Нет отправленных заявок",
-      received: "Нет входящих заявок",
+    const config = {
+      friends: {
+        icon: <LucideIcons.UsersRound size="lg" className="text-[#abd1c6]" />,
+        title: "Пока ни одного друга",
+        hint: "Добавьте друзей через поиск или примите входящие заявки.",
+        showSearch: true,
+      },
+      sent: {
+        icon: <LucideIcons.Send size="lg" className="text-[#abd1c6]" />,
+        title: "Нет отправленных заявок",
+        hint: "Отправленные вами заявки появятся здесь.",
+        showSearch: false,
+      },
+      received: {
+        icon: <LucideIcons.Inbox size="lg" className="text-[#abd1c6]" />,
+        title: "Нет входящих заявок",
+        hint: "Когда кто-то отправит вам заявку, она появится здесь.",
+        showSearch: false,
+      },
     };
+    const { icon, title, hint, showSearch } = config[type];
     return (
-      <div className="text-center py-12 rounded-2xl border border-dashed border-[#abd1c6]/30 bg-[#001e1d]/40">
-        <p className="text-[#abd1c6]">{messages[type]}</p>
+      <div className="text-center py-12 px-4 rounded-2xl border border-dashed border-white/10 bg-[#004643]/40 backdrop-blur-sm">
+        <div className="inline-flex w-14 h-14 rounded-full bg-[#abd1c6]/10 items-center justify-center mb-4">
+          {icon}
+        </div>
+        <p className="text-[#fffffe] font-semibold mb-1">{title}</p>
+        <p className="text-[#abd1c6] text-sm mb-4">{hint}</p>
+        {showSearch && onGoToSearch && (
+          <button
+            type="button"
+            onClick={onGoToSearch}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#f9bc60] text-[#001e1d] font-bold hover:bg-[#e8a545] transition-colors"
+          >
+            <LucideIcons.Search size="sm" />
+            Найти друзей
+          </button>
+        )}
       </div>
     );
   }
@@ -85,7 +118,7 @@ export function FriendsList({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.03, duration: 0.25, ease: "easeOut" }}
             whileHover={{ scale: 1.01 }}
-            className="relative flex flex-col gap-4 p-4 sm:p-5 bg-[#001e1d]/25 rounded-xl border border-[#abd1c6]/15 hover:border-[#f9bc60]/30 hover:bg-white/5 transition-colors w-full min-w-0"
+            className="relative flex flex-col gap-4 p-4 sm:p-5 rounded-2xl border border-white/[0.08] bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] shadow-[0_4px_24px_rgba(0,0,0,0.2)] w-full min-w-0 transition-all duration-200 hover:border-white/15 hover:shadow-lg hover:shadow-black/20"
           >
             <Link
               href={`/profile/${user.id}`}

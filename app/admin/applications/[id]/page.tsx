@@ -208,7 +208,9 @@ export default function AdminApplicationPage({
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data = await response.json().catch(() => null);
+      const data = (await response.json().catch(() => null)) as {
+        item?: ApplicationItem | null;
+      } | null;
       const updated = data?.item;
       setItem((prev) =>
         prev
@@ -280,7 +282,6 @@ export default function AdminApplicationPage({
               status: updated.status,
               adminComment: updated.adminComment,
               publishInStories: updated.publishInStories,
-              // @ts-expect-error поле есть в ответе
               trustDecreasedAtDecision: updated.trustDecreasedAtDecision,
             }
           : prev,

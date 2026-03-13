@@ -136,6 +136,14 @@ export function useApplicationFormState() {
 
   useIntroOverflow(introOpen);
 
+  // Окно условий теперь показываем при каждом заходе на /applications
+  // для авторизованного пользователя.
+  useEffect(() => {
+    if (!loadingAuth && user) {
+      setIntroOpen(true);
+    }
+  }, [loadingAuth, user]);
+
   useEffect(() => {
     if (loadingAuth) return;
     const wasSubmitted = consumePendingSubmissionSuccess();

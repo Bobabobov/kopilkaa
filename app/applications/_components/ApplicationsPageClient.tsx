@@ -84,8 +84,6 @@ export default function ApplicationsPageClient() {
     setActivityModal,
   } = state;
 
-  const { introAckKey } = state;
-
   if (loadingAuth) {
     return (
       <div
@@ -174,12 +172,6 @@ export default function ApplicationsPageClient() {
         onCheckedChange={setIntroChecked}
         onConfirm={() => {
           setIntroOpen(false);
-          try {
-            sessionStorage.setItem(introAckKey, "true");
-            localStorage.setItem(introAckKey, "true");
-          } catch {
-            // storage может быть недоступен в in-app браузере (Telegram и др.)
-          }
         }}
       />
 

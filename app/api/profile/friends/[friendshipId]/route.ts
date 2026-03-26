@@ -1,5 +1,5 @@
 // app/api/profile/friends/[friendshipId]/route.ts
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
@@ -8,7 +8,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ friendshipId: string }> },
 ) {
-  const session = await getSession();
+  const session = await getAuthUser(request);
   if (!session) {
     return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
   }
@@ -101,7 +101,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ friendshipId: string }> },
 ) {
-  const session = await getSession();
+  const session = await getAuthUser(request);
   if (!session) {
     return NextResponse.json({ message: "Не авторизован" }, { status: 401 });
   }

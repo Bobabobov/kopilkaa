@@ -1,13 +1,28 @@
 // app/api/auth/login/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { attachSessionToResponse } from "@/lib/auth";
+import { attachSessionToResponse, signAccessToken } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 import { checkUserBan } from "@/lib/ban-check";
 
 export async function POST(req: Request) {
   try {
-    const { identifier, password } = await req.json();
+    const contentType = (req.headers.get("content-type") || "").toLowerCase();
+    if (!contentType.includes("application/json")) {
+      return NextResponse.json(
+        { error: "Ожидается JSON (Content-Type: application/json)" },
+        { status: 415 },
+      );
+    }
+
+    let body: { identifier?: unknown; password?: unknown };
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: "Некорректный JSON" }, { status: 400 });
+    }
+
+    const { identifier, password } = body;
     const rawIdentifier = String(identifier ?? "").trim();
 
     if (!rawIdentifier || !password) {
@@ -75,6 +90,10 @@ export async function POST(req: Request) {
         role: user.role,
         name: user.name,
       },
+      accessToken: signAccessToken(
+        { uid: user.id, role: user.role as any },
+        process.env.ACCESS_TOKEN_SECRET || process.env.AUTH_SECRET || "dev-secret",
+      ),
     });
     attachSessionToResponse(res, { uid: user.id, role: user.role as any }, req);
     return res;

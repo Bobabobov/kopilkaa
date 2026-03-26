@@ -1,6 +1,6 @@
 // app/api/profile/phone/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 function normalizePhone(raw: string): string | null {
@@ -25,7 +25,7 @@ function normalizePhone(raw: string): string | null {
 // Привязка/обновление телефона у текущего пользователя и отправка кода подтверждения
 export async function POST(req: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(req);
     if (!session) {
       return NextResponse.json(
         { success: false, error: "Необходимо войти в аккаунт" },

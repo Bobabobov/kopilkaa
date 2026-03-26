@@ -1,9 +1,9 @@
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(request);
     if (!session)
       return Response.json({ error: "Unauthorized" }, { status: 401 });
 

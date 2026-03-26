@@ -1,11 +1,11 @@
 // app/api/donations/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 // Создать запись оплаты (цифровая услуга / тестовый режим)
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(request);
     const body = await request.json().catch(() => ({}));
 
     const amount = Number(body.amount);

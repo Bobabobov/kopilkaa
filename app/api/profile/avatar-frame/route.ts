@@ -1,11 +1,11 @@
 // app/api/profile/avatar-frame/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(request);
 
     if (!session?.uid) {
       return NextResponse.json({ error: "Не авторизован" }, { status: 401 });

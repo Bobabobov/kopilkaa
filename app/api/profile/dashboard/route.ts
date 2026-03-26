@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatTimeAgo } from "@/lib/time";
 import { createHash } from "crypto";
@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 // Объединенный API для загрузки всех данных профиля за один запрос
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(request);
     if (!session?.uid) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

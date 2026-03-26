@@ -1,5 +1,5 @@
 // app/api/profile/me/route.ts
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { checkUserBan } from "@/lib/ban-check";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
@@ -148,9 +148,9 @@ function sanitizeSocialLink(
   return `https://${host}${sanitizedPath}${searchAndHash}`;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(request);
     if (!session)
       return Response.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -252,7 +252,7 @@ export async function GET() {
 
 export async function PATCH(req: Request) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(req);
     if (!session)
       return Response.json({ error: "Unauthorized" }, { status: 401 });
 

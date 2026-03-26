@@ -1,11 +1,11 @@
 // app/api/profile/friends/route.ts
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 export async function GET(request: Request) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(request);
     if (!session) {
       return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
     }
@@ -103,7 +103,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(request);
     if (!session) {
       return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
     }

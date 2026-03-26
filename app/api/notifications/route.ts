@@ -1,5 +1,5 @@
 // app/api/notifications/route.ts
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatTimeAgo } from "@/lib/time";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
@@ -7,9 +7,9 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(request);
     if (!session) {
       return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
     }

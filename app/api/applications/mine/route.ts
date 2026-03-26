@@ -1,5 +1,5 @@
 // app/api/applications/mine/route.ts
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(req);
     if (!session) {
       return Response.json({ error: "Требуется вход" }, { status: 401 });
     }

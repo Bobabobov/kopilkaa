@@ -1,6 +1,6 @@
 // app/api/profile/avatar/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { randomUUID } from "crypto";
 import { writeFile, mkdir } from "fs/promises";
@@ -16,7 +16,7 @@ const ADMIN_MAX_SIZE = 20 * 1024 * 1024; // 20MB для админов
 
 // POST /api/profile/avatar - загрузить аватарку
 export async function POST(req: NextRequest) {
-  const session = await getSession();
+  const session = await getAuthUser(req);
   if (!session) {
     return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }
@@ -103,8 +103,8 @@ export async function POST(req: NextRequest) {
 }
 
 // DELETE /api/profile/avatar - удалить аватарку
-export async function DELETE() {
-  const session = await getSession();
+export async function DELETE(request: Request) {
+  const session = await getAuthUser(request);
   if (!session) {
     return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }

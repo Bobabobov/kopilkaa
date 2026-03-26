@@ -8,6 +8,7 @@ export type SessionPayload = { uid: string; role: Role; exp: number };
 
 const COOKIE_NAME = "kopilka_session";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 дней
+const ACCESS_TOKEN_MAX_AGE = 60 * 60 * 24 * 7; // 7 дней
 
 const enc = (obj: any) =>
   Buffer.from(JSON.stringify(obj)).toString("base64url");
@@ -68,6 +69,28 @@ export function verifySession(
   }
 }
 
+export function signAccessToken(
+  payload: Omit<SessionPayload, "exp">,
+  secret = process.env.ACCESS_TOKEN_SECRET || process.env.AUTH_SECRET || "dev-secret",
+) {
+  const header = { alg: "HS256", typ: "JWT" };
+  const body: SessionPayload = {
+    ...payload,
+    exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_MAX_AGE,
+  };
+  const p1 = enc(header);
+  const p2 = enc(body);
+  const sig = hmac(`${p1}.${p2}`, secret);
+  return `${p1}.${p2}.${sig}`;
+}
+
+export function verifyAccessToken(
+  token?: string | null,
+  secret = process.env.ACCESS_TOKEN_SECRET || process.env.AUTH_SECRET || "dev-secret",
+): SessionPayload | null {
+  return verifySession(token, secret);
+}
+
 export async function getSession(): Promise<SessionPayload | null> {
   try {
     const cookieStore = await cookies();
@@ -82,6 +105,22 @@ export async function getSession(): Promise<SessionPayload | null> {
     }
     return null;
   }
+}
+
+export async function getAuthUser(
+  request: Request,
+): Promise<SessionPayload | null> {
+  const authHeader =
+    request.headers.get("Authorization") ||
+    request.headers.get("authorization");
+
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice("Bearer ".length).trim();
+    if (token) return verifyAccessToken(token);
+    return null;
+  }
+
+  return getSession();
 }
 
 // Правильный способ для API routes: ставим cookie на NextResponse

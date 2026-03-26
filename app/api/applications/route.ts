@@ -1,6 +1,6 @@
 // app/api/applications/route.ts
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { publish } from "@/lib/sse";
 import {
   getPlainTextLenFromHtml,
@@ -57,7 +57,7 @@ function getClientDevice(req: Request): string {
 }
 
 export async function POST(req: Request) {
-  const session = await getSession();
+  const session = await getAuthUser(req);
   if (!session) {
     return Response.json({ error: "Требуется вход" }, { status: 401 });
   }

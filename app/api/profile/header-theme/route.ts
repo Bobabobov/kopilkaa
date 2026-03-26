@@ -1,12 +1,12 @@
 // app/api/profile/header-theme/route.ts
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { headerThemes } from "@/lib/header-customization";
 import { NextResponse } from "next/server";
 
 export async function PATCH(req: Request) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(req);
     if (!session) {
       return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
     }

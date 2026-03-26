@@ -1,12 +1,12 @@
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const session = await getSession();
+    const session = await getAuthUser(request);
     if (!session)
       return Response.json({ error: "Unauthorized" }, { status: 401 });
 

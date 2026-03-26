@@ -4,7 +4,7 @@ import { writeFile, mkdir } from "fs/promises";
 import { extname } from "path";
 import { randomUUID } from "crypto";
 import sharp from "sharp";
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -29,7 +29,7 @@ const buildVariantFilename = (base: string, variant: string, format: string) =>
 
 // POST /api/uploads - загрузить файлы
 export async function POST(req: NextRequest) {
-  const session = await getSession();
+  const session = await getAuthUser(req);
   if (!session) {
     return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }

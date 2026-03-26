@@ -24,8 +24,9 @@ export async function POST(req: Request) {
 
     const { identifier, password } = body;
     const rawIdentifier = String(identifier ?? "").trim();
+    const rawPassword = typeof password === "string" ? password : "";
 
-    if (!rawIdentifier || !password) {
+    if (!rawIdentifier || !rawPassword) {
       return NextResponse.json(
         { error: "Введите логин/email и пароль" },
         { status: 400 },
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const ok = await bcrypt.compare(password, user.passwordHash);
+    const ok = await bcrypt.compare(rawPassword, user.passwordHash);
     if (!ok) {
       return NextResponse.json({ error: "Неверный пароль" }, { status: 401 });
     }

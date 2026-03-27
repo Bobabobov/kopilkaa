@@ -1,5 +1,5 @@
 // app/api/stories/[id]/like/route.ts
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
@@ -8,10 +8,10 @@ function isValidStoryId(id: string) {
 }
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getSession();
+  const session = await getAuthUser(request);
   if (!session) {
     return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }
@@ -77,10 +77,10 @@ export async function POST(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await getSession();
+  const session = await getAuthUser(request);
   if (!session) {
     return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
   }

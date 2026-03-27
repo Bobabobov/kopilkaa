@@ -1,6 +1,6 @@
 // app/api/stories/[id]/likes/route.ts
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 
 function isValidStoryId(id: string) {
@@ -8,10 +8,10 @@ function isValidStoryId(id: string) {
 }
 
 export async function GET(
-  _: Request,
+  request: Request,
   { params: { id } }: { params: { id: string } },
 ) {
-  const session = await getSession();
+  const session = await getAuthUser(request);
 
   try {
     if (!isValidStoryId(id)) {

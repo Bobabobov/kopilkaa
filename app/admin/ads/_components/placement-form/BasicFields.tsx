@@ -145,6 +145,11 @@ export default function BasicFields({
           onChange={(e) => onFieldChange("expiresAt", e.target.value)}
           className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none"
         />
+        <p className="text-xs text-[#abd1c6]/70 mt-1">
+          Считается действующей до конца выбранного дня (UTC). Если указали дату и
+          реклама не показывалась — откройте объявление и сохраните снова после
+          обновления сайта.
+        </p>
       </div>
 
       <div>

@@ -38,7 +38,7 @@ async function fetchWithCookies(
 
 async function fetchTopStories(): Promise<Story[]> {
   try {
-    const res = await fetchWithCookies(`${baseUrl}/api/stories/top?limit=3`);
+    const res = await fetchWithCookies(`${baseUrl}/api/stories/top?limit=10`);
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data.items) ? data.items : [];

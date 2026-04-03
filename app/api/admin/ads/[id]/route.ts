@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
+import { parseAdvertisementExpiryInput } from "@/lib/ads/expiry";
 
 export const dynamic = "force-dynamic";
 
@@ -60,7 +61,7 @@ export async function PUT(
           content: safeContent,
           imageUrl,
           linkUrl,
-          expiresAt: expiresAt ? new Date(expiresAt) : null,
+          expiresAt: parseAdvertisementExpiryInput(expiresAt),
           isActive: finalIsActive,
           placement: finalPlacement,
           config: safeConfig || null,

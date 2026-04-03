@@ -3,10 +3,17 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-export default function NotFoundActions() {
+type NotFoundActionsProps = {
+  /** Канонический origin (без слэша) — для абсолютной ссылки с 404, которую видят SEO-аудиторы */
+  homeOrigin: string;
+};
+
+export default function NotFoundActions({ homeOrigin }: NotFoundActionsProps) {
+  const homeHref = `${homeOrigin}/`;
+
   const mainLinks = [
     {
-      href: "/",
+      href: homeHref,
       label: "На главную",
       icon: (
         <svg

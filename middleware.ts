@@ -5,6 +5,39 @@ import {
   getRealIP,
 } from "./lib/security";
 
+/** Редирект www ↔ канонический хост из NEXT_PUBLIC_SITE_URL (для SEO, один главный зеркальный адрес). */
+function redirectToCanonicalHost(req: NextRequest): NextResponse | null {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru";
+  let canonicalHost: string;
+  try {
+    canonicalHost = new URL(raw).hostname.toLowerCase();
+  } catch {
+    return null;
+  }
+
+  const hostHeader = req.headers.get("host") || "";
+  const host = hostHeader.split(":")[0].toLowerCase();
+
+  if (!host || host === canonicalHost) return null;
+
+  const canonicalIsWww = canonicalHost.startsWith("www.");
+  const bareHost = canonicalIsWww ? canonicalHost.slice(4) : canonicalHost;
+
+  if (!canonicalIsWww && host === `www.${bareHost}`) {
+    const url = req.nextUrl.clone();
+    url.hostname = bareHost;
+    return NextResponse.redirect(url, 308);
+  }
+
+  if (canonicalIsWww && host === bareHost) {
+    const url = req.nextUrl.clone();
+    url.hostname = canonicalHost;
+    return NextResponse.redirect(url, 308);
+  }
+
+  return null;
+}
+
 // Rate limiting store (в продакшене лучше использовать Redis)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
@@ -53,6 +86,9 @@ function pruneRateLimitStore(maxEntries: number = 5000) {
 
 // Основной middleware
 export function middleware(req: NextRequest) {
+  const canonicalRedirect = redirectToCanonicalHost(req);
+  if (canonicalRedirect) return canonicalRedirect;
+
   const realIP = getRealIP(req);
   pruneRateLimitStore();
   const isProd = process.env.NODE_ENV === "production";

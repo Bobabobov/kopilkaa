@@ -3,6 +3,7 @@
 
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { cn } from "@/lib/utils";
 
 interface FormFieldProps {
   // Основные свойства
@@ -27,6 +28,10 @@ interface FormFieldProps {
   className?: string;
   delay?: number;
   compact?: boolean; // для компактного отображения textarea
+  /** Счётчик символов: всегда или только при непустом поле */
+  charCountVisibility?: "always" | "when_nonempty";
+  /** Блок «Поле заполнено корректно» и похожие подсказки */
+  showFieldStatus?: boolean;
 
   // Дополнительные свойства
   rows?: number;
@@ -52,6 +57,8 @@ export default function FormField({
   className = "",
   delay = 0,
   compact = false,
+  charCountVisibility = "always",
+  showFieldStatus = true,
   rows = 6,
   inputProps,
   textareaProps,
@@ -188,21 +195,30 @@ export default function FormField({
       </div>
 
       {/* Подсказка и счетчик */}
-      {(hint || maxLength) && (
-        <div className="flex justify-between items-center text-xs">
+      {(hint ||
+        (maxLength &&
+          (charCountVisibility === "always" ||
+            (charCountVisibility === "when_nonempty" && charCount > 0)))) && (
+        <div className="flex justify-between items-center gap-2 text-xs">
           {hint && (
             <span className="text-gray-500 dark:text-gray-400">{hint}</span>
           )}
-          {maxLength && (
-            <span className={getCounterColor()}>
-              {charCount} / {maxLength}
-            </span>
-          )}
+          {maxLength &&
+            (charCountVisibility === "always" ||
+              (charCountVisibility === "when_nonempty" && charCount > 0)) && (
+              <span className={cn(getCounterColor(), "shrink-0 tabular-nums")}>
+                {charCount} / {maxLength}
+              </span>
+            )}
         </div>
       )}
 
       {/* Статус поля */}
-      {showValidation && value.trim() && !error && !isRequiredEmpty && (
+      {showFieldStatus &&
+        showValidation &&
+        value.trim() &&
+        !error &&
+        !isRequiredEmpty && (
         <div className="flex items-center gap-2 text-sm mt-1">
           {isOverLimit ? (
             <div className="flex items-center gap-2 text-[#e16162]">

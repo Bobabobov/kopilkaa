@@ -5,7 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import {
   getTextLengthFromHtml,
@@ -27,6 +27,7 @@ interface RichTextEditorProps {
   allowPaste?: boolean; // Разрешить вставку текста
   error?: string; // Сообщение об ошибке
   required?: boolean; // Обязательное поле
+  charCountVisibility?: "always" | "when_nonempty";
 }
 
 export default function RichTextEditor({
@@ -41,6 +42,7 @@ export default function RichTextEditor({
   allowPaste = false,
   error,
   required = false,
+  charCountVisibility = "always",
 }: RichTextEditorProps) {
   const [linkUrl, setLinkUrl] = useState("");
   const [showLinkInput, setShowLinkInput] = useState(false);
@@ -165,6 +167,26 @@ export default function RichTextEditor({
     }
   }, [value, editor]);
 
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  /**
+   * Визард размонтирует шаг «История» при переходе назад — TipTap может успеть
+   * уничтожиться без последнего onUpdate; сохраняем HTML до destroy.
+   * Cleanup объявлен после эффекта синхронизации, чтобы выполняться раньше destroy из useEditor.
+   */
+  useEffect(() => {
+    if (!editor) return;
+    return () => {
+      if (editor.isDestroyed) return;
+      try {
+        onChangeRef.current(editor.getHTML());
+      } catch {
+        // ignore
+      }
+    };
+  }, [editor]);
+
   if (!editor) {
     return null;
   }
@@ -237,21 +259,23 @@ export default function RichTextEditor({
           </div>
         )}
 
-        {maxLength && (
-          <div className="flex justify-end">
-            <span
-              className={`text-sm ${
-                mobileTextLength > maxLength
-                  ? "text-red-400"
-                  : mobileTextLength > maxLength * 0.8
-                    ? "text-[#f9bc60]"
-                    : "text-[#abd1c6]"
-              }`}
-            >
-              {mobileTextLength} / {maxLength}
-            </span>
-          </div>
-        )}
+        {maxLength &&
+          (charCountVisibility === "always" ||
+            (charCountVisibility === "when_nonempty" && mobileTextLength > 0)) && (
+            <div className="flex justify-end">
+              <span
+                className={`text-sm tabular-nums ${
+                  mobileTextLength > maxLength
+                    ? "text-red-400"
+                    : mobileTextLength > maxLength * 0.8
+                      ? "text-[#f9bc60]"
+                      : "text-[#abd1c6]"
+                }`}
+              >
+                {mobileTextLength} / {maxLength}
+              </span>
+            </div>
+          )}
       </div>
     );
   }
@@ -334,21 +358,23 @@ export default function RichTextEditor({
       <RichTextEditorStyles rows={rows} allowLinks={allowLinks} />
 
       {/* Счетчик символов */}
-      {maxLength && (
-        <div className="flex justify-end">
-          <span
-            className={`text-sm ${
-              textLength > maxLength
-                ? "text-red-400"
-                : textLength > maxLength * 0.8
-                  ? "text-[#f9bc60]"
-                  : "text-[#abd1c6]"
-            }`}
-          >
-            {textLength} / {maxLength}
-          </span>
-        </div>
-      )}
+      {maxLength &&
+        (charCountVisibility === "always" ||
+          (charCountVisibility === "when_nonempty" && textLength > 0)) && (
+          <div className="flex justify-end">
+            <span
+              className={`text-sm tabular-nums ${
+                textLength > maxLength
+                  ? "text-red-400"
+                  : textLength > maxLength * 0.8
+                    ? "text-[#f9bc60]"
+                    : "text-[#abd1c6]"
+              }`}
+            >
+              {textLength} / {maxLength}
+            </span>
+          </div>
+        )}
     </div>
   );
 }

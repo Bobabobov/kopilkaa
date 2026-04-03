@@ -43,6 +43,7 @@ export function ApplicationsConsent({
 
   return (
     <Card
+      id="application-field-consent"
       variant="darkGlass"
       padding="none"
       className={cn("overflow-hidden", ackError && "border-[#e16162]/40 ring-2 ring-[#e16162]/20")}

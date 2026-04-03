@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   loadTrustAck,
   loadPolicyAck,
@@ -88,6 +88,8 @@ interface PersistParams {
   policiesAccepted: boolean;
   introChecked: boolean;
   formStartedAtRef: React.MutableRefObject<number | null>;
+  /** Вызывается после debounce, если в форме есть введённые данные (как сигнал «черновик на месте»). */
+  onDebouncedPersist?: () => void;
 }
 
 export function usePersistForm(params: PersistParams): void {
@@ -107,7 +109,11 @@ export function usePersistForm(params: PersistParams): void {
     policiesAccepted,
     introChecked,
     formStartedAtRef,
+    onDebouncedPersist,
   } = params;
+
+  const onDebouncedPersistRef = useRef(onDebouncedPersist);
+  onDebouncedPersistRef.current = onDebouncedPersist;
 
   useEffect(() => {
     const t = window.setTimeout(() => {
@@ -126,6 +132,9 @@ export function usePersistForm(params: PersistParams): void {
         savePolicyAck(policyAckKey, policiesAccepted);
         if (introChecked) {
           saveIntroAck(introAckKey);
+        }
+        if (hasInput) {
+          onDebouncedPersistRef.current?.();
         }
       } catch (error) {
         console.error("Ошибка при сохранении данных:", error);

@@ -29,11 +29,14 @@ export function sanitizeAdHtml(html: string) {
       a: (tagName, attribs) => {
         const href =
           typeof attribs.href === "string" ? attribs.href.trim() : "";
-        if (!href) return { tagName: "span", text: "" };
+        if (!href) {
+          return { tagName: "span", attribs: {}, text: "" };
+        }
         return {
           tagName,
           attribs: {
             ...attribs,
+            href,
             target: "_blank",
             rel: "noopener noreferrer nofollow",
           },

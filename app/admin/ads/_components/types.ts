@@ -16,6 +16,8 @@ export interface Advertisement {
     storyImageUrls?: string[];
     advertiserName?: string;
     advertiserLink?: string;
+    advertiserWebsite?: string;
+    advertiserTelegram?: string;
     bannerMobileImageUrl?: string;
     bannerVideoUrl?: string;
     bannerMobileVideoUrl?: string;
@@ -38,6 +40,8 @@ export interface AdFormData {
   storyImageUrls: string[];
   advertiserName: string;
   advertiserLink: string;
+  advertiserWebsite: string;
+  advertiserTelegram: string;
   bannerMobileImageUrl: string;
   bannerVideoUrl: string;
   bannerMobileVideoUrl: string;

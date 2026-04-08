@@ -56,6 +56,7 @@ export default function StoryFields({
             onChange={(value) => onFieldChange("storyText", value)}
             placeholder="Кратко опишите историю, которая будет показана в ленте /stories"
             rows={6}
+            allowPaste
           />
         </div>
 
@@ -91,6 +92,48 @@ export default function StoryFields({
           <p className="text-xs text-[#abd1c6]/70 mt-1">
             Клик по названию проекта откроет эту ссылку в новой вкладке. Если
             оставить пустой — подпись будет без ссылки.
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-[#abd1c6] mb-2">
+            Сайт рекламодателя
+          </label>
+          <input
+            type="url"
+            value={formData.advertiserWebsite}
+            onChange={(e) => onFieldChange("advertiserWebsite", e.target.value)}
+            className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none text-sm"
+            placeholder="https://example.com"
+          />
+          <p className="text-xs text-[#abd1c6]/70 mt-1">
+            Покажем на странице <code>/stories/ad</code> как кнопку с иконкой
+            сайта. Можно оставить пустым, если используете только Telegram.
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-[#abd1c6] mb-2">
+            Telegram рекламодателя
+          </label>
+          <input
+            type="text"
+            value={formData.advertiserTelegram}
+            onChange={(e) =>
+              onFieldChange("advertiserTelegram", e.target.value)
+            }
+            className="w-full px-3 py-2 bg-[#004643] border border-[#abd1c6]/30 rounded-lg text-[#fffffe] focus:border-[#f9bc60] focus:outline-none text-sm"
+            placeholder="@channel или https://t.me/channel"
+          />
+          <p className="text-xs text-[#abd1c6]/70 mt-1">
+            Можно указать <code>@username</code> или ссылку <code>t.me</code>.
+          </p>
+        </div>
+
+        <div className="md:col-span-2">
+          <p className="text-xs text-[#f9bc60]/90 bg-[#f9bc60]/10 border border-[#f9bc60]/30 rounded-lg px-3 py-2">
+            Для страницы <code>/stories/ad</code> укажите хотя бы один канал
+            связи: сайт или Telegram.
           </p>
         </div>
 

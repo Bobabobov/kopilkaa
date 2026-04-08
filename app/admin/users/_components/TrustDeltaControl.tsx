@@ -1,10 +1,12 @@
 "use client";
 
-import {
-  getTrustLabel,
-  getTrustLevelFromEffectiveApproved,
-} from "@/lib/trustLevel";
 import type { TrustLevel } from "@/lib/trustLevel";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const LEVEL_ORDER: TrustLevel[] = [
   "LEVEL_1",
@@ -28,7 +30,7 @@ interface TrustDeltaControlProps {
 
 export function TrustDeltaControl({
   userId,
-  initialDelta,
+  initialDelta: _initialDelta,
   trustLevel,
   effectiveApprovedApplications,
   savingId,
@@ -36,6 +38,8 @@ export function TrustDeltaControl({
   onSaved,
   showToast,
 }: TrustDeltaControlProps) {
+  void _initialDelta;
+
   const applyDelta = async (levelStep: number) => {
     const currentLevel = trustLevel ?? "LEVEL_1";
     const currentIndex = Math.max(0, LEVEL_ORDER.indexOf(currentLevel));
@@ -73,30 +77,62 @@ export function TrustDeltaControl({
   };
 
   const disabled = savingId === userId;
+  const currentLevel = trustLevel ?? "LEVEL_1";
+  const currentIndex = Math.max(0, LEVEL_ORDER.indexOf(currentLevel));
+  const canDecrease = currentIndex > 0;
+  const canIncrease = currentIndex < LEVEL_ORDER.length - 1;
+
   return (
-    <div className="flex items-center gap-2 text-xs text-[#abd1c6]">
-      <span className="text-[#abd1c6]/80">
-        Уровень доверия:{" "}
-        <span className="text-[#f9bc60] font-semibold">
-          {getTrustLabel(trustLevel ?? "LEVEL_1")}
-        </span>
-      </span>
-      <button
-        type="button"
-        className="px-2 py-1 rounded bg-[#001e1d]/70 border border-[#abd1c6]/30 hover:border-[#f9bc60]/50 transition-colors"
-        onClick={() => applyDelta(-1)}
-        disabled={disabled}
-      >
-        -1 уровень
-      </button>
-      <button
-        type="button"
-        className="px-2 py-1 rounded bg-[#001e1d]/70 border border-[#abd1c6]/30 hover:border-[#f9bc60]/50 transition-colors"
-        onClick={() => applyDelta(1)}
-        disabled={disabled}
-      >
-        +1 уровень
-      </button>
+    <div className="rounded-xl border border-[#abd1c6]/15 bg-[#001e1d]/35 p-3">
+      <p className="mb-2 text-[0.65rem] font-medium uppercase tracking-wider text-[#abd1c6]/60">
+        Корректировка уровня доверия
+      </p>
+      <p className="mb-3 text-xs text-[#abd1c6]/75">
+        Сдвигает уровень на шаг вниз или вверх относительно текущего расчёта по
+        одобренным заявкам (шаг ≈ 3 одобрения).
+      </p>
+      <div className="flex flex-col gap-2 xs:flex-row xs:flex-wrap xs:items-center">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full border-[#abd1c6]/30 text-[#fffffe] hover:border-[#f9bc60]/45 hover:bg-[#f9bc60]/10 xs:w-auto"
+              onClick={() => applyDelta(-1)}
+              disabled={disabled || !canDecrease}
+            >
+              −1 уровень
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-[220px] text-xs">
+            Понизить уровень доверия на одну ступень (если это возможно).
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full border-[#abd1c6]/30 text-[#fffffe] hover:border-[#f9bc60]/45 hover:bg-[#f9bc60]/10 xs:w-auto"
+              onClick={() => applyDelta(1)}
+              disabled={disabled || !canIncrease}
+            >
+              +1 уровень
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-[220px] text-xs">
+            Повысить уровень доверия на одну ступень (если это возможно).
+          </TooltipContent>
+        </Tooltip>
+        {disabled ? (
+          <span className="flex items-center gap-1.5 text-xs text-[#abd1c6]/70">
+            <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#f9bc60]/40 border-t-transparent" />
+            Сохранение…
+          </span>
+        ) : null}
+      </div>
     </div>
   );
 }

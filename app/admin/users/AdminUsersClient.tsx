@@ -8,6 +8,7 @@ import { useAdminUsers } from "@/hooks/admin/useAdminUsers";
 export default function AdminUsersClient() {
   const {
     users,
+    totalCount,
     loading,
     loadingMore,
     hasMore,
@@ -36,14 +37,16 @@ export default function AdminUsersClient() {
   return (
     <div className="min-h-screen relative">
       <div className="relative z-10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">
           <AdminHeader />
 
           <AdminUsersHeader
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             usersCount={users.length}
+            totalCount={totalCount}
             hasMore={hasMore}
+            loading={loading}
           />
 
           <AdminUsersList
@@ -59,6 +62,7 @@ export default function AdminUsersClient() {
             onTrustUpdated={handleTrustUpdated}
             onDelete={handleDeleteUser}
             showToast={showToast}
+            onClearSearch={() => setSearchQuery("")}
           />
         </div>
       </div>

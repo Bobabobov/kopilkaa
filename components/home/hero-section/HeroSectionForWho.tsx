@@ -19,7 +19,9 @@ export function HeroSectionForWho() {
             <HandHeart className="w-6 h-6" />
           </span>
           <div>
-            <span className="font-bold text-[#fffffe] block">Мне нужна финансовая помощь</span>
+            <span className="font-bold text-[#fffffe] block">
+              Мне нужна финансовая помощь
+            </span>
             <span className="text-sm text-[#abd1c6]">Подать заявку →</span>
           </div>
         </Link>
@@ -28,8 +30,12 @@ export function HeroSectionForWho() {
             <PiggyBank className="w-6 h-6" />
           </span>
           <div className="min-w-0">
-            <span className="font-bold text-[#fffffe] block">Хочу поддержать других</span>
-            <span className="text-sm text-[#abd1c6] block mb-2">Пополнить копилку</span>
+            <span className="font-bold text-[#fffffe] block">
+              Хочу поддержать других
+            </span>
+            <span className="text-sm text-[#abd1c6] block mb-2">
+              Пополнить копилку
+            </span>
             <DonateButton variant="default" />
           </div>
         </div>

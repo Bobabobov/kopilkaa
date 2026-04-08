@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
-import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 import { parseAdvertisementExpiryInput } from "@/lib/ads/expiry";
+import { sanitizeAdHtml } from "@/lib/ads/sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -33,13 +33,11 @@ export async function PUT(
     const finalPlacement: string = placement || "home_sidebar";
     const finalIsActive: boolean = !!isActive;
     const safeContent =
-      typeof content === "string"
-        ? sanitizeApplicationStoryHtml(content)
-        : content;
+      typeof content === "string" ? sanitizeAdHtml(content) : content;
     const safeConfig =
       config && typeof config === "object" ? { ...(config as any) } : config;
     if (safeConfig && typeof (safeConfig as any).storyText === "string") {
-      (safeConfig as any).storyText = sanitizeApplicationStoryHtml(
+      (safeConfig as any).storyText = sanitizeAdHtml(
         (safeConfig as any).storyText,
       );
     }
@@ -75,7 +73,7 @@ export async function PUT(
         config: safeConfig || null,
         content:
           typeof ad.content === "string"
-            ? sanitizeApplicationStoryHtml(ad.content)
+            ? sanitizeAdHtml(ad.content)
             : ad.content,
       },
     });

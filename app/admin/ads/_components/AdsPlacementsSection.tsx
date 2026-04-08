@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
 import type { Advertisement, AdFormData } from "./types";
 import AdPlacementActions from "./AdPlacementActions";
 import AdPlacementForm from "./AdPlacementForm";
@@ -12,6 +13,11 @@ export default function AdsPlacementsSection() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingAd, setEditingAd] = useState<Advertisement | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [cleaningUp, setCleaningUp] = useState(false);
+
+  const { showToast, showDialog } = useBeautifulNotifications();
   const [formData, setFormData] = useState<AdFormData>({
     title: "",
     content: "",
@@ -25,6 +31,8 @@ export default function AdsPlacementsSection() {
     storyImageUrls: [""],
     advertiserName: "",
     advertiserLink: "",
+    advertiserWebsite: "",
+    advertiserTelegram: "",
     bannerMobileImageUrl: "",
     bannerVideoUrl: "",
     bannerMobileVideoUrl: "",
@@ -44,9 +52,21 @@ export default function AdsPlacementsSection() {
       if (response.ok) {
         const data = await response.json();
         setAds(data.ads || []);
+      } else {
+        const data = await response.json().catch(() => null);
+        showToast(
+          "error",
+          "Не удалось загрузить размещения",
+          data?.error || response.statusText,
+        );
       }
     } catch (error) {
       console.error("Error fetching ads:", error);
+      showToast(
+        "error",
+        "Не удалось загрузить размещения",
+        "Проверьте соединение и попробуйте ещё раз",
+      );
     } finally {
       setLoading(false);
     }
@@ -55,7 +75,22 @@ export default function AdsPlacementsSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const isStoriesPlacement = formData.placement === "stories";
+    const hasWebsite = Boolean(formData.advertiserWebsite.trim());
+    const hasTelegram = Boolean(formData.advertiserTelegram.trim());
+    const hasLegacyLink = Boolean(formData.advertiserLink.trim());
+
+    if (isStoriesPlacement && !hasWebsite && !hasTelegram && !hasLegacyLink) {
+      showToast(
+        "warning",
+        "Добавьте контакт для рекламной истории",
+        "Укажите сайт или Telegram (можно оба).",
+      );
+      return;
+    }
+
     try {
+      setSaving(true);
       const url = editingAd
         ? `/api/admin/ads/${editingAd.id}`
         : "/api/admin/ads";
@@ -65,8 +100,6 @@ export default function AdsPlacementsSection() {
         formData.placement === "stories"
           ? formData.storyImageUrls.map((url) => url.trim()).filter(Boolean)
           : [];
-
-      const isStoriesPlacement = formData.placement === "stories";
 
       // Формируем config в зависимости от типа размещения
       let config: any = null;
@@ -78,6 +111,8 @@ export default function AdsPlacementsSection() {
           storyImageUrls: cleanedStoryImages,
           advertiserName: formData.advertiserName,
           advertiserLink: formData.advertiserLink,
+          advertiserWebsite: formData.advertiserWebsite,
+          advertiserTelegram: formData.advertiserTelegram,
         };
       } else if (formData.placement === "home_banner") {
         config = {
@@ -123,9 +158,27 @@ export default function AdsPlacementsSection() {
         setFormData(resetForm());
         setShowForm(false);
         setEditingAd(null);
+        showToast(
+          "success",
+          editingAd ? "Размещение обновлено" : "Размещение создано",
+        );
+      } else {
+        const data = await response.json().catch(() => null);
+        showToast(
+          "error",
+          "Не удалось сохранить размещение",
+          data?.error || response.statusText,
+        );
       }
     } catch (error) {
       console.error("Error saving ad:", error);
+      showToast(
+        "error",
+        "Не удалось сохранить размещение",
+        "Проверьте соединение и попробуйте ещё раз",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -146,6 +199,8 @@ export default function AdsPlacementsSection() {
         : [""],
       advertiserName: ad.config?.advertiserName || "",
       advertiserLink: ad.config?.advertiserLink || "",
+      advertiserWebsite: ad.config?.advertiserWebsite || "",
+      advertiserTelegram: ad.config?.advertiserTelegram || "",
       bannerMobileImageUrl: ad.config?.bannerMobileImageUrl || "",
       bannerVideoUrl: ad.config?.bannerVideoUrl || "",
       bannerMobileVideoUrl: ad.config?.bannerMobileVideoUrl || "",
@@ -156,29 +211,49 @@ export default function AdsPlacementsSection() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Вы уверены, что хотите удалить это размещение?")) return;
-
+  const deleteAd = async (id: string) => {
+    setDeletingId(id);
     try {
       const response = await fetch(`/api/admin/ads/${id}`, {
         method: "DELETE",
       });
-
       const data = await response.json().catch(() => null);
 
       if (response.ok && data?.success) {
         await fetchAds();
+        showToast("success", "Размещение удалено");
       } else {
         console.error(
           "Failed to delete ad:",
           data?.error || response.statusText,
         );
-        alert(data?.error || "Не удалось удалить размещение");
+        showToast(
+          "error",
+          "Не удалось удалить размещение",
+          data?.error || response.statusText,
+        );
       }
     } catch (error) {
       console.error("Error deleting ad:", error);
-      alert("Ошибка при удалении размещения");
+      showToast(
+        "error",
+        "Не удалось удалить размещение",
+        "Проверьте соединение и попробуйте ещё раз",
+      );
+    } finally {
+      setDeletingId(null);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    showDialog({
+      type: "confirm",
+      title: "Удалить размещение?",
+      message: "Действие необратимо. Размещение исчезнет с сайта.",
+      confirmText: "Удалить",
+      cancelText: "Отмена",
+      onConfirm: () => void deleteAd(id),
+    });
   };
 
   const resetForm = (): AdFormData => {
@@ -195,6 +270,8 @@ export default function AdsPlacementsSection() {
       storyImageUrls: [""],
       advertiserName: "",
       advertiserLink: "",
+      advertiserWebsite: "",
+      advertiserTelegram: "",
       bannerMobileImageUrl: "",
       bannerVideoUrl: "",
       bannerMobileVideoUrl: "",
@@ -211,22 +288,49 @@ export default function AdsPlacementsSection() {
   };
 
   const handleCleanup = async () => {
-    if (!confirm("Деактивировать все истёкшие размещения?")) return;
-
+    setCleaningUp(true);
     try {
       const response = await fetch("/api/admin/ads/cleanup", {
         method: "POST",
       });
-
       if (response.ok) {
-        const data = await response.json();
-        alert(`Деактивировано размещений: ${data.deactivatedCount}`);
+        const data = await response.json().catch(() => null);
+        showToast(
+          "success",
+          "Очистка выполнена",
+          `Деактивировано размещений: ${data?.deactivatedCount ?? 0}`,
+        );
         await fetchAds();
+      } else {
+        const data = await response.json().catch(() => null);
+        showToast(
+          "error",
+          "Не удалось выполнить очистку",
+          data?.error || response.statusText,
+        );
       }
     } catch (error) {
       console.error("Error cleaning up ads:", error);
-      alert("Ошибка при очистке рекламы");
+      showToast(
+        "error",
+        "Не удалось выполнить очистку",
+        "Проверьте соединение и попробуйте ещё раз",
+      );
+    } finally {
+      setCleaningUp(false);
     }
+  };
+
+  const handleCleanupConfirm = () => {
+    showDialog({
+      type: "confirm",
+      title: "Деактивировать истёкшие размещения?",
+      message:
+        "Мы отключим все активные размещения, у которых срок действия уже прошёл.",
+      confirmText: "Деактивировать",
+      cancelText: "Отмена",
+      onConfirm: () => void handleCleanup(),
+    });
   };
 
   if (loading) {
@@ -242,8 +346,11 @@ export default function AdsPlacementsSection() {
     <>
       <AdPlacementActions
         activeCount={ads.filter((ad) => ad.isActive).length}
-        onCleanup={handleCleanup}
-        onAddNew={() => setShowForm(true)}
+        onCleanup={handleCleanupConfirm}
+        onAddNew={() => {
+          setEditingAd(null);
+          setShowForm(true);
+        }}
       />
 
       {showForm && (
@@ -258,6 +365,15 @@ export default function AdsPlacementsSection() {
 
       {/* Список размещений */}
       <div className="space-y-4">
+        {(saving || cleaningUp || deletingId) && (
+          <div className="mb-2 text-xs text-[#abd1c6]/70">
+            {saving
+              ? "Сохраняем..."
+              : cleaningUp
+                ? "Выполняем очистку..."
+                : "Удаляем..."}
+          </div>
+        )}
         {ads.length === 0 ? (
           <div className="text-center py-16 px-4">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#001e1d] border border-[#abd1c6]/20 mb-4">

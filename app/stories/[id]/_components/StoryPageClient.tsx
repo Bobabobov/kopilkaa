@@ -14,18 +14,21 @@ import {
   StoryMetadata,
   StoryNavigation,
 } from "@/components/stories";
+import StoryAdImages from "@/components/stories/StoryAdImages";
 import { StoryPageLoading } from "./sections/StoryPageLoading";
 import { StoryPageError } from "./sections/StoryPageError";
 import { StoryPageNotFound } from "./sections/StoryPageNotFound";
 import { StoryAdInfoBanner } from "./sections/StoryAdInfoBanner";
 import { ReadingProgressBar } from "./ReadingProgressBar";
 import { StoryMoreStories } from "./StoryMoreStories";
+import StoryAdLanding from "./StoryAdLanding";
 
 export interface Story {
   id: string;
   title: string;
   summary: string;
   story?: string;
+  previewImageUrl?: string;
   createdAt?: string;
   isContestWinner?: boolean;
   images?: Array<{ url: string; sort: number }>;
@@ -41,6 +44,8 @@ export interface Story {
   };
   userLiked?: boolean;
   advertiserLink?: string;
+  advertiserWebsite?: string;
+  advertiserTelegram?: string;
 }
 
 interface StoryPageClientProps {
@@ -57,10 +62,14 @@ export default function StoryPageClient({
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [story, setStory] = useState<Story | null>(initialStory);
-  const [loading, setLoading] = useState(storyId === "ad" || (!initialStory && !initialError));
+  const [loading, setLoading] = useState(
+    storyId === "ad" || (!initialStory && !initialError),
+  );
   const [error, setError] = useState<string | null>(initialError);
   const [liked, setLiked] = useState(initialStory?.userLiked ?? false);
-  const [likesCount, setLikesCount] = useState(initialStory?._count?.likes ?? 0);
+  const [likesCount, setLikesCount] = useState(
+    initialStory?._count?.likes ?? 0,
+  );
   const [isLiking, setIsLiking] = useState(false);
 
   // При открытии страницы истории всегда показывать сверху (текст, а не низ)
@@ -99,6 +108,8 @@ export default function StoryPageClient({
             storyImageUrls?: string[];
             advertiserName?: string;
             advertiserLink?: string;
+            advertiserWebsite?: string;
+            advertiserTelegram?: string;
           };
 
           const images: Array<{ url: string; sort: number }> = [];
@@ -124,6 +135,7 @@ export default function StoryPageClient({
               ad.content ||
               "Рекламная история в разделе /stories. Описание будет здесь.",
             story: config.storyText || ad.content || "",
+            previewImageUrl: ad.imageUrl || undefined,
             createdAt: ad.createdAt || new Date().toISOString(),
             images,
             user: {
@@ -137,6 +149,8 @@ export default function StoryPageClient({
             },
             userLiked: false,
             advertiserLink,
+            advertiserWebsite: config.advertiserWebsite || undefined,
+            advertiserTelegram: config.advertiserTelegram || undefined,
           };
 
           setStory(adStory);
@@ -164,6 +178,7 @@ export default function StoryPageClient({
 
 Когда проект наберёт статистику, мы добавим реальные данные по показам и кликам именно вашей рекламной истории. До этого момента все числа на странице рекламы — это аккуратные ориентиры по опыту похожих проектов, а не красивые обещания из воздуха.`,
       createdAt: new Date().toISOString(),
+      previewImageUrl: "/stories-preview.jpg",
       images: [
         { url: "/stories-preview.jpg", sort: 1 },
         { url: "/stories-icon.png", sort: 2 },
@@ -179,6 +194,8 @@ export default function StoryPageClient({
       },
       userLiked: false,
       advertiserLink: "/advertising",
+      advertiserWebsite: undefined,
+      advertiserTelegram: undefined,
     };
 
     setStory(fallbackStory);
@@ -309,6 +326,20 @@ export default function StoryPageClient({
     return <StoryPageNotFound />;
   }
 
+  if (story.id === "ad") {
+    return (
+      <StoryAdLanding
+        story={story}
+        liked={liked}
+        likesCount={likesCount}
+        onLike={handleLike}
+        isAuthenticated={isAuthenticated}
+        storyId={storyId}
+        isLiking={isLiking}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <ReadingProgressBar />
@@ -321,56 +352,53 @@ export default function StoryPageClient({
               <div className="hidden sm:block absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#f9bc60]/10 blur-3xl pointer-events-none" />
               <div className="hidden sm:block absolute -bottom-20 -left-20 h-32 w-32 rounded-full bg-[#abd1c6]/10 blur-3xl pointer-events-none" />
               <div className="relative">
-              <StoryHeader
-                title={story.title}
-                author={
-                  story.user?.name || story.user?.email || "Неизвестный автор"
-                }
-                authorId={story.user?.id}
-                authorAvatar={story.user?.avatar}
-                createdAt={story.createdAt}
-                isAd={story.id === "ad"}
-                isContestWinner={!!story.isContestWinner}
-                authorExternalUrl={
-                  story.id === "ad" ? story.advertiserLink : undefined
-                }
-              />
+                <StoryHeader
+                  title={story.title}
+                  author={
+                    story.user?.name || story.user?.email || "Неизвестный автор"
+                  }
+                  authorId={story.user?.id}
+                  authorAvatar={story.user?.avatar}
+                  createdAt={story.createdAt}
+                  isAd={story.id === "ad"}
+                  isContestWinner={!!story.isContestWinner}
+                  authorExternalUrl={
+                    story.id === "ad" ? story.advertiserLink : undefined
+                  }
+                />
 
-            <StoryMetadata
-              story={story}
-              liked={liked}
-              likesCount={likesCount}
-              onLike={handleLike}
-              isAuthenticated={isAuthenticated}
-              isAd={story.id === "ad"}
-              storyId={story.id}
-              storyTitle={story.title}
-              isLiking={isLiking}
-            />
+                <StoryMetadata
+                  story={story}
+                  liked={liked}
+                  likesCount={likesCount}
+                  onLike={handleLike}
+                  isAuthenticated={isAuthenticated}
+                  isAd={story.id === "ad"}
+                  storyId={story.id}
+                  storyTitle={story.title}
+                  isLiking={isLiking}
+                />
 
-            <div className="mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#94a1b2]">
-                Текст истории
-              </span>
-            </div>
-            <StoryContent
-              content={
-                story.story || story.summary || "Текст истории недоступен."
-              }
-              isAd={story.id === "ad"}
-            />
+                <div className="mb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[#94a1b2]">
+                    Текст истории
+                  </span>
+                </div>
+                <StoryContent
+                  content={
+                    story.story || story.summary || "Текст истории недоступен."
+                  }
+                  isAd={story.id === "ad"}
+                />
 
-            {story.images && story.images.length > 0 && (
-              <StoryImages images={story.images} title={story.title} />
-            )}
+                {story.images && story.images.length > 0 && (
+                  <StoryImages images={story.images} title={story.title} />
+                )}
 
-            {story.id === "ad" && <StoryAdInfoBanner />}
-
-            <StoryActions
-              isAd={story.id === "ad"}
-              advertiserLink={story.advertiserLink}
-            />
-
+                <StoryActions
+                  isAd={story.id === "ad"}
+                  advertiserLink={story.advertiserLink}
+                />
               </div>
             </article>
 

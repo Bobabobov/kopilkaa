@@ -12,7 +12,8 @@ export function HeroSectionHeadline() {
 
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-9 text-[#fffffe]">
         Нужны деньги на жизнь?{" "}
-        <span className="text-[#f9bc60]">Расскажите историю</span> — мы рассмотрим и, по возможности, поможем
+        <span className="text-[#f9bc60]">Расскажите историю</span> — мы
+        рассмотрим и, по возможности, поможем
       </h1>
     </>
   );

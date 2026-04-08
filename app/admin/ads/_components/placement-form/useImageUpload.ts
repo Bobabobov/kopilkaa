@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
 
 interface ImageFile {
   file: File;
@@ -8,6 +9,7 @@ interface ImageFile {
 export function useImageUpload() {
   const [uploading, setUploading] = useState(false);
   const [previewFile, setPreviewFile] = useState<ImageFile | null>(null);
+  const { showToast } = useBeautifulNotifications();
 
   const validateFile = (file: File): string | null => {
     if (!file.type.startsWith("image/")) {
@@ -55,7 +57,7 @@ export function useImageUpload() {
 
     const validationError = validateFile(file);
     if (validationError) {
-      alert(validationError);
+      showToast("warning", "Неверный файл", validationError);
       return;
     }
 
@@ -72,7 +74,11 @@ export function useImageUpload() {
       setPreviewFile(null);
     } catch (error: any) {
       console.error("Error uploading image:", error);
-      alert(error.message || "Не удалось загрузить изображение");
+      showToast(
+        "error",
+        "Не удалось загрузить изображение",
+        error?.message || "Попробуйте ещё раз",
+      );
       URL.revokeObjectURL(previewUrl);
       setPreviewFile(null);
     } finally {
@@ -98,6 +104,7 @@ export function useImageUpload() {
 export function useVideoUpload() {
   const [uploading, setUploading] = useState(false);
   const [previewFile, setPreviewFile] = useState<ImageFile | null>(null);
+  const { showToast } = useBeautifulNotifications();
 
   const validateFile = (file: File): string | null => {
     const allowed = ["video/mp4", "video/webm"];
@@ -146,7 +153,7 @@ export function useVideoUpload() {
 
     const validationError = validateFile(file);
     if (validationError) {
-      alert(validationError);
+      showToast("warning", "Неверный файл", validationError);
       return;
     }
 
@@ -162,7 +169,11 @@ export function useVideoUpload() {
       setPreviewFile(null);
     } catch (error: any) {
       console.error("Error uploading video:", error);
-      alert(error.message || "Не удалось загрузить видео");
+      showToast(
+        "error",
+        "Не удалось загрузить видео",
+        error?.message || "Попробуйте ещё раз",
+      );
       URL.revokeObjectURL(previewUrl);
       setPreviewFile(null);
     } finally {
@@ -190,6 +201,7 @@ export function useMultipleImageUpload() {
   const [previewFiles, setPreviewFiles] = useState<Record<number, ImageFile>>(
     {},
   );
+  const { showToast } = useBeautifulNotifications();
 
   const validateFile = (file: File): string | null => {
     if (!file.type.startsWith("image/")) {
@@ -238,7 +250,7 @@ export function useMultipleImageUpload() {
 
     const validationError = validateFile(file);
     if (validationError) {
-      alert(validationError);
+      showToast("warning", "Неверный файл", validationError);
       return;
     }
 
@@ -262,7 +274,11 @@ export function useMultipleImageUpload() {
       });
     } catch (error: any) {
       console.error("Error uploading image:", error);
-      alert(error.message || "Не удалось загрузить изображение");
+      showToast(
+        "error",
+        "Не удалось загрузить изображение",
+        error?.message || "Попробуйте ещё раз",
+      );
       URL.revokeObjectURL(previewUrl);
       setPreviewFiles((prev) => {
         const next = { ...prev };

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
-import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 import { parseAdvertisementExpiryInput } from "@/lib/ads/expiry";
+import { sanitizeAdHtml } from "@/lib/ads/sanitize";
 
 export async function GET() {
   try {
@@ -22,16 +22,14 @@ export async function GET() {
           ? { ...(ad.config as any) }
           : null;
       if (safeConfig && typeof safeConfig.storyText === "string") {
-        safeConfig.storyText = sanitizeApplicationStoryHtml(
-          safeConfig.storyText,
-        );
+        safeConfig.storyText = sanitizeAdHtml(safeConfig.storyText);
       }
       return {
         ...ad,
         config: safeConfig,
         content:
           typeof ad.content === "string"
-            ? sanitizeApplicationStoryHtml(ad.content)
+            ? sanitizeAdHtml(ad.content)
             : ad.content,
       };
     });
@@ -64,13 +62,11 @@ export async function POST(request: NextRequest) {
     const finalPlacement: string = placement || "home_sidebar";
     const finalIsActive: boolean = isActive ?? true;
     const safeContent =
-      typeof content === "string"
-        ? sanitizeApplicationStoryHtml(content)
-        : content;
+      typeof content === "string" ? sanitizeAdHtml(content) : content;
     const safeConfig =
       config && typeof config === "object" ? { ...(config as any) } : config;
     if (safeConfig && typeof (safeConfig as any).storyText === "string") {
-      (safeConfig as any).storyText = sanitizeApplicationStoryHtml(
+      (safeConfig as any).storyText = sanitizeAdHtml(
         (safeConfig as any).storyText,
       );
     }
@@ -105,7 +101,7 @@ export async function POST(request: NextRequest) {
         config: safeConfig || null,
         content:
           typeof ad.content === "string"
-            ? sanitizeApplicationStoryHtml(ad.content)
+            ? sanitizeAdHtml(ad.content)
             : ad.content,
       },
     });

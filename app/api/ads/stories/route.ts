@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
+import { sanitizeAdHtml } from "@/lib/ads/sanitize";
 
 // Явно указываем, что роут динамический (не кэшируется)
 export const dynamic = "force-dynamic";
@@ -27,14 +27,14 @@ export async function GET() {
       ad.config && typeof ad.config === "object" ? ad.config : {}
     ) as any;
     if (typeof safeConfig.storyText === "string") {
-      safeConfig.storyText = sanitizeApplicationStoryHtml(safeConfig.storyText);
+      safeConfig.storyText = sanitizeAdHtml(safeConfig.storyText);
     }
     const safeAd: any = {
       ...ad,
       config: safeConfig,
       content:
         typeof ad.content === "string"
-          ? sanitizeApplicationStoryHtml(ad.content)
+          ? sanitizeAdHtml(ad.content)
           : ad.content,
     };
 

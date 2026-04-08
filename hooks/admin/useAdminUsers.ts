@@ -8,6 +8,7 @@ import { getTrustLevelFromEffectiveApproved } from "@/lib/trustLevel";
 
 export function useAdminUsers() {
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -69,6 +70,9 @@ export function useAdminUsers() {
       const data = await response.json();
       if (data.success) {
         const newUsers = data.data || [];
+        if (typeof data.total === "number") {
+          setTotalCount(data.total);
+        }
         if (reset) {
           setUsers(newUsers);
         } else {
@@ -153,6 +157,7 @@ export function useAdminUsers() {
 
   return {
     users,
+    totalCount,
     loading,
     loadingMore,
     hasMore,

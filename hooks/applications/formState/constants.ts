@@ -23,4 +23,4 @@ export const UPLOAD_LIMITS = {
   maxTotalBytes: 10 * 1024 * 1024,
 } as const;
 
-export const TOTAL_FIELDS = 7;
+export const TOTAL_FIELDS = 8;

@@ -2,11 +2,13 @@
 
 import type { Variants } from "framer-motion";
 
-/** Контейнер шага: поочерёдное появление полей */
+/**
+ * Контейнер шага: только stagger по дочерним motion — без opacity на родителе,
+ * иначе при переключении шагов весь блок мог оставаться с opacity 0 (редкий баг с FM + wait).
+ */
 export const wizardStaggerContainer: Variants = {
-  hidden: { opacity: 0 },
+  hidden: {},
   show: {
-    opacity: 1,
     transition: {
       staggerChildren: 0.065,
       delayChildren: 0.05,
@@ -14,8 +16,9 @@ export const wizardStaggerContainer: Variants = {
   },
 };
 
+/** Без opacity:0 в hidden — при не-motion обёртках между родителем и полем FM иногда не доанимировал «show», форма оставалась невидимой */
 export const wizardStaggerItem: Variants = {
-  hidden: { opacity: 0, y: 14 },
+  hidden: { opacity: 1, y: 10 },
   show: {
     opacity: 1,
     y: 0,

@@ -1,14 +1,20 @@
 "use client";
 
-import { postApplication } from "@/hooks/applications/formState/submitApi";
+import {
+  postApplication,
+  type SubmitApplicationPayload,
+} from "@/hooks/applications/formState/submitApi";
+import { isApplicationCategory } from "@/lib/applications/categories";
 
 export type PendingApplicationPayload = {
+  category?: import("@prisma/client").ApplicationCategory;
   title: string;
   summary: string;
   story: string;
   amount: string;
   payment: string;
   images: string[];
+  reportImages?: string[];
   hpCompany: string;
   acknowledgedRules: boolean;
   clientMeta: { filledMs: number | null };
@@ -36,6 +42,13 @@ export function loadPendingApplication(): PendingApplicationPayload | null {
     if (!parsed || typeof parsed !== "object") return null;
     if (!parsed.title || !parsed.summary || !parsed.story) return null;
     if (!Array.isArray(parsed.images)) return null;
+    if (
+      parsed.category != null &&
+      typeof parsed.category === "string" &&
+      !isApplicationCategory(parsed.category)
+    ) {
+      return null;
+    }
     return parsed as PendingApplicationPayload;
   } catch {
     return null;
@@ -80,7 +93,14 @@ export async function submitPendingApplicationIfNeeded(): Promise<boolean> {
 
   sessionStorage.setItem(INFLIGHT_KEY, "true");
   try {
-    const { response, data } = await postApplication(payload);
+    if (!payload.category || !isApplicationCategory(payload.category)) {
+      clearPendingApplication();
+      return false;
+    }
+
+    const { response, data } = await postApplication(
+      payload as SubmitApplicationPayload,
+    );
     if (response.ok) {
       markPendingSubmissionSuccess();
       clearPendingApplication();

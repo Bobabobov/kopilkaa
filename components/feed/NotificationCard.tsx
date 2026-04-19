@@ -35,7 +35,7 @@ const getNotificationAccent = (
   if (type === "friend_request") {
     return `bg-gradient-to-r from-[#f9bc60]/${opacity} to-[#e16162]/${opacity}`;
   }
-  if (type === "application_status") {
+  if (type === "application_status" || type === "withdrawal_status") {
     if (status === "APPROVED") {
       return `bg-gradient-to-r from-green-500/${opacity} to-emerald-500/${opacity}`;
     }
@@ -66,6 +66,7 @@ const TYPE_LABELS: Record<string, string> = {
   like: "Лайк",
   friend_request: "Друзья",
   application_status: "Заявка",
+  withdrawal_status: "Выплата",
   system: "Система",
 };
 
@@ -178,10 +179,13 @@ export default function NotificationCard({
                     "text-[10px] font-medium px-2 py-0 rounded-md",
                     notification.type === "like" && "bg-red-500/15 text-red-400 border-red-500/30",
                     notification.type === "friend_request" && "bg-[#f9bc60]/15 text-[#f9bc60] border-[#f9bc60]/30",
-                    notification.type === "application_status" &&
+                    (notification.type === "application_status" ||
+                      notification.type === "withdrawal_status") &&
                       (notification.status === "APPROVED"
                         ? "bg-green-500/15 text-green-400 border-green-500/30"
-                        : "bg-red-500/15 text-red-400 border-red-500/30"),
+                        : notification.status === "REJECTED"
+                          ? "bg-red-500/15 text-red-400 border-red-500/30"
+                          : "bg-violet-500/15 text-violet-400 border-violet-500/30"),
                   )}
                 >
                   {typeLabel}
@@ -235,6 +239,13 @@ export default function NotificationCard({
                             одобрена
                           </span>
                         </>
+                      ) : notification.status === "CONTEST" ? (
+                        <>
+                          Ваша заявка{" "}
+                          <span className="font-medium text-violet-400">
+                            участвует в конкурсе
+                          </span>
+                        </>
                       ) : (
                         <>
                           Ваша заявка была{" "}
@@ -253,6 +264,13 @@ export default function NotificationCard({
                       </div>
                     )}
                   </>
+                )}
+
+                {/* Выплаты бонусов */}
+                {notification.type === "withdrawal_status" && (
+                  <p className="text-sm sm:text-base text-[#abd1c6]/70 leading-relaxed">
+                    {notification.message}
+                  </p>
                 )}
 
                 {/* Заявки в друзья */}

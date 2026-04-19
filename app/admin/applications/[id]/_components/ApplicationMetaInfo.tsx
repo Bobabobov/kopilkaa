@@ -8,6 +8,8 @@ interface ApplicationMetaInfoProps {
   summary: string;
   onCopyEmail: (email: string) => void;
   filledMs?: number | null;
+  /** Локализованное название категории помощи */
+  categoryLabel?: string | null;
 }
 
 export default function ApplicationMetaInfo({
@@ -16,6 +18,7 @@ export default function ApplicationMetaInfo({
   summary,
   onCopyEmail,
   filledMs,
+  categoryLabel,
 }: ApplicationMetaInfoProps) {
   const formattedTime = (() => {
     if (typeof filledMs !== "number" || !Number.isFinite(filledMs)) return null;
@@ -104,6 +107,25 @@ export default function ApplicationMetaInfo({
           </div>
         )}
       </motion.div>
+
+      {/* Категория помощи */}
+      {categoryLabel ? (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.35 }}
+          className="mb-4"
+        >
+          <div className="inline-flex flex-wrap items-center gap-2 rounded-2xl border border-[#abd1c6]/35 bg-[#001e1d]/45 px-3 py-2 sm:px-4 sm:py-2.5">
+            <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wide text-[#94a1b2]">
+              Категория
+            </span>
+            <span className="text-sm font-semibold text-[#f9bc60]">
+              {categoryLabel}
+            </span>
+          </div>
+        </motion.div>
+      ) : null}
 
       {/* Краткое описание */}
       <motion.div

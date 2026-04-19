@@ -12,7 +12,8 @@ export type FilterType =
   | "unread"
   | "like"
   | "friend_request"
-  | "application_status";
+  | "application_status"
+  | "withdrawal_status";
 
 interface FeedFiltersProps {
   activeFilter: FilterType;
@@ -30,6 +31,7 @@ const filters: {
   { type: "like", label: "Лайки", icon: "Heart" },
   { type: "friend_request", label: "Друзья", icon: "UserPlus" },
   { type: "application_status", label: "Заявки", icon: "FileText" },
+  { type: "withdrawal_status", label: "Выплаты", icon: "Coins" },
 ];
 
 export default function FeedFilters({

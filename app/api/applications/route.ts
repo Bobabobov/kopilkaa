@@ -7,11 +7,19 @@ import {
   sanitizeApplicationStoryHtml,
 } from "@/lib/applications/sanitize";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
-import { ApplicationStatus } from "@prisma/client";
+import {
+  ApplicationCategory,
+  ApplicationStatus,
+  Prisma,
+} from "@prisma/client";
 import {
   checkActivityRequirement,
   isActivityRequirementMet,
 } from "@/lib/activity/checkActivityRequirement";
+import {
+  isApplicationCategory,
+  REPORT_PHOTOS_MIN,
+} from "@/lib/applications/categories";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -63,6 +71,7 @@ export async function POST(req: Request) {
   }
 
   const body = (await req.json()) as {
+    category: string;
     title: string;
     summary: string;
     story: string;
@@ -104,6 +113,7 @@ export async function POST(req: Request) {
       whitelistEmails.includes(requester.email.toLowerCase());
 
     const {
+      category: categoryRaw,
       title,
       summary,
       story,
@@ -159,6 +169,14 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
+
+    if (!categoryRaw || !isApplicationCategory(categoryRaw)) {
+      return Response.json(
+        { error: "Укажите категорию помощи" },
+        { status: 400 },
+      );
+    }
+    const category: ApplicationCategory = categoryRaw;
 
     const sanitizedStory = sanitizeApplicationStoryHtml(story);
     const storyTextLen = getPlainTextLenFromHtml(sanitizedStory);
@@ -295,12 +313,27 @@ export async function POST(req: Request) {
     const submitterIp = getClientIp(req);
     const clientDevice = getClientDevice(req);
 
+    if (
+      session.role !== "ADMIN" &&
+      lastApprovedByUser?.id &&
+      (!Array.isArray(reportImages) ||
+        reportImages.length < REPORT_PHOTOS_MIN)
+    ) {
+      return Response.json(
+        {
+          error: `Приложите минимум ${REPORT_PHOTOS_MIN} фото отчёта по прошлой одобренной заявке`,
+        },
+        { status: 400 },
+      );
+    }
+
     // Используем транзакцию для атомарности
     const result = await prisma.$transaction(async (tx) => {
       // Создаём заявку
       const app = await tx.application.create({
         data: {
           userId: session.uid,
+          category,
           title,
           summary,
           story: sanitizedStory,
@@ -338,12 +371,11 @@ export async function POST(req: Request) {
           0,
           session.role === "ADMIN" ? reportImages.length : 5,
         );
-        const reportModel = (tx as any).applicationReportImage;
-        if (reportModel) {
-          await reportModel.deleteMany({
-            where: { applicationId: lastApprovedByUser.id },
-          });
-          await reportModel.createMany({
+        await tx.applicationReportImage.deleteMany({
+          where: { applicationId: lastApprovedByUser.id },
+        });
+        if (urls.length > 0) {
+          await tx.applicationReportImage.createMany({
             data: urls.map((url, index) => ({
               applicationId: lastApprovedByUser.id,
               url,
@@ -362,7 +394,7 @@ export async function POST(req: Request) {
       userId: session.uid,
       title,
       summary,
-      amount: parseInt(amount),
+      amount: amountNumber,
       status: "PENDING",
     });
 
@@ -373,8 +405,44 @@ export async function POST(req: Request) {
     const msg = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack : "";
     console.error("[POST /api/applications]", msg, stack);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2022") {
+        return Response.json(
+          {
+            error:
+              "База данных не обновлена: отсутствует колонка в таблице заявок. Выполните у себя: npx prisma migrate deploy и prisma generate.",
+          },
+          { status: 500 },
+        );
+      }
+      if (error.code === "P2002") {
+        return Response.json(
+          {
+            error:
+              "Не удалось сохранить из‑за конфликта записей. Обновите страницу и отправьте снова.",
+          },
+          { status: 409 },
+        );
+      }
+      if (error.code === "P2003") {
+        return Response.json(
+          {
+            error:
+              "Ошибка связи записей в базе. Обновите страницу или напишите в поддержку.",
+          },
+          { status: 500 },
+        );
+      }
+    }
+
     return Response.json(
-      { error: "Ошибка сохранения заявки" },
+      {
+        error: "Ошибка сохранения заявки",
+        ...(process.env.NODE_ENV === "development"
+          ? { detail: msg.slice(0, 300) }
+          : {}),
+      },
       { status: 500 },
     );
   }

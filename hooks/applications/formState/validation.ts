@@ -1,5 +1,7 @@
 "use client";
 
+import type { ApplicationCategory } from "@prisma/client";
+import { isApplicationCategory, REPORT_PHOTOS_MIN } from "@/lib/applications/categories";
 import { LIMITS, TOTAL_FIELDS } from "./constants";
 
 export function getStoryTextLen(story: string): number {
@@ -15,6 +17,7 @@ export function getCharCount(text: string): number {
 }
 
 export interface FormValidationInput {
+  category: ApplicationCategory | "";
   title: string;
   summary: string;
   storyTextLen: number;
@@ -23,12 +26,16 @@ export interface FormValidationInput {
   bankName: string;
   payment: string;
   photosCount: number;
+  reportPhotosCount: number;
+  /** Нужен фото-отчёт по прошлой одобренной заявке */
+  requiresReport: boolean;
   isAdmin: boolean;
   withinTrustRange: boolean;
 }
 
 export function isApplicationFormValid(input: FormValidationInput): boolean {
   const {
+    category,
     title,
     summary,
     storyTextLen,
@@ -37,11 +44,17 @@ export function isApplicationFormValid(input: FormValidationInput): boolean {
     bankName,
     payment,
     photosCount,
+    reportPhotosCount,
+    requiresReport,
     isAdmin,
     withinTrustRange,
   } = input;
+  const reportOk =
+    !requiresReport ||
+    isAdmin ||
+    reportPhotosCount >= REPORT_PHOTOS_MIN;
   return (
-    title.length > 0 &&
+    isApplicationCategory(category) &&
     title.length <= LIMITS.titleMax &&
     summary.length > 0 &&
     summary.length <= LIMITS.summaryMax &&
@@ -55,11 +68,13 @@ export function isApplicationFormValid(input: FormValidationInput): boolean {
     payment.length >= LIMITS.paymentMin &&
     (isAdmin || payment.length <= LIMITS.paymentMax) &&
     photosCount > 0 &&
-    photosCount <= LIMITS.maxPhotos
+    photosCount <= LIMITS.maxPhotos &&
+    reportOk
   );
 }
 
 export function getFilledFieldsCount(input: {
+  category: ApplicationCategory | "";
   title: string;
   summary: string;
   storyTextLen: number;
@@ -71,6 +86,7 @@ export function getFilledFieldsCount(input: {
 }): number {
   const g = getCharCount;
   return [
+    isApplicationCategory(input.category),
     g(input.title) > 0,
     g(input.summary) > 0,
     input.storyTextLen >= LIMITS.storyMin,
@@ -87,19 +103,22 @@ export function getProgressPercentage(filledFields: number): number {
 
 /** Ключи полей формы для скролла и подсветки */
 export type ApplicationFieldKey =
+  | "category"
   | "title"
   | "summary"
   | "story"
   | "amount"
   | "bankName"
   | "payment"
-  | "photos";
+  | "photos"
+  | "reportPhotos";
 
 /** Ошибки по полям: ключ — id поля, значение — текст подсказки */
 export function getApplicationFormErrors(
   input: FormValidationInput
 ): Partial<Record<ApplicationFieldKey, string>> {
   const {
+    category,
     title,
     summary,
     storyTextLen,
@@ -108,10 +127,16 @@ export function getApplicationFormErrors(
     bankName,
     payment,
     photosCount,
+    reportPhotosCount,
+    requiresReport,
     isAdmin,
     withinTrustRange,
   } = input;
   const errors: Partial<Record<ApplicationFieldKey, string>> = {};
+
+  if (!isApplicationCategory(category)) {
+    errors.category = "Выберите категорию помощи";
+  }
 
   if (title.length === 0) {
     errors.title = "Введите заголовок заявки";
@@ -161,6 +186,14 @@ export function getApplicationFormErrors(
     errors.photos = "Добавьте хотя бы одну фотографию";
   } else if (photosCount > LIMITS.maxPhotos) {
     errors.photos = `Максимум ${LIMITS.maxPhotos} фото`;
+  }
+
+  if (
+    requiresReport &&
+    !isAdmin &&
+    reportPhotosCount < REPORT_PHOTOS_MIN
+  ) {
+    errors.reportPhotos = `Добавьте минимум ${REPORT_PHOTOS_MIN} фото отчёта по прошлой заявке`;
   }
 
   return errors;

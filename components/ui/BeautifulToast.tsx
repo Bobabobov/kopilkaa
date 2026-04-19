@@ -36,6 +36,9 @@ const toastConfig = {
     bgColor: "bg-white/95 dark:bg-[#0d2b29]/97",
     borderColor: "border-emerald-300 dark:border-emerald-500",
     textColor: "text-emerald-700 dark:text-emerald-300",
+    /** Тело: всегда контрастно к bgColor этого типа */
+    messageColor:
+      "text-slate-800 dark:text-emerald-50/95",
   },
   error: {
     icon: (
@@ -57,6 +60,7 @@ const toastConfig = {
     bgColor: "bg-red-50 dark:bg-[#2a1a1a]/97",
     borderColor: "border-red-300 dark:border-red-500",
     textColor: "text-red-600 dark:text-red-400",
+    messageColor: "text-red-950/90 dark:text-red-50/95",
   },
   warning: {
     icon: (
@@ -78,6 +82,7 @@ const toastConfig = {
     bgColor: "bg-amber-50 dark:bg-[#001e1d]/98",
     borderColor: "border-amber-300 dark:border-amber-500",
     textColor: "text-amber-600 dark:text-amber-400",
+    messageColor: "text-amber-950/90 dark:text-amber-50/95",
   },
   info: {
     icon: (
@@ -99,6 +104,8 @@ const toastConfig = {
     bgColor: "bg-blue-50 dark:bg-[#0d1f2b]/97",
     borderColor: "border-blue-300 dark:border-blue-500",
     textColor: "text-blue-600 dark:text-blue-400",
+    /** Только тёмный текст — при `html.dark` классы `dark:text-*` давали белое на голубой плашке */
+    messageColor: "!text-black",
   },
 };
 
@@ -166,7 +173,9 @@ export default function BeautifulToast({
                     {title}
                   </p>
                   {message && (
-                    <p className="text-xs xs:text-sm sm:text-sm text-gray-900 dark:text-[#e8e8e8] mt-1 xs:mt-1.5 leading-relaxed break-words">
+                    <p
+                      className={`text-xs xs:text-sm sm:text-sm mt-1 xs:mt-1.5 leading-relaxed break-words font-medium ${config.messageColor}`}
+                    >
                       {message}
                     </p>
                   )}

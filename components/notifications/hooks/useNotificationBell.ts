@@ -188,6 +188,12 @@ export function useNotificationBell() {
           router.push("/applications");
         }
         setIsOpen(false);
+      } else if (
+        notification.type === "withdrawal_status" &&
+        notification.withdrawalId
+      ) {
+        router.push("/good-deeds");
+        setIsOpen(false);
       } else if (notification.type === "like" && notification.applicationId) {
         router.push(`/stories/${notification.applicationId}`);
         setIsOpen(false);

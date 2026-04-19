@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useRef, useState, useCallback, useEffect } from "react";
+import type { ApplicationCategory } from "@prisma/client";
+import { isApplicationCategory } from "@/lib/applications/categories";
 
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import {
@@ -38,6 +40,7 @@ import {
 export function useApplicationFormState() {
   const { user, loadingAuth } = useApplicationFormAuth();
 
+  const [category, setCategory] = useState<ApplicationCategory | "">("");
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [story, setStory] = useState("");
@@ -152,6 +155,7 @@ export function useApplicationFormState() {
     setSubmitted(true);
     setPhotos([]);
     setReportPhotos([]);
+    setCategory("");
     setTitle("");
     setSummary("");
     setStory("");
@@ -189,6 +193,8 @@ export function useApplicationFormState() {
   } = trust;
 
   const storyTextLen = useMemo(() => getStoryTextLen(story), [story]);
+  const requiresReport =
+    approvedCount !== null && approvedCount >= 1;
 
   useEffect(() => {
     if (storyTextLen > 0) {
@@ -202,6 +208,7 @@ export function useApplicationFormState() {
   const valid = useMemo(
     () =>
       isApplicationFormValid({
+        category,
         title,
         summary,
         storyTextLen,
@@ -210,10 +217,13 @@ export function useApplicationFormState() {
         bankName,
         payment,
         photosCount: photos.length,
+        reportPhotosCount: reportPhotos.length,
+        requiresReport,
         isAdmin,
         withinTrustRange,
       }),
     [
+      category,
       title,
       summary,
       storyTextLen,
@@ -222,6 +232,8 @@ export function useApplicationFormState() {
       bankName,
       payment,
       photos.length,
+      reportPhotos.length,
+      requiresReport,
       isAdmin,
       withinTrustRange,
     ],
@@ -229,6 +241,7 @@ export function useApplicationFormState() {
   const filledFields = useMemo(
     () =>
       getFilledFieldsCount({
+        category,
         title,
         summary,
         storyTextLen,
@@ -239,6 +252,7 @@ export function useApplicationFormState() {
         photosCount: photos.length,
       }),
     [
+      category,
       title,
       summary,
       storyTextLen,
@@ -255,6 +269,7 @@ export function useApplicationFormState() {
   const fieldErrors = useMemo(
     () =>
       getApplicationFormErrors({
+        category,
         title,
         summary,
         storyTextLen,
@@ -263,10 +278,13 @@ export function useApplicationFormState() {
         bankName,
         payment,
         photosCount: photos.length,
+        reportPhotosCount: reportPhotos.length,
+        requiresReport,
         isAdmin,
         withinTrustRange,
       }),
     [
+      category,
       title,
       summary,
       storyTextLen,
@@ -275,6 +293,8 @@ export function useApplicationFormState() {
       bankName,
       payment,
       photos.length,
+      reportPhotos.length,
+      requiresReport,
       isAdmin,
       withinTrustRange,
     ]
@@ -296,48 +316,65 @@ export function useApplicationFormState() {
 
   const amountFormatted = formatAmountRu(amount);
 
-  const submit = useCallback(
-    async (e?: React.FormEvent) => {
-      if (e) e.preventDefault();
-      setErr(null);
+  /** Проверки перед отправкой (без загрузки файлов и без API). */
+  const validateSubmit = useCallback((): boolean => {
+    setErr(null);
 
-      if (!user) {
-        const href = buildAuthModalUrl({
-          pathname:
-            typeof window !== "undefined"
-              ? window.location.pathname
-              : "/applications",
-          search: typeof window !== "undefined" ? window.location.search : "",
-          modal: "auth/signup",
-        });
-        if (typeof window !== "undefined") window.location.href = href;
-        return;
-      }
-      if (!trustAcknowledged || !policiesAccepted) {
-        setAckError(true);
-        return;
-      }
-      setAckError(false);
-      if (photos.length === 0) {
-        setErr("Добавьте хотя бы одну фотографию");
-        return;
-      }
-      if (approvedCount !== null && approvedCount >= 1 && reportPhotos.length === 0) {
-        setErr("Добавьте хотя бы одно фото-отчёт по прошлой заявке");
-        return;
-      }
-      if (!valid) {
-        setErr("Проверьте поля — есть ошибки/лимиты");
-        setValidationScrollTrigger((n) => n + 1);
-        return;
-      }
+    if (!user) {
+      const href = buildAuthModalUrl({
+        pathname:
+          typeof window !== "undefined"
+            ? window.location.pathname
+            : "/applications",
+        search: typeof window !== "undefined" ? window.location.search : "",
+        modal: "auth/signup",
+      });
+      if (typeof window !== "undefined") window.location.href = href;
+      return false;
+    }
+    if (!trustAcknowledged || !policiesAccepted) {
+      setAckError(true);
+      return false;
+    }
+    setAckError(false);
+    if (photos.length === 0) {
+      setErr("Добавьте хотя бы одну фотографию");
+      return false;
+    }
+    if (!valid) {
+      setErr("Проверьте поля — есть ошибки/лимиты");
+      setValidationScrollTrigger((n) => n + 1);
+      return false;
+    }
+
+    if (!isApplicationCategory(category)) {
+      setErr("Выберите категорию помощи");
+      setValidationScrollTrigger((n) => n + 1);
+      return false;
+    }
+
+    return true;
+  }, [
+    user,
+    trustAcknowledged,
+    policiesAccepted,
+    photos.length,
+    valid,
+    category,
+  ]);
+
+  const executeSubmit = useCallback(async () => {
+    const categorySubmit = category;
+    if (!isApplicationCategory(categorySubmit)) {
+      setErr("Выберите категорию помощи");
+      return;
+    }
 
       try {
         setSubmitting(true);
         setUploading(true);
         const urls = await uploadApplicationPhotos(photos);
         const reportUrls = await uploadApplicationPhotos(reportPhotos);
-        setUploading(false);
 
         if (formStartedAtRef.current == null) {
           formStartedAtRef.current = Date.now();
@@ -360,6 +397,7 @@ export function useApplicationFormState() {
           : payment;
 
         const pendingPayload = {
+          category: categorySubmit,
           title,
           summary,
           story,
@@ -415,12 +453,18 @@ export function useApplicationFormState() {
           throw new Error("Превышен лимит. Попробуйте позже.");
         }
         if (!r.ok) {
-          throw new Error((d?.error as string) || "Ошибка отправки");
+          const main = (d?.error as string) || "Ошибка отправки";
+          const detail =
+            typeof d?.detail === "string" && d.detail.length > 0
+              ? d.detail
+              : null;
+          throw new Error(detail ? `${main} ${detail}` : main);
         }
 
         setSubmitted(true);
         setPhotos([]);
         setReportPhotos([]);
+        setCategory("");
         setTitle("");
         setSummary("");
         setStory("");
@@ -437,35 +481,43 @@ export function useApplicationFormState() {
         setErr(e instanceof Error ? e.message : "Ошибка");
       } finally {
         setSubmitting(false);
+        setUploading(false);
       }
+  }, [
+    category,
+    photos,
+    reportPhotos,
+    storyTextLen,
+    title,
+    summary,
+    story,
+    amount,
+    bankName,
+    payment,
+    hpCompany,
+    trustAcknowledged,
+    policiesAccepted,
+    saveKey,
+    trustAckKey,
+    policyAckKey,
+    formStartKey,
+  ]);
+
+  const submit = useCallback(
+    async (e?: React.FormEvent) => {
+      if (e) e.preventDefault();
+      if (!validateSubmit()) return;
+      await executeSubmit();
     },
-    [
-      user,
-      trustAcknowledged,
-      policiesAccepted,
-      photos,
-      reportPhotos,
-      approvedCount,
-      valid,
-      title,
-      summary,
-      story,
-      storyTextLen,
-      amount,
-      bankName,
-      payment,
-      hpCompany,
-      saveKey,
-      trustAckKey,
-      policyAckKey,
-      formStartKey,
-    ],
+    [validateSubmit, executeSubmit],
   );
 
   return {
     introAckKey,
     user,
     loadingAuth,
+    category,
+    setCategory,
     title,
     setTitle,
     summary,
@@ -520,6 +572,8 @@ export function useApplicationFormState() {
     fieldErrors,
     firstErrorKey,
     validationScrollTrigger,
+    validateSubmit,
+    executeSubmit,
     submit,
     formStartedAtRef,
     formStartKey,

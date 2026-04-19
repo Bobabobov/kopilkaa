@@ -130,7 +130,8 @@ export default function ApplicationStatusModalGate() {
     [notification?.adminComment],
   );
   const isApproved =
-    notification?.type === "application_status" &&
+    (notification?.type === "application_status" ||
+      notification?.type === "withdrawal_status") &&
     notification?.status === "APPROVED";
   const isContest =
     notification?.type === "application_status" &&
@@ -146,6 +147,11 @@ export default function ApplicationStatusModalGate() {
   };
 
   const goToTarget = () => {
+    if (notification?.type === "withdrawal_status") {
+      router.push("/good-deeds");
+      close();
+      return;
+    }
     if (
       notification?.type === "application_status" &&
       notification.applicationId
@@ -159,16 +165,32 @@ export default function ApplicationStatusModalGate() {
     close();
   };
 
-  const actionButtonLabel = isApproved ? "Открыть историю" : "Открыть заявки";
+  const actionButtonLabel = (() => {
+    if (notification?.type === "withdrawal_status") return "К добрым делам";
+    if (isApproved) return "Открыть историю";
+    return "Открыть заявки";
+  })();
   const showActionButton = !isContest; // для конкурса только «Понятно», перейти нельзя
+
+  const statusLine = useMemo(() => {
+    if (isContest) return "Поздравляем!";
+    if (notification?.type === "withdrawal_status")
+      return "Обновление по выплате";
+    return "Обновление по заявке";
+  }, [isContest, notification?.type]);
 
   const pickNewestUnshown = (items: Notification[]): Notification | null => {
     const lastShown = safeGetLastShownMs();
     const candidates = items
-      .filter(
-        (n) =>
-          n.type === "application_status" && n.applicationId && n.createdAt,
-      )
+      .filter((n) => {
+        if (n.type === "application_status") {
+          return !!(n.applicationId && n.createdAt);
+        }
+        if (n.type === "withdrawal_status") {
+          return !!(n.withdrawalId && n.createdAt);
+        }
+        return false;
+      })
       .sort((a, b) => toMs(b.createdAt) - toMs(a.createdAt));
     const newest = candidates[0];
     if (!newest) return null;
@@ -333,7 +355,7 @@ export default function ApplicationStatusModalGate() {
                         isContest ? "text-[#c4b5fd]/80" : "text-[#9bb3ab]"
                       }`}
                     >
-                      {isContest ? "Поздравляем!" : "Обновление по заявке"}
+                      {statusLine}
                     </p>
                     <h3
                       className={`mt-1 font-semibold leading-tight ${

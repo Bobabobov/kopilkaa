@@ -6,6 +6,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import {
   getTextLengthFromHtml,
@@ -188,7 +189,17 @@ export default function RichTextEditor({
   }, [editor]);
 
   if (!editor) {
-    return null;
+    return (
+      <div
+        className={cn("w-full max-w-full overflow-hidden", className)}
+        aria-busy="true"
+      >
+        <div
+          className="rounded-xl border-2 border-[#abd1c6]/25 bg-[#004643]/45 animate-pulse"
+          style={{ minHeight: `${rows * 2.5}rem` }}
+        />
+      </div>
+    );
   }
 
   const textLength = getTextLengthFromHtml(editor.getHTML());

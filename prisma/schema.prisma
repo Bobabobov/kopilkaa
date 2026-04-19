@@ -15,6 +15,27 @@ enum ApplicationStatus {
   CONTEST
 }
 
+/** Категория запрашиваемой помощи (шаг формы и требования к фото) */
+enum ApplicationCategory {
+  FOOD_DRINKS
+  HOUSEHOLD_ESSENTIALS
+  TRANSPORT_COMMS
+  SMALL_GIFT
+  GAME_OR_SERVICE
+  EVERYDAY_SUPPORT
+}
+
+enum GoodDeedSubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum GoodDeedMediaType {
+  IMAGE
+  VIDEO
+}
+
 model User {
   id                  String    @id @default(cuid())
   email               String?   @unique
@@ -64,6 +85,11 @@ model User {
   projectNewsPosts     ProjectNewsPost[]
   projectNewsReactions ProjectNewsReaction[]
   reviews              Review[]
+  goodDeedSubmissions  GoodDeedSubmission[] @relation("GoodDeedAuthor")
+  goodDeedWeekPreferences GoodDeedWeekPreference[]
+  goodDeedWithdrawalRequests GoodDeedWithdrawalRequest[] @relation("GoodDeedWithdrawalRequester")
+  reviewedGoodDeeds    GoodDeedSubmission[] @relation("GoodDeedReviewer")
+  reviewedGoodDeedWithdrawals GoodDeedWithdrawalRequest[] @relation("GoodDeedWithdrawalReviewer")
   gameScores           GameScore[]
   coinCatchTrial       CoinCatchTrial?
   isBanned             Boolean               @default(false)
@@ -79,6 +105,8 @@ model Application {
   title        String
   summary      String
   story        String
+  /** Категория помощи — влияет на подсказки к фото до заявки и к отчёту */
+  category     ApplicationCategory @default(EVERYDAY_SUPPORT)
   amount       Int               @default(0)
   payment      String
   status       ApplicationStatus  @default(PENDING)
@@ -350,6 +378,96 @@ model ReviewImage {
 
   @@index([reviewId])
   @@index([sort])
+}
+
+model GoodDeedSubmission {
+  id          String                   @id @default(cuid())
+  userId      String
+  user        User                     @relation("GoodDeedAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedById String?
+  reviewedBy  User?                    @relation("GoodDeedReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  taskKey         String
+  taskTitle       String
+  taskDescription String
+  weekKey         String
+  reward          Int
+
+  /// Рассказ участника о том, как было сделано задание (мин. 100 символов при отправке)
+  storyText String @default("")
+
+  status       GoodDeedSubmissionStatus @default(PENDING)
+  adminComment String?
+  reviewedAt   DateTime?
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+
+  media GoodDeedSubmissionMedia[]
+
+  @@unique([userId, weekKey, taskKey])
+  @@index([status])
+  @@index([weekKey])
+  @@index([createdAt])
+}
+
+/// Одна строка (id = singleton): бонус «первый в ленте» выдан навсегда; без FK, чтобы удаление отчёта админом не открывало повторную выдачу
+model GoodDeedFirstFeedBonusMeta {
+  id           String   @id
+  submissionId String   @unique
+  bonusBonuses Int      @default(300)
+  createdAt    DateTime @default(now())
+}
+
+model GoodDeedSubmissionMedia {
+  id           String             @id @default(cuid())
+  submissionId String
+  submission   GoodDeedSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  url          String
+  type         GoodDeedMediaType
+  sort         Int                @default(0)
+
+  @@index([submissionId])
+  @@index([sort])
+}
+
+enum GoodDeedWithdrawalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model GoodDeedWithdrawalRequest {
+  id            String                   @id @default(cuid())
+  userId        String
+  user          User                     @relation("GoodDeedWithdrawalRequester", fields: [userId], references: [id], onDelete: Cascade)
+  amountBonuses Int
+  bankName      String
+  details       String
+  status        GoodDeedWithdrawalStatus @default(PENDING)
+  adminComment  String?
+  reviewedAt    DateTime?
+  reviewedById  String?
+  reviewedBy    User?                    @relation("GoodDeedWithdrawalReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model GoodDeedWeekPreference {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekKey         String
+  replacedTaskKey String
+  newTaskKey      String
+  createdAt       DateTime @default(now())
+
+  @@unique([userId, weekKey])
+  @@index([userId])
+  @@index([weekKey])
 }
 
 model ApplicationReportImage {

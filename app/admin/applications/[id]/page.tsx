@@ -7,6 +7,10 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import { checkApplicationSuspicion } from "@/lib/applications/suspicionCheck";
+import {
+  getApplicationCategoryLabel,
+  isApplicationCategory,
+} from "@/lib/applications/categories";
 import { statusRu } from "@/lib/status";
 import ApplicationHeader from "./_components/ApplicationHeader";
 import ApplicationMetaInfo from "./_components/ApplicationMetaInfo";
@@ -430,6 +434,11 @@ export default function AdminApplicationPage({
                 userEmail={item.user.email}
                 summary={item.summary}
                 filledMs={item.filledMs}
+                categoryLabel={
+                  item.category && isApplicationCategory(item.category)
+                    ? getApplicationCategoryLabel(item.category)
+                    : null
+                }
                 onCopyEmail={handleCopyEmail}
               />
             </AdminSection>

@@ -19,6 +19,7 @@ const filters = [
   { type: "like" as FilterType, label: "Лайки" },
   { type: "friend_request" as FilterType, label: "Друзья" },
   { type: "application_status" as FilterType, label: "Заявки" },
+  { type: "withdrawal_status" as FilterType, label: "Выплаты" },
 ];
 
 export default function FeedContent() {
@@ -143,6 +144,11 @@ export default function FeedContent() {
       router.push(`/stories/${notification.applicationId}`);
     } else if (notification.type === "friend_request") {
       router.push("/friends?tab=received");
+    } else if (
+      notification.type === "withdrawal_status" &&
+      notification.withdrawalId
+    ) {
+      router.push("/good-deeds");
     }
   };
 

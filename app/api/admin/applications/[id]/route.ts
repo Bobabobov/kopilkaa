@@ -35,6 +35,7 @@ export async function GET(
         title: true,
         summary: true,
         story: true,
+        category: true,
         amount: true,
         payment: true,
         status: true,

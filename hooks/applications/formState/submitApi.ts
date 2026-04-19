@@ -1,8 +1,11 @@
 "use client";
 
+import type { ApplicationCategory } from "@prisma/client";
+
 const POST_APPLICATION_TIMEOUT_MS = 45_000; // 45 секунд
 
 export interface SubmitApplicationPayload {
+  category: ApplicationCategory;
   title: string;
   summary: string;
   story: string;

@@ -26,6 +26,7 @@ export async function GET(request: Request) {
       isRead: boolean;
       applicationId?: string;
       friendshipId?: string;
+      withdrawalId?: string;
       requesterId?: string;
       adminComment?: string | null;
       status?: string;
@@ -208,6 +209,59 @@ export async function GET(request: Request) {
         isRead: false,
         applicationId: application.id,
         status: application.status,
+      });
+    });
+
+    // Заявки на выплату бонусов (одобрены или отклонены за последние 7 дней)
+    const statusChangedWithdrawals = await prisma.goodDeedWithdrawalRequest
+      .findMany({
+        where: {
+          userId,
+          status: {
+            in: ["APPROVED", "REJECTED"],
+          },
+          reviewedAt: {
+            not: null,
+            gte: sevenDaysAgo,
+          },
+        },
+        orderBy: { reviewedAt: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          amountBonuses: true,
+          status: true,
+          adminComment: true,
+          reviewedAt: true,
+        },
+      })
+      .catch(() => []);
+
+    statusChangedWithdrawals.forEach((withdrawal) => {
+      const when = withdrawal.reviewedAt ?? new Date();
+      let title: string;
+      let message: string;
+
+      if (withdrawal.status === "APPROVED") {
+        title = "Выплата одобрена";
+        message = `✅ Ваша заявка на выплату ${withdrawal.amountBonuses} бонусов была одобрена.`;
+      } else {
+        title = "Выплата отклонена";
+        message = `❌ Ваша заявка на выплату ${withdrawal.amountBonuses} бонусов была отклонена.`;
+      }
+
+      notifications.push({
+        id: `withdrawal_${withdrawal.id}_${withdrawal.status}`,
+        type: "withdrawal_status",
+        title,
+        message,
+        adminComment: withdrawal.adminComment ?? null,
+        avatar: null,
+        createdAt: when,
+        timestamp: formatTimeAgo(new Date(when)),
+        isRead: false,
+        withdrawalId: withdrawal.id,
+        status: withdrawal.status,
       });
     });
 

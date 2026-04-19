@@ -12,18 +12,32 @@ import SubmitSection from "@/components/applications/SubmitSection";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { ApplicationApplicantStrip } from "@/components/applications/ApplicationApplicantStrip";
 import { ApplicationWizardSidebar } from "@/components/applications/ApplicationWizardSidebar";
-import {
-  cardEntranceSpring,
-  wizardStaggerContainer,
-  wizardStaggerItem,
-} from "@/components/applications/applicationWizardMotion";
+import { cardEntranceSpring } from "@/components/applications/applicationWizardMotion";
 import type { ApplicationFieldKey } from "@/hooks/applications/formState/validation";
+import type { ApplicationCategory } from "@prisma/client";
+import {
+  getApplicationCategoryConfig,
+  REPORT_PHOTOS_MIN,
+} from "@/lib/applications/categories";
+import { ApplicationCategoryPicker } from "@/components/applications/ApplicationCategoryPicker";
+import {
+  ApplicationPhotoCurrentRequestHints,
+  ApplicationPhotoReportHints,
+  ApplicationPhotoStepIntro,
+} from "@/components/applications/ApplicationPhotoStepHints";
+import ApplicationSubmitConfirmModal from "@/components/applications/ApplicationSubmitConfirmModal";
 
 type LocalImage = { file: File; url: string };
 
-const WIZARD_STEPS = 4;
+const WIZARD_STEPS = 5;
 
-const STEP_LABELS = ["Основа", "История", "Реквизиты", "Фото"];
+const STEP_LABELS = [
+  "Категория",
+  "Основа",
+  "История",
+  "Реквизиты",
+  "Фото",
+];
 
 function WizardProgressFill({
   pct,
@@ -64,17 +78,20 @@ function WizardProgressFill({
 
 function stepForField(key: ApplicationFieldKey): number {
   switch (key) {
+    case "category":
+      return 0;
     case "title":
     case "summary":
     case "amount":
-      return 0;
-    case "story":
       return 1;
+    case "story":
+      return 2;
     case "bankName":
     case "payment":
-      return 2;
-    case "photos":
       return 3;
+    case "photos":
+    case "reportPhotos":
+      return 4;
     default:
       return 0;
   }
@@ -83,13 +100,15 @@ function stepForField(key: ApplicationFieldKey): number {
 function stepFieldKeys(step: number): ApplicationFieldKey[] {
   switch (step) {
     case 0:
-      return ["title", "summary", "amount"];
+      return ["category"];
     case 1:
-      return ["story"];
+      return ["title", "summary", "amount"];
     case 2:
-      return ["bankName", "payment"];
+      return ["story"];
     case 3:
-      return ["photos"];
+      return ["bankName", "payment"];
+    case 4:
+      return ["photos", "reportPhotos"];
     default:
       return [];
   }
@@ -103,6 +122,8 @@ function stepHasError(
 }
 
 type Props = {
+  category: ApplicationCategory | "";
+  setCategory: (v: ApplicationCategory | "") => void;
   title: string;
   setTitle: (v: string) => void;
   summary: string;
@@ -126,7 +147,8 @@ type Props = {
   fieldErrors?: Partial<Record<string, string>>;
   firstErrorKey?: string;
   validationScrollTrigger?: number;
-  submit: (e?: FormEvent) => Promise<void>;
+  validateSubmit: () => boolean;
+  executeSubmit: () => Promise<void>;
   hpCompany: string;
   setHpCompany: (v: string) => void;
   limits: {
@@ -161,6 +183,8 @@ type Props = {
 
 export function ApplicationsForm(props: Props) {
   const {
+    category,
+    setCategory,
     title,
     setTitle,
     summary,
@@ -184,7 +208,8 @@ export function ApplicationsForm(props: Props) {
     fieldErrors,
     firstErrorKey,
     validationScrollTrigger,
-    submit,
+    validateSubmit,
+    executeSubmit,
     hpCompany,
     setHpCompany,
     limits,
@@ -210,18 +235,30 @@ export function ApplicationsForm(props: Props) {
   const reducedMotion = useReducedMotion();
   const [step, setStep] = useState(0);
   const [stepFeedback, setStepFeedback] = useState<string | null>(null);
+  const [confirmSendOpen, setConfirmSendOpen] = useState(false);
+
+  const handleSubmitIntent = (e?: FormEvent) => {
+    if (e) e.preventDefault();
+    if (!validateSubmit()) return;
+    setConfirmSendOpen(true);
+  };
+
+  const handleConfirmSend = async () => {
+    setConfirmSendOpen(false);
+    await executeSubmit();
+  };
 
   const fe = fieldErrors as
     | Partial<Record<ApplicationFieldKey, string>>
     | undefined;
 
+  const categoryConfig =
+    category !== "" ? getApplicationCategoryConfig(category) : null;
+
   useEffect(() => {
     if (!err || !firstErrorKey || typeof document === "undefined") return;
     const key = firstErrorKey as ApplicationFieldKey;
-    const id =
-      key === "photos"
-        ? "application-field-photos"
-        : `application-field-${key}`;
+    const id = `application-field-${key}`;
     document.getElementById(id)?.scrollIntoView({
       behavior: "smooth",
       block: "center",
@@ -282,8 +319,7 @@ export function ApplicationsForm(props: Props) {
         <form
           className="flex flex-col"
           onSubmit={(e) => {
-            e.preventDefault();
-            submit(e);
+            handleSubmitIntent(e);
           }}
           onFocusCapture={() => {
             if (!trustAcknowledged && !policiesAccepted) return;
@@ -472,83 +508,82 @@ export function ApplicationsForm(props: Props) {
                   )}
                 </AnimatePresence>
 
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
+                {/* Без AnimatePresence+motion: при повторном входе на шаг Framer иногда оставлял opacity 0 и ломал TipTap/поля */}
+                <div className="relative min-h-[200px] sm:min-h-[220px] lg:min-h-[260px]">
+                  <div
                     key={step}
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.22, ease: "easeOut" }}
-                    className="min-h-[200px] sm:min-h-[220px] lg:min-h-[260px]"
+                    className={cn(
+                      "w-full",
+                      !reducedMotion && "animate-fadeIn",
+                    )}
                   >
                     {step === 0 && (
-                      <motion.div
-                        className="grid gap-5 lg:gap-6"
-                        variants={wizardStaggerContainer}
-                        initial="hidden"
-                        animate="show"
-                      >
-                        <div className="grid gap-5 lg:grid-cols-2 lg:gap-6">
-                          <motion.div
-                            variants={wizardStaggerItem}
-                            className="min-w-0"
-                          >
-                            <div
-                              id="application-field-title"
-                              className={cn(
-                                "rounded-2xl p-3 sm:p-4 -mx-1 border border-transparent transition-colors lg:p-5",
-                                fe?.title &&
-                                  "border-[#e16162]/50 bg-[#e16162]/8",
-                              )}
-                            >
-                              <FormField
-                                type="input"
-                                label="Заголовок"
-                                icon="Home"
-                                value={title}
-                                onChange={setTitle}
-                                placeholder="Например: Помощь с арендой после сокращения"
-                                hint={`До ${limits.titleMax} символов`}
-                                maxLength={limits.titleMax}
-                                charCountVisibility="when_nonempty"
-                                showFieldStatus={false}
-                                delay={0}
-                                required
-                                error={fe?.title}
-                              />
-                            </div>
-                          </motion.div>
-                          <motion.div
-                            variants={wizardStaggerItem}
-                            className="min-w-0"
-                          >
-                            <div
-                              id="application-field-summary"
-                              className={cn(
-                                "rounded-2xl p-3 sm:p-4 -mx-1 border border-transparent transition-colors lg:p-5",
-                                fe?.summary &&
-                                  "border-[#e16162]/50 bg-[#e16162]/8",
-                              )}
-                            >
-                              <FormField
-                                type="input"
-                                label="Краткое описание"
-                                icon="MessageCircle"
-                                value={summary}
-                                onChange={setSummary}
-                                placeholder="3–10 слов для списка заявок"
-                                hint={`До ${limits.summaryMax} символов`}
-                                maxLength={limits.summaryMax}
-                                charCountVisibility="when_nonempty"
-                                showFieldStatus={false}
-                                delay={0}
-                                required
-                                error={fe?.summary}
-                              />
-                            </div>
-                          </motion.div>
+                      <div className="grid gap-5 lg:gap-6">
+                        <div>
+                          <ApplicationCategoryPicker
+                            category={category}
+                            setCategory={setCategory}
+                            error={fe?.category}
+                          />
                         </div>
-                        <motion.div variants={wizardStaggerItem}>
+                      </div>
+                    )}
+
+                    {step === 1 && (
+                      <div className="grid gap-5 lg:grid-cols-2 lg:gap-6 lg:items-start">
+                        <div className="min-w-0">
+                          <div
+                            id="application-field-title"
+                            className={cn(
+                              "rounded-2xl p-3 sm:p-4 -mx-1 border border-transparent transition-colors lg:p-5",
+                              fe?.title &&
+                                "border-[#e16162]/50 bg-[#e16162]/8",
+                            )}
+                          >
+                            <FormField
+                              type="input"
+                              label="Заголовок"
+                              icon="Home"
+                              value={title}
+                              onChange={setTitle}
+                              placeholder="Например: Помощь с арендой после сокращения"
+                              hint={`До ${limits.titleMax} символов`}
+                              maxLength={limits.titleMax}
+                              charCountVisibility="when_nonempty"
+                              showFieldStatus={false}
+                              delay={0}
+                              required
+                              error={fe?.title}
+                            />
+                          </div>
+                        </div>
+                        <div className="min-w-0">
+                          <div
+                            id="application-field-summary"
+                            className={cn(
+                              "rounded-2xl p-3 sm:p-4 -mx-1 border border-transparent transition-colors lg:p-5",
+                              fe?.summary &&
+                                "border-[#e16162]/50 bg-[#e16162]/8",
+                            )}
+                          >
+                            <FormField
+                              type="input"
+                              label="Краткое описание"
+                              icon="MessageCircle"
+                              value={summary}
+                              onChange={setSummary}
+                              placeholder="3–10 слов для списка заявок"
+                              hint={`До ${limits.summaryMax} символов`}
+                              maxLength={limits.summaryMax}
+                              charCountVisibility="when_nonempty"
+                              showFieldStatus={false}
+                              delay={0}
+                              required
+                              error={fe?.summary}
+                            />
+                          </div>
+                        </div>
+                        <div className="min-w-0 lg:col-span-2">
                           <div
                             id="application-field-amount"
                             className={cn(
@@ -582,20 +617,15 @@ export function ApplicationsForm(props: Props) {
                             />
                             {trustSupportNotice}
                           </div>
-                        </motion.div>
-                      </motion.div>
+                        </div>
+                      </div>
                     )}
 
-                    {step === 1 && (
-                      <motion.div
-                        variants={wizardStaggerContainer}
-                        initial="hidden"
-                        animate="show"
-                      >
-                        <motion.div variants={wizardStaggerItem}>
-                          <div
-                            id="application-field-story"
-                            className={cn(
+                    {step === 2 && (
+                      <div>
+                        <div
+                          id="application-field-story"
+                          className={cn(
                               "rounded-2xl p-3 sm:p-4 -mx-1 border border-transparent transition-colors lg:max-w-4xl lg:p-5",
                               fe?.story &&
                                 "border-[#e16162]/50 bg-[#e16162]/8",
@@ -625,18 +655,12 @@ export function ApplicationsForm(props: Props) {
                               charCountVisibility="when_nonempty"
                             />
                           </div>
-                        </motion.div>
-                      </motion.div>
+                      </div>
                     )}
 
-                    {step === 2 && (
-                      <motion.div
-                        className="grid gap-5 lg:max-w-3xl lg:gap-6"
-                        variants={wizardStaggerContainer}
-                        initial="hidden"
-                        animate="show"
-                      >
-                        <motion.div variants={wizardStaggerItem}>
+                    {step === 3 && (
+                      <div className="grid gap-5 lg:max-w-3xl lg:gap-6">
+                        <div>
                           <div
                             id="application-field-bankName"
                             className={cn(
@@ -661,8 +685,8 @@ export function ApplicationsForm(props: Props) {
                               error={fe?.bankName}
                             />
                           </div>
-                        </motion.div>
-                        <motion.div variants={wizardStaggerItem}>
+                        </div>
+                        <div>
                           <div
                             id="application-field-payment"
                             className={cn(
@@ -689,18 +713,25 @@ export function ApplicationsForm(props: Props) {
                               error={fe?.payment}
                             />
                           </div>
-                        </motion.div>
-                      </motion.div>
+                        </div>
+                      </div>
                     )}
 
-                    {step === 3 && (
-                      <motion.div
-                        className="grid gap-5 lg:max-w-4xl lg:gap-6"
-                        variants={wizardStaggerContainer}
-                        initial="hidden"
-                        animate="show"
-                      >
-                        <motion.div variants={wizardStaggerItem}>
+                    {step === 4 && (
+                      <div className="grid gap-5 lg:max-w-4xl lg:gap-6">
+                        <div>
+                          <ApplicationPhotoStepIntro
+                            config={categoryConfig}
+                          />
+                        </div>
+
+                        <div>
+                          <ApplicationPhotoCurrentRequestHints
+                            config={categoryConfig}
+                          />
+                        </div>
+
+                        <div>
                           <div
                             id="application-field-photos"
                             className={cn(
@@ -717,30 +748,50 @@ export function ApplicationsForm(props: Props) {
                               error={fe?.photos}
                               inputId="application-photos-upload"
                               variant="dark"
-                              title="Фото к заявке"
-                              subtitle="Хотя бы одно фото обязательно"
+                              title="Загрузите файлы к этой заявке"
+                              subtitle={
+                                categoryConfig
+                                  ? "Добавьте хотя бы один файл. Снимки должны соответствовать нумерованному списку выше (можно несколько фото)."
+                                  : "Сначала выберите категорию на шаге 1."
+                              }
                             />
                           </div>
-                        </motion.div>
+                        </div>
 
                         {approvedCount !== null && approvedCount >= 1 && (
-                          <motion.div variants={wizardStaggerItem}>
-                            <div className="rounded-2xl p-2 -mx-1 border border-transparent">
+                          <div>
+                            <ApplicationPhotoReportHints
+                              config={categoryConfig}
+                            />
+                          </div>
+                        )}
+
+                        {approvedCount !== null && approvedCount >= 1 && (
+                          <div>
+                            <div
+                              id="application-field-reportPhotos"
+                              className={cn(
+                                "rounded-2xl p-2 -mx-1 border border-transparent transition-colors",
+                                fe?.reportPhotos &&
+                                  "border-[#e16162]/50 bg-[#e16162]/8",
+                              )}
+                            >
                               <PhotoUpload
                                 photos={reportPhotos}
                                 onPhotosChange={setReportPhotos}
                                 maxPhotos={5}
                                 delay={0}
+                                error={fe?.reportPhotos}
                                 inputId="report-photos-upload"
                                 variant="dark"
-                                title="Отчёт по прошлой заявке"
-                                subtitle="Минимум одно фото для отправки: чек, результат, переписка — видит только админ"
+                                title="Загрузите файлы отчёта"
+                                subtitle={`Минимум ${REPORT_PHOTOS_MIN} разных фото по двум блокам выше. Можно больше файлов, если нужно.`}
                               />
                             </div>
-                          </motion.div>
+                          </div>
                         )}
 
-                        <motion.div variants={wizardStaggerItem}>
+                        <div>
                           <ApplicationsConsent
                             trustAck1={trustAck1}
                             setTrustAck1={setTrustAck1}
@@ -752,11 +803,11 @@ export function ApplicationsForm(props: Props) {
                             setPoliciesAccepted={setPoliciesAccepted}
                             ackError={ackError}
                           />
-                        </motion.div>
-                      </motion.div>
+                        </div>
+                      </div>
                     )}
-                  </motion.div>
-                </AnimatePresence>
+                  </div>
+                </div>
 
                 <div className="hidden lg:block">
                   {step === WIZARD_STEPS - 1 ? (
@@ -773,8 +824,7 @@ export function ApplicationsForm(props: Props) {
                             : err
                         }
                         onSubmit={(e) => {
-                          e.preventDefault();
-                          submit(e);
+                          handleSubmitIntent(e);
                         }}
                       />
                     </div>
@@ -844,8 +894,7 @@ export function ApplicationsForm(props: Props) {
                             : err
                         }
                         onSubmit={(e) => {
-                          e.preventDefault();
-                          submit(e);
+                          handleSubmitIntent(e);
                         }}
                       />
                       <motion.button
@@ -911,6 +960,14 @@ export function ApplicationsForm(props: Props) {
           </div>
         </form>
       </Card>
+
+      <ApplicationSubmitConfirmModal
+        isOpen={confirmSendOpen}
+        onClose={() => setConfirmSendOpen(false)}
+        onConfirm={handleConfirmSend}
+        submitting={submitting}
+        uploading={uploading}
+      />
     </motion.div>
   );
 }

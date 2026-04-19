@@ -45,6 +45,11 @@ export default function NotificationItem({
       } else {
         router.push("/applications");
       }
+    } else if (
+      notification.type === "withdrawal_status" &&
+      notification.withdrawalId
+    ) {
+      router.push("/good-deeds");
     } else if (notification.type === "like" && notification.applicationId) {
       router.push(`/stories/${notification.applicationId}`);
     } else if (notification.type === "friend_request") {

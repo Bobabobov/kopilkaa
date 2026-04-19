@@ -38,6 +38,14 @@ export type ApplicationItem = {
   title: string;
   summary: string;
   story: string;
+  /** Категория помощи из формы подачи */
+  category?:
+    | "FOOD_DRINKS"
+    | "HOUSEHOLD_ESSENTIALS"
+    | "TRANSPORT_COMMS"
+    | "SMALL_GIFT"
+    | "GAME_OR_SERVICE"
+    | "EVERYDAY_SUPPORT";
   amount: number;
   payment: string;
   bankName?: string | null;

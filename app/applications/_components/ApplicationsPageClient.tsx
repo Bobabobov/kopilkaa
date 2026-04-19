@@ -46,6 +46,8 @@ export default function ApplicationsPageClient() {
   const {
     user,
     loadingAuth,
+    category,
+    setCategory,
     title,
     setTitle,
     summary,
@@ -92,7 +94,8 @@ export default function ApplicationsPageClient() {
     fieldErrors,
     firstErrorKey,
     validationScrollTrigger,
-    submit,
+    validateSubmit,
+    executeSubmit,
     setSubmitted,
     requiresReview,
     approvedCount,
@@ -327,6 +330,8 @@ export default function ApplicationsPageClient() {
           {!requiresReview && user && (
             <ApplicationsForm
               {...applicantLabelFromUser(user)}
+              category={category}
+              setCategory={setCategory}
               title={title}
               setTitle={setTitle}
               summary={summary}
@@ -350,7 +355,8 @@ export default function ApplicationsPageClient() {
               fieldErrors={fieldErrors}
               firstErrorKey={firstErrorKey}
               validationScrollTrigger={validationScrollTrigger}
-              submit={submit}
+              validateSubmit={validateSubmit}
+              executeSubmit={executeSubmit}
               hpCompany={hpCompany}
               setHpCompany={setHpCompany}
               limits={{

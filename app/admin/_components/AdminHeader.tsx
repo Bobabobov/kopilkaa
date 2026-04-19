@@ -12,6 +12,8 @@ export function AdminHeader() {
   const navLinks = [
     { href: "/admin", label: "Заявки" },
     { href: "/admin/users", label: "Пользователи" },
+    { href: "/admin/good-deeds", label: "Добрые дела" },
+    { href: "/admin/good-deeds/withdrawals", label: "Вывод бонусов" },
     { href: "/admin/heroes", label: "Герои" },
     { href: "/admin/balance", label: "Баланс" },
     { href: "/admin/ads", label: "Реклама" },

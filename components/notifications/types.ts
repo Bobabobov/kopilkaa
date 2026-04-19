@@ -2,7 +2,12 @@
 
 export interface Notification {
   id: string;
-  type: "like" | "system" | "application_status" | "friend_request";
+  type:
+    | "like"
+    | "system"
+    | "application_status"
+    | "withdrawal_status"
+    | "friend_request";
   title: string;
   message: string;
   adminComment?: string | null;
@@ -12,6 +17,7 @@ export interface Notification {
   isRead: boolean;
   rarity?: string;
   applicationId?: string;
+  withdrawalId?: string;
   status?: "APPROVED" | "REJECTED" | "CONTEST";
   friendshipId?: string;
   requesterId?: string;

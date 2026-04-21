@@ -178,13 +178,39 @@ export function GoodDeedsTaskCard({
       </CardHeader>
 
       {showCollapsedPreview ? (
-        <CardFooter className="flex-col gap-2 pt-0 sm:flex-row sm:justify-end">
+        <CardFooter
+          className={cn(
+            "flex-col gap-2 pt-0",
+            canReroll
+              ? "sm:flex-row sm:flex-wrap sm:justify-end"
+              : "sm:flex-row sm:justify-end",
+          )}
+        >
+          {canReroll && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onReroll}
+              disabled={isRerolling}
+              className={cn(
+                "w-full rounded-xl border-[#abd1c6]/35 bg-transparent text-[#abd1c6] hover:bg-[#004643]/50 hover:text-[#fffffe]",
+                compact ? "h-9 text-sm" : "h-10",
+                "sm:min-w-[200px] sm:flex-1",
+              )}
+            >
+              <RefreshCcw
+                className={cn("h-4 w-4", isRerolling && "animate-spin")}
+              />
+              {isRerolling ? "Замена…" : "Заменить задание"}
+            </Button>
+          )}
           <Button
             type="button"
             onClick={() => setWorkspaceOpen(true)}
             className={cn(
               "w-full rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] hover:bg-[#f7b24a]",
               compact ? "h-9 text-sm" : "h-10",
+              canReroll && "sm:min-w-[200px] sm:flex-1",
             )}
           >
             Взять задание

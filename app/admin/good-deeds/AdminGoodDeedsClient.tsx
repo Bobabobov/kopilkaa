@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, XCircle } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle2, ExternalLink, XCircle } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { AdminHeader } from "../_components/AdminHeader";
@@ -61,6 +62,8 @@ export default function AdminGoodDeedsClient() {
   useEffect(() => {
     load().catch(console.error);
   }, []);
+
+  const profileHref = (userId: string) => `/profile/${userId}`;
 
   const updateStatus = async (id: string, action: "approve" | "reject") => {
     setBusyId(id);
@@ -207,10 +210,36 @@ export default function AdminGoodDeedsClient() {
                 )}
 
                 <div className="rounded-xl border border-[#abd1c6]/20 bg-black/10 p-3">
-                  <p className="text-sm text-[#fffffe] font-medium">
-                    Отправитель: {item.user.name}
-                    {item.user.username ? ` (@${item.user.username})` : ""}
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#94a1b2]">
+                    Отправитель
                   </p>
+                  <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+                    <Link
+                      href={profileHref(item.user.id)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-[#fffffe] underline-offset-4 transition hover:text-[#f9bc60] hover:underline"
+                    >
+                      {item.user.name}
+                      {item.user.username ? ` (@${item.user.username})` : ""}
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+                    </Link>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="rounded-xl border-[#abd1c6]/35 text-[#abd1c6] hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/10 hover:text-[#fffffe]"
+                      asChild
+                    >
+                      <Link
+                        href={profileHref(item.user.id)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Профиль
+                      </Link>
+                    </Button>
+                  </div>
                   {item.user.email && (
                     <p className="text-xs text-[#94a1b2] mt-1">{item.user.email}</p>
                   )}
@@ -225,11 +254,13 @@ export default function AdminGoodDeedsClient() {
                       {media.type === "VIDEO" ? (
                         <video src={media.url} controls className="w-full h-52 object-cover" />
                       ) : (
-                        <img
-                          src={media.url}
-                          alt="Отчёт по доброму делу"
-                          className="w-full h-52 object-cover"
-                        />
+                        <a href={media.url} target="_blank" rel="noopener noreferrer">
+                          <img
+                            src={media.url}
+                            alt="Отчёт по доброму делу"
+                            className="w-full h-52 object-cover transition hover:opacity-90"
+                          />
+                        </a>
                       )}
                     </div>
                   ))}

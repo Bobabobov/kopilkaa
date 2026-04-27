@@ -27,6 +27,7 @@ export async function GET(request: Request) {
       applicationId?: string;
       friendshipId?: string;
       withdrawalId?: string;
+      goodDeedSubmissionId?: string;
       requesterId?: string;
       adminComment?: string | null;
       status?: string;
@@ -262,6 +263,52 @@ export async function GET(request: Request) {
         isRead: false,
         withdrawalId: withdrawal.id,
         status: withdrawal.status,
+      });
+    });
+
+    // Добрые дела: модерация отчётов (одобрены/отклонены за последние 7 дней)
+    const statusChangedGoodDeeds = await prisma.goodDeedSubmission
+      .findMany({
+        where: {
+          userId,
+          status: {
+            in: ["APPROVED", "REJECTED"],
+          },
+          reviewedAt: {
+            not: null,
+            gte: sevenDaysAgo,
+          },
+        },
+        orderBy: { reviewedAt: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          taskTitle: true,
+          status: true,
+          adminComment: true,
+          reviewedAt: true,
+        },
+      })
+      .catch(() => []);
+
+    statusChangedGoodDeeds.forEach((submission) => {
+      const when = submission.reviewedAt ?? new Date();
+      const isApproved = submission.status === "APPROVED";
+
+      notifications.push({
+        id: `good_deed_${submission.id}_${submission.status}`,
+        type: "good_deed_submission_status",
+        title: isApproved ? "Доброе дело подтверждено" : "Доброе дело отклонено",
+        message: isApproved
+          ? `✅ Ваш отчёт по заданию "${submission.taskTitle}" подтвержден.`
+          : `❌ Ваш отчёт по заданию "${submission.taskTitle}" отклонен.`,
+        adminComment: submission.adminComment ?? null,
+        avatar: null,
+        createdAt: when,
+        timestamp: formatTimeAgo(new Date(when)),
+        isRead: false,
+        goodDeedSubmissionId: submission.id,
+        status: submission.status,
       });
     });
 

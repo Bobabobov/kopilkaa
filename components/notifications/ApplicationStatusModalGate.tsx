@@ -131,11 +131,17 @@ export default function ApplicationStatusModalGate() {
   );
   const isApproved =
     (notification?.type === "application_status" ||
-      notification?.type === "withdrawal_status") &&
+      notification?.type === "withdrawal_status" ||
+      notification?.type === "good_deed_submission_status") &&
     notification?.status === "APPROVED";
   const isContest =
     notification?.type === "application_status" &&
     notification?.status === "CONTEST";
+  const isRejected =
+    (notification?.type === "application_status" ||
+      notification?.type === "withdrawal_status" ||
+      notification?.type === "good_deed_submission_status") &&
+    notification?.status === "REJECTED";
 
   const close = () => {
     if (notification?.createdAt) {
@@ -147,7 +153,10 @@ export default function ApplicationStatusModalGate() {
   };
 
   const goToTarget = () => {
-    if (notification?.type === "withdrawal_status") {
+    if (
+      notification?.type === "withdrawal_status" ||
+      notification?.type === "good_deed_submission_status"
+    ) {
       router.push("/good-deeds");
       close();
       return;
@@ -166,7 +175,12 @@ export default function ApplicationStatusModalGate() {
   };
 
   const actionButtonLabel = (() => {
-    if (notification?.type === "withdrawal_status") return "К добрым делам";
+    if (
+      notification?.type === "withdrawal_status" ||
+      notification?.type === "good_deed_submission_status"
+    ) {
+      return "К добрым делам";
+    }
     if (isApproved) return "Открыть историю";
     return "Открыть заявки";
   })();
@@ -176,6 +190,8 @@ export default function ApplicationStatusModalGate() {
     if (isContest) return "Поздравляем!";
     if (notification?.type === "withdrawal_status")
       return "Обновление по выплате";
+    if (notification?.type === "good_deed_submission_status")
+      return "Обновление по доброму делу";
     return "Обновление по заявке";
   }, [isContest, notification?.type]);
 
@@ -188,6 +204,9 @@ export default function ApplicationStatusModalGate() {
         }
         if (n.type === "withdrawal_status") {
           return !!(n.withdrawalId && n.createdAt);
+        }
+        if (n.type === "good_deed_submission_status") {
+          return !!(n.goodDeedSubmissionId && n.createdAt);
         }
         return false;
       })
@@ -350,12 +369,38 @@ export default function ApplicationStatusModalGate() {
                   </div>
 
                   <div className="min-w-0">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${
+                          isContest
+                            ? "border-[#9b87f5]/40 bg-[#9b87f5]/15 text-[#d8ccff]"
+                            : isApproved
+                              ? "border-[#10B981]/35 bg-[#10B981]/12 text-[#a6f4d5]"
+                              : isRejected
+                                ? "border-[#e16162]/40 bg-[#e16162]/12 text-[#ffc9c9]"
+                                : "border-[#2c4f45]/70 bg-[#0e2420] text-[#9bb3ab]"
+                        }`}
+                      >
+                        {statusLine}
+                      </span>
+                      {notification?.status && !isContest && (
+                        <span
+                          className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-medium ${
+                            notification.status === "APPROVED"
+                              ? "border-[#10B981]/30 bg-[#10B981]/10 text-[#b8f7de]"
+                              : "border-[#e16162]/30 bg-[#e16162]/10 text-[#ffd4d4]"
+                          }`}
+                        >
+                          {notification.status === "APPROVED" ? "Одобрено" : "Отклонено"}
+                        </span>
+                      )}
+                    </div>
                     <p
                       className={`text-xs uppercase tracking-[0.14em] ${
-                        isContest ? "text-[#c4b5fd]/80" : "text-[#9bb3ab]"
+                        isContest ? "text-[#c4b5fd]/70" : "text-[#9bb3ab]/80"
                       }`}
                     >
-                      {statusLine}
+                      Уведомление
                     </p>
                     <h3
                       className={`mt-1 font-semibold leading-tight ${
@@ -376,26 +421,44 @@ export default function ApplicationStatusModalGate() {
                         <span>{timeAgo}</span>
                       </div>
                     ) : null}
-                    <p
-                      className={`mt-2 leading-relaxed ${
+                    <div
+                      className={`mt-2 rounded-xl border px-3 py-2.5 ${
                         isContest
-                          ? "text-sm sm:text-base text-[#e2ddff]"
-                          : "text-sm sm:text-base text-[#cfdcd6]"
+                          ? "border-[#9b87f5]/30 bg-[#1a1525]/60"
+                          : isApproved
+                            ? "border-[#10B981]/25 bg-[#10B981]/8"
+                            : isRejected
+                              ? "border-[#e16162]/25 bg-[#e16162]/8"
+                              : "border-[#2c4f45]/70 bg-[#0e2420]"
                       }`}
                     >
-                      {message}
-                    </p>
+                      <p
+                        className={`leading-relaxed ${
+                          isContest
+                            ? "text-sm sm:text-base text-[#e2ddff]"
+                            : "text-sm sm:text-base text-[#e9f4ef]"
+                        }`}
+                      >
+                        {message}
+                      </p>
+                    </div>
                     {adminComment ? (
                       <div
                         className={`mt-3 rounded-xl border p-3 ${
                           isContest
                             ? "border-[#9b87f5]/30 bg-[#1a1525]/80"
+                            : isRejected
+                              ? "border-[#e16162]/30 bg-[#3a1718]/35"
                             : "border-[#2c4f45]/70 bg-[#0e2420]"
                         }`}
                       >
                         <div
                           className={`text-xs uppercase tracking-[0.12em] ${
-                            isContest ? "text-[#c4b5fd]/90" : "text-[#9bb3ab]"
+                            isContest
+                              ? "text-[#c4b5fd]/90"
+                              : isRejected
+                                ? "text-[#ffb4b4]"
+                                : "text-[#9bb3ab]"
                           }`}
                         >
                           Комментарий администратора

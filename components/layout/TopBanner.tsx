@@ -302,7 +302,7 @@ export default function TopBanner({
       ref={bannerRef}
       data-top-banner
       data-has-image={hasImage ? "true" : "false"}
-      className={`top-banner-component h-[300px] md:h-[250px] ${
+      className={`top-banner-component h-[min(200px,38svh)] md:h-[250px] ${
         variant === "default" ? "bg-[#eef1f4]" : styles.bg
       } ${styles.border} border-b shadow-lg overflow-hidden ${
         isAnimating ? "" : isHidden ? "" : ""
@@ -371,7 +371,7 @@ export default function TopBanner({
 
       {/* OverlayLayer убран по требованию: без затемнения/наложений */}
 
-      <div className="container-p max-w-[1680px] mx-auto py-4 relative z-10 h-[300px] md:h-[250px]">
+      <div className="container-p max-w-[1680px] mx-auto py-3 md:py-4 relative z-10 min-h-0 h-[min(200px,38svh)] md:h-[250px]">
         {/* Десктопная версия */}
         <div className="hidden md:flex items-center justify-between gap-4 h-full">
           {/* Левая часть - только текст без иконки */}

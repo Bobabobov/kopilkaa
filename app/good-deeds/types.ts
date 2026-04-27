@@ -1,15 +1,30 @@
 export type TaskStatus = "PENDING" | "APPROVED" | "REJECTED" | null;
+export type GoodDeedDifficulty = "EASY" | "MEDIUM" | "HARD";
+
+export type GoodDeedTaskView = {
+  id: string;
+  difficulty: GoodDeedDifficulty;
+  title: string;
+  description: string;
+  reward: number;
+  submissionStatus: TaskStatus;
+  adminComment: string | null;
+};
 
 export type GoodDeedsResponse = {
   week: { key: string; label: string };
-  tasks: {
-    id: string;
-    title: string;
-    description: string;
-    reward: number;
-    submissionStatus: TaskStatus;
-    adminComment: string | null;
-  }[];
+  tasks: GoodDeedTaskView[];
+  tasksByDifficulty: Record<GoodDeedDifficulty, GoodDeedTaskView[]>;
+  categoryStats: Record<
+    GoodDeedDifficulty,
+    {
+      completedCount: number;
+      totalCount: number;
+      completionBonus: number;
+      label: string;
+      description: string;
+    }
+  >;
   stats: {
     approvedCount: number;
     pendingCount: number;
@@ -43,5 +58,15 @@ export type GoodDeedsResponse = {
       youtubeLink?: string | null;
     };
   }[];
-  viewer: { isAuthenticated: boolean; rerollUsed: boolean };
+  viewer: {
+    isAuthenticated: boolean;
+    selectedDifficulty: GoodDeedDifficulty;
+    canChangeDifficulty: boolean;
+  };
+  selectedCategoryProgress: {
+    approved: number;
+    pending: number;
+    rejected: number;
+    total: number;
+  };
 };

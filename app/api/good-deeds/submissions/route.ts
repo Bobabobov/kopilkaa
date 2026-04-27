@@ -4,12 +4,13 @@ import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import {
   getTaskById,
+  getTaskDifficulty,
+  type GoodDeedDifficulty,
   getWeekInfo,
   inferMediaTypeFromUrl,
   isSafeUploadUrl,
   MAX_GOOD_DEED_STORY_CHARS,
   MIN_GOOD_DEED_STORY_CHARS,
-  pickTasksForWeek,
 } from "@/lib/goodDeeds";
 
 const MAX_MEDIA = 5;
@@ -29,6 +30,15 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const taskId = String(body?.taskId || "").trim();
+    const requestedDifficultyRaw = String(body?.difficulty || "")
+      .trim()
+      .toUpperCase();
+    const requestedDifficulty =
+      requestedDifficultyRaw === "EASY" ||
+      requestedDifficultyRaw === "MEDIUM" ||
+      requestedDifficultyRaw === "HARD"
+        ? (requestedDifficultyRaw as GoodDeedDifficulty)
+        : null;
     const storyRaw =
       typeof body?.storyText === "string"
         ? body.storyText
@@ -73,32 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     const week = getWeekInfo(new Date());
-    const weekTasks = pickTasksForWeek(week.key);
-    const preference = await prisma.goodDeedWeekPreference.findUnique({
-      where: {
-        userId_weekKey: {
-          userId: session.uid,
-          weekKey: week.key,
-        },
-      },
-      select: {
-        replacedTaskKey: true,
-        newTaskKey: true,
-      },
-    });
-
-    let effectiveTasks = [...weekTasks];
-    if (preference) {
-      const replacedIndex = effectiveTasks.findIndex(
-        (item) => item.id === preference.replacedTaskKey,
-      );
-      const replacementTask = getTaskById(preference.newTaskKey);
-      if (replacedIndex >= 0 && replacementTask) {
-        effectiveTasks[replacedIndex] = replacementTask;
-      }
-    }
-
-    const task = effectiveTasks.find((item) => item.id === taskId);
+    const task = getTaskById(taskId);
     if (!task) {
       return NextResponse.json(
         { error: "Это задание недоступно на текущей неделе" },
@@ -129,6 +114,46 @@ export async function POST(req: NextRequest) {
       },
       select: { id: true, status: true },
     });
+
+    const taskDifficulty = getTaskDifficulty(task.id);
+    const approvedSubmissions = await prisma.goodDeedSubmission.findMany({
+      where: {
+        userId: session.uid,
+        status: GoodDeedSubmissionStatus.APPROVED,
+      },
+      select: { taskKey: true },
+    });
+
+    const lockedDifficulty = approvedSubmissions
+      .map((submission) => getTaskDifficulty(submission.taskKey))
+      .find((difficulty): difficulty is NonNullable<typeof difficulty> =>
+        Boolean(difficulty),
+      );
+
+    if (
+      requestedDifficulty &&
+      taskDifficulty &&
+      requestedDifficulty !== taskDifficulty
+    ) {
+      return NextResponse.json(
+        { error: "Выбранная категория не совпадает с заданием" },
+        { status: 400 },
+      );
+    }
+
+    if (
+      taskDifficulty &&
+      lockedDifficulty &&
+      taskDifficulty !== lockedDifficulty
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "После первого одобренного доброго дела категория фиксируется и больше не меняется.",
+        },
+        { status: 409 },
+      );
+    }
 
     if (existing?.status === GoodDeedSubmissionStatus.PENDING) {
       return NextResponse.json(

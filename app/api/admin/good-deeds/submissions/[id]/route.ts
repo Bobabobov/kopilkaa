@@ -5,6 +5,12 @@ import {
   GOOD_DEED_FIRST_IN_FEED_BONUS_BONUSES,
   GOOD_DEED_FIRST_IN_FEED_BONUS_ROW_ID,
 } from "@/lib/goodDeedsFirstFeedBonus";
+import {
+  getCompletionBonusForDifficulty,
+  getTaskDifficulty,
+  getTasksForDifficulty,
+  TASKS_PER_WEEK,
+} from "@/lib/goodDeeds";
 import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +27,10 @@ export async function PATCH(
 
     const { id } = await context.params;
     if (!id) {
-      return NextResponse.json({ error: "Не указан id заявки" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Не указан id заявки" },
+        { status: 400 },
+      );
     }
 
     const body = await req.json();
@@ -68,10 +77,10 @@ export async function PATCH(
       return NextResponse.json({ success: true });
     }
 
-    const firstFeedBonusGranted = await prisma.$transaction(async (tx) => {
+    const approvalMeta = await prisma.$transaction(async (tx) => {
       const pending = await tx.goodDeedSubmission.findFirst({
         where: { id, status: GoodDeedSubmissionStatus.PENDING },
-        select: { id: true },
+        select: { id: true, userId: true, weekKey: true, taskKey: true },
       });
 
       if (!pending) {
@@ -85,11 +94,31 @@ export async function PATCH(
       const changesRows = await tx.$queryRaw<{ n: bigint }[]>`
         SELECT changes() AS n
       `;
-      const insertedFirstBonus =
-        Number(changesRows[0]?.n ?? 0) > 0;
-      const extraReward = insertedFirstBonus
+      const insertedFirstBonus = Number(changesRows[0]?.n ?? 0) > 0;
+      const firstFeedBonus = insertedFirstBonus
         ? GOOD_DEED_FIRST_IN_FEED_BONUS_BONUSES
         : 0;
+
+      const taskDifficulty = getTaskDifficulty(pending.taskKey);
+      let categoryCompletionBonus = 0;
+      if (taskDifficulty) {
+        const taskIdsInDifficulty = getTasksForDifficulty(taskDifficulty).map(
+          (task) => task.id,
+        );
+        const approvedInDifficulty = await tx.goodDeedSubmission.count({
+          where: {
+            userId: pending.userId,
+            weekKey: pending.weekKey,
+            status: GoodDeedSubmissionStatus.APPROVED,
+            taskKey: { in: taskIdsInDifficulty },
+          },
+        });
+        if (approvedInDifficulty === TASKS_PER_WEEK - 1) {
+          categoryCompletionBonus =
+            getCompletionBonusForDifficulty(taskDifficulty);
+        }
+      }
+      const extraReward = firstFeedBonus + categoryCompletionBonus;
 
       const updated = await tx.goodDeedSubmission.updateMany({
         where: {
@@ -101,9 +130,7 @@ export async function PATCH(
           reviewedAt: new Date(),
           reviewedById: admin.id,
           adminComment: adminComment || null,
-          ...(extraReward > 0
-            ? { reward: { increment: extraReward } }
-            : {}),
+          ...(extraReward > 0 ? { reward: { increment: extraReward } } : {}),
         },
       });
 
@@ -111,10 +138,13 @@ export async function PATCH(
         throw new Error("CONFLICT_APPROVE");
       }
 
-      return extraReward > 0;
+      return {
+        firstFeedBonusGranted: firstFeedBonus > 0,
+        categoryCompletionBonus,
+      };
     });
 
-    if (firstFeedBonusGranted === null) {
+    if (approvalMeta === null) {
       return NextResponse.json(
         { error: "Задание не найдено или уже обработано" },
         { status: 409 },
@@ -123,7 +153,8 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
-      firstFeedBonusGranted,
+      firstFeedBonusGranted: approvalMeta.firstFeedBonusGranted,
+      categoryCompletionBonus: approvalMeta.categoryCompletionBonus,
     });
   } catch (error) {
     if (error instanceof Error && error.message === "CONFLICT_APPROVE") {
@@ -152,7 +183,10 @@ export async function DELETE(
 
     const { id } = await context.params;
     if (!id) {
-      return NextResponse.json({ error: "Не указан id заявки" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Не указан id заявки" },
+        { status: 400 },
+      );
     }
 
     await prisma.goodDeedSubmission.delete({
@@ -161,7 +195,10 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("DELETE /api/admin/good-deeds/submissions/[id] error:", error);
+    console.error(
+      "DELETE /api/admin/good-deeds/submissions/[id] error:",
+      error,
+    );
     return NextResponse.json(
       { error: "Не удалось удалить задание" },
       { status: 500 },

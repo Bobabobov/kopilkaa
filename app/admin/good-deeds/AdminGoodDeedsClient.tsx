@@ -1,135 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, ExternalLink, XCircle } from "lucide-react";
+import { CheckCircle2, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { AdminHeader } from "../_components/AdminHeader";
-import { GOOD_DEED_FIRST_IN_FEED_BONUS_BONUSES } from "@/lib/goodDeedsFirstFeedBonus";
-
-type ModerationItem = {
-  id: string;
-  taskTitle: string;
-  taskDescription: string;
-  storyText: string;
-  reward: number;
-  weekKey: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
-  adminComment?: string | null;
-  reviewedAt?: string | null;
-  createdAt: string;
-  media: { url: string; type: "IMAGE" | "VIDEO" }[];
-  user: {
-    id: string;
-    name: string;
-    username?: string | null;
-    avatar?: string | null;
-    email?: string | null;
-    vkLink?: string | null;
-    telegramLink?: string | null;
-    youtubeLink?: string | null;
-  };
-};
+import { ModerationCard } from "./_components/ModerationCard";
+import { ModerationFilters } from "./_components/ModerationFilters";
+import { ModerationNotice } from "./_components/ModerationNotice";
+import { ModerationStats } from "./_components/ModerationStats";
+import { useGoodDeedsModeration } from "./_lib/useGoodDeedsModeration";
 
 export default function AdminGoodDeedsClient() {
-  const [items, setItems] = useState<ModerationItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [rejectCommentById, setRejectCommentById] = useState<
-    Record<string, string>
-  >({});
-
-  const load = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/good-deeds/submissions", {
-        cache: "no-store",
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json?.error || "Ошибка загрузки модерации");
-      }
-      setItems(Array.isArray(json?.items) ? json.items : []);
-    } catch (error) {
-      console.error(error);
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load().catch(console.error);
-  }, []);
-
-  const profileHref = (userId: string) => `/profile/${userId}`;
-
-  const updateStatus = async (id: string, action: "approve" | "reject") => {
-    setBusyId(id);
-    try {
-      const res = await fetch(`/api/admin/good-deeds/submissions/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action,
-          adminComment: rejectCommentById[id] || "",
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json?.error || "Не удалось обновить статус");
-      }
-      const bonusGranted =
-        action === "approve" && Boolean(json?.firstFeedBonusGranted);
-      setItems((prev) =>
-        prev.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                status: action === "approve" ? "APPROVED" : "REJECTED",
-                reward: bonusGranted
-                  ? item.reward + GOOD_DEED_FIRST_IN_FEED_BONUS_BONUSES
-                  : item.reward,
-                adminComment:
-                  action === "reject" ? rejectCommentById[id] || null : null,
-                reviewedAt: new Date().toISOString(),
-              }
-            : item,
-        ),
-      );
-      if (bonusGranted) {
-        alert(
-          `Начислен бонус «первый в ленте»: +${GOOD_DEED_FIRST_IN_FEED_BONUS_BONUSES} бонусов к сумме отчёта.`,
-        );
-      }
-    } catch (error) {
-      console.error(error);
-      alert(error instanceof Error ? error.message : "Ошибка");
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const deleteItem = async (id: string) => {
-    if (!window.confirm("Удалить это задание безвозвратно?")) return;
-    setBusyId(id);
-    try {
-      const res = await fetch(`/api/admin/good-deeds/submissions/${id}`, {
-        method: "DELETE",
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json?.error || "Не удалось удалить");
-      }
-      setItems((prev) => prev.filter((item) => item.id !== id));
-    } catch (error) {
-      console.error(error);
-      alert(error instanceof Error ? error.message : "Ошибка");
-    } finally {
-      setBusyId(null);
-    }
-  };
+  const {
+    loading,
+    busyId,
+    bulkBusy,
+    notice,
+    selectedIds,
+    selectedPendingCount,
+    rejectCommentById,
+    statusFilter,
+    query,
+    sortBy,
+    stats,
+    visibleItems,
+    setRejectCommentById,
+    setStatusFilter,
+    setQuery,
+    setSortBy,
+    toggleSelect,
+    clearSelection,
+    selectAllVisiblePending,
+    load,
+    updateStatus,
+    bulkApproveSelected,
+    deleteItem,
+    copyId,
+    applyRejectTemplate,
+  } = useGoodDeedsModeration();
 
   return (
     <div className="min-h-screen relative">
@@ -137,177 +46,111 @@ export default function AdminGoodDeedsClient() {
         <AdminHeader />
 
         <Card variant="darkGlass" className="mb-6">
-          <h2 className="text-2xl font-bold text-[#fffffe] mb-2">
-            Модерация добрых дел
-          </h2>
-          <p className="text-[#abd1c6]/90">
-            Проверяйте рассказ и материалы (фото/видео), затем подтверждайте или
-            отклоняйте выполнение заданий.
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="mb-2 text-2xl font-bold text-[#fffffe]">
+                Модерация добрых дел
+              </h2>
+              <p className="text-[#abd1c6]/90">
+                Проверяйте рассказ и материалы (фото/видео), затем подтверждайте
+                или отклоняйте выполнение заданий.
+              </p>
+            </div>
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-xl border-[#abd1c6]/35 text-[#abd1c6] hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/10 hover:text-[#fffffe]"
+            >
+              <Link href="/admin/good-deeds/withdrawals">
+                Заявки на вывод
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </Card>
+
+        <ModerationStats stats={stats} />
+        <ModerationFilters
+          query={query}
+          sortBy={sortBy}
+          statusFilter={statusFilter}
+          pendingCount={stats.pending}
+          onQueryChange={setQuery}
+          onSortByChange={setSortBy}
+          onStatusFilterChange={setStatusFilter}
+          onReload={load}
+        />
+        <ModerationNotice notice={notice} />
+        <Card variant="darkGlass" className="mb-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-[#abd1c6]">
+              Выбрано заявок на проверке:{" "}
+              <span className="font-bold text-[#f9bc60]">
+                {selectedPendingCount}
+              </span>
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={selectAllVisiblePending}
+                className="rounded-lg border-[#abd1c6]/35 text-[#abd1c6] hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/10 hover:text-[#fffffe]"
+              >
+                Выбрать все видимые
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={clearSelection}
+                className="rounded-lg border-[#abd1c6]/35 text-[#abd1c6] hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/10 hover:text-[#fffffe]"
+              >
+                Снять выбор
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                disabled={bulkBusy || selectedPendingCount === 0}
+                onClick={bulkApproveSelected}
+                className="rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-60"
+              >
+                <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                Подтвердить выбранные
+              </Button>
+            </div>
+          </div>
         </Card>
 
         {loading ? (
           <Card variant="default">
             <p className="text-[#abd1c6]">Загрузка...</p>
           </Card>
-        ) : items.length === 0 ? (
+        ) : visibleItems.length === 0 ? (
           <Card variant="default">
-            <p className="text-[#abd1c6]">Список пуст.</p>
+            <p className="text-[#abd1c6]">Нет заявок по выбранным фильтрам.</p>
           </Card>
         ) : (
           <div className="space-y-4">
-            {items.map((item) => (
-              <Card key={item.id} variant="darkGlass" className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <div>
-                    <h3 className="text-lg font-semibold text-[#fffffe]">
-                      {item.taskTitle}
-                    </h3>
-                    <p className="text-sm text-[#abd1c6]">
-                      Награда: +{item.reward} бонусов | Неделя: {item.weekKey}
-                    </p>
-                    <p className="text-xs mt-1">
-                      <span className="text-[#94a1b2]">Статус: </span>
-                      <span
-                        className={
-                          item.status === "APPROVED"
-                            ? "text-[#10B981]"
-                            : item.status === "REJECTED"
-                              ? "text-[#e16162]"
-                              : "text-[#f9bc60]"
-                        }
-                      >
-                        {item.status === "APPROVED"
-                          ? "Подтверждено"
-                          : item.status === "REJECTED"
-                            ? "Отклонено"
-                            : "На проверке"}
-                      </span>
-                    </p>
-                  </div>
-                  <p className="text-xs text-[#94a1b2]">
-                    {new Date(item.createdAt).toLocaleString("ru-RU")}
-                  </p>
-                </div>
-
-                <p className="text-[#abd1c6]/90">{item.taskDescription}</p>
-
-                {item.storyText?.trim() && (
-                  <div className="rounded-xl border border-[#f9bc60]/25 bg-[#f9bc60]/8 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#f9bc60] mb-2">
-                      Рассказ участника
-                    </p>
-                    <p className="text-sm text-[#fffffe]/95 whitespace-pre-wrap leading-relaxed">
-                      {item.storyText}
-                    </p>
-                  </div>
-                )}
-
-                {item.adminComment && (
-                  <div className="rounded-xl border border-[#abd1c6]/20 bg-black/10 p-3 text-sm text-[#abd1c6]">
-                    Комментарий администратора: {item.adminComment}
-                  </div>
-                )}
-
-                <div className="rounded-xl border border-[#abd1c6]/20 bg-black/10 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#94a1b2]">
-                    Отправитель
-                  </p>
-                  <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
-                    <Link
-                      href={profileHref(item.user.id)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-[#fffffe] underline-offset-4 transition hover:text-[#f9bc60] hover:underline"
-                    >
-                      {item.user.name}
-                      {item.user.username ? ` (@${item.user.username})` : ""}
-                      <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
-                    </Link>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="rounded-xl border-[#abd1c6]/35 text-[#abd1c6] hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/10 hover:text-[#fffffe]"
-                      asChild
-                    >
-                      <Link
-                        href={profileHref(item.user.id)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Профиль
-                      </Link>
-                    </Button>
-                  </div>
-                  {item.user.email && (
-                    <p className="text-xs text-[#94a1b2] mt-1">{item.user.email}</p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {item.media.map((media) => (
-                    <div
-                      key={`${item.id}-${media.url}`}
-                      className="rounded-xl overflow-hidden border border-white/10 bg-black/20"
-                    >
-                      {media.type === "VIDEO" ? (
-                        <video src={media.url} controls className="w-full h-52 object-cover" />
-                      ) : (
-                        <a href={media.url} target="_blank" rel="noopener noreferrer">
-                          <img
-                            src={media.url}
-                            alt="Отчёт по доброму делу"
-                            className="w-full h-52 object-cover transition hover:opacity-90"
-                          />
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                <textarea
-                  value={rejectCommentById[item.id] || ""}
-                  onChange={(e) =>
-                    setRejectCommentById((prev) => ({
-                      ...prev,
-                      [item.id]: e.target.value,
-                    }))
-                  }
-                  placeholder="Комментарий для пользователя (обязательно при отклонении)"
-                  className="w-full min-h-[84px] rounded-xl border border-[#abd1c6]/30 bg-[#003b3a]/70 text-[#fffffe] placeholder:text-[#94a1b2] p-3 text-sm outline-none focus:border-[#f9bc60]"
-                />
-
-                <div className="flex flex-col sm:flex-row gap-2">
-                  {item.status === "PENDING" && (
-                    <>
-                      <Button
-                        onClick={() => updateStatus(item.id, "approve")}
-                        disabled={busyId === item.id}
-                        className="bg-[#10B981] hover:bg-[#0fa372] text-white"
-                      >
-                        <CheckCircle2 className="w-4 h-4 mr-1" />
-                        Подтвердить
-                      </Button>
-                      <Button
-                        onClick={() => updateStatus(item.id, "reject")}
-                        disabled={busyId === item.id}
-                        className="bg-[#e16162] hover:bg-[#cf5253] text-white"
-                      >
-                        <XCircle className="w-4 h-4 mr-1" />
-                        Отклонить
-                      </Button>
-                    </>
-                  )}
-                  <Button
-                    onClick={() => deleteItem(item.id)}
-                    disabled={busyId === item.id}
-                    className="bg-[#343d49] hover:bg-[#2d3440] text-white"
-                  >
-                    Удалить
-                  </Button>
-                </div>
-              </Card>
+            {visibleItems.map((item) => (
+              <ModerationCard
+                key={item.id}
+                item={item}
+                busyId={busyId}
+                selected={selectedIds.includes(item.id)}
+                rejectComment={rejectCommentById[item.id] || ""}
+                onToggleSelect={toggleSelect}
+                onRejectCommentChange={(value) =>
+                  setRejectCommentById((prev) => ({
+                    ...prev,
+                    [item.id]: value,
+                  }))
+                }
+                onCopyId={copyId}
+                onApplyRejectTemplate={applyRejectTemplate}
+                onUpdateStatus={updateStatus}
+                onDelete={deleteItem}
+              />
             ))}
           </div>
         )}

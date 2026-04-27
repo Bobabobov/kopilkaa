@@ -24,8 +24,22 @@ type WithdrawItem = {
   };
 };
 
+type UserBonusesRow = {
+  user: {
+    id: string;
+    name: string;
+    username?: string | null;
+    email?: string | null;
+  };
+  totalEarnedBonuses: number;
+  pendingWithdrawalBonuses: number;
+  withdrawnBonuses: number;
+  availableBonuses: number;
+};
+
 export default function AdminGoodDeedWithdrawalsClient() {
   const [items, setItems] = useState<WithdrawItem[]>([]);
+  const [leaderboard, setLeaderboard] = useState<UserBonusesRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [commentById, setCommentById] = useState<Record<string, string>>({});
@@ -39,9 +53,11 @@ export default function AdminGoodDeedWithdrawalsClient() {
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || "Ошибка загрузки");
       setItems(Array.isArray(json?.items) ? json.items : []);
+      setLeaderboard(Array.isArray(json?.leaderboard) ? json.leaderboard : []);
     } catch (e) {
       console.error(e);
       setItems([]);
+      setLeaderboard([]);
     } finally {
       setLoading(false);
     }
@@ -120,6 +136,79 @@ export default function AdminGoodDeedWithdrawalsClient() {
         ) : (
           <>
             <h3 className="mb-3 text-lg font-bold text-[#fffffe]">
+              Баланс пользователей (по убыванию)
+            </h3>
+            {leaderboard.length === 0 ? (
+              <Card variant="default" className="mb-10">
+                <p className="text-[#abd1c6]">Пока нет данных по бонусам.</p>
+              </Card>
+            ) : (
+              <Card variant="darkGlass" className="mb-10 overflow-x-auto p-0">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-white/[0.04] text-[#94a1b2]">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-semibold">#</th>
+                      <th className="px-4 py-3 text-left font-semibold">
+                        Пользователь
+                      </th>
+                      <th className="px-4 py-3 text-right font-semibold">
+                        Доступно
+                      </th>
+                      <th className="px-4 py-3 text-right font-semibold">
+                        Начислено
+                      </th>
+                      <th className="px-4 py-3 text-right font-semibold">
+                        В заявках
+                      </th>
+                      <th className="px-4 py-3 text-right font-semibold">
+                        Выведено
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leaderboard.map((row, idx) => (
+                      <tr
+                        key={row.user.id}
+                        className="border-t border-white/[0.06] text-[#fffffe]"
+                      >
+                        <td className="px-4 py-3 text-[#abd1c6]">{idx + 1}</td>
+                        <td className="px-4 py-3">
+                          <Link
+                            href={profileHref(row.user.id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 underline-offset-2 hover:text-[#f9bc60] hover:underline"
+                          >
+                            {row.user.name}
+                            {row.user.username
+                              ? ` (@${row.user.username})`
+                              : ""}
+                            <ExternalLink
+                              className="h-3.5 w-3.5 shrink-0 opacity-70"
+                              aria-hidden
+                            />
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3 text-right font-bold text-[#f9bc60]">
+                          {row.availableBonuses}
+                        </td>
+                        <td className="px-4 py-3 text-right text-[#abd1c6]">
+                          {row.totalEarnedBonuses}
+                        </td>
+                        <td className="px-4 py-3 text-right text-[#abd1c6]">
+                          {row.pendingWithdrawalBonuses}
+                        </td>
+                        <td className="px-4 py-3 text-right text-[#abd1c6]">
+                          {row.withdrawnBonuses}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Card>
+            )}
+
+            <h3 className="mb-3 text-lg font-bold text-[#fffffe]">
               На проверке ({pending.length})
             </h3>
             {pending.length === 0 ? (
@@ -160,8 +249,13 @@ export default function AdminGoodDeedWithdrawalsClient() {
                             className="mt-1 inline-flex items-center gap-1.5 font-medium text-[#fffffe] underline-offset-4 transition hover:text-[#f9bc60] hover:underline"
                           >
                             {item.user.name}
-                            {item.user.username ? ` (@${item.user.username})` : ""}
-                            <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+                            {item.user.username
+                              ? ` (@${item.user.username})`
+                              : ""}
+                            <ExternalLink
+                              className="h-3.5 w-3.5 shrink-0 opacity-70"
+                              aria-hidden
+                            />
                           </Link>
                           {item.user.email && (
                             <p className="mt-1 text-xs text-[#abd1c6]/90">
@@ -268,7 +362,10 @@ export default function AdminGoodDeedWithdrawalsClient() {
                           className="inline-flex items-center gap-1 text-[#f9bc60] underline-offset-2 hover:underline"
                         >
                           {item.user.name}
-                          <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-80" aria-hidden />
+                          <ExternalLink
+                            className="h-3.5 w-3.5 shrink-0 opacity-80"
+                            aria-hidden
+                          />
                         </Link>
                       </p>
                       <p className="text-xs text-[#94a1b2]">
@@ -304,9 +401,7 @@ export default function AdminGoodDeedWithdrawalsClient() {
                             : "text-rose-400"
                         }
                       >
-                        {item.status === "APPROVED"
-                          ? "Одобрено"
-                          : "Отклонено"}
+                        {item.status === "APPROVED" ? "Одобрено" : "Отклонено"}
                       </span>
                     </div>
                   </Card>

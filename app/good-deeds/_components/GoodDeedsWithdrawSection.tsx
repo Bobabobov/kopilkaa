@@ -109,7 +109,9 @@ export function GoodDeedsWithdrawSection({
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(typeof json?.error === "string" ? json.error : "Ошибка");
+        throw new Error(
+          typeof json?.error === "string" ? json.error : "Ошибка",
+        );
       }
       showToast(
         "success",
@@ -149,9 +151,9 @@ export function GoodDeedsWithdrawSection({
         >
           <h2 className="text-xl font-black text-[#fffffe]">Вывод бонусов</h2>
           <p className="mt-2 text-sm leading-relaxed text-[#abd1c6]/95">
-            1 бонус = 1 ₽. Минимальный вывод — {MIN_WITHDRAWAL_BONUSES}{" "}
-            бонусов. Укажите банк и реквизиты (номер карты, счёт, телефон для
-            СБП и т.д.).
+            1 бонус = 1 ₽. Минимальный вывод — {MIN_WITHDRAWAL_BONUSES} бонусов.
+            Укажите банк и реквизиты (номер карты, счёт, телефон для СБП и
+            т.д.).
           </p>
 
           <form className="mt-6 space-y-4" onSubmit={submit}>
@@ -241,9 +243,9 @@ export function GoodDeedsWithdrawSection({
             <p className="text-xs font-semibold uppercase tracking-wide text-[#94a1b2]">
               Бонусы
             </p>
-            <p className="text-2xl font-black tabular-nums text-[#fffffe]">
+            <p className="text-2xl font-bold tabular-nums text-[#fffffe]">
               {stats.availableBonuses}{" "}
-              <span className="text-base font-bold text-[#abd1c6]">
+              <span className="text-base font-semibold text-[#abd1c6]">
                 доступно
               </span>
             </p>

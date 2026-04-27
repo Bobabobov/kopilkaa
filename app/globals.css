@@ -94,7 +94,8 @@
   /* TopBanner: позиционирование через CSS */
   .top-banner-component {
     position: relative;
-    z-index: 40;
+    /* Ниже шапки и модалок — полноэкранные диалоги рендерятся в portal с z-index выше */
+    z-index: 30;
     margin-top: var(--header-height); /* Отступ для Header на мобильных */
   }
 
@@ -104,7 +105,8 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 60;
+      /* Должен быть ниже модалок (обычно z-[100]+); Header z-50 остаётся под баннером при скролле */
+      z-index: 55;
       margin-top: 0;
     }
   }

@@ -7,6 +7,7 @@ export interface Notification {
     | "system"
     | "application_status"
     | "withdrawal_status"
+    | "good_deed_submission_status"
     | "friend_request";
   title: string;
   message: string;
@@ -18,6 +19,7 @@ export interface Notification {
   rarity?: string;
   applicationId?: string;
   withdrawalId?: string;
+  goodDeedSubmissionId?: string;
   status?: "APPROVED" | "REJECTED" | "CONTEST";
   friendshipId?: string;
   requesterId?: string;

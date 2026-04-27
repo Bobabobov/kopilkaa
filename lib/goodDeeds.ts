@@ -1,9 +1,12 @@
 export type GoodDeedTaskTemplate = {
   id: string;
+  difficulty: GoodDeedDifficulty;
   title: string;
   description: string;
   reward: number;
 };
+
+export type GoodDeedDifficulty = "EASY" | "MEDIUM" | "HARD";
 
 export type WeekInfo = {
   key: string;
@@ -11,6 +14,38 @@ export type WeekInfo = {
 };
 
 export const TASKS_PER_WEEK = 3;
+export const GOOD_DEED_COMPLETION_BONUS: Record<GoodDeedDifficulty, number> = {
+  EASY: 50,
+  MEDIUM: 70,
+  HARD: 180,
+};
+
+/** Тексты по умолчанию для поля отчёта в UI (конкретные задания — см. GOOD_DEED_STORY_EXTRA_HELP). */
+export const DEFAULT_GOOD_DEED_STORY_PLACEHOLDER =
+  "Что сделали и как прошло — не короче 100 символов.";
+
+/**
+ * Доп. подсказки для заданий, где участники часто путают «отчёт на Копилке» с самим действием.
+ * Ключ — task id из GOOD_DEED_TASK_POOL.
+ */
+export const GOOD_DEED_STORY_EXTRA_HELP: Partial<
+  Record<
+    string,
+    {
+      /** Короткий блок над полем рассказа */
+      notice?: string;
+      /** Плейсхолдер textarea */
+      placeholder?: string;
+      /** Строка под подписью «Фото или видео» */
+      fileUploadHint?: string;
+    }
+  >
+> = {
+  "easy-good-review": {
+    placeholder: "Где оставили отзыв и про что (не отзыв на Копилку).",
+    fileUploadHint: "Скрин того отзыва, что уже висит на площадке.",
+  },
+};
 
 /** Минимальная длина рассказа при отправке отчёта о добром деле. */
 export const MIN_GOOD_DEED_STORY_CHARS = 100;
@@ -31,103 +66,103 @@ export const MAX_WITHDRAWAL_DETAILS_LEN = 2500;
  * Экономика наград (середина между «слишком мало» и фармом):
  * — Лёгкие задания ≈ 70–76 бон.: короткое действие без существенных затрат.
  * — Обычные ≈ 80–96: заметное время/усилие или умеренные траты.
- * — Тяжёлые ≈ 100–112: час+ времени, поездка, донорство, заметные затраты.
+ * — Тяжёлые ≈ 180–230: заметно больше времени и ответственности.
  *
  * В неделю максимум 3 одобренных отчёта → типичная сумма при полном закрытии
- * недели порядка ~220–310 ₽, без экстремальных разбросов «в ноль» или «джекпот».
+ * недели порядка ~220–410 ₽, без экстремальных разбросов «в ноль» или «джекпот».
  */
 export const GOOD_DEED_TASK_POOL: GoodDeedTaskTemplate[] = [
   {
-    id: "help-neighbor",
-    title: "Помочь соседу",
-    description: "Помогите пожилому соседу донести сумки или с бытовыми делами.",
-    reward: 88,
+    id: "easy-kind-message",
+    difficulty: "EASY",
+    title: "Сообщение поддержки",
+    description:
+      "Напишите человеку искренние слова поддержки в трудный момент и объясните, почему он справится.",
+    reward: 58,
   },
   {
-    id: "eco-walk",
-    title: "Эко-прогулка",
-    description: "Соберите мусор в парке или во дворе не менее 20 минут.",
-    reward: 84,
-  },
-  {
-    id: "good-review",
+    id: "easy-good-review",
+    difficulty: "EASY",
     title: "Добрый отзыв",
-    description: "Оставьте развёрнутый позитивный отзыв о полезном сервисе или человеке.",
-    reward: 74,
+    description:
+      "Оставьте развернутый позитивный отзыв во внешнем месте: приложение — в Google Play или App Store, локальный бизнес — в карточке на Яндекс Картах / 2ГИС / Google Maps, сервис — на его странице отзывов или в соцсети компании. Приложите скрин или фото экрана с опубликованным отзывом.",
+    reward: 62,
   },
   {
-    id: "share-food",
-    title: "Поделиться едой",
-    description: "Передайте продукты тем, кому они сейчас особенно нужны.",
+    id: "easy-library-books",
+    difficulty: "EASY",
+    title: "Книги в библиотеку",
+    description:
+      "Передайте хорошие книги в библиотеку, школу или книжный обменник, чтобы они приносили пользу другим.",
+    reward: 66,
+  },
+  {
+    id: "medium-help-neighbor",
+    difficulty: "MEDIUM",
+    title: "Помочь соседу",
+    description:
+      "Помогите пожилому соседу с бытовыми делами: покупки, доставка сумок, мелкая домашняя помощь.",
     reward: 92,
   },
   {
-    id: "volunteer-hour",
-    title: "Час волонтерства",
-    description: "Посвятите минимум 1 час волонтерской активности по месту или онлайн.",
-    reward: 104,
-  },
-  {
-    id: "kind-message",
-    title: "Сообщение поддержки",
-    description: "Напишите человеку искренние слова поддержки в трудный момент.",
-    reward: 72,
-  },
-  {
-    id: "donate-things",
-    title: "Передать вещи",
-    description: "Передайте ненужные, но аккуратные вещи в приют, фонд или отдам даром.",
-    reward: 88,
-  },
-  {
-    id: "help-animal",
-    title: "Помощь животным",
-    description: "Купите корм, лекарства или помогите приюту для животных делом.",
-    reward: 102,
-  },
-  {
-    id: "blood-donation",
-    title: "Донорство крови",
-    description: "Сдайте кровь или плазму в пункте переливания (если позволяет здоровье).",
-    reward: 112,
-  },
-  {
-    id: "mentor-help",
-    title: "Наставничество",
-    description: "Помогите ученику, коллеге или знакомому разобраться в теме 30+ минут.",
-    reward: 86,
-  },
-  {
-    id: "community-space",
+    id: "medium-community-space",
+    difficulty: "MEDIUM",
     title: "Уборка общего места",
-    description: "Приведите в порядок подъезд, лестницу или зону отдыха во дворе.",
-    reward: 82,
+    description:
+      "Приведите в порядок подъезд, лестницу, двор или общее пространство и покажите результат до/после.",
+    reward: 98,
   },
   {
-    id: "care-package",
-    title: "Набор первой необходимости",
-    description: "Соберите и передайте гигиену, еду или тёплые вещи нуждающимся.",
-    reward: 96,
+    id: "medium-transport-help",
+    difficulty: "MEDIUM",
+    title: "Сопроводить по делу",
+    description:
+      "Сопроводите человека к врачу, в МФЦ или на важную встречу, чтобы он не оставался один в сложной ситуации.",
+    reward: 106,
   },
   {
-    id: "transport-help",
-    title: "Подвезти по делу",
-    description: "Бесплатно подвезите человека к врачу, на работу или на важную встречу.",
-    reward: 94,
+    id: "hard-volunteer-hour",
+    difficulty: "HARD",
+    title: "Час волонтерства",
+    description:
+      "Посвятите минимум 1 час реальной волонтерской активности (офлайн или онлайн) с доказательствами участия.",
+    reward: 190,
   },
   {
-    id: "plant-tree",
-    title: "Посадить или полить",
-    description: "Посадите дерево/куст или полейте уже посаженное городское озеленение.",
-    reward: 80,
+    id: "hard-help-animal",
+    difficulty: "HARD",
+    title: "Помощь животным",
+    description:
+      "Помогите приюту делом и временем: выгул, уборка, перевозка или другая реальная помощь без обязательных трат.",
+    reward: 210,
   },
   {
-    id: "library-books",
-    title: "Книги в библиотеку",
-    description: "Передайте хорошие книги в библиотеку, школу или книжный обменник.",
-    reward: 70,
+    id: "hard-blood-donation",
+    difficulty: "HARD",
+    title: "Донорство крови",
+    description:
+      "Сдайте кровь или плазму в пункте переливания (если позволяет здоровье) и приложите подтверждение.",
+    reward: 230,
   },
 ];
+
+export function getDifficultyLabel(difficulty: GoodDeedDifficulty): string {
+  if (difficulty === "EASY") return "Легкие";
+  if (difficulty === "MEDIUM") return "Средние";
+  return "Тяжелые";
+}
+
+export function getDifficultyDescription(
+  difficulty: GoodDeedDifficulty,
+): string {
+  if (difficulty === "EASY") {
+    return "Проще задания, меньше времени.";
+  }
+  if (difficulty === "MEDIUM") {
+    return "Середина по силам и времени.";
+  }
+  return "Больше времени и ответственности, выше бонус.";
+}
 
 export function getWeekInfo(date: Date): WeekInfo {
   const currentDate = new Date(date);
@@ -185,22 +220,81 @@ function mulberry32(seed: number) {
  * чтобы наборы по неделям отличались равномернее.
  */
 export function pickTasksForWeek(weekKey: string): GoodDeedTaskTemplate[] {
-  const n = GOOD_DEED_TASK_POOL.length;
-  const order = Array.from({ length: n }, (_, i) => i);
-  const rnd = mulberry32(hashWeekKeyToSeed(weekKey));
+  return getTasksForDifficulty("MEDIUM");
+}
 
-  for (let i = n - 1; i > 0; i -= 1) {
-    const j = Math.floor(rnd() * (i + 1));
-    const tmp = order[i];
-    order[i] = order[j]!;
-    order[j] = tmp!;
+export function getTasksForDifficulty(
+  difficulty: GoodDeedDifficulty,
+): GoodDeedTaskTemplate[] {
+  return GOOD_DEED_TASK_POOL.filter((task) => task.difficulty === difficulty);
+}
+
+const TASK_EXAMPLE_BLURBS: Record<string, string> = {
+  "easy-kind-message":
+    "Поддержать человека словами и объяснить, почему он справится.",
+  "easy-good-review":
+    "Оставить реальный отзыв вне Копилки и приложить скрин как подтверждение.",
+  "easy-library-books":
+    "Передать книги в библиотеку, школу или пункт книжного обмена.",
+  "medium-help-neighbor":
+    "Помочь соседу с бытовыми делами: покупки, сумки, мелкая помощь.",
+  "medium-community-space":
+    "Убрать общее место и показать результат формата до/после.",
+  "medium-transport-help":
+    "Сопроводить человека к врачу или по важному делу, чтобы он не был один.",
+  "hard-volunteer-hour":
+    "Посвятить минимум час волонтерству и подтвердить участие.",
+  "hard-help-animal":
+    "Помочь приюту делом и временем (без обязательной покупки).",
+  "hard-blood-donation":
+    "Сдать кровь или плазму (если позволяет здоровье) и приложить подтверждение.",
+};
+
+function compactDescriptionBlurb(text: string, maxChars: number): string {
+  if (text.length <= maxChars) return text;
+  const softCut = text.slice(0, maxChars);
+  const stopChars = [".", ":", ";"];
+  for (const ch of stopChars) {
+    const idx = softCut.lastIndexOf(ch);
+    if (idx >= 28) return softCut.slice(0, idx + 1).trim();
   }
+  const lastSpace = softCut.lastIndexOf(" ");
+  const base = lastSpace > 28 ? softCut.slice(0, lastSpace) : softCut;
+  return base.trim();
+}
 
-  return order.slice(0, TASKS_PER_WEEK).map((idx) => GOOD_DEED_TASK_POOL[idx]!);
+/** Короткие примеры заданий для UI (модалка): из пула `GOOD_DEED_TASK_POOL`. */
+export function getDifficultyTaskExamples(
+  difficulty: GoodDeedDifficulty,
+): { title: string; blurb: string }[] {
+  return getTasksForDifficulty(difficulty).map((t) => ({
+    title: t.title,
+    blurb:
+      TASK_EXAMPLE_BLURBS[t.id] ?? compactDescriptionBlurb(t.description, 98),
+  }));
+}
+
+export function getTasksByDifficulty() {
+  return {
+    EASY: getTasksForDifficulty("EASY"),
+    MEDIUM: getTasksForDifficulty("MEDIUM"),
+    HARD: getTasksForDifficulty("HARD"),
+  };
 }
 
 export function getTaskById(taskId: string): GoodDeedTaskTemplate | undefined {
   return GOOD_DEED_TASK_POOL.find((task) => task.id === taskId);
+}
+
+export function getTaskDifficulty(taskId: string): GoodDeedDifficulty | null {
+  const task = getTaskById(taskId);
+  return task?.difficulty ?? null;
+}
+
+export function getCompletionBonusForDifficulty(
+  difficulty: GoodDeedDifficulty,
+): number {
+  return GOOD_DEED_COMPLETION_BONUS[difficulty];
 }
 
 export function pickReplacementTask(

@@ -17,6 +17,15 @@ export interface GameConfig {
 
 export const GAMES_LIST: GameConfig[] = [
   {
+    title: "Dino Run",
+    description:
+      "Прыгай через препятствия и держись как можно дольше. Скорость растет каждую секунду.",
+    href: "/games/dino-run",
+    badge: "Топ недели",
+    image: "/game.png",
+    leaderboardApi: "dino-run",
+  },
+  {
     title: "Монетка",
     description: "Собирай монеты за 30 секунд. 3 жизни. Попади в топ недели.",
     href: "/games/coin-catch",

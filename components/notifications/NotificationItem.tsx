@@ -50,6 +50,11 @@ export default function NotificationItem({
       notification.withdrawalId
     ) {
       router.push("/good-deeds");
+    } else if (
+      notification.type === "good_deed_submission_status" &&
+      notification.goodDeedSubmissionId
+    ) {
+      router.push("/good-deeds");
     } else if (notification.type === "like" && notification.applicationId) {
       router.push(`/stories/${notification.applicationId}`);
     } else if (notification.type === "friend_request") {

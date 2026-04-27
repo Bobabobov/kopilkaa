@@ -194,6 +194,12 @@ export function useNotificationBell() {
       ) {
         router.push("/good-deeds");
         setIsOpen(false);
+      } else if (
+        notification.type === "good_deed_submission_status" &&
+        notification.goodDeedSubmissionId
+      ) {
+        router.push("/good-deeds");
+        setIsOpen(false);
       } else if (notification.type === "like" && notification.applicationId) {
         router.push(`/stories/${notification.applicationId}`);
         setIsOpen(false);

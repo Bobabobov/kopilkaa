@@ -14,12 +14,14 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
+  DEFAULT_GOOD_DEED_STORY_PLACEHOLDER,
+  GOOD_DEED_STORY_EXTRA_HELP,
   MAX_GOOD_DEED_STORY_CHARS,
   MIN_GOOD_DEED_STORY_CHARS,
 } from "@/lib/goodDeeds";
-import type { GoodDeedsResponse } from "../types";
+import type { GoodDeedTaskView } from "../types";
 
-type Task = GoodDeedsResponse["tasks"][number];
+type Task = GoodDeedTaskView;
 
 function bonusWord(n: number): string {
   const m = n % 10;
@@ -63,10 +65,17 @@ export function GoodDeedsTaskCard({
 }: Props) {
   const compact = variant === "compact";
   const status = task.submissionStatus;
+  const storyHelp = GOOD_DEED_STORY_EXTRA_HELP[task.id];
+  const storyPlaceholder =
+    storyHelp?.placeholder ?? DEFAULT_GOOD_DEED_STORY_PLACEHOLDER;
 
   const [workspaceOpen, setWorkspaceOpen] = useState(status !== null);
 
   useEffect(() => {
+    if (status === "PENDING") {
+      setWorkspaceOpen(false);
+      return;
+    }
     if (status !== null) {
       setWorkspaceOpen(true);
     }
@@ -87,6 +96,7 @@ export function GoodDeedsTaskCard({
   /** Пока задание не начато — короткая карточка; отчёт раскрывается по кнопке. */
   const showCollapsedPreview =
     status === null && !workspaceOpen && selectedFiles.length === 0;
+  const showPendingPreview = status === "PENDING";
 
   const statusMeta =
     status === "PENDING"
@@ -165,28 +175,40 @@ export function GoodDeedsTaskCard({
               </Badge>
             )}
           </div>
-          <p
-            className={cn(
-              "leading-relaxed text-[#abd1c6]/95",
-              compact ? "line-clamp-2 text-xs" : "text-sm",
-              showCollapsedPreview && "line-clamp-3",
-            )}
-          >
-            {task.description}
-          </p>
+          {!showCollapsedPreview && (
+            <p
+              className={cn(
+                "leading-relaxed text-[#abd1c6]/95",
+                compact ? "text-xs sm:text-[13px]" : "text-sm sm:text-[15px]",
+                !showPendingPreview && "text-[#e8f4ef]/95",
+              )}
+            >
+              {task.description}
+            </p>
+          )}
         </div>
       </CardHeader>
 
-      {showCollapsedPreview ? (
+      {showCollapsedPreview || showPendingPreview ? (
         <CardFooter
           className={cn(
             "flex-col gap-2 pt-0",
-            canReroll
+            canReroll && !showPendingPreview
               ? "sm:flex-row sm:flex-wrap sm:justify-end"
               : "sm:flex-row sm:justify-end",
           )}
         >
-          {canReroll && (
+          {showPendingPreview && (
+            <p
+              className={cn(
+                "w-full rounded-xl border border-amber-500/35 bg-amber-500/10 text-amber-100",
+                compact ? "px-3 py-2 text-xs" : "px-4 py-2.5 text-sm",
+              )}
+            >
+              На проверке.
+            </p>
+          )}
+          {canReroll && !showPendingPreview && (
             <Button
               type="button"
               variant="outline"
@@ -204,21 +226,23 @@ export function GoodDeedsTaskCard({
               {isRerolling ? "Замена…" : "Заменить задание"}
             </Button>
           )}
-          <Button
-            type="button"
-            onClick={() => setWorkspaceOpen(true)}
-            className={cn(
-              "w-full rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] hover:bg-[#f7b24a]",
-              compact ? "h-9 text-sm" : "h-10",
-              canReroll && "sm:min-w-[200px] sm:flex-1",
-            )}
-          >
-            Взять задание
-          </Button>
+          {!showPendingPreview && (
+            <Button
+              type="button"
+              onClick={() => setWorkspaceOpen(true)}
+              className={cn(
+                "w-full rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] hover:bg-[#f7b24a]",
+                compact ? "h-9 text-sm" : "h-10",
+                canReroll && "sm:min-w-[200px] sm:flex-1",
+              )}
+            >
+              Открыть
+            </Button>
+          )}
         </CardFooter>
       ) : null}
 
-      {!showCollapsedPreview && (
+      {!showCollapsedPreview && !showPendingPreview && (
         <>
           <CardContent
             className={cn("pt-0", compact ? "space-y-3" : "space-y-4")}
@@ -240,128 +264,150 @@ export function GoodDeedsTaskCard({
             )}
 
             {status === "REJECTED" && task.adminComment && (
-          <div
-            className={cn(
-              "rounded-2xl border border-rose-500/35 bg-rose-950/30 text-rose-100/95",
-              compact ? "px-3 py-2 text-xs" : "px-4 py-3 text-sm",
-            )}
-          >
-            <span className="font-semibold text-rose-200">
-              Комментарий модератора:{" "}
-            </span>
-            {task.adminComment}
-          </div>
-        )}
-
-        {status === "APPROVED" ? (
-          <p
-            className={cn(
-              "rounded-2xl border border-emerald-500/25 bg-emerald-950/20 text-[#abd1c6]",
-              compact ? "px-3 py-2 text-xs" : "px-4 py-3 text-sm",
-            )}
-          >
-            Задание принято — бонусы начислены. Спасибо за участие.
-          </p>
-        ) : (
-          <>
-            <Separator className="bg-[#abd1c6]/15" />
-            <div className={cn(compact ? "space-y-2" : "space-y-3")}>
-              <div className="flex items-center justify-between gap-2">
-                <Label
-                  htmlFor={`good-deed-story-${task.id}`}
-                  className={cn("text-[#abd1c6]", compact && "text-xs")}
-                >
-                  Рассказ о выполнении
-                </Label>
-                <span
-                  className={cn(
-                    "tabular-nums text-xs font-medium",
-                    storyText.trim().length >= MIN_GOOD_DEED_STORY_CHARS
-                      ? "text-emerald-300/90"
-                      : "text-[#94a1b2]",
-                  )}
-                >
-                  {storyText.trim().length}/{MIN_GOOD_DEED_STORY_CHARS} мин.
-                </span>
-              </div>
-              <textarea
-                id={`good-deed-story-${task.id}`}
-                value={storyText}
-                maxLength={MAX_GOOD_DEED_STORY_CHARS}
-                rows={compact ? 4 : 5}
-                disabled={!isAuthenticated || status === "PENDING"}
-                placeholder="Опишите, как вы выполнили задание — не короче 100 символов без пробелов по краям."
-                onChange={(e) => onStoryTextChange(e.target.value)}
-                className={cn(
-                  "min-h-[96px] w-full resize-y rounded-2xl border border-[#abd1c6]/25 bg-[#001e1d]/55 px-3 py-2.5 text-sm leading-relaxed text-[#fffffe] placeholder:text-[#5c6d7a]",
-                  "outline-none transition focus:border-[#f9bc60]/45 focus:ring-2 focus:ring-[#f9bc60]/15",
-                  (!isAuthenticated || status === "PENDING") &&
-                    "cursor-not-allowed opacity-50",
-                )}
-              />
-            </div>
-            <div className={cn(compact ? "space-y-2" : "space-y-3")}>
-              <Label
-                htmlFor={`good-deed-files-${task.id}`}
-                className={cn("text-[#abd1c6]", compact && "text-xs")}
-              >
-                {compact
-                  ? "Фото / видео (до 5)"
-                  : "Фото или видео (до 5 файлов)"}
-              </Label>
               <div
                 className={cn(
-                  "rounded-2xl border border-dashed border-[#abd1c6]/35 bg-[#001e1d]/40 text-center transition",
-                  compact ? "px-3 py-4" : "px-4 py-6",
-                  !isAuthenticated && "opacity-60",
-                  status === "PENDING" && "pointer-events-none opacity-50",
+                  "rounded-2xl border border-rose-500/35 bg-rose-950/30 text-rose-100/95",
+                  compact ? "px-3 py-2 text-xs" : "px-4 py-3 text-sm",
                 )}
               >
-                <input
-                  id={`good-deed-files-${task.id}`}
-                  type="file"
-                  multiple
-                  accept="image/*,video/mp4,video/webm"
-                  disabled={!isAuthenticated || status === "PENDING"}
-                  onChange={(e) => onFilesChange(e.currentTarget.files)}
-                  className="sr-only"
-                />
-                <label
-                  htmlFor={`good-deed-files-${task.id}`}
-                  className="flex cursor-pointer flex-col items-center gap-1.5 sm:gap-2"
-                >
-                  <span
-                    className={cn(
-                      "inline-flex items-center justify-center rounded-full bg-[#f9bc60]/15 text-[#f9bc60]",
-                      compact ? "h-8 w-8" : "h-10 w-10",
-                    )}
-                  >
-                    <Upload className={compact ? "h-4 w-4" : "h-5 w-5"} />
-                  </span>
-                  <span
-                    className={cn(
-                      "font-medium text-[#fffffe]",
-                      compact ? "text-xs" : "text-sm",
-                    )}
-                  >
-                    {compact ? "Выбрать файлы" : "Нажмите или перетащите файлы"}
-                  </span>
-                  {!compact && (
-                    <span className="text-xs text-[#94a1b2]">
-                      JPG, PNG, WebP, GIF, MP4, WebM · до 5 МБ каждый (для видео
-                      — по правилам загрузки)
-                    </span>
-                  )}
-                </label>
-                {selectedFiles.length > 0 && (
-                  <p className="mt-3 text-xs font-medium text-[#f9bc60]">
-                    Выбрано файлов: {selectedFiles.length}
-                  </p>
-                )}
+                <span className="font-semibold text-rose-200">
+                  Комментарий модератора:{" "}
+                </span>
+                {task.adminComment}
               </div>
-            </div>
-          </>
-        )}
+            )}
+
+            {status === "APPROVED" ? (
+              <p
+                className={cn(
+                  "rounded-2xl border border-emerald-500/25 bg-emerald-950/20 text-[#abd1c6]",
+                  compact ? "px-3 py-2 text-xs" : "px-4 py-3 text-sm",
+                )}
+              >
+                Принято, бонусы начислены.
+              </p>
+            ) : (
+              <>
+                <Separator className="bg-[#abd1c6]/15" />
+                <div className={cn(compact ? "space-y-2" : "space-y-3")}>
+                  {storyHelp?.notice && (
+                    <p
+                      className={cn(
+                        "rounded-lg border border-amber-500/30 bg-amber-950/25 text-amber-100/95",
+                        compact ? "px-3 py-2 text-xs" : "px-3 py-2.5 text-sm",
+                      )}
+                    >
+                      {storyHelp.notice}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between gap-2">
+                    <Label
+                      htmlFor={`good-deed-story-${task.id}`}
+                      className={cn("text-[#abd1c6]", compact && "text-xs")}
+                    >
+                      Рассказ
+                    </Label>
+                    <span
+                      className={cn(
+                        "tabular-nums text-xs font-medium",
+                        storyText.trim().length >= MIN_GOOD_DEED_STORY_CHARS
+                          ? "text-emerald-300/90"
+                          : "text-[#94a1b2]",
+                      )}
+                    >
+                      {storyText.trim().length}/{MIN_GOOD_DEED_STORY_CHARS}{" "}
+                      симв.
+                    </span>
+                  </div>
+                  <textarea
+                    id={`good-deed-story-${task.id}`}
+                    value={storyText}
+                    maxLength={MAX_GOOD_DEED_STORY_CHARS}
+                    rows={compact ? 4 : 5}
+                    disabled={!isAuthenticated}
+                    placeholder={storyPlaceholder}
+                    onChange={(e) => onStoryTextChange(e.target.value)}
+                    className={cn(
+                      "min-h-[96px] w-full resize-y rounded-2xl border border-[#abd1c6]/25 bg-[#001e1d]/55 px-3 py-2.5 text-sm leading-relaxed text-[#fffffe] placeholder:text-[#5c6d7a]",
+                      "outline-none transition focus:border-[#f9bc60]/45 focus:ring-2 focus:ring-[#f9bc60]/15",
+                      !isAuthenticated && "cursor-not-allowed opacity-50",
+                    )}
+                  />
+                </div>
+                <div className={cn(compact ? "space-y-2" : "space-y-3")}>
+                  <div className="space-y-1">
+                    <Label
+                      htmlFor={`good-deed-files-${task.id}`}
+                      className={cn("text-[#abd1c6]", compact && "text-xs")}
+                    >
+                      {compact ? "Фото или видео" : "Фото или видео (до 5)"}
+                    </Label>
+                    {storyHelp?.fileUploadHint && (
+                      <p
+                        className={cn(
+                          "text-[#abd1c6]/90",
+                          compact
+                            ? "text-[11px] leading-snug"
+                            : "text-xs leading-relaxed",
+                        )}
+                      >
+                        {storyHelp.fileUploadHint}
+                      </p>
+                    )}
+                  </div>
+                  <div
+                    className={cn(
+                      "rounded-2xl border border-dashed border-[#abd1c6]/35 bg-[#001e1d]/40 text-center transition",
+                      compact ? "px-3 py-4" : "px-4 py-6",
+                      !isAuthenticated && "opacity-60",
+                    )}
+                  >
+                    <input
+                      id={`good-deed-files-${task.id}`}
+                      type="file"
+                      multiple
+                      accept="image/*,video/mp4,video/webm"
+                      disabled={!isAuthenticated}
+                      onChange={(e) => onFilesChange(e.currentTarget.files)}
+                      className="sr-only"
+                    />
+                    <label
+                      htmlFor={`good-deed-files-${task.id}`}
+                      className="flex cursor-pointer flex-col items-center gap-1.5 sm:gap-2"
+                    >
+                      <span
+                        className={cn(
+                          "inline-flex items-center justify-center rounded-full bg-[#f9bc60]/15 text-[#f9bc60]",
+                          compact ? "h-8 w-8" : "h-10 w-10",
+                        )}
+                      >
+                        <Upload className={compact ? "h-4 w-4" : "h-5 w-5"} />
+                      </span>
+                      <span
+                        className={cn(
+                          "font-medium text-[#fffffe]",
+                          compact ? "text-xs" : "text-sm",
+                        )}
+                      >
+                        {compact
+                          ? "Добавить файлы"
+                          : "Нажмите и выберите файлы"}
+                      </span>
+                      {!compact && (
+                        <span className="text-xs text-[#94a1b2]">
+                          JPG, PNG и др., MP4/WebM · до 5 файлов, до 5 МБ каждый
+                        </span>
+                      )}
+                    </label>
+                    {selectedFiles.length > 0 && (
+                      <p className="mt-3 text-xs font-medium text-[#f9bc60]">
+                        К отправке прикреплено файлов: {selectedFiles.length}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
 
           {status !== "APPROVED" && (
@@ -375,7 +421,6 @@ export function GoodDeedsTaskCard({
                 onClick={onSubmit}
                 disabled={
                   isSubmitting ||
-                  status === "PENDING" ||
                   !isAuthenticated ||
                   selectedFiles.length < 1 ||
                   storyText.trim().length < MIN_GOOD_DEED_STORY_CHARS
@@ -386,11 +431,7 @@ export function GoodDeedsTaskCard({
                 )}
               >
                 <Upload className="h-4 w-4" />
-                {status === "PENDING"
-                  ? "Отправлено на проверку"
-                  : compact
-                    ? "На проверку"
-                    : "Отправить на проверку"}
+                Отправить
               </Button>
               {canReroll && (
                 <Button

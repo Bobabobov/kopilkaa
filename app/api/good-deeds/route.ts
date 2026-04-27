@@ -3,7 +3,15 @@ import { GoodDeedSubmissionStatus } from "@prisma/client";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeGoodDeedBonusWallet } from "@/lib/goodDeedBonusWallet";
-import { getTaskById, getWeekInfo, pickTasksForWeek } from "@/lib/goodDeeds";
+import {
+  getCompletionBonusForDifficulty,
+  getDifficultyDescription,
+  getDifficultyLabel,
+  type GoodDeedDifficulty,
+  getTaskDifficulty,
+  getTasksByDifficulty,
+  getWeekInfo,
+} from "@/lib/goodDeeds";
 
 export const dynamic = "force-dynamic";
 
@@ -11,9 +19,9 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getAuthUser(req);
     const weekInfo = getWeekInfo(new Date());
-    const weeklyTasks = pickTasksForWeek(weekInfo.key);
+    const tasksByDifficulty = getTasksByDifficulty();
 
-    const [weeklySubmissions, weekPreference, feedSubmissions] = await Promise.all([
+    const [weeklySubmissions, feedSubmissions] = await Promise.all([
       session?.uid
         ? prisma.goodDeedSubmission.findMany({
             where: {
@@ -24,23 +32,10 @@ export async function GET(req: NextRequest) {
               taskKey: true,
               status: true,
               adminComment: true,
+              reviewedAt: true,
             },
           })
         : Promise.resolve([]),
-      session?.uid
-        ? prisma.goodDeedWeekPreference.findUnique({
-            where: {
-              userId_weekKey: {
-                userId: session.uid,
-                weekKey: weekInfo.key,
-              },
-            },
-            select: {
-              replacedTaskKey: true,
-              newTaskKey: true,
-            },
-          })
-        : Promise.resolve(null),
       prisma.goodDeedSubmission.findMany({
         where: {
           status: GoodDeedSubmissionStatus.APPROVED,
@@ -77,26 +72,87 @@ export async function GET(req: NextRequest) {
     const submissionMap = new Map(
       weeklySubmissions.map((submission) => [submission.taskKey, submission]),
     );
-
-    let effectiveTasks = [...weeklyTasks];
-    if (weekPreference) {
-      const replacedIndex = effectiveTasks.findIndex(
-        (task) => task.id === weekPreference.replacedTaskKey,
-      );
-      const replacementTask = getTaskById(weekPreference.newTaskKey);
-      if (replacedIndex >= 0 && replacementTask) {
-        effectiveTasks[replacedIndex] = replacementTask;
+    const selectedDifficultyFromSubmissions = (() => {
+      for (const submission of weeklySubmissions) {
+        const difficulty = getTaskDifficulty(submission.taskKey);
+        if (difficulty) return difficulty;
       }
-    }
+      return null;
+    })();
+    const lastApprovedSubmission = session?.uid
+      ? await prisma.goodDeedSubmission.findFirst({
+          where: {
+            userId: session.uid,
+            status: GoodDeedSubmissionStatus.APPROVED,
+          },
+          orderBy: { updatedAt: "desc" },
+          select: { taskKey: true },
+        })
+      : null;
+    const lastApprovedDifficulty = lastApprovedSubmission
+      ? getTaskDifficulty(lastApprovedSubmission.taskKey)
+      : null;
+    const hasApprovedSubmissionEver = Boolean(lastApprovedSubmission);
+    const selectedDifficulty: GoodDeedDifficulty =
+      selectedDifficultyFromSubmissions ?? lastApprovedDifficulty ?? "MEDIUM";
 
-    const tasks = effectiveTasks.map((task) => {
+    const withStatus = (task: (typeof tasksByDifficulty)["EASY"][number]) => {
       const submission = submissionMap.get(task.id);
       return {
         ...task,
         submissionStatus: submission?.status ?? null,
         adminComment: submission?.adminComment ?? null,
       };
-    });
+    };
+
+    const categorizedTasks = {
+      EASY: tasksByDifficulty.EASY.map(withStatus),
+      MEDIUM: tasksByDifficulty.MEDIUM.map(withStatus),
+      HARD: tasksByDifficulty.HARD.map(withStatus),
+    };
+    const selectedTasks = categorizedTasks[selectedDifficulty];
+
+    const categoryStats = {
+      EASY: {
+        completedCount: categorizedTasks.EASY.filter(
+          (task) => task.submissionStatus === GoodDeedSubmissionStatus.APPROVED,
+        ).length,
+        totalCount: categorizedTasks.EASY.length,
+        completionBonus: getCompletionBonusForDifficulty("EASY"),
+        label: getDifficultyLabel("EASY"),
+        description: getDifficultyDescription("EASY"),
+      },
+      MEDIUM: {
+        completedCount: categorizedTasks.MEDIUM.filter(
+          (task) => task.submissionStatus === GoodDeedSubmissionStatus.APPROVED,
+        ).length,
+        totalCount: categorizedTasks.MEDIUM.length,
+        completionBonus: getCompletionBonusForDifficulty("MEDIUM"),
+        label: getDifficultyLabel("MEDIUM"),
+        description: getDifficultyDescription("MEDIUM"),
+      },
+      HARD: {
+        completedCount: categorizedTasks.HARD.filter(
+          (task) => task.submissionStatus === GoodDeedSubmissionStatus.APPROVED,
+        ).length,
+        totalCount: categorizedTasks.HARD.length,
+        completionBonus: getCompletionBonusForDifficulty("HARD"),
+        label: getDifficultyLabel("HARD"),
+        description: getDifficultyDescription("HARD"),
+      },
+    };
+    const selectedCategoryProgress = {
+      approved: selectedTasks.filter(
+        (task) => task.submissionStatus === GoodDeedSubmissionStatus.APPROVED,
+      ).length,
+      pending: selectedTasks.filter(
+        (task) => task.submissionStatus === GoodDeedSubmissionStatus.PENDING,
+      ).length,
+      rejected: selectedTasks.filter(
+        (task) => task.submissionStatus === GoodDeedSubmissionStatus.REJECTED,
+      ).length,
+      total: selectedTasks.length,
+    };
 
     let approvedCount = 0;
     let pendingCount = 0;
@@ -129,12 +185,14 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       week: weekInfo,
-      tasks,
+      tasksByDifficulty: categorizedTasks,
+      tasks: selectedTasks,
       stats: {
         approvedCount,
         pendingCount,
         ...walletInfo,
       },
+      categoryStats,
       feed: feedSubmissions.map((item) => ({
         id: item.id,
         taskTitle: item.taskTitle,
@@ -143,7 +201,10 @@ export async function GET(req: NextRequest) {
         reward: item.reward,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
-        media: item.media.map((media) => ({ url: media.url, type: media.type })),
+        media: item.media.map((media) => ({
+          url: media.url,
+          type: media.type,
+        })),
         user: {
           id: item.user.id,
           name: item.user.name || item.user.username || "Пользователь",
@@ -156,8 +217,10 @@ export async function GET(req: NextRequest) {
       })),
       viewer: {
         isAuthenticated: Boolean(session?.uid),
-        rerollUsed: Boolean(weekPreference),
+        selectedDifficulty,
+        canChangeDifficulty: !hasApprovedSubmissionEver,
       },
+      selectedCategoryProgress,
     });
   } catch (error) {
     console.error("GET /api/good-deeds error:", error);

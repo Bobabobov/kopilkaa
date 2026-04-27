@@ -1,21 +1,53 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { GoodDeedsFeedSection } from "./_components/GoodDeedsFeedSection";
 import { GoodDeedsHero } from "./_components/GoodDeedsHero";
 import { GoodDeedsPageSkeleton } from "./_components/GoodDeedsPageSkeleton";
 import { GoodDeedsTasksPanel } from "./_components/GoodDeedsTasksPanel";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
 import { MIN_GOOD_DEED_STORY_CHARS } from "@/lib/goodDeeds";
-import type { GoodDeedsResponse } from "./types";
+import type { GoodDeedDifficulty, GoodDeedsResponse } from "./types";
+
+const WEEK_DIFFICULTY_KEY_PREFIX = "good-deeds:difficulty:";
+
+function isDifficulty(value: string | null): value is GoodDeedDifficulty {
+  return value === "EASY" || value === "MEDIUM" || value === "HARD";
+}
+
+function readStoredDifficulty(weekKey: string): GoodDeedDifficulty | null {
+  if (typeof window === "undefined") return null;
+  const raw = window.localStorage.getItem(
+    `${WEEK_DIFFICULTY_KEY_PREFIX}${weekKey}`,
+  );
+  return isDifficulty(raw) ? raw : null;
+}
+
+function storeDifficulty(
+  weekKey: string,
+  difficulty: GoodDeedDifficulty,
+): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(
+    `${WEEK_DIFFICULTY_KEY_PREFIX}${weekKey}`,
+    difficulty,
+  );
+}
 
 export default function GoodDeedsPage() {
   const [data, setData] = useState<GoodDeedsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [submittingTaskId, setSubmittingTaskId] = useState<string | null>(null);
-  const [rerollingTaskId, setRerollingTaskId] = useState<string | null>(null);
   const [filesByTask, setFilesByTask] = useState<Record<string, File[]>>({});
   const [storyByTask, setStoryByTask] = useState<Record<string, string>>({});
+  const [selectedDifficulty, setSelectedDifficulty] =
+    useState<GoodDeedDifficulty>("MEDIUM");
+  const [tasksMode, setTasksMode] = useState<"difficulty-select" | "tasks">(
+    "difficulty-select",
+  );
   const { showToast, ToastComponent } = useBeautifulToast();
 
   const load = async () => {
@@ -27,6 +59,14 @@ export default function GoodDeedsPage() {
         throw new Error(json?.error || "Ошибка загрузки");
       }
       setData(json as GoodDeedsResponse);
+      const apiData = json as GoodDeedsResponse;
+      const persistedDifficulty = readStoredDifficulty(apiData.week.key);
+      const initialDifficulty =
+        apiData.viewer.canChangeDifficulty && persistedDifficulty
+          ? persistedDifficulty
+          : apiData.viewer.selectedDifficulty;
+      setSelectedDifficulty(initialDifficulty);
+      setTasksMode("tasks");
     } catch (error) {
       console.error(error);
       showToast("error", "Ошибка", "Не удалось загрузить добрые дела");
@@ -49,6 +89,13 @@ export default function GoodDeedsPage() {
     setStoryByTask((prev) => ({ ...prev, [taskId]: value }));
   };
 
+  const handleDifficultyChange = (difficulty: GoodDeedDifficulty) => {
+    setSelectedDifficulty(difficulty);
+    if (data?.week?.key && data.viewer.canChangeDifficulty) {
+      storeDifficulty(data.week.key, difficulty);
+    }
+  };
+
   const submitTask = async (taskId: string) => {
     if (!data?.viewer?.isAuthenticated) {
       showToast(
@@ -64,14 +111,18 @@ export default function GoodDeedsPage() {
       showToast(
         "warning",
         "Нужен рассказ",
-        `Опишите выполнение задания не короче ${MIN_GOOD_DEED_STORY_CHARS} символов`,
+        `Расскажите подробнее — минимум ${MIN_GOOD_DEED_STORY_CHARS} символов`,
       );
       return;
     }
 
     const files = filesByTask[taskId] ?? [];
     if (files.length < 1) {
-      showToast("warning", "Добавьте файл", "Нужно прикрепить фото или видео");
+      showToast(
+        "warning",
+        "Добавьте фото или видео",
+        "Без вложения мы не сможем проверить отчёт",
+      );
       return;
     }
     if (files.length > 5) {
@@ -101,6 +152,7 @@ export default function GoodDeedsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           taskId,
+          difficulty: selectedDifficulty,
           mediaUrls,
           storyText: trimmedStory,
         }),
@@ -114,8 +166,8 @@ export default function GoodDeedsPage() {
 
       showToast(
         "success",
-        "Отправлено на модерацию",
-        "Админ проверит отчёт и подтвердит задание",
+        "Отчёт отправлен",
+        "Мы проверим и начислим бонусы, если всё в порядке",
       );
       setFilesByTask((prev) => ({ ...prev, [taskId]: [] }));
       setStoryByTask((prev) => ({ ...prev, [taskId]: "" }));
@@ -131,53 +183,16 @@ export default function GoodDeedsPage() {
       setSubmittingTaskId(null);
     }
   };
-
-  const rerollTask = async (taskId: string) => {
-    if (!data?.viewer?.isAuthenticated) {
-      showToast(
-        "warning",
-        "Нужна авторизация",
-        "Войдите, чтобы менять задания",
-      );
-      return;
-    }
-    if (data.viewer.rerollUsed) {
-      showToast(
-        "warning",
-        "Лимит",
-        "Замену можно использовать только 1 раз в неделю",
-      );
-      return;
-    }
-
-    setRerollingTaskId(taskId);
-    try {
-      const res = await fetch("/api/good-deeds/reroll", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ taskId }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json?.error || "Не удалось заменить задание");
-      }
-      showToast(
-        "success",
-        "Задание заменено",
-        "Это можно сделать только один раз за неделю",
-      );
-      await load();
-    } catch (error) {
-      console.error(error);
-      showToast(
-        "error",
-        "Ошибка",
-        error instanceof Error ? error.message : "Не удалось заменить задание",
-      );
-    } finally {
-      setRerollingTaskId(null);
-    }
+  const tasks = data?.tasksByDifficulty[selectedDifficulty] ?? [];
+  const selectedCategoryProgress = {
+    approved: tasks.filter((task) => task.submissionStatus === "APPROVED")
+      .length,
+    pending: tasks.filter((task) => task.submissionStatus === "PENDING").length,
+    rejected: tasks.filter((task) => task.submissionStatus === "REJECTED")
+      .length,
+    total: tasks.length,
   };
+  const difficultyLocked = data ? !data.viewer.canChangeDifficulty : false;
 
   return (
     <div className="min-h-screen relative">
@@ -214,19 +229,53 @@ export default function GoodDeedsPage() {
               onWithdrawSuccess={() => load().catch(console.error)}
             />
 
-            <GoodDeedsTasksPanel
-              tasks={data.tasks}
-              filesByTask={filesByTask}
-              storyByTask={storyByTask}
-              onStoryChange={onStoryChange}
-              onFilesChange={onFilesChange}
-              onSubmit={submitTask}
-              onReroll={rerollTask}
-              submittingTaskId={submittingTaskId}
-              rerollingTaskId={rerollingTaskId}
-              isAuthenticated={data.viewer.isAuthenticated}
-              rerollUsed={data.viewer.rerollUsed}
-            />
+            {data.viewer.isAuthenticated ? (
+              <GoodDeedsTasksPanel
+                mode={tasksMode}
+                onStartTasks={() => setTasksMode("tasks")}
+                selectedDifficulty={selectedDifficulty}
+                onDifficultyChange={handleDifficultyChange}
+                difficultyLocked={difficultyLocked}
+                categoryStats={data.categoryStats}
+                selectedCategoryProgress={selectedCategoryProgress}
+                tasks={tasks}
+                filesByTask={filesByTask}
+                storyByTask={storyByTask}
+                onStoryChange={onStoryChange}
+                onFilesChange={onFilesChange}
+                onSubmit={submitTask}
+                submittingTaskId={submittingTaskId}
+                isAuthenticated={data.viewer.isAuthenticated}
+              />
+            ) : (
+              <Card
+                variant="darkGlass"
+                className="border-[#f9bc60]/25 bg-gradient-to-br from-[#004643]/45 to-[#001e1d]/70"
+              >
+                <h2 className="text-lg font-bold text-[#fffffe] sm:text-xl">
+                  Выполнение добрых дел доступно только после входа
+                </h2>
+                <p className="mt-2 text-sm text-[#abd1c6]/95">
+                  Чтобы отправлять отчёты и получать бонусы, войдите в аккаунт
+                  или зарегистрируйтесь.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button
+                    asChild
+                    className="bg-[#f9bc60] text-[#001e1d] hover:bg-[#f7b24a]"
+                  >
+                    <Link href="/login">Войти</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-[#abd1c6]/35 text-[#abd1c6] hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/10 hover:text-[#fffffe]"
+                  >
+                    <Link href="/register">Регистрация</Link>
+                  </Button>
+                </div>
+              </Card>
+            )}
 
             <GoodDeedsFeedSection
               items={data.feed}

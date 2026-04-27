@@ -25,6 +25,13 @@ const HomeReviewsSection = dynamic(() => import("./HomeReviewsSection"), {
   ),
 });
 
+const HomeGoodDeedsSection = dynamic(() => import("./HomeGoodDeedsSection"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-96 bg-[#004643]/30 animate-pulse rounded-3xl" />
+  ),
+});
+
 const FAQ = dynamic(() => import("./FAQ"), {
   ssr: false,
   loading: () => (
@@ -52,6 +59,7 @@ export default function HomePageClient({ initialStats }: HomePageClientProps) {
         <HomeReviewsSection />
         <HowItWorks />
         <TopDonorsInline />
+        <HomeGoodDeedsSection />
         <FAQ />
       </div>
     </div>

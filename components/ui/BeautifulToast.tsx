@@ -33,12 +33,11 @@ const toastConfig = {
       </svg>
     ),
     gradient: "from-emerald-500 to-green-500",
-    bgColor: "bg-white/95 dark:bg-[#0d2b29]/97",
+    bgColor: "bg-emerald-50/95 dark:bg-[#0d2b29]/97",
     borderColor: "border-emerald-300 dark:border-emerald-500",
-    textColor: "text-emerald-700 dark:text-emerald-300",
+    textColor: "!text-emerald-900 dark:!text-emerald-200",
     /** Тело: всегда контрастно к bgColor этого типа */
-    messageColor:
-      "text-slate-800 dark:text-emerald-50/95",
+    messageColor: "!text-slate-900 dark:!text-emerald-50/95",
   },
   error: {
     icon: (

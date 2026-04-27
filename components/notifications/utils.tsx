@@ -15,6 +15,7 @@ export function getNotificationIcon(
       return <LucideIcons.UserPlus className="text-[#f9bc60]" size="sm" />;
     case "application_status":
     case "withdrawal_status":
+    case "good_deed_submission_status":
       if (status === "APPROVED") {
         return <LucideIcons.CheckCircle className="text-[#10B981]" size="sm" />;
       }
@@ -35,13 +36,17 @@ export function getNotificationBackgroundColor(
   status?: string,
 ): string {
   if (
-    (type === "application_status" || type === "withdrawal_status") &&
+    (type === "application_status" ||
+      type === "withdrawal_status" ||
+      type === "good_deed_submission_status") &&
     status === "APPROVED"
   ) {
     return "bg-[#10B981]/20";
   }
   if (
-    (type === "application_status" || type === "withdrawal_status") &&
+    (type === "application_status" ||
+      type === "withdrawal_status" ||
+      type === "good_deed_submission_status") &&
     status === "REJECTED"
   ) {
     return "bg-red-500/20";

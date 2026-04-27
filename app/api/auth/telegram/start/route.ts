@@ -19,8 +19,16 @@ function getOrigin(req: NextRequest): string {
       // fallback ниже
     }
   }
-  const proto = req.headers.get("x-forwarded-proto") || req.nextUrl.protocol.replace(":", "");
-  const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || req.nextUrl.host;
+  const proto =
+    req.headers.get("x-forwarded-proto") ||
+    req.nextUrl.protocol.replace(":", "");
+  const host =
+    req.headers.get("x-forwarded-host") ||
+    req.headers.get("host") ||
+    req.nextUrl.host;
+  if (!host || host === "0.0.0.0:3000" || host.startsWith("0.0.0.0")) {
+    return "https://kopilka-online.ru";
+  }
   return `${proto}://${host}`;
 }
 
@@ -29,7 +37,7 @@ export async function GET(req: NextRequest) {
   const botId = token.split(":")[0];
 
   if (!/^\d+$/.test(botId)) {
-    const fail = new URL("/", req.url);
+    const fail = new URL("/", getOrigin(req));
     fail.searchParams.set("modal", "auth");
     fail.searchParams.set("error", "Telegram вход временно недоступен");
     return NextResponse.redirect(fail, 302);

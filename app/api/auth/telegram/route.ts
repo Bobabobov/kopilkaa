@@ -18,6 +18,29 @@ function getSafeNext(raw: string | null): string {
   return v;
 }
 
+function getPublicOrigin(req: NextRequest): string {
+  const env = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (env) {
+    try {
+      return new URL(env).origin;
+    } catch {
+      // fallback ниже
+    }
+  }
+  const proto =
+    req.headers.get("x-forwarded-proto") ||
+    req.nextUrl.protocol.replace(":", "");
+  const host =
+    req.headers.get("x-forwarded-host") ||
+    req.headers.get("host") ||
+    req.nextUrl.host;
+  // Защита от внутренних/невалидных хостов из reverse proxy.
+  if (!host || host === "0.0.0.0:3000" || host.startsWith("0.0.0.0")) {
+    return "https://kopilka-online.ru";
+  }
+  return `${proto}://${host}`;
+}
+
 async function authenticateTelegram(
   req: NextRequest,
   tgData: TelegramAuthData | undefined,
@@ -316,17 +339,21 @@ export async function GET(req: NextRequest) {
   };
 
   const next = getSafeNext(sp.get("next"));
+  const publicOrigin = getPublicOrigin(req);
   const result = await authenticateTelegram(req, tgData);
 
   if (!result.ok) {
-    const failUrl = new URL("/", req.url);
+    const failUrl = new URL("/", publicOrigin);
     failUrl.searchParams.set("modal", "auth");
-    failUrl.searchParams.set("error", result.error || "Ошибка входа через Telegram");
+    failUrl.searchParams.set(
+      "error",
+      result.error || "Ошибка входа через Telegram",
+    );
     return NextResponse.redirect(failUrl, 302);
   }
 
   if (result.mode === "login" && result.res) {
-    const redirectUrl = new URL(next, req.url);
+    const redirectUrl = new URL(next, publicOrigin);
     result.res.headers.set("Location", redirectUrl.toString());
     result.res = new NextResponse(null, {
       status: 302,
@@ -335,5 +362,5 @@ export async function GET(req: NextRequest) {
     return result.res;
   }
 
-  return NextResponse.redirect(new URL(next, req.url), 302);
+  return NextResponse.redirect(new URL(next, publicOrigin), 302);
 }

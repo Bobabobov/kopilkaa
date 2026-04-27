@@ -11,6 +11,7 @@ export default function AuthModalRoot() {
   const searchParams = useSearchParams();
   const modal = searchParams.get("modal");
   const nextParam = searchParams.get("next");
+  const errorParam = searchParams.get("error");
 
   const isAuthModal =
     modal === "auth" ||
@@ -40,6 +41,12 @@ export default function AuthModalRoot() {
   }
 
   const safeNext = getSafeNext(nextParam);
+
+  useEffect(() => {
+    if (!isAuthModal) return;
+    if (!errorParam) return;
+    setError(errorParam);
+  }, [isAuthModal, errorParam]);
 
   async function safeReadJson(res: Response): Promise<any> {
     try {

@@ -10,11 +10,7 @@ import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ADMIN_MAX_SIZE = 20 * 1024 * 1024; // 20MB для админов
 
-const IMAGE_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
+const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 const VARIANT_SIZES: Record<string, number> = {
   thumb: 360,
@@ -109,14 +105,14 @@ export async function POST(req: NextRequest) {
             : OUTPUT_FORMATS;
 
         for (const [variant, width] of Object.entries(VARIANT_SIZES)) {
-          const transformer = sharp(buffer).rotate().resize({
-            width,
-            height: undefined,
-            fit: "inside",
-            withoutEnlargement: true,
-          });
-
           for (const format of formats) {
+            const transformer = sharp(buffer).rotate().resize({
+              width,
+              height: undefined,
+              fit: "inside",
+              withoutEnlargement: true,
+            });
+
             let out: Buffer;
             if (format === "webp") {
               out = await transformer.webp({ quality: 80 }).toBuffer();

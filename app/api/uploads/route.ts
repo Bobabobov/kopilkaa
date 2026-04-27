@@ -12,6 +12,42 @@ const ADMIN_MAX_SIZE = 20 * 1024 * 1024; // 20MB для админов
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
+/** Расширение имени файла → MIME (когда браузер прислал пустой или неверный type). */
+function inferMimeFromFilename(filename: string): string | null {
+  const lower = filename.toLowerCase();
+  const dot = lower.lastIndexOf(".");
+  if (dot < 0) return null;
+  const ext = lower.slice(dot + 1);
+  const map: Record<string, string> = {
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
+    heic: "image/heic",
+    heif: "image/heif",
+    mp4: "video/mp4",
+    webm: "video/webm",
+  };
+  return map[ext] ?? null;
+}
+
+/**
+ * Нормализует MIME с учётом мобильных браузеров (пустой type, image/jpg, octet-stream + расширение).
+ */
+function normalizeUploadMime(rawType: string, filename: string): string | null {
+  const t = rawType.trim().toLowerCase();
+  if (t === "image/jpg" || t === "image/pjpeg") return "image/jpeg";
+  if (
+    t &&
+    t !== "application/octet-stream" &&
+    t !== "application/x-www-form-urlencoded"
+  ) {
+    return t;
+  }
+  return inferMimeFromFilename(filename);
+}
+
 const VARIANT_SIZES: Record<string, number> = {
   thumb: 360,
   medium: 960,
@@ -53,21 +89,31 @@ export async function POST(req: NextRequest) {
     }
 
     // Проверяем типы файлов (картинки + видео для TopBanner)
-    const allowedTypes = [
+    const allowedTypes = new Set([
       "image/jpeg",
       "image/png",
       "image/gif",
       "image/webp",
+      "image/heic",
+      "image/heif",
       "video/mp4",
       "video/webm",
-    ];
+    ]);
+
+    const normalizedTypes: string[] = [];
     for (const file of files) {
-      if (!allowedTypes.includes(file.type)) {
+      const normalized = normalizeUploadMime(file.type || "", file.name || "");
+      if (!normalized || !allowedTypes.has(normalized)) {
+        const hint =
+          file.type || "не указан";
         return NextResponse.json(
-          { error: `Неподдерживаемый тип файла: ${file.type}` },
+          {
+            error: `Неподдерживаемый тип файла (${hint}). Загрузите JPEG, PNG, WebP или видео MP4/WebM.`,
+          },
           { status: 400 },
         );
       }
+      normalizedTypes.push(normalized);
     }
 
     const UPLOAD_DIR = getUploadDir();
@@ -75,9 +121,33 @@ export async function POST(req: NextRequest) {
 
     const uploadedFiles = [];
 
-    for (const file of files) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      let effectiveType = normalizedTypes[i];
       const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      let buffer = Buffer.from(arrayBuffer);
+
+      // HEIC/HEIF → JPEG: иначе часть браузеров не покажет файл по URL + стабильнее для sharp.
+      if (effectiveType === "image/heic" || effectiveType === "image/heif") {
+        try {
+          const jpegBuf = await sharp(buffer)
+            .rotate()
+            .jpeg({ quality: 90 })
+            .toBuffer();
+          buffer = Buffer.from(jpegBuf);
+          effectiveType = "image/jpeg";
+        } catch (heicErr) {
+          console.error("HEIC conversion failed:", heicErr);
+          return NextResponse.json(
+            {
+              error:
+                "Не удалось обработать фото HEIC/HEIF. Откройте снимок в галерее, экспортируйте как JPEG и загрузите снова.",
+            },
+            { status: 400 },
+          );
+        }
+      }
+
       const mimeToExt: Record<string, string> = {
         "image/jpeg": ".jpg",
         "image/png": ".png",
@@ -87,7 +157,7 @@ export async function POST(req: NextRequest) {
         "video/webm": ".webm",
       };
       const ext =
-        mimeToExt[file.type] ||
+        mimeToExt[effectiveType] ||
         extname(file.name || "").toLowerCase() ||
         ".bin";
       const id = randomUUID().replace(/-/g, "");
@@ -98,36 +168,44 @@ export async function POST(req: NextRequest) {
       await writeFile(filepath, buffer);
 
       // Предгенерация вариантов для изображений (thumb/medium/full + webp/avif)
-      if (IMAGE_TYPES.has(file.type)) {
+      if (IMAGE_TYPES.has(effectiveType)) {
         const formats =
-          file.type === "image/png"
+          effectiveType === "image/png"
             ? (["png", ...OUTPUT_FORMATS] as const)
             : OUTPUT_FORMATS;
 
-        for (const [variant, width] of Object.entries(VARIANT_SIZES)) {
-          for (const format of formats) {
-            const transformer = sharp(buffer).rotate().resize({
-              width,
-              height: undefined,
-              fit: "inside",
-              withoutEnlargement: true,
-            });
+        try {
+          for (const [variant, width] of Object.entries(VARIANT_SIZES)) {
+            for (const format of formats) {
+              const transformer = sharp(buffer).rotate().resize({
+                width,
+                height: undefined,
+                fit: "inside",
+                withoutEnlargement: true,
+              });
 
-            let out: Buffer;
-            if (format === "webp") {
-              out = await transformer.webp({ quality: 80 }).toBuffer();
-            } else if (format === "avif") {
-              out = await transformer.avif({ quality: 60 }).toBuffer();
-            } else if (format === "png") {
-              out = await transformer.png({ compressionLevel: 8 }).toBuffer();
-            } else {
-              out = await transformer.jpeg({ quality: 82 }).toBuffer();
+              let out: Buffer;
+              if (format === "webp") {
+                out = await transformer.webp({ quality: 80 }).toBuffer();
+              } else if (format === "avif") {
+                out = await transformer.avif({ quality: 60 }).toBuffer();
+              } else if (format === "png") {
+                out = await transformer.png({ compressionLevel: 8 }).toBuffer();
+              } else {
+                out = await transformer.jpeg({ quality: 82 }).toBuffer();
+              }
+
+              const variantFilename = buildVariantFilename(base, variant, format);
+              const variantPath = getUploadFilePath(variantFilename);
+              await writeFile(variantPath, out);
             }
-
-            const variantFilename = buildVariantFilename(base, variant, format);
-            const variantPath = getUploadFilePath(variantFilename);
-            await writeFile(variantPath, out);
           }
+        } catch (variantErr) {
+          // Оригинал уже сохранён — не роняем загрузку из‑за экзотического JPEG/цветового профиля и т.п.
+          console.error(
+            "Image variant generation failed (original kept):",
+            variantErr,
+          );
         }
       }
 

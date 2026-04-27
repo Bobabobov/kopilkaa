@@ -88,8 +88,10 @@ model User {
   goodDeedSubmissions  GoodDeedSubmission[] @relation("GoodDeedAuthor")
   goodDeedWeekPreferences GoodDeedWeekPreference[]
   goodDeedWithdrawalRequests GoodDeedWithdrawalRequest[] @relation("GoodDeedWithdrawalRequester")
+  goodDeedBonusGrants  GoodDeedBonusGrant[] @relation("GoodDeedBonusGrantRecipient")
   reviewedGoodDeeds    GoodDeedSubmission[] @relation("GoodDeedReviewer")
   reviewedGoodDeedWithdrawals GoodDeedWithdrawalRequest[] @relation("GoodDeedWithdrawalReviewer")
+  grantedGoodDeedBonuses GoodDeedBonusGrant[] @relation("GoodDeedBonusGrantAdmin")
   gameScores           GameScore[]
   coinCatchTrial       CoinCatchTrial?
   isBanned             Boolean               @default(false)
@@ -468,6 +470,21 @@ model GoodDeedWeekPreference {
   @@unique([userId, weekKey])
   @@index([userId])
   @@index([weekKey])
+}
+
+model GoodDeedBonusGrant {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation("GoodDeedBonusGrantRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  amountBonuses Int
+  comment       String?
+  grantedById   String?
+  grantedBy     User?    @relation("GoodDeedBonusGrantAdmin", fields: [grantedById], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([grantedById])
+  @@index([createdAt])
 }
 
 model ApplicationReportImage {

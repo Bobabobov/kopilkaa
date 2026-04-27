@@ -42,6 +42,7 @@ export default function AdminGoodDeedWithdrawalsClient() {
   const [leaderboard, setLeaderboard] = useState<UserBonusesRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [bonusBusyUserId, setBonusBusyUserId] = useState<string | null>(null);
   const [commentById, setCommentById] = useState<Record<string, string>>({});
 
   const load = async () => {
@@ -111,6 +112,30 @@ export default function AdminGoodDeedWithdrawalsClient() {
     }
   };
 
+  const grantBonuses = async (userId: string, amountBonuses: number) => {
+    setBonusBusyUserId(userId);
+    try {
+      const res = await fetch("/api/admin/good-deeds/bonuses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          amountBonuses,
+          comment: "Ручное начисление администратором",
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json?.error || "Не удалось начислить бонусы");
+      }
+      await load();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Ошибка");
+    } finally {
+      setBonusBusyUserId(null);
+    }
+  };
+
   const pending = items.filter((x) => x.status === "PENDING");
   const processed = items.filter((x) => x.status !== "PENDING");
 
@@ -163,6 +188,9 @@ export default function AdminGoodDeedWithdrawalsClient() {
                       <th className="px-4 py-3 text-right font-semibold">
                         Выведено
                       </th>
+                      <th className="px-4 py-3 text-right font-semibold">
+                        Начислить
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -200,6 +228,30 @@ export default function AdminGoodDeedWithdrawalsClient() {
                         </td>
                         <td className="px-4 py-3 text-right text-[#abd1c6]">
                           {row.withdrawnBonuses}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              disabled={bonusBusyUserId === row.user.id}
+                              onClick={() => grantBonuses(row.user.id, 10)}
+                              className="h-8 rounded-lg border-[#abd1c6]/35 px-2.5 text-xs text-[#abd1c6] hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/10 hover:text-[#fffffe]"
+                            >
+                              +10
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              disabled={bonusBusyUserId === row.user.id}
+                              onClick={() => grantBonuses(row.user.id, 20)}
+                              className="h-8 rounded-lg border-[#abd1c6]/35 px-2.5 text-xs text-[#abd1c6] hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/10 hover:text-[#fffffe]"
+                            >
+                              +20
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}

@@ -15,42 +15,48 @@ export async function GET() {
       return NextResponse.json({ error: "Доступ запрещён" }, { status: 403 });
     }
 
-    const [rows, earnedByUser, withdrawalsByUser] = await Promise.all([
-      prisma.goodDeedWithdrawalRequest.findMany({
-        orderBy: { createdAt: "desc" },
-        take: 200,
-        select: {
-          id: true,
-          amountBonuses: true,
-          bankName: true,
-          details: true,
-          status: true,
-          adminComment: true,
-          reviewedAt: true,
-          createdAt: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-              email: true,
+    const [rows, earnedByUser, grantsByUser, withdrawalsByUser] =
+      await Promise.all([
+        prisma.goodDeedWithdrawalRequest.findMany({
+          orderBy: { createdAt: "desc" },
+          take: 200,
+          select: {
+            id: true,
+            amountBonuses: true,
+            bankName: true,
+            details: true,
+            status: true,
+            adminComment: true,
+            reviewedAt: true,
+            createdAt: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+              },
             },
           },
-        },
-      }),
-      prisma.goodDeedSubmission.groupBy({
-        by: ["userId"],
-        where: { status: GoodDeedSubmissionStatus.APPROVED },
-        _sum: { reward: true },
-      }),
-      prisma.goodDeedWithdrawalRequest.groupBy({
-        by: ["userId", "status"],
-        _sum: { amountBonuses: true },
-      }),
-    ]);
+        }),
+        prisma.goodDeedSubmission.groupBy({
+          by: ["userId"],
+          where: { status: GoodDeedSubmissionStatus.APPROVED },
+          _sum: { reward: true },
+        }),
+        prisma.goodDeedBonusGrant.groupBy({
+          by: ["userId"],
+          _sum: { amountBonuses: true },
+        }),
+        prisma.goodDeedWithdrawalRequest.groupBy({
+          by: ["userId", "status"],
+          _sum: { amountBonuses: true },
+        }),
+      ]);
 
     const userIds = new Set<string>();
     for (const row of earnedByUser) userIds.add(row.userId);
+    for (const row of grantsByUser) userIds.add(row.userId);
     for (const row of withdrawalsByUser) userIds.add(row.userId);
     for (const row of rows) userIds.add(row.user.id);
 
@@ -69,6 +75,9 @@ export async function GET() {
 
     const earnedMap = new Map(
       earnedByUser.map((row) => [row.userId, row._sum.reward ?? 0]),
+    );
+    const grantsMap = new Map(
+      grantsByUser.map((row) => [row.userId, row._sum.amountBonuses ?? 0]),
     );
     const withdrawalsMap = new Map<
       string,
@@ -92,7 +101,8 @@ export async function GET() {
     const leaderboard = Array.from(userIds)
       .map((userId) => {
         const user = userMap.get(userId);
-        const totalEarnedBonuses = earnedMap.get(userId) ?? 0;
+        const totalEarnedBonuses =
+          (earnedMap.get(userId) ?? 0) + (grantsMap.get(userId) ?? 0);
         const w = withdrawalsMap.get(userId) ?? {
           withdrawnBonuses: 0,
           pendingWithdrawalBonuses: 0,

@@ -56,6 +56,15 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     script.setAttribute("data-lang", "ru");
     script.setAttribute("data-request-access", "write");
     script.setAttribute("data-onauth", "onTelegramAuth(user)");
+    // Fallback для нестабильных сетей/VPN: Telegram может вернуть пользователя редиректом,
+    // даже если callback в popup не сработал.
+    const next = encodeURIComponent(
+      `${window.location.pathname}${window.location.search}`,
+    );
+    script.setAttribute(
+      "data-auth-url",
+      `${window.location.origin}/api/auth/telegram?next=${next}`,
+    );
 
     // Добавляем таймаут для случая, когда скрипт не загружается
     let timeoutId: NodeJS.Timeout | null = null;

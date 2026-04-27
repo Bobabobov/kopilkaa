@@ -8,24 +8,44 @@ import { saveRemoteImageAsAvatar } from "@/lib/uploads/saveRemoteImage";
 
 export const runtime = "nodejs";
 
-export async function POST(req: NextRequest) {
+function getSafeNext(raw: string | null): string {
+  if (!raw) return "/profile";
+  const v = raw.trim();
+  if (!v.startsWith("/")) return "/profile";
+  if (v.startsWith("//")) return "/profile";
+  if (v.includes("://")) return "/profile";
+  if (v.includes("\n") || v.includes("\r")) return "/profile";
+  return v;
+}
+
+async function authenticateTelegram(
+  req: NextRequest,
+  tgData: TelegramAuthData | undefined,
+): Promise<{
+  ok: boolean;
+  status?: number;
+  error?: string;
+  user?: { id: string; email: string | null; telegramUsername: string | null };
+  res?: NextResponse;
+  mode?: "linked" | "login";
+}> {
   try {
-    const body = await req.json().catch(() => ({}));
-    const tgData = body?.telegram as TelegramAuthData | undefined;
 
     if (!tgData || typeof tgData.id !== "number" || !tgData.hash) {
-      return NextResponse.json(
-        { success: false, error: "Некорректные данные Telegram" },
-        { status: 400 },
-      );
+      return {
+        ok: false,
+        status: 400,
+        error: "Некорректные данные Telegram",
+      };
     }
 
     const verify = verifyTelegramAuth(tgData);
     if (!verify.ok) {
-      return NextResponse.json(
-        { success: false, error: verify.error || "Ошибка проверки Telegram" },
-        { status: 400 },
-      );
+      return {
+        ok: false,
+        status: 400,
+        error: verify.error || "Ошибка проверки Telegram",
+      };
     }
 
     const telegramId = String(tgData.id);
@@ -46,18 +66,11 @@ export async function POST(req: NextRequest) {
       // Проверяем блокировку перед привязкой
       const banStatus = await checkUserBan(sessionUser.id);
       if (banStatus.isBanned) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Ваш аккаунт заблокирован",
-            banInfo: {
-              reason: banStatus.bannedReason,
-              until: banStatus.bannedUntil?.toISOString() || null,
-              isPermanent: banStatus.isPermanent,
-            },
-          },
-          { status: 403 },
-        );
+        return {
+          ok: false,
+          status: 403,
+          error: "Ваш аккаунт заблокирован",
+        };
       }
 
       // Пользователь уже залогинен — привязываем Telegram к его аккаунту
@@ -92,11 +105,15 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      return NextResponse.json({
-        success: true,
+      return {
+        ok: true,
         mode: "linked",
-        user: updated,
-      });
+        user: {
+          id: updated.id,
+          email: updated.email,
+          telegramUsername: updated.telegramUsername,
+        },
+      };
     }
 
     // Полноценный вход через Telegram
@@ -219,18 +236,11 @@ export async function POST(req: NextRequest) {
     // Проверяем блокировку перед входом
     const banStatus = await checkUserBan(user.id);
     if (banStatus.isBanned) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Ваш аккаунт заблокирован",
-          banInfo: {
-            reason: banStatus.bannedReason,
-            until: banStatus.bannedUntil?.toISOString() || null,
-            isPermanent: banStatus.isPermanent,
-          },
-        },
-        { status: 403 },
-      );
+      return {
+        ok: false,
+        status: 403,
+        error: "Ваш аккаунт заблокирован",
+      };
     }
 
     const res = NextResponse.json({
@@ -247,18 +257,83 @@ export async function POST(req: NextRequest) {
       { uid: user.id, role: (user.role as any) || "USER" },
       req,
     );
-    return res;
+    return {
+      ok: true,
+      mode: "login",
+      user: {
+        id: user.id,
+        email: user.email,
+        telegramUsername: user.telegramUsername,
+      },
+      res,
+    };
   } catch (error: any) {
     console.error("Error in /api/auth/telegram:", error);
     const message =
       error?.message ||
       (typeof error === "string" ? error : "Неизвестная ошибка сервера");
+    return {
+      ok: false,
+      status: 500,
+      error: `Ошибка авторизации через Telegram: ${message}`,
+    };
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const body = await req.json().catch(() => ({}));
+  const tgData = body?.telegram as TelegramAuthData | undefined;
+  const result = await authenticateTelegram(req, tgData);
+
+  if (!result.ok) {
     return NextResponse.json(
-      {
-        success: false,
-        error: `Ошибка авторизации через Telegram: ${message}`,
-      },
-      { status: 500 },
+      { success: false, error: result.error || "Ошибка входа через Telegram" },
+      { status: result.status || 400 },
     );
   }
+
+  if (result.mode === "login" && result.res) {
+    return result.res;
+  }
+
+  return NextResponse.json({
+    success: true,
+    mode: result.mode || "linked",
+    user: result.user,
+  });
+}
+
+export async function GET(req: NextRequest) {
+  const sp = req.nextUrl.searchParams;
+  const tgData: TelegramAuthData = {
+    id: Number(sp.get("id")),
+    first_name: sp.get("first_name") || undefined,
+    last_name: sp.get("last_name") || undefined,
+    username: sp.get("username") || undefined,
+    photo_url: sp.get("photo_url") || undefined,
+    auth_date: Number(sp.get("auth_date")),
+    hash: sp.get("hash") || "",
+  };
+
+  const next = getSafeNext(sp.get("next"));
+  const result = await authenticateTelegram(req, tgData);
+
+  if (!result.ok) {
+    const failUrl = new URL("/", req.url);
+    failUrl.searchParams.set("modal", "auth");
+    failUrl.searchParams.set("error", result.error || "Ошибка входа через Telegram");
+    return NextResponse.redirect(failUrl, 302);
+  }
+
+  if (result.mode === "login" && result.res) {
+    const redirectUrl = new URL(next, req.url);
+    result.res.headers.set("Location", redirectUrl.toString());
+    result.res = new NextResponse(null, {
+      status: 302,
+      headers: result.res.headers,
+    });
+    return result.res;
+  }
+
+  return NextResponse.redirect(new URL(next, req.url), 302);
 }

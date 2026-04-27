@@ -7,7 +7,10 @@ import {
 
 /** Редирект www ↔ канонический хост из NEXT_PUBLIC_SITE_URL (для SEO, один главный зеркальный адрес). */
 function redirectToCanonicalHost(req: NextRequest): NextResponse | null {
-  const raw = process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru";
+  const raw = process.env.NEXT_PUBLIC_SITE_URL;
+  // Без явного канонического URL не делаем редирект:
+  // fallback-домен может не совпадать с текущим прод-доменом и ломать OAuth/Telegram Login.
+  if (!raw) return null;
   let canonicalHost: string;
   try {
     canonicalHost = new URL(raw).hostname.toLowerCase();

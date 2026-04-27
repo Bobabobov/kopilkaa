@@ -18,6 +18,7 @@ export const buildUploadUrl = (url: string, options: UploadUrlOptions = {}) => {
   const basePath = CDN_BASE ? `${CDN_BASE}${url}` : url;
   const params = new URLSearchParams();
 
+  // Единый параметр для превью на `/api/uploads/[filename]` (сервер также понимает `s` как алиас).
   if (options.variant) params.set("v", options.variant);
   if (options.width) params.set("w", String(options.width));
   if (options.height) params.set("h", String(options.height));

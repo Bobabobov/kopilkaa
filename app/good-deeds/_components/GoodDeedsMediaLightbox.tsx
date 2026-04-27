@@ -33,6 +33,7 @@ export function GoodDeedsMediaLightbox({
 }: Props) {
   const [mounted, setMounted] = useState(false);
   const [imgFailed, setImgFailed] = useState<Record<string, boolean>>({});
+  const [imgPlainSrc, setImgPlainSrc] = useState(false);
   const touchStartXRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export function GoodDeedsMediaLightbox({
 
   useEffect(() => {
     setImgFailed({});
+    setImgPlainSrc(false);
   }, [currentIndex]);
 
   if (!mounted || !isOpen || media.length === 0) return null;
@@ -92,8 +94,9 @@ export function GoodDeedsMediaLightbox({
   if (!item) return null;
 
   const imageFull = displaySrc(item.url, "full");
+  const imageDisplay = imgPlainSrc ? item.url : imageFull;
   const bypassImg =
-    isUploadUrl(imageFull) || isExternalUrl(imageFull);
+    isUploadUrl(imageDisplay) || isExternalUrl(imageDisplay);
   const failed = imgFailed[item.url];
 
   const goPrev = () =>
@@ -188,16 +191,20 @@ export function GoodDeedsMediaLightbox({
             ) : (
               <div className="relative h-[min(85dvh,900px)] w-full">
                 <Image
-                  src={imageFull}
+                  src={imageDisplay}
                   alt={`Фото ${currentIndex + 1}`}
                   fill
                   sizes="100vw"
                   className="object-contain"
                   unoptimized={bypassImg}
                   draggable={false}
-                  onError={() =>
-                    setImgFailed((p) => ({ ...p, [item.url]: true }))
-                  }
+                  onError={() => {
+                    if (!imgPlainSrc && isUploadUrl(item.url)) {
+                      setImgPlainSrc(true);
+                      return;
+                    }
+                    setImgFailed((p) => ({ ...p, [item.url]: true }));
+                  }}
                 />
               </div>
             )}

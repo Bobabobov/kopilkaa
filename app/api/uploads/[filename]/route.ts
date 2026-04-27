@@ -61,7 +61,9 @@ export async function GET(
     const searchParams = request.nextUrl.searchParams;
     const widthParam = searchParams.get("w");
     const heightParam = searchParams.get("h");
-    const variantParam = searchParams.get("v");
+    // «size» / опечатки прокси: иногда вместо v= приходит s= (как в DevTools).
+    const variantParam =
+      searchParams.get("v") ?? searchParams.get("s");
     const formatParam = searchParams.get("format");
 
     // Проверяем безопасность имени файла
@@ -124,71 +126,81 @@ export async function GET(
       const isImage = IMAGE_EXTS.includes(ext || "");
       const isGif = ext === "gif";
 
+      // Превью в ленте добрых дел ходят с ?v=thumb|medium — ресайз через sharp.
+      // Если sharp не справляется с файлом (как на POST), без fallback отдавали бы 404.
+      // Админка показывает тот же файл без query — там всегда отдаётся оригинал.
       if (isImage && shouldResize && !isGif) {
-        const accept = request.headers.get("accept");
-        const allowedFormats = new Set(["avif", "webp", "jpeg", "jpg", "png"]);
-        const safeFormat = formatParam && allowedFormats.has(formatParam)
-          ? formatParam
-          : null;
-        const targetFormat = safeFormat || pickFormat(accept, ext || "jpeg");
-        const normalizedFormat = targetFormat === "jpg" ? "jpeg" : targetFormat;
-        const outputType = toContentType(normalizedFormat, contentType);
-        const variantKey =
-          variantParam ||
-          `w${safeWidth ?? "auto"}h${safeHeight ?? "auto"}`;
-        const variantFilename = buildVariantFilename(
-          filename,
-          variantKey,
-          normalizedFormat,
-        );
-        const variantPath = getUploadFilePath(variantFilename);
-
         try {
-          await access(variantPath);
-          const cached = await readFile(variantPath);
-          return new NextResponse(new Uint8Array(cached), {
+          const accept = request.headers.get("accept");
+          const allowedFormats = new Set(["avif", "webp", "jpeg", "jpg", "png"]);
+          const safeFormat = formatParam && allowedFormats.has(formatParam)
+            ? formatParam
+            : null;
+          const targetFormat = safeFormat || pickFormat(accept, ext || "jpeg");
+          const normalizedFormat = targetFormat === "jpg" ? "jpeg" : targetFormat;
+          const outputType = toContentType(normalizedFormat, contentType);
+          const variantKey =
+            variantParam ||
+            `w${safeWidth ?? "auto"}h${safeHeight ?? "auto"}`;
+          const variantFilename = buildVariantFilename(
+            filename,
+            variantKey,
+            normalizedFormat,
+          );
+          const variantPath = getUploadFilePath(variantFilename);
+
+          try {
+            await access(variantPath);
+            const cached = await readFile(variantPath);
+            return new NextResponse(new Uint8Array(cached), {
+              headers: {
+                "Content-Type": outputType,
+                "Cache-Control": "public, max-age=31536000, immutable",
+              },
+            });
+          } catch {
+            // no cached variant
+          }
+
+          const transformer = sharp(fileBuffer).rotate().resize({
+            width: safeWidth ?? undefined,
+            height: safeHeight ?? undefined,
+            fit: "inside",
+            withoutEnlargement: true,
+          });
+
+          let outputBuffer: Buffer;
+          switch (normalizedFormat) {
+            case "png":
+              outputBuffer = await transformer
+                .png({ compressionLevel: 8 })
+                .toBuffer();
+              break;
+            case "webp":
+              outputBuffer = await transformer.webp({ quality: 80 }).toBuffer();
+              break;
+            case "avif":
+              outputBuffer = await transformer.avif({ quality: 60 }).toBuffer();
+              break;
+            default:
+              outputBuffer = await transformer.jpeg({ quality: 82 }).toBuffer();
+              break;
+          }
+
+          await writeFile(variantPath, outputBuffer);
+
+          return new NextResponse(new Uint8Array(outputBuffer), {
             headers: {
               "Content-Type": outputType,
               "Cache-Control": "public, max-age=31536000, immutable",
             },
           });
-        } catch {
-          // no cached variant
+        } catch (resizeErr) {
+          console.error(
+            "uploads GET: variant resize failed, serving original file:",
+            resizeErr,
+          );
         }
-
-        const transformer = sharp(fileBuffer).rotate().resize({
-          width: safeWidth ?? undefined,
-          height: safeHeight ?? undefined,
-          fit: "inside",
-          withoutEnlargement: true,
-        });
-
-        let outputBuffer: Buffer;
-        switch (normalizedFormat) {
-          case "png":
-            outputBuffer = await transformer
-              .png({ compressionLevel: 8 })
-              .toBuffer();
-            break;
-          case "webp":
-            outputBuffer = await transformer.webp({ quality: 80 }).toBuffer();
-            break;
-          case "avif":
-            outputBuffer = await transformer.avif({ quality: 60 }).toBuffer();
-            break;
-          default:
-            outputBuffer = await transformer.jpeg({ quality: 82 }).toBuffer();
-            break;
-        }
-
-        await writeFile(variantPath, outputBuffer);
-
-        return new NextResponse(new Uint8Array(outputBuffer), {
-          headers: {
-            "Content-Type": outputType,
-            "Cache-Control": "public, max-age=31536000, immutable",
-          },
-        });
       }
 
       return new NextResponse(new Uint8Array(fileBuffer), {

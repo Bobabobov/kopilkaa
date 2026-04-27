@@ -12,7 +12,7 @@ import {
   GoodDeedsMediaLightbox,
   type LightboxMediaItem,
 } from "@/app/good-deeds/_components/GoodDeedsMediaLightbox";
-import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
+import { buildUploadUrl, isUploadUrl } from "@/lib/uploads/url";
 
 export type StoryAdGalleryItem = {
   url: string;
@@ -28,6 +28,13 @@ export interface StoryAdGalleryProps {
 
 const buildPreviewUrl = (url: string) =>
   buildUploadUrl(url, { variant: "medium" });
+
+/** Цепочка URL, если превью с ?v=medium отдаёт 404 (CDN, кэш) — падаем на оригинал. */
+function imageSrcForStep(storedUrl: string, step: number): string {
+  if (step <= 0) return buildPreviewUrl(storedUrl);
+  if (step === 1) return buildUploadUrl(storedUrl);
+  return storedUrl;
+}
 
 function videoSrc(url: string) {
   return isUploadUrl(url) ? buildUploadUrl(url) : url;
@@ -52,8 +59,16 @@ function StoryAdGalleryInner({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [failedUrls, setFailedUrls] = useState<Record<string, boolean>>({});
   const [ratios, setRatios] = useState<Record<string, number>>({});
+  /** Шаг fallback для src картинки (0 = medium, 1 = без query/CDN-base, 2 = как в БД). */
+  const [uploadFallbackStep, setUploadFallbackStep] = useState<
+    Record<string, number>
+  >({});
 
   const probeKey = sorted.map((i) => `${i.url}|${i.type}`).join(";");
+
+  useEffect(() => {
+    setUploadFallbackStep({});
+  }, [probeKey]);
 
   useEffect(() => {
     if (sorted.length === 0) return;
@@ -79,17 +94,29 @@ function StoryAdGalleryInner({
         });
       }
 
-      const previewUrl = buildPreviewUrl(item.url);
-      return await new Promise((resolve) => {
-        const probe = new window.Image();
-        probe.onload = () => {
-          const w = probe.naturalWidth || 1;
-          const h = probe.naturalHeight || 1;
-          resolve([previewUrl, w / h] as const);
-        };
-        probe.onerror = () => resolve(null);
-        probe.src = previewUrl;
-      });
+      const tryLoad = (src: string) =>
+        new Promise<readonly [string, number] | null>((resolve) => {
+          const probe = new window.Image();
+          probe.onload = () => {
+            const w = probe.naturalWidth || 1;
+            const h = probe.naturalHeight || 1;
+            resolve([src, w / h] as const);
+          };
+          probe.onerror = () => resolve(null);
+          probe.src = src;
+        });
+
+      const chain = [
+        buildPreviewUrl(item.url),
+        buildUploadUrl(item.url),
+        item.url,
+      ];
+      for (const src of chain) {
+        if (cancelled) return null;
+        const got = await tryLoad(src);
+        if (got) return got;
+      }
+      return null;
     };
 
     const load = async () => {
@@ -138,16 +165,20 @@ function StoryAdGalleryInner({
   if (sorted.length === 0) return null;
 
   const renderFigure = (image: StoryAdGalleryItem, index: number) => {
+    const fbStep = uploadFallbackStep[image.url] ?? 0;
     const previewUrl =
       image.type === "VIDEO"
         ? videoSrc(image.url)
-        : buildPreviewUrl(image.url);
+        : imageSrcForStep(image.url, fbStep);
     const ratioKey =
-      image.type === "VIDEO" ? previewUrl : buildPreviewUrl(image.url);
+      image.type === "VIDEO"
+        ? previewUrl
+        : imageSrcForStep(image.url, 0);
 
-    const shouldBypassOptimization =
-      isUploadUrl(previewUrl) || isExternalUrl(previewUrl);
-    const isFailed = failedUrls[previewUrl] || failedUrls[image.url];
+    const isFailed =
+      failedUrls[previewUrl] ||
+      failedUrls[image.url] ||
+      failedUrls[buildPreviewUrl(image.url)];
 
     const ratioRaw = ratios[ratioKey];
     const ratio =
@@ -207,33 +238,27 @@ function StoryAdGalleryInner({
                 }))
               }
             />
-          ) : shouldBypassOptimization ? (
-            <img
-              src={previewUrl}
-              alt={`${title || "Галерея"} — ${index + 1}`}
-              className="h-full w-full object-contain"
-              loading={isHero ? "eager" : "lazy"}
-              onError={() =>
-                setFailedUrls((prev) => ({
-                  ...prev,
-                  [previewUrl]: true,
-                  [image.url]: true,
-                }))
-              }
-            />
           ) : (
             <img
               src={previewUrl}
               alt={`${title || "Галерея"} — ${index + 1}`}
               className="h-full w-full object-contain"
               loading={isHero ? "eager" : "lazy"}
-              onError={() =>
+              onError={() => {
+                if (fbStep < 2) {
+                  setUploadFallbackStep((prev) => ({
+                    ...prev,
+                    [image.url]: fbStep + 1,
+                  }));
+                  return;
+                }
                 setFailedUrls((prev) => ({
                   ...prev,
                   [previewUrl]: true,
                   [image.url]: true,
-                }))
-              }
+                  [buildPreviewUrl(image.url)]: true,
+                }));
+              }}
             />
           )}
 

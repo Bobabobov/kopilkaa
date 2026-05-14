@@ -6,7 +6,7 @@ export const REFERRAL_VISITOR_COOKIE = "kopilka_ref_visitor";
 export const REFERRAL_CODE_COOKIE = "kopilka_ref_code";
 
 const DEFAULT_REFERRAL_MIN_ACTIVE_DAYS = 7;
-const DEFAULT_REFERRAL_BONUS_AMOUNT = 300;
+const DEFAULT_REFERRAL_BONUS_AMOUNT = 50;
 
 export function getReferralMinActiveDays(): number {
   const raw = process.env.REFERRAL_MIN_ACTIVE_DAYS;

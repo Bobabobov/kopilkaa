@@ -8,13 +8,17 @@ import {
   MAX_WITHDRAWAL_DETAILS_LEN,
   MIN_WITHDRAWAL_BONUSES,
 } from "@/lib/goodDeeds";
+import { digitsFingerprint } from "@/lib/admin/requisitesFingerprint";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const session = await getAuthUser(req);
   if (!session?.uid) {
-    return NextResponse.json({ error: "Требуется авторизация" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Требуется авторизация" },
+      { status: 401 },
+    );
   }
 
   try {
@@ -82,6 +86,7 @@ export async function POST(req: NextRequest) {
         amountBonuses,
         bankName,
         details,
+        detailsFingerprint: digitsFingerprint(details),
         status: GoodDeedWithdrawalStatus.PENDING,
       },
     });

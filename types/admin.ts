@@ -4,11 +4,7 @@
  */
 import type { TrustLevel } from "@/lib/trustLevel";
 
-export type ApplicationStatus =
-  | "PENDING"
-  | "APPROVED"
-  | "REJECTED"
-  | "CONTEST";
+export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED" | "CONTEST";
 
 export type ApplicationItem = {
   id: string;
@@ -24,7 +20,7 @@ export type ApplicationItem = {
   createdAt: string;
   countTowardsTrust: boolean;
   trustDecreasedAtDecision?: boolean;
-   clientDevice?: string | null;
+  clientDevice?: string | null;
   user: {
     email: string;
     id: string;
@@ -86,7 +82,7 @@ export interface AdminUser {
     rejectedWithLevelDecrease: number;
     trustScore: number;
   };
-  /** Связи по реквизитам и IP (возможные мультиаккаунты). Есть только при запросе с withLinks=1. */
+  /** Связи по реквизитам и IP (возможные мультиаккаунты). Запрос с withLinks=1; поиск по всей базе заявок и выводов. */
   links?: {
     samePayment: AdminUserLinkRef[];
     sameIp: AdminUserLinkRef[];

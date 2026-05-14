@@ -130,6 +130,11 @@ export function AdminUserCard({
                 <p className="mb-2 font-semibold text-[#f9bc60]">
                   Возможные связанные аккаунты
                 </p>
+                <p className="mb-2 text-[0.65rem] leading-snug text-[#abd1c6]/70">
+                  Учитываются заявки (текст реквизитов и IP при отправке) и
+                  заявки на вывод бонусов добрых дел. Поиск по базе целиком, не
+                  только среди пользователей на этой странице.
+                </p>
                 {user.links.samePayment.length > 0 ? (
                   <p className="mb-2 text-[#abd1c6]/90">
                     <span className="text-[#fffffe]/90">По реквизитам:</span>{" "}

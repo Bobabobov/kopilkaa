@@ -7,11 +7,7 @@ import {
   sanitizeApplicationStoryHtml,
 } from "@/lib/applications/sanitize";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
-import {
-  ApplicationCategory,
-  ApplicationStatus,
-  Prisma,
-} from "@prisma/client";
+import { ApplicationCategory, ApplicationStatus, Prisma } from "@prisma/client";
 import {
   checkActivityRequirement,
   isActivityRequirementMet,
@@ -21,26 +17,13 @@ import {
   isSubmittableApplicationCategory,
   REPORT_PHOTOS_MIN,
 } from "@/lib/applications/categories";
+import {
+  extractClientIpFromRequest,
+  normalizeClientIp,
+} from "@/lib/http/clientIp";
+import { digitsFingerprint } from "@/lib/admin/requisitesFingerprint";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-
-function getClientIp(req: Request): string | null {
-  const headers = [
-    "x-forwarded-for",
-    "x-real-ip",
-    "cf-connecting-ip",
-    "x-client-ip",
-    "true-client-ip",
-  ];
-  for (const name of headers) {
-    const value = req.headers.get(name);
-    if (value) {
-      const first = value.split(",")[0]?.trim();
-      if (first && first.length > 0) return first;
-    }
-  }
-  return null;
-}
 
 function getWhitelistEmails(): string[] {
   const raw = process.env.WHITELIST_EMAILS || "";
@@ -59,7 +42,11 @@ function getClientDevice(req: Request): string {
   if (ua.includes("android")) {
     return "android";
   }
-  if (ua.includes("windows") || ua.includes("macintosh") || ua.includes("linux")) {
+  if (
+    ua.includes("windows") ||
+    ua.includes("macintosh") ||
+    ua.includes("linux")
+  ) {
     return "desktop";
   }
   return "other";
@@ -317,14 +304,14 @@ export async function POST(req: Request) {
       }
     }
 
-    const submitterIp = getClientIp(req);
+    const submitterIpRaw = extractClientIpFromRequest(req);
+    const submitterIp = normalizeClientIp(submitterIpRaw);
     const clientDevice = getClientDevice(req);
 
     if (
       session.role !== "ADMIN" &&
       lastApprovedByUser?.id &&
-      (!Array.isArray(reportImages) ||
-        reportImages.length < REPORT_PHOTOS_MIN)
+      (!Array.isArray(reportImages) || reportImages.length < REPORT_PHOTOS_MIN)
     ) {
       return Response.json(
         {
@@ -346,6 +333,7 @@ export async function POST(req: Request) {
           story: sanitizedStory,
           amount: amountNumber,
           payment,
+          paymentFingerprint: digitsFingerprint(payment),
           countTowardsTrust: false,
           filledMs: clampedFilledMs,
           storyEditMs: clampedStoryEditMs,

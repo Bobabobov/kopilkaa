@@ -136,6 +136,8 @@ model Application {
   category     ApplicationCategory @default(EVERYDAY_SUPPORT)
   amount       Int               @default(0)
   payment      String
+  /** Нормализованные цифры из payment (>=10) для поиска связанных аккаунтов по всей базе */
+  paymentFingerprint String?
   status       ApplicationStatus  @default(PENDING)
   publishInStories Boolean        @default(false)
   countTowardsTrust Boolean      @default(false)
@@ -159,6 +161,8 @@ model Application {
   @@index([status])
   @@index([createdAt])
   @@index([updatedAt])
+  @@index([paymentFingerprint])
+  @@index([submitterIp])
 }
 
 model ApplicationImage {
@@ -494,6 +498,8 @@ model GoodDeedWithdrawalRequest {
   amountBonuses Int
   bankName      String
   details       String
+  /** Цифры из реквизитов вывода (>=10) — связь с заявками и другими пользователями */
+  detailsFingerprint String?
   status        GoodDeedWithdrawalStatus @default(PENDING)
   adminComment  String?
   reviewedAt    DateTime?
@@ -505,6 +511,7 @@ model GoodDeedWithdrawalRequest {
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+  @@index([detailsFingerprint])
 }
 
 model GoodDeedWeekPreference {

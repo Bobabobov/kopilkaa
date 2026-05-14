@@ -12,12 +12,22 @@ export function AdminHeader() {
   const navLinks = [
     { href: "/admin", label: "Заявки" },
     { href: "/admin/users", label: "Пользователи" },
+    { href: "/admin/referrals", label: "Рефералы" },
     { href: "/admin/good-deeds", label: "Добрые дела" },
     { href: "/admin/good-deeds/withdrawals", label: "Вывод бонусов" },
     { href: "/admin/heroes", label: "Герои" },
     { href: "/admin/balance", label: "Баланс" },
     { href: "/admin/ads", label: "Реклама" },
   ];
+
+  const isNavItemActive = (href: string) => {
+    if (href === "/admin/referrals") {
+      return (
+        pathname === href || pathname.startsWith(`${href}/`)
+      );
+    }
+    return pathname === href;
+  };
 
   // Закрывать меню при смене роута и по Escape
   useEffect(() => {
@@ -71,7 +81,7 @@ export function AdminHeader() {
       {/* Десктоп: навигация в ряд */}
       <div className="hidden sm:flex flex-wrap gap-2 sm:gap-3">
         {navLinks.map((link) => {
-          const isActive = pathname === link.href;
+          const isActive = isNavItemActive(link.href);
           return (
             <Link
               key={link.href}
@@ -127,7 +137,7 @@ export function AdminHeader() {
                   </button>
                 </div>
                 {navLinks.map((link) => {
-                  const isActive = pathname === link.href;
+                  const isActive = isNavItemActive(link.href);
                   return (
                     <Link
                       key={link.href}

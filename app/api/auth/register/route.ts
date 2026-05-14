@@ -2,7 +2,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
-import { attachSessionToResponse } from "@/lib/auth";
+import { deliverEmailVerification } from "@/lib/emailVerification";
+import { isSmtpConfigured } from "@/lib/mailer";
 import {
   REFERRAL_CODE_COOKIE,
   REFERRAL_VISITOR_COOKIE,
@@ -44,6 +45,19 @@ export async function POST(req: Request) {
     if (!usernamePattern.test(usernameRaw))
       return bad("Логин может содержать 3-20 символов: буквы, цифры, ._-");
 
+    if (process.env.NODE_ENV === "production" && !isSmtpConfigured()) {
+      console.error(
+        "[API Error] /api/auth/register: в production не задан SMTP_HOST — письмо подтверждения не отправить.",
+      );
+      return NextResponse.json(
+        {
+          message:
+            "Регистрация по почте временно недоступна: на сервере не настроена отправка писем (SMTP). Обратитесь в поддержку.",
+        },
+        { status: 503 },
+      );
+    }
+
     const exists = await prisma.user.findUnique({
       where: { email },
       select: { id: true },
@@ -64,6 +78,7 @@ export async function POST(req: Request) {
         passwordHash,
         name: name || null,
         role: "USER",
+        emailVerified: false,
       },
       select: { id: true, role: true, email: true },
     });
@@ -76,13 +91,32 @@ export async function POST(req: Request) {
       });
     }
 
-    // Сразу логиним (httpOnly-cookie через твой lib/auth.ts)
-    // Система достижений отключена
+    let delivery:
+      | { mode: "sent" }
+      | { mode: "dev_console"; link: string }
+      | { mode: "failed" };
+    try {
+      delivery = await deliverEmailVerification(user.id, email, req);
+    } catch (e) {
+      console.error("[API Error] /api/auth/register: подготовка письма:", e);
+      return NextResponse.json(
+        {
+          message:
+            "Не удалось подготовить подтверждение email. Попробуйте позже или напишите в поддержку.",
+        },
+        { status: 500 },
+      );
+    }
 
     const res = NextResponse.json(
       {
         ok: true,
+        needsEmailVerification: true,
         user: { id: user.id, email: user.email },
+        emailDispatchFailed: delivery.mode === "failed",
+        ...(delivery.mode === "dev_console"
+          ? { devInlineVerificationLink: delivery.link }
+          : {}),
       },
       { status: 201 },
     );
@@ -106,11 +140,6 @@ export async function POST(req: Request) {
       });
     }
 
-    attachSessionToResponse(
-      res,
-      { uid: user.id, role: user.role as "USER" | "ADMIN" },
-      req,
-    );
     return res;
   } catch (err: any) {
     if (err?.code === "P2002")

@@ -48,15 +48,34 @@ export async function POST(req: Request) {
         passwordHash: true,
         role: true,
         name: true,
+        emailVerified: true,
       },
     });
     if (!user) {
-      return NextResponse.json({ error: "Неверный логин или пароль" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Неверный логин или пароль" },
+        { status: 401 },
+      );
     }
 
     const ok = await bcrypt.compare(rawPassword, user.passwordHash);
     if (!ok) {
-      return NextResponse.json({ error: "Неверный логин или пароль" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Неверный логин или пароль" },
+        { status: 401 },
+      );
+    }
+
+    if (!user.emailVerified) {
+      return NextResponse.json(
+        {
+          error:
+            "Сначала подтвердите email — откройте ссылку в письме или нажмите «Отправить письмо снова».",
+          code: "EMAIL_NOT_VERIFIED",
+          ...(user.email ? { email: user.email } : {}),
+        },
+        { status: 403 },
+      );
     }
 
     // Проверяем блокировку пользователя

@@ -23,6 +23,16 @@ interface AuthModalProps {
   ) => Promise<void>;
   busy: boolean;
   error: string | null;
+  signupPendingEmail?: string | null;
+  signupMailDispatchFailed?: boolean;
+  signupDevLink?: string | null;
+  onResendSignupVerification?: () => void | Promise<void>;
+  resendSignupBusy?: boolean;
+  resendSignupMessage?: string | null;
+  loginPendingVerificationEmail?: string | null;
+  onResendLoginVerification?: () => void | Promise<void>;
+  resendLoginBusy?: boolean;
+  resendLoginMessage?: string | null;
 }
 
 export function AuthModal({
@@ -34,6 +44,16 @@ export function AuthModal({
   onEmailSignup,
   busy,
   error,
+  signupPendingEmail,
+  signupMailDispatchFailed,
+  signupDevLink,
+  onResendSignupVerification,
+  resendSignupBusy,
+  resendSignupMessage,
+  loginPendingVerificationEmail,
+  onResendLoginVerification,
+  resendLoginBusy,
+  resendLoginMessage,
 }: AuthModalProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -193,7 +213,8 @@ export function AuthModal({
           tabIndex={-1}
           className="relative w-full max-w-[520px] rounded-3xl border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden"
           style={{
-            background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 50%, rgba(0,30,29,0.95) 100%)",
+            background:
+              "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 50%, rgba(0,30,29,0.95) 100%)",
           }}
         >
           {/* Декоративные элементы */}
@@ -271,6 +292,12 @@ export function AuthModal({
                   onEmailSignup={onEmailSignup}
                   busy={busy}
                   error={error}
+                  signupPendingEmail={signupPendingEmail}
+                  signupMailDispatchFailed={signupMailDispatchFailed}
+                  signupDevLink={signupDevLink}
+                  onResendSignupVerification={onResendSignupVerification}
+                  resendSignupBusy={resendSignupBusy}
+                  resendSignupMessage={resendSignupMessage}
                 />
               ) : (
                 <LoginView
@@ -281,6 +308,10 @@ export function AuthModal({
                   onEmailLogin={onEmailLogin}
                   busy={busy}
                   error={error}
+                  loginPendingVerificationEmail={loginPendingVerificationEmail}
+                  onResendLoginVerification={onResendLoginVerification}
+                  resendLoginBusy={resendLoginBusy}
+                  resendLoginMessage={resendLoginMessage}
                 />
               )}
             </div>

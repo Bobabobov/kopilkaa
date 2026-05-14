@@ -8,9 +8,21 @@ interface EmailLoginFormProps {
   onSubmit: (identifier: string, password: string) => Promise<void>;
   busy: boolean;
   error: string | null;
+  loginPendingVerificationEmail?: string | null;
+  onResendLoginVerification?: () => void | Promise<void>;
+  resendLoginBusy?: boolean;
+  resendLoginMessage?: string | null;
 }
 
-export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
+export function EmailLoginForm({
+  onSubmit,
+  busy,
+  error,
+  loginPendingVerificationEmail,
+  onResendLoginVerification,
+  resendLoginBusy,
+  resendLoginMessage,
+}: EmailLoginFormProps) {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [validationErrors, setValidationErrors] = useState<{
@@ -169,6 +181,29 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
           </motion.div>
         )}
 
+        {loginPendingVerificationEmail && onResendLoginVerification && (
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-[#abd1c6] space-y-2">
+            <p>
+              На{" "}
+              <span className="text-[#f9bc60]">
+                {loginPendingVerificationEmail}
+              </span>{" "}
+              можно отправить письмо с ссылкой ещё раз.
+            </p>
+            {resendLoginMessage && (
+              <p className="text-xs text-[#94a1b2]">{resendLoginMessage}</p>
+            )}
+            <button
+              type="button"
+              disabled={resendLoginBusy}
+              onClick={() => void onResendLoginVerification()}
+              className="w-full rounded-lg border border-[#f9bc60]/40 py-2 text-xs font-semibold text-[#f9bc60] hover:bg-[#f9bc60]/10 disabled:opacity-50"
+            >
+              {resendLoginBusy ? "Отправляем…" : "Отправить письмо снова"}
+            </button>
+          </div>
+        )}
+
         <motion.button
           whileHover={{ scale: busy ? 1 : 1.02, y: busy ? 0 : -2 }}
           whileTap={{ scale: 0.98 }}
@@ -176,7 +211,8 @@ export function EmailLoginForm({ onSubmit, busy, error }: EmailLoginFormProps) {
           disabled={busy}
           className="w-full py-3.5 px-4 rounded-xl font-semibold text-base transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed relative overflow-hidden hover:opacity-90"
           style={{
-            background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+            background:
+              "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
             color: "#001e1d",
             boxShadow: "0 8px 24px rgba(249, 188, 96, 0.25)",
           }}

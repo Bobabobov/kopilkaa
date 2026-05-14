@@ -20,9 +20,30 @@ export default function AuthModalRoot() {
     modal === "auth/login/email" ||
     modal === "auth/signup/email";
 
+  const mode: AuthMode =
+    modal === "auth/signup" || modal === "auth/signup/email"
+      ? "signup"
+      : "login";
+
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [signupPendingEmail, setSignupPendingEmail] = useState<string | null>(
+    null,
+  );
+  const [signupMailDispatchFailed, setSignupMailDispatchFailed] =
+    useState(false);
+  const [signupDevLink, setSignupDevLink] = useState<string | null>(null);
+  const [resendSignupBusy, setResendSignupBusy] = useState(false);
+  const [resendSignupMessage, setResendSignupMessage] = useState<string | null>(
+    null,
+  );
+  const [loginPendingVerificationEmail, setLoginPendingVerificationEmail] =
+    useState<string | null>(null);
+  const [resendLoginBusy, setResendLoginBusy] = useState(false);
+  const [resendLoginMessage, setResendLoginMessage] = useState<string | null>(
+    null,
+  );
 
   function getSafeNext(nextValue: string | null): string | null {
     if (!nextValue) return null;
@@ -48,6 +69,30 @@ export default function AuthModalRoot() {
     if (!errorParam) return;
     setError(errorParam);
   }, [isAuthModal, errorParam]);
+
+  useEffect(() => {
+    if (!isAuthModal) {
+      setSignupPendingEmail(null);
+      setSignupMailDispatchFailed(false);
+      setSignupDevLink(null);
+      setResendSignupMessage(null);
+      setLoginPendingVerificationEmail(null);
+      setResendLoginMessage(null);
+    }
+  }, [isAuthModal]);
+
+  useEffect(() => {
+    if (mode === "login") {
+      setSignupPendingEmail(null);
+      setSignupMailDispatchFailed(false);
+      setSignupDevLink(null);
+      setResendSignupMessage(null);
+    }
+    if (mode === "signup") {
+      setLoginPendingVerificationEmail(null);
+      setResendLoginMessage(null);
+    }
+  }, [mode]);
 
   async function safeReadJson(res: Response): Promise<any> {
     try {
@@ -126,11 +171,6 @@ export default function AuthModalRoot() {
 
   if (!isAuthModal || checkingAuth) return null;
 
-  const mode: AuthMode =
-    modal === "auth/signup" || modal === "auth/signup/email"
-      ? "signup"
-      : "login";
-
   const handleTelegramAuth = async (user: any) => {
     try {
       setError(null);
@@ -192,6 +232,8 @@ export default function AuthModalRoot() {
   const handleEmailLogin = async (identifier: string, password: string) => {
     try {
       setError(null);
+      setResendLoginMessage(null);
+      setLoginPendingVerificationEmail(null);
       setBusy(true);
 
       const r = await fetch("/api/auth/login", {
@@ -211,9 +253,24 @@ export default function AuthModalRoot() {
       const data = await safeReadJson(r);
 
       if (!r.ok) {
+        if (
+          r.status === 403 &&
+          data &&
+          typeof data === "object" &&
+          (data as Record<string, unknown>).code === "EMAIL_NOT_VERIFIED"
+        ) {
+          const o = data as Record<string, unknown>;
+          const fromApi = typeof o.email === "string" ? o.email.trim() : "";
+          const fallback = identifier.includes("@")
+            ? identifier.trim().toLowerCase()
+            : "";
+          setLoginPendingVerificationEmail(fromApi || fallback || null);
+        }
         setError(getMessageFromApiJson(data, "Ошибка входа"));
         return;
       }
+
+      setLoginPendingVerificationEmail(null);
 
       if (data.ok) {
         window.location.href = safeNext || "/profile";
@@ -233,6 +290,10 @@ export default function AuthModalRoot() {
   ) => {
     try {
       setError(null);
+      setSignupPendingEmail(null);
+      setSignupMailDispatchFailed(false);
+      setSignupDevLink(null);
+      setResendSignupMessage(null);
       setBusy(true);
 
       // Генерируем username из name или email
@@ -276,6 +337,19 @@ export default function AuthModalRoot() {
         return;
       }
 
+      if (data.ok && data.needsEmailVerification) {
+        setSignupPendingEmail(
+          String(data.user?.email ?? email.trim().toLowerCase()),
+        );
+        setSignupMailDispatchFailed(Boolean(data.emailDispatchFailed));
+        setSignupDevLink(
+          typeof data.devInlineVerificationLink === "string"
+            ? data.devInlineVerificationLink
+            : null,
+        );
+        return;
+      }
+
       if (data.ok) {
         window.location.href = safeNext || "/profile";
       }
@@ -284,6 +358,67 @@ export default function AuthModalRoot() {
       setError(error.message || "Ошибка регистрации");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const handleResendSignupVerification = async () => {
+    if (!signupPendingEmail) return;
+    setResendSignupBusy(true);
+    setResendSignupMessage(null);
+    try {
+      const r = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: signupPendingEmail }),
+      });
+      const data = await safeReadJson(r);
+      if (!r.ok) {
+        setResendSignupMessage(
+          getMessageFromApiJson(data, "Не удалось отправить письмо."),
+        );
+        return;
+      }
+      if (typeof data?.devInlineVerificationLink === "string") {
+        setSignupDevLink(data.devInlineVerificationLink);
+      }
+      setResendSignupMessage(
+        typeof data?.message === "string"
+          ? data.message
+          : "Проверьте почту (и папку «Спам»).",
+      );
+    } catch (e: any) {
+      setResendSignupMessage(e?.message || "Ошибка сети.");
+    } finally {
+      setResendSignupBusy(false);
+    }
+  };
+
+  const handleResendLoginVerification = async () => {
+    if (!loginPendingVerificationEmail) return;
+    setResendLoginBusy(true);
+    setResendLoginMessage(null);
+    try {
+      const r = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: loginPendingVerificationEmail }),
+      });
+      const data = await safeReadJson(r);
+      if (!r.ok) {
+        setResendLoginMessage(
+          getMessageFromApiJson(data, "Не удалось отправить письмо."),
+        );
+        return;
+      }
+      setResendLoginMessage(
+        typeof data?.message === "string"
+          ? data.message
+          : "Проверьте почту (и папку «Спам»).",
+      );
+    } catch (e: any) {
+      setResendLoginMessage(e?.message || "Ошибка сети.");
+    } finally {
+      setResendLoginBusy(false);
     }
   };
 
@@ -297,6 +432,16 @@ export default function AuthModalRoot() {
       onEmailSignup={handleEmailSignup}
       busy={busy}
       error={error}
+      signupPendingEmail={signupPendingEmail}
+      signupMailDispatchFailed={signupMailDispatchFailed}
+      signupDevLink={signupDevLink}
+      onResendSignupVerification={handleResendSignupVerification}
+      resendSignupBusy={resendSignupBusy}
+      resendSignupMessage={resendSignupMessage}
+      loginPendingVerificationEmail={loginPendingVerificationEmail}
+      onResendLoginVerification={handleResendLoginVerification}
+      resendLoginBusy={resendLoginBusy}
+      resendLoginMessage={resendLoginMessage}
     />
   );
 }

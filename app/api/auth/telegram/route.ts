@@ -201,6 +201,7 @@ async function authenticateTelegram(
         // Устанавливаем email только если он не требуется (для совместимости со старыми схемами)
         // Если в БД email обязателен, используем временный email на основе telegramId
         email: `telegram-${telegramId}@telegram.local`,
+        emailVerified: true,
       };
 
       // Сохраняем аватар из Telegram, если есть

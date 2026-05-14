@@ -21,6 +21,12 @@ interface SignupViewProps {
   ) => Promise<void>;
   busy: boolean;
   error: string | null;
+  signupPendingEmail?: string | null;
+  signupMailDispatchFailed?: boolean;
+  signupDevLink?: string | null;
+  onResendSignupVerification?: () => void | Promise<void>;
+  resendSignupBusy?: boolean;
+  resendSignupMessage?: string | null;
 }
 
 export function SignupView({
@@ -31,6 +37,12 @@ export function SignupView({
   onEmailSignup,
   busy,
   error,
+  signupPendingEmail,
+  signupMailDispatchFailed,
+  signupDevLink,
+  onResendSignupVerification,
+  resendSignupBusy,
+  resendSignupMessage,
 }: SignupViewProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -91,7 +103,51 @@ export function SignupView({
         </>
       )}
 
-      {showEmailForm && (
+      {showEmailForm && signupPendingEmail && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-white/15 bg-white/5 p-5 text-center space-y-4"
+        >
+          <p className="text-[#fffffe] font-semibold">Проверьте почту</p>
+          <p className="text-sm text-[#abd1c6] leading-relaxed">
+            Мы отправили письмо на{" "}
+            <span className="text-[#f9bc60]">{signupPendingEmail}</span>.
+            Перейдите по ссылке в письме, чтобы подтвердить адрес и войти в
+            аккаунт.
+          </p>
+          {signupMailDispatchFailed && (
+            <p className="text-xs text-amber-200/90">
+              Письмо могло не отправиться. Нажмите «Отправить снова» или
+              проверьте настройки SMTP на сервере.
+            </p>
+          )}
+          {signupDevLink && (
+            <p className="text-xs text-left break-all rounded-lg bg-black/30 p-3 text-[#94a1b2]">
+              Ссылка подтверждения (режим без SMTP):
+              <br />
+              <span className="text-[#abd1c6]">{signupDevLink}</span>
+            </p>
+          )}
+          {resendSignupMessage && (
+            <p className="text-xs text-[#abd1c6]">{resendSignupMessage}</p>
+          )}
+          <div className="flex flex-col sm:flex-row gap-2 justify-center">
+            {onResendSignupVerification && (
+              <button
+                type="button"
+                disabled={resendSignupBusy}
+                onClick={() => void onResendSignupVerification()}
+                className="rounded-xl border border-[#f9bc60]/40 px-4 py-2.5 text-sm font-semibold text-[#f9bc60] hover:bg-[#f9bc60]/10 disabled:opacity-50"
+              >
+                {resendSignupBusy ? "Отправляем…" : "Отправить снова"}
+              </button>
+            )}
+          </div>
+        </motion.div>
+      )}
+
+      {showEmailForm && !signupPendingEmail && (
         <EmailSignupForm onSubmit={onEmailSignup} busy={busy} error={error} />
       )}
     </>

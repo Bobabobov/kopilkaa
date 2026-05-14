@@ -47,6 +47,8 @@ model User {
   avatarUpdatedAt     DateTime?
   phone               String?   @unique
   phoneVerified       Boolean   @default(false)
+  /** Подтверждение владения email (регистрация по паролю); OAuth/Telegram выставляют true при создании. */
+  emailVerified       Boolean   @default(false)
   telegramId          String?   @unique
   telegramUsername    String?
   googleId            String?   @unique
@@ -83,6 +85,7 @@ model User {
   storyLikes           StoryLike[]
   donations            Donation[]
   phoneLoginCodes      PhoneLoginCode[]
+  emailVerificationTokens EmailVerificationToken[]
   projectNewsPosts     ProjectNewsPost[]
   projectNewsReactions ProjectNewsReaction[]
   reviews              Review[]
@@ -255,6 +258,19 @@ model PhoneLoginCode {
 
   @@index([userId])
   @@index([code])
+  @@index([expiresAt])
+}
+
+/** Одноразовые токены подтверждения email (в БД хранится только SHA-256 открытого токена). */
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
   @@index([expiresAt])
 }
 

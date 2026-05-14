@@ -106,6 +106,7 @@ export async function POST(req: NextRequest) {
       const updateData: any = {
         googleId,
         googleEmail,
+        emailVerified: true,
       };
 
       // Получаем текущие данные пользователя
@@ -200,6 +201,7 @@ export async function POST(req: NextRequest) {
         googleId,
         googleEmail,
         role: "USER",
+        emailVerified: true,
       };
 
       // Сохраняем аватар из Google, если есть
@@ -252,6 +254,8 @@ export async function POST(req: NextRequest) {
         updateData.name = googleName;
       }
 
+      updateData.emailVerified = true;
+
       if (Object.keys(updateData).length > 0) {
         user = await prisma.user.update({
           where: { id: user.id },
@@ -269,6 +273,21 @@ export async function POST(req: NextRequest) {
         });
       }
     }
+
+    user = await prisma.user.update({
+      where: { id: user.id },
+      data: { emailVerified: true },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        role: true,
+        name: true,
+        avatar: true,
+        googleId: true,
+        googleEmail: true,
+      },
+    });
 
     // Проверяем блокировку перед входом
     const banStatus = await checkUserBan(user.id);

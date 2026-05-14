@@ -17,6 +17,10 @@ interface LoginViewProps {
   onEmailLogin: (identifier: string, password: string) => Promise<void>;
   busy: boolean;
   error: string | null;
+  loginPendingVerificationEmail?: string | null;
+  onResendLoginVerification?: () => void | Promise<void>;
+  resendLoginBusy?: boolean;
+  resendLoginMessage?: string | null;
 }
 
 export function LoginView({
@@ -27,6 +31,10 @@ export function LoginView({
   onEmailLogin,
   busy,
   error,
+  loginPendingVerificationEmail,
+  onResendLoginVerification,
+  resendLoginBusy,
+  resendLoginMessage,
 }: LoginViewProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -88,7 +96,15 @@ export function LoginView({
       )}
 
       {showEmailForm && (
-        <EmailLoginForm onSubmit={onEmailLogin} busy={busy} error={error} />
+        <EmailLoginForm
+          onSubmit={onEmailLogin}
+          busy={busy}
+          error={error}
+          loginPendingVerificationEmail={loginPendingVerificationEmail}
+          onResendLoginVerification={onResendLoginVerification}
+          resendLoginBusy={resendLoginBusy}
+          resendLoginMessage={resendLoginMessage}
+        />
       )}
     </>
   );

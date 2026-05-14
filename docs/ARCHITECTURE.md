@@ -40,7 +40,7 @@ Hooks should not live in `lib/`.
 Suggested placement:
 
 - `hooks/ui/` UI-only hooks (scroll, visibility, etc.)
-- `hooks/<domain>/` feature hooks (profile, ads, reports, etc.)
+- `hooks/<domain>/` feature hooks (profile, ads, friends, etc.)
 
 ## lib/
 

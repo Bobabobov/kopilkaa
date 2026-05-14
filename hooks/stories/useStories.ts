@@ -1,5 +1,6 @@
 // hooks/stories/useStories.ts
 import { useState, useEffect, useRef, useCallback } from "react";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 export interface Story {
   id: string;
@@ -170,18 +171,14 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
           setHasMore(page < (data.pages || 1));
           setCurrentPage(page);
         } else {
+          const errorBody = await response.json().catch(() => null);
           console.error(
             "[useStories] Failed to load stories:",
-            response.status,
-            response.statusText,
+            getMessageFromApiJson(
+              errorBody,
+              `${response.status} ${response.statusText || ""}`.trim(),
+            ),
           );
-          // Пытаемся прочитать тело ответа для дополнительной информации
-          try {
-            const errorData = await response.text();
-            console.error("[useStories] Error response:", errorData);
-          } catch (e) {
-            // Игнорируем ошибки чтения тела ответа
-          }
           if (page === 1) {
             setStories([]);
           }

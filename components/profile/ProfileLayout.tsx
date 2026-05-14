@@ -14,6 +14,7 @@ import {
   ProfileRecentActivity,
   MotivationalCard,
 } from "./ProfileDynamicImports";
+import ProfileReferralProgramCard from "./ProfileReferralProgramCard";
 import { ProfileStatsStrip } from "./ProfileStatsStrip";
 import { ProfileSectionTitle } from "./ProfileSectionTitle";
 import { Card } from "@/components/ui/Card";
@@ -127,11 +128,19 @@ export default function ProfileLayout({
                   </Card>
                 </motion.div>
                 <motion.div variants={item} className="space-y-2">
-                  <ProfileSectionTitle icon="MessageCircle" title="Отзыв" subtitle="Ваш отзыв о помощи" />
+                  <ProfileSectionTitle
+                    icon="MessageCircle"
+                    title="Отзыв"
+                    subtitle="Ваш отзыв о помощи"
+                  />
                   <ProfileReviewSection userId={user.id} isOwner />
                 </motion.div>
                 <motion.div variants={item} className="space-y-2">
-                  <ProfileSectionTitle icon="Activity" title="Активность" subtitle="Последние действия" />
+                  <ProfileSectionTitle
+                    icon="Activity"
+                    title="Активность"
+                    subtitle="Последние действия"
+                  />
                   <ProfileRecentActivity />
                 </motion.div>
               </motion.div>
@@ -147,7 +156,11 @@ export default function ProfileLayout({
                 transition={{ duration: 0.35, delay: 0.1 }}
                 className="space-y-2"
               >
-                <ProfileSectionTitle icon="Shield" title="Доверие" subtitle="Уровень и поддержка" />
+                <ProfileSectionTitle
+                  icon="Shield"
+                  title="Доверие"
+                  subtitle="Уровень и поддержка"
+                />
                 <ProfileTrustAndStatsCard
                   status={trustStatus}
                   supportText={trustSupportText}
@@ -157,6 +170,13 @@ export default function ProfileLayout({
                   progressTotal={trustProgressTotal}
                   levelStats={levelStats ?? undefined}
                 />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.12 }}
+              >
+                <ProfileReferralProgramCard />
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 12 }}

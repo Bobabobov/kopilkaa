@@ -9,8 +9,6 @@ export type SettingsUser = {
   createdAt: string;
   avatar?: string | null;
   hideEmail?: boolean;
-  phone?: string | null;
-  phoneVerified?: boolean;
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;
@@ -45,7 +43,6 @@ export interface UseSettingsReturn {
   handleNameChange: (newName: string) => Promise<void>;
   handleEmailChange: (newEmail: string) => Promise<void>;
   handleEmailVisibilityChange: (hideEmail: boolean) => Promise<void>;
-  handlePhoneChange: (phone: string) => Promise<void>;
   handleSocialLinkChange: (
     field: "vkLink" | "telegramLink" | "youtubeLink",
     link: string,

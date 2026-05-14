@@ -103,15 +103,6 @@ export function StepRestrictions() {
           </p>
         </li>
 
-        <li className="space-y-1 pl-0.5">
-          <div className="font-semibold text-[#e3f0ea]">
-            • Азартные игры и ставки
-          </div>
-          <p className="text-xs text-[#9fb2ab]">
-            Букмекеры, казино, лотереи и рискованные игровые активности.
-          </p>
-        </li>
-
         <li className="space-y-1">
           <div className="font-semibold text-[#ffe0dd] flex flex-wrap items-center gap-2">
             <span className="inline-flex px-1.5 py-0.5 rounded-full bg-[#e16162]/20 text-[10px] font-bold text-[#ffc9c2]">

@@ -26,6 +26,7 @@ import ApplicationReviewBlock from "./_components/ApplicationReviewBlock";
 import ApplicationPreviousReviewBlock from "./_components/ApplicationPreviousReviewBlock";
 import AdminSection from "./_components/AdminSection";
 import type { ApplicationItem, ApplicationStatus } from "./types";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 export default function AdminApplicationPage({
   params,
@@ -88,7 +89,7 @@ export default function AdminApplicationPage({
           setEditPublishInStories(Boolean(d.item.publishInStories));
           setDecreaseOnDecision(Boolean(d.item.trustDecreasedAtDecision));
         } else {
-          setErr(d?.error || "Не найдено");
+          setErr(getMessageFromApiJson(d, "Заявка не найдена"));
         }
       })
       .catch(() => setErr("Ошибка загрузки"))

@@ -10,32 +10,8 @@ import { GoodDeedsTasksPanel } from "./_components/GoodDeedsTasksPanel";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { MIN_GOOD_DEED_STORY_CHARS } from "@/lib/goodDeeds";
-import type { GoodDeedDifficulty, GoodDeedsResponse } from "./types";
-
-const WEEK_DIFFICULTY_KEY_PREFIX = "good-deeds:difficulty:";
-
-function isDifficulty(value: string | null): value is GoodDeedDifficulty {
-  return value === "EASY" || value === "MEDIUM" || value === "HARD";
-}
-
-function readStoredDifficulty(weekKey: string): GoodDeedDifficulty | null {
-  if (typeof window === "undefined") return null;
-  const raw = window.localStorage.getItem(
-    `${WEEK_DIFFICULTY_KEY_PREFIX}${weekKey}`,
-  );
-  return isDifficulty(raw) ? raw : null;
-}
-
-function storeDifficulty(
-  weekKey: string,
-  difficulty: GoodDeedDifficulty,
-): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(
-    `${WEEK_DIFFICULTY_KEY_PREFIX}${weekKey}`,
-    difficulty,
-  );
-}
+import type { GoodDeedsResponse } from "./types";
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 
 export default function GoodDeedsPage() {
   const [data, setData] = useState<GoodDeedsResponse | null>(null);
@@ -43,11 +19,6 @@ export default function GoodDeedsPage() {
   const [submittingTaskId, setSubmittingTaskId] = useState<string | null>(null);
   const [filesByTask, setFilesByTask] = useState<Record<string, File[]>>({});
   const [storyByTask, setStoryByTask] = useState<Record<string, string>>({});
-  const [selectedDifficulty, setSelectedDifficulty] =
-    useState<GoodDeedDifficulty>("MEDIUM");
-  const [tasksMode, setTasksMode] = useState<"difficulty-select" | "tasks">(
-    "difficulty-select",
-  );
   const { showToast, ToastComponent } = useBeautifulToast();
 
   const load = async () => {
@@ -55,18 +26,8 @@ export default function GoodDeedsPage() {
     try {
       const res = await fetch("/api/good-deeds", { cache: "no-store" });
       const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json?.error || "Ошибка загрузки");
-      }
+      throwIfApiFailed(res, json, "Не удалось загрузить раздел «Добрые дела»");
       setData(json as GoodDeedsResponse);
-      const apiData = json as GoodDeedsResponse;
-      const persistedDifficulty = readStoredDifficulty(apiData.week.key);
-      const initialDifficulty =
-        apiData.viewer.canChangeDifficulty && persistedDifficulty
-          ? persistedDifficulty
-          : apiData.viewer.selectedDifficulty;
-      setSelectedDifficulty(initialDifficulty);
-      setTasksMode("tasks");
     } catch (error) {
       console.error(error);
       showToast("error", "Ошибка", "Не удалось загрузить добрые дела");
@@ -87,13 +48,6 @@ export default function GoodDeedsPage() {
 
   const onStoryChange = (taskId: string, value: string) => {
     setStoryByTask((prev) => ({ ...prev, [taskId]: value }));
-  };
-
-  const handleDifficultyChange = (difficulty: GoodDeedDifficulty) => {
-    setSelectedDifficulty(difficulty);
-    if (data?.week?.key && data.viewer.canChangeDifficulty) {
-      storeDifficulty(data.week.key, difficulty);
-    }
   };
 
   const submitTask = async (taskId: string) => {
@@ -140,9 +94,7 @@ export default function GoodDeedsPage() {
         body: fd,
       });
       const uploadJson = await uploadRes.json();
-      if (!uploadRes.ok) {
-        throw new Error(uploadJson?.error || "Ошибка загрузки медиа");
-      }
+      throwIfApiFailed(uploadRes, uploadJson, "Ошибка загрузки медиа");
       const mediaUrls = ((uploadJson?.files as { url: string }[]) || []).map(
         (item) => item.url,
       );
@@ -152,17 +104,16 @@ export default function GoodDeedsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           taskId,
-          difficulty: selectedDifficulty,
           mediaUrls,
           storyText: trimmedStory,
         }),
       });
       const submitJson = await submitRes.json();
-      if (!submitRes.ok) {
-        throw new Error(
-          submitJson?.error || "Не удалось отправить на проверку",
-        );
-      }
+      throwIfApiFailed(
+        submitRes,
+        submitJson,
+        "Не удалось отправить отчёт на проверку",
+      );
 
       showToast(
         "success",
@@ -183,16 +134,8 @@ export default function GoodDeedsPage() {
       setSubmittingTaskId(null);
     }
   };
-  const tasks = data?.tasksByDifficulty[selectedDifficulty] ?? [];
-  const selectedCategoryProgress = {
-    approved: tasks.filter((task) => task.submissionStatus === "APPROVED")
-      .length,
-    pending: tasks.filter((task) => task.submissionStatus === "PENDING").length,
-    rejected: tasks.filter((task) => task.submissionStatus === "REJECTED")
-      .length,
-    total: tasks.length,
-  };
-  const difficultyLocked = data ? !data.viewer.canChangeDifficulty : false;
+
+  const tasks = data?.weeklyTasks ?? [];
 
   return (
     <div className="min-h-screen relative">
@@ -231,13 +174,8 @@ export default function GoodDeedsPage() {
 
             {data.viewer.isAuthenticated ? (
               <GoodDeedsTasksPanel
-                mode={tasksMode}
-                onStartTasks={() => setTasksMode("tasks")}
-                selectedDifficulty={selectedDifficulty}
-                onDifficultyChange={handleDifficultyChange}
-                difficultyLocked={difficultyLocked}
-                categoryStats={data.categoryStats}
-                selectedCategoryProgress={selectedCategoryProgress}
+                weekLabel={data.week.label}
+                weeklyProgress={data.weeklyProgress}
                 tasks={tasks}
                 filesByTask={filesByTask}
                 storyByTask={storyByTask}

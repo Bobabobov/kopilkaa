@@ -28,6 +28,7 @@ import {
   type ApplicationFieldKey,
 } from "./validation";
 import { formatAmountRu, createHandleAmountInputChange } from "./amountUtils";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 import { uploadApplicationPhotos } from "./upload";
 import { postApplication } from "./submitApi";
 import { clearFormStorage } from "./storage";
@@ -426,8 +427,10 @@ export function useApplicationFormState() {
         }
         if (r.status === 403 && (d?.requiresReview as boolean)) {
           throw new Error(
-            (d?.error as string) ||
+            getMessageFromApiJson(
+              d,
               "Необходимо оставить отзыв перед созданием следующей заявки",
+            ),
           );
         }
         if (r.status === 403 && (d?.requiresActivity as boolean)) {
@@ -437,9 +440,10 @@ export function useApplicationFormState() {
             activityType:
               (d?.activityType as ActivityModalState["activityType"]) ??
               "LIKE_STORY",
-            message:
-              (d?.error as string) ||
+            message: getMessageFromApiJson(
+              d,
               "Для создания заявки требуется активность",
+            ),
           });
           setErr(null);
           return;
@@ -449,11 +453,12 @@ export function useApplicationFormState() {
             setLeft(d.leftMs as number);
             throw new Error("Лимит: 1 заявка в 24 часа");
           }
-          if (d?.error) throw new Error(d.error as string);
-          throw new Error("Превышен лимит. Попробуйте позже.");
+          throw new Error(
+            getMessageFromApiJson(d, "Превышен лимит. Попробуйте позже."),
+          );
         }
         if (!r.ok) {
-          const main = (d?.error as string) || "Ошибка отправки";
+          const main = getMessageFromApiJson(d, "Ошибка отправки");
           const detail =
             typeof d?.detail === "string" && d.detail.length > 0
               ? d.detail

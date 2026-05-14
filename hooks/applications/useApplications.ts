@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { ApplicationItem } from "@/components/applications/ApplicationCard";
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 
 export function useApplications() {
   const [items, setItems] = useState<ApplicationItem[]>([]);
@@ -23,7 +24,7 @@ export function useApplications() {
         cache: "no-store",
       });
       const d = await r.json();
-      if (!r.ok) throw new Error(d?.error || "Ошибка загрузки");
+      throwIfApiFailed(r, d, "Не удалось загрузить список заявок");
 
       setItems(d.items);
       setPage(d.page);

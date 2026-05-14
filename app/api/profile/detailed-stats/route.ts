@@ -127,18 +127,10 @@ export async function GET(request: Request) {
       daysActive,
     };
 
-    // Игровая статистика (пока заглушка)
-    const gameStats = {
-      gamesPlayed: 0,
-      highScore: 0,
-      rank: 0,
-    };
-
     const trust = await computeUserTrustSnapshot(session.uid);
     const detailedStats = {
       applications: applicationStats,
       activity: activityStats,
-      games: gameStats,
       user: {
         createdAt: userData?.createdAt || new Date(),
       },
@@ -173,11 +165,6 @@ export async function GET(request: Request) {
         likesReceived: 0,
         friendsCount: 0,
         daysActive: 0,
-      },
-      games: {
-        gamesPlayed: 0,
-        highScore: 0,
-        rank: 0,
       },
       user: {
         createdAt: new Date(),

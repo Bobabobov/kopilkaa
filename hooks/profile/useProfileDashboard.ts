@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import type { TrustLevel } from "@/lib/trustLevel";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 interface User {
   id: string;
@@ -39,8 +40,6 @@ interface Stats {
   approvedAmount: number;
   friendsCount: number;
   pendingFriendRequests: number;
-  gameAttempts: number;
-  bestGameScore: number;
   applications?: {
     effectiveApproved?: number;
   };
@@ -174,7 +173,13 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
           await fetchDataFallback();
           return;
         }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errBody = await response.json().catch(() => null);
+        throw new Error(
+          getMessageFromApiJson(
+            errBody,
+            `Не удалось загрузить профиль (${response.status})`,
+          ),
+        );
       }
 
       const profileData = await response.json();
@@ -218,11 +223,17 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       fetch("/api/profile/stats", { cache: "no-store" }).catch(() => null),
     ]);
 
+    const userJson = await userResponse.json().catch(() => null);
     if (!userResponse.ok) {
-      throw new Error("Failed to fetch user data");
+      throw new Error(
+        getMessageFromApiJson(userJson, "Не удалось загрузить данные профиля"),
+      );
     }
 
-    const userData = await userResponse.json();
+    const userData = userJson as { user?: User };
+    if (!userData.user) {
+      throw new Error("В ответе профиля нет данных пользователя");
+    }
     const statsData = statsResponse?.ok ? await statsResponse.json() : {};
 
     const normalizedStats = (() => {
@@ -267,7 +278,7 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       };
     })();
 
-    const fallbackData = {
+    const fallbackData: ProfileDashboardData = {
       user: userData.user,
       friends: [],
       receivedRequests: [],

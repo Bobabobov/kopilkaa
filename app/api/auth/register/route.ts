@@ -3,6 +3,12 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { attachSessionToResponse } from "@/lib/auth";
+import {
+  REFERRAL_CODE_COOKIE,
+  REFERRAL_VISITOR_COOKIE,
+  readReferralCookies,
+  tryAwardReferralBonusForNewUser,
+} from "@/lib/referralProgram";
 
 export const runtime = "nodejs";
 
@@ -10,27 +16,15 @@ function bad(message: string, status = 400) {
   return NextResponse.json({ message }, { status });
 }
 
-function normalizePhone(raw: string): string | null {
-  const digits = raw.replace(/[^\d]+/g, "");
-  if (!digits) return null;
-
-  if (digits.length === 10) {
-    return `7${digits}`;
-  }
-  if (
-    digits.length === 11 &&
-    (digits.startsWith("7") || digits.startsWith("8"))
-  ) {
-    return `7${digits.slice(1)}`;
-  }
-  if (digits.length >= 7 && digits.length <= 15) {
-    return digits;
-  }
-  return null;
-}
-
 export async function POST(req: Request) {
   try {
+    // Реферальные cookies выставляются роутом `/ref/[code]` и используются,
+    // чтобы привязать “успешную регистрацию” к рефереру.
+    const referralCookies = await readReferralCookies().catch(() => ({
+      referralCode: null,
+      visitorId: null,
+    }));
+
     const body = await req.json().catch(() => ({}));
     const email = String(body?.email ?? "")
       .trim()
@@ -42,8 +36,6 @@ export async function POST(req: Request) {
       .toLowerCase();
     const usernamePattern = /^[\p{L}\p{N}._-]{3,20}$/u;
 
-    const phoneRaw = String(body?.phone ?? "").trim();
-
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))
       return bad("Некорректный email");
     if (password.length < 8 || password.length > 30)
@@ -51,15 +43,6 @@ export async function POST(req: Request) {
     if (!usernameRaw) return bad("Придумайте логин");
     if (!usernamePattern.test(usernameRaw))
       return bad("Логин может содержать 3-20 символов: буквы, цифры, ._-");
-
-    // Телефон опционален
-    let normalizedPhone: string | null = null;
-    if (phoneRaw) {
-      normalizedPhone = normalizePhone(phoneRaw);
-      if (!normalizedPhone) {
-        return bad("Введите корректный номер телефона");
-      }
-    }
 
     const exists = await prisma.user.findUnique({
       where: { email },
@@ -73,22 +56,11 @@ export async function POST(req: Request) {
     });
     if (usernameExists) return bad("Этот логин уже занят", 409);
 
-    // Проверяем телефон только если он указан
-    if (normalizedPhone) {
-      const phoneExists = await prisma.user.findFirst({
-        where: { phone: normalizedPhone },
-        select: { id: true },
-      });
-      if (phoneExists) return bad("Этот телефон уже используется", 409);
-    }
-
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: {
         email,
         username: usernameRaw,
-        phone: normalizedPhone || null,
-        phoneVerified: false,
         passwordHash,
         name: name || null,
         role: "USER",
@@ -96,20 +68,12 @@ export async function POST(req: Request) {
       select: { id: true, role: true, email: true },
     });
 
-    // Генерируем код подтверждения телефона только если телефон указан
-    if (normalizedPhone) {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-      await prisma.phoneLoginCode.create({
-        data: {
-          userId: user.id,
-          code,
-          expiresAt,
-        },
+    if (referralCookies?.referralCode && referralCookies?.visitorId) {
+      await tryAwardReferralBonusForNewUser({
+        newUserId: user.id,
+        referralCode: referralCookies.referralCode,
+        visitorId: referralCookies.visitorId,
       });
-
-      // В продакшене код отправляется через SMS, здесь не логируем
     }
 
     // Сразу логиним (httpOnly-cookie через твой lib/auth.ts)
@@ -119,10 +83,29 @@ export async function POST(req: Request) {
       {
         ok: true,
         user: { id: user.id, email: user.email },
-        phone: normalizedPhone || null,
       },
       { status: 201 },
     );
+
+    // Очищаем referral-cookies после успешной регистрации,
+    // чтобы не начислять бонус повторно при следующих попытках.
+    if (referralCookies?.referralCode && referralCookies?.visitorId) {
+      res.cookies.set(REFERRAL_CODE_COOKIE, "", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        expires: new Date(0),
+      });
+      res.cookies.set(REFERRAL_VISITOR_COOKIE, "", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        expires: new Date(0),
+      });
+    }
+
     attachSessionToResponse(
       res,
       { uid: user.id, role: user.role as "USER" | "ADMIN" },

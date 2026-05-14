@@ -9,6 +9,24 @@ export type SessionPayload = { uid: string; role: Role; exp: number };
 const COOKIE_NAME = "kopilka_session";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 дней
 const ACCESS_TOKEN_MAX_AGE = 60 * 60 * 24 * 7; // 7 дней
+const DEV_ONLY_SECRET = "dev-secret-local-only";
+
+function resolveSecret(secret: string | undefined, label: string): string {
+  if (secret && secret.trim()) return secret;
+  if (process.env.NODE_ENV !== "production") return DEV_ONLY_SECRET;
+  throw new Error(`[auth] Missing required secret: ${label}`);
+}
+
+function getSessionSecret(): string {
+  return resolveSecret(process.env.AUTH_SECRET, "AUTH_SECRET");
+}
+
+function getAccessSecret(): string {
+  return resolveSecret(
+    process.env.ACCESS_TOKEN_SECRET || process.env.AUTH_SECRET,
+    "ACCESS_TOKEN_SECRET or AUTH_SECRET",
+  );
+}
 
 const enc = (obj: any) =>
   Buffer.from(JSON.stringify(obj)).toString("base64url");
@@ -33,7 +51,7 @@ function getIsHttpsFromReq(req?: Request) {
 
 export function signSession(
   payload: Omit<SessionPayload, "exp">,
-  secret = process.env.AUTH_SECRET || "dev-secret",
+  secret = getSessionSecret(),
 ) {
   const header = { alg: "HS256", typ: "JWT" };
   const body: SessionPayload = {
@@ -48,7 +66,7 @@ export function signSession(
 
 export function verifySession(
   token?: string | null,
-  secret = process.env.AUTH_SECRET || "dev-secret",
+  secret = getSessionSecret(),
 ): SessionPayload | null {
   try {
     if (!token) return null;
@@ -71,7 +89,7 @@ export function verifySession(
 
 export function signAccessToken(
   payload: Omit<SessionPayload, "exp">,
-  secret = process.env.ACCESS_TOKEN_SECRET || process.env.AUTH_SECRET || "dev-secret",
+  secret = getAccessSecret(),
 ) {
   const header = { alg: "HS256", typ: "JWT" };
   const body: SessionPayload = {
@@ -86,7 +104,7 @@ export function signAccessToken(
 
 export function verifyAccessToken(
   token?: string | null,
-  secret = process.env.ACCESS_TOKEN_SECRET || process.env.AUTH_SECRET || "dev-secret",
+  secret = getAccessSecret(),
 ): SessionPayload | null {
   return verifySession(token, secret);
 }

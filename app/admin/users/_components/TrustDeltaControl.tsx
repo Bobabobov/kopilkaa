@@ -7,6 +7,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 
 const LEVEL_ORDER: TrustLevel[] = [
   "LEVEL_1",
@@ -58,7 +59,7 @@ export function TrustDeltaControl({
         body: JSON.stringify({ trustDelta: next }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Ошибка");
+      throwIfApiFailed(res, data, "Не удалось сохранить изменение уровня доверия");
       onSaved(data?.trustDelta ?? next);
       showToast(
         "success",

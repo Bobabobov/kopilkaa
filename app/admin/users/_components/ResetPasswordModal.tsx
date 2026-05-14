@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 interface ResetPasswordModalProps {
   userId: string;
@@ -70,7 +71,7 @@ export function ResetPasswordModal({
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        setError(data.error || "Не удалось сбросить пароль");
+        setError(getMessageFromApiJson(data, "Не удалось сбросить пароль"));
         return;
       }
 

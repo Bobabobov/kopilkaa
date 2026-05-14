@@ -4,7 +4,6 @@ import { useOtherUserProfile } from "./useOtherUserProfile";
 import OtherUserLoadingStates from "./OtherUserLoadingStates";
 import { BannedNotice, isUserCurrentlyBanned } from "./BannedNotice";
 import { OtherUserProfileContent } from "./OtherUserProfileContent";
-import ReportUserModal from "./modals/ReportUserModal";
 import type { OtherUserProfileProps } from "./types";
 
 export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
@@ -13,8 +12,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     loading,
     isAuthenticated,
     resolvedUserId,
-    isReportModalOpen,
-    setIsReportModalOpen,
     ToastComponent,
     trustDerived,
     friendship,
@@ -68,13 +65,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
       />
 
       <ToastComponent />
-
-      <ReportUserModal
-        isOpen={isReportModalOpen}
-        onClose={() => setIsReportModalOpen(false)}
-        userId={effectiveUserId}
-        userName={user.name}
-      />
     </div>
   );
 }

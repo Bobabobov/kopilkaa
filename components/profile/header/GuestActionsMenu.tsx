@@ -5,14 +5,12 @@ interface GuestActionsMenuProps {
   isOpen: boolean;
   style: { top: number; right: number };
   onClose: () => void;
-  onReport: () => void;
 }
 
 export function GuestActionsMenu({
   isOpen,
   style,
   onClose,
-  onReport,
 }: GuestActionsMenuProps) {
   if (!isOpen) return null;
 
@@ -31,19 +29,10 @@ export function GuestActionsMenu({
         }}
         onMouseLeave={onClose}
       >
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          type="button"
-          onClick={() => {
-            onReport();
-            onClose();
-          }}
-          className="w-full inline-flex items-center gap-2.5 rounded-lg px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-500/20 transition-all duration-200"
-        >
-          <LucideIcons.Flag size="sm" className="text-red-400" />
-          Пожаловаться
-        </motion.button>
+        <div className="w-full inline-flex items-center gap-2.5 rounded-lg px-4 py-2 text-sm font-medium text-[#abd1c6]">
+          <LucideIcons.Info size="sm" />
+          Нет доступных действий
+        </div>
       </motion.div>
     </AnimatePresence>
   );

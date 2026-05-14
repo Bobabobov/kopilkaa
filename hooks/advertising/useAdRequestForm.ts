@@ -6,6 +6,7 @@ import {
   validateAdRequestForm,
   scrollToFirstError,
 } from "@/components/advertising/adRequestValidation";
+import { getMessageFromApiJson, throwIfApiFailed } from "@/lib/api/parseApiError";
 
 const INITIAL_FORM: AdRequestFormData = {
   name: "",
@@ -76,9 +77,7 @@ export function useAdRequestForm() {
         body: fd,
       });
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.error || "Ошибка загрузки изображений");
-      }
+      throwIfApiFailed(response, data, "Ошибка загрузки изображений");
       return (data.files as { url: string }[]).map((f) => f.url);
     } finally {
       setIsUploading(false);
@@ -144,8 +143,10 @@ export function useAdRequestForm() {
 
       if (!response.ok) {
         alert(
-          data?.error ||
+          getMessageFromApiJson(
+            data,
             "Не удалось отправить заявку. Попробуйте ещё раз позже.",
+          ),
         );
         isSubmittingRef.current = false;
         setIsSubmitting(false);

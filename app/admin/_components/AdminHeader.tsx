@@ -17,8 +17,6 @@ export function AdminHeader() {
     { href: "/admin/heroes", label: "Герои" },
     { href: "/admin/balance", label: "Баланс" },
     { href: "/admin/ads", label: "Реклама" },
-    { href: "/admin/news", label: "Новости" },
-    { href: "/admin/reports", label: "Жалобы" },
   ];
 
   // Закрывать меню при смене роута и по Escape

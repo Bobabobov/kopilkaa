@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ApplicationStatus } from "@/types/admin";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 interface UseAdminActionsProps {
   refreshStats: () => Promise<void>;
@@ -37,13 +38,20 @@ export function useAdminActions({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ countTowardsTrust: next }),
       });
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
+      const raw = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(
+          getMessageFromApiJson(raw, "Не удалось обновить флаг доверия"),
+        );
+      }
       showToast("success", "Флаг доверия обновлён");
       await refreshApplications();
     } catch (err) {
       console.error("Failed to update trust flag:", err);
-      showToast("error", "Ошибка обновления флага доверия");
+      showToast(
+        "error",
+        err instanceof Error ? err.message : "Ошибка обновления флага доверия",
+      );
     }
   };
 
@@ -65,8 +73,11 @@ export function useAdminActions({
         }),
       });
 
+      const raw = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(
+          getMessageFromApiJson(raw, "Не удалось изменить статус заявки"),
+        );
       }
 
       showToast(
@@ -78,7 +89,10 @@ export function useAdminActions({
       await Promise.all([refreshStats(), refreshApplications()]);
     } catch (err) {
       console.error("Failed to update application:", err);
-      showToast("error", "Ошибка обновления заявки");
+      showToast(
+        "error",
+        err instanceof Error ? err.message : "Ошибка обновления заявки",
+      );
     }
   };
 
@@ -96,8 +110,11 @@ export function useAdminActions({
         }),
       });
 
+      const rawUpdate = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(
+          getMessageFromApiJson(rawUpdate, "Не удалось обновить заявку"),
+        );
       }
 
       showToast("success", "Статус заявки обновлен!");
@@ -115,7 +132,10 @@ export function useAdminActions({
       await Promise.all([refreshStats(), refreshApplications()]);
     } catch (err) {
       console.error("Failed to update application:", err);
-      showToast("error", "Ошибка обновления заявки");
+      showToast(
+        "error",
+        err instanceof Error ? err.message : "Ошибка обновления заявки",
+      );
     }
   };
 
@@ -129,8 +149,11 @@ export function useAdminActions({
         },
       );
 
+      const rawDel = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(
+          getMessageFromApiJson(rawDel, "Не удалось удалить заявку"),
+        );
       }
 
       showToast("success", "Заявка удалена!");
@@ -142,7 +165,10 @@ export function useAdminActions({
       await Promise.all([refreshStats(), refreshApplications()]);
     } catch (err) {
       console.error("Failed to delete application:", err);
-      showToast("error", "Ошибка удаления заявки");
+      showToast(
+        "error",
+        err instanceof Error ? err.message : "Ошибка удаления заявки",
+      );
     }
   };
 

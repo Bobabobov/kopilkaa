@@ -51,15 +51,12 @@ export async function POST(req: Request) {
       },
     });
     if (!user) {
-      return NextResponse.json(
-        { error: "Такого пользователя не существует" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Неверный логин или пароль" }, { status: 401 });
     }
 
     const ok = await bcrypt.compare(rawPassword, user.passwordHash);
     if (!ok) {
-      return NextResponse.json({ error: "Неверный пароль" }, { status: 401 });
+      return NextResponse.json({ error: "Неверный логин или пароль" }, { status: 401 });
     }
 
     // Проверяем блокировку пользователя
@@ -91,10 +88,7 @@ export async function POST(req: Request) {
         role: user.role,
         name: user.name,
       },
-      accessToken: signAccessToken(
-        { uid: user.id, role: user.role as any },
-        process.env.ACCESS_TOKEN_SECRET || process.env.AUTH_SECRET || "dev-secret",
-      ),
+      accessToken: signAccessToken({ uid: user.id, role: user.role as any }),
     });
     attachSessionToResponse(res, { uid: user.id, role: user.role as any }, req);
     return res;

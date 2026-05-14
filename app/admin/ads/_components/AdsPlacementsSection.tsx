@@ -7,6 +7,7 @@ import type { Advertisement, AdFormData } from "./types";
 import AdPlacementActions from "./AdPlacementActions";
 import AdPlacementForm from "./AdPlacementForm";
 import AdPlacementCard from "./AdPlacementCard";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 export default function AdsPlacementsSection() {
   const [ads, setAds] = useState<Advertisement[]>([]);
@@ -57,7 +58,7 @@ export default function AdsPlacementsSection() {
         showToast(
           "error",
           "Не удалось загрузить размещения",
-          data?.error || response.statusText,
+          getMessageFromApiJson(data, response.statusText || "Ошибка запроса"),
         );
       }
     } catch (error) {
@@ -167,7 +168,7 @@ export default function AdsPlacementsSection() {
         showToast(
           "error",
           "Не удалось сохранить размещение",
-          data?.error || response.statusText,
+          getMessageFromApiJson(data, response.statusText || "Ошибка запроса"),
         );
       }
     } catch (error) {
@@ -225,12 +226,12 @@ export default function AdsPlacementsSection() {
       } else {
         console.error(
           "Failed to delete ad:",
-          data?.error || response.statusText,
+          getMessageFromApiJson(data, response.statusText || "Ошибка запроса"),
         );
         showToast(
           "error",
           "Не удалось удалить размещение",
-          data?.error || response.statusText,
+          getMessageFromApiJson(data, response.statusText || "Ошибка запроса"),
         );
       }
     } catch (error) {
@@ -306,7 +307,7 @@ export default function AdsPlacementsSection() {
         showToast(
           "error",
           "Не удалось выполнить очистку",
-          data?.error || response.statusText,
+          getMessageFromApiJson(data, response.statusText || "Ошибка запроса"),
         );
       }
     } catch (error) {

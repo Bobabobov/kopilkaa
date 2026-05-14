@@ -40,15 +40,6 @@ export async function GET(request: Request) {
             },
           },
         },
-        gameScores: {
-          select: {
-            gameKey: true,
-            weekKey: true,
-            score: true,
-            displayName: true,
-            createdAt: true,
-          },
-        },
         userTree: {
           select: {
             level: true,
@@ -109,7 +100,6 @@ export async function GET(request: Request) {
         lastSeen: user.lastSeen,
       },
       applications: user.applications,
-      gameScores: user.gameScores,
       tree: user.userTree,
       friendships: {
         sent: user.friendshipsSent,

@@ -59,32 +59,24 @@
   - Тонкий `useApplicationFormState.ts` в formState/
   - Реэкспорт и `LIMITS` из `hooks/applications/useApplicationFormState.ts`
 
-### 7. GameCanvas (игра Coin Catch)
-
-- **Было:** ~394 строки.
-- **Сделано:**
-  - `LeaderboardIcons.tsx`, `leaderboardUtils.ts`, `LeaderboardPanel.tsx`
-  - `AudioSetupOverlay.tsx`, `useCoinCatchGame.ts`
-  - `GameCanvas.tsx` — ~69 строк, композиция
-
-### 8. HowItWorks (главная)
+### 7. HowItWorks (главная)
 
 - **Было:** ~258 строк.
 - **Сделано:**
   - `components/home/how-it-works/` — config, HowItWorksHeader, HowItWorksStepCard, HowItWorksDisclaimer, HowItWorksCta, useHowItWorksAuth
   - `HowItWorks.tsx` — ~36 строк
 
-### 9. OtherUserProfile (профиль другого пользователя)
+### 8. OtherUserProfile (профиль другого пользователя)
 
 - **Было:** ~236 строк.
 - **Сделано:**
   - `components/profile/other-user/types.ts` — `OtherUserProfileUser`, `OtherUserProfileProps`
-  - `useOtherUserProfile.ts` — составной хук (useOtherUserData, useOtherUserTrust, useOtherUserFriendship, модалка жалобы, редирект)
+- `useOtherUserProfile.ts` — составной хук (useOtherUserData, useOtherUserTrust, useOtherUserFriendship, редирект)
   - `OtherUserProfileBackLink.tsx` — ссылка «Мой профиль»
   - `OtherUserProfileContent.tsx` — разметка: back link, ProfileHeaderCard, MutualFriends, сетка секций
-  - `OtherUserProfile.tsx` — ~90 строк: useOtherUserProfile, ранние выходы, Content + Toast + ReportModal
+- `OtherUserProfile.tsx` — ~90 строк: useOtherUserProfile, ранние выходы, Content + Toast
 
-### 10. HeroSection (главная)
+### 9. HeroSection (главная)
 
 - **Было:** ~195 строк.
 - **Сделано:**
@@ -112,7 +104,7 @@
 ## Архитектура и долг (не разбиение файлов)
 
 - **Границы слоёв** — описаны в `docs/ARCHITECTURE.md`; в коде местами ещё смешаны.
-- **Feature-first** — частично (admin/users, applications formState, coin-catch, how-it-works); не везде.
+- **Feature-first** — частично (admin/users, applications formState, how-it-works); не везде.
 - **Типизация** — часть `any` закрыта отключением правил; при желании можно заменить на нормальные типы.
 - **Ошибки** — единого подхода к логам и error boundaries нет. Добавлен `docs/ERROR_HANDLING.md` с рекомендациями; применять по мере правок.
 - **Тесты** — юнит/интеграционных нет.
@@ -127,7 +119,6 @@
 - `app/api/admin/applications/stats/route.ts` — обёрнута логика в try/catch, при ошибке — 500.
 - `app/api/users/search/route.ts` — вызов `getSession()` перенесён в try, при любой ошибке — 500; формат ошибки `{ error: string }`.
 - `app/api/notifications/route.ts` — формат ошибки 401 приведён к `{ error: string }`; массив уведомлений типизирован (`NotificationItem` вместо `any[]`).
-- `app/api/users/report/route.ts` — весь POST в try/catch, `getSession()` внутри try; все ответы об ошибках — `{ error: string }`; в catch только `console.error` и 500 без деталей в ответе.
 
 ### Следующие шаги (по приоритету)
 
@@ -142,7 +133,7 @@
 
 ## Итог по разбиению
 
-- Крупные монолиты (AdminUsers, AdvertisingContact, Terms, useSettings, useApplicationFormState, GameCanvas, HowItWorks, OtherUserProfile, **HeroSection**) разнесены по модулям и тонким точкам входа.
+- Крупные монолиты (AdminUsers, AdvertisingContact, Terms, useSettings, useApplicationFormState, HowItWorks, OtherUserProfile, **HeroSection**) разнесены по модулям и тонким точкам входа.
 - Achievements удалены.
 - Публичные API и импорты сохранены; страницы и роуты не ломались.
 - Линт и формат проходят.
@@ -155,7 +146,7 @@
 
 | Категория | Сделано |
 | --------- | ------- |
-| **Разбиение монолитов** | 10 крупных файлов/хуков разнесены по модулям: AdminUsersClient, AdvertisingContact, TermsContent, useSettings, useApplicationFormState, GameCanvas, HowItWorks, OtherUserProfile, HeroSection + полное удаление Achievements. |
+| **Разбиение монолитов** | 9 крупных файлов/хуков разнесены по модулям: AdminUsersClient, AdvertisingContact, TermsContent, useSettings, useApplicationFormState, HowItWorks, OtherUserProfile, HeroSection + полное удаление Achievements. |
 | **Обработка ошибок (API)** | 9 роутов приведены к `docs/ERROR_HANDLING.md`: check-email, admin/applications, logout, applications/mine, admin/applications/stats, users/search, profile/friends, friends/suggestions, applications POST; плюс notifications, users/report (формат `{ error: string }`, try/catch). |
 | **Документация** | `docs/ARCHITECTURE.md` — границы слоёв; `docs/ERROR_HANDLING.md` — рекомендации по ошибкам; `docs/REFACTORING_AUDIT.md` — аудит и план. |
 | **Исправления** | Импорты в OtherUserProfileContent (MutualFriends, OtherUserPersonalStats, OtherUserActivity) — исправлены default/named. |
@@ -184,7 +175,7 @@
 
 - **Структура:** Next.js App Router, разделение app/components/features/hooks/lib — предсказуемо. После рефакторинга крупные монолиты разбиты, точки входа тонкие.
 - **Документация:** Есть ARCHITECTURE, ERROR_HANDLING, LOGS, REFACTORING_AUDIT — понятно, куда класть код и как обрабатывать ошибки.
-- **Фичи:** Админка, заявки, профиль, друзья, истории, реклама, донаты, игра — широкий функционал; часть фич вынесена в feature-модули (coin-catch, how-it-works).
+- **Фичи:** Админка, заявки, профиль, друзья, истории, реклама, донаты — широкий функционал; часть фич вынесена в feature-модули (how-it-works).
 - **Публичный контракт:** Реэкспорты и импорты сохранены; страницы и API не ломались. Линт и формат проходят.
 
 **Слабые стороны / риски**

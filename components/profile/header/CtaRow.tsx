@@ -79,13 +79,6 @@ export function CtaRow({
                 isOpen={isGuestActionsOpen}
                 style={guestMenuStyle}
                 onClose={() => setIsGuestActionsOpen(false)}
-                onReport={() => {
-                  window.dispatchEvent(
-                    new CustomEvent("open-report-user-modal", {
-                      detail: { userId: user.id },
-                    }),
-                  );
-                }}
               />,
               document.body,
             )}

@@ -1,5 +1,6 @@
 "use client";
 
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 import { UPLOAD_LIMITS } from "./constants";
 import type { LocalImage } from "./types";
 
@@ -77,9 +78,6 @@ export async function uploadApplicationPhotos(
   const d = contentType.includes("application/json")
     ? await r.json().catch(() => null)
     : null;
-  if (!r.ok) {
-    const serverMsg = d?.error || d?.message;
-    throw new Error(serverMsg || "Ошибка загрузки фото");
-  }
+  throwIfApiFailed(r, d, "Ошибка загрузки фото");
   return ((d?.files as { url: string }[]) || []).map((f) => f.url);
 }

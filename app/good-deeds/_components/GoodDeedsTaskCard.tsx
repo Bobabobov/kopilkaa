@@ -31,8 +31,17 @@ function bonusWord(n: number): string {
   return "бонусов";
 }
 
+function displayTierLabel(name: string): string {
+  if (!name) return name;
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
 type Props = {
   index: number;
+  /** Номер слота недели (1–3), если отличается от порядка в списке */
+  slotNumber?: number;
+  /** Подпись уровня: «лёгкое», «среднее», «сложное» */
+  slotName?: string;
   task: Task;
   storyText: string;
   onStoryTextChange: (value: string) => void;
@@ -50,6 +59,8 @@ type Props = {
 
 export function GoodDeedsTaskCard({
   index,
+  slotNumber,
+  slotName,
   task,
   storyText,
   onStoryTextChange,
@@ -64,6 +75,7 @@ export function GoodDeedsTaskCard({
   variant = "default",
 }: Props) {
   const compact = variant === "compact";
+  const badgeNumber = slotNumber ?? index + 1;
   const status = task.submissionStatus;
   const storyHelp = GOOD_DEED_STORY_EXTRA_HELP[task.id];
   const storyPlaceholder =
@@ -97,6 +109,7 @@ export function GoodDeedsTaskCard({
   const showCollapsedPreview =
     status === null && !workspaceOpen && selectedFiles.length === 0;
   const showPendingPreview = status === "PENDING";
+  const useTierColumnLayout = compact && Boolean(slotName);
 
   const statusMeta =
     status === "PENDING"
@@ -129,51 +142,86 @@ export function GoodDeedsTaskCard({
     >
       <CardHeader
         className={cn(
-          "mb-0 flex flex-row items-start justify-start gap-3 pb-2",
-          compact && "gap-2.5 pb-1.5",
+          'mb-0 flex flex-row items-start justify-between gap-3 pb-2',
+          compact && 'gap-3 pb-1.5',
         )}
       >
         <div
           className={cn(
-            "flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#f9bc60] to-[#e8a545] font-black text-[#001e1d] shadow-inner shadow-white/20",
-            compact ? "h-9 w-9 text-sm" : "h-11 w-11 text-lg",
+            'min-w-0 flex-1 space-y-2',
+            compact && 'space-y-1.5',
           )}
         >
-          {index + 1}
-        </div>
-        <div
-          className={cn("min-w-0 flex-1", compact ? "space-y-1" : "space-y-2")}
-        >
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          {slotName ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge
+                className={cn(
+                  'border-0 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] px-2.5 font-bold tabular-nums text-[#001e1d] shadow-sm ring-1 ring-white/15',
+                  compact ? 'h-6 min-w-[1.5rem] justify-center text-[11px]' : 'text-xs',
+                )}
+              >
+                {badgeNumber}
+              </Badge>
+              <Badge
+                variant="outline"
+                className={cn(
+                  'border-[#f9bc60]/40 bg-[#f9bc60]/12 font-semibold capitalize text-[#ffe8c2] shadow-sm backdrop-blur-[2px]',
+                  compact ? 'h-6 px-2.5 text-[11px]' : 'text-xs',
+                )}
+              >
+                {displayTierLabel(slotName)}
+              </Badge>
+            </div>
+          ) : (
+            <Badge
+              variant="secondary"
+              className={cn(
+                'font-bold tabular-nums',
+                compact ? 'text-xs' : 'text-sm',
+              )}
+            >
+              {badgeNumber}
+            </Badge>
+          )}
+          <div
+            className={cn(
+              'flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2',
+              useTierColumnLayout && 'block',
+            )}
+          >
             <h2
               className={cn(
-                "font-bold leading-tight text-[#fffffe]",
-                compact ? "text-base" : "text-lg sm:text-xl",
+                'min-w-0 font-bold leading-tight text-[#fffffe]',
+                compact ? 'text-base' : 'text-lg sm:text-xl',
               )}
             >
               {task.title}
             </h2>
-            <Badge variant="secondary" className="font-semibold">
-              +{task.reward} {bonusWord(task.reward)}
-            </Badge>
-            {statusMeta && (
-              <span
-                className={cn(
-                  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold",
-                  statusMeta.className,
+            {!useTierColumnLayout ? (
+              <>
+                <Badge variant="secondary" className="font-semibold">
+                  +{task.reward} {bonusWord(task.reward)}
+                </Badge>
+                {statusMeta && (
+                  <span
+                    className={cn(
+                      'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold',
+                      statusMeta.className,
+                    )}
+                  >
+                    {statusMeta.label}
+                  </span>
                 )}
-              >
-                {statusMeta.label}
-              </span>
-            )}
-            {canReroll && !showCollapsedPreview && (
-              <Badge
-                variant="outline"
-                className="border-dashed border-[#abd1c6]/50"
-              >
-                Замена 1× / нед
-              </Badge>
-            )}
+                {canReroll && !showCollapsedPreview && (
+                  <Badge
+                    variant="outline"
+                    className="border-dashed border-[#abd1c6]/50"
+                  >
+                    Замена 1× / нед
+                  </Badge>
+                )}
+              </>
+            ) : null}
           </div>
           {!showCollapsedPreview && (
             <p
@@ -187,6 +235,31 @@ export function GoodDeedsTaskCard({
             </p>
           )}
         </div>
+        {useTierColumnLayout ? (
+          <div className="flex shrink-0 flex-col items-end gap-1.5 pt-0.5 text-right">
+            <Badge variant="secondary" className="font-semibold whitespace-nowrap">
+              +{task.reward} {bonusWord(task.reward)}
+            </Badge>
+            {statusMeta ? (
+              <span
+                className={cn(
+                  'inline-flex max-w-[9rem] items-center justify-end rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-tight',
+                  statusMeta.className,
+                )}
+              >
+                {statusMeta.label}
+              </span>
+            ) : null}
+            {canReroll && !showCollapsedPreview ? (
+              <Badge
+                variant="outline"
+                className="border-dashed border-[#abd1c6]/50 text-[10px]"
+              >
+                Замена 1× / нед
+              </Badge>
+            ) : null}
+          </div>
+        ) : null}
       </CardHeader>
 
       {showCollapsedPreview || showPendingPreview ? (
@@ -231,9 +304,9 @@ export function GoodDeedsTaskCard({
               type="button"
               onClick={() => setWorkspaceOpen(true)}
               className={cn(
-                "w-full rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] hover:bg-[#f7b24a]",
-                compact ? "h-9 text-sm" : "h-10",
-                canReroll && "sm:min-w-[200px] sm:flex-1",
+                'w-full rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] shadow-sm shadow-black/20 hover:bg-[#f7b24a]',
+                compact ? 'h-10 text-sm sm:h-11' : 'h-10',
+                canReroll && 'sm:min-w-[200px] sm:flex-1',
               )}
             >
               Открыть

@@ -3,7 +3,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Bus,
-  Gamepad2,
   Gift,
   HeartHandshake,
   Package,
@@ -30,7 +29,6 @@ const CATEGORY_ICON: Record<ApplicationCategory, LucideIcon> = {
   HOUSEHOLD_ESSENTIALS: Package,
   TRANSPORT_COMMS: Bus,
   SMALL_GIFT: Gift,
-  GAME_OR_SERVICE: Gamepad2,
   EVERYDAY_SUPPORT: HeartHandshake,
 };
 
@@ -58,11 +56,6 @@ const CATEGORY_ICON_SHELL: Record<
     ring: "ring-rose-400/35",
     glow: "shadow-[0_0_22px_rgba(251,113,133,0.14)]",
     fg: "text-rose-100",
-  },
-  GAME_OR_SERVICE: {
-    ring: "ring-violet-400/35",
-    glow: "shadow-[0_0_24px_rgba(167,139,250,0.18)]",
-    fg: "text-violet-100",
   },
   EVERYDAY_SUPPORT: {
     ring: "ring-emerald-400/30",

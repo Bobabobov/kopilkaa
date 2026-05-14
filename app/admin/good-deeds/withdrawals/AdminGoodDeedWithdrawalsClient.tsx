@@ -6,6 +6,7 @@ import { CheckCircle2, ExternalLink, XCircle } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { AdminHeader } from "../../_components/AdminHeader";
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 
 type WithdrawItem = {
   id: string;
@@ -52,7 +53,7 @@ export default function AdminGoodDeedWithdrawalsClient() {
         cache: "no-store",
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || "Ошибка загрузки");
+      throwIfApiFailed(res, json, "Не удалось загрузить список выводов");
       setItems(Array.isArray(json?.items) ? json.items : []);
       setLeaderboard(Array.isArray(json?.leaderboard) ? json.leaderboard : []);
     } catch (e) {
@@ -82,9 +83,7 @@ export default function AdminGoodDeedWithdrawalsClient() {
         }),
       });
       const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(json?.error || "Не удалось обновить заявку");
-      }
+      throwIfApiFailed(res, json, "Не удалось обновить заявку");
       setItems((prev) =>
         prev.map((it) =>
           it.id === id
@@ -125,9 +124,7 @@ export default function AdminGoodDeedWithdrawalsClient() {
         }),
       });
       const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(json?.error || "Не удалось начислить бонусы");
-      }
+      throwIfApiFailed(res, json, "Не удалось начислить бонусы");
       await load();
     } catch (e) {
       alert(e instanceof Error ? e.message : "Ошибка");

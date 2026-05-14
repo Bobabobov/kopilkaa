@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useOtherUserData } from "./hooks/useOtherUserData";
@@ -10,7 +10,6 @@ import type { OtherUserProfileUser } from "./types";
 
 export function useOtherUserProfile(userId: string) {
   const router = useRouter();
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
 
   const emitFriendEvents = useCallback(() => {
@@ -22,24 +21,6 @@ export function useOtherUserProfile(userId: string) {
 
   const { user, loading, isAuthenticated, currentUserId, resolvedUserId } =
     useOtherUserData({ userId });
-
-  useEffect(() => {
-    const handleOpenReportModal = (event: Event) => {
-      const customEvent = event as CustomEvent<{ userId: string }>;
-      const targetId = resolvedUserId || user?.id || null;
-      if (targetId && customEvent.detail?.userId === targetId) {
-        setIsReportModalOpen(true);
-      }
-    };
-
-    window.addEventListener("open-report-user-modal", handleOpenReportModal);
-    return () => {
-      window.removeEventListener(
-        "open-report-user-modal",
-        handleOpenReportModal,
-      );
-    };
-  }, [resolvedUserId, user?.id]);
 
   const { approvedApplications, trustDerived } = useOtherUserTrust({
     isAuthenticated,
@@ -76,8 +57,6 @@ export function useOtherUserProfile(userId: string) {
     isAuthenticated,
     currentUserId,
     resolvedUserId,
-    isReportModalOpen,
-    setIsReportModalOpen,
     ToastComponent,
     trustDerived,
     friendship,

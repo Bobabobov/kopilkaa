@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 interface AvatarUploadProps {
   currentAvatar?: string | null;
@@ -87,7 +88,7 @@ export default function AvatarUpload({
         showToast(
           "error",
           "Ошибка загрузки",
-          data.error || "Не удалось загрузить аватарку",
+          getMessageFromApiJson(data, "Не удалось загрузить аватарку"),
         );
       }
     } catch (error) {
@@ -116,7 +117,7 @@ export default function AvatarUpload({
         showToast(
           "error",
           "Ошибка удаления",
-          data.error || "Не удалось удалить аватарку",
+          getMessageFromApiJson(data, "Не удалось удалить аватарку"),
         );
       }
     } catch (error) {

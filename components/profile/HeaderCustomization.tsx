@@ -9,6 +9,7 @@ import { useAutoHideScrollbar } from "@/hooks/ui/useAutoHideScrollbar";
 import { useScrollLock } from "@/hooks/ui/useScrollLock";
 import { getAllHeaderThemes, getHeaderTheme } from "@/lib/header-customization";
 import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 import { HeaderPreview } from "./header-customization/HeaderPreview";
 import { ColorWheelSection } from "./header-customization/ColorWheelSection";
 import { ThemeGrid } from "./header-customization/ThemeGrid";
@@ -142,7 +143,7 @@ export default function HeaderCustomization({
         showToast(
           "error",
           "Ошибка сохранения",
-          data.error || "Не удалось сохранить тему",
+          getMessageFromApiJson(data, "Не удалось сохранить тему"),
         );
       }
     } catch (error) {

@@ -61,22 +61,6 @@ export async function POST(
       },
     });
 
-    // Обновляем статус всех жалоб на этого пользователя на "resolved" (решена)
-    // Обновляем только жалобы со статусом pending или reviewed
-    const updatedReports = await prisma.userReport.updateMany({
-      where: {
-        reportedId: userId,
-        status: {
-          in: ["pending", "reviewed"],
-        },
-      },
-      data: {
-        status: "resolved",
-        processedBy: admin.id,
-        adminComment: `Пользователь заблокирован. ${reason || "Нарушение правил"}`,
-      },
-    });
-
     return NextResponse.json({
       message: daysClamped
         ? `Пользователь заблокирован на ${daysClamped} дней`
@@ -87,7 +71,6 @@ export async function POST(
         bannedUntil: updated.bannedUntil?.toISOString() || null,
         bannedReason: updated.bannedReason,
       },
-      updatedReports: updatedReports.count,
     });
   } catch (error) {
     console.error("Ban user error:", error);
@@ -161,17 +144,9 @@ export async function DELETE(
       },
     });
 
-    // Удаляем все жалобы на этого пользователя при разблокировке
-    const deletedReports = await prisma.userReport.deleteMany({
-      where: {
-        reportedId: userId,
-      },
-    });
-
     return NextResponse.json({
       message: "Блокировка снята",
       user: updated,
-      deletedReports: deletedReports.count,
     });
   } catch (error) {
     console.error("Unban user error:", error);

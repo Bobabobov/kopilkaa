@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { loadUserApi } from "./api";
 import { useLocalNotification } from "./useLocalNotification";
 import { useProfileHandlers } from "./handlers/profileHandlers";
-import { usePhoneHandler } from "./handlers/phoneHandler";
 import { useSocialHandler } from "./handlers/socialHandler";
 import { useAvatarHandlers } from "./handlers/avatarHandlers";
 import { usePasswordHandlers } from "./handlers/passwordHandlers";
@@ -54,12 +53,6 @@ export function useSettings(): UseSettingsReturn {
     handleEmailVisibilityChange,
   } = useProfileHandlers(setUser, setSaving, showLocalNotification);
 
-  const { handlePhoneChange } = usePhoneHandler(
-    loadUser,
-    setSaving,
-    showLocalNotification,
-  );
-
   const { handleSocialLinkChange } = useSocialHandler(
     setUser,
     setSaving,
@@ -98,7 +91,6 @@ export function useSettings(): UseSettingsReturn {
     handleNameChange,
     handleEmailChange,
     handleEmailVisibilityChange,
-    handlePhoneChange,
     handleSocialLinkChange,
     handleAvatarChange,
     handleAvatarUpload,

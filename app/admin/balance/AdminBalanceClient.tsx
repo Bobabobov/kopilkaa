@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AdminHeader } from "../_components/AdminHeader";
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 
 type BalanceData = {
   totalSupport: number;
@@ -31,7 +32,7 @@ export default function AdminBalanceClient() {
       setMessage(null);
       const r = await fetch("/api/admin/balance", { cache: "no-store" });
       const j = await r.json().catch(() => null);
-      if (!r.ok) throw new Error(j?.error || "Ошибка загрузки баланса");
+      throwIfApiFailed(r, j, "Не удалось загрузить баланс копилки");
       setData(j?.data ?? null);
       if (typeof j?.data?.balance === "number") {
         setDesired(String(Math.trunc(j.data.balance)));
@@ -60,7 +61,7 @@ export default function AdminBalanceClient() {
         body: JSON.stringify({ desiredBalance: Math.trunc(desiredNum) }),
       });
       const j = await r.json().catch(() => null);
-      if (!r.ok) throw new Error(j?.error || "Ошибка сохранения");
+      throwIfApiFailed(r, j, "Не удалось сохранить баланс");
       if (j?.data) setData(j.data as BalanceData);
       if (j?.message) setMessage(String(j.message));
       else setMessage("Готово: баланс обновлён через корректировку (ADJUST)");

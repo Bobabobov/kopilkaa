@@ -13,18 +13,8 @@ export type GoodDeedTaskView = {
 
 export type GoodDeedsResponse = {
   week: { key: string; label: string };
-  tasks: GoodDeedTaskView[];
-  tasksByDifficulty: Record<GoodDeedDifficulty, GoodDeedTaskView[]>;
-  categoryStats: Record<
-    GoodDeedDifficulty,
-    {
-      completedCount: number;
-      totalCount: number;
-      completionBonus: number;
-      label: string;
-      description: string;
-    }
-  >;
+  /** По одному активному заданию на уровень: лёгкое → среднее → сложное. */
+  weeklyTasks: GoodDeedTaskView[];
   stats: {
     approvedCount: number;
     pendingCount: number;
@@ -60,10 +50,9 @@ export type GoodDeedsResponse = {
   }[];
   viewer: {
     isAuthenticated: boolean;
-    selectedDifficulty: GoodDeedDifficulty;
-    canChangeDifficulty: boolean;
   };
-  selectedCategoryProgress: {
+  /** Прогресс по трём слотам недели (одобрено / на проверке / всего слотов). */
+  weeklyProgress: {
     approved: number;
     pending: number;
     rejected: number;

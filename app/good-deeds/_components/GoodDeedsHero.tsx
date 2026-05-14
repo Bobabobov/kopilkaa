@@ -60,9 +60,9 @@ export function GoodDeedsHero({
               Добрые дела
             </h1>
             <p className="max-w-xl text-[15px] leading-relaxed text-[#abd1c6] sm:text-base">
-              Выбираете доброе дело на неделю, делаете его в жизни и
-              отправляете короткий отчёт с фото или видео. После проверки
-              бонусы приходят на баланс.
+              Три задания на неделю — лёгкое, среднее и сложное. Набор обновляется
+              раз в семь дней. Выполняете в жизни и отправляете отчёт с фото или
+              видео; после проверки бонусы приходят на баланс.
             </p>
             <div className="relative max-w-xl overflow-hidden rounded-2xl border border-amber-400/45 bg-gradient-to-r from-amber-500/14 via-amber-500/8 to-transparent px-4 py-3 shadow-[0_0_0_1px_rgba(249,188,96,0.12),0_10px_30px_rgba(0,0,0,0.25)]">
               <span

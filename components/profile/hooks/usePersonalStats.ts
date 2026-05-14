@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 export interface DetailedStats {
   applications: {
@@ -69,10 +70,14 @@ export function usePersonalStats() {
         const response = await fetch("/api/profile/detailed-stats", {
           cache: "no-store",
         });
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const raw = await response.json().catch(() => null);
+        if (!response.ok) {
+          throw new Error(
+            getMessageFromApiJson(raw, "Не удалось загрузить статистику"),
+          );
+        }
 
-        const result: ApiResponse = await response.json();
+        const result = raw as ApiResponse;
         if (result.detailedStats) {
           setData(result.detailedStats);
         } else {
@@ -80,7 +85,9 @@ export function usePersonalStats() {
         }
       } catch (err: any) {
         console.error("Error fetching detailed stats:", err);
-        setError(err?.message || "Failed to load stats");
+        setError(
+          err instanceof Error ? err.message : "Не удалось загрузить статистику",
+        );
       } finally {
         setLoading(false);
       }

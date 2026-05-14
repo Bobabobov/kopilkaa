@@ -4,14 +4,11 @@ import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeGoodDeedBonusWallet } from "@/lib/goodDeedBonusWallet";
 import {
-  getCompletionBonusForDifficulty,
-  getDifficultyDescription,
-  getDifficultyLabel,
-  type GoodDeedDifficulty,
-  getTaskDifficulty,
-  getTasksByDifficulty,
-  getWeekInfo,
-} from "@/lib/goodDeeds";
+  getActiveTasksByDifficulty,
+  getGoodDeedCycleKey,
+  getTaskRotationState,
+} from "@/lib/goodDeedTasksAdmin";
+import { type GoodDeedDifficulty, getWeekInfo } from "@/lib/goodDeeds";
 
 export const dynamic = "force-dynamic";
 
@@ -19,14 +16,16 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getAuthUser(req);
     const weekInfo = getWeekInfo(new Date());
-    const tasksByDifficulty = getTasksByDifficulty();
+    const cycleKey = await getGoodDeedCycleKey(weekInfo.key);
+    const rotationState = await getTaskRotationState();
+    const tasksByDifficulty = await getActiveTasksByDifficulty();
 
     const [weeklySubmissions, feedSubmissions] = await Promise.all([
       session?.uid
         ? prisma.goodDeedSubmission.findMany({
             where: {
               userId: session.uid,
-              weekKey: weekInfo.key,
+              weekKey: cycleKey,
             },
             select: {
               taskKey: true,
@@ -72,29 +71,6 @@ export async function GET(req: NextRequest) {
     const submissionMap = new Map(
       weeklySubmissions.map((submission) => [submission.taskKey, submission]),
     );
-    const selectedDifficultyFromSubmissions = (() => {
-      for (const submission of weeklySubmissions) {
-        const difficulty = getTaskDifficulty(submission.taskKey);
-        if (difficulty) return difficulty;
-      }
-      return null;
-    })();
-    const lastApprovedSubmission = session?.uid
-      ? await prisma.goodDeedSubmission.findFirst({
-          where: {
-            userId: session.uid,
-            status: GoodDeedSubmissionStatus.APPROVED,
-          },
-          orderBy: { updatedAt: "desc" },
-          select: { taskKey: true },
-        })
-      : null;
-    const lastApprovedDifficulty = lastApprovedSubmission
-      ? getTaskDifficulty(lastApprovedSubmission.taskKey)
-      : null;
-    const hasApprovedSubmissionEver = Boolean(lastApprovedSubmission);
-    const selectedDifficulty: GoodDeedDifficulty =
-      selectedDifficultyFromSubmissions ?? lastApprovedDifficulty ?? "MEDIUM";
 
     const withStatus = (task: (typeof tasksByDifficulty)["EASY"][number]) => {
       const submission = submissionMap.get(task.id);
@@ -110,48 +86,24 @@ export async function GET(req: NextRequest) {
       MEDIUM: tasksByDifficulty.MEDIUM.map(withStatus),
       HARD: tasksByDifficulty.HARD.map(withStatus),
     };
-    const selectedTasks = categorizedTasks[selectedDifficulty];
 
-    const categoryStats = {
-      EASY: {
-        completedCount: categorizedTasks.EASY.filter(
-          (task) => task.submissionStatus === GoodDeedSubmissionStatus.APPROVED,
-        ).length,
-        totalCount: categorizedTasks.EASY.length,
-        completionBonus: getCompletionBonusForDifficulty("EASY"),
-        label: getDifficultyLabel("EASY"),
-        description: getDifficultyDescription("EASY"),
-      },
-      MEDIUM: {
-        completedCount: categorizedTasks.MEDIUM.filter(
-          (task) => task.submissionStatus === GoodDeedSubmissionStatus.APPROVED,
-        ).length,
-        totalCount: categorizedTasks.MEDIUM.length,
-        completionBonus: getCompletionBonusForDifficulty("MEDIUM"),
-        label: getDifficultyLabel("MEDIUM"),
-        description: getDifficultyDescription("MEDIUM"),
-      },
-      HARD: {
-        completedCount: categorizedTasks.HARD.filter(
-          (task) => task.submissionStatus === GoodDeedSubmissionStatus.APPROVED,
-        ).length,
-        totalCount: categorizedTasks.HARD.length,
-        completionBonus: getCompletionBonusForDifficulty("HARD"),
-        label: getDifficultyLabel("HARD"),
-        description: getDifficultyDescription("HARD"),
-      },
-    };
-    const selectedCategoryProgress = {
-      approved: selectedTasks.filter(
+    const difficultyOrder: GoodDeedDifficulty[] = ["EASY", "MEDIUM", "HARD"];
+    const weeklyTasks = difficultyOrder.flatMap((key) => {
+      const first = categorizedTasks[key][0];
+      return first ? [first] : [];
+    });
+
+    const weeklyProgress = {
+      approved: weeklyTasks.filter(
         (task) => task.submissionStatus === GoodDeedSubmissionStatus.APPROVED,
       ).length,
-      pending: selectedTasks.filter(
+      pending: weeklyTasks.filter(
         (task) => task.submissionStatus === GoodDeedSubmissionStatus.PENDING,
       ).length,
-      rejected: selectedTasks.filter(
+      rejected: weeklyTasks.filter(
         (task) => task.submissionStatus === GoodDeedSubmissionStatus.REJECTED,
       ).length,
-      total: selectedTasks.length,
+      total: weeklyTasks.length,
     };
 
     let approvedCount = 0;
@@ -185,14 +137,17 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       week: weekInfo,
-      tasksByDifficulty: categorizedTasks,
-      tasks: selectedTasks,
+      cycle: {
+        key: cycleKey,
+        nextRotationAt: rotationState.nextRotationAt.toISOString(),
+        version: rotationState.version,
+      },
+      weeklyTasks,
       stats: {
         approvedCount,
         pendingCount,
         ...walletInfo,
       },
-      categoryStats,
       feed: feedSubmissions.map((item) => ({
         id: item.id,
         taskTitle: item.taskTitle,
@@ -217,10 +172,8 @@ export async function GET(req: NextRequest) {
       })),
       viewer: {
         isAuthenticated: Boolean(session?.uid),
-        selectedDifficulty,
-        canChangeDifficulty: !hasApprovedSubmissionEver,
       },
-      selectedCategoryProgress,
+      weeklyProgress,
     });
   } catch (error) {
     console.error("GET /api/good-deeds error:", error);

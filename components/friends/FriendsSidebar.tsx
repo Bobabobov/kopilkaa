@@ -5,26 +5,6 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
-const mockActivity = [
-  {
-    id: "a1",
-    text: "asdasdasd стал вашим другом",
-    time: "3 дня назад",
-    icon: "UserPlus",
-  },
-  {
-    id: "a2",
-    text: "TEST получил достижение «Легенда»",
-    time: "1 день назад",
-    icon: "Award",
-  },
-  {
-    id: "a3",
-    text: "Лена приняла вашу заявку",
-    time: "5 часов назад",
-    icon: "CheckCircle2",
-  },
-];
 
 export function FriendsSidebar() {
   const [suggestions, setSuggestions] = useState<
@@ -93,46 +73,6 @@ export function FriendsSidebar() {
   return (
     <aside className="hidden md:block lg:sticky lg:top-6 space-y-4 min-w-0">
       <div className="rounded-2xl border border-white/[0.08] bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] shadow-[0_4px_24px_rgba(0,0,0,0.2)] p-4 sm:p-5 min-w-0">
-        <div className="flex items-center justify-between mb-1.5">
-          <h3 className="text-lg font-semibold text-[#fffffe]">
-            Активность друзей
-          </h3>
-          <span className="px-2 py-1 text-[11px] rounded-full bg-white/10 text-[#abd1c6] border border-white/10">
-            Сегодня
-          </span>
-        </div>
-        <p className="text-xs text-[#abd1c6] mb-3">
-          Недавние события с друзьями, достижениями и заявками.
-        </p>
-        <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-          {mockActivity.map((item, idx) => {
-            const Icon =
-              item.icon === "UserPlus"
-                ? LucideIcons.UserPlus
-                : item.icon === "Award"
-                  ? LucideIcons.Award
-                  : LucideIcons.CheckCircle2;
-            return (
-              <div
-                key={item.id}
-                className={`px-3 py-2.5 flex items-start gap-3 ${idx !== mockActivity.length - 1 ? "border-b border-white/5" : ""}`}
-              >
-                <div className="mt-0.5 text-[#f9bc60]">
-                  <Icon size="sm" className="w-4 h-4" />
-                </div>
-                <div className="min-w-0 space-y-1">
-                  <p className="text-sm text-[#fffffe] leading-snug">
-                    {item.text}
-                  </p>
-                  <p className="text-xs text-white/60">{item.time}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-white/[0.08] bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] shadow-[0_4px_24px_rgba(0,0,0,0.2)] p-4 sm:p-5 min-w-0">
         <div className="flex items-center justify-between mb-1.5 gap-2">
           <h3 className="text-lg font-semibold text-[#fffffe]">
             Возможно, вы знакомы
@@ -148,7 +88,7 @@ export function FriendsSidebar() {
           </button>
         </div>
         <p className="text-xs text-[#abd1c6] mb-3">
-          Рекомендации на основе общих друзей и недавней активности.
+          Случайные пользователи, с которыми вы пока не в друзьях.
         </p>
         <div className="space-y-2.5">
           <AnimatePresence>
@@ -228,47 +168,6 @@ export function FriendsSidebar() {
               Рекомендаций пока нет
             </div>
           )}
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-white/[0.08] bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] shadow-[0_4px_24px_rgba(0,0,0,0.2)] p-4 sm:p-5 min-w-0">
-        <h3 className="text-lg font-semibold text-[#fffffe] mb-1.5">
-          Полезные шаги
-        </h3>
-        <p className="text-xs text-[#abd1c6] mb-3">
-          Небольшие действия, которые помогут найти больше друзей.
-        </p>
-        <div className="space-y-2.5">
-          <Link
-            href="/profile?settings=1"
-            className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:border-[#f9bc60]/40 hover:bg-white/10 transition-colors"
-          >
-            <span className="inline-flex items-center gap-2 text-sm text-[#fffffe]">
-              <LucideIcons.Edit3 size="sm" className="text-[#f9bc60]" />
-              Заполнить профиль
-            </span>
-            <LucideIcons.ChevronRight size="sm" className="text-[#abd1c6]" />
-          </Link>
-          <Link
-            href="/friends?tab=search"
-            className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:border-[#f9bc60]/40 hover:bg-white/10 transition-colors"
-          >
-            <span className="inline-flex items-center gap-2 text-sm text-[#fffffe]">
-              <LucideIcons.Search size="sm" className="text-[#f9bc60]" />
-              Найти друзей по интересам
-            </span>
-            <LucideIcons.ChevronRight size="sm" className="text-[#abd1c6]" />
-          </Link>
-          <Link
-            href="/profile/achievements"
-            className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:border-[#f9bc60]/40 hover:bg-white/10 transition-colors"
-          >
-            <span className="inline-flex items-center gap-2 text-sm text-[#fffffe]">
-              <LucideIcons.Trophy size="sm" className="text-[#f9bc60]" />
-              Посмотреть достижения
-            </span>
-            <LucideIcons.ChevronRight size="sm" className="text-[#abd1c6]" />
-          </Link>
         </div>
       </div>
     </aside>

@@ -11,8 +11,6 @@ export default function ScrollToTop() {
   const [isNearFooter, setIsNearFooter] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  const isGamePage = pathname?.startsWith("/games/") && pathname !== "/games";
-
   useEffect(() => {
     let rafId: number | null = null;
     let prevVisible = false;
@@ -76,7 +74,7 @@ export default function ScrollToTop() {
 
   return (
     <AnimatePresence>
-      {isVisible && !isGamePage && (
+      {isVisible && (
         <motion.button
           type="button"
           initial={{ opacity: 0, y: 12, scale: 0.9 }}

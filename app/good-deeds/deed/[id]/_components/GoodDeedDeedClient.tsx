@@ -15,6 +15,7 @@ import { formatTimeAgo } from "@/lib/time";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { StoryAdGallery } from "@/app/good-deeds/_components/StoryAdGallery";
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 
 type DeedPayload = {
   id: string;
@@ -51,9 +52,7 @@ export function GoodDeedDeedClient({ id }: { id: string }) {
           cache: "no-store",
         });
         const json = await res.json();
-        if (!res.ok) {
-          throw new Error(json?.error || "Не удалось загрузить");
-        }
+        throwIfApiFailed(res, json, "Не удалось загрузить задание");
         if (!cancelled) {
           setDeed(json.deed as DeedPayload);
         }

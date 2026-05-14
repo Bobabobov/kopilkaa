@@ -5,6 +5,12 @@ import { getSession, attachSessionToResponse } from "@/lib/auth";
 import { verifyTelegramAuth, TelegramAuthData } from "@/lib/telegramAuth";
 import { checkUserBan } from "@/lib/ban-check";
 import { saveRemoteImageAsAvatar } from "@/lib/uploads/saveRemoteImage";
+import {
+  REFERRAL_CODE_COOKIE,
+  REFERRAL_VISITOR_COOKIE,
+  readReferralCookies,
+  tryAwardReferralBonusForNewUser,
+} from "@/lib/referralProgram";
 
 export const runtime = "nodejs";
 
@@ -53,6 +59,7 @@ async function authenticateTelegram(
   mode?: "linked" | "login";
 }> {
   try {
+    let createdNewUserId: string | null = null;
 
     if (!tgData || typeof tgData.id !== "number" || !tgData.hash) {
       return {
@@ -222,6 +229,7 @@ async function authenticateTelegram(
           telegramUsername: true,
         },
       });
+      createdNewUserId = user.id;
     } else {
       // Пользователь с таким Telegram уже есть — обновляем при необходимости
       const updateData: any = {};
@@ -266,6 +274,21 @@ async function authenticateTelegram(
       };
     }
 
+    if (createdNewUserId) {
+      const referralCookies = await readReferralCookies().catch(() => ({
+        referralCode: null,
+        visitorId: null,
+      }));
+
+      if (referralCookies.referralCode && referralCookies.visitorId) {
+        await tryAwardReferralBonusForNewUser({
+          newUserId: createdNewUserId,
+          referralCode: referralCookies.referralCode,
+          visitorId: referralCookies.visitorId,
+        });
+      }
+    }
+
     const res = NextResponse.json({
       success: true,
       mode: "login",
@@ -275,6 +298,30 @@ async function authenticateTelegram(
         telegramUsername: user.telegramUsername,
       },
     });
+
+    if (createdNewUserId) {
+      const referralCookies = await readReferralCookies().catch(() => ({
+        referralCode: null,
+        visitorId: null,
+      }));
+
+      if (referralCookies.referralCode && referralCookies.visitorId) {
+        res.cookies.set(REFERRAL_CODE_COOKIE, "", {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+          expires: new Date(0),
+        });
+        res.cookies.set(REFERRAL_VISITOR_COOKIE, "", {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+          expires: new Date(0),
+        });
+      }
+    }
     attachSessionToResponse(
       res,
       { uid: user.id, role: (user.role as any) || "USER" },

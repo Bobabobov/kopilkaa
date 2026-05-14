@@ -1,5 +1,6 @@
 "use client";
 
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 import type { SettingsUser } from "./types";
 
 export async function loadUserApi(): Promise<{
@@ -30,26 +31,12 @@ export async function patchProfileApi(
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const msg = data.message || data.error || "Не удалось обновить данные";
-    throw new Error(msg);
+    throw new Error(
+      getMessageFromApiJson(data, "Не удалось обновить данные"),
+    );
   }
   if (!data.user) throw new Error("No user in response");
   return { user: data.user };
-}
-
-export async function postPhoneApi(
-  phone: string,
-): Promise<{ success: boolean }> {
-  const response = await fetch("/api/profile/phone", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone }),
-  });
-  const data = await response.json().catch(() => null);
-  if (!response.ok || !data?.success) {
-    throw new Error(data?.error || "Не удалось обновить телефон");
-  }
-  return { success: true };
 }
 
 export async function postAvatarApi(file: File): Promise<{ avatar: string }> {
@@ -61,7 +48,9 @@ export async function postAvatarApi(file: File): Promise<{ avatar: string }> {
   });
   const data = await response.json().catch(() => null);
   if (!response.ok || !data?.ok) {
-    throw new Error(data?.error || "Не удалось загрузить аватарку");
+    throw new Error(
+      getMessageFromApiJson(data, "Не удалось загрузить аватарку"),
+    );
   }
   return { avatar: data.avatar as string };
 }
@@ -70,7 +59,9 @@ export async function deleteAvatarApi(): Promise<{ ok: boolean }> {
   const response = await fetch("/api/profile/avatar", { method: "DELETE" });
   const data = await response.json().catch(() => null);
   if (!response.ok || !data?.ok) {
-    throw new Error(data?.error || "Не удалось удалить аватарку");
+    throw new Error(
+      getMessageFromApiJson(data, "Не удалось удалить аватарку"),
+    );
   }
   return { ok: true };
 }
@@ -86,7 +77,9 @@ export async function patchPasswordApi(
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.message || "Ошибка изменения пароля");
+    throw new Error(
+      getMessageFromApiJson(data, "Ошибка изменения пароля"),
+    );
   }
 }
 
@@ -100,6 +93,8 @@ export async function deleteAccountApi(): Promise<void> {
   const response = await fetch("/api/profile/delete", { method: "DELETE" });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.message || "Не удалось удалить аккаунт");
+    throw new Error(
+      getMessageFromApiJson(data, "Не удалось удалить аккаунт"),
+    );
   }
 }

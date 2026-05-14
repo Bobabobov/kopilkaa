@@ -2,9 +2,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
 import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
-import ReportUserModal from "./modals/ReportUserModal";
 import { OtherUserAvatar, type OtherUserBasic } from "./OtherUserAvatar";
 import { OtherUserInfo } from "./OtherUserInfo";
 import {
@@ -33,7 +31,6 @@ export default function OtherUserCard({
   onDeclineFriendRequest,
 }: OtherUserCardProps) {
   const { showToast, confirm } = useBeautifulNotifications();
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const { handleRemoveFriend } = useRemoveFriend({
     friendshipId: friendship?.id,
     confirm,
@@ -67,18 +64,10 @@ export default function OtherUserCard({
           <OtherUserExtraActions
             friendshipId={friendship?.id}
             onRemoveFriend={handleRemoveFriend}
-            onOpenReport={() => setIsReportModalOpen(true)}
           />
           <OtherUserQuickActions />
         </div>
       </motion.div>
-
-      <ReportUserModal
-        isOpen={isReportModalOpen}
-        onClose={() => setIsReportModalOpen(false)}
-        userId={user.id}
-        userName={user.name}
-      />
     </div>
   );
 }

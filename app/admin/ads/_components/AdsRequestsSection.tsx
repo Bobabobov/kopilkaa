@@ -8,6 +8,7 @@ import AdRequestsStats from "./ad-requests/AdRequestsStats";
 import AdRequestsFilters from "./ad-requests/AdRequestsFilters";
 import AdRequestCard from "./ad-requests/AdRequestCard";
 import AdRequestModal from "./ad-requests/AdRequestModal";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 export default function AdsRequestsSection() {
   const [adRequests, setAdRequests] = useState<AdRequest[]>([]);
@@ -51,7 +52,7 @@ export default function AdsRequestsSection() {
         showToast(
           "error",
           "Не удалось загрузить заявки",
-          data?.error || response.statusText,
+          getMessageFromApiJson(data, response.statusText || "Ошибка запроса"),
         );
       }
     } catch (error) {
@@ -104,7 +105,7 @@ export default function AdsRequestsSection() {
         showToast(
           "error",
           "Ошибка при обновлении заявки",
-          data?.error || response.statusText,
+          getMessageFromApiJson(data, response.statusText || "Ошибка запроса"),
         );
       }
     } catch (error) {
@@ -134,7 +135,7 @@ export default function AdsRequestsSection() {
         showToast(
           "error",
           "Ошибка при удалении заявки",
-          data?.error || response.statusText,
+          getMessageFromApiJson(data, response.statusText || "Ошибка запроса"),
         );
       }
     } catch (error) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { normalizeSafeExternalUrl } from "@/lib/ads/linkUrl";
 
 export const dynamic = "force-dynamic";
 
@@ -107,7 +108,7 @@ export async function GET(req: NextRequest) {
       mobile,
       title: ad.title || null,
       content: ad.content || ad.title || null,
-      linkUrl: ad.linkUrl ?? null,
+      linkUrl: normalizeSafeExternalUrl(ad.linkUrl),
       imageUrl: ad.imageUrl ?? null,
     };
 

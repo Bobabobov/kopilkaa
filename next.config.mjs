@@ -6,7 +6,14 @@ const nextConfig = {
 
   // Оптимизация производительности
   experimental: {
-    optimizePackageImports: ["lucide-react", "framer-motion"],
+    optimizePackageImports: [
+      "lucide-react",
+      "framer-motion",
+      "@radix-ui/react-avatar",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-tooltip",
+    ],
     // optimizeCss: true, // Отключено из-за проблем с модулем critters
   },
 

@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoodDeedSubmissionStatus } from "@prisma/client";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getGoodDeedCycleKey, getManagedTaskById } from "@/lib/goodDeedTasksAdmin";
 import {
-  getTaskById,
-  getTaskDifficulty,
-  type GoodDeedDifficulty,
   getWeekInfo,
   inferMediaTypeFromUrl,
   isSafeUploadUrl,
@@ -30,15 +28,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const taskId = String(body?.taskId || "").trim();
-    const requestedDifficultyRaw = String(body?.difficulty || "")
-      .trim()
-      .toUpperCase();
-    const requestedDifficulty =
-      requestedDifficultyRaw === "EASY" ||
-      requestedDifficultyRaw === "MEDIUM" ||
-      requestedDifficultyRaw === "HARD"
-        ? (requestedDifficultyRaw as GoodDeedDifficulty)
-        : null;
     const storyRaw =
       typeof body?.storyText === "string"
         ? body.storyText
@@ -83,11 +72,18 @@ export async function POST(req: NextRequest) {
     }
 
     const week = getWeekInfo(new Date());
-    const task = getTaskById(taskId);
+    const cycleKey = await getGoodDeedCycleKey(week.key);
+    const task = await getManagedTaskById(taskId);
     if (!task) {
       return NextResponse.json(
         { error: "Это задание недоступно на текущей неделе" },
         { status: 400 },
+      );
+    }
+    if (!task.isActive) {
+      return NextResponse.json(
+        { error: "Это задание сейчас отключено администратором" },
+        { status: 409 },
       );
     }
 
@@ -108,14 +104,13 @@ export async function POST(req: NextRequest) {
       where: {
         userId_weekKey_taskKey: {
           userId: session.uid,
-          weekKey: week.key,
+          weekKey: cycleKey,
           taskKey: task.id,
         },
       },
       select: { id: true, status: true },
     });
 
-    const taskDifficulty = getTaskDifficulty(task.id);
     const approvedSubmissions = await prisma.goodDeedSubmission.findMany({
       where: {
         userId: session.uid,
@@ -124,33 +119,12 @@ export async function POST(req: NextRequest) {
       select: { taskKey: true },
     });
 
-    const lockedDifficulty = approvedSubmissions
-      .map((submission) => getTaskDifficulty(submission.taskKey))
-      .find((difficulty): difficulty is NonNullable<typeof difficulty> =>
-        Boolean(difficulty),
-      );
-
-    if (
-      requestedDifficulty &&
-      taskDifficulty &&
-      requestedDifficulty !== taskDifficulty
-    ) {
+    const alreadyApprovedThisTask = approvedSubmissions.some(
+      (submission) => submission.taskKey === task.id,
+    );
+    if (alreadyApprovedThisTask) {
       return NextResponse.json(
-        { error: "Выбранная категория не совпадает с заданием" },
-        { status: 400 },
-      );
-    }
-
-    if (
-      taskDifficulty &&
-      lockedDifficulty &&
-      taskDifficulty !== lockedDifficulty
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "После первого одобренного доброго дела категория фиксируется и больше не меняется.",
-        },
+        { error: "Это задание уже было одобрено ранее" },
         { status: 409 },
       );
     }
@@ -202,7 +176,7 @@ export async function POST(req: NextRequest) {
           taskKey: task.id,
           taskTitle: task.title,
           taskDescription: task.description,
-          weekKey: week.key,
+          weekKey: cycleKey,
           reward: task.reward,
           storyText,
           status: GoodDeedSubmissionStatus.PENDING,

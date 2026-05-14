@@ -22,6 +22,7 @@ import { StoryAdInfoBanner } from "./sections/StoryAdInfoBanner";
 import { ReadingProgressBar } from "./ReadingProgressBar";
 import { StoryMoreStories } from "./StoryMoreStories";
 import StoryAdLanding from "./StoryAdLanding";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 export interface Story {
   id: string;
@@ -212,11 +213,13 @@ export default function StoryPageClient({
 
       const response = await fetch(`/api/stories/${id}`, { cache: "no-store" });
 
+      const body = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        setError(getMessageFromApiJson(body, "Не удалось загрузить историю"));
+        return;
       }
 
-      const data = await response.json();
+      const data = body as Story;
       setStory(data);
       setLiked(data.userLiked || false);
       setLikesCount(data._count?.likes || 0);
@@ -289,8 +292,11 @@ export default function StoryPageClient({
           pushAuth("signup");
           return;
         }
-        const errorData = await response.json();
-        console.error("Ошибка лайка:", errorData.error || errorData.message);
+        const errorData = await response.json().catch(() => null);
+        console.error(
+          "Ошибка лайка:",
+          getMessageFromApiJson(errorData, `Код ${response.status}`),
+        );
         return;
       }
 

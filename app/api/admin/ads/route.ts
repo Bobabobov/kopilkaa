@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { parseAdvertisementExpiryInput } from "@/lib/ads/expiry";
 import { sanitizeAdHtml } from "@/lib/ads/sanitize";
+import { normalizeSafeExternalUrl } from "@/lib/ads/linkUrl";
 
 export async function GET() {
   try {
@@ -61,6 +62,13 @@ export async function POST(request: NextRequest) {
 
     const finalPlacement: string = placement || "home_sidebar";
     const finalIsActive: boolean = isActive ?? true;
+    const safeLinkUrl = normalizeSafeExternalUrl(linkUrl);
+    if (linkUrl && !safeLinkUrl) {
+      return NextResponse.json(
+        { error: "Укажите корректную ссылку (http/https)" },
+        { status: 400 },
+      );
+    }
     const safeContent =
       typeof content === "string" ? sanitizeAdHtml(content) : content;
     const safeConfig =
@@ -86,7 +94,7 @@ export async function POST(request: NextRequest) {
           title,
           content: safeContent,
           imageUrl,
-          linkUrl,
+          linkUrl: safeLinkUrl,
           expiresAt: parseAdvertisementExpiryInput(expiresAt),
           isActive: finalIsActive,
           placement: finalPlacement,

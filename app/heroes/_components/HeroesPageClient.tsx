@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import HeroesHero from "@/components/heroes/HeroesHero";
 import HeroesContent from "@/components/heroes/HeroesContent";
 import HeroesLoading from "@/components/heroes/HeroesLoading";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 export interface Hero {
   id: string;
   name: string;
@@ -132,10 +133,15 @@ export default function HeroesPageClient({
         cache: "no-store",
         signal: ac.signal,
       });
+      const data = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error("Ошибка загрузки героев");
+        throw new Error(
+          getMessageFromApiJson(data, "Не удалось загрузить список героев"),
+        );
       }
-      const data = await response.json();
+      if (!data) {
+        throw new Error("Не удалось разобрать ответ сервера");
+      }
       if (reset) {
         setTopThree(data.topThree || []);
         setHeroes(data.items || []);

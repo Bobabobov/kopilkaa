@@ -117,7 +117,6 @@ export function middleware(req: NextRequest) {
   const isAuthApi = path.startsWith("/api/auth/");
   const isAuthRegister = path === "/api/auth/register";
   const isAuthLogin = path === "/api/auth/login";
-  const isAuthPhone = path.startsWith("/api/auth/phone/");
   const isUploadsApi = path === "/api/uploads";
   const isApplicationsApi = path === "/api/applications";
   const isStoryLikeApi = /^\/api\/stories\/[^/]+\/like$/.test(path);
@@ -132,7 +131,7 @@ export function middleware(req: NextRequest) {
     // Auth API: делаем лимит мягче для обычных пользователей.
     // Регистрация/вход: 10 запросов/мин на IP
     // Остальные auth-эндпоинты (telegram/google/logout/check): 30 запросов/мин на IP
-    limit = isPost && (isAuthRegister || isAuthLogin || isAuthPhone) ? 10 : 30;
+    limit = isPost && (isAuthRegister || isAuthLogin) ? 10 : 30;
     windowMs = 60_000;
     retryAfterSec = 60;
   } else if (isPost && isUploadsApi) {
@@ -203,7 +202,7 @@ export function middleware(req: NextRequest) {
         // Telegram widget внутри использует eval, поэтому держим unsafe-eval включенным в PROD,
         // но максимально ограничиваем источники скриптов.
         "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://telegram.org https://accounts.google.com https://mc.yandex.ru https://mc.yandex.com https://yandex.ru https://an.yandex.ru https://yastatic.net",
-        // Игра (PIXI/coin-catch) создаёт Web Worker — без worker-src браузер блокирует создание воркера
+        // Разрешаем Web Worker для внутренних сценариев с blob URL
         "worker-src 'self' blob:",
         "style-src 'self' 'unsafe-inline' https://accounts.google.com", // Tailwind/Google OAuth
         "img-src 'self' data: blob: https:",

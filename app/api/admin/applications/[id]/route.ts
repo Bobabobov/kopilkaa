@@ -6,6 +6,7 @@ import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { publish } from "@/lib/sse";
 import { sendStatusEmail } from "@/lib/email";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
+import { getReferralBonusAmount } from "@/lib/referralProgram";
 
 type SameRef = {
   id: string;
@@ -238,13 +239,20 @@ export async function PATCH(
 
   try {
     const item = await prisma.$transaction(async (tx) => {
+      const previous = await tx.application.findUnique({
+        where: { id },
+        select: { status: true, userId: true },
+      });
+      if (!previous) {
+        throw new Error("Application not found");
+      }
+
       const updated = await tx.application.update({
         where: { id },
         data: {
           status,
           adminComment: adminComment ?? null,
-          publishInStories:
-            status === "CONTEST" ? !!publishInStories : false,
+          publishInStories: status === "CONTEST" ? !!publishInStories : false,
           ...(status === "APPROVED" || status === "REJECTED"
             ? { trustDecreasedAtDecision: decreaseTrustOnDecision }
             : {}),
@@ -267,6 +275,46 @@ export async function PATCH(
           where: { id: updated.user.id },
           data: { trustDelta: { decrement: 3 } },
         });
+      }
+
+      // Реферальный бонус: начисляем ТОЛЬКО когда статус стал APPROVED
+      // и ТОЛЬКО один раз на реферала (bonusGrantedAt == null).
+      if (status === "APPROVED" && previous.status !== "APPROVED") {
+        const referredUserId = updated.user?.id;
+        if (referredUserId) {
+          const reg = await tx.referralRegistration.findUnique({
+            where: { referredUserId },
+            select: {
+              id: true,
+              referrerUserId: true,
+              bonusGrantedAt: true,
+              createdAt: true,
+            },
+          });
+
+          if (
+            reg &&
+            !reg.bonusGrantedAt &&
+            updated.createdAt >= reg.createdAt
+          ) {
+            const grantAt = new Date();
+            const updatedRegs = await tx.referralRegistration.updateMany({
+              where: { id: reg.id, bonusGrantedAt: null },
+              data: { bonusGrantedAt: grantAt },
+            });
+
+            if (updatedRegs.count > 0) {
+              await tx.goodDeedBonusGrant.create({
+                data: {
+                  userId: reg.referrerUserId,
+                  amountBonuses: getReferralBonusAmount(),
+                  comment: "Реферальная программа: заявка реферала одобрена",
+                  grantedById: admin.id,
+                },
+              });
+            }
+          }
+        }
       }
 
       return updated;

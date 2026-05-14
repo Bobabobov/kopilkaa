@@ -5,7 +5,6 @@ export const APPLICATION_CATEGORY_ORDER: ApplicationCategory[] = [
   "HOUSEHOLD_ESSENTIALS",
   "TRANSPORT_COMMS",
   "SMALL_GIFT",
-  "GAME_OR_SERVICE",
   "EVERYDAY_SUPPORT",
 ];
 
@@ -68,19 +67,6 @@ const CONFIG: Record<ApplicationCategory, ApplicationCategoryConfig> = {
     ],
     reportSlot1: "Фото подарка (упаковка/товар) после покупки.",
     reportSlot2: "Чек или скрин оплаты.",
-  },
-  GAME_OR_SERVICE: {
-    id: "GAME_OR_SERVICE",
-    title: "Донат в игру или сервис",
-    description: "Игры, подписки и небольшие цифровые покупки.",
-    proofBeforeTitle: "Что должно быть видно в кабинете игры/сервиса",
-    proofBeforeLines: [
-      "Скрин личного кабинета игры/сервиса, где видно, что подписка или нужная функция сейчас не активна.",
-    ],
-    reportSlot1:
-      "Скрин того же кабинета: подписка или покупка активна (дата/статус видны).",
-    reportSlot2:
-      "Скрин из банка или истории платежей сервиса, подтверждающий оплату.",
   },
   EVERYDAY_SUPPORT: {
     id: "EVERYDAY_SUPPORT",

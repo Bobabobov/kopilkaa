@@ -11,12 +11,14 @@ function buildUrl(pathname: string, search: string) {
   return p + (q ? "?" + q : "");
 }
 
-export function useMetrika() {
+export function useMetrika(isEnabled: boolean) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const lastHitRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (!isEnabled) return;
+
     const search = searchParams?.toString() ?? "";
     const url = buildUrl(pathname || "/", search);
     if (lastHitRef.current === url) return;
@@ -49,5 +51,5 @@ export function useMetrika() {
     return () => {
       cancelled = true;
     };
-  }, [pathname, searchParams?.toString()]);
+  }, [isEnabled, pathname, searchParams?.toString()]);
 }

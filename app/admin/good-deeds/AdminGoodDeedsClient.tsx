@@ -9,6 +9,7 @@ import { ModerationCard } from "./_components/ModerationCard";
 import { ModerationFilters } from "./_components/ModerationFilters";
 import { ModerationNotice } from "./_components/ModerationNotice";
 import { ModerationStats } from "./_components/ModerationStats";
+import { TasksManagementSection } from "./_components/TasksManagementSection";
 import { useGoodDeedsModeration } from "./_lib/useGoodDeedsModeration";
 
 export default function AdminGoodDeedsClient() {
@@ -68,6 +69,7 @@ export default function AdminGoodDeedsClient() {
             </Button>
           </div>
         </Card>
+        <TasksManagementSection />
 
         <ModerationStats stats={stats} />
         <ModerationFilters

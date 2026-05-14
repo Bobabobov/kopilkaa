@@ -38,7 +38,6 @@ function validateUsernameOrThrow(raw: string): string {
     "register",
     "settings",
     "friends",
-    "reports",
     "applications",
   ]);
   if (reserved.has(normalized)) {
@@ -182,8 +181,6 @@ export async function GET(request: Request) {
         createdAt: true,
         name: true,
         avatar: true,
-        phone: true,
-        phoneVerified: true,
         vkLink: true,
         telegramLink: true,
         telegramUsername: true,

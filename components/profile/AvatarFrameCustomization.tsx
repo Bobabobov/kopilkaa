@@ -8,6 +8,7 @@ import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { getAllAvatarFrames, getAvatarFrame } from "@/lib/header-customization";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import ColorWheel from "./ColorWheel";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 interface User {
   id: string;
@@ -151,7 +152,7 @@ export default function AvatarFrameCustomization({
         showToast(
           "error",
           "Ошибка сохранения",
-          data.error || "Не удалось сохранить рамку",
+          getMessageFromApiJson(data, "Не удалось сохранить рамку"),
         );
       }
     } catch (error) {

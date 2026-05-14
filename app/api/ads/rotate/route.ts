@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { normalizeSafeExternalUrl } from "@/lib/ads/linkUrl";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,12 @@ export async function GET() {
     const selectedAd = activeAds[adIndex];
 
     return NextResponse.json(
-      { ad: selectedAd },
+      {
+        ad: {
+          ...selectedAd,
+          linkUrl: normalizeSafeExternalUrl(selectedAd.linkUrl),
+        },
+      },
       {
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",

@@ -8,7 +8,7 @@
 
 | Категория | Результат |
 | --------- | --------- |
-| **Разбиение крупных файлов** | 10 монолитов разнесены по модулям; точки входа — тонкие оркестраторы |
+| **Разбиение крупных файлов** | 9 монолитов разнесены по модулям; точки входа — тонкие оркестраторы |
 | **Удаление фичи** | Achievements (достижения) полностью убраны: страницы, API, модели, компоненты |
 | **Обработка ошибок (API)** | 11+ роутов приведены к try/catch, единому формату `{ error: string }`, логированию |
 | **Документация** | ARCHITECTURE, ERROR_HANDLING, LOGS, REFACTORING_AUDIT |
@@ -27,7 +27,6 @@
 | TermsContent | ~683 строки | sections/ Section01–13, sectionsConfig; рендер по конфигу ~30 строк |
 | useSettings | ~646 строк | settings/types, api, handlers/, useLocalNotification; useSettings ~115 строк |
 | useApplicationFormState | ~601 строка | formState/ (constants, types, storage, useAuth, validation, submitApi, …); реэкспорт + LIMITS |
-| GameCanvas (Coin Catch) | ~394 строки | LeaderboardPanel, AudioSetupOverlay, useCoinCatchGame; канва ~69 строк |
 | HowItWorks | ~258 строк | how-it-works/ (config, Header, StepCard, Disclaimer, Cta, useHowItWorksAuth); ~36 строк |
 | OtherUserProfile | ~236 строк | types, useOtherUserProfile, BackLink, Content; профиль ~90 строк |
 | HeroSection | ~195 строк | hero-section/ (types, Headline, Cta, Ads, Stats); секция ~27 строк |
@@ -42,7 +41,7 @@
 - `app/api/auth/check-email` · `app/api/auth/logout`
 - `app/api/admin/applications` · `app/api/admin/applications/stats`
 - `app/api/applications` (POST) · `app/api/applications/mine`
-- `app/api/users/search` · `app/api/users/report`
+- `app/api/users/search`
 - `app/api/profile/friends` (GET, POST) · `app/api/friends/suggestions`
 - `app/api/notifications`
 

@@ -4,6 +4,15 @@ import { prisma } from "@/lib/db";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 export const dynamic = "force-dynamic";
 
+function shuffleUsers<T>(items: T[]): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 export async function GET(request: Request) {
   try {
     const session = await getSession();
@@ -30,7 +39,7 @@ export async function GET(request: Request) {
       excludeIds.add(link.receiverId);
     }
 
-    const users = await prisma.user.findMany({
+    const candidateUsers = await prisma.user.findMany({
       where: {
         id: { notIn: Array.from(excludeIds) },
       },
@@ -42,11 +51,11 @@ export async function GET(request: Request) {
         avatar: true,
         lastSeen: true,
       },
-      take: limit,
-      orderBy: { createdAt: "desc" },
     });
 
-    const safeUsers = users.map((u: any) =>
+    const users = shuffleUsers(candidateUsers).slice(0, limit);
+
+    const safeUsers = users.map((u) =>
       sanitizeEmailForViewer(u, session.uid),
     );
 

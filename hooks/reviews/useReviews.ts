@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 
 type ReviewUser = {
   id: string;
@@ -70,11 +71,15 @@ export function useReviews() {
           cache: "no-store",
           signal: controller.signal,
         });
-        if (!res.ok) {
-          const text = await res.text().catch(() => "");
-          throw new Error(text || "Не удалось загрузить отзывы");
-        }
-        const json = (await res.json()) as ReviewsResponse;
+        const json = (await res.json().catch(() => null)) as
+          | ReviewsResponse
+          | null;
+        throwIfApiFailed(
+          res,
+          json,
+          "Не удалось загрузить отзывы",
+        );
+        if (!json) throw new Error("Не удалось загрузить отзывы");
         if (append) {
           setData((prev) => {
             if (!prev) return json;
@@ -171,9 +176,7 @@ export function useReviews() {
             body: fd,
           });
           const uploadJson = await uploadRes.json();
-          if (!uploadRes.ok) {
-            throw new Error(uploadJson?.error || "Ошибка загрузки файлов");
-          }
+          throwIfApiFailed(uploadRes, uploadJson, "Ошибка загрузки файлов");
           uploadedUrls.push(
             ...((uploadJson.files as { url: string }[]) || []).map((f) => f.url),
           );
@@ -193,9 +196,7 @@ export function useReviews() {
           }),
         });
         const json = await res.json();
-        if (!res.ok) {
-          throw new Error(json?.error || "Не удалось сохранить отзыв");
-        }
+        throwIfApiFailed(res, json, "Не удалось сохранить отзыв");
 
         showToastRef.current?.("success", "Готово", "Отзыв сохранён");
 
@@ -244,9 +245,7 @@ export function useReviews() {
           method: "DELETE",
         });
         const json = await res.json();
-        if (!res.ok) {
-          throw new Error(json?.error || "Не удалось удалить отзыв");
-        }
+        throwIfApiFailed(res, json, "Не удалось удалить отзыв");
 
         showToastRef.current?.("success", "Готово", "Отзыв удалён");
 

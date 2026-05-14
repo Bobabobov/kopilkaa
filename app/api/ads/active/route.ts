@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { normalizeSafeExternalUrl } from "@/lib/ads/linkUrl";
 
 // Явно указываем, что роут динамический (не кэшируется)
 export const dynamic = "force-dynamic";
@@ -50,7 +51,12 @@ export async function GET() {
       return NextResponse.json({ ad: null });
     }
 
-    return NextResponse.json({ ad: activeAd });
+    return NextResponse.json({
+      ad: {
+        ...activeAd,
+        linkUrl: normalizeSafeExternalUrl(activeAd.linkUrl),
+      },
+    });
   } catch (error) {
     console.error("Error fetching active ad:", error);
     // Возвращаем null вместо ошибки

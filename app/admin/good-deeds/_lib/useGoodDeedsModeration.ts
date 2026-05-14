@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GOOD_DEED_FIRST_IN_FEED_BONUS_BONUSES } from "@/lib/goodDeedsFirstFeedBonus";
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 import type { ModerationItem, Notice, SortBy, StatusFilter } from "./types";
 
 export function useGoodDeedsModeration() {
@@ -26,9 +27,7 @@ export function useGoodDeedsModeration() {
         cache: "no-store",
       });
       const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json?.error || "Ошибка загрузки модерации");
-      }
+      throwIfApiFailed(res, json, "Ошибка загрузки модерации");
       setItems(Array.isArray(json?.items) ? json.items : []);
     } catch (error) {
       console.error(error);
@@ -70,9 +69,7 @@ export function useGoodDeedsModeration() {
         }),
       });
       const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json?.error || "Не удалось обновить статус");
-      }
+      throwIfApiFailed(res, json, "Не удалось обновить статус");
       const bonusGranted =
         action === "approve" && Boolean(json?.firstFeedBonusGranted);
       const categoryCompletionBonus =
@@ -150,9 +147,7 @@ export function useGoodDeedsModeration() {
         method: "DELETE",
       });
       const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json?.error || "Не удалось удалить");
-      }
+      throwIfApiFailed(res, json, "Не удалось удалить");
       setItems((prev) => prev.filter((item) => item.id !== id));
       setNotice({ type: "success", text: "Заявка удалена." });
     } catch (error) {

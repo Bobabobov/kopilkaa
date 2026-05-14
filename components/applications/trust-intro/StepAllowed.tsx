@@ -90,14 +90,6 @@ export function StepAllowed() {
         </li>
         <li className="space-y-1 pl-0.5">
           <div className="font-semibold text-[#f2faf6]">
-            • Донат в игру или сервис
-          </div>
-          <p className="text-xs text-[#c8d9d2]">
-            Игры, подписки и небольшие цифровые покупки.
-          </p>
-        </li>
-        <li className="space-y-1 pl-0.5">
-          <div className="font-semibold text-[#f2faf6]">
             • Поддержка в обычной жизненной ситуации
           </div>
           <p className="text-xs text-[#c8d9d2]">

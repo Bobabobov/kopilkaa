@@ -14,6 +14,7 @@ import {
   MAX_WITHDRAWAL_DETAILS_LEN,
 } from "@/lib/goodDeeds";
 import type { GoodDeedsResponse } from "../types";
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 
 type Stats = Pick<
   GoodDeedsResponse["stats"],
@@ -108,11 +109,7 @@ export function GoodDeedsWithdrawSection({
         }),
       });
       const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(
-          typeof json?.error === "string" ? json.error : "Ошибка",
-        );
-      }
+      throwIfApiFailed(res, json, "Не удалось отправить заявку на вывод");
       showToast(
         "success",
         "Заявка отправлена",

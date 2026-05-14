@@ -8,6 +8,7 @@ import Link from "next/link";
 import { getPublicProfilePath } from "@/lib/profileUrl";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 type ResultUser = {
   id: string;
@@ -79,7 +80,7 @@ export default function AdminHeroesClient() {
         showToast(
           "error",
           "Ошибка",
-          data?.error || "Не удалось добавить поддержку",
+          getMessageFromApiJson(data, "Не удалось добавить поддержку"),
         );
         return;
       }
@@ -127,7 +128,7 @@ export default function AdminHeroesClient() {
         showToast(
           "error",
           "Ошибка",
-          data?.error || "Не удалось обновить видимость",
+          getMessageFromApiJson(data, "Не удалось обновить видимость"),
         );
         return;
       }

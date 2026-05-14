@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthModal } from "./AuthModal";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 type AuthMode = "login" | "signup";
 
@@ -138,13 +139,14 @@ export default function AuthModalRoot() {
       const r = await fetch("/api/auth/telegram", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ telegram: user }),
       });
       const data = await r.json();
 
       if (!r.ok || !data?.success) {
         console.error("Ошибка ответа /api/auth/telegram:", data);
-        setError(data?.error || "Ошибка входа через Telegram");
+        setError(getMessageFromApiJson(data, "Ошибка входа через Telegram"));
         return;
       }
 
@@ -165,13 +167,16 @@ export default function AuthModalRoot() {
       const r = await fetch("/api/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ google: data }),
       });
       const responseData = await r.json();
 
       if (!r.ok || !responseData?.success) {
         console.error("Ошибка ответа /api/auth/google:", responseData);
-        setError(responseData?.error || "Ошибка входа через Google");
+        setError(
+          getMessageFromApiJson(responseData, "Ошибка входа через Google"),
+        );
         return;
       }
 
@@ -192,6 +197,7 @@ export default function AuthModalRoot() {
       const r = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ identifier, password }),
       });
       if (r.status === 429) {
@@ -205,7 +211,7 @@ export default function AuthModalRoot() {
       const data = await safeReadJson(r);
 
       if (!r.ok) {
-        setError(data?.message || data?.error || "Ошибка входа");
+        setError(getMessageFromApiJson(data, "Ошибка входа"));
         return;
       }
 
@@ -247,6 +253,7 @@ export default function AuthModalRoot() {
       const r = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
           username: generatedUsername,
@@ -265,8 +272,7 @@ export default function AuthModalRoot() {
       const data = await safeReadJson(r);
 
       if (!r.ok) {
-        // 409 = почта/логин уже заняты. Показываем точное сообщение с бэка.
-        setError(data?.message || data?.error || "Ошибка регистрации");
+        setError(getMessageFromApiJson(data, "Ошибка регистрации"));
         return;
       }
 

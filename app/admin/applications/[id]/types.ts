@@ -44,7 +44,6 @@ export type ApplicationItem = {
     | "HOUSEHOLD_ESSENTIALS"
     | "TRANSPORT_COMMS"
     | "SMALL_GIFT"
-    | "GAME_OR_SERVICE"
     | "EVERYDAY_SUPPORT";
   amount: number;
   payment: string;

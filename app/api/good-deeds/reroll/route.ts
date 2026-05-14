@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getGoodDeedCycleKey } from "@/lib/goodDeedTasksAdmin";
 import { getWeekInfo, pickReplacementTask, pickTasksForWeek } from "@/lib/goodDeeds";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +23,8 @@ export async function POST(req: NextRequest) {
     }
 
     const week = getWeekInfo(new Date());
-    const weekTasks = pickTasksForWeek(week.key);
+    const cycleKey = await getGoodDeedCycleKey(week.key);
+    const weekTasks = pickTasksForWeek(cycleKey);
     const weekTaskIds = weekTasks.map((task) => task.id);
 
     if (!weekTaskIds.includes(taskId)) {
@@ -37,7 +39,7 @@ export async function POST(req: NextRequest) {
         where: {
           userId_weekKey: {
             userId: session.uid,
-            weekKey: week.key,
+            weekKey: cycleKey,
           },
         },
         select: { id: true },
@@ -46,7 +48,7 @@ export async function POST(req: NextRequest) {
         where: {
           userId_weekKey_taskKey: {
             userId: session.uid,
-            weekKey: week.key,
+            weekKey: cycleKey,
             taskKey: taskId,
           },
         },
@@ -79,7 +81,7 @@ export async function POST(req: NextRequest) {
     await prisma.goodDeedWeekPreference.create({
       data: {
         userId: session.uid,
-        weekKey: week.key,
+        weekKey: cycleKey,
         replacedTaskKey: taskId,
         newTaskKey: replacement.id,
       },

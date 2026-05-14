@@ -5,6 +5,12 @@ import { getSession, attachSessionToResponse } from "@/lib/auth";
 import { checkUserBan } from "@/lib/ban-check";
 import { OAuth2Client } from "google-auth-library";
 import { saveRemoteImageAsAvatar } from "@/lib/uploads/saveRemoteImage";
+import {
+  REFERRAL_CODE_COOKIE,
+  REFERRAL_VISITOR_COOKIE,
+  readReferralCookies,
+  tryAwardReferralBonusForNewUser,
+} from "@/lib/referralProgram";
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 
@@ -20,6 +26,8 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
+    let createdNewUserId: string | null = null;
+
     const body = await req.json().catch(() => ({}));
     const googleData = body?.google as
       | { credential: string }
@@ -213,6 +221,7 @@ export async function POST(req: NextRequest) {
           googleEmail: true,
         },
       });
+      createdNewUserId = user.id;
     } else {
       // Пользователь с таким email уже есть — обновляем Google данные
       const updateData: any = {};
@@ -278,6 +287,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (createdNewUserId) {
+      const referralCookies = await readReferralCookies().catch(() => ({
+        referralCode: null,
+        visitorId: null,
+      }));
+
+      if (referralCookies.referralCode && referralCookies.visitorId) {
+        await tryAwardReferralBonusForNewUser({
+          newUserId: createdNewUserId,
+          referralCode: referralCookies.referralCode,
+          visitorId: referralCookies.visitorId,
+        });
+      }
+    }
+
     const res = NextResponse.json({
       success: true,
       mode: "login",
@@ -287,6 +311,30 @@ export async function POST(req: NextRequest) {
         googleEmail: user.googleEmail,
       },
     });
+
+    if (createdNewUserId) {
+      const referralCookies = await readReferralCookies().catch(() => ({
+        referralCode: null,
+        visitorId: null,
+      }));
+
+      if (referralCookies.referralCode && referralCookies.visitorId) {
+        res.cookies.set(REFERRAL_CODE_COOKIE, "", {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+          expires: new Date(0),
+        });
+        res.cookies.set(REFERRAL_VISITOR_COOKIE, "", {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+          expires: new Date(0),
+        });
+      }
+    }
     attachSessionToResponse(
       res,
       { uid: user.id, role: (user.role as any) || "USER" },

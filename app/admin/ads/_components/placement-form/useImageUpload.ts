@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useBeautifulNotifications } from "@/components/ui/BeautifulNotificationsProvider";
+import { throwIfApiFailed } from "@/lib/api/parseApiError";
 
 interface ImageFile {
   file: File;
@@ -33,13 +34,9 @@ export function useImageUpload() {
       body: formData,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error?.error || "Ошибка загрузки");
-    }
-
-    const data = await response.json();
-    const uploadedUrl = data.files?.[0]?.url;
+    const data = await response.json().catch(() => null);
+    throwIfApiFailed(response, data, "Ошибка загрузки");
+    const uploadedUrl = data?.files?.[0]?.url as string | undefined;
 
     if (!uploadedUrl) {
       throw new Error("Не удалось получить URL загруженного файла");
@@ -129,13 +126,9 @@ export function useVideoUpload() {
       body: formData,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error?.error || "Ошибка загрузки");
-    }
-
-    const data = await response.json();
-    const uploadedUrl = data.files?.[0]?.url;
+    const data = await response.json().catch(() => null);
+    throwIfApiFailed(response, data, "Ошибка загрузки");
+    const uploadedUrl = data?.files?.[0]?.url as string | undefined;
 
     if (!uploadedUrl) {
       throw new Error("Не удалось получить URL загруженного файла");
@@ -225,13 +218,9 @@ export function useMultipleImageUpload() {
       body: formData,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error?.error || "Ошибка загрузки");
-    }
-
-    const data = await response.json();
-    const uploadedUrl = data.files?.[0]?.url;
+    const data = await response.json().catch(() => null);
+    throwIfApiFailed(response, data, "Ошибка загрузки");
+    const uploadedUrl = data?.files?.[0]?.url as string | undefined;
 
     if (!uploadedUrl) {
       throw new Error("Не удалось получить URL загруженного файла");

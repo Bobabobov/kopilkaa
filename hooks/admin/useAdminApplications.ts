@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { ApplicationItem, Stats } from "@/types/admin";
+import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 interface UseAdminApplicationsProps {
   initialPage?: number;
@@ -90,12 +91,13 @@ export function useAdminApplications({
         });
 
         const response = await fetch(`/api/admin/applications?${params}`);
+        const data = await response.json().catch(() => null);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(
+            getMessageFromApiJson(data, "Не удалось загрузить список заявок"),
+          );
         }
-
-        const data = await response.json();
-        const newItems = data.items || [];
+        const newItems = data?.items || [];
 
         if (page === 1) {
           setItems(newItems);
@@ -103,11 +105,13 @@ export function useAdminApplications({
           setItems((prev) => [...prev, ...newItems]);
         }
 
-        setHasMore(page < (data.pages || 1));
+        setHasMore(page < (data?.pages || 1));
         setCurrentPage(page + 1);
       } catch (err) {
         console.error("Failed to load applications:", err);
-        setError("Ошибка загрузки заявок");
+        setError(
+          err instanceof Error ? err.message : "Ошибка загрузки заявок",
+        );
       } finally {
         setLoading(false);
         setLoadingMore(false);
@@ -195,19 +199,22 @@ export function useAdminApplications({
           cache: "no-store",
         });
 
+        const data = await response.json().catch(() => null);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(
+            getMessageFromApiJson(data, "Не удалось обновить список заявок"),
+          );
         }
-
-        const data = await response.json();
-        const newItems = data.items || [];
+        const newItems = data?.items || [];
 
         setItems(newItems);
-        setHasMore(1 < (data.pages || 1));
+        setHasMore(1 < (data?.pages || 1));
         setCurrentPage(2);
       } catch (err) {
         console.error("Failed to refresh applications:", err);
-        setError("Ошибка обновления заявок");
+        setError(
+          err instanceof Error ? err.message : "Ошибка обновления заявок",
+        );
       } finally {
         setLoading(false);
       }

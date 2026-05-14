@@ -311,7 +311,7 @@ export function ReviewsSection() {
                 Больше историй в Telegram
               </h3>
               <p className="text-sm text-[#abd1c6] mt-1">
-                Присоединяйтесь к каналу — отзывы и новости проекта
+                Присоединяйтесь к каналу — отзывы и обновления проекта
               </p>
               <span className="inline-flex items-center gap-2 mt-3 text-sm text-[#229ED9] font-semibold group-hover:gap-3 transition-all">
                 Перейти в канал

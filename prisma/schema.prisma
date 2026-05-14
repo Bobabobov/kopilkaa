@@ -106,6 +106,7 @@ model ReferralClick {
   visitorId      String   // идентификатор “посетителя” из cookie
   createdAt      DateTime @default(now())
 
+  @@unique([referrerUserId, visitorId])
   @@index([referrerUserId])
   @@index([createdAt])
 }

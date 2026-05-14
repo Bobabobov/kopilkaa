@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/db";
+import { getPublicSiteOrigin } from "@/lib/siteOrigin";
 import {
   REFERRAL_CODE_COOKIE,
   REFERRAL_VISITOR_COOKIE,
@@ -10,10 +11,9 @@ import {
 
 export const runtime = "nodejs";
 
-function getSignupRedirectUrl(requestUrl: string): URL {
-  const url = new URL(requestUrl);
-  url.pathname = "/";
-  url.search = "";
+function getSignupRedirectUrl(req: NextRequest): URL {
+  const origin = getPublicSiteOrigin(req);
+  const url = new URL("/", origin);
   url.searchParams.set("modal", "auth/signup");
   url.searchParams.set("next", "/profile");
   return url;
@@ -35,7 +35,7 @@ export async function GET(
 ) {
   const referralCode = normalizeReferralCode(params.code);
 
-  const redirectUrl = getSignupRedirectUrl(request.url);
+  const redirectUrl = getSignupRedirectUrl(request);
 
   if (!referralCode) {
     return NextResponse.redirect(redirectUrl, 302);

@@ -22,9 +22,10 @@ import { cn } from "@/lib/utils";
 import {
   APPLICATION_CATEGORY_ORDER,
   getApplicationCategoryConfig,
+  type ApplicationPickerCategory,
 } from "@/lib/applications/categories";
 
-const CATEGORY_ICON: Record<ApplicationCategory, LucideIcon> = {
+const CATEGORY_ICON: Record<ApplicationPickerCategory, LucideIcon> = {
   FOOD_DRINKS: Utensils,
   HOUSEHOLD_ESSENTIALS: Package,
   TRANSPORT_COMMS: Bus,
@@ -34,7 +35,7 @@ const CATEGORY_ICON: Record<ApplicationCategory, LucideIcon> = {
 
 /** Цветовые акценты для иконок (палитра проекта + контраст) */
 const CATEGORY_ICON_SHELL: Record<
-  ApplicationCategory,
+  ApplicationPickerCategory,
   { ring: string; glow: string; fg: string }
 > = {
   FOOD_DRINKS: {

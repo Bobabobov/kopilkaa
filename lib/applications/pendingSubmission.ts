@@ -4,7 +4,10 @@ import {
   postApplication,
   type SubmitApplicationPayload,
 } from "@/hooks/applications/formState/submitApi";
-import { isApplicationCategory } from "@/lib/applications/categories";
+import {
+  isApplicationCategory,
+  isSubmittableApplicationCategory,
+} from "@/lib/applications/categories";
 
 export type PendingApplicationPayload = {
   category?: import("@prisma/client").ApplicationCategory;
@@ -93,7 +96,11 @@ export async function submitPendingApplicationIfNeeded(): Promise<boolean> {
 
   sessionStorage.setItem(INFLIGHT_KEY, "true");
   try {
-    if (!payload.category || !isApplicationCategory(payload.category)) {
+    if (
+      !payload.category ||
+      !isApplicationCategory(payload.category) ||
+      !isSubmittableApplicationCategory(payload.category)
+    ) {
       clearPendingApplication();
       return false;
     }

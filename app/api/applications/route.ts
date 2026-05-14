@@ -18,6 +18,7 @@ import {
 } from "@/lib/activity/checkActivityRequirement";
 import {
   isApplicationCategory,
+  isSubmittableApplicationCategory,
   REPORT_PHOTOS_MIN,
 } from "@/lib/applications/categories";
 
@@ -173,6 +174,12 @@ export async function POST(req: Request) {
     if (!categoryRaw || !isApplicationCategory(categoryRaw)) {
       return Response.json(
         { error: "Укажите категорию помощи" },
+        { status: 400 },
+      );
+    }
+    if (!isSubmittableApplicationCategory(categoryRaw)) {
+      return Response.json(
+        { error: "Выберите актуальную категорию помощи" },
         { status: 400 },
       );
     }

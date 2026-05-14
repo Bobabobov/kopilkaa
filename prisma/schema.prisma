@@ -22,7 +22,7 @@ enum ApplicationCategory {
   TRANSPORT_COMMS
   SMALL_GIFT
   EVERYDAY_SUPPORT
-  /** Встречается в старых БД; не показываем в форме, но Prisma должен уметь читать строку */
+  /** Значение из старых БД; в форме не используется, нужно для чтения заявок */
   GAME_OR_SERVICE
 }
 

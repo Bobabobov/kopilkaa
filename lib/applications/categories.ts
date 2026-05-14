@@ -1,12 +1,16 @@
 import type { ApplicationCategory } from "@prisma/client";
 
-export const APPLICATION_CATEGORY_ORDER: ApplicationCategory[] = [
+/** Категории, показываемые в форме заявки (без архивных значений из БД). */
+export const APPLICATION_CATEGORY_ORDER = [
   "FOOD_DRINKS",
   "HOUSEHOLD_ESSENTIALS",
   "TRANSPORT_COMMS",
   "SMALL_GIFT",
   "EVERYDAY_SUPPORT",
-];
+] as const satisfies readonly ApplicationCategory[];
+
+export type ApplicationPickerCategory =
+  (typeof APPLICATION_CATEGORY_ORDER)[number];
 
 export type ApplicationCategoryConfig = {
   id: ApplicationCategory;
@@ -80,6 +84,16 @@ const CONFIG: Record<ApplicationCategory, ApplicationCategoryConfig> = {
       "Фото или скрин, показывающий, на что пошла помощь (результат/чек оплаты по сути ситуации).",
     reportSlot2: "Подтверждение траты: чек, скрин перевода или из банка.",
   },
+  /** Только чтение старых заявок; в форме не предлагается */
+  GAME_OR_SERVICE: {
+    id: "GAME_OR_SERVICE",
+    title: "Игра или сервис (архив)",
+    description: "Устаревшая категория в базе данных.",
+    proofBeforeTitle: "Доказательства до рассмотрения",
+    proofBeforeLines: ["Категория не используется для новых заявок."],
+    reportSlot1: "Отчёт по заявке.",
+    reportSlot2: "Подтверждение траты.",
+  },
 };
 
 export function getApplicationCategoryConfig(
@@ -94,6 +108,15 @@ export function getApplicationCategoryLabel(id: ApplicationCategory): string {
 
 export function isApplicationCategory(value: unknown): value is ApplicationCategory {
   return typeof value === "string" && value in CONFIG;
+}
+
+/** Категории, разрешённые при создании новой заявки (без архивных). */
+export function isSubmittableApplicationCategory(
+  value: ApplicationCategory,
+): value is ApplicationPickerCategory {
+  return (APPLICATION_CATEGORY_ORDER as readonly ApplicationCategory[]).includes(
+    value,
+  );
 }
 
 /** Минимум фото в отчёте по прошлой одобренной заявке */

@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type UserStats = {
   applicationsCount: number;
@@ -26,10 +27,10 @@ export default function OtherUserStats({ userId }: OtherUserStatsProps) {
           setStats(data.stats);
         } else {
           const errorData = await response.json();
-          console.error("Stats error:", errorData);
+          logRouteCatchError("[OtherUserStats] response", errorData);
         }
       } catch (error) {
-        console.error("Load stats error:", error);
+        logRouteCatchError("[OtherUserStats] load", error);
       } finally {
         setLoading(false);
       }

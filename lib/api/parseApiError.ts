@@ -71,3 +71,15 @@ export function throwIfApiFailed(
     throw new Error(getMessageFromApiJson(body, fallback));
   }
 }
+
+/**
+ * Лог в catch API route: в dev пишем полный объект ошибки, в prod — только краткое сообщение.
+ */
+export function logRouteCatchError(context: string, error: unknown): void {
+  const msg = error instanceof Error ? error.message : String(error);
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(context, error);
+  } else {
+    console.error(context, msg);
+  }
+}

@@ -25,7 +25,10 @@ export function BannedNotice({ user, ToastComponent }: BannedNoticeProps) {
   if (!isCurrentlyBanned) return null;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <main
+      className="min-h-screen relative overflow-hidden"
+      aria-label="Профиль пользователя"
+    >
       <div className="w-full px-6 pt-32 pb-8">
         <div className="max-w-2xl mx-auto">
           <motion.div
@@ -34,7 +37,10 @@ export function BannedNotice({ user, ToastComponent }: BannedNoticeProps) {
             className="bg-red-500/20 border-2 border-red-500/50 rounded-2xl p-8"
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-red-500/30 rounded-full flex items-center justify-center flex-shrink-0">
+              <div
+                className="w-12 h-12 bg-red-500/30 rounded-full flex items-center justify-center flex-shrink-0"
+                aria-hidden
+              >
                 <svg
                   className="w-6 h-6 text-red-400"
                   fill="none"
@@ -49,7 +55,7 @@ export function BannedNotice({ user, ToastComponent }: BannedNoticeProps) {
                   />
                 </svg>
               </div>
-              <div className="flex-1">
+              <div className="flex-1" role="alert">
                 <h3 className="text-xl font-bold text-red-400 mb-3">
                   Чечик в бане
                 </h3>
@@ -84,6 +90,6 @@ export function BannedNotice({ user, ToastComponent }: BannedNoticeProps) {
         </div>
       </div>
       <ToastComponent />
-    </div>
+    </main>
   );
 }

@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export async function POST(
   request: Request,
@@ -104,7 +105,7 @@ export async function POST(
       blocked: true,
     });
   } catch (error) {
-    console.error("Block user error:", error);
+    logRouteCatchError("[API POST /api/users/[userId]/block]", error);
     const errorMessage =
       error instanceof Error ? error.message : "Неизвестная ошибка";
     return NextResponse.json(

@@ -1,9 +1,20 @@
 // app/api/stories/route.ts
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
+
+/** Синонимы для текстового поиска по историям (общие для Prisma и fuzzy-ветки). */
+const STORY_SEARCH_SYNONYMS: Record<string, string[]> = {
+  деньги: ["средства", "помощь", "финансы", "руб", "рубли"],
+  срочно: ["срочно", "быстро", "немедленно"],
+  помощь: ["поддержка", "средства", "выручка"],
+  лечение: ["врачи", "медицина", "больница"],
+  ребенок: ["дети", "ребенок", "сын", "дочь"],
+};
 
 export async function GET(req: Request) {
   try {
@@ -28,37 +39,34 @@ export async function GET(req: Request) {
 
     const orderBy =
       sortMode === "popular"
-        ? [{ likes: { _count: "desc" as const } }, { createdAt: "desc" as const }]
+        ? [
+            { likes: { _count: "desc" as const } },
+            { createdAt: "desc" as const },
+          ]
         : sortMode === "oldest"
           ? { createdAt: "asc" as const }
           : { createdAt: "desc" as const };
 
-    const statusFilter = {
+    const statusFilter: Prisma.ApplicationWhereInput = {
       OR: [
-        { status: "APPROVED" as const },
-        { status: "CONTEST" as const, publishInStories: true },
+        { status: "APPROVED" },
+        { status: "CONTEST", publishInStories: true },
       ],
     };
-    const where: any = { AND: [statusFilter] };
+
+    const andClauses: Prisma.ApplicationWhereInput[] = [statusFilter];
+
     if (normalizedQuery) {
       const tokens = normalizedQuery.split(" ").filter(Boolean).slice(0, 6);
-      const synonymMap: Record<string, string[]> = {
-        деньги: ["средства", "помощь", "финансы", "руб", "рубли"],
-        срочно: ["срочно", "быстро", "немедленно"],
-        помощь: ["поддержка", "средства", "выручка"],
-        лечение: ["врачи", "медицина", "больница"],
-        ребенок: ["дети", "ребенок", "сын", "дочь"],
-      };
       const expandedTokens = tokens.flatMap((token) => {
         const lower = token.toLowerCase();
-        return [token, ...(synonymMap[lower] || [])];
+        return [token, ...(STORY_SEARCH_SYNONYMS[lower] || [])];
       });
       const digitsOnly = normalizedQuery.replace(/[^\d]/g, "");
-      const amountFromQuery =
-        digitsOnly.length > 0 ? Number(digitsOnly) : null;
+      const amountFromQuery = digitsOnly.length > 0 ? Number(digitsOnly) : null;
 
-      const buildOr = (term: string) => {
-        const ors: any[] = [
+      const buildOr = (term: string): Prisma.ApplicationWhereInput[] => {
+        const ors: Prisma.ApplicationWhereInput[] = [
           { title: { contains: term } },
           { summary: { contains: term } },
           { story: { contains: term } },
@@ -84,13 +92,18 @@ export async function GET(req: Request) {
         ? expandedTokens.flatMap((token) => buildOr(token))
         : [];
 
-      const combinedOr: any[] = [...phraseOr, ...tokenOrs];
+      const combinedOr: Prisma.ApplicationWhereInput[] = [
+        ...phraseOr,
+        ...tokenOrs,
+      ];
       if (amountFromQuery && Number.isFinite(amountFromQuery)) {
         combinedOr.push({ amount: { equals: amountFromQuery } });
       }
 
-      where.AND.push({ OR: combinedOr });
+      andClauses.push({ OR: combinedOr });
     }
+
+    const where: Prisma.ApplicationWhereInput = { AND: andClauses };
 
     const skip = (page - 1) * limit;
 
@@ -165,18 +178,11 @@ export async function GET(req: Request) {
       const queryTokens = normalizedQuery
         ? normalizeText(normalizedQuery).split(" ").filter(Boolean).slice(0, 6)
         : [];
-      const synonymMap: Record<string, string[]> = {
-        деньги: ["средства", "помощь", "финансы", "руб", "рубли"],
-        срочно: ["срочно", "быстро", "немедленно"],
-        помощь: ["поддержка", "средства", "выручка"],
-        лечение: ["врачи", "медицина", "больница"],
-        ребенок: ["дети", "ребенок", "сын", "дочь"],
-      };
       const expandedTokens = Array.from(
         new Set(
           queryTokens.flatMap((token) => [
             token,
-            ...(synonymMap[token] || []),
+            ...(STORY_SEARCH_SYNONYMS[token] || []),
           ]),
         ),
       ).filter((token) => token.length >= 2);
@@ -239,7 +245,9 @@ export async function GET(req: Request) {
           for (const token of expandedTokens) {
             const lowerToken = token.toLowerCase();
             if (!lowerToken) continue;
-            if (fields.some((field) => normalizeText(field).includes(lowerToken))) {
+            if (
+              fields.some((field) => normalizeText(field).includes(lowerToken))
+            ) {
               score += 3;
               continue;
             }
@@ -274,7 +282,7 @@ export async function GET(req: Request) {
         .findMany({
           where: {
             userId: viewerId,
-            applicationId: { in: finalItems.map((i: any) => i.id) },
+            applicationId: { in: finalItems.map((row) => row.id) },
           },
           select: { applicationId: true },
         })
@@ -282,7 +290,7 @@ export async function GET(req: Request) {
       likedSet = new Set(likes.map((l) => l.applicationId));
     }
 
-    const safeItems = finalItems.map((it: any) => ({
+    const safeItems = finalItems.map((it) => ({
       ...it,
       user: it.user ? sanitizeEmailForViewer(it.user, viewerId || "") : it.user,
       userLiked: likedSet ? likedSet.has(it.id) : false,
@@ -305,7 +313,7 @@ export async function GET(req: Request) {
       },
     });
   } catch (error) {
-    console.error("Error fetching stories:", error);
+    logRouteCatchError("GET /api/stories:", error);
     return new Response(
       JSON.stringify({
         page: 1,

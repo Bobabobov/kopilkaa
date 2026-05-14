@@ -14,11 +14,25 @@ const ctaPrimaryStyle = {
 const ctaSecondary =
   "inline-flex items-center justify-center px-10 py-5 text-lg font-medium rounded-xl border border-white/20 text-[#fffffe] hover:border-[#f9bc60]/50 hover:text-[#f9bc60] transition-colors";
 
+const formatCardCtaClass =
+  "inline-flex items-center gap-2 px-6 py-3.5 font-semibold rounded-xl transition-all hover:opacity-90";
+
+function scrollToContactWithFormat(format: string) {
+  window.location.hash = `#contact?format=${format}`;
+  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+}
+
 export default function AdvertisingPage() {
   return (
-    <div className="min-h-screen pb-20 relative">
+    <main
+      className="min-h-screen pb-20 relative"
+      aria-label="Реклама на платформе Копилка"
+    >
       {/* Фоновые блики */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+      <div
+        className="fixed inset-0 pointer-events-none overflow-hidden -z-10"
+        aria-hidden
+      >
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
       </div>
@@ -42,7 +56,9 @@ export default function AdvertisingPage() {
           <Card variant="darkGlass" padding="lg" className="mb-12">
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <div className="text-[#f9bc60] text-2xl font-bold mt-1">01</div>
+                <div className="text-[#f9bc60] text-2xl font-bold mt-1" aria-hidden>
+                  01
+                </div>
                 <div>
                   <div className="text-[#fffffe] text-xl font-medium mb-1">
                     Вы — среди первых
@@ -55,7 +71,9 @@ export default function AdvertisingPage() {
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="text-[#f9bc60] text-2xl font-bold mt-1">02</div>
+                <div className="text-[#f9bc60] text-2xl font-bold mt-1" aria-hidden>
+                  02
+                </div>
                 <div>
                   <div className="text-[#fffffe] text-xl font-medium mb-1">
                     Условия — гибкие
@@ -67,7 +85,9 @@ export default function AdvertisingPage() {
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="text-[#f9bc60] text-2xl font-bold mt-1">03</div>
+                <div className="text-[#f9bc60] text-2xl font-bold mt-1" aria-hidden>
+                  03
+                </div>
                 <div>
                   <div className="text-[#fffffe] text-xl font-medium mb-1">
                     Запускаем за день
@@ -97,10 +117,17 @@ export default function AdvertisingPage() {
       </div>
 
       {/* Форматы рекламы */}
-      <section id="formats" className="py-24 px-4 relative z-10">
+      <section
+        id="formats"
+        className="py-24 px-4 relative z-10"
+        aria-labelledby="formats-heading"
+      >
         <div className="container mx-auto max-w-6xl">
           <div className="mb-16">
-            <h2 className="text-5xl font-bold text-[#fffffe] mb-4">
+            <h2
+              id="formats-heading"
+              className="text-5xl font-bold text-[#fffffe] mb-4"
+            >
               Форматы размещения
             </h2>
             <p className="text-xl text-[#abd1c6]">
@@ -126,18 +153,14 @@ export default function AdvertisingPage() {
               <p className="text-sm md:text-base text-[#abd1c6] mb-6 leading-relaxed">
                 План: выйти на ~5000 показов в день по мере роста проекта
               </p>
-              <a
-                href="#contact"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.hash = "#contact?format=banner";
-                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="inline-flex items-center gap-2 px-6 py-3.5 font-semibold rounded-xl transition-all hover:opacity-90"
+              <button
+                type="button"
+                className={formatCardCtaClass}
                 style={{ ...ctaPrimaryStyle, padding: "0.75rem 1.5rem", fontSize: "1rem" }}
+                onClick={() => scrollToContactWithFormat("banner")}
               >
                 Хочу это →
-              </a>
+              </button>
             </Card>
 
             {/* Блок сбоку на главной */}
@@ -157,18 +180,14 @@ export default function AdvertisingPage() {
               <p className="text-sm md:text-base text-[#abd1c6] mb-6 leading-relaxed">
                 Особенно заметен на старте, пока рекламодателей немного
               </p>
-              <a
-                href="#contact"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.hash = "#contact?format=side";
-                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="inline-flex items-center gap-2 px-6 py-3.5 font-semibold rounded-xl transition-all hover:opacity-90"
+              <button
+                type="button"
+                className={formatCardCtaClass}
                 style={{ ...ctaPrimaryStyle, padding: "0.75rem 1.5rem", fontSize: "1rem" }}
+                onClick={() => scrollToContactWithFormat("side")}
               >
                 Хочу это →
-              </a>
+              </button>
             </Card>
 
             {/* Рекламная история */}
@@ -188,18 +207,14 @@ export default function AdvertisingPage() {
               <p className="text-sm md:text-base text-[#abd1c6] mb-6 leading-relaxed">
                 Вы получаете свой блок в списке историй и отдельную страницу с подробным текстом и фотографиями — честный рассказ о вас, без приукрашивания и фейковых цифр.
               </p>
-              <a
-                href="#contact"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.hash = "#contact?format=story";
-                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="inline-flex items-center gap-2 px-6 py-3.5 font-semibold rounded-xl transition-all hover:opacity-90"
+              <button
+                type="button"
+                className={formatCardCtaClass}
                 style={{ ...ctaPrimaryStyle, padding: "0.75rem 1.5rem", fontSize: "1rem" }}
+                onClick={() => scrollToContactWithFormat("story")}
               >
                 Хочу это →
-              </a>
+              </button>
             </Card>
 
             {/* Пост в Telegram */}
@@ -219,28 +234,31 @@ export default function AdvertisingPage() {
               <p className="text-sm md:text-base text-[#abd1c6] mb-6 leading-relaxed">
                 Живой Telegram‑канал, аудитория растёт
               </p>
-              <a
-                href="#contact"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.hash = "#contact?format=tg";
-                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="inline-flex items-center gap-2 px-6 py-3.5 font-semibold rounded-xl transition-all hover:opacity-90"
+              <button
+                type="button"
+                className={formatCardCtaClass}
                 style={{ ...ctaPrimaryStyle, padding: "0.75rem 1.5rem", fontSize: "1rem" }}
+                onClick={() => scrollToContactWithFormat("tg")}
               >
                 Хочу это →
-              </a>
+              </button>
             </Card>
           </div>
         </div>
       </section>
 
       {/* Выбор способа подачи заявки */}
-      <section id="contact" className="py-24 px-4 relative z-10">
+      <section
+        id="contact"
+        className="py-24 px-4 relative z-10"
+        aria-labelledby="contact-heading"
+      >
         <div className="container mx-auto max-w-4xl">
           <div className="mb-12 text-center">
-            <h2 className="text-5xl font-bold text-[#fffffe] mb-4">
+            <h2
+              id="contact-heading"
+              className="text-5xl font-bold text-[#fffffe] mb-4"
+            >
               Оставить заявку
             </h2>
             <p className="text-xl text-[#abd1c6]">
@@ -254,9 +272,27 @@ export default function AdvertisingPage() {
               variant="darkGlass"
               padding="lg"
               className="relative cursor-pointer transition-all hover:border-[#f9bc60]/25 group"
-              onClick={() => document.getElementById("contact-form")?.scrollIntoView({ behavior: "smooth" })}
+              role="button"
+              tabIndex={0}
+              aria-label="Форма на сайте: прокрутить к форме заявки"
+              onClick={() =>
+                document
+                  .getElementById("contact-form")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  document
+                    .getElementById("contact-form")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
             >
-              <div className="absolute top-4 right-4 w-12 h-12 bg-[#f9bc60]/15 rounded-xl flex items-center justify-center group-hover:bg-[#f9bc60]/25 transition-colors">
+              <div
+                className="absolute top-4 right-4 w-12 h-12 bg-[#f9bc60]/15 rounded-xl flex items-center justify-center group-hover:bg-[#f9bc60]/25 transition-colors"
+                aria-hidden
+              >
                 <LucideIcons.Document className="w-6 h-6 text-[#f9bc60]" />
               </div>
               <h3 className="text-2xl font-bold text-[#fffffe] mb-3 group-hover:text-[#f9bc60] transition-colors">
@@ -293,7 +329,10 @@ export default function AdvertisingPage() {
               className="block"
             >
               <Card variant="darkGlass" padding="lg" className="relative h-full transition-all hover:border-[#229ED9]/30 group">
-                <div className="absolute top-4 right-4 w-12 h-12 bg-[#229ED9]/15 rounded-xl flex items-center justify-center group-hover:bg-[#229ED9]/25 transition-colors">
+                <div
+                  className="absolute top-4 right-4 w-12 h-12 bg-[#229ED9]/15 rounded-xl flex items-center justify-center group-hover:bg-[#229ED9]/25 transition-colors"
+                  aria-hidden
+                >
                   <svg className="w-6 h-6 text-[#229ED9]" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
                   </svg>
@@ -342,6 +381,6 @@ export default function AdvertisingPage() {
       <div id="contact-form" className="relative z-10">
         <AdvertisingContact />
       </div>
-    </div>
+    </main>
   );
 }

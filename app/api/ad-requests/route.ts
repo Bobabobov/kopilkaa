@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 // POST - создание новой заявки на рекламу (публичный)
 export async function POST(request: NextRequest) {
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
-    console.error("Error creating ad request:", error);
+    logRouteCatchError("POST /api/ad-requests:", error);
     return NextResponse.json(
       { error: "Не удалось отправить заявку" },
       { status: 500 },
@@ -151,7 +152,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ adRequests, stats });
   } catch (error) {
-    console.error("Error fetching ad requests:", error);
+    logRouteCatchError("GET /api/ad-requests:", error);
     return NextResponse.json(
       { error: "Не удалось загрузить заявки" },
       { status: 500 },

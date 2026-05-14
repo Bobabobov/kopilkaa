@@ -12,6 +12,7 @@ import { AmountButtons } from "./one-time/AmountButtons";
 import { CustomAmountInput } from "./one-time/CustomAmountInput";
 import { SupportSocialPrompt } from "./one-time/SupportSocialPrompt";
 import type { PreSupportProfile } from "./one-time/types";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface OneTimeSupportProps {
   customAmount: string;
@@ -67,6 +68,9 @@ export default function OneTimeSupport({
       const username =
         (data?.user?.username as string | null | undefined) ?? null;
       setProfile({ username, isAuthed: true });
+    } catch (error) {
+      logRouteCatchError("[OneTimeSupport] ensureProfileLoaded", error);
+      setProfile({ username: null, isAuthed: false });
     } finally {
       setIsLoadingProfile(false);
     }

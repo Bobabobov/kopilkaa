@@ -4,11 +4,16 @@ import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { computeGoodDeedBonusWallet } from "@/lib/goodDeedBonusWallet";
 import {
+  fetchApprovedGoodDeedFeedRows,
+  mapFeedRowToGoodDeedsApiItem,
+} from "@/lib/goodDeedPublicFeed";
+import {
   getActiveTasksByDifficulty,
   getGoodDeedCycleKey,
   getTaskRotationState,
 } from "@/lib/goodDeedTasksAdmin";
 import { type GoodDeedDifficulty, getWeekInfo } from "@/lib/goodDeeds";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -35,37 +40,7 @@ export async function GET(req: NextRequest) {
             },
           })
         : Promise.resolve([]),
-      prisma.goodDeedSubmission.findMany({
-        where: {
-          status: GoodDeedSubmissionStatus.APPROVED,
-        },
-        orderBy: { updatedAt: "desc" },
-        take: 24,
-        select: {
-          id: true,
-          taskTitle: true,
-          taskDescription: true,
-          storyText: true,
-          reward: true,
-          createdAt: true,
-          updatedAt: true,
-          media: {
-            orderBy: { sort: "asc" },
-            select: { url: true, type: true },
-          },
-          user: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-              avatar: true,
-              vkLink: true,
-              telegramLink: true,
-              youtubeLink: true,
-            },
-          },
-        },
-      }),
+      fetchApprovedGoodDeedFeedRows(24),
     ]);
 
     const submissionMap = new Map(
@@ -148,35 +123,14 @@ export async function GET(req: NextRequest) {
         pendingCount,
         ...walletInfo,
       },
-      feed: feedSubmissions.map((item) => ({
-        id: item.id,
-        taskTitle: item.taskTitle,
-        taskDescription: item.taskDescription,
-        storyText: item.storyText || "",
-        reward: item.reward,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt,
-        media: item.media.map((media) => ({
-          url: media.url,
-          type: media.type,
-        })),
-        user: {
-          id: item.user.id,
-          name: item.user.name || item.user.username || "Пользователь",
-          username: item.user.username,
-          avatar: item.user.avatar,
-          vkLink: item.user.vkLink,
-          telegramLink: item.user.telegramLink,
-          youtubeLink: item.user.youtubeLink,
-        },
-      })),
+      feed: feedSubmissions.map(mapFeedRowToGoodDeedsApiItem),
       viewer: {
         isAuthenticated: Boolean(session?.uid),
       },
       weeklyProgress,
     });
   } catch (error) {
-    console.error("GET /api/good-deeds error:", error);
+    logRouteCatchError("GET /api/good-deeds error:", error);
     return NextResponse.json(
       { error: "Не удалось загрузить страницу добрых дел" },
       { status: 500 },

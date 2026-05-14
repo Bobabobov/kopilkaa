@@ -5,7 +5,13 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export default function ProfileLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <span className="sr-only">Загрузка профиля…</span>
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}

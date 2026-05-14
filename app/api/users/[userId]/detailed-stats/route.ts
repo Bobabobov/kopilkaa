@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -158,7 +159,7 @@ export async function GET(
       },
     );
   } catch (error) {
-    console.error("Error fetching detailed stats:", error);
+    logRouteCatchError("[API GET /api/users/[userId]/detailed-stats]", error);
     // Возвращаем базовую статистику вместо ошибки
     const fallbackStats = {
       applications: {

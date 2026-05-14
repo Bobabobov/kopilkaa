@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -62,7 +63,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("Error fetching user donations:", error);
+    logRouteCatchError("[API GET /api/users/[userId]/donations]", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

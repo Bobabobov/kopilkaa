@@ -9,6 +9,7 @@ import {
   MIN_WITHDRAWAL_BONUSES,
 } from "@/lib/goodDeeds";
 import { digitsFingerprint } from "@/lib/admin/requisitesFingerprint";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("POST /api/good-deeds/withdrawals error:", error);
+    logRouteCatchError("POST /api/good-deeds/withdrawals error:", error);
     return NextResponse.json(
       { error: "Не удалось отправить заявку" },
       { status: 500 },

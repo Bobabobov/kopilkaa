@@ -17,19 +17,9 @@ import {
 
 interface StoryAdLandingProps {
   story: Story;
-  liked: boolean;
-  likesCount: number;
-  onLike: () => void;
-  isAuthenticated: boolean;
-  storyId: string;
-  isLiking: boolean;
 }
 
 export default function StoryAdLanding({ story }: StoryAdLandingProps) {
-  const primaryCta = useMemo(() => {
-    if (!story.advertiserLink) return null;
-    return story.advertiserLink;
-  }, [story.advertiserLink]);
   const websiteUrl = useMemo(
     () => normalizeWebsiteUrl(story.advertiserWebsite),
     [story.advertiserWebsite],
@@ -67,6 +57,7 @@ export default function StoryAdLanding({ story }: StoryAdLandingProps) {
       <div className="relative z-10">
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
           <div className="mx-auto max-w-5xl">
+            <main id="story-ad-content">
             <div className="relative overflow-hidden rounded-3xl border border-[#abd1c6]/18 bg-gradient-to-br from-[#001e1d]/82 via-[#003d3a]/34 to-transparent backdrop-blur-sm shadow-[0_28px_80px_-48px_rgba(0,0,0,0.55)]">
               <div className="pointer-events-none absolute -top-28 -right-36 h-72 w-72 rounded-full bg-[#f9bc60]/12 blur-3xl" />
               <div className="pointer-events-none absolute -bottom-40 -left-36 h-96 w-96 rounded-full bg-[#abd1c6]/10 blur-3xl" />
@@ -79,6 +70,11 @@ export default function StoryAdLanding({ story }: StoryAdLandingProps) {
                       href={mainAction.href}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={
+                        advertiserName
+                          ? `Перейти к предложению: ${advertiserName}`
+                          : "Перейти к предложению рекламодателя"
+                      }
                       className="group inline-flex items-center gap-2.5 rounded-full border border-[#abd1c6]/45 bg-gradient-to-r from-[#0f3f3d]/95 via-[#14514d]/95 to-[#0f3f3d]/95 px-5 py-2.5 text-sm font-extrabold tracking-wide text-[#e6f5ef] shadow-[0_14px_34px_-18px_rgba(0,0,0,0.65)] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#abd1c6]/70 hover:shadow-[0_18px_38px_-16px_rgba(171,209,198,0.35)] active:translate-y-0"
                     >
                       <span className="h-2 w-2 rounded-full bg-[#abd1c6] shadow-[0_0_0_4px_rgba(171,209,198,0.22)]" />
@@ -91,6 +87,7 @@ export default function StoryAdLanding({ story }: StoryAdLandingProps) {
                   ) : (
                     <Link
                       href="/advertising"
+                      aria-label="Страница размещения рекламы"
                       className="group inline-flex items-center gap-2.5 rounded-full border border-[#abd1c6]/45 bg-gradient-to-r from-[#0f3f3d]/95 via-[#14514d]/95 to-[#0f3f3d]/95 px-5 py-2.5 text-sm font-extrabold tracking-wide text-[#e6f5ef] shadow-[0_14px_34px_-18px_rgba(0,0,0,0.65)] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#abd1c6]/70 hover:shadow-[0_18px_38px_-16px_rgba(171,209,198,0.35)] active:translate-y-0"
                     >
                       <span className="h-2 w-2 rounded-full bg-[#abd1c6] shadow-[0_0_0_4px_rgba(171,209,198,0.22)]" />
@@ -175,6 +172,7 @@ export default function StoryAdLanding({ story }: StoryAdLandingProps) {
                 Разместить рекламу
               </Link>
             </div>
+            </main>
           </div>
         </div>
       </div>

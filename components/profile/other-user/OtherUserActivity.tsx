@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type Activity = {
   id: string;
@@ -29,7 +30,7 @@ export default function OtherUserActivity({ userId }: OtherUserActivityProps) {
           setActivities(data.activities || []);
         }
       } catch (error) {
-        console.error("Load activities error:", error);
+        logRouteCatchError("[OtherUserActivity] load", error);
       } finally {
         setLoading(false);
       }

@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +51,7 @@ export async function GET(
 
     return NextResponse.json({ stats });
   } catch (error) {
-    console.error("Get user stats error:", error);
+    logRouteCatchError("[API GET /api/users/[userId]/stats]", error);
     return NextResponse.json(
       { message: "Ошибка получения статистики" },
       { status: 500 },

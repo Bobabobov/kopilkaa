@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -86,7 +87,7 @@ export async function GET(req: Request) {
       },
     });
   } catch (error) {
-    console.error("Error fetching top stories:", error);
+    logRouteCatchError("GET /api/stories/top:", error);
     return new Response(JSON.stringify({ items: [] }), {
       status: 200,
       headers: {

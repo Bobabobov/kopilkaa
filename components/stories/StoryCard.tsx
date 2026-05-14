@@ -7,6 +7,7 @@ import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
 import { StoryCardContent } from "./story-card/StoryCardContent";
 import type { Story } from "./story-card/types";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface StoryCardProps {
   story: Story;
@@ -98,7 +99,12 @@ function StoryCardInner({
           return;
         }
         const errorData = await response.json();
-        console.error("Ошибка лайка:", errorData.error || errorData.message);
+        logRouteCatchError(
+          "[StoryCard] like",
+          new Error(
+            String(errorData.error || errorData.message || response.status),
+          ),
+        );
         return;
       }
 
@@ -114,7 +120,7 @@ function StoryCardInner({
         }
       }
     } catch (error) {
-      console.error("Error updating like:", error);
+      logRouteCatchError("[StoryCard] handleLike", error);
     } finally {
       setIsLiking(false);
     }

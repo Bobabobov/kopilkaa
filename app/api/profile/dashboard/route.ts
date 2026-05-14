@@ -5,6 +5,7 @@ import { formatTimeAgo } from "@/lib/time";
 import { createHash } from "crypto";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -332,7 +333,7 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("Error fetching profile dashboard:", error);
+    logRouteCatchError("GET /api/profile/dashboard:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

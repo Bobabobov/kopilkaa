@@ -4,7 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import HeroesHero from "@/components/heroes/HeroesHero";
 import HeroesContent from "@/components/heroes/HeroesContent";
 import HeroesLoading from "@/components/heroes/HeroesLoading";
-import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import {
+  getMessageFromApiJson,
+  logRouteCatchError,
+} from "@/lib/api/parseApiError";
 export interface Hero {
   id: string;
   name: string;
@@ -154,6 +157,7 @@ export default function HeroesPageClient({
       setPage(data.page || p);
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") return;
+      logRouteCatchError("[HeroesPageClient] loadPage", err);
       setError(err instanceof Error ? err.message : "Неизвестная ошибка");
     } finally {
       setLoading(false);

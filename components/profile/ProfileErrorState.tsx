@@ -25,14 +25,20 @@ export default function ProfileErrorState({
           background: "linear-gradient(165deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
         }}
       >
-        <div className="w-16 h-16 rounded-2xl bg-red-500/15 flex items-center justify-center mx-auto mb-6 text-red-400">
+        <div
+          className="w-16 h-16 rounded-2xl bg-red-500/15 flex items-center justify-center mx-auto mb-6 text-red-400"
+          aria-hidden
+        >
           <LucideIcons.AlertTriangle className="w-8 h-8" size="xl" />
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-[#fffffe] mb-3">
           Ошибка загрузки
         </h1>
-        <p className="text-[#abd1c6] mb-8 text-base">{error}</p>
+        <div role="alert">
+          <p className="text-[#abd1c6] mb-8 text-base">{error}</p>
+        </div>
         <button
+          type="button"
           onClick={onRetry}
           className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all duration-300 hover:opacity-90 hover:shadow-lg"
           style={{

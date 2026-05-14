@@ -8,7 +8,8 @@ import {
   getTrustLimits,
   type TrustLevel,
 } from "@/lib/trustLevel";
-import { ApplicationStatus } from "@prisma/client";
+import { ApplicationStatus, type Prisma } from "@prisma/client";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -77,7 +78,9 @@ function buildTrustSnapshot(approved: number): TrustSnapshot {
   };
 }
 
-async function mapReviews(raw: any[], viewerId: string | null) {
+type ReviewListRow = Prisma.ReviewGetPayload<{ select: typeof REVIEW_SELECT }>;
+
+async function mapReviews(raw: ReviewListRow[], viewerId: string | null) {
   if (!raw.length) return [];
 
   const userIds = Array.from(new Set(raw.map((r) => r.userId)));
@@ -97,8 +100,8 @@ async function mapReviews(raw: any[], viewerId: string | null) {
   ]);
 
   const approvedMap = new Map<string, number>();
-  effectiveGroups.forEach((g: any) => {
-    approvedMap.set(g.userId, g._count?._all ?? 0);
+  effectiveGroups.forEach((g) => {
+    approvedMap.set(g.userId, g._count._all);
   });
 
   return raw.map((item) => {
@@ -112,8 +115,7 @@ async function mapReviews(raw: any[], viewerId: string | null) {
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
       images:
-        item.images?.map((img: any) => ({ url: img.url, sort: img.sort })) ??
-        [],
+        item.images?.map((img) => ({ url: img.url, sort: img.sort })) ?? [],
       user: {
         id: item.user.id,
         name: displayName,
@@ -159,9 +161,11 @@ export async function GET(req: NextRequest) {
     ] = await Promise.all([
       prisma.review.count({ where }),
       viewerId
-        ? prisma.application.count({
-            where: { userId: viewerId, status: ApplicationStatus.APPROVED },
-          }).catch(() => 0)
+        ? prisma.application
+            .count({
+              where: { userId: viewerId, status: ApplicationStatus.APPROVED },
+            })
+            .catch(() => 0)
         : 0,
       viewerId
         ? prisma.application.findFirst({
@@ -204,10 +208,9 @@ export async function GET(req: NextRequest) {
       shouldRequireFirstReview && lastApprovedApp
         ? { id: lastApprovedApp.id, title: lastApprovedApp.title }
         : null;
-    const mappedReviewForPending =
-      viewerSingleReview
-        ? (await mapReviews([viewerSingleReview], viewerId))[0]
-        : null;
+    const mappedReviewForPending = viewerSingleReview
+      ? (await mapReviews([viewerSingleReview], viewerId))[0]
+      : null;
 
     return NextResponse.json({
       limit,
@@ -223,7 +226,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching reviews:", error);
+    logRouteCatchError("[API GET /api/reviews]", error);
     return NextResponse.json(
       {
         limit: 12,
@@ -256,7 +259,8 @@ export async function POST(req: NextRequest) {
   try {
     const select = REVIEW_SELECT;
     const body = await req.json();
-    const applicationId = typeof body?.applicationId === "string" ? body.applicationId.trim() : "";
+    const applicationId =
+      typeof body?.applicationId === "string" ? body.applicationId.trim() : "";
     const content = String(body?.content || "").trim();
     const images = Array.isArray(body?.images) ? (body.images as string[]) : [];
 
@@ -274,7 +278,9 @@ export async function POST(req: NextRequest) {
     }
     if (content.length < MIN_TEXT_LENGTH) {
       return NextResponse.json(
-        { error: `Опишите опыт подробнее (минимум ${MIN_TEXT_LENGTH} символов)` },
+        {
+          error: `Опишите опыт подробнее (минимум ${MIN_TEXT_LENGTH} символов)`,
+        },
         { status: 400 },
       );
     }
@@ -292,7 +298,9 @@ export async function POST(req: NextRequest) {
     }
     if (images.length < MIN_IMAGES) {
       return NextResponse.json(
-        { error: "Добавьте хотя бы одно фото (чек, товар или результат помощи)" },
+        {
+          error: "Добавьте хотя бы одно фото (чек, товар или результат помощи)",
+        },
         { status: 400 },
       );
     }
@@ -342,7 +350,9 @@ export async function POST(req: NextRequest) {
       });
 
       if (existingByUser) {
-        await tx.reviewImage.deleteMany({ where: { reviewId: existingByUser.id } });
+        await tx.reviewImage.deleteMany({
+          where: { reviewId: existingByUser.id },
+        });
         const updated = await tx.review.update({
           where: { id: existingByUser.id },
           data: {
@@ -374,7 +384,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ review: mapped }, { status: 200 });
   } catch (error) {
-    console.error("Error creating/updating review:", error);
+    logRouteCatchError("[API POST /api/reviews]", error);
     return NextResponse.json(
       { error: "Не удалось сохранить отзыв" },
       { status: 500 },

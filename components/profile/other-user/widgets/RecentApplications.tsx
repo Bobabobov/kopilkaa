@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type Application = {
   id: string;
@@ -34,7 +35,7 @@ export default function RecentApplications({
           setItems(data.applications || []);
         }
       } catch (error) {
-        console.error("Error loading recent applications:", error);
+        logRouteCatchError("[RecentApplications] load", error);
       } finally {
         setLoading(false);
       }

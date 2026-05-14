@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export interface Donation {
   id: string;
@@ -38,7 +39,7 @@ export function useOtherUserDonations(userId: string) {
         const result = await response.json();
         setData(result);
       } catch (error) {
-        console.error("Error fetching donations:", error);
+        logRouteCatchError("[useOtherUserDonations] fetch", error);
         setError(
           error instanceof Error ? error.message : "Failed to load donations",
         );

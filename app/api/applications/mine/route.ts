@@ -42,7 +42,7 @@ export async function GET(req: Request) {
       prisma.application.count({ where: { userId: session.uid } }),
     ]);
 
-    const safeItems = items.map((it: { story: string; [key: string]: unknown }) => ({
+    const safeItems = items.map((it) => ({
       ...it,
       story: sanitizeApplicationStoryHtml(it.story),
     }));
@@ -55,7 +55,9 @@ export async function GET(req: Request) {
       items: safeItems,
     });
   } catch (error) {
-    console.error("Error fetching my applications:", error);
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error fetching my applications:", error);
+    }
     return Response.json(
       { error: "Internal server error" },
       { status: 500 },

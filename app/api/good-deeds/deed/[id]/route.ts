@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoodDeedSubmissionStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { isValidCuidLikeId } from "@/lib/reviews/reviewId";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +14,9 @@ export async function GET(
     const { id } = await ctx.params;
     if (!id?.trim()) {
       return NextResponse.json({ error: "Не указан отчёт" }, { status: 400 });
+    }
+    if (!isValidCuidLikeId(id)) {
+      return NextResponse.json({ error: "Некорректный идентификатор" }, { status: 400 });
     }
 
     const submission = await prisma.goodDeedSubmission.findFirst({
@@ -77,7 +82,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("GET /api/good-deeds/deed/[id] error:", error);
+    logRouteCatchError("GET /api/good-deeds/deed/[id] error:", error);
     return NextResponse.json(
       { error: "Не удалось загрузить отчёт" },
       { status: 500 },

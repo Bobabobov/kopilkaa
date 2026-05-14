@@ -3,7 +3,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function GoodDeedsPageSkeleton() {
   return (
-    <div className="space-y-8">
+    <div
+      className="space-y-8"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <span className="sr-only">Загрузка раздела «Добрые дела»…</span>
       <Card variant="darkGlass" padding="lg" className="overflow-hidden">
         <Skeleton className="h-6 w-40 rounded-full" />
         <Skeleton className="mt-4 h-10 w-3/4 max-w-md rounded-lg" />

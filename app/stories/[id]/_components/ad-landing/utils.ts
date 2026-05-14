@@ -1,6 +1,7 @@
-export const stripHTML = (html: string): string => {
+export const stripHTML = (html: string, maxLen = 8000): string => {
   if (!html) return "";
-  return html
+  const sliced = html.length > maxLen ? html.slice(0, maxLen) : html;
+  return sliced
     .replace(/<[^>]*>/g, " ")
     .replace(/\s+/g, " ")
     .trim();

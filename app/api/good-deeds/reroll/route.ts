@@ -3,6 +3,7 @@ import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getGoodDeedCycleKey } from "@/lib/goodDeedTasksAdmin";
 import { getWeekInfo, pickReplacementTask, pickTasksForWeek } from "@/lib/goodDeeds";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
       replacementTask: replacement,
     });
   } catch (error) {
-    console.error("POST /api/good-deeds/reroll error:", error);
+    logRouteCatchError("POST /api/good-deeds/reroll error:", error);
     return NextResponse.json(
       { error: "Не удалось заменить задание" },
       { status: 500 },

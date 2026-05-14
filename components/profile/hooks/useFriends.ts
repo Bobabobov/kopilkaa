@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { getUserStatus } from "@/lib/userStatus";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface User {
   id: string;
@@ -141,7 +142,7 @@ export function useFriends(): UseFriendsReturn {
 
       emitFriendsUpdated();
     } catch (error) {
-      console.error("Error loading friends:", error);
+      logRouteCatchError("[useFriends] loadFriends", error);
       showToast("error", "Ошибка загрузки друзей");
     } finally {
       setLoading(false);
@@ -172,11 +173,11 @@ export function useFriends(): UseFriendsReturn {
         setSearchResults(data.users || []);
       } else {
         const errorData = await response.json();
-        console.error("Search error:", errorData);
+        logRouteCatchError("[useFriends] search error response", errorData);
         setSearchResults([]);
       }
     } catch (error) {
-      console.error("Error searching users:", error);
+      logRouteCatchError("[useFriends] searchUsers", error);
       setSearchResults([]);
     } finally {
       setSearchLoading(false);
@@ -213,7 +214,7 @@ export function useFriends(): UseFriendsReturn {
         setOnlineUsers([]);
       }
     } catch (error) {
-      console.error("Error loading online users:", error);
+      logRouteCatchError("[useFriends] loadOnlineUsers", error);
       setOnlineUsers([]);
     } finally {
       setOnlineLoading(false);
@@ -253,11 +254,11 @@ export function useFriends(): UseFriendsReturn {
         loadOnlineUsers();
       } else {
         const errorData = await response.json();
-        console.error("Error response:", errorData);
+        logRouteCatchError("[useFriends] sendRequest error response", errorData);
         showToast("error", errorData.message || "Ошибка отправки заявки");
       }
     } catch (error) {
-      console.error("Error sending friend request:", error);
+      logRouteCatchError("[useFriends] sendFriendRequest", error);
       showToast("error", "Ошибка отправки заявки");
     } finally {
       setSendingRequests((prev) => {
@@ -297,11 +298,11 @@ export function useFriends(): UseFriendsReturn {
         loadOnlineUsers();
       } else {
         const errorData = await response.json();
-        console.error("Cancel error response:", errorData);
+        logRouteCatchError("[useFriends] cancelRequest error response", errorData);
         showToast("error", errorData.message || "Ошибка отмены заявки");
       }
     } catch (error) {
-      console.error("Error canceling friend request:", error);
+      logRouteCatchError("[useFriends] cancelFriendRequest", error);
       showToast("error", "Ошибка отмены заявки");
     } finally {
       setSendingRequests((prev) => {
@@ -346,7 +347,7 @@ export function useFriends(): UseFriendsReturn {
         showToast("error", errorData.message || "Ошибка принятия заявки");
       }
     } catch (error) {
-      console.error("Error accepting friend request:", error);
+      logRouteCatchError("[useFriends] acceptFriendRequest", error);
       showToast("error", "Ошибка принятия заявки");
     }
   };
@@ -377,7 +378,7 @@ export function useFriends(): UseFriendsReturn {
         showToast("error", errorData.message || "Ошибка отклонения заявки");
       }
     } catch (error) {
-      console.error("Error declining friend request:", error);
+      logRouteCatchError("[useFriends] declineFriendRequest", error);
       showToast("error", "Ошибка отклонения заявки");
     }
   };
@@ -397,7 +398,7 @@ export function useFriends(): UseFriendsReturn {
         showToast("error", errorData.message || "Ошибка удаления друга");
       }
     } catch (error) {
-      console.error("Error removing friend:", error);
+      logRouteCatchError("[useFriends] removeFriend", error);
       showToast("error", "Ошибка удаления друга");
     }
   };

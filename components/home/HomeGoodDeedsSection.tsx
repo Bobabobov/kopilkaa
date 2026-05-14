@@ -25,11 +25,17 @@ export default function HomeGoodDeedsSection() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("/api/good-deeds", { cache: "no-store" });
+        const res = await fetch(
+          `/api/good-deeds/feed?limit=${MAX_HOME_GOOD_DEEDS}`,
+          { cache: "no-store" },
+        );
         if (!res.ok) return;
-        const json = await res.json();
-        const feed = Array.isArray(json?.feed) ? json.feed : [];
-        setItems(feed.slice(0, MAX_HOME_GOOD_DEEDS));
+        const json = (await res.json()) as {
+          success?: boolean;
+          feed?: HomeGoodDeedItem[];
+        };
+        if (!json.success || !Array.isArray(json.feed)) return;
+        setItems(json.feed);
       } catch (error) {
         if (process.env.NODE_ENV !== "production") {
           console.error("Failed to load good deeds feed:", error);

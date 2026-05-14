@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type ReviewData = {
   id: string;
@@ -53,7 +54,7 @@ export default function ProfileReviewSection({
           setReview(null);
         }
       } catch (error) {
-        console.error("Failed to load review:", error);
+        logRouteCatchError("[ProfileReviewSection] load", error);
         setReview(null);
       } finally {
         setLoading(false);

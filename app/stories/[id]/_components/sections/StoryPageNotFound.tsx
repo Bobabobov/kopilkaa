@@ -6,7 +6,10 @@ export function StoryPageNotFound() {
     <div className="min-h-screen">
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
         <div className="w-full max-w-md rounded-2xl border border-[#abd1c6]/25 bg-[#001e1d]/40 p-8 shadow-xl text-center">
-          <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#abd1c6]/20 text-[#abd1c6] mb-5">
+          <span
+            className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#abd1c6]/20 text-[#abd1c6] mb-5"
+            aria-hidden
+          >
             <LucideIcons.BookOpen size="xl" />
           </span>
           <h1 className="mb-2 text-2xl font-bold text-[#fffffe]">

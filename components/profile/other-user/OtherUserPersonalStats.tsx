@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface DetailedStats {
   applications: {
@@ -58,7 +59,7 @@ export default function OtherUserPersonalStats({
           throw new Error("No detailed stats in response");
         }
       } catch (error) {
-        console.error("Error fetching detailed stats:", error);
+        logRouteCatchError("[OtherUserPersonalStats] fetch", error);
         setError(
           error instanceof Error ? error.message : "Failed to load stats",
         );

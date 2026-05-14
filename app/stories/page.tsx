@@ -1,21 +1,10 @@
-import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import StoriesPageClient from "./_components/StoriesPageClient";
 import type { Story } from "@/hooks/stories/useStories";
+import { getInternalApiBaseUrl } from "@/lib/siteOrigin";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
-const baseUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
-export const metadata: Metadata = {
-  title: "Истории платформы",
-  description:
-    "Истории пользователей, которым платформа Копилка оказала финансовую поддержку.",
-  openGraph: {
-    title: "Истории платформы",
-    description:
-      "Истории пользователей, которым платформа Копилка оказала финансовую поддержку.",
-  },
-};
+const baseUrl = getInternalApiBaseUrl();
 
 async function fetchWithCookies(
   url: string,
@@ -42,7 +31,8 @@ async function fetchTopStories(): Promise<Story[]> {
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data.items) ? data.items : [];
-  } catch {
+  } catch (error) {
+    logRouteCatchError("[StoriesPage] fetchTopStories", error);
     return [];
   }
 }
@@ -58,7 +48,8 @@ async function fetchStoriesSummary(): Promise<number | null> {
     if (!res.ok) return null;
     const data = await res.json();
     return typeof data.totalPaid === "number" ? data.totalPaid : null;
-  } catch {
+  } catch (error) {
+    logRouteCatchError("[StoriesPage] fetchStoriesSummary", error);
     return null;
   }
 }
@@ -73,7 +64,8 @@ async function fetchFirstStoriesPage(): Promise<FirstPageResult> {
     const items = Array.isArray(data.items) ? data.items : [];
     const pages = Number(data.pages) || 0;
     return { items, hasMore: pages > 1 };
-  } catch {
+  } catch (error) {
+    logRouteCatchError("[StoriesPage] fetchFirstStoriesPage", error);
     return { items: [], hasMore: false };
   }
 }

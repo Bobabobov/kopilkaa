@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
 
 export interface DetailedStats {
   applications: {
@@ -84,7 +84,7 @@ export function usePersonalStats() {
           throw new Error("No detailed stats in response");
         }
       } catch (err: any) {
-        console.error("Error fetching detailed stats:", err);
+        logRouteCatchError("[usePersonalStats] fetch", err);
         setError(
           err instanceof Error ? err.message : "Не удалось загрузить статистику",
         );

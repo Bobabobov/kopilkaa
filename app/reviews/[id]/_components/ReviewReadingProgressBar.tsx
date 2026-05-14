@@ -36,6 +36,7 @@ export function ReviewReadingProgressBar() {
     <div
       className="fixed left-0 top-0 z-50 h-0.5 sm:h-1 bg-[#001e1d]/25"
       role="progressbar"
+      aria-label="Прогресс чтения страницы"
       aria-valuenow={Math.round(progress)}
       aria-valuemin={0}
       aria-valuemax={100}

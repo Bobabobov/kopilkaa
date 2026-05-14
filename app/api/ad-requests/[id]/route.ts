@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 // PUT - обновление статуса заявки (только для админов)
 export async function PUT(
@@ -37,7 +38,7 @@ export async function PUT(
 
     return NextResponse.json({ adRequest });
   } catch (error) {
-    console.error("Error updating ad request:", error);
+    logRouteCatchError("PUT /api/ad-requests/[id]:", error);
     return NextResponse.json(
       { error: "Не удалось обновить заявку" },
       { status: 500 },
@@ -68,7 +69,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: "Заявка удалена" });
   } catch (error) {
-    console.error("Error deleting ad request:", error);
+    logRouteCatchError("DELETE /api/ad-requests/[id]:", error);
     return NextResponse.json(
       { error: "Не удалось удалить заявку" },
       { status: 500 },

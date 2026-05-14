@@ -8,7 +8,7 @@ import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { getAllAvatarFrames, getAvatarFrame } from "@/lib/header-customization";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import ColorWheel from "./ColorWheel";
-import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface User {
   id: string;
@@ -156,7 +156,7 @@ export default function AvatarFrameCustomization({
         );
       }
     } catch (error) {
-      console.error("Error saving avatar frame:", error);
+      logRouteCatchError("[AvatarFrameCustomization] save", error);
       showToast("error", "Ошибка сохранения", "Не удалось сохранить рамку");
     } finally {
       setSaving(false);

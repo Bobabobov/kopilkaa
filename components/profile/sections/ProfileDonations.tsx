@@ -8,6 +8,7 @@ import { ProfileDonationsHeader } from "./donations/ProfileDonationsHeader";
 import { ProfileDonationsStats } from "./donations/ProfileDonationsStats";
 import { ProfileDonationsList } from "./donations/ProfileDonationsList";
 import type { DonationsData } from "./donations/types";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export default function ProfileDonations() {
   const [data, setData] = useState<DonationsData | null>(null);
@@ -28,7 +29,7 @@ export default function ProfileDonations() {
         const result = await response.json();
         setData(result);
       } catch (error) {
-        console.error("Error fetching donations:", error);
+        logRouteCatchError("[ProfileDonations] fetch", error);
         setError(
           error instanceof Error ? error.message : "Failed to load donations",
         );

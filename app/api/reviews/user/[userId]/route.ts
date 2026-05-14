@@ -9,6 +9,8 @@ import {
   type TrustLevel,
 } from "@/lib/trustLevel";
 import { ApplicationStatus } from "@prisma/client";
+import { isValidCuidLikeId } from "@/lib/reviews/reviewId";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -40,15 +42,18 @@ function buildTrustSnapshot(approved: number): TrustSnapshot {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { userId: string } },
+  context: { params: Promise<{ userId: string }> },
 ) {
   try {
     const session = await getSession();
     const viewerId = session?.uid ? String(session.uid) : null;
-    const userId = params.userId;
+    const { userId } = await context.params;
 
-    if (!userId) {
-      return NextResponse.json({ error: "userId required" }, { status: 400 });
+    if (!userId || !isValidCuidLikeId(userId)) {
+      return NextResponse.json(
+        { error: "Некорректный userId" },
+        { status: 400 },
+      );
     }
 
     const select = {
@@ -57,7 +62,10 @@ export async function GET(
       content: true,
       createdAt: true,
       updatedAt: true,
-      images: { orderBy: { sort: "asc" as const }, select: { url: true, sort: true } },
+      images: {
+        orderBy: { sort: "asc" as const },
+        select: { url: true, sort: true },
+      },
       user: {
         select: {
           id: true,
@@ -109,7 +117,7 @@ export async function GET(
 
     return NextResponse.json({ review: mapped });
   } catch (error) {
-    console.error("Error fetching review by userId:", error);
+    logRouteCatchError("[API GET /api/reviews/user/[userId]]", error);
     return NextResponse.json({ error: "Ошибка загрузки" }, { status: 500 });
   }
 }

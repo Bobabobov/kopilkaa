@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatRelativeDate } from "@/lib/time";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type StoryData = {
   id: string;
@@ -42,7 +43,7 @@ export default function ProfileStoriesSection({
           setStories([]);
         }
       } catch (error) {
-        console.error("Failed to load stories:", error);
+        logRouteCatchError("[ProfileStoriesSection] load", error);
         setStories([]);
       } finally {
         setLoading(false);

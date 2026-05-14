@@ -1,15 +1,8 @@
-import type { Metadata } from "next";
 import HeroesPageClient from "./_components/HeroesPageClient";
 import type { Hero, HeroesStats } from "./_components/HeroesPageClient";
+import { getInternalApiBaseUrl } from "@/lib/siteOrigin";
 
-export const metadata: Metadata = {
-  title: "Герои",
-  description:
-    "Участники платформы Копилка, поддержавшие проект. Рейтинг по размещению профиля.",
-};
-
-const baseUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const baseUrl = getInternalApiBaseUrl();
 
 async function fetchHeroesFirstPage(): Promise<{
   topThree: Hero[];

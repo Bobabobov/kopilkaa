@@ -16,11 +16,13 @@ export default function HeroesErrorState({ error, onRetry }: HeroesErrorStatePro
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
           <Card variant="darkGlass" padding="lg" className="border-red-400/20">
             <CardContent>
-              <div className="mb-6 flex justify-center">
+              <div className="mb-6 flex justify-center" aria-hidden>
                 <LucideIcons.AlertTriangle className="w-14 h-14 sm:w-16 sm:h-16 text-amber-400" />
               </div>
               <h3 className="text-3xl font-bold mb-4 text-[#fffffe]">Что-то пошло не так</h3>
-              <p className="text-lg mb-8 text-red-400">{error}</p>
+              <div role="alert">
+                <p className="text-lg mb-8 text-red-400">{error}</p>
+              </div>
               {onRetry && (
                 <button
                   onClick={onRetry}

@@ -6,13 +6,20 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export default function HeroesLoading() {
   return (
-    <div className="min-h-screen px-4 sm:px-6 lg:px-8 pt-10 sm:pt-12 md:pt-14 pb-16">
+    <div
+      className="min-h-screen px-4 sm:px-6 lg:px-8 pt-10 sm:pt-12 md:pt-14 pb-16"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <span className="sr-only">Загрузка раздела «Герои проекта»…</span>
       <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10 md:space-y-12">
         <Card variant="darkGlass" padding="lg" className="overflow-hidden">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
             className="mb-6 flex justify-center"
+            aria-hidden
           >
             <LucideIcons.Star className="w-12 h-12 text-[#f9bc60]" />
           </motion.div>

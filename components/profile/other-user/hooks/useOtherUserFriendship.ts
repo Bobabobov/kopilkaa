@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ToastType } from "@/components/ui/BeautifulToast";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type Friendship = {
   id: string;
@@ -51,7 +52,7 @@ export function useOtherUserFriendship({
         setFriendship(userFriendship || null);
       }
     } catch (error) {
-      console.error("Load friendship data error:", error);
+      logRouteCatchError("[useOtherUserFriendship] load", error);
     }
   }, [resolvedUserId]);
 
@@ -98,7 +99,7 @@ export function useOtherUserFriendship({
         );
       }
     } catch (error) {
-      console.error("Friend request error:", error);
+      logRouteCatchError("[useOtherUserFriendship] request", error);
       showToast(
         "error",
         "Ошибка отправки",

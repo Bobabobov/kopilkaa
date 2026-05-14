@@ -3,6 +3,10 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
+import { publicStoryWhereById } from "@/lib/stories/publicStoryWhere";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(
   _request: Request,
@@ -14,7 +18,7 @@ export async function GET(
   try {
     decodedId = decodeURIComponent(id);
   } catch (error) {
-    // Игнорируем ошибки декодирования
+    logRouteCatchError(`[API GET /api/stories/${id}] decodeURIComponent`, error);
   }
 
   // Валидация ID (не модифицируем входные данные)
@@ -27,13 +31,7 @@ export async function GET(
   const session = await getSession();
 
   const story = await prisma.application.findFirst({
-    where: {
-      id: finalId,
-      OR: [
-        { status: "APPROVED" },
-        { status: "CONTEST", publishInStories: true },
-      ],
-    },
+    where: publicStoryWhereById(finalId),
     select: {
       id: true,
       title: true,
@@ -84,10 +82,7 @@ export async function GET(
       isContestWinner: story.status === "CONTEST" && story.publishInStories,
       story: sanitizeApplicationStoryHtml(story.story || ""),
       user: story.user
-        ? sanitizeEmailForViewer(
-            story.user as any,
-            session?.uid || "",
-          )
+        ? sanitizeEmailForViewer(story.user, session?.uid ?? "")
         : story.user,
       userLiked,
     },

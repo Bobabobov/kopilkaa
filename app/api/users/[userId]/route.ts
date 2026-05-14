@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { isUsernameIdentifier } from "@/lib/userResolve";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export async function GET(
   request: Request,
@@ -62,11 +63,11 @@ export async function GET(
       );
     }
 
-    const safeUser = sanitizeEmailForViewer(user as any, session.uid);
+    const safeUser = sanitizeEmailForViewer(user, session.uid);
 
     return NextResponse.json({ user: safeUser });
   } catch (error) {
-    console.error("Get user error:", error);
+    logRouteCatchError("[API GET /api/users/[userId]]", error);
     return NextResponse.json(
       { message: "Ошибка получения пользователя" },
       { status: 500 },

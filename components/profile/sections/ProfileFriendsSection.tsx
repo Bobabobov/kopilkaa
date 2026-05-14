@@ -8,6 +8,7 @@ import { ProfileFriendsError } from "./friends/ProfileFriendsError";
 import { ProfileFriendsEmpty } from "./friends/ProfileFriendsEmpty";
 import { FriendsPreviewList } from "./friends/FriendsPreviewList";
 import type { Friendship } from "./friends/types";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export default function ProfileFriendsSection() {
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function ProfileFriendsSection() {
         setSentRequests(sentData.friendships || []);
       }
     } catch (err) {
-      console.error("Error fetching friends:", err);
+      logRouteCatchError("[ProfileFriendsSection] fetchFriends", err);
       setError(err instanceof Error ? err.message : "Неизвестная ошибка");
     } finally {
       setLoading(false);

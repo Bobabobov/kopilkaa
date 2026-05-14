@@ -69,7 +69,7 @@ export function ReviewsSection() {
             color: "#f9bc60",
           }}
         >
-          <LucideIcons.MessageCircle className="w-4 h-4" />
+              <LucideIcons.MessageCircle className="w-4 h-4" aria-hidden />
           <span className="text-sm font-semibold uppercase tracking-wider">
             Опыт сообщества
           </span>
@@ -206,7 +206,7 @@ export function ReviewsSection() {
                     border: "2px solid rgba(249, 188, 96, 0.4)",
                   }}
                 >
-                  <LucideIcons.Gift className="w-7 h-7 text-[#f9bc60]" />
+                  <LucideIcons.Gift className="w-7 h-7 text-[#f9bc60]" aria-hidden />
                 </div>
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-[#fffffe]">
@@ -219,7 +219,18 @@ export function ReviewsSection() {
               </div>
               <div className="flex items-center gap-2">
                 {loading ? (
-                  <LucideIcons.Loader2 className="w-5 h-5 animate-spin text-[#f9bc60]" />
+                  <span
+                    className="inline-flex items-center gap-2"
+                    role="status"
+                    aria-live="polite"
+                    aria-busy="true"
+                  >
+                    <span className="sr-only">Обновление счётчика отзывов</span>
+                    <LucideIcons.Loader2
+                      className="w-5 h-5 animate-spin text-[#f9bc60]"
+                      aria-hidden
+                    />
+                  </span>
                 ) : (
                   <span
                     className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold"

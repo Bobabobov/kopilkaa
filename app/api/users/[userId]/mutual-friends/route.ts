@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export async function GET(
   _request: Request,
@@ -87,7 +88,7 @@ export async function GET(
 
     return NextResponse.json({ users: safeUsers });
   } catch (error) {
-    console.error("Mutual friends error:", error);
+    logRouteCatchError("[API GET /api/users/[userId]/mutual-friends]", error);
     return NextResponse.json(
       { message: "Ошибка получения общих друзей" },
       { status: 500 },

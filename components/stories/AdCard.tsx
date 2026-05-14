@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useRouter } from "next/navigation";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface AdCardProps {
   index: number;
@@ -81,7 +82,7 @@ export function AdCard({ index }: AdCardProps) {
           setCardText(stripHTML(textFromAd));
         }
       } catch (error) {
-        console.error("Error loading stories ad preview:", error);
+        logRouteCatchError("[AdCard] loadPreview", error);
       }
     };
 

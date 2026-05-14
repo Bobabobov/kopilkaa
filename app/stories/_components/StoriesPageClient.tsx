@@ -12,6 +12,7 @@ import { StoriesEmptyWithAd } from "./sections/StoriesEmptyWithAd";
 import { TopStoriesSection } from "./top-stories";
 import { StoriesSummaryBanner } from "./sections/StoriesSummaryBanner";
 import { StoriesGrid } from "./sections/StoriesGrid";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface StoriesPageClientProps {
   initialTopStories?: StoryItem[];
@@ -192,7 +193,7 @@ export default function StoriesPageClient({
           setTopStories(data.items);
         }
       } catch (error) {
-        console.error("Failed to load top stories:", error);
+        logRouteCatchError("[StoriesPageClient] loadTopStories", error);
       } finally {
         if (isMounted) {
           setTopLoading(false);
@@ -221,7 +222,7 @@ export default function StoriesPageClient({
           setTotalPaid(data.totalPaid);
         }
       } catch (error) {
-        console.error("Failed to load stories summary:", error);
+        logRouteCatchError("[StoriesPageClient] loadSummary", error);
       }
     };
 

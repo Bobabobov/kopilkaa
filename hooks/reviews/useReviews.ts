@@ -1,7 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
-import { throwIfApiFailed } from "@/lib/api/parseApiError";
+import { throwIfApiFailed, logRouteCatchError } from "@/lib/api/parseApiError";
+
+function isAbortError(error: unknown): boolean {
+  return (
+    (error instanceof DOMException && error.name === "AbortError") ||
+    (typeof error === "object" &&
+      error !== null &&
+      "name" in error &&
+      String((error as { name?: string }).name) === "AbortError")
+  );
+}
 
 type ReviewUser = {
   id: string;
@@ -101,7 +111,9 @@ export function useReviews(options?: UseReviewsOptions) {
           setData(json);
         }
       } catch (error) {
-        console.error("Failed to load reviews", error);
+        if (!isAbortError(error)) {
+          logRouteCatchError("[useReviews] fetchReviews", error);
+        }
         if (!append) {
           showToastRef.current?.(
             "error",
@@ -126,7 +138,11 @@ export function useReviews(options?: UseReviewsOptions) {
   const loadMore = useCallback(() => {
     if (loadingMore || !data) return;
     if (data.page >= data.pages) return;
-    fetchReviews(data.page + 1, true).catch(console.error);
+    fetchReviews(data.page + 1, true).catch((err) => {
+      if (!isAbortError(err)) {
+        logRouteCatchError("[useReviews] loadMore", err);
+      }
+    });
   }, [loadingMore, data, fetchReviews]);
 
   const submitReview = useCallback(
@@ -236,12 +252,16 @@ export function useReviews(options?: UseReviewsOptions) {
               : prev.viewer,
           };
         });
-      } catch (error: any) {
-        console.error("Submit review error", error);
+      } catch (error: unknown) {
+        logRouteCatchError("[useReviews] submitReview", error);
+        const msg =
+          error instanceof Error
+            ? error.message
+            : "Не удалось сохранить отзыв";
         showToastRef.current?.(
           "error",
           "Ошибка",
-          error?.message || "Не удалось сохранить отзыв",
+          msg,
         );
       } finally {
         setSubmitting(false);
@@ -266,12 +286,16 @@ export function useReviews(options?: UseReviewsOptions) {
 
         // Обновляем данные с сервера (чтобы получить актуальный pendingReviewApplication)
         fetchReviews(1, false);
-      } catch (error: any) {
-        console.error("Delete review error", error);
+      } catch (error: unknown) {
+        logRouteCatchError("[useReviews] deleteReview", error);
+        const msg =
+          error instanceof Error
+            ? error.message
+            : "Не удалось удалить отзыв";
         showToastRef.current?.(
           "error",
           "Ошибка",
-          error?.message || "Не удалось удалить отзыв",
+          msg,
         );
       } finally {
         setSubmitting(false);

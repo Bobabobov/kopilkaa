@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export async function GET(
   request: Request,
@@ -41,7 +42,7 @@ export async function GET(
 
     return NextResponse.json({ applications: apps });
   } catch (error) {
-    console.error("Other user recent applications error:", error);
+    logRouteCatchError("[API GET /api/users/[userId]/applications/recent]", error);
     return NextResponse.json(
       { message: "Ошибка получения заявок пользователя" },
       { status: 500 },

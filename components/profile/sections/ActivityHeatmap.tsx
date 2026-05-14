@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface DayData {
   date: string;
@@ -44,7 +45,7 @@ export default function ActivityHeatmap() {
 
         setData(days);
       } catch (error) {
-        console.error("Error fetching activity:", error);
+        logRouteCatchError("[ActivityHeatmap] fetch", error);
       } finally {
         setLoading(false);
       }

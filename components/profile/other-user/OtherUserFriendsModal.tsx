@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type UserLite = {
   id: string;
@@ -51,7 +52,7 @@ export default function OtherUserFriendsModal({
           setFriends(data.friends || []);
         }
       } catch (e) {
-        console.error("Error loading friends for modal:", e);
+        logRouteCatchError("[OtherUserFriendsModal] load", e);
       } finally {
         if (!cancelled) setLoading(false);
       }

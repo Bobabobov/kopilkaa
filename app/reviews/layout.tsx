@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://kopilka.ru"
-).replace(/\/$/, "");
-
 export const metadata: Metadata = {
   title: "Отзывы участников",
   description:
@@ -23,6 +19,8 @@ export const metadata: Metadata = {
     description:
       "Читайте честные отзывы участников платформы Копилка. Реальные истории тех, кто оформил заявку и получил одобрение",
     url: "/reviews",
+    siteName: "Копилка",
+    locale: "ru_RU",
     type: "website",
     images: [
       {

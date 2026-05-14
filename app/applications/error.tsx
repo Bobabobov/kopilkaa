@@ -14,7 +14,9 @@ export default function ApplicationsError({
   const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
-    console.error("Applications page error:", error);
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Applications page error:", error);
+    }
   }, [error]);
 
   const errorText = error?.message || String(error) || "Неизвестная ошибка";

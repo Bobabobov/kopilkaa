@@ -20,15 +20,18 @@ export default function ProfileUnauthorizedState() {
         <div
           className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 text-[#f9bc60]"
           style={{ background: "rgba(249, 188, 96, 0.15)" }}
+          aria-hidden
         >
           <LucideIcons.User className="w-8 h-8" size="xl" />
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#fffffe] mb-3">
-          Требуется авторизация
-        </h1>
-        <p className="text-[#abd1c6] mb-8 text-base">
-          Войдите в аккаунт, чтобы просмотреть свой профиль
-        </p>
+        <div role="status" aria-live="polite">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#fffffe] mb-3">
+            Требуется авторизация
+          </h1>
+          <p className="text-[#abd1c6] mb-8 text-base">
+            Войдите в аккаунт, чтобы просмотреть свой профиль
+          </p>
+        </div>
         <a
           href="/profile?modal=auth/signup"
           className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all duration-300 hover:opacity-90 hover:shadow-lg"

@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { type TrustLevel } from "@/lib/trustLevel";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
+import { isValidCuidLikeId } from "@/lib/reviews/reviewId";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -42,8 +44,8 @@ export async function GET(
     const { id: reviewId } = await params;
     const session = await getSession();
     const viewerId = session?.uid || null;
-    if (!reviewId) {
-      return NextResponse.json({ error: "id required" }, { status: 400 });
+    if (!reviewId || !isValidCuidLikeId(reviewId)) {
+      return NextResponse.json({ error: "Некорректный id" }, { status: 400 });
     }
 
     const review = await prisma.review.findUnique({
@@ -95,7 +97,7 @@ export async function GET(
 
     return NextResponse.json({ review: mapped });
   } catch (error) {
-    console.error("Error fetching review by id:", error);
+    logRouteCatchError("[API GET /api/reviews/[id]]", error);
     return NextResponse.json({ error: "Ошибка загрузки" }, { status: 500 });
   }
 }
@@ -115,8 +117,8 @@ export async function DELETE(
         { status: 401 },
       );
     }
-    if (!reviewId) {
-      return NextResponse.json({ error: "id required" }, { status: 400 });
+    if (!reviewId || !isValidCuidLikeId(reviewId)) {
+      return NextResponse.json({ error: "Некорректный id" }, { status: 400 });
     }
 
     // Проверяем, что отзыв существует и принадлежит текущему пользователю
@@ -143,7 +145,7 @@ export async function DELETE(
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting review:", error);
+    logRouteCatchError("[API DELETE /api/reviews/[id]]", error);
     return NextResponse.json(
       { error: "Не удалось удалить отзыв" },
       { status: 500 },

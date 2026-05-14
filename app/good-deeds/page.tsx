@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { MIN_GOOD_DEED_STORY_CHARS } from "@/lib/goodDeeds";
 import type { GoodDeedsResponse } from "./types";
-import { throwIfApiFailed } from "@/lib/api/parseApiError";
+import { throwIfApiFailed, logRouteCatchError } from "@/lib/api/parseApiError";
 
 export default function GoodDeedsPage() {
   const [data, setData] = useState<GoodDeedsResponse | null>(null);
@@ -29,7 +29,7 @@ export default function GoodDeedsPage() {
       throwIfApiFailed(res, json, "Не удалось загрузить раздел «Добрые дела»");
       setData(json as GoodDeedsResponse);
     } catch (error) {
-      console.error(error);
+      logRouteCatchError("[GoodDeedsPage] load", error);
       showToast("error", "Ошибка", "Не удалось загрузить добрые дела");
       setData(null);
     } finally {
@@ -38,7 +38,9 @@ export default function GoodDeedsPage() {
   };
 
   useEffect(() => {
-    load().catch(console.error);
+    load().catch((error) =>
+      logRouteCatchError("[GoodDeedsPage] load (effect)", error),
+    );
   }, []);
 
   const onFilesChange = (taskId: string, fileList: FileList | null) => {
@@ -124,7 +126,7 @@ export default function GoodDeedsPage() {
       setStoryByTask((prev) => ({ ...prev, [taskId]: "" }));
       await load();
     } catch (error) {
-      console.error(error);
+      logRouteCatchError("[GoodDeedsPage] submitTask", error);
       showToast(
         "error",
         "Ошибка",
@@ -169,7 +171,11 @@ export default function GoodDeedsPage() {
                 data.viewer.isAuthenticated ? data.stats : undefined
               }
               showToast={showToast}
-              onWithdrawSuccess={() => load().catch(console.error)}
+              onWithdrawSuccess={() =>
+                load().catch((error) =>
+                  logRouteCatchError("[GoodDeedsPage] load (withdraw)", error),
+                )
+              }
             />
 
             {data.viewer.isAuthenticated ? (
@@ -190,13 +196,15 @@ export default function GoodDeedsPage() {
                 variant="darkGlass"
                 className="border-[#f9bc60]/25 bg-gradient-to-br from-[#004643]/45 to-[#001e1d]/70"
               >
-                <h2 className="text-lg font-bold text-[#fffffe] sm:text-xl">
-                  Выполнение добрых дел доступно только после входа
-                </h2>
-                <p className="mt-2 text-sm text-[#abd1c6]/95">
-                  Чтобы отправлять отчёты и получать бонусы, войдите в аккаунт
-                  или зарегистрируйтесь.
-                </p>
+                <div role="status" aria-live="polite">
+                  <h2 className="text-lg font-bold text-[#fffffe] sm:text-xl">
+                    Выполнение добрых дел доступно только после входа
+                  </h2>
+                  <p className="mt-2 text-sm text-[#abd1c6]/95">
+                    Чтобы отправлять отчёты и получать бонусы, войдите в аккаунт
+                    или зарегистрируйтесь.
+                  </p>
+                </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Button
                     asChild

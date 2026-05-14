@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface RouteParams {
   params: {
@@ -62,7 +63,7 @@ export async function GET(_req: Request, { params }: RouteParams) {
 
     return NextResponse.json({ success: true, friends: safeFriends });
   } catch (error) {
-    console.error("Error fetching user friends:", error);
+    logRouteCatchError("[API GET /api/users/[userId]/friends]", error);
     return NextResponse.json(
       { error: "Ошибка получения списка друзей" },
       { status: 500 },

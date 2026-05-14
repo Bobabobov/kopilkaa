@@ -10,6 +10,7 @@ import {
   MAX_GOOD_DEED_STORY_CHARS,
   MIN_GOOD_DEED_STORY_CHARS,
 } from "@/lib/goodDeeds";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 const MAX_MEDIA = 5;
 const MIN_MEDIA = 1;
@@ -189,7 +190,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("POST /api/good-deeds/submissions error:", error);
+    logRouteCatchError("POST /api/good-deeds/submissions error:", error);
     return NextResponse.json(
       { error: "Не удалось отправить задание на модерацию" },
       { status: 500 },

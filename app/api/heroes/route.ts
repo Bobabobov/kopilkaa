@@ -1,9 +1,43 @@
 // app/api/heroes/route.ts
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getSafeExternalUrl } from "@/lib/safeExternalUrl";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
+
+const userSelect = {
+  id: true,
+  name: true,
+  email: true,
+  hideEmail: true,
+  avatar: true,
+  createdAt: true,
+  vkLink: true,
+  telegramLink: true,
+  youtubeLink: true,
+} as const satisfies Prisma.UserSelect;
+
+type UserHeroRow = Prisma.UserGetPayload<{ select: typeof userSelect }>;
+
+interface HeroPublicRow {
+  id: string;
+  name: string;
+  avatar: string | null;
+  totalDonated: number;
+  donationCount: number;
+  joinedAt: Date;
+  hasExtendedPlacement: boolean;
+  isSubscriber: boolean;
+  vkLink: string | null;
+  telegramLink: string | null;
+  youtubeLink: string | null;
+}
+
+interface HeroWithRank extends HeroPublicRow {
+  rank: number;
+}
 
 export async function GET(request: Request) {
   try {
@@ -14,10 +48,11 @@ export async function GET(request: Request) {
       Math.max(1, Number(searchParams.get("limit") || 24)),
     );
     const q = (searchParams.get("q") || "").trim().toLowerCase();
-    const sortBy = (searchParams.get("sortBy") || "total") as
-      | "total"
-      | "count"
-      | "date";
+    const sortRaw = (searchParams.get("sortBy") || "total").toLowerCase();
+    const sortBy: "total" | "count" | "date" =
+      sortRaw === "count" || sortRaw === "date" || sortRaw === "total"
+        ? sortRaw
+        : "total";
 
     // Агрегируем оплаты услуги размещения в разделе «Герои» (DonationType.SUPPORT)
     // ВАЖНО: это оплата цифровой услуги размещения профиля (не благотворительность).
@@ -68,22 +103,10 @@ export async function GET(request: Request) {
       );
     }
 
-    const userSelect = {
-      id: true,
-      name: true,
-      email: true,
-      hideEmail: true,
-      avatar: true,
-      createdAt: true,
-      vkLink: true,
-      telegramLink: true,
-      youtubeLink: true,
-    } as const;
-
     // ВАЖНО: hideFromHeroes добавлен позже миграцией. Если на окружении миграция ещё не применена,
     // Prisma упадёт на where: { hideFromHeroes: false }. Чтобы /heroes не становилась пустой,
     // делаем fallback запрос без фильтра.
-    let users: any[] = [];
+    let users: UserHeroRow[] = [];
     try {
       users = await prisma.user.findMany({
         where: { id: { in: userIds }, hideFromHeroes: false },
@@ -98,10 +121,10 @@ export async function GET(request: Request) {
         .catch(() => []);
     }
 
-    const byId = new Map(users.map((u) => [u.id, u]));
+    const byId = new Map<string, UserHeroRow>(users.map((u) => [u.id, u]));
 
-    const heroesRawAll = aggregates
-      .map((agg) => {
+    const heroesRawAll: HeroPublicRow[] = aggregates
+      .map((agg): HeroPublicRow | null => {
         // Prisma groupBy может вернуть userId = null (анонимные оплаты)
         if (!agg.userId) return null;
         const user = byId.get(agg.userId);
@@ -131,16 +154,16 @@ export async function GET(request: Request) {
           youtubeLink: getSafeExternalUrl(user.youtubeLink),
         };
       })
-      .filter(Boolean) as any[];
+      .filter((row): row is HeroPublicRow => row !== null);
 
     // Global ranks always by total donated
-    const heroesByTotal = [...heroesRawAll].sort(
+    const heroesByTotal: HeroPublicRow[] = [...heroesRawAll].sort(
       (a, b) => b.totalDonated - a.totalDonated,
     );
     const rankById = new Map<string, number>();
     heroesByTotal.forEach((h, idx) => rankById.set(h.id, idx + 1));
 
-    const heroesAll = heroesRawAll.map((hero) => ({
+    const heroesAll: HeroWithRank[] = heroesRawAll.map((hero) => ({
       ...hero,
       rank: rankById.get(hero.id) || 0,
     }));
@@ -157,14 +180,14 @@ export async function GET(request: Request) {
       totalHeroes > 0 ? Math.round(totalDonated / totalHeroes) : 0;
 
     // Top 3 всегда по totalDonated
-    const topThree = heroesByTotal.slice(0, 3).map((h) => ({
+    const topThree: HeroWithRank[] = heroesByTotal.slice(0, 3).map((h) => ({
       ...h,
       rank: rankById.get(h.id) || 0,
     }));
     const topIds = new Set(topThree.map((h) => h.id));
 
     // Filter (search) applies to list only
-    let list = heroesAll;
+    let list: HeroWithRank[] = heroesAll;
     if (q) {
       list = list.filter((h) => (h.name || "").toLowerCase().includes(q));
     }
@@ -226,7 +249,7 @@ export async function GET(request: Request) {
       },
     );
   } catch (error) {
-    console.error("Ошибка при получении героев:", error);
+    logRouteCatchError("GET /api/heroes:", error);
     // Возвращаем пустой список вместо падения страницы
     return NextResponse.json(
       {

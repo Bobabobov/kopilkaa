@@ -2,10 +2,14 @@
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { publicStoryWhereById } from "@/lib/stories/publicStoryWhere";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 function isValidStoryId(id: string) {
   return /^[a-zA-Z0-9_-]+$/.test(id);
 }
+
+export const dynamic = "force-dynamic";
 
 export async function POST(
   request: Request,
@@ -21,15 +25,12 @@ export async function POST(
     const userId = session.uid;
 
     if (!isValidStoryId(storyId)) {
-      return NextResponse.json(
-        { error: "Invalid ID format" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
     }
 
-    // Проверяем, что история существует
+    // Проверяем, что история существует и публично доступна (как в GET /api/stories/:id)
     const story = await prisma.application.findFirst({
-      where: { id: storyId, status: "APPROVED" },
+      where: publicStoryWhereById(storyId),
       select: { id: true },
     });
 
@@ -71,7 +72,7 @@ export async function POST(
       },
     );
   } catch (error) {
-    console.error("Error adding like:", error);
+    logRouteCatchError("POST /api/stories/[id]/like:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
@@ -90,10 +91,7 @@ export async function DELETE(
     const userId = session.uid;
 
     if (!isValidStoryId(storyId)) {
-      return NextResponse.json(
-        { error: "Invalid ID format" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
     }
 
     // Удаляем лайк
@@ -119,7 +117,7 @@ export async function DELETE(
       },
     );
   } catch (error) {
-    console.error("Error removing like:", error);
+    logRouteCatchError("DELETE /api/stories/[id]/like:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }

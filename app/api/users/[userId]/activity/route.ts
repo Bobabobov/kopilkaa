@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { resolveUserIdFromIdentifier } from "@/lib/userResolve";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export async function GET(
   request: Request,
@@ -54,7 +55,7 @@ export async function GET(
 
     return NextResponse.json({ activities: recentActivities });
   } catch (error) {
-    console.error("Get user activity error:", error);
+    logRouteCatchError("[API GET /api/users/[userId]/activity]", error);
     return NextResponse.json(
       { message: "Ошибка получения активности" },
       { status: 500 },

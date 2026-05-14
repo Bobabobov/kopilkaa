@@ -3,6 +3,7 @@ import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { checkUserBan } from "@/lib/ban-check";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type SocialLinkType = "vk" | "telegram" | "youtube";
 
@@ -206,7 +207,9 @@ export async function GET(request: Request) {
             where: { id: session.uid },
             data: { lastSeen: new Date() },
           })
-          .catch(console.error);
+          .catch((e) =>
+            logRouteCatchError("[API GET /api/profile/me] lastSeen", e),
+          );
       }
     } else if (user) {
       // Если lastSeen null, обновляем
@@ -215,7 +218,9 @@ export async function GET(request: Request) {
           where: { id: session.uid },
           data: { lastSeen: new Date() },
         })
-        .catch(console.error);
+        .catch((e) =>
+          logRouteCatchError("[API GET /api/profile/me] lastSeen", e),
+        );
     }
 
     // Нормализуем пользователя: если есть telegramUsername, но нет telegramLink,
@@ -242,7 +247,7 @@ export async function GET(request: Request) {
       },
     );
   } catch (error) {
-    console.error("Error in /api/profile/me:", error);
+    logRouteCatchError("[API GET /api/profile/me]", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -434,7 +439,7 @@ export async function PATCH(req: Request) {
       },
     );
   } catch (error) {
-    console.error("Error updating profile:", error);
+    logRouteCatchError("[API PATCH /api/profile/me]", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }

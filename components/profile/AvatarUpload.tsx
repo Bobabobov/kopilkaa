@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
-import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface AvatarUploadProps {
   currentAvatar?: string | null;
@@ -84,7 +84,7 @@ export default function AvatarUpload({
           return;
         }
       } else {
-        console.error("Upload failed:", data);
+        logRouteCatchError("[AvatarUpload] upload failed body", data);
         showToast(
           "error",
           "Ошибка загрузки",
@@ -92,7 +92,7 @@ export default function AvatarUpload({
         );
       }
     } catch (error) {
-      console.error("Error uploading avatar:", error);
+      logRouteCatchError("[AvatarUpload] upload", error);
       showToast("error", "Ошибка загрузки", "Не удалось загрузить аватарку");
     } finally {
       setUploading(false);
@@ -121,7 +121,7 @@ export default function AvatarUpload({
         );
       }
     } catch (error) {
-      console.error("Error deleting avatar:", error);
+      logRouteCatchError("[AvatarUpload] delete", error);
       showToast("error", "Ошибка удаления", "Не удалось удалить аватарку");
     } finally {
       setUploading(false);

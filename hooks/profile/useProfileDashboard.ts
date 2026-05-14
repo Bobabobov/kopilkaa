@@ -1,7 +1,10 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import type { TrustLevel } from "@/lib/trustLevel";
-import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import {
+  getMessageFromApiJson,
+  logRouteCatchError,
+} from "@/lib/api/parseApiError";
 
 interface User {
   id: string;
@@ -167,8 +170,9 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       if (!response.ok) {
         // Если новый API не работает, fallback на старый подход
         if (response.status === 404 || response.status === 500) {
-          console.warn(
-            "Dashboard API not available, falling back to individual requests",
+          logRouteCatchError(
+            "[useProfileDashboard] dashboard API fallback",
+            new Error(`HTTP ${response.status}`),
           );
           await fetchDataFallback();
           return;
@@ -202,14 +206,14 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
 
       setData(profileData);
     } catch (err) {
-      console.error("Error fetching profile dashboard:", err);
+      logRouteCatchError("[useProfileDashboard] fetchData", err);
       setError(err instanceof Error ? err.message : "Неизвестная ошибка");
 
       // Пытаемся использовать fallback при ошибке
       try {
         await fetchDataFallback();
       } catch (fallbackError) {
-        console.error("Fallback also failed:", fallbackError);
+        logRouteCatchError("[useProfileDashboard] fetchDataFallback", fallbackError);
       }
     } finally {
       setLoading(false);

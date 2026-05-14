@@ -126,7 +126,12 @@ export default function ApplicationsPageClient() {
             className="max-w-md text-center"
           >
             <CardContent>
-              <div className="flex items-center justify-center gap-2 text-[#abd1c6]">
+              <div
+                className="flex items-center justify-center gap-2 text-[#abd1c6]"
+                role="status"
+                aria-live="polite"
+                aria-busy="true"
+              >
                 <LucideIcons.Loader2 className="h-5 w-5 animate-spin text-[#f9bc60]" />
                 <span>Проверка авторизации...</span>
               </div>
@@ -152,22 +157,24 @@ export default function ApplicationsPageClient() {
         </div>
         <div className="w-full max-w-lg">
           <Card variant="darkGlass" padding="lg" className="text-center">
-            <div className="mb-6 flex justify-center">
+            <div className="mb-6 flex justify-center" aria-hidden>
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#f9bc60]/15 border border-[#f9bc60]/30">
                 <LucideIcons.User className="w-7 h-7 text-[#f9bc60]" />
               </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#fffffe] mb-3">
-              Войдите, чтобы подать заявку
-            </h1>
-            <p className="text-[#abd1c6] mb-6 leading-relaxed">
-              Окно входа или регистрации должно открыться автоматически. Если
-              этого не произошло — обновите страницу.
-            </p>
-            <p className="text-sm text-[#94a1b2]">
-              После входа вы вернётесь на эту страницу и сможете заполнить
-              заявку.
-            </p>
+            <div role="status" aria-live="polite">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#fffffe] mb-3">
+                Войдите, чтобы подать заявку
+              </h1>
+              <p className="text-[#abd1c6] mb-6 leading-relaxed">
+                Окно входа или регистрации должно открыться автоматически. Если
+                этого не произошло — обновите страницу.
+              </p>
+              <p className="text-sm text-[#94a1b2]">
+                После входа вы вернётесь на эту страницу и сможете заполнить
+                заявку.
+              </p>
+            </div>
           </Card>
         </div>
       </div>

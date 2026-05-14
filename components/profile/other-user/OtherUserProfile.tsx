@@ -44,10 +44,9 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
 
   const effectiveUserId = resolvedUserId || user.id;
 
-  return (
-    <div
+    return (
+    <main
       className="min-h-screen relative overflow-x-hidden overflow-y-auto"
-      role="main"
       aria-label="Профиль пользователя"
     >
       <OtherUserProfileContent
@@ -65,6 +64,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
       />
 
       <ToastComponent />
-    </div>
+    </main>
   );
 }

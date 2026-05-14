@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export async function GET() {
       },
     );
   } catch (error) {
-    console.error("Error fetching stories summary:", error);
+    logRouteCatchError("GET /api/stories/summary:", error);
     return new Response(JSON.stringify({ totalPaid: 0 }), {
       status: 200,
       headers: {

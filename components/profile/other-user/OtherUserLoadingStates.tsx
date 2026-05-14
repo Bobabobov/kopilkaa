@@ -80,20 +80,46 @@ export default function OtherUserLoadingStates({
   };
 
   const content = getContent();
+  const isBusy =
+    state === "checking" || state === "loading";
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <main
+      className="min-h-screen flex items-center justify-center px-4"
+      aria-label="Профиль пользователя"
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        role="status"
+        aria-live="polite"
+        aria-busy={isBusy}
         className="relative w-full max-w-xl text-center bg-gradient-to-br from-[#004643] via-[#004643] to-[#001e1d] rounded-3xl px-8 py-10 shadow-2xl border border-[#abd1c6]/20"
       >
-        <div className="text-6xl mb-4">{content.icon}</div>
-        <h1 className="text-2xl md:text-3xl font-semibold text-[#fffffe] mb-4">
+        <span className="sr-only">
+          {state === "checking" && "Проверка авторизации"}
+          {state === "loading" && "Загрузка профиля"}
+          {state === "unauthorized" && "Требуется вход в аккаунт"}
+          {state === "not-found" && "Пользователь не найден"}
+        </span>
+        <div className="text-6xl mb-4" aria-hidden="true">
+          {content.icon}
+        </div>
+        <h1
+          id="other-profile-state-title"
+          className="text-2xl md:text-3xl font-semibold text-[#fffffe] mb-4"
+        >
           {content.title}
         </h1>
         {content.description && (
-          <p className="text-[#abd1c6] mb-8 text-base md:text-lg">
+          <p
+            className="text-[#abd1c6] mb-8 text-base md:text-lg"
+            role={
+              state === "unauthorized" || state === "not-found"
+                ? "alert"
+                : undefined
+            }
+          >
             {content.description}
           </p>
         )}
@@ -131,6 +157,6 @@ export default function OtherUserLoadingStates({
           </div>
         )}
       </motion.div>
-    </div>
+    </main>
   );
 }

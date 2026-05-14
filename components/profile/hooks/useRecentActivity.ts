@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { formatRub } from "@/lib/format";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export type ActivityItem = {
   id: string;
@@ -82,7 +83,7 @@ export function useRecentActivity() {
         );
         setActivities(activitiesList.slice(0, 5));
       } catch (error) {
-        console.error("Error fetching activity:", error);
+        logRouteCatchError("[useRecentActivity] fetch", error);
       } finally {
         setLoading(false);
       }

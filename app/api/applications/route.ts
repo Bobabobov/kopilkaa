@@ -399,7 +399,11 @@ export async function POST(req: Request) {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack : "";
-    console.error("[POST /api/applications]", msg, stack);
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[POST /api/applications]", msg, stack);
+    } else {
+      console.error("[POST /api/applications]", msg);
+    }
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2022") {

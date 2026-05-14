@@ -5,6 +5,7 @@ import { writeFile, mkdir } from "fs/promises";
 import { extname } from "path";
 import { randomUUID } from "crypto";
 import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB для публичных загрузок
 const MAX_FILES = 5; // Максимум файлов за раз
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ files: uploadedFiles });
   } catch (error) {
-    console.error("Error uploading ad request files:", error);
+    logRouteCatchError("POST /api/ad-requests/upload:", error);
     return NextResponse.json(
       { error: "Ошибка загрузки файлов" },
       { status: 500 },

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
 
@@ -73,7 +74,7 @@ export async function GET(
 
     return NextResponse.json({ stories: safeStories });
   } catch (error) {
-    console.error("Error fetching user stories:", error);
+    logRouteCatchError("GET /api/stories/user/[userId]:", error);
     return NextResponse.json({ error: "Ошибка загрузки" }, { status: 500 });
   }
 }

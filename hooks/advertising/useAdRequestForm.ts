@@ -6,7 +6,7 @@ import {
   validateAdRequestForm,
   scrollToFirstError,
 } from "@/components/advertising/adRequestValidation";
-import { getMessageFromApiJson, throwIfApiFailed } from "@/lib/api/parseApiError";
+import { getMessageFromApiJson, throwIfApiFailed, logRouteCatchError } from "@/lib/api/parseApiError";
 
 const INITIAL_FORM: AdRequestFormData = {
   name: "",
@@ -161,7 +161,8 @@ export function useAdRequestForm() {
       setMobileImages([]);
       setImageUrlInput("");
       setMobileUrlInput("");
-    } catch {
+    } catch (error) {
+      logRouteCatchError("[useAdRequestForm] handleSubmit", error);
       alert("Произошла ошибка при отправке заявки.");
       isSubmittingRef.current = false;
       setIsSubmitting(false);

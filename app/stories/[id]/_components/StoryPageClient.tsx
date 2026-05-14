@@ -14,15 +14,13 @@ import {
   StoryMetadata,
   StoryNavigation,
 } from "@/components/stories";
-import StoryAdImages from "@/components/stories/StoryAdImages";
 import { StoryPageLoading } from "./sections/StoryPageLoading";
 import { StoryPageError } from "./sections/StoryPageError";
 import { StoryPageNotFound } from "./sections/StoryPageNotFound";
-import { StoryAdInfoBanner } from "./sections/StoryAdInfoBanner";
 import { ReadingProgressBar } from "./ReadingProgressBar";
 import { StoryMoreStories } from "./StoryMoreStories";
 import StoryAdLanding from "./StoryAdLanding";
-import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
 
 export interface Story {
   id: string;
@@ -47,6 +45,54 @@ export interface Story {
   advertiserLink?: string;
   advertiserWebsite?: string;
   advertiserTelegram?: string;
+}
+
+/** Ответ GET /api/ads/stories — узкая проверка без `any`. */
+interface StoriesApiAdRow {
+  id: string;
+  title: string;
+  content?: string | null;
+  imageUrl?: string | null;
+  linkUrl?: string | null;
+  createdAt?: string;
+  config?: unknown;
+}
+
+function isStoriesApiAdRow(value: unknown): value is StoriesApiAdRow {
+  if (typeof value !== "object" || value === null) return false;
+  const o = value as Record<string, unknown>;
+  return typeof o.id === "string" && typeof o.title === "string";
+}
+
+function parseStoriesAdConfig(raw: unknown): {
+  storyTitle?: string;
+  storyText?: string;
+  storyImageUrls?: string[];
+  advertiserName?: string;
+  advertiserLink?: string;
+  advertiserWebsite?: string;
+  advertiserTelegram?: string;
+} {
+  if (!raw || typeof raw !== "object") return {};
+  const c = raw as Record<string, unknown>;
+  const storyImageUrls = Array.isArray(c.storyImageUrls)
+    ? c.storyImageUrls.filter((u): u is string => typeof u === "string")
+    : undefined;
+  return {
+    storyTitle: typeof c.storyTitle === "string" ? c.storyTitle : undefined,
+    storyText: typeof c.storyText === "string" ? c.storyText : undefined,
+    storyImageUrls,
+    advertiserName:
+      typeof c.advertiserName === "string" ? c.advertiserName : undefined,
+    advertiserLink:
+      typeof c.advertiserLink === "string" ? c.advertiserLink : undefined,
+    advertiserWebsite:
+      typeof c.advertiserWebsite === "string" ? c.advertiserWebsite : undefined,
+    advertiserTelegram:
+      typeof c.advertiserTelegram === "string"
+        ? c.advertiserTelegram
+        : undefined,
+  };
 }
 
 interface StoryPageClientProps {
@@ -99,30 +145,22 @@ export default function StoryPageClient({
       const response = await fetch("/api/ads/stories", { cache: "no-store" });
 
       if (response.ok) {
-        const data = await response.json();
-        const ad = data.ad as any;
+        const data = (await response.json()) as { ad?: unknown };
+        const ad = data.ad;
 
-        if (ad) {
-          const config = (ad.config || {}) as {
-            storyTitle?: string;
-            storyText?: string;
-            storyImageUrls?: string[];
-            advertiserName?: string;
-            advertiserLink?: string;
-            advertiserWebsite?: string;
-            advertiserTelegram?: string;
-          };
+        if (isStoriesApiAdRow(ad)) {
+          const config = parseStoriesAdConfig(ad.config);
 
           const images: Array<{ url: string; sort: number }> = [];
 
-          if (Array.isArray(config.storyImageUrls)) {
+          if (config.storyImageUrls?.length) {
             config.storyImageUrls.forEach((url, index) => {
               if (url) {
                 images.push({ url, sort: index + 1 });
               }
             });
           } else if (ad.imageUrl) {
-            images.push({ url: ad.imageUrl as string, sort: 1 });
+            images.push({ url: ad.imageUrl, sort: 1 });
           }
 
           const advertiserName = config.advertiserName || "Команда проекта";
@@ -133,11 +171,16 @@ export default function StoryPageClient({
             id: "ad",
             title: config.storyTitle || ad.title || "Рекламная история",
             summary:
-              ad.content ||
+              (typeof ad.content === "string" && ad.content) ||
               "Рекламная история в разделе /stories. Описание будет здесь.",
-            story: config.storyText || ad.content || "",
+            story:
+              config.storyText ||
+              (typeof ad.content === "string" ? ad.content : "") ||
+              "",
             previewImageUrl: ad.imageUrl || undefined,
-            createdAt: ad.createdAt || new Date().toISOString(),
+            createdAt:
+              (typeof ad.createdAt === "string" && ad.createdAt) ||
+              new Date().toISOString(),
             images,
             user: {
               id: "advertising",
@@ -163,7 +206,7 @@ export default function StoryPageClient({
         }
       }
     } catch (err) {
-      console.error("Error loading stories ad:", err);
+      logRouteCatchError("[StoryPageClient] loadAdStory", err);
     }
 
     const fallbackStory: Story = {
@@ -224,7 +267,7 @@ export default function StoryPageClient({
       setLiked(data.userLiked || false);
       setLikesCount(data._count?.likes || 0);
     } catch (err) {
-      console.error("Error loading story:", err);
+      logRouteCatchError("[StoryPageClient] loadStory", err);
       setError("Не удалось загрузить историю");
     } finally {
       setLoading(false);
@@ -264,8 +307,8 @@ export default function StoryPageClient({
           JSON.stringify([...current, story.id]),
         );
       }
-    } catch {
-      // ignore malformed storage
+    } catch (err) {
+      logRouteCatchError("[StoryPageClient] stories-read-ids localStorage", err);
     }
   }, [story?.id]);
 
@@ -293,9 +336,9 @@ export default function StoryPageClient({
           return;
         }
         const errorData = await response.json().catch(() => null);
-        console.error(
-          "Ошибка лайка:",
-          getMessageFromApiJson(errorData, `Код ${response.status}`),
+        logRouteCatchError(
+          "[StoryPageClient] like",
+          new Error(getMessageFromApiJson(errorData, `Код ${response.status}`)),
         );
         return;
       }
@@ -314,7 +357,7 @@ export default function StoryPageClient({
 
       await loadStory(story.id);
     } catch (err) {
-      console.error("Error updating like:", err);
+      logRouteCatchError("[StoryPageClient] handleLike", err);
     } finally {
       setIsLiking(false);
     }
@@ -333,17 +376,7 @@ export default function StoryPageClient({
   }
 
   if (story.id === "ad") {
-    return (
-      <StoryAdLanding
-        story={story}
-        liked={liked}
-        likesCount={likesCount}
-        onLike={handleLike}
-        isAuthenticated={isAuthenticated}
-        storyId={storyId}
-        isLiking={isLiking}
-      />
-    );
+    return <StoryAdLanding story={story} />;
   }
 
   return (
@@ -354,61 +387,63 @@ export default function StoryPageClient({
 
         <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
           <div className="mx-auto max-w-4xl">
-            <article className="relative overflow-hidden rounded-2xl sm:rounded-[1.75rem] border border-[#abd1c6]/20 bg-gradient-to-b from-[#004643]/40 via-[#003d3a]/25 to-transparent backdrop-blur-sm p-5 sm:p-8 md:p-10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)]">
-              <div className="hidden sm:block absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#f9bc60]/10 blur-3xl pointer-events-none" />
-              <div className="hidden sm:block absolute -bottom-20 -left-20 h-32 w-32 rounded-full bg-[#abd1c6]/10 blur-3xl pointer-events-none" />
-              <div className="relative">
-                <StoryHeader
-                  title={story.title}
-                  author={
-                    story.user?.name || story.user?.email || "Неизвестный автор"
-                  }
-                  authorId={story.user?.id}
-                  authorAvatar={story.user?.avatar}
-                  createdAt={story.createdAt}
-                  isAd={story.id === "ad"}
-                  isContestWinner={!!story.isContestWinner}
-                  authorExternalUrl={
-                    story.id === "ad" ? story.advertiserLink : undefined
-                  }
-                />
+            <main id="story-content">
+              <article className="relative overflow-hidden rounded-2xl sm:rounded-[1.75rem] border border-[#abd1c6]/20 bg-gradient-to-b from-[#004643]/40 via-[#003d3a]/25 to-transparent backdrop-blur-sm p-5 sm:p-8 md:p-10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)]">
+                <div className="hidden sm:block absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#f9bc60]/10 blur-3xl pointer-events-none" />
+                <div className="hidden sm:block absolute -bottom-20 -left-20 h-32 w-32 rounded-full bg-[#abd1c6]/10 blur-3xl pointer-events-none" />
+                <div className="relative">
+                  <StoryHeader
+                    title={story.title}
+                    author={
+                      story.user?.name || story.user?.email || "Неизвестный автор"
+                    }
+                    authorId={story.user?.id}
+                    authorAvatar={story.user?.avatar}
+                    createdAt={story.createdAt}
+                    isAd={story.id === "ad"}
+                    isContestWinner={!!story.isContestWinner}
+                    authorExternalUrl={
+                      story.id === "ad" ? story.advertiserLink : undefined
+                    }
+                  />
 
-                <StoryMetadata
-                  story={story}
-                  liked={liked}
-                  likesCount={likesCount}
-                  onLike={handleLike}
-                  isAuthenticated={isAuthenticated}
-                  isAd={story.id === "ad"}
-                  storyId={story.id}
-                  storyTitle={story.title}
-                  isLiking={isLiking}
-                />
+                  <StoryMetadata
+                    story={story}
+                    liked={liked}
+                    likesCount={likesCount}
+                    onLike={handleLike}
+                    isAuthenticated={isAuthenticated}
+                    isAd={story.id === "ad"}
+                    storyId={story.id}
+                    storyTitle={story.title}
+                    isLiking={isLiking}
+                  />
 
-                <div className="mb-2">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#94a1b2]">
-                    Текст истории
-                  </span>
+                  <div className="mb-2">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-[#94a1b2]">
+                      Текст истории
+                    </span>
+                  </div>
+                  <StoryContent
+                    content={
+                      story.story || story.summary || "Текст истории недоступен."
+                    }
+                    isAd={story.id === "ad"}
+                  />
+
+                  {story.images && story.images.length > 0 && (
+                    <StoryImages images={story.images} title={story.title} />
+                  )}
+
+                  <StoryActions
+                    isAd={story.id === "ad"}
+                    advertiserLink={story.advertiserLink}
+                  />
                 </div>
-                <StoryContent
-                  content={
-                    story.story || story.summary || "Текст истории недоступен."
-                  }
-                  isAd={story.id === "ad"}
-                />
+              </article>
 
-                {story.images && story.images.length > 0 && (
-                  <StoryImages images={story.images} title={story.title} />
-                )}
-
-                <StoryActions
-                  isAd={story.id === "ad"}
-                  advertiserLink={story.advertiserLink}
-                />
-              </div>
-            </article>
-
-            {story.id !== "ad" && <StoryMoreStories />}
+              {story.id !== "ad" && <StoryMoreStories />}
+            </main>
           </div>
         </div>
       </div>

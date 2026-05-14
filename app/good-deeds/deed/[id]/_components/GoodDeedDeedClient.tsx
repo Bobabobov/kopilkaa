@@ -72,7 +72,13 @@ export function GoodDeedDeedClient({ id }: { id: string }) {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-16 text-center text-[#abd1c6]">
+      <div
+        className="mx-auto max-w-3xl px-4 py-16 text-center text-[#abd1c6]"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <span className="sr-only">Загрузка отчёта…</span>
         Загрузка…
       </div>
     );
@@ -82,7 +88,9 @@ export function GoodDeedDeedClient({ id }: { id: string }) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
         <Card variant="darkGlass" padding="md" className="space-y-4">
-          <p className="text-[#abd1c6]">{error || "Отчёт не найден"}</p>
+          <div role="alert">
+            <p className="text-[#abd1c6]">{error || "Отчёт не найден"}</p>
+          </div>
           <Button
             type="button"
             variant="outline"

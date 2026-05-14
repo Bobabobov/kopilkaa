@@ -77,9 +77,8 @@ export default function ProfileLayout({
   };
 
   return (
-    <div
+    <main
       className="min-h-screen relative overflow-x-hidden overflow-y-auto"
-      role="main"
       aria-label="Профиль пользователя"
     >
       <div className="relative z-10 w-full px-2 xs:px-3 sm:px-4 md:px-5 lg:px-6 pt-3 xs:pt-4 sm:pt-6 md:pt-8 lg:pt-10 pb-6 xs:pb-8 sm:pb-10 md:pb-12">
@@ -104,8 +103,9 @@ export default function ProfileLayout({
 
           <div className="my-4 sm:my-5 h-px bg-white/10" aria-hidden />
 
-          <main
+          <div
             className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-5 sm:gap-6 lg:gap-7"
+            role="region"
             aria-label="Контент профиля"
           >
             <section
@@ -193,9 +193,9 @@ export default function ProfileLayout({
                 <ProfileStoriesSection userId={user.id} isOwner />
               </motion.div>
             </aside>
-          </main>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

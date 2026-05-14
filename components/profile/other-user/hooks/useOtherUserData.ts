@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type User = {
   id: string;
@@ -43,7 +44,8 @@ export function useOtherUserData({ userId }: UseOtherUserDataParams) {
         } else {
           setIsAuthenticated(false);
         }
-      } catch {
+      } catch (error) {
+        logRouteCatchError("[useOtherUserData] checkAuth", error);
         setIsAuthenticated(false);
       }
     };
@@ -70,10 +72,14 @@ export function useOtherUserData({ userId }: UseOtherUserDataParams) {
           setUser(null);
           return;
         } else {
-          console.error("User not found");
+          logRouteCatchError(
+            "[useOtherUserData] loadUserData",
+            new Error(`HTTP ${userResponse.status}`),
+          );
+          setUser(null);
         }
       } catch (error) {
-        console.error("Load user data error:", error);
+        logRouteCatchError("[useOtherUserData] load", error);
       } finally {
         setLoading(false);
       }

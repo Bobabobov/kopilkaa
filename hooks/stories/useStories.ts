@@ -1,6 +1,6 @@
 // hooks/stories/useStories.ts
 import { useState, useEffect, useRef, useCallback } from "react";
-import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
 
 export interface Story {
   id: string;
@@ -123,12 +123,16 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
             cache: "no-store",
             ...(abortController && { signal: abortController.signal }),
           });
-        } catch (fetchError: any) {
+        } catch (fetchError: unknown) {
           // Обрабатываем ошибки сети
-          if (fetchError.name === "AbortError") {
+          const name =
+            fetchError && typeof fetchError === "object" && "name" in fetchError
+              ? String((fetchError as { name?: string }).name)
+              : "";
+          if (name === "AbortError") {
             return;
           }
-          console.error("[useStories] Network error:", fetchError);
+          logRouteCatchError("[useStories] network", fetchError);
           if (page === 1) {
             setStories([]);
           }
@@ -145,7 +149,7 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
           try {
             data = await response.json();
           } catch (jsonError) {
-            console.error("[useStories] JSON parse error:", jsonError);
+            logRouteCatchError("[useStories] JSON parse", jsonError);
             if (page === 1) {
               setStories([]);
             }
@@ -172,23 +176,29 @@ export function useStories(options: UseStoriesOptions = {}): UseStoriesReturn {
           setCurrentPage(page);
         } else {
           const errorBody = await response.json().catch(() => null);
-          console.error(
-            "[useStories] Failed to load stories:",
-            getMessageFromApiJson(
-              errorBody,
-              `${response.status} ${response.statusText || ""}`.trim(),
+          logRouteCatchError(
+            "[useStories] non-OK response",
+            new Error(
+              getMessageFromApiJson(
+                errorBody,
+                `${response.status} ${response.statusText || ""}`.trim(),
+              ),
             ),
           );
           if (page === 1) {
             setStories([]);
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Игнорируем ошибки отменённых запросов
-        if (error.name === "AbortError") {
+        const name =
+          error && typeof error === "object" && "name" in error
+            ? String((error as { name?: string }).name)
+            : "";
+        if (name === "AbortError") {
           return;
         }
-        console.error("Error loading stories:", error);
+        logRouteCatchError("[useStories] loadStories", error);
         if (page === 1) {
           setStories([]);
         }

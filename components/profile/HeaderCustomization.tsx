@@ -9,7 +9,7 @@ import { useAutoHideScrollbar } from "@/hooks/ui/useAutoHideScrollbar";
 import { useScrollLock } from "@/hooks/ui/useScrollLock";
 import { getAllHeaderThemes, getHeaderTheme } from "@/lib/header-customization";
 import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
-import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
 import { HeaderPreview } from "./header-customization/HeaderPreview";
 import { ColorWheelSection } from "./header-customization/ColorWheelSection";
 import { ThemeGrid } from "./header-customization/ThemeGrid";
@@ -147,7 +147,7 @@ export default function HeaderCustomization({
         );
       }
     } catch (error) {
-      console.error("Error saving header theme:", error);
+      logRouteCatchError("[HeaderCustomization] save", error);
       showToast("error", "Ошибка сохранения", "Не удалось сохранить тему");
     } finally {
       setSaving(false);

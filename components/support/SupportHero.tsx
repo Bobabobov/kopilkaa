@@ -3,6 +3,7 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type Stats = {
   collected: number;
@@ -74,7 +75,9 @@ export default function SupportHero() {
           setStats(newStats);
         }
       })
-      .catch(() => {})
+      .catch((error: unknown) => {
+        logRouteCatchError("[SupportHero] stats fetch", error);
+      })
       .finally(() => setLoading(false));
   }, []);
   return (
@@ -97,7 +100,9 @@ export default function SupportHero() {
             transition={{ duration: 3, repeat: Infinity }}
             style={{ color: "#fffffe" }}
           >
-            <LucideIcons.Heart className="text-[#f9bc60] flex-shrink-0" size="xl" />
+            <span className="inline-flex flex-shrink-0" aria-hidden>
+              <LucideIcons.Heart className="text-[#f9bc60]" size="xl" />
+            </span>
             Поддержка проекта «Копилка»
           </motion.h1>
 
@@ -115,7 +120,21 @@ export default function SupportHero() {
             Поддержка добровольная. Это не инвестиция и не финансовая услуга.
           </p>
 
-          <Card variant="darkGlass" padding="lg" className="max-w-4xl mx-auto">
+          <Card
+            variant="darkGlass"
+            padding="lg"
+            className="max-w-4xl mx-auto"
+            {...(loading
+              ? {
+                  role: "status" as const,
+                  "aria-live": "polite" as const,
+                  "aria-busy": true as const,
+                }
+              : {})}
+          >
+            {loading ? (
+              <span className="sr-only">Загрузка статистики…</span>
+            ) : null}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
               <motion.div
                 whileHover={{ scale: 1.02, y: -2 }}

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import Link from "next/link";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface QuickStat {
   label: string;
@@ -59,7 +60,7 @@ export default function QuickStatsWidget() {
 
         setStats(mockStats);
       } catch (error) {
-        console.error("Error fetching quick stats:", error);
+        logRouteCatchError("[QuickStatsWidget] fetch", error);
       } finally {
         setLoading(false);
       }

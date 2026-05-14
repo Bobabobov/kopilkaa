@@ -9,5 +9,4 @@ export type HeroStats = {
 
 export interface HeroSectionProps {
   stats: HeroStats;
-  loading: boolean;
 }

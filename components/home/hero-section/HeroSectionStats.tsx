@@ -10,7 +10,6 @@ import type { HeroStats } from "./types";
 
 interface HeroSectionStatsProps {
   stats: HeroStats;
-  loading: boolean;
 }
 
 const subStats = [
@@ -80,7 +79,7 @@ const miniCardVariants = {
   },
 };
 
-export function HeroSectionStats({ stats, loading }: HeroSectionStatsProps) {
+export function HeroSectionStats({ stats }: HeroSectionStatsProps) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -163,13 +162,7 @@ export function HeroSectionStats({ stats, loading }: HeroSectionStatsProps) {
                   <PiggyBank className="w-6 h-6 text-[#f9bc60] drop-shadow-[0_0_12px_rgba(249,188,96,0.35)]" />
                 </motion.span>
                 <span className="text-3xl sm:text-4xl font-bold tabular-nums text-[#f9bc60] drop-shadow-[0_0_24px_rgba(249,188,96,0.15)]">
-                  {loading ? (
-                    "0 ₽"
-                  ) : (
-                    <>
-                      <AnimatedNumber value={stats.collected} /> ₽
-                    </>
-                  )}
+                  <AnimatedNumber value={stats.collected} /> ₽
                 </span>
               </div>
               <p className="text-sm text-[#abd1c6] text-center max-w-sm">
@@ -208,7 +201,7 @@ export function HeroSectionStats({ stats, loading }: HeroSectionStatsProps) {
                   <item.icon className="w-5 h-5" />
                 </motion.span>
                 <div className="text-xl font-bold tabular-nums mb-0.5 text-[#fffffe]">
-                  {loading ? "0" : <AnimatedNumber value={stats[item.key]} />}
+                  <AnimatedNumber value={stats[item.key]} />
                 </div>
                 <div className="text-sm font-medium text-[#abd1c6]">
                   {item.label}

@@ -29,9 +29,13 @@ export default function RecentApplications() {
     const fetchApplications = async () => {
       try {
         const response = await fetch("/api/applications/recent?limit=3");
-        if (response.ok) {
-          const data = await response.json();
-          setApplications(data.applications || []);
+        if (!response.ok) return;
+        const data = (await response.json()) as {
+          success?: boolean;
+          applications?: Application[];
+        };
+        if (data.success && Array.isArray(data.applications)) {
+          setApplications(data.applications);
         }
       } catch (error) {
         if (process.env.NODE_ENV !== "production") {
@@ -88,7 +92,10 @@ export default function RecentApplications() {
           >
             Истории людей
           </h2>
-          <p className="text-lg md:text-xl max-w-xl mx-auto" style={{ color: "#abd1c6" }}>
+          <p
+            className="text-lg md:text-xl max-w-xl mx-auto"
+            style={{ color: "#abd1c6" }}
+          >
             Люди, которым уже помогли
           </p>
         </motion.div>
@@ -107,8 +114,10 @@ export default function RecentApplications() {
                 href={`/stories/${app.id}`}
                 className="group block h-full rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
                 style={{
-                  background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                  boxShadow:
+                    "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
                 }}
               >
                 {/* Изображение */}
@@ -129,7 +138,10 @@ export default function RecentApplications() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <span
                     className="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-semibold"
-                    style={{ background: "rgba(249, 188, 96, 0.95)", color: "#001e1d" }}
+                    style={{
+                      background: "rgba(249, 188, 96, 0.95)",
+                      color: "#001e1d",
+                    }}
                   >
                     Помогли
                   </span>
@@ -151,20 +163,27 @@ export default function RecentApplications() {
                   </p>
 
                   {/* Сумма */}
-                  <div className="inline-flex items-baseline gap-1 rounded-xl px-3 py-1.5 mb-4" style={{ background: "rgba(249, 188, 96, 0.12)" }}>
-                    <span className="text-xl font-bold tabular-nums" style={{ color: "#f9bc60" }}>
+                  <div
+                    className="inline-flex items-baseline gap-1 rounded-xl px-3 py-1.5 mb-4"
+                    style={{ background: "rgba(249, 188, 96, 0.12)" }}
+                  >
+                    <span
+                      className="text-xl font-bold tabular-nums"
+                      style={{ color: "#f9bc60" }}
+                    >
                       {app.amount.toLocaleString("ru-RU")}
                     </span>
-                    <span className="text-sm font-semibold" style={{ color: "#f9bc60" }}>
+                    <span
+                      className="text-sm font-semibold"
+                      style={{ color: "#f9bc60" }}
+                    >
                       руб
                     </span>
                   </div>
 
                   {/* Автор */}
                   <div className="flex items-center gap-3 pt-4 border-t border-white/10">
-                    <div
-                      className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-white/10 group-hover:ring-[#f9bc60]/40 transition-all"
-                    >
+                    <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-white/10 group-hover:ring-[#f9bc60]/40 transition-all">
                       <img
                         src={resolveAvatarUrl(app.user?.avatar)}
                         alt={app.user ? app.user.name || "User" : "User"}
@@ -209,7 +228,8 @@ export default function RecentApplications() {
             href="/stories"
             className="inline-flex items-center gap-2 px-8 py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
             style={{
-              background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+              background:
+                "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
               color: "#001e1d",
               boxShadow: "0 8px 32px rgba(249, 188, 96, 0.25)",
             }}

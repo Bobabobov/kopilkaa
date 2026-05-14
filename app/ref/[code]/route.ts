@@ -61,18 +61,27 @@ export async function GET(
   const existingVisitorId = request.cookies.get(REFERRAL_VISITOR_COOKIE)?.value;
   const visitorId = existingVisitorId || crypto.randomUUID();
 
-  // Фиксируем клик по ссылке (засчитываем максимум 1 раз на “visitorId” с этого устройства).
-  try {
-    await prisma.referralClick.create({
-      data: {
-        referrerUserId: referrer.id,
-        visitorId,
-      },
-    });
-  } catch (err: any) {
-    // Если клик уже учтён (уникальный индекс) — просто игнорируем.
-    if (err?.code !== "P2002") {
-      console.error("[referral] click create error:", err);
+  // Фиксируем клик по ссылке (засчитываем максимум 1 раз на «visitorId» с этого устройства).
+  // Сначала проверяем наличие записи — без лишнего INSERT и без prisma:error в stdout.
+  const already = await prisma.referralClick.findFirst({
+    where: { referrerUserId: referrer.id, visitorId },
+    select: { id: true },
+  });
+
+  if (!already) {
+    try {
+      await prisma.referralClick.create({
+        data: { referrerUserId: referrer.id, visitorId },
+      });
+    } catch (err: unknown) {
+      const code =
+        err && typeof err === "object" && "code" in err
+          ? String((err as { code: unknown }).code)
+          : "";
+      // Редкая гонка: два параллельных запроса с одним visitorId.
+      if (code !== "P2002") {
+        console.error("[referral] click create error:", err);
+      }
     }
   }
 

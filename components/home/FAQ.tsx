@@ -23,7 +23,6 @@ const FAQ_ICONS = {
   User,
   CheckCircle,
   DollarSign,
-  Coin: Coins,
   Coins,
   Shield,
 } as const;
@@ -69,7 +68,7 @@ const faqs: FAQItem[] = [
     question: "Где лежат деньги из копилки и кто платит комиссию?",
     answer:
       "Средства обрабатываются платёжными системами. Комиссии оплачиваются платформой. Баланс на сайте отражает текущий бюджет проекта, используемый для оказания финансовой поддержки.",
-    icon: "Coin",
+    icon: "Coins",
   },
   {
     question: "Можно ли подавать истории повторно?",
@@ -134,7 +133,7 @@ export default function FAQ() {
 
         <div className="space-y-3">
           {faqs.map((faq, index) => {
-            const IconComponent = FAQ_ICONS[faq.icon as keyof typeof FAQ_ICONS];
+            const IconComponent = FAQ_ICONS[faq.icon];
             const isOpen = openIndex === index;
 
             return (
@@ -150,7 +149,8 @@ export default function FAQ() {
                   onClick={() => toggleFAQ(index)}
                   className="w-full text-left rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-lg group"
                   style={{
-                    background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                      "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
                     boxShadow: isOpen
                       ? "0 4px 24px rgba(0,0,0,0.25), 0 0 0 1px rgba(249,188,96,0.2)"
                       : "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
@@ -230,7 +230,8 @@ export default function FAQ() {
             href="/applications"
             className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
             style={{
-              background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+              background:
+                "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
               color: "#001e1d",
               boxShadow: "0 8px 32px rgba(249, 188, 96, 0.25)",
             }}

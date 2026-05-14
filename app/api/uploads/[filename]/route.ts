@@ -8,8 +8,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 function getUploadFilePath(filename: string): string {
-  const uploadDir =
-    process.env.UPLOAD_DIR ?? join(process.cwd(), "uploads");
+  const uploadDir = process.env.UPLOAD_DIR ?? join(process.cwd(), "uploads");
   return join(uploadDir, filename);
 }
 
@@ -62,8 +61,7 @@ export async function GET(
     const widthParam = searchParams.get("w");
     const heightParam = searchParams.get("h");
     // «size» / опечатки прокси: иногда вместо v= приходит s= (как в DevTools).
-    const variantParam =
-      searchParams.get("v") ?? searchParams.get("s");
+    const variantParam = searchParams.get("v") ?? searchParams.get("s");
     const formatParam = searchParams.get("format");
 
     // Проверяем безопасность имени файла
@@ -111,7 +109,8 @@ export async function GET(
         variantParam && VARIANT_WIDTHS[variantParam]
           ? VARIANT_WIDTHS[variantParam]
           : null;
-      const width = widthFromVariant ?? (widthParam ? parseInt(widthParam, 10) : null);
+      const width =
+        widthFromVariant ?? (widthParam ? parseInt(widthParam, 10) : null);
       const height = heightParam ? parseInt(heightParam, 10) : null;
       const shouldResize =
         (width && Number.isFinite(width)) ||
@@ -132,16 +131,21 @@ export async function GET(
       if (isImage && shouldResize && !isGif) {
         try {
           const accept = request.headers.get("accept");
-          const allowedFormats = new Set(["avif", "webp", "jpeg", "jpg", "png"]);
-          const safeFormat = formatParam && allowedFormats.has(formatParam)
-            ? formatParam
-            : null;
+          const allowedFormats = new Set([
+            "avif",
+            "webp",
+            "jpeg",
+            "jpg",
+            "png",
+          ]);
+          const safeFormat =
+            formatParam && allowedFormats.has(formatParam) ? formatParam : null;
           const targetFormat = safeFormat || pickFormat(accept, ext || "jpeg");
-          const normalizedFormat = targetFormat === "jpg" ? "jpeg" : targetFormat;
+          const normalizedFormat =
+            targetFormat === "jpg" ? "jpeg" : targetFormat;
           const outputType = toContentType(normalizedFormat, contentType);
           const variantKey =
-            variantParam ||
-            `w${safeWidth ?? "auto"}h${safeHeight ?? "auto"}`;
+            variantParam || `w${safeWidth ?? "auto"}h${safeHeight ?? "auto"}`;
           const variantFilename = buildVariantFilename(
             filename,
             variantKey,
@@ -162,12 +166,15 @@ export async function GET(
             // no cached variant
           }
 
-          const transformer = sharp(fileBuffer).rotate().resize({
-            width: safeWidth ?? undefined,
-            height: safeHeight ?? undefined,
-            fit: "inside",
-            withoutEnlargement: true,
-          });
+          // failOn: «мягче» стандартного warning — частично битые JPEG чаще дают превью вместо падения.
+          const transformer = sharp(fileBuffer, { failOn: "none" })
+            .rotate()
+            .resize({
+              width: safeWidth ?? undefined,
+              height: safeHeight ?? undefined,
+              fit: "inside",
+              withoutEnlargement: true,
+            });
 
           let outputBuffer: Buffer;
           switch (normalizedFormat) {
@@ -196,9 +203,10 @@ export async function GET(
             },
           });
         } catch (resizeErr) {
-          console.error(
-            "uploads GET: variant resize failed, serving original file:",
-            resizeErr,
+          const hint =
+            resizeErr instanceof Error ? resizeErr.message : String(resizeErr);
+          console.warn(
+            `[uploads] превью для ${filename} недоступно (${hint}), отдаём оригинал`,
           );
         }
       }

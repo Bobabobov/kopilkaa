@@ -5,7 +5,7 @@ import { HowItWorksHeader } from "./how-it-works/HowItWorksHeader";
 import { HowItWorksStepCard } from "./how-it-works/HowItWorksStepCard";
 import { HowItWorksDisclaimer } from "./how-it-works/HowItWorksDisclaimer";
 import { HowItWorksCta } from "./how-it-works/HowItWorksCta";
-import { useHowItWorksAuth } from "./how-it-works/useHowItWorksAuth";
+import { useHowItWorksAuth } from "@/hooks/home/useHowItWorksAuth";
 
 export default function HowItWorks() {
   const { loading, handleStartClick } = useHowItWorksAuth();
@@ -18,7 +18,7 @@ export default function HowItWorks() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-6">
           {HOW_IT_WORKS_STEPS.map((step, index) => (
             <HowItWorksStepCard
-              key={index}
+              key={step.title}
               step={step}
               index={index}
               steps={HOW_IT_WORKS_STEPS}

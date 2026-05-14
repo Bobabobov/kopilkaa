@@ -1,5 +1,6 @@
 // Server component для загрузки статистики
 import { cache } from "react";
+import type { DonationType } from "@prisma/client";
 import { prisma } from "@/lib/db";
 
 type Stats = {
@@ -7,6 +8,12 @@ type Stats = {
   requests: number;
   approved: number;
   people: number;
+};
+
+/** Результат groupBy по типу доната — для типобезопасной агрегации без `any`. */
+type DonationSumByType = {
+  type: DonationType;
+  _sum: { amount: number | null };
 };
 
 // Используем React cache для дедупликации запросов в рамках одного рендера
@@ -31,10 +38,9 @@ const getStats = cache(async (): Promise<Stats> => {
     ]);
 
     const sumByType = new Map<string, number>();
-    donationSums.forEach((row: any) => {
-      const t = String(row?.type ?? "");
-      const v = Number(row?._sum?.amount ?? 0);
-      if (!t) return;
+    (donationSums as DonationSumByType[]).forEach((row) => {
+      const t = String(row.type);
+      const v = Number(row._sum.amount ?? 0);
       sumByType.set(t, v);
     });
 

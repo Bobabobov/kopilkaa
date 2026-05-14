@@ -13,7 +13,7 @@ type HomeGoodDeedItem = {
   storyText: string;
   reward: number;
   media: { url: string; type: "IMAGE" | "VIDEO" }[];
-  user: { name: string };
+  user: { name?: string | null };
 };
 
 const MAX_HOME_GOOD_DEEDS = 3;

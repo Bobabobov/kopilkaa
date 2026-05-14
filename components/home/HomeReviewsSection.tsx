@@ -9,7 +9,7 @@ import { ReviewCard } from "@/components/reviews/ReviewCard";
 const MAX_HOME_REVIEWS = 3;
 
 export default function HomeReviewsSection() {
-  const { loading, reviews, total } = useReviews();
+  const { loading, reviews, total } = useReviews({ limit: MAX_HOME_REVIEWS });
 
   const visibleReviews = (reviews || []).slice(0, MAX_HOME_REVIEWS);
 
@@ -40,7 +40,8 @@ export default function HomeReviewsSection() {
             className="text-lg md:text-xl max-w-2xl mx-auto"
             style={{ color: "#abd1c6" }}
           >
-            Отзывы участников с фото и подтверждениями — чтобы было понятно, как именно помогла платформа.
+            Отзывы участников с фото и подтверждениями — чтобы было понятно, как
+            именно помогла платформа.
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-2">
@@ -101,4 +102,3 @@ export default function HomeReviewsSection() {
     </section>
   );
 }
-

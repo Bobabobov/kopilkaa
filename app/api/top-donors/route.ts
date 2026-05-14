@@ -17,9 +17,11 @@ export async function GET() {
       })
       .catch(() => []);
 
+    type SupportAggRow = { userId: string; _sum: { amount: number | null } };
+
     const topAggs = aggregates
-      .filter((a: any) => typeof a.userId === "string" && a.userId.length > 0)
-      .slice(0, 3) as { userId: string; _sum: { amount: number | null } }[];
+      .filter((a) => typeof a.userId === "string" && a.userId.length > 0)
+      .slice(0, 3) as SupportAggRow[];
 
     if (!topAggs.length) {
       return NextResponse.json(
@@ -52,7 +54,17 @@ export async function GET() {
       .catch(() => []);
     const byId = new Map(users.map((u) => [u.id, u]));
 
-    const donors = topAggs
+    type TopDonorBase = {
+      id: string;
+      name: string;
+      avatar: string | null;
+      vkLink: string | null;
+      telegramLink: string | null;
+      youtubeLink: string | null;
+      totalAmount: number;
+    };
+
+    const donors: TopDonorBase[] = topAggs
       .map((agg) => {
         const user = byId.get(agg.userId);
         if (!user) return null;
@@ -71,7 +83,7 @@ export async function GET() {
           totalAmount,
         };
       })
-      .filter(Boolean) as any[];
+      .filter((row): row is TopDonorBase => row !== null);
 
     return NextResponse.json(
       {

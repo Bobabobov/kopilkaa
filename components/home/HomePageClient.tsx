@@ -70,7 +70,7 @@ export default function HomePageClient({ initialStats }: HomePageClientProps) {
   return (
     <div className="min-h-screen">
       <div className="relative z-10">
-        <HeroSection stats={initialStats} loading={false} />
+        <HeroSection stats={initialStats} />
         <RecentApplications />
         <HomeReviewsSection />
         <HowItWorks />

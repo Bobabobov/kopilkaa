@@ -32,6 +32,11 @@ export type ReviewItem = {
 
 type PendingReviewApplication = { id: string; title: string } | null;
 
+export interface UseReviewsOptions {
+  /** По умолчанию 12 (страница отзывов); на главной — меньше, чтобы не тянуть лишнее. */
+  limit?: number;
+}
+
 type ReviewsResponse = {
   limit: number;
   items: ReviewItem[];
@@ -46,7 +51,8 @@ type ReviewsResponse = {
   };
 };
 
-export function useReviews() {
+export function useReviews(options?: UseReviewsOptions) {
+  const pageLimit = Math.min(30, Math.max(1, options?.limit ?? 12));
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -65,20 +71,19 @@ export function useReviews() {
       else setLoading(true);
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
-      const params = new URLSearchParams({ page: String(page), limit: "12" });
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(pageLimit),
+      });
       try {
         const res = await fetch(`/api/reviews?${params}`, {
           cache: "no-store",
           signal: controller.signal,
         });
-        const json = (await res.json().catch(() => null)) as
-          | ReviewsResponse
-          | null;
-        throwIfApiFailed(
-          res,
-          json,
-          "Не удалось загрузить отзывы",
-        );
+        const json = (await res
+          .json()
+          .catch(() => null)) as ReviewsResponse | null;
+        throwIfApiFailed(res, json, "Не удалось загрузить отзывы");
         if (!json) throw new Error("Не удалось загрузить отзывы");
         if (append) {
           setData((prev) => {
@@ -98,7 +103,11 @@ export function useReviews() {
       } catch (error) {
         console.error("Failed to load reviews", error);
         if (!append) {
-          showToastRef.current?.("error", "Ошибка", "Не удалось загрузить отзывы");
+          showToastRef.current?.(
+            "error",
+            "Ошибка",
+            "Не удалось загрузить отзывы",
+          );
           setData(null);
         }
       } finally {
@@ -107,7 +116,7 @@ export function useReviews() {
         setLoadingMore(false);
       }
     },
-    [],
+    [pageLimit],
   );
 
   useEffect(() => {
@@ -129,7 +138,11 @@ export function useReviews() {
     ) => {
       if (submitting) return;
       if (!applicationId) {
-        showToastRef.current?.("error", "Ошибка", "Не указана заявка для отзыва");
+        showToastRef.current?.(
+          "error",
+          "Ошибка",
+          "Не указана заявка для отзыва",
+        );
         return;
       }
       if (!content.trim()) {
@@ -178,7 +191,9 @@ export function useReviews() {
           const uploadJson = await uploadRes.json();
           throwIfApiFailed(uploadRes, uploadJson, "Ошибка загрузки файлов");
           uploadedUrls.push(
-            ...((uploadJson.files as { url: string }[]) || []).map((f) => f.url),
+            ...((uploadJson.files as { url: string }[]) || []).map(
+              (f) => f.url,
+            ),
           );
         }
         const images = uploadedUrls.slice(0, 5);

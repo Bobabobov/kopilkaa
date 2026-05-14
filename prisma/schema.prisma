@@ -22,6 +22,8 @@ enum ApplicationCategory {
   TRANSPORT_COMMS
   SMALL_GIFT
   EVERYDAY_SUPPORT
+  /** Встречается в старых БД; не показываем в форме, но Prisma должен уметь читать строку */
+  GAME_OR_SERVICE
 }
 
 enum GoodDeedSubmissionStatus {

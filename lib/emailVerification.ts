@@ -102,8 +102,8 @@ export async function deliverEmailVerification(
       html,
     });
     return { mode: "sent" };
-  } catch (err) {
-    console.error("[emailVerification] Ошибка SMTP при отправке:", err);
+  } catch {
+    // Подробности уже пишет `lib/mailer.ts` (без пароля).
     return { mode: "failed" };
   }
 }

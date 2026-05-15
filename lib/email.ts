@@ -1,10 +1,11 @@
 // lib/email.ts
 import nodemailer from "nodemailer";
+import { normalizeSmtpEnvValue } from "@/lib/mailer";
 
 const host = process.env.SMTP_HOST || "";
 const port = Number(process.env.SMTP_PORT || 587);
-const user = process.env.SMTP_USER || "";
-const pass = process.env.SMTP_PASS || "";
+const user = normalizeSmtpEnvValue(process.env.SMTP_USER);
+const pass = normalizeSmtpEnvValue(process.env.SMTP_PASS);
 const from = process.env.MAIL_FROM || "no-reply@example.com";
 
 // Можно принудительно выключить письма переменной MAIL_ON=0

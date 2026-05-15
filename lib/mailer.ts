@@ -1,5 +1,19 @@
 import nodemailer from "nodemailer";
 
+/**
+ * В .env часто пишут SMTP_PASS='секрет' — часть парсеров оставляет кавычки в значении,
+ * тогда SMTP-сервер получает неверный пароль (535).
+ */
+export function normalizeSmtpEnvValue(raw: string | undefined): string {
+  if (raw == null) return "";
+  const t = raw.trim();
+  if (t.length >= 2) {
+    if (t.startsWith("'") && t.endsWith("'")) return t.slice(1, -1).trim();
+    if (t.startsWith('"') && t.endsWith('"')) return t.slice(1, -1).trim();
+  }
+  return t;
+}
+
 /** Достаточно задать SMTP-хост; порт/логин/пароль — по провайдеру (см. .env.example). */
 export function isSmtpConfigured(): boolean {
   return Boolean(process.env.SMTP_HOST?.trim());
@@ -16,8 +30,8 @@ function createSmtpTransport() {
     process.env.SMTP_SECURE === "true" ||
     process.env.SMTP_SECURE === "1" ||
     port === 465;
-  const user = process.env.SMTP_USER?.trim() ?? "";
-  const pass = process.env.SMTP_PASS ?? "";
+  const user = normalizeSmtpEnvValue(process.env.SMTP_USER);
+  const pass = normalizeSmtpEnvValue(process.env.SMTP_PASS);
 
   // См. документацию nodemailer: порт 587 — STARTTLS (secure: false), 465 — implicit TLS.
   return nodemailer.createTransport({

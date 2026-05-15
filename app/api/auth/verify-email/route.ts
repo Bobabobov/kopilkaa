@@ -5,6 +5,8 @@ import { verifyEmailVerificationToken } from "@/lib/emailVerification";
 import { getPublicOriginFromRequest } from "@/lib/siteUrl";
 
 export const runtime = "nodejs";
+/** Иначе `next build` дергает роут при статической генерации и падает на `request.url`. */
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {

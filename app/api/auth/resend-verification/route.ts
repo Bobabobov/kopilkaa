@@ -4,6 +4,7 @@ import { deliverEmailVerification } from "@/lib/emailVerification";
 import { isSmtpConfigured } from "@/lib/mailer";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * Повторная отправка письма подтверждения.

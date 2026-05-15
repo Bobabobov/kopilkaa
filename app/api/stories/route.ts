@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 
 export const dynamic = "force-dynamic";
 
@@ -133,6 +134,7 @@ export async function GET(req: Request) {
                 avatarFrame: true,
                 headerTheme: true,
                 hideEmail: true,
+                ...USER_PUBLIC_BADGE_SELECT,
               },
             },
             _count: { select: { likes: true } },
@@ -212,6 +214,7 @@ export async function GET(req: Request) {
                 avatarFrame: true,
                 headerTheme: true,
                 hideEmail: true,
+                ...USER_PUBLIC_BADGE_SELECT,
               },
             },
             _count: { select: { likes: true } },

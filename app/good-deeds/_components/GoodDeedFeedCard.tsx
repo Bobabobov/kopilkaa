@@ -9,6 +9,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { StoryAdGallery } from "@/app/good-deeds/_components/StoryAdGallery";
 import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import type { GoodDeedsResponse } from "../types";
 
 export type FeedCardItem = GoodDeedsResponse["feed"][number];
@@ -172,6 +173,7 @@ function GoodDeedFeedCardInner({
                   {authorName}
                 </span>
             </Link>
+            <UserPublicBadges markedAsDeceiver={item.user.markedAsDeceiver} />
 
             <div className="flex flex-shrink-0 items-center gap-2 rounded-2xl border border-[#f9bc60]/50 bg-gradient-to-r from-[#f9bc60]/25 to-[#f9bc60]/10 px-3 py-2 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:border-[#f9bc60]/80 hover:shadow-md">
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#f9bc60]/50 bg-[#f9bc60]/30 shadow-inner">

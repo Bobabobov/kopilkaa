@@ -29,6 +29,7 @@ type User = {
   telegramLink?: string | null;
   youtubeLink?: string | null;
   lastSeen?: string | null;
+  markedAsDeceiver?: boolean;
   applicationsCount?: number;
   approvedApplications?: number;
   friendsCount?: number;
@@ -232,6 +233,7 @@ export default function ProfileHeaderCard({
                   name={user.name}
                   role={user.role}
                   status={status}
+                  markedAsDeceiver={user.markedAsDeceiver}
                 />
 
                 <CtaRow

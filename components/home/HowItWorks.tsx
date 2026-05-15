@@ -6,6 +6,7 @@ import { HowItWorksStepCard } from "./how-it-works/HowItWorksStepCard";
 import { HowItWorksDisclaimer } from "./how-it-works/HowItWorksDisclaimer";
 import { HowItWorksCta } from "./how-it-works/HowItWorksCta";
 import { useHowItWorksAuth } from "@/hooks/home/useHowItWorksAuth";
+import { HomeSectionLayout } from "@/components/home/HomeSectionLayout";
 
 export default function HowItWorks() {
   const { loading, handleStartClick } = useHowItWorksAuth();
@@ -15,7 +16,11 @@ export default function HowItWorks() {
       <div className="max-w-6xl mx-auto">
         <HowItWorksHeader />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-6">
+        <HomeSectionLayout
+          ariaLabel="Как это работает"
+          gridClassName="md:grid-cols-2 lg:grid-cols-4"
+          slideBasis="basis-[85%]"
+        >
           {HOW_IT_WORKS_STEPS.map((step, index) => (
             <HowItWorksStepCard
               key={step.title}
@@ -24,7 +29,7 @@ export default function HowItWorks() {
               steps={HOW_IT_WORKS_STEPS}
             />
           ))}
-        </div>
+        </HomeSectionLayout>
 
         <HowItWorksDisclaimer />
 

@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
+import { shouldShowMobileBottomNav } from "@/lib/navigation/mobileBottomNav";
 
 export default function ScrollToTop() {
   const pathname = usePathname();
+  const hasBottomNav = shouldShowMobileBottomNav(pathname);
   const [isVisible, setIsVisible] = useState(false);
   const [isNearFooter, setIsNearFooter] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -88,11 +90,13 @@ export default function ScrollToTop() {
               ? "h-11 w-11 rounded-full p-0"
               : "px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl"
           } ${
-            isMobile
-              ? "bottom-20"
-              : isNearFooter
-              ? "bottom-32 sm:bottom-36 md:bottom-40 lg:bottom-20"
-              : "bottom-24 sm:bottom-28 md:bottom-8 lg:bottom-8"
+            hasBottomNav
+              ? "max-[1199px]:bottom-[calc(var(--bottom-nav-offset)+0.75rem)] min-[1200px]:bottom-8"
+              : isMobile
+                ? "bottom-20"
+                : isNearFooter
+                  ? "bottom-32 sm:bottom-36 md:bottom-40 lg:bottom-20"
+                  : "bottom-24 sm:bottom-28 md:bottom-8 lg:bottom-8"
           }`}
           style={{
             background: "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",

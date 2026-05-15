@@ -11,6 +11,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { formatAmount } from "@/lib/format";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { RankConfig } from "./rankConfig";
@@ -134,25 +135,28 @@ function TopStoryCardInner({
 
           <div className="absolute bottom-4 left-4 right-4 z-[3] flex items-center gap-2">
             {story.user?.id ? (
-              <Link
-                href={`/profile/${story.user.id}`}
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-2 text-sm font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] hover:text-[#f9bc60] transition-colors truncate min-w-0"
-              >
-                <Image
-                  src={avatarUrl}
-                  alt=""
-                  width={32}
-                  height={32}
-                  quality={65}
-                  className="h-8 w-8 shrink-0 rounded-full object-cover ring-2 ring-[#001e1d]/90"
-                  unoptimized={avatarUnoptimized}
-                  onError={(e) => {
-                    e.currentTarget.src = DEFAULT_AVATAR;
-                  }}
-                />
-                <span className="truncate">{authorName}</span>
-              </Link>
+              <>
+                <Link
+                  href={`/profile/${story.user.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex min-w-0 items-center gap-2 truncate text-sm font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] transition-colors hover:text-[#f9bc60]"
+                >
+                  <Image
+                    src={avatarUrl}
+                    alt=""
+                    width={32}
+                    height={32}
+                    quality={65}
+                    className="h-8 w-8 shrink-0 rounded-full object-cover ring-2 ring-[#001e1d]/90"
+                    unoptimized={avatarUnoptimized}
+                    onError={(e) => {
+                      e.currentTarget.src = DEFAULT_AVATAR;
+                    }}
+                  />
+                  <span className="truncate">{authorName}</span>
+                </Link>
+                <UserPublicBadges markedAsDeceiver={story.user?.markedAsDeceiver} />
+              </>
             ) : (
               <>
                 <Image
@@ -167,9 +171,10 @@ function TopStoryCardInner({
                     e.currentTarget.src = DEFAULT_AVATAR;
                   }}
                 />
-                <span className="text-sm font-semibold text-white truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                <span className="truncate text-sm font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                   {authorName}
                 </span>
+                <UserPublicBadges markedAsDeceiver={story.user?.markedAsDeceiver} />
               </>
             )}
           </div>

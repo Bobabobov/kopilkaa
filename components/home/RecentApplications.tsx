@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Heart, ArrowRight } from "lucide-react";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
+import { HomeSectionLayout } from "@/components/home/HomeSectionLayout";
 
 interface Application {
   id: string;
@@ -17,6 +19,7 @@ interface Application {
     id: string;
     name: string | null;
     avatar: string | null;
+    markedAsDeceiver?: boolean;
   };
 }
 
@@ -100,8 +103,7 @@ export default function RecentApplications() {
           </p>
         </motion.div>
 
-        {/* Сетка заявок */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <HomeSectionLayout ariaLabel="Истории людей">
           {applications.map((app, index) => (
             <motion.div
               key={app.id}
@@ -109,6 +111,7 @@ export default function RecentApplications() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.08 }}
+              className="h-full"
             >
               <Link
                 href={`/stories/${app.id}`}
@@ -196,10 +199,17 @@ export default function RecentApplications() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className="text-sm font-medium truncate"
+                        className="flex items-center gap-1.5 text-sm font-medium truncate"
                         style={{ color: "#fffffe" }}
                       >
-                        {app.user ? app.user.name || "Аноним" : "Аноним"}
+                        <span className="truncate">
+                          {app.user ? app.user.name || "Аноним" : "Аноним"}
+                        </span>
+                        {app.user ? (
+                          <UserPublicBadges
+                            markedAsDeceiver={app.user.markedAsDeceiver}
+                          />
+                        ) : null}
                       </p>
                       <p className="text-xs" style={{ color: "#94a1b2" }}>
                         {new Date(app.createdAt).toLocaleDateString("ru-RU", {
@@ -214,7 +224,7 @@ export default function RecentApplications() {
               </Link>
             </motion.div>
           ))}
-        </div>
+        </HomeSectionLayout>
 
         {/* Кнопка "Смотреть все" */}
         <motion.div

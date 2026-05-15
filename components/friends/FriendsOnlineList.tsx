@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 
 interface FriendsOnlineListProps {
   onlineUsers: any[];
@@ -98,6 +99,7 @@ export function FriendsOnlineList({
                       ? user.email.split("@")[0]
                       : "Пользователь")}
                 </p>
+                <UserPublicBadges markedAsDeceiver={user.markedAsDeceiver} />
                 <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#10B981] shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
                   В сети

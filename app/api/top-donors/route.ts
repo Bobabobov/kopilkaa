@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { getSafeExternalUrl } from "@/lib/safeExternalUrl";
+import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +50,7 @@ export async function GET() {
           vkLink: true,
           telegramLink: true,
           youtubeLink: true,
+          ...USER_PUBLIC_BADGE_SELECT,
         },
       })
       .catch(() => []);
@@ -61,6 +63,7 @@ export async function GET() {
       vkLink: string | null;
       telegramLink: string | null;
       youtubeLink: string | null;
+      markedAsDeceiver: boolean;
       totalAmount: number;
     };
 
@@ -80,6 +83,7 @@ export async function GET() {
           vkLink: getSafeExternalUrl(user.vkLink),
           telegramLink: getSafeExternalUrl(user.telegramLink),
           youtubeLink: getSafeExternalUrl(user.youtubeLink),
+          markedAsDeceiver: user.markedAsDeceiver,
           totalAmount,
         };
       })

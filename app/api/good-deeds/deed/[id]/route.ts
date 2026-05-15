@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoodDeedSubmissionStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 import { isValidCuidLikeId } from "@/lib/reviews/reviewId";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +46,7 @@ export async function GET(
             vkLink: true,
             telegramLink: true,
             youtubeLink: true,
+            ...USER_PUBLIC_BADGE_SELECT,
           },
         },
       },
@@ -78,6 +80,7 @@ export async function GET(
           vkLink: submission.user.vkLink,
           telegramLink: submission.user.telegramLink,
           youtubeLink: submission.user.youtubeLink,
+          markedAsDeceiver: submission.user.markedAsDeceiver,
         },
       },
     });

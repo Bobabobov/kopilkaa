@@ -72,6 +72,7 @@ export interface AdminUser {
   createdAt: string;
   lastSeen: string | null;
   role: string;
+  markedAsDeceiver?: boolean;
   trustDelta?: number;
   trustLevel?: TrustLevel;
   effectiveApprovedApplications?: number;

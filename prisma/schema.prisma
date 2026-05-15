@@ -99,6 +99,8 @@ model User {
   isBanned             Boolean               @default(false)
   bannedUntil          DateTime?
   bannedReason         String?
+  /** Публичная метка админа: красный бейдж «Обманывал» на всём сайте. */
+  markedAsDeceiver     Boolean               @default(false)
 }
 
 // Реферальная программа: фиксируем клики по ссылке и успешную регистрацию по этой ссылке.

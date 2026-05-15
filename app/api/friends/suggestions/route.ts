@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 export const dynamic = "force-dynamic";
 
 function shuffleUsers<T>(items: T[]): T[] {
@@ -50,6 +51,7 @@ export async function GET(request: Request) {
         hideEmail: true,
         avatar: true,
         lastSeen: true,
+        ...USER_PUBLIC_BADGE_SELECT,
       },
     });
 

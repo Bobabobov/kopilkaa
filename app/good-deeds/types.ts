@@ -46,6 +46,7 @@ export type GoodDeedsResponse = {
       vkLink?: string | null;
       telegramLink?: string | null;
       youtubeLink?: string | null;
+      markedAsDeceiver?: boolean;
     };
   }[];
   viewer: {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { HeartHandshake } from "lucide-react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { HomeSectionLayout } from "@/components/home/HomeSectionLayout";
 
 type HomeGoodDeedItem = {
   id: string;
@@ -81,14 +82,14 @@ export default function HomeGoodDeedsSection() {
         </motion.div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <HomeSectionLayout ariaLabel="Загрузка добрых дел">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
                 className="h-72 rounded-2xl border border-white/10 bg-white/5 animate-pulse"
               />
             ))}
-          </div>
+          </HomeSectionLayout>
         ) : items.length === 0 ? (
           <div className="text-center py-10 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
             <div className="inline-flex w-14 h-14 rounded-2xl bg-white/10 items-center justify-center mb-4 border border-white/10">
@@ -103,7 +104,7 @@ export default function HomeGoodDeedsSection() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <HomeSectionLayout ariaLabel="Добрые дела">
             {items.map((item, index) => (
               <motion.article
                 key={item.id}
@@ -111,7 +112,7 @@ export default function HomeGoodDeedsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, delay: index * 0.06 }}
-                className="rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_8px_26px_rgba(0,0,0,0.22)]"
+                className="h-full rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_8px_26px_rgba(0,0,0,0.22)]"
               >
                 <div className="relative mb-4 h-40 overflow-hidden rounded-xl border border-white/10 bg-black/20">
                   <img
@@ -154,7 +155,7 @@ export default function HomeGoodDeedsSection() {
                 </div>
               </motion.article>
             ))}
-          </div>
+          </HomeSectionLayout>
         )}
 
         <div className="mt-10 flex items-center justify-center">

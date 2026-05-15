@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 
 interface FriendsListProps {
   type: "friends" | "sent" | "received";
@@ -157,6 +158,7 @@ export function FriendsList({
                     {user.name ||
                       (user.email ? user.email.split("@")[0] : "Пользователь")}
                   </p>
+                  <UserPublicBadges markedAsDeceiver={user.markedAsDeceiver} />
                   {isAccepted && (
                     <LucideIcons.CheckCircle2
                       size="sm"

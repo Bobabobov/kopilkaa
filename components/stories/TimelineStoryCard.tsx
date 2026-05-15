@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { getAvatarFrame } from "@/lib/header-customization";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 
 interface TimelineStoryCardProps {
   story: {
@@ -20,6 +21,7 @@ interface TimelineStoryCardProps {
       avatarFrame: string | null;
       headerTheme: string | null;
       hideEmail?: boolean;
+      markedAsDeceiver?: boolean;
     };
     _count: {
       likes: number;
@@ -125,11 +127,16 @@ export function TimelineStoryCard({ story, index }: TimelineStoryCardProps) {
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {story.user.name ||
-                      (!story.user.hideEmail && story.user.email
-                        ? story.user.email.split("@")[0]
-                        : "Пользователь")}
+                  <p className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-gray-900 dark:text-white">
+                    <span>
+                      {story.user.name ||
+                        (!story.user.hideEmail && story.user.email
+                          ? story.user.email.split("@")[0]
+                          : "Пользователь")}
+                    </span>
+                    <UserPublicBadges
+                      markedAsDeceiver={story.user.markedAsDeceiver}
+                    />
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Автор истории

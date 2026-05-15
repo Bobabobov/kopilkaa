@@ -6,6 +6,7 @@ import { renderHighlightedText } from "./highlight";
 import type { Story } from "./types";
 import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 
 interface StoryCardContentProps {
   story: Story;
@@ -186,42 +187,48 @@ export function StoryCardContent({
         <div className="space-y-3 flex-shrink-0">
           <div className="flex items-center gap-2 flex-wrap">
             {story.user?.id ? (
-              <Link
-                href={`/profile/${story.user.id}`}
-                className="flex items-center gap-2 group/author bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 hover:border-[#f9bc60]/60 hover:from-[#abd1c6]/30 hover:to-[#94c4b8]/30 transition-all duration-300 hover:shadow-md hover:scale-[1.02] flex-shrink-0"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="relative flex-shrink-0">
+              <>
+                <Link
+                  href={`/profile/${story.user.id}`}
+                  className="flex items-center gap-2 group/author bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 hover:border-[#f9bc60]/60 hover:from-[#abd1c6]/30 hover:to-[#94c4b8]/30 transition-all duration-300 hover:shadow-md hover:scale-[1.02] flex-shrink-0"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="relative flex-shrink-0">
+                    <img
+                      src={safeAuthorAvatar}
+                      alt={authorName}
+                      loading="lazy"
+                      className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60 group-hover/author:border-[#f9bc60] transition-all duration-300 shadow-sm"
+                      onError={(e) => {
+                        e.currentTarget.src = DEFAULT_AVATAR;
+                      }}
+                    />
+                    <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-[#f9bc60]/30 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-300 blur-sm" />
+                  </div>
+                  <span className="text-sm font-bold text-[#001e1d] group-hover/author:text-[#004643] transition-colors duration-300 whitespace-nowrap">
+                    {authorName}
+                  </span>
+                </Link>
+                <UserPublicBadges markedAsDeceiver={story.user?.markedAsDeceiver} />
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 flex-shrink-0">
                   <img
                     src={safeAuthorAvatar}
                     alt={authorName}
                     loading="lazy"
-                    className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60 group-hover/author:border-[#f9bc60] transition-all duration-300 shadow-sm"
+                    className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60"
                     onError={(e) => {
                       e.currentTarget.src = DEFAULT_AVATAR;
                     }}
                   />
-                  <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-[#f9bc60]/30 to-transparent opacity-0 group-hover/author:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                  <span className="text-sm font-bold text-[#001e1d] whitespace-nowrap">
+                    {authorName}
+                  </span>
                 </div>
-                <span className="text-sm font-bold text-[#001e1d] group-hover/author:text-[#004643] transition-colors duration-300 whitespace-nowrap">
-                  {authorName}
-                </span>
-              </Link>
-            ) : (
-              <div className="flex items-center gap-2 bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 flex-shrink-0">
-                <img
-                  src={safeAuthorAvatar}
-                  alt={authorName}
-                  loading="lazy"
-                  className="w-7 h-7 rounded-full object-cover border-2 border-[#abd1c6]/60"
-                  onError={(e) => {
-                    e.currentTarget.src = DEFAULT_AVATAR;
-                  }}
-                />
-                <span className="text-sm font-bold text-[#001e1d] whitespace-nowrap">
-                  {authorName}
-                </span>
-              </div>
+                <UserPublicBadges markedAsDeceiver={story.user?.markedAsDeceiver} />
+              </>
             )}
 
             <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#abd1c6]/20 to-[#94c4b8]/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-[#abd1c6]/40 hover:border-[#f9bc60]/60 hover:from-[#abd1c6]/30 hover:to-[#94c4b8]/30 transition-all duration-300 hover:shadow-md hover:scale-[1.02] flex-shrink-0">

@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 
 const MIN_SEARCH_LENGTH = 2;
 
@@ -170,6 +171,7 @@ export function FriendsSearch({
                           ? user.email.split("@")[0]
                           : "Пользователь")}
                     </p>
+                    <UserPublicBadges markedAsDeceiver={user.markedAsDeceiver} />
                     {isOnline ? (
                       <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#10B981] shrink-0">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>

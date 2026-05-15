@@ -1,17 +1,20 @@
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import type { UserStatus } from "../hooks/useUserStatus";
 
 interface HeaderIdentityProps {
   name?: string | null;
   role: "USER" | "ADMIN";
   status: UserStatus;
+  markedAsDeceiver?: boolean;
 }
 
 export function HeaderIdentity({
   name,
   role,
   status,
+  markedAsDeceiver,
 }: HeaderIdentityProps) {
   return (
     <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-0 mt-0 sm:-mt-10 md:-mt-12 min-w-0">
@@ -23,6 +26,7 @@ export function HeaderIdentity({
       >
         {name || "Пользователь"}
       </motion.h1>
+      <UserPublicBadges markedAsDeceiver={markedAsDeceiver} />
       {role === "ADMIN" && (
         <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">
           <LucideIcons.Shield className="w-3 h-3" />

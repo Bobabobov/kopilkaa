@@ -14,6 +14,7 @@ import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { formatTimeAgo } from "@/lib/time";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import { StoryAdGallery } from "@/app/good-deeds/_components/StoryAdGallery";
 import { throwIfApiFailed } from "@/lib/api/parseApiError";
 
@@ -34,6 +35,7 @@ type DeedPayload = {
     vkLink?: string | null;
     telegramLink?: string | null;
     youtubeLink?: string | null;
+    markedAsDeceiver?: boolean;
   };
 };
 
@@ -177,8 +179,11 @@ export function GoodDeedDeedClient({ id }: { id: string }) {
                 }}
               />
               <div className="min-w-0 text-left">
-                <p className="truncate font-semibold text-[#fffffe] transition group-hover:text-[#f9bc60]">
-                  {deed.user.name}
+                <p className="flex items-center gap-1.5 truncate font-semibold text-[#fffffe] transition group-hover:text-[#f9bc60]">
+                  <span className="truncate">{deed.user.name}</span>
+                  <UserPublicBadges
+                    markedAsDeceiver={deed.user.markedAsDeceiver}
+                  />
                 </p>
                 {deed.user.username && (
                   <p className="truncate text-sm text-[#94a1b2]">

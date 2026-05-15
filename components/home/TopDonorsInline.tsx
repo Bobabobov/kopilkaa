@@ -9,6 +9,8 @@ import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
+import { HomeSectionLayout } from "@/components/home/HomeSectionLayout";
 
 interface Donor {
   id: string;
@@ -18,6 +20,7 @@ interface Donor {
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;
+  markedAsDeceiver?: boolean;
   position?: number;
 }
 
@@ -42,7 +45,6 @@ export default function TopDonorsInline() {
         const data = await response.json();
         if (!data.success || !Array.isArray(data.donors)) return;
 
-        // Берём только первых трёх донатёров
         setDonors((data.donors as Donor[]).slice(0, 3));
       } catch (error) {
         if (process.env.NODE_ENV !== "production") {
@@ -128,7 +130,7 @@ export default function TopDonorsInline() {
           )}
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <HomeSectionLayout ariaLabel="Топ донатёры">
           {donors.map((donor, index) => {
             const numericAmount = parseInt(donor.amount.replace(/\D/g, ""), 10);
             const formattedAmount = Number.isNaN(numericAmount)
@@ -155,6 +157,7 @@ export default function TopDonorsInline() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.08 }}
+                className="h-full"
               >
                 <Link
                   href={`/profile/${donor.id}`}
@@ -207,10 +210,13 @@ export default function TopDonorsInline() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p
-                          className="text-lg font-bold truncate"
+                          className="flex items-center gap-1.5 text-lg font-bold truncate"
                           style={{ color: "#fffffe" }}
                         >
-                          {donor.name}
+                          <span className="truncate">{donor.name}</span>
+                          <UserPublicBadges
+                            markedAsDeceiver={donor.markedAsDeceiver}
+                          />
                         </p>
                         <p
                           className="text-sm font-medium"
@@ -310,7 +316,7 @@ export default function TopDonorsInline() {
               </motion.div>
             );
           })}
-        </div>
+        </HomeSectionLayout>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}

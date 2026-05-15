@@ -22,6 +22,7 @@ type ReviewUser = {
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;
+  markedAsDeceiver?: boolean;
   trust: {
     status: string;
     approved: number;

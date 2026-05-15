@@ -12,7 +12,9 @@ import { Separator } from "@/components/ui/separator";
 import { getTrustLabel } from "@/lib/trustLevel";
 import { formatDateShort, formatDateTime } from "@/lib/time";
 import { TrustDeltaControl } from "./TrustDeltaControl";
+import { DeceiverMarkControl } from "./DeceiverMarkControl";
 import { ResetPasswordModal } from "./ResetPasswordModal";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import type { AdminUser } from "./types";
 
 interface AdminUserCardProps {
@@ -21,7 +23,10 @@ interface AdminUserCardProps {
   deletingUserId: string | null;
   trustDeltaSaving: string | null;
   setTrustDeltaSaving: (id: string | null) => void;
+  deceiverMarkSaving: string | null;
+  setDeceiverMarkSaving: (id: string | null) => void;
   onTrustUpdated: (userId: string, nextDelta: number) => void;
+  onDeceiverMarkUpdated: (userId: string, marked: boolean) => void;
   onDelete: (userId: string, userName: string) => void;
   showToast: (type: "success" | "error", title: string, desc?: string) => void;
 }
@@ -32,7 +37,10 @@ export function AdminUserCard({
   deletingUserId,
   trustDeltaSaving,
   setTrustDeltaSaving,
+  deceiverMarkSaving,
+  setDeceiverMarkSaving,
   onTrustUpdated,
+  onDeceiverMarkUpdated,
   onDelete,
   showToast,
 }: AdminUserCardProps) {
@@ -73,6 +81,7 @@ export function AdminUserCard({
                   <h2 className="text-base font-semibold text-[#fffffe] sm:text-lg">
                     {user.name || "Без имени"}
                   </h2>
+                  <UserPublicBadges markedAsDeceiver={user.markedAsDeceiver} />
                   {user.role === "ADMIN" ? (
                     <Badge className="shrink-0 text-[0.65rem] uppercase tracking-wide">
                       Админ
@@ -240,6 +249,16 @@ export function AdminUserCard({
                 savingId={trustDeltaSaving}
                 setSavingId={setTrustDeltaSaving}
                 onSaved={(next) => onTrustUpdated(user.id, next)}
+                showToast={showToast}
+              />
+
+              <DeceiverMarkControl
+                userId={user.id}
+                initialMarked={user.markedAsDeceiver ?? false}
+                isAdmin={user.role === "ADMIN"}
+                savingId={deceiverMarkSaving}
+                setSavingId={setDeceiverMarkSaving}
+                onSaved={(marked) => onDeceiverMarkUpdated(user.id, marked)}
                 showToast={showToast}
               />
             </div>

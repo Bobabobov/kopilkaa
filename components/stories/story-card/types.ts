@@ -12,6 +12,7 @@ export interface Story {
     email: string | null;
     avatar: string | null;
     hideEmail?: boolean;
+    markedAsDeceiver?: boolean;
   };
   _count?: {
     likes: number;

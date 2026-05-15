@@ -18,7 +18,10 @@ interface AdminUsersListProps {
   deletingUserId: string | null;
   trustDeltaSaving: string | null;
   setTrustDeltaSaving: (id: string | null) => void;
+  deceiverMarkSaving: string | null;
+  setDeceiverMarkSaving: (id: string | null) => void;
   onTrustUpdated: (userId: string, nextDelta: number) => void;
+  onDeceiverMarkUpdated: (userId: string, marked: boolean) => void;
   onDelete: (userId: string, userName: string) => void;
   showToast: (type: "success" | "error", title: string, desc?: string) => void;
   onClearSearch: () => void;
@@ -63,7 +66,10 @@ export function AdminUsersList({
   deletingUserId,
   trustDeltaSaving,
   setTrustDeltaSaving,
+  deceiverMarkSaving,
+  setDeceiverMarkSaving,
   onTrustUpdated,
+  onDeceiverMarkUpdated,
   onDelete,
   showToast,
   onClearSearch,
@@ -130,7 +136,10 @@ export function AdminUsersList({
             deletingUserId={deletingUserId}
             trustDeltaSaving={trustDeltaSaving}
             setTrustDeltaSaving={setTrustDeltaSaving}
+            deceiverMarkSaving={deceiverMarkSaving}
+            setDeceiverMarkSaving={setDeceiverMarkSaving}
             onTrustUpdated={onTrustUpdated}
+            onDeceiverMarkUpdated={onDeceiverMarkUpdated}
             onDelete={onDelete}
             showToast={showToast}
           />

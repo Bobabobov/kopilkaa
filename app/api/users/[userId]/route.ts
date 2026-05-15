@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { isUsernameIdentifier } from "@/lib/userResolve";
+import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export async function GET(
@@ -44,6 +45,7 @@ export async function GET(
       isBanned: true,
       bannedUntil: true,
       bannedReason: true,
+      ...USER_PUBLIC_BADGE_SELECT,
     } as const;
 
     const user = isUsernameIdentifier(normalized)

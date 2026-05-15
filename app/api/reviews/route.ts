@@ -10,6 +10,7 @@ import {
 } from "@/lib/trustLevel";
 import { ApplicationStatus, type Prisma } from "@prisma/client";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,7 @@ const REVIEW_SELECT = {
       vkLink: true,
       telegramLink: true,
       youtubeLink: true,
+      ...USER_PUBLIC_BADGE_SELECT,
     },
   },
 };
@@ -125,6 +127,7 @@ async function mapReviews(raw: ReviewListRow[], viewerId: string | null) {
         vkLink: item.user.vkLink,
         telegramLink: item.user.telegramLink,
         youtubeLink: item.user.youtubeLink,
+        markedAsDeceiver: item.user.markedAsDeceiver,
         trust,
         isSelf: viewerId ? viewerId === item.userId : false,
       },

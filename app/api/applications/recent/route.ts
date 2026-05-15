@@ -1,5 +1,6 @@
 // app/api/applications/recent/route.ts
 import { prisma } from "@/lib/db";
+import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 
 // Динамический роут: Prisma + searchParams (с `force-dynamic` несовместим `revalidate` сегмента)
 export const dynamic = "force-dynamic";
@@ -41,6 +42,7 @@ export async function GET(req: Request) {
               id: true,
               name: true,
               avatar: true,
+              ...USER_PUBLIC_BADGE_SELECT,
             },
           },
         },

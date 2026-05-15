@@ -64,6 +64,18 @@
     --top-banner-height: 0px;
     --header-height: 56px; /* Мобильные (< 640px) */
     --header-offset: calc(var(--top-banner-height) + var(--header-height));
+    --bottom-nav-height: 0px;
+    --bottom-nav-offset: 0px;
+  }
+
+  /* Нижняя навигация на планшетах и мобильных (< 1200px) */
+  @media (max-width: 1199px) {
+    :root {
+      --bottom-nav-height: 4.25rem;
+      --bottom-nav-offset: calc(
+        var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px)
+      );
+    }
   }
 
   /* Десктоп: высота Header 64px */

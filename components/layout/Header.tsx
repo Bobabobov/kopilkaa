@@ -193,9 +193,8 @@ export default function Header() {
               <NavAuth />
             </div>
 
-            {/* Мобильные/планшетные кнопки: donate + burger (до 1200px) */}
+            {/* Мобильные/планшетные кнопки: burger (поддержка — в нижней навигации) */}
             <div className="min-[1200px]:hidden flex items-center gap-2">
-              <DonateButton variant="mobileHeader" />
               <HeaderMobileButton
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 isOpen={mobileMenuOpen}

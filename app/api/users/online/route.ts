@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,7 @@ export async function GET() {
         youtubeLink: true,
         createdAt: true,
         lastSeen: true,
+        ...USER_PUBLIC_BADGE_SELECT,
       },
       orderBy: { lastSeen: "desc" },
       take: 100,

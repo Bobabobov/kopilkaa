@@ -1,5 +1,6 @@
 import { GoodDeedSubmissionStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 
 /** Единый select для публичной ленты одобренных отчётов (главная + раздел «Добрые дела»). */
 export const GOOD_DEED_PUBLIC_FEED_SELECT = {
@@ -23,6 +24,7 @@ export const GOOD_DEED_PUBLIC_FEED_SELECT = {
       vkLink: true,
       telegramLink: true,
       youtubeLink: true,
+      ...USER_PUBLIC_BADGE_SELECT,
     },
   },
 } as const;
@@ -64,6 +66,7 @@ export function mapFeedRowToGoodDeedsApiItem(row: GoodDeedPublicFeedRow) {
       vkLink: row.user.vkLink,
       telegramLink: row.user.telegramLink,
       youtubeLink: row.user.youtubeLink,
+      markedAsDeceiver: row.user.markedAsDeceiver,
     },
   };
 }
@@ -82,6 +85,7 @@ export function mapFeedRowToHomePreviewItem(row: GoodDeedPublicFeedRow) {
     })),
     user: {
       name: row.user.name || row.user.username || "Пользователь",
+      markedAsDeceiver: row.user.markedAsDeceiver,
     },
   };
 }

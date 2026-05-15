@@ -16,6 +16,9 @@ export function useAdminUsers() {
   const [hasMore, setHasMore] = useState(true);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [trustDeltaSaving, setTrustDeltaSaving] = useState<string | null>(null);
+  const [deceiverMarkSaving, setDeceiverMarkSaving] = useState<string | null>(
+    null,
+  );
   const { showToast } = useBeautifulToast();
   const { confirm } = useBeautifulNotifications();
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -155,6 +158,14 @@ export function useAdminUsers() {
     );
   };
 
+  const updateUserDeceiverMark = (userId: string, marked: boolean) => {
+    setUsers((prev) =>
+      prev.map((it) =>
+        it.id === userId ? { ...it, markedAsDeceiver: marked } : it,
+      ),
+    );
+  };
+
   return {
     users,
     totalCount,
@@ -168,7 +179,10 @@ export function useAdminUsers() {
     handleDeleteUser,
     trustDeltaSaving,
     setTrustDeltaSaving,
+    deceiverMarkSaving,
+    setDeceiverMarkSaving,
     updateUserTrust,
+    updateUserDeceiverMark,
     showToast,
   };
 }

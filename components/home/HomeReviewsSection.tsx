@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useReviews } from "@/hooks/reviews/useReviews";
 import { ReviewCard } from "@/components/reviews/ReviewCard";
+import { HomeSectionLayout } from "@/components/home/HomeSectionLayout";
 
 const MAX_HOME_REVIEWS = 3;
 
@@ -43,7 +44,6 @@ export default function HomeReviewsSection() {
             Отзывы участников с фото и подтверждениями — чтобы было понятно, как
             именно помогла платформа.
           </p>
-
           <div className="mt-6 flex items-center justify-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/90">
               <LucideIcons.Sparkles size="sm" className="text-[#f9bc60]" />
@@ -57,14 +57,14 @@ export default function HomeReviewsSection() {
         </motion.div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <HomeSectionLayout ariaLabel="Загрузка отзывов">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
                 className="h-80 rounded-2xl border border-white/10 bg-white/5 animate-pulse"
               />
             ))}
-          </div>
+          </HomeSectionLayout>
         ) : visibleReviews.length === 0 ? (
           <div className="text-center py-10 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
             <div className="inline-flex w-14 h-14 rounded-2xl bg-white/10 items-center justify-center mb-4 border border-white/10">
@@ -78,11 +78,13 @@ export default function HomeReviewsSection() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <HomeSectionLayout ariaLabel="Отзывы участников">
             {visibleReviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
+              <div key={review.id} className="h-full">
+                <ReviewCard review={review} />
+              </div>
             ))}
-          </div>
+          </HomeSectionLayout>
         )}
 
         <div className="mt-10 flex items-center justify-center">

@@ -19,7 +19,10 @@ export default function AdminUsersClient() {
     handleDeleteUser,
     trustDeltaSaving,
     setTrustDeltaSaving,
+    deceiverMarkSaving,
+    setDeceiverMarkSaving,
     updateUserTrust,
+    updateUserDeceiverMark,
     showToast,
   } = useAdminUsers();
 
@@ -32,6 +35,10 @@ export default function AdminUsersClient() {
         user.effectiveApprovedApplications ?? 0,
       );
     }
+  };
+
+  const handleDeceiverMarkUpdated = (userId: string, marked: boolean) => {
+    updateUserDeceiverMark(userId, marked);
   };
 
   return (
@@ -59,7 +66,10 @@ export default function AdminUsersClient() {
             deletingUserId={deletingUserId}
             trustDeltaSaving={trustDeltaSaving}
             setTrustDeltaSaving={setTrustDeltaSaving}
+            deceiverMarkSaving={deceiverMarkSaving}
+            setDeceiverMarkSaving={setDeceiverMarkSaving}
             onTrustUpdated={handleTrustUpdated}
+            onDeceiverMarkUpdated={handleDeceiverMarkUpdated}
             onDelete={handleDeleteUser}
             showToast={showToast}
             onClearSearch={() => setSearchQuery("")}

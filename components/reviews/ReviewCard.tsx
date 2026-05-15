@@ -8,6 +8,7 @@ import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { cn } from "@/lib/utils";
+import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import type { ReviewItem } from "@/hooks/reviews/useReviews";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 
@@ -138,13 +139,15 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
               {profileHref ? (
                 <button
                   onClick={handleProfileClick}
-                  className="text-sm font-semibold leading-tight hover:text-[#f9bc60] transition-colors text-left cursor-pointer"
+                  className="flex items-center gap-1.5 text-sm font-semibold leading-tight hover:text-[#f9bc60] transition-colors text-left cursor-pointer"
                 >
-                  {user.name}
+                  <span>{user.name}</span>
+                  <UserPublicBadges markedAsDeceiver={user.markedAsDeceiver} />
                 </button>
               ) : (
-                <span className="text-sm font-semibold leading-tight">
-                  {user.name}
+                <span className="flex items-center gap-1.5 text-sm font-semibold leading-tight">
+                  <span>{user.name}</span>
+                  <UserPublicBadges markedAsDeceiver={user.markedAsDeceiver} />
                 </span>
               )}
               {user.username &&

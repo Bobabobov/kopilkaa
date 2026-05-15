@@ -86,6 +86,7 @@ export async function GET(request: Request) {
           role: true,
           trustDelta: true,
           emailVerified: true,
+          markedAsDeceiver: true,
         },
         orderBy: {
           createdAt: "desc",

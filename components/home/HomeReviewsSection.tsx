@@ -90,7 +90,7 @@ export default function HomeReviewsSection() {
         <div className="mt-10 flex items-center justify-center">
           <Link
             href="/reviews"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] border border-white/10 bg-white/5 text-[#fffffe] hover:bg-white/10 hover:border-[#f9bc60]/30"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all md:hover:scale-[1.02] active:scale-[0.98] border border-white/10 bg-white/5 text-[#fffffe] hover:bg-white/10 hover:border-[#f9bc60]/30"
           >
             <span>
               {total > 0

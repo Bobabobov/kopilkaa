@@ -46,14 +46,14 @@ function StoryAdGalleryInner({
   mode = "page",
 }: StoryAdGalleryProps) {
   const sorted = useMemo(
-    () =>
-      [...items]
-        .sort((a, b) => a.sort - b.sort)
-        .filter((i) => !!i?.url),
+    () => [...items].sort((a, b) => a.sort - b.sort).filter((i) => !!i?.url),
     [items],
   );
 
-  const toShow = mode === "feed" && sorted[0] ? [sorted[0]] : sorted;
+  const toShow = useMemo(
+    () => (mode === "feed" && sorted[0] ? [sorted[0]] : sorted),
+    [mode, sorted],
+  );
 
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -64,14 +64,14 @@ function StoryAdGalleryInner({
     Record<string, number>
   >({});
 
-  const probeKey = sorted.map((i) => `${i.url}|${i.type}`).join(";");
+  const probeKey = toShow.map((i) => `${i.url}|${i.type}`).join(";");
 
   useEffect(() => {
     setUploadFallbackStep({});
   }, [probeKey]);
 
   useEffect(() => {
-    if (sorted.length === 0) return;
+    if (toShow.length === 0) return;
 
     let cancelled = false;
 
@@ -120,7 +120,7 @@ function StoryAdGalleryInner({
     };
 
     const load = async () => {
-      const entries = await Promise.all(sorted.map((img) => probeOne(img)));
+      const entries = await Promise.all(toShow.map((img) => probeOne(img)));
 
       if (cancelled) return;
 
@@ -140,7 +140,7 @@ function StoryAdGalleryInner({
     return () => {
       cancelled = true;
     };
-  }, [probeKey]);
+  }, [probeKey, toShow]);
 
   const lightboxMedia: LightboxMediaItem[] = useMemo(
     () => sorted.map((x) => ({ url: x.url, type: x.type })),
@@ -171,9 +171,7 @@ function StoryAdGalleryInner({
         ? videoSrc(image.url)
         : imageSrcForStep(image.url, fbStep);
     const ratioKey =
-      image.type === "VIDEO"
-        ? previewUrl
-        : imageSrcForStep(image.url, 0);
+      image.type === "VIDEO" ? previewUrl : imageSrcForStep(image.url, 0);
 
     const isFailed =
       failedUrls[previewUrl] ||
@@ -187,8 +185,7 @@ function StoryAdGalleryInner({
         : 16 / 10;
     const isHero = index === 0;
 
-    const maxHeight =
-      mode === "feed" ? "14rem" : isHero ? "72vh" : "62vh";
+    const maxHeight = mode === "feed" ? "14rem" : isHero ? "72vh" : "62vh";
 
     const paddingY =
       mode === "feed"
@@ -200,8 +197,8 @@ function StoryAdGalleryInner({
     const frameInner = (
       <>
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-24 -right-20 h-52 w-52 rounded-full bg-[#f9bc60]/10 blur-3xl" />
-          <div className="absolute -bottom-28 -left-24 h-56 w-56 rounded-full bg-[#abd1c6]/10 blur-3xl" />
+          <div className="absolute -top-24 -right-20 h-52 w-52 rounded-full bg-[#f9bc60]/10 blur-xl md:blur-3xl" />
+          <div className="absolute -bottom-28 -left-24 h-56 w-56 rounded-full bg-[#abd1c6]/10 blur-xl md:blur-3xl" />
         </div>
 
         <div

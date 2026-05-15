@@ -164,7 +164,7 @@ export default function TopDonorsInline() {
                   className="block h-full group"
                 >
                   <div
-                    className="h-full rounded-2xl p-6 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                    className="h-full rounded-2xl p-6 overflow-hidden transition-all duration-300 md:hover:scale-[1.02] md:hover:shadow-xl"
                     style={{
                       background:
                         "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
@@ -327,7 +327,7 @@ export default function TopDonorsInline() {
         >
           <Link
             href="/support"
-            className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+            className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl transition-all duration-300 md:hover:scale-[1.02] md:hover:shadow-lg"
             style={{
               background:
                 "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
@@ -340,7 +340,7 @@ export default function TopDonorsInline() {
           </Link>
           <Link
             href="/heroes"
-            className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl border-2 transition-all duration-300 hover:scale-[1.02] hover:bg-white/[0.06]"
+            className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl border-2 transition-all duration-300 md:hover:scale-[1.02] hover:bg-white/[0.06]"
             style={{
               borderColor: "#abd1c6",
               color: "#abd1c6",

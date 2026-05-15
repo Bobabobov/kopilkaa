@@ -95,7 +95,7 @@ export function HeroSectionStats({ stats }: HeroSectionStatsProps) {
           aria-hidden
         >
           <motion.div
-            className="absolute -top-16 -right-20 h-56 w-56 rounded-full bg-[#f9bc60]/[0.12] blur-3xl sm:h-72 sm:w-72"
+            className="absolute -top-16 -right-20 h-56 w-56 rounded-full bg-[#f9bc60]/[0.12] blur-xl md:blur-3xl sm:h-72 sm:w-72"
             animate={
               reduceMotion
                 ? undefined
@@ -111,7 +111,7 @@ export function HeroSectionStats({ stats }: HeroSectionStatsProps) {
             }
           />
           <motion.div
-            className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-[#abd1c6]/[0.08] blur-3xl sm:h-80 sm:w-80"
+            className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-[#abd1c6]/[0.08] blur-xl md:blur-3xl sm:h-80 sm:w-80"
             animate={
               reduceMotion
                 ? undefined
@@ -190,11 +190,11 @@ export function HeroSectionStats({ stats }: HeroSectionStatsProps) {
                   "group text-center rounded-2xl p-4 sm:p-5",
                   "bg-white/[0.04] shadow-[0_0_0_1px_rgba(255,255,255,0.06)]",
                   "transition-shadow duration-300",
-                  "hover:shadow-[0_8px_28px_rgba(0,0,0,0.25),0_0_0_1px_rgba(249,188,96,0.22)]",
+                  "md:hover:shadow-[0_8px_28px_rgba(0,0,0,0.25),0_0_0_1px_rgba(249,188,96,0.22)]",
                 )}
               >
                 <motion.span
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-full mb-2.5 text-[#abd1c6] bg-white/[0.06] ring-1 ring-white/[0.06] group-hover:text-[#f9bc60] group-hover:ring-[#f9bc60]/25 transition-colors duration-300"
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-full mb-2.5 text-[#abd1c6] bg-white/[0.06] ring-1 ring-white/[0.06] md:group-hover:text-[#f9bc60] md:group-hover:ring-[#f9bc60]/25 transition-colors duration-300"
                   whileHover={reduceMotion ? undefined : { scale: 1.06 }}
                   transition={{ type: "spring", stiffness: 400, damping: 18 }}
                 >

@@ -77,8 +77,6 @@ export async function GET(
     const filePath = getUploadFilePath(filename);
 
     try {
-      const fileBuffer = await readFile(filePath);
-
       // Определяем MIME тип по расширению
       const ext = filename.toLowerCase().split(".").pop();
       let contentType = "application/octet-stream";
@@ -166,6 +164,8 @@ export async function GET(
             // no cached variant
           }
 
+          const fileBuffer = await readFile(filePath);
+
           // failOn: «мягче» стандартного warning — частично битые JPEG чаще дают превью вместо падения.
           const transformer = sharp(fileBuffer, { failOn: "none" })
             .rotate()
@@ -210,6 +210,8 @@ export async function GET(
           );
         }
       }
+
+      const fileBuffer = await readFile(filePath);
 
       return new NextResponse(new Uint8Array(fileBuffer), {
         headers: {

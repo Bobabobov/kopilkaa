@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { HeartHandshake } from "lucide-react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { HomeSectionLayout } from "@/components/home/HomeSectionLayout";
+import { buildUploadUrl } from "@/lib/uploads/url";
 
 type HomeGoodDeedItem = {
   id: string;
@@ -18,6 +19,9 @@ type HomeGoodDeedItem = {
 };
 
 const MAX_HOME_GOOD_DEEDS = 3;
+
+const goodDeedPreviewUrl = (url?: string | null): string =>
+  url ? buildUploadUrl(url, { variant: "thumb" }) : "/stories-preview.jpg";
 
 export default function HomeGoodDeedsSection() {
   const [loading, setLoading] = useState(true);
@@ -105,63 +109,69 @@ export default function HomeGoodDeedsSection() {
           </div>
         ) : (
           <HomeSectionLayout ariaLabel="Добрые дела">
-            {items.map((item, index) => (
-              <motion.article
-                key={item.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: index * 0.06 }}
-                className="h-full rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_8px_26px_rgba(0,0,0,0.22)]"
-              >
-                <div className="relative mb-4 h-40 overflow-hidden rounded-xl border border-white/10 bg-black/20">
-                  <img
-                    src={
-                      item.media.find((m) => m.type === "IMAGE")?.url ||
-                      item.media[0]?.url ||
-                      "/stories-preview.jpg"
-                    }
-                    alt={item.taskTitle}
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-                    onError={(e) => {
-                      e.currentTarget.src = "/stories-preview.jpg";
-                    }}
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-black/15 to-transparent" />
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-[#f9bc60]">
-                    +{item.reward} бонусов
-                  </span>
-                  <span className="text-xs text-[#abd1c6]/80">
-                    {item.user?.name || "Участник"}
-                  </span>
-                </div>
-                <h3 className="mt-2 text-lg font-bold leading-tight text-[#fffffe] line-clamp-2">
-                  {item.taskTitle}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-[#abd1c6] line-clamp-3">
-                  {item.storyText || item.taskDescription}
-                </p>
-                <div className="mt-4">
-                  <Link
-                    href={`/good-deeds/deed/${item.id}`}
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#fffffe] transition hover:bg-white/10 hover:border-[#f9bc60]/40"
-                  >
-                    Смотреть отчет
-                    <LucideIcons.ArrowRight size="sm" />
-                  </Link>
-                </div>
-              </motion.article>
-            ))}
+            {items.map((item, index) => {
+              const previewUrl = goodDeedPreviewUrl(
+                item.media.find((m) => m.type === "IMAGE")?.url ||
+                  item.media[0]?.url,
+              );
+
+              return (
+                <motion.article
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.45, delay: index * 0.06 }}
+                  className="h-full rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] p-5 shadow-[0_8px_26px_rgba(0,0,0,0.22)]"
+                >
+                  <div className="relative mb-4 h-40 overflow-hidden rounded-xl border border-white/10 bg-black/20">
+                    <img
+                      src={previewUrl}
+                      alt={item.taskTitle}
+                      loading="lazy"
+                      decoding="async"
+                      width={640}
+                      height={360}
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 md:hover:scale-105"
+                      onError={(e) => {
+                        e.currentTarget.src = "/stories-preview.jpg";
+                      }}
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-black/15 to-transparent" />
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-[#f9bc60]">
+                      +{item.reward} бонусов
+                    </span>
+                    <span className="text-xs text-[#abd1c6]/80">
+                      {item.user?.name || "Участник"}
+                    </span>
+                  </div>
+                  <h3 className="mt-2 text-lg font-bold leading-tight text-[#fffffe] line-clamp-2">
+                    {item.taskTitle}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-[#abd1c6] line-clamp-3">
+                    {item.storyText || item.taskDescription}
+                  </p>
+                  <div className="mt-4">
+                    <Link
+                      href={`/good-deeds/deed/${item.id}`}
+                      className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-[#fffffe] transition hover:bg-white/10 hover:border-[#f9bc60]/40"
+                    >
+                      Смотреть отчет
+                      <LucideIcons.ArrowRight size="sm" />
+                    </Link>
+                  </div>
+                </motion.article>
+              );
+            })}
           </HomeSectionLayout>
         )}
 
         <div className="mt-10 flex items-center justify-center">
           <Link
             href="/good-deeds"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] border border-white/10 bg-white/5 text-[#fffffe] hover:bg-white/10 hover:border-[#f9bc60]/30"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all md:hover:scale-[1.02] active:scale-[0.98] border border-white/10 bg-white/5 text-[#fffffe] hover:bg-white/10 hover:border-[#f9bc60]/30"
           >
             Все добрые дела
             <LucideIcons.ArrowRight size="sm" />

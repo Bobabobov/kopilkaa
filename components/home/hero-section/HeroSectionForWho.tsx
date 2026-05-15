@@ -15,7 +15,7 @@ export function HeroSectionForWho() {
           href="/applications"
           className="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl border-2 border-[#f9bc60]/40 bg-[#f9bc60]/10 hover:bg-[#f9bc60]/20 hover:border-[#f9bc60] transition-all text-left"
         >
-          <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#f9bc60]/30 flex items-center justify-center text-[#f9bc60] group-hover:scale-110 transition-transform">
+          <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#f9bc60]/30 flex items-center justify-center text-[#f9bc60] md:group-hover:scale-110 transition-transform">
             <HandHeart className="w-6 h-6" />
           </span>
           <div>

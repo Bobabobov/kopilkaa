@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import type { ReviewItem } from "@/hooks/reviews/useReviews";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { buildUploadUrl } from "@/lib/uploads/url";
 
 function SocialChip({
   href,
@@ -45,7 +46,13 @@ function SocialChip({
 export function ReviewCard({ review }: { review: ReviewItem }) {
   const router = useRouter();
   const { user } = review;
-  const avatarUrl = resolveAvatarUrl(user.avatar);
+  const avatarUrl = buildUploadUrl(resolveAvatarUrl(user.avatar), {
+    variant: "thumb",
+  });
+  const coverUrl = buildUploadUrl(
+    review.images?.[0]?.url || "/stories-preview.jpg",
+    { variant: "thumb" },
+  );
   const trust = user.trust;
   const trustLevelNumber = trust.status.split("_")[1] || "";
   const trustTitle = trustLevelNumber
@@ -66,8 +73,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
     }
   };
 
-  const hasSocial =
-    user.vkLink || user.telegramLink || user.youtubeLink;
+  const hasSocial = user.vkLink || user.telegramLink || user.youtubeLink;
 
   return (
     <motion.article
@@ -77,7 +83,8 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
       whileHover={{ y: -4 }}
       className="relative overflow-hidden rounded-2xl border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-all duration-300 group hover:border-white/15 hover:shadow-lg hover:shadow-black/20"
       style={{
-        background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+        background:
+          "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
       }}
     >
       <Link
@@ -90,11 +97,13 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
         {/* Cover image or avatar */}
         <div className="relative h-48 w-full overflow-hidden rounded-t-2xl">
           <img
-            src={review.images?.[0]?.url || "/stories-preview.jpg"}
+            src={coverUrl}
             alt={review.content.slice(0, 40)}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-110"
             loading="lazy"
             decoding="async"
+            width={640}
+            height={360}
             onError={(e) => {
               e.currentTarget.src = "/stories-preview.jpg";
             }}
@@ -114,6 +123,8 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                       className="w-full h-full object-cover"
                       loading="lazy"
                       decoding="async"
+                      width={80}
+                      height={80}
                       onError={(e) => {
                         e.currentTarget.src = DEFAULT_AVATAR;
                       }}
@@ -128,6 +139,8 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                     className="w-full h-full object-cover"
                     loading="lazy"
                     decoding="async"
+                    width={80}
+                    height={80}
                     onError={(e) => {
                       e.currentTarget.src = DEFAULT_AVATAR;
                     }}
@@ -172,7 +185,10 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <div
               className="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 font-semibold"
-              style={{ background: "rgba(249, 188, 96, 0.15)", color: "#f9bc60" }}
+              style={{
+                background: "rgba(249, 188, 96, 0.15)",
+                color: "#f9bc60",
+              }}
             >
               <LucideIcons.Shield size="xs" />
               {trustTitle}
@@ -191,11 +207,13 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                   className="relative overflow-hidden rounded-xl border border-white/10 group/image"
                 >
                   <img
-                    src={img.url}
+                    src={buildUploadUrl(img.url, { variant: "thumb" })}
                     alt="Фото отзыва"
-                    className="w-full h-24 sm:h-28 object-cover transition-transform duration-300 group-hover/image:scale-110"
+                    className="w-full h-24 sm:h-28 object-cover transition-transform duration-300 md:group-hover/image:scale-110"
                     loading="lazy"
                     decoding="async"
+                    width={320}
+                    height={180}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-300" />
                 </div>

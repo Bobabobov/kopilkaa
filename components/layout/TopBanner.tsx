@@ -328,7 +328,7 @@ export default function TopBanner({
               loop
               muted
               playsInline
-              preload="auto"
+              preload={isMobile ? "metadata" : "auto"}
               className="w-full h-full object-contain object-center bg-transparent"
               style={{ backgroundColor: "transparent" }}
               onError={(e) => {
@@ -349,7 +349,8 @@ export default function TopBanner({
                   alt=""
                   fill
                   // Баннер — почти всегда LCP на главной, просим загрузить приоритетно.
-                  priority
+                  priority={!isMobile}
+                  loading={isMobile ? "eager" : undefined}
                   sizes="(min-width: 768px) 1400px, 100vw"
                   quality={70}
                   className="object-contain object-center"

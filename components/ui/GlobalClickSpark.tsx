@@ -24,9 +24,15 @@ export default function GlobalClickSpark() {
     return t * (2 - t); // ease-out
   }, []);
 
-  // Создание canvas и запуск анимации
+  // Создание canvas без постоянного RAF: анимация стартует только после клика.
   useEffect(() => {
-    // Создаем canvas элемент
+    const disableForTouch = window.matchMedia("(pointer: coarse)").matches;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (disableForTouch || reduceMotion) return;
+
     const canvas = document.createElement("canvas");
     canvas.style.position = "fixed";
     canvas.style.top = "0";
@@ -50,13 +56,11 @@ export default function GlobalClickSpark() {
     };
     window.addEventListener("resize", handleResize);
 
-    // Функция отрисовки - работает постоянно
     const animate = (timestamp: number) => {
       if (!ctx) return;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Фильтруем и рисуем искры
       sparksRef.current = sparksRef.current.filter((spark) => {
         const elapsed = timestamp - spark.startTime;
         if (elapsed >= duration) {
@@ -84,29 +88,20 @@ export default function GlobalClickSpark() {
         return true;
       });
 
-      // Продолжаем анимацию постоянно
+      if (sparksRef.current.length > 0) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      animationFrameRef.current = null;
+    };
+
+    const startAnimation = () => {
+      if (animationFrameRef.current !== null) return;
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
-    // Запускаем анимацию
-    animationFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
-      if (canvas && canvas.parentElement) {
-        canvas.parentElement.removeChild(canvas);
-      }
-    };
-  }, [easeFunc, sparkColor, sparkSize, sparkRadius, duration]);
-
-  // Обработчик клика на весь документ
-  useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      // Игнорируем клики на canvas сам по себе
       const target = e.target as HTMLElement;
       if (target.tagName === "CANVAS") return;
 
@@ -122,14 +117,23 @@ export default function GlobalClickSpark() {
       }));
 
       sparksRef.current.push(...newSparks);
+      startAnimation();
     };
 
     document.addEventListener("click", handleClick, true);
 
     return () => {
+      window.removeEventListener("resize", handleResize);
       document.removeEventListener("click", handleClick, true);
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      if (canvas && canvas.parentElement) {
+        canvas.parentElement.removeChild(canvas);
+      }
     };
-  }, [sparkCount]);
+  }, [easeFunc, sparkColor, sparkSize, sparkRadius, sparkCount, duration]);
 
   return null; // Компонент не рендерит ничего, работает через DOM API
 }

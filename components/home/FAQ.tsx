@@ -228,7 +228,7 @@ export default function FAQ() {
           </p>
           <Link
             href="/applications"
-            className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+            className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl transition-all duration-300 md:hover:scale-[1.02] md:hover:shadow-lg"
             style={{
               background:
                 "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",

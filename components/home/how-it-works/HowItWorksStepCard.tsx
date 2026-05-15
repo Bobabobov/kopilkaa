@@ -38,16 +38,19 @@ export function HowItWorksStepCard({
         <div
           className="hidden lg:block absolute top-14 left-full w-full h-0.5 -z-10"
           style={{
-            background: "linear-gradient(to right, rgba(249,188,96,0.35), transparent)",
+            background:
+              "linear-gradient(to right, rgba(249,188,96,0.35), transparent)",
           }}
         />
       )}
 
       <div
-        className="relative h-full rounded-2xl p-6 sm:p-7 overflow-hidden transition-all duration-300 hover:scale-[1.02] group"
+        className="relative h-full rounded-2xl p-6 sm:p-7 overflow-hidden transition-all duration-300 md:hover:scale-[1.02] group"
         style={{
-          background: "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
+          background:
+            "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+          boxShadow:
+            "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
         }}
       >
         <div
@@ -72,7 +75,10 @@ export function HowItWorksStepCard({
             >
               Шаг {index + 1}
             </span>
-            <h3 className="text-lg font-bold leading-tight" style={{ color: "#fffffe" }}>
+            <h3
+              className="text-lg font-bold leading-tight"
+              style={{ color: "#fffffe" }}
+            >
               {step.title}
             </h3>
           </div>

@@ -184,6 +184,10 @@ export function EmailLoginForm({
         {loginPendingVerificationEmail && onResendLoginVerification && (
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-[#abd1c6] space-y-2">
             <p>
+              Аккаунт с этим email уже есть, пароль вы ввели верно — осталось
+              только подтвердить почту (защита от чужих адресов).
+            </p>
+            <p>
               На{" "}
               <span className="text-[#f9bc60]">
                 {loginPendingVerificationEmail}

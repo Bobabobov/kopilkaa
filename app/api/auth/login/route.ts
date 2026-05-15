@@ -69,8 +69,7 @@ export async function POST(req: Request) {
     if (!user.emailVerified) {
       return NextResponse.json(
         {
-          error:
-            "Пароль верный, аккаунт уже создан. Вход по почте откроется после подтверждения адреса — откройте ссылку в письме или нажмите «Отправить письмо снова». Так мы защищаем сайт от регистрации на чужие email.",
+          error: "Сначала подтвердите адрес почты по ссылке из письма.",
           code: "EMAIL_NOT_VERIFIED",
           ...(user.email ? { email: user.email } : {}),
         },

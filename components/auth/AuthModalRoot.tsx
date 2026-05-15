@@ -265,6 +265,8 @@ export default function AuthModalRoot() {
             ? identifier.trim().toLowerCase()
             : "";
           setLoginPendingVerificationEmail(fromApi || fallback || null);
+          setError(null);
+          return;
         }
         setError(getMessageFromApiJson(data, "Ошибка входа"));
         return;

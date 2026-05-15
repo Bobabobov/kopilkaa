@@ -78,6 +78,17 @@ export function AdminUserCard({
                       Админ
                     </Badge>
                   ) : null}
+                  {user.email &&
+                  user.emailVerified === false &&
+                  user.role !== "ADMIN" ? (
+                    <Badge
+                      variant="outline"
+                      className="shrink-0 border-amber-500/50 text-[0.65rem] font-medium uppercase tracking-wide text-amber-200/95"
+                      title="Регистрация по почте: ссылка из письма ещё не открыта"
+                    >
+                      Почта не подтверждена
+                    </Badge>
+                  ) : null}
                 </div>
                 <p className="mt-1 break-all text-xs text-[#abd1c6]/85 sm:text-sm">
                   {user.email || "Email не указан"}

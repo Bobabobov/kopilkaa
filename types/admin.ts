@@ -65,6 +65,8 @@ export type AdminUserLinkRef = {
 export interface AdminUser {
   id: string;
   email: string | null;
+  /** Для регистрации по почте: false — ждёт подтверждения ссылки. OAuth обычно true. */
+  emailVerified?: boolean;
   name: string | null;
   avatar: string | null;
   createdAt: string;

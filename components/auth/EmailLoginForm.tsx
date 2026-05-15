@@ -167,7 +167,10 @@ export function EmailLoginForm({
           )}
         </motion.div>
 
-        {error && (
+        {error &&
+        !(
+          loginPendingVerificationEmail && onResendLoginVerification
+        ) ? (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
@@ -179,20 +182,20 @@ export function EmailLoginForm({
             />
             <span>{error}</span>
           </motion.div>
-        )}
+        ) : null}
 
         {loginPendingVerificationEmail && onResendLoginVerification && (
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-[#abd1c6] space-y-2">
             <p>
-              Аккаунт с этим email уже есть, пароль вы ввели верно — осталось
-              только подтвердить почту (защита от чужих адресов).
+              Для входа нужно подтвердить почту — откройте ссылку из письма при
+              регистрации.
             </p>
             <p>
-              На{" "}
+              Не пришло письмо? Отправьте ссылку ещё раз на{" "}
               <span className="text-[#f9bc60]">
                 {loginPendingVerificationEmail}
-              </span>{" "}
-              можно отправить письмо с ссылкой ещё раз.
+              </span>
+              .
             </p>
             {resendLoginMessage && (
               <p className="text-xs text-[#94a1b2]">{resendLoginMessage}</p>

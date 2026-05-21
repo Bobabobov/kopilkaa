@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { GoodDeedsFeedSection } from "./_components/GoodDeedsFeedSection";
@@ -20,8 +20,13 @@ export default function GoodDeedsPage() {
   const [filesByTask, setFilesByTask] = useState<Record<string, File[]>>({});
   const [storyByTask, setStoryByTask] = useState<Record<string, string>>({});
   const { showToast, ToastComponent } = useBeautifulToast();
+  const showToastRef = useRef(showToast);
 
-  const load = async () => {
+  useEffect(() => {
+    showToastRef.current = showToast;
+  }, [showToast]);
+
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/good-deeds", { cache: "no-store" });
@@ -30,18 +35,40 @@ export default function GoodDeedsPage() {
       setData(json as GoodDeedsResponse);
     } catch (error) {
       logRouteCatchError("[GoodDeedsPage] load", error);
-      showToast("error", "Ошибка", "Не удалось загрузить добрые дела");
+      showToastRef.current(
+        "error",
+        "Ошибка",
+        "Не удалось загрузить добрые дела",
+      );
       setData(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     load().catch((error) =>
       logRouteCatchError("[GoodDeedsPage] load (effect)", error),
     );
-  }, []);
+  }, [load]);
+
+  useEffect(() => {
+    const reloadOnFocus = () => {
+      if (document.visibilityState === "visible") {
+        load().catch((error) =>
+          logRouteCatchError("[GoodDeedsPage] load (focus)", error),
+        );
+      }
+    };
+
+    window.addEventListener("focus", reloadOnFocus);
+    document.addEventListener("visibilitychange", reloadOnFocus);
+
+    return () => {
+      window.removeEventListener("focus", reloadOnFocus);
+      document.removeEventListener("visibilitychange", reloadOnFocus);
+    };
+  }, [load]);
 
   const onFilesChange = (taskId: string, fileList: FileList | null) => {
     const selected = fileList ? Array.from(fileList) : [];

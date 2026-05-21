@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
 import {
-  getAllManagedGoodDeedTasks,
+  getCurrentGoodDeedTasks,
   getTaskRotationState,
 } from "@/lib/goodDeedTasksAdmin";
 
@@ -16,7 +16,7 @@ export async function GET() {
     }
 
     const [tasks, rotation] = await Promise.all([
-      getAllManagedGoodDeedTasks(),
+      getCurrentGoodDeedTasks(),
       getTaskRotationState(),
     ]);
 

@@ -21,6 +21,36 @@ export const LIMITS = {
 export const UPLOAD_LIMITS = {
   maxFileBytes: 5 * 1024 * 1024,
   maxTotalBytes: 10 * 1024 * 1024,
+  allowedMimeTypes: [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/heic",
+    "image/heif",
+  ],
+  allowedExtensions: [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"],
 } as const;
+
+export const ACCEPTED_PHOTO_TYPES = [
+  ...UPLOAD_LIMITS.allowedMimeTypes,
+  ...UPLOAD_LIMITS.allowedExtensions,
+].join(",");
+
+export function formatUploadMb(bytes: number): string {
+  return `${Math.round(bytes / (1024 * 1024))} МБ`;
+}
+
+export function hasAllowedPhotoType(file: File): boolean {
+  const type = file.type.trim().toLowerCase();
+  if (
+    type &&
+    (UPLOAD_LIMITS.allowedMimeTypes as readonly string[]).includes(type)
+  ) {
+    return true;
+  }
+
+  const name = file.name.toLowerCase();
+  return UPLOAD_LIMITS.allowedExtensions.some((ext) => name.endsWith(ext));
+}
 
 export const TOTAL_FIELDS = 8;

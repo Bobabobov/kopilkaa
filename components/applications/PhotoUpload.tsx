@@ -1,8 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import {
+  ACCEPTED_PHOTO_TYPES,
+  UPLOAD_LIMITS,
+  formatUploadMb,
+  hasAllowedPhotoType,
+} from "@/hooks/applications/formState/constants";
 
 interface PhotoUploadProps {
   photos: { file: File; url: string }[];
@@ -36,6 +42,8 @@ export default function PhotoUpload({
     title ??
     (isDark ? "Фотографии" : `Фотографии * (до ${maxPhotos})`);
   const prevUrlsRef = useRef<string[]>([]);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const displayError = error || localError;
 
   useEffect(() => {
     const prev = prevUrlsRef.current;
@@ -64,14 +72,67 @@ export default function PhotoUpload({
     };
   }, []);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const mappedFiles = files.map((f) => ({
+  const addFiles = (incomingFiles: File[]) => {
+    setLocalError(null);
+
+    const remainingSlots = maxPhotos - photos.length;
+    if (remainingSlots <= 0) {
+      setLocalError(`Можно добавить не более ${maxPhotos} фото.`);
+      return;
+    }
+
+    const selectedFiles = incomingFiles.slice(0, remainingSlots);
+    if (incomingFiles.length > remainingSlots) {
+      setLocalError(`Добавлено только ${remainingSlots} фото: лимит ${maxPhotos}.`);
+    }
+
+    const currentTotalBytes = photos.reduce((sum, item) => sum + item.file.size, 0);
+    const acceptedFiles: File[] = [];
+    let totalBytes = currentTotalBytes;
+
+    for (const file of selectedFiles) {
+      if (file.size === 0) {
+        setLocalError("Файл пустой. Выберите другое фото.");
+        continue;
+      }
+
+      if (file.size > UPLOAD_LIMITS.maxFileBytes) {
+        setLocalError(
+          `Файл "${file.name || "без названия"}" слишком большой. Максимум ${formatUploadMb(UPLOAD_LIMITS.maxFileBytes)} на фото.`,
+        );
+        continue;
+      }
+
+      if (!hasAllowedPhotoType(file)) {
+        setLocalError(
+          `Файл "${file.name || "без названия"}" не похож на фото. Подойдут JPG, PNG, WebP или HEIC. Если файл из Telegram, сохраните его в галерею и загрузите как фото.`,
+        );
+        continue;
+      }
+
+      if (totalBytes + file.size > UPLOAD_LIMITS.maxTotalBytes) {
+        setLocalError(
+          `Слишком большой общий размер фото. Максимум ${formatUploadMb(UPLOAD_LIMITS.maxTotalBytes)} на все фото вместе.`,
+        );
+        continue;
+      }
+
+      totalBytes += file.size;
+      acceptedFiles.push(file);
+    }
+
+    if (!acceptedFiles.length) return;
+
+    const mappedFiles = acceptedFiles.map((f) => ({
       file: f,
       url: URL.createObjectURL(f),
     }));
-    const newPhotos = [...photos, ...mappedFiles].slice(0, maxPhotos);
-    onPhotosChange(newPhotos);
+    onPhotosChange([...photos, ...mappedFiles]);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    addFiles(Array.from(e.target.files || []));
+    e.target.value = "";
   };
 
   const removePhoto = (index: number) => {
@@ -84,18 +145,13 @@ export default function PhotoUpload({
       }
     }
     const newPhotos = photos.filter((_, i) => i !== index);
+    setLocalError(null);
     onPhotosChange(newPhotos);
   };
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
-    const mappedFiles = files.map((f) => ({
-      file: f,
-      url: URL.createObjectURL(f),
-    }));
-    const newPhotos = [...photos, ...mappedFiles].slice(0, maxPhotos);
-    onPhotosChange(newPhotos);
+    addFiles(Array.from(e.dataTransfer.files));
   };
 
   return (
@@ -107,10 +163,10 @@ export default function PhotoUpload({
       onDrop={onDrop}
       className={`rounded-2xl border-2 border-dashed p-4 sm:p-5 transition-colors duration-300 relative ${
         isDark
-          ? error
+          ? displayError
             ? "border-[#e16162]/60 bg-[#e16162]/8"
             : "border-[#abd1c6]/35 bg-[#004643]/30 hover:border-[#f9bc60]/45"
-          : error
+          : displayError
             ? "border-[#e16162]/60 bg-[#e16162]/8"
             : "border-slate-300 dark:border-slate-600 hover:border-emerald-400 dark:hover:border-emerald-500 bg-transparent"
       }`}
@@ -138,7 +194,7 @@ export default function PhotoUpload({
         <input
           type="file"
           multiple
-          accept="image/*"
+          accept={ACCEPTED_PHOTO_TYPES}
           onChange={handleFileSelect}
           className="hidden"
           id={inputId}
@@ -189,6 +245,9 @@ export default function PhotoUpload({
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                <div className="absolute inset-x-0 bottom-0 bg-black/55 px-2 py-1 text-[10px] text-white/90 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <span className="block truncate">{photo.file.name}</span>
+                </div>
               </div>
 
               <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -222,10 +281,10 @@ export default function PhotoUpload({
           )}
         </div>
       )}
-      {error && (
+      {displayError && (
         <div className="flex items-center gap-2 text-[#e16162] text-sm mt-2">
           <LucideIcons.Alert size="sm" />
-          <span>{error}</span>
+          <span>{displayError}</span>
         </div>
       )}
     </motion.div>

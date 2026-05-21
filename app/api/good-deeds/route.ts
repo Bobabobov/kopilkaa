@@ -8,11 +8,11 @@ import {
   mapFeedRowToGoodDeedsApiItem,
 } from "@/lib/goodDeedPublicFeed";
 import {
-  getActiveTasksByDifficulty,
+  getCurrentGoodDeedTasks,
   getGoodDeedCycleKey,
   getTaskRotationState,
 } from "@/lib/goodDeedTasksAdmin";
-import { type GoodDeedDifficulty, getWeekInfo } from "@/lib/goodDeeds";
+import { getWeekInfo } from "@/lib/goodDeeds";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +23,61 @@ export async function GET(req: NextRequest) {
     const weekInfo = getWeekInfo(new Date());
     const cycleKey = await getGoodDeedCycleKey(weekInfo.key);
     const rotationState = await getTaskRotationState();
-    const tasksByDifficulty = await getActiveTasksByDifficulty();
+    const currentTasks = await getCurrentGoodDeedTasks();
+
+    const preference = session?.uid
+      ? await prisma.goodDeedWeekPreference.findUnique({
+          where: {
+            userId_weekKey: {
+              userId: session.uid,
+              weekKey: cycleKey,
+            },
+          },
+          select: {
+            replacedTaskKey: true,
+            newTaskKey: true,
+          },
+        })
+      : null;
+
+    const tasks =
+      preference?.newTaskKey && preference.replacedTaskKey
+        ? await Promise.all(
+            currentTasks.map(async (task) => {
+              if (task.id !== preference.replacedTaskKey) return task;
+
+              const replacement = await prisma.goodDeedTask.findUnique({
+                where: { id: preference.newTaskKey },
+                select: {
+                  id: true,
+                  difficulty: true,
+                  title: true,
+                  description: true,
+                  reward: true,
+                  isActive: true,
+                  sortOrder: true,
+                },
+              });
+
+              if (
+                !replacement?.isActive ||
+                replacement.difficulty !== task.difficulty
+              ) {
+                return task;
+              }
+
+              return {
+                id: replacement.id,
+                difficulty: task.difficulty,
+                title: replacement.title,
+                description: replacement.description,
+                reward: replacement.reward,
+                isActive: replacement.isActive,
+                sortOrder: replacement.sortOrder,
+              };
+            }),
+          )
+        : currentTasks;
 
     const [weeklySubmissions, feedSubmissions] = await Promise.all([
       session?.uid
@@ -47,25 +101,13 @@ export async function GET(req: NextRequest) {
       weeklySubmissions.map((submission) => [submission.taskKey, submission]),
     );
 
-    const withStatus = (task: (typeof tasksByDifficulty)["EASY"][number]) => {
+    const weeklyTasks = tasks.map((task) => {
       const submission = submissionMap.get(task.id);
       return {
         ...task,
         submissionStatus: submission?.status ?? null,
         adminComment: submission?.adminComment ?? null,
       };
-    };
-
-    const categorizedTasks = {
-      EASY: tasksByDifficulty.EASY.map(withStatus),
-      MEDIUM: tasksByDifficulty.MEDIUM.map(withStatus),
-      HARD: tasksByDifficulty.HARD.map(withStatus),
-    };
-
-    const difficultyOrder: GoodDeedDifficulty[] = ["EASY", "MEDIUM", "HARD"];
-    const weeklyTasks = difficultyOrder.flatMap((key) => {
-      const first = categorizedTasks[key][0];
-      return first ? [first] : [];
     });
 
     const weeklyProgress = {

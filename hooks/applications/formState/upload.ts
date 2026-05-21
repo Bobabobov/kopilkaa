@@ -1,7 +1,7 @@
 "use client";
 
 import { throwIfApiFailed } from "@/lib/api/parseApiError";
-import { UPLOAD_LIMITS } from "./constants";
+import { UPLOAD_LIMITS, hasAllowedPhotoType } from "./constants";
 import type { LocalImage } from "./types";
 
 /** Таймаут загрузки фото: в браузере Telegram и на мобильном интернете может быть медленно */
@@ -34,6 +34,12 @@ export async function uploadApplicationPhotos(
   if (tooBig) {
     throw new Error(
       `Файл "${tooBig.name}" слишком большой. Максимум: 5 МБ на фото.`,
+    );
+  }
+  const wrongType = filesToUpload.find((f) => !hasAllowedPhotoType(f));
+  if (wrongType) {
+    throw new Error(
+      `Файл "${wrongType.name || "без названия"}" не похож на фото. Загрузите JPG, PNG, WebP или HEIC. Если файл из Telegram не принимается, сохраните его в галерею и отправьте как фото, не как документ.`,
     );
   }
   const totalBytes = filesToUpload.reduce((sum, f) => sum + f.size, 0);

@@ -1,6 +1,13 @@
 "use client";
 
-import { FormEvent, ReactNode, useEffect, useRef, useState } from "react";
+import {
+  FormEvent,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import ApplicationsConsent from "@/components/applications/ApplicationsConsent";
@@ -29,15 +36,42 @@ import ApplicationSubmitConfirmModal from "@/components/applications/Application
 
 type LocalImage = { file: File; url: string };
 
-const WIZARD_STEPS = 5;
+type WizardStepId =
+  | "category"
+  | "base"
+  | "story"
+  | "payment"
+  | "report"
+  | "photos";
 
-const STEP_LABELS = [
-  "Категория",
-  "Основа",
-  "История",
-  "Реквизиты",
-  "Фото",
+interface WizardStepDefinition {
+  id: WizardStepId;
+  label: string;
+  fields: ApplicationFieldKey[];
+}
+
+const WIZARD_STEPS_WITHOUT_REPORT: WizardStepDefinition[] = [
+  { id: "category", label: "Категория", fields: ["category"] },
+  { id: "base", label: "Основа", fields: ["title", "summary", "amount"] },
+  { id: "story", label: "История", fields: ["story"] },
+  { id: "payment", label: "Реквизиты", fields: ["bankName", "payment"] },
+  { id: "photos", label: "Фото", fields: ["photos"] },
 ];
+
+const REPORT_STEP: WizardStepDefinition = {
+  id: "report",
+  label: "Отчёт",
+  fields: ["reportPhotos"],
+};
+
+function getWizardSteps(hasReportStep: boolean): WizardStepDefinition[] {
+  if (!hasReportStep) return WIZARD_STEPS_WITHOUT_REPORT;
+  return [
+    ...WIZARD_STEPS_WITHOUT_REPORT.slice(0, 4),
+    REPORT_STEP,
+    WIZARD_STEPS_WITHOUT_REPORT[4],
+  ];
+}
 
 function WizardProgressFill({
   pct,
@@ -76,49 +110,20 @@ function WizardProgressFill({
   );
 }
 
-function stepForField(key: ApplicationFieldKey): number {
-  switch (key) {
-    case "category":
-      return 0;
-    case "title":
-    case "summary":
-    case "amount":
-      return 1;
-    case "story":
-      return 2;
-    case "bankName":
-    case "payment":
-      return 3;
-    case "photos":
-    case "reportPhotos":
-      return 4;
-    default:
-      return 0;
-  }
-}
-
-function stepFieldKeys(step: number): ApplicationFieldKey[] {
-  switch (step) {
-    case 0:
-      return ["category"];
-    case 1:
-      return ["title", "summary", "amount"];
-    case 2:
-      return ["story"];
-    case 3:
-      return ["bankName", "payment"];
-    case 4:
-      return ["photos", "reportPhotos"];
-    default:
-      return [];
-  }
+function stepForField(
+  key: ApplicationFieldKey,
+  steps: WizardStepDefinition[],
+): number {
+  const index = steps.findIndex((item) => item.fields.includes(key));
+  return index >= 0 ? index : 0;
 }
 
 function stepHasError(
   step: number,
   fieldErrors: Partial<Record<ApplicationFieldKey, string>>,
+  steps: WizardStepDefinition[],
 ): boolean {
-  return stepFieldKeys(step).some((k) => Boolean(fieldErrors[k]));
+  return steps[step]?.fields.some((k) => Boolean(fieldErrors[k])) ?? false;
 }
 
 type Props = {
@@ -236,6 +241,17 @@ export function ApplicationsForm(props: Props) {
   const [step, setStep] = useState(0);
   const [stepFeedback, setStepFeedback] = useState<string | null>(null);
   const [confirmSendOpen, setConfirmSendOpen] = useState(false);
+  const hasReportStep = approvedCount !== null && approvedCount >= 1;
+  const wizardSteps = useMemo(
+    () => getWizardSteps(hasReportStep),
+    [hasReportStep],
+  );
+  const stepLabels = useMemo(
+    () => wizardSteps.map((item) => item.label),
+    [wizardSteps],
+  );
+  const totalSteps = wizardSteps.length;
+  const currentStep = wizardSteps[step]?.id ?? "category";
 
   const handleSubmitIntent = (e?: FormEvent) => {
     if (e) e.preventDefault();
@@ -265,15 +281,19 @@ export function ApplicationsForm(props: Props) {
     });
   }, [err, firstErrorKey, validationScrollTrigger]);
 
+  useEffect(() => {
+    setStep((current) => Math.min(current, totalSteps - 1));
+  }, [totalSteps]);
+
   const prevValidationTrig = useRef(0);
   useEffect(() => {
     if (validationScrollTrigger === undefined) return;
     if (validationScrollTrigger === prevValidationTrig.current) return;
     prevValidationTrig.current = validationScrollTrigger;
     if (firstErrorKey) {
-      setStep(stepForField(firstErrorKey as ApplicationFieldKey));
+      setStep(stepForField(firstErrorKey as ApplicationFieldKey, wizardSteps));
     }
-  }, [validationScrollTrigger, firstErrorKey]);
+  }, [validationScrollTrigger, firstErrorKey, wizardSteps]);
 
   useEffect(() => {
     if (!ackError) return;
@@ -292,17 +312,17 @@ export function ApplicationsForm(props: Props) {
   }, [stepFeedback]);
 
   const goNext = () => {
-    if (step >= WIZARD_STEPS - 1) return;
-    if (stepHasError(step, fe ?? {})) return;
+    if (step >= totalSteps - 1) return;
+    if (stepHasError(step, fe ?? {}, wizardSteps)) return;
     if (step === 0) {
       setStepFeedback("Отлично, продолжаем");
     }
-    setStep((s) => Math.min(WIZARD_STEPS - 1, s + 1));
+    setStep((s) => Math.min(totalSteps - 1, s + 1));
   };
 
   const goBack = () => setStep((s) => Math.max(0, s - 1));
 
-  const stepProgressPct = Math.round(((step + 1) / WIZARD_STEPS) * 100);
+  const stepProgressPct = Math.round(((step + 1) / totalSteps) * 100);
 
   return (
     <motion.div
@@ -363,7 +383,7 @@ export function ApplicationsForm(props: Props) {
                 <div className="lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] px-8 pb-8 pt-6 xl:px-10 xl:pb-10">
                   <ApplicationWizardSidebar
                     step={step}
-                    labels={STEP_LABELS}
+                    labels={stepLabels}
                     onGoToStep={(i) => {
                       if (i < step) setStep(i);
                     }}
@@ -382,7 +402,7 @@ export function ApplicationsForm(props: Props) {
                 <div className="space-y-3 lg:hidden">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-sm font-medium text-[#fffffe]">
-                      Шаг {step + 1} из {WIZARD_STEPS}
+                      Шаг {step + 1} из {totalSteps}
                       <AnimatePresence mode="wait" initial={false}>
                         <motion.span
                           key={step}
@@ -401,7 +421,7 @@ export function ApplicationsForm(props: Props) {
                           className="text-[#94a1b2] font-normal"
                         >
                           {" "}
-                          · {STEP_LABELS[step]}
+                          · {stepLabels[step]}
                         </motion.span>
                       </AnimatePresence>
                     </p>
@@ -422,7 +442,7 @@ export function ApplicationsForm(props: Props) {
                     role="progressbar"
                     aria-valuenow={step + 1}
                     aria-valuemin={1}
-                    aria-valuemax={WIZARD_STEPS}
+                    aria-valuemax={totalSteps}
                   >
                     <WizardProgressFill
                       pct={stepProgressPct}
@@ -454,11 +474,11 @@ export function ApplicationsForm(props: Props) {
                           transition={{ duration: 0.2, ease: "easeOut" }}
                           className="mt-1 text-xl font-semibold tracking-tight text-[#fffffe] xl:text-2xl"
                         >
-                          {STEP_LABELS[step]}
+                          {stepLabels[step]}
                         </motion.h2>
                       </AnimatePresence>
                       <p className="mt-1 text-sm text-[#abd1c6]">
-                        Шаг {step + 1} из {WIZARD_STEPS}
+                        Шаг {step + 1} из {totalSteps}
                       </p>
                     </div>
                     <div
@@ -517,7 +537,7 @@ export function ApplicationsForm(props: Props) {
                       !reducedMotion && "animate-fadeIn",
                     )}
                   >
-                    {step === 0 && (
+                    {currentStep === "category" && (
                       <div className="grid gap-5 lg:gap-6">
                         <div>
                           <ApplicationCategoryPicker
@@ -529,7 +549,7 @@ export function ApplicationsForm(props: Props) {
                       </div>
                     )}
 
-                    {step === 1 && (
+                    {currentStep === "base" && (
                       <div className="grid gap-5 lg:grid-cols-2 lg:gap-6 lg:items-start">
                         <div className="min-w-0">
                           <div
@@ -621,7 +641,7 @@ export function ApplicationsForm(props: Props) {
                       </div>
                     )}
 
-                    {step === 2 && (
+                    {currentStep === "story" && (
                       <div>
                         <div
                           id="application-field-story"
@@ -658,7 +678,7 @@ export function ApplicationsForm(props: Props) {
                       </div>
                     )}
 
-                    {step === 3 && (
+                    {currentStep === "payment" && (
                       <div className="grid gap-5 lg:max-w-3xl lg:gap-6">
                         <div>
                           <div
@@ -717,7 +737,40 @@ export function ApplicationsForm(props: Props) {
                       </div>
                     )}
 
-                    {step === 4 && (
+                    {currentStep === "report" && (
+                      <div className="grid gap-5 lg:max-w-4xl lg:gap-6">
+                        <div>
+                          <ApplicationPhotoReportHints
+                            config={categoryConfig}
+                          />
+                        </div>
+
+                        <div>
+                          <div
+                            id="application-field-reportPhotos"
+                            className={cn(
+                              "rounded-2xl p-2 -mx-1 border border-transparent transition-colors",
+                              fe?.reportPhotos &&
+                                "border-[#e16162]/50 bg-[#e16162]/8",
+                            )}
+                          >
+                            <PhotoUpload
+                              photos={reportPhotos}
+                              onPhotosChange={setReportPhotos}
+                              maxPhotos={5}
+                              delay={0}
+                              error={fe?.reportPhotos}
+                              inputId="report-photos-upload"
+                              variant="dark"
+                              title="Загрузите файлы отчёта"
+                              subtitle={`Минимум ${REPORT_PHOTOS_MIN} разных фото по двум блокам выше. Можно больше файлов, если нужно.`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {currentStep === "photos" && (
                       <div className="grid gap-5 lg:max-w-4xl lg:gap-6">
                         <div>
                           <ApplicationPhotoStepIntro
@@ -758,39 +811,6 @@ export function ApplicationsForm(props: Props) {
                           </div>
                         </div>
 
-                        {approvedCount !== null && approvedCount >= 1 && (
-                          <div>
-                            <ApplicationPhotoReportHints
-                              config={categoryConfig}
-                            />
-                          </div>
-                        )}
-
-                        {approvedCount !== null && approvedCount >= 1 && (
-                          <div>
-                            <div
-                              id="application-field-reportPhotos"
-                              className={cn(
-                                "rounded-2xl p-2 -mx-1 border border-transparent transition-colors",
-                                fe?.reportPhotos &&
-                                  "border-[#e16162]/50 bg-[#e16162]/8",
-                              )}
-                            >
-                              <PhotoUpload
-                                photos={reportPhotos}
-                                onPhotosChange={setReportPhotos}
-                                maxPhotos={5}
-                                delay={0}
-                                error={fe?.reportPhotos}
-                                inputId="report-photos-upload"
-                                variant="dark"
-                                title="Загрузите файлы отчёта"
-                                subtitle={`Минимум ${REPORT_PHOTOS_MIN} разных фото по двум блокам выше. Можно больше файлов, если нужно.`}
-                              />
-                            </div>
-                          </div>
-                        )}
-
                         <div>
                           <ApplicationsConsent
                             trustAck1={trustAck1}
@@ -810,7 +830,7 @@ export function ApplicationsForm(props: Props) {
                 </div>
 
                 <div className="hidden lg:block">
-                  {step === WIZARD_STEPS - 1 ? (
+                  {step === totalSteps - 1 ? (
                     <div className="space-y-4 border-t border-white/10 pt-8">
                       <SubmitSection
                         submitting={submitting}
@@ -880,7 +900,7 @@ export function ApplicationsForm(props: Props) {
                     "pb-[max(4px,env(safe-area-inset-bottom))]",
                   )}
                 >
-                  {step === WIZARD_STEPS - 1 ? (
+                  {step === totalSteps - 1 ? (
                     <div className="space-y-3 w-full">
                       <SubmitSection
                         submitting={submitting}

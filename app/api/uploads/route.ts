@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
           file.type || "не указан";
         return NextResponse.json(
           {
-            error: `Неподдерживаемый тип файла (${hint}). Загрузите JPEG, PNG, WebP или видео MP4/WebM.`,
+            error: `Неподдерживаемый тип файла (${hint}). Загрузите JPEG, PNG, WebP, HEIC/HEIF или видео MP4/WebM.`,
           },
           { status: 400 },
         );

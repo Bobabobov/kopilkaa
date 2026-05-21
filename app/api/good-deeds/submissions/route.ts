@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoodDeedSubmissionStatus } from "@prisma/client";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { getGoodDeedCycleKey, getManagedTaskById } from "@/lib/goodDeedTasksAdmin";
+import {
+  getCurrentGoodDeedTasks,
+  getGoodDeedCycleKey,
+  getManagedTaskById,
+} from "@/lib/goodDeedTasksAdmin";
 import {
   getWeekInfo,
   inferMediaTypeFromUrl,
@@ -85,6 +89,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Это задание сейчас отключено администратором" },
         { status: 409 },
+      );
+    }
+
+    const [currentTasks, preference] = await Promise.all([
+      getCurrentGoodDeedTasks(),
+      prisma.goodDeedWeekPreference.findUnique({
+        where: {
+          userId_weekKey: {
+            userId: session.uid,
+            weekKey: cycleKey,
+          },
+        },
+        select: {
+          replacedTaskKey: true,
+          newTaskKey: true,
+        },
+      }),
+    ]);
+    const allowedTaskIds = new Set(currentTasks.map((item) => item.id));
+    if (preference) {
+      allowedTaskIds.delete(preference.replacedTaskKey);
+      allowedTaskIds.add(preference.newTaskKey);
+    }
+
+    if (!allowedTaskIds.has(task.id)) {
+      return NextResponse.json(
+        { error: "Это задание недоступно на текущей неделе" },
+        { status: 400 },
       );
     }
 

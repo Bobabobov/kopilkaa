@@ -45,11 +45,17 @@ export async function ensureGoodDeedTasksSeeded(): Promise<void> {
   });
 }
 
-export async function getAllManagedGoodDeedTasks(): Promise<ManagedGoodDeedTask[]> {
+export async function getAllManagedGoodDeedTasks(): Promise<
+  ManagedGoodDeedTask[]
+> {
   await ensureGoodDeedTasksSeeded();
 
   const tasks = await prisma.goodDeedTask.findMany({
-    orderBy: [{ difficulty: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
+    orderBy: [
+      { difficulty: "asc" },
+      { sortOrder: "asc" },
+      { createdAt: "asc" },
+    ],
   });
 
   if (!tasks.length) {
@@ -74,12 +80,34 @@ export async function getActiveTasksByDifficulty(): Promise<
 > {
   const allTasks = await getAllManagedGoodDeedTasks();
   return {
-    EASY: allTasks.filter((task) => task.isActive && task.difficulty === "EASY"),
+    EASY: allTasks.filter(
+      (task) => task.isActive && task.difficulty === "EASY",
+    ),
     MEDIUM: allTasks.filter(
       (task) => task.isActive && task.difficulty === "MEDIUM",
     ),
-    HARD: allTasks.filter((task) => task.isActive && task.difficulty === "HARD"),
+    HARD: allTasks.filter(
+      (task) => task.isActive && task.difficulty === "HARD",
+    ),
   };
+}
+
+export async function getCurrentGoodDeedTasks(): Promise<
+  ManagedGoodDeedTask[]
+> {
+  const [tasksByDifficulty, rotation] = await Promise.all([
+    getActiveTasksByDifficulty(),
+    getTaskRotationState(),
+  ]);
+
+  const difficultyOrder: GoodDeedDifficulty[] = ["EASY", "MEDIUM", "HARD"];
+
+  return difficultyOrder.flatMap((difficulty) => {
+    const tasks = tasksByDifficulty[difficulty];
+    if (!tasks.length) return [];
+
+    return [tasks[rotation.version % tasks.length]];
+  });
 }
 
 export async function getManagedTaskById(
@@ -124,14 +152,17 @@ export async function getTaskRotationState(): Promise<{
   }
 
   const passedPeriods =
-    Math.floor((now.getTime() - existing.nextRotationAt.getTime()) / ROTATION_MS) +
-    1;
+    Math.floor(
+      (now.getTime() - existing.nextRotationAt.getTime()) / ROTATION_MS,
+    ) + 1;
   const updated = await prisma.goodDeedTaskRotationState.update({
     where: { id: ROTATION_STATE_ID },
     data: {
       version: { increment: passedPeriods },
       lastRotatedAt: now,
-      nextRotationAt: new Date(existing.nextRotationAt.getTime() + passedPeriods * ROTATION_MS),
+      nextRotationAt: new Date(
+        existing.nextRotationAt.getTime() + passedPeriods * ROTATION_MS,
+      ),
     },
   });
 

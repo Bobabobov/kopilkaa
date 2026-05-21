@@ -29,6 +29,11 @@ type RotationPayload = {
   lastRotatedAt: string;
 };
 
+type LoadOptions = {
+  showSpinner?: boolean;
+  clearNotice?: boolean;
+};
+
 function getDifficultyLabel(difficulty: Difficulty): string {
   if (difficulty === "EASY") return "Лёгкие";
   if (difficulty === "MEDIUM") return "Средние";
@@ -58,9 +63,14 @@ export function TasksManagementSection() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const load = async () => {
-    setLoading(true);
-    setNotice(null);
+  const load = async (options: LoadOptions = {}) => {
+    const { showSpinner = true, clearNotice = true } = options;
+    if (showSpinner) {
+      setLoading(true);
+    }
+    if (clearNotice) {
+      setNotice(null);
+    }
     try {
       const res = await fetch("/api/admin/good-deeds/tasks", {
         cache: "no-store",
@@ -74,7 +84,9 @@ export function TasksManagementSection() {
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Ошибка загрузки");
     } finally {
-      setLoading(false);
+      if (showSpinner) {
+        setLoading(false);
+      }
     }
   };
 
@@ -114,7 +126,12 @@ export function TasksManagementSection() {
       if (!res.ok) {
         throw new Error(json?.error || "Не удалось сохранить задание");
       }
-      setNotice(`Задание «${task.title}» обновлено`);
+      if (json?.task) {
+        setTasks((prev) =>
+          prev.map((item) => (item.id === task.id ? json.task : item)),
+        );
+      }
+      setNotice(`Задание «${task.title}» сохранено`);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Ошибка сохранения");
     } finally {
@@ -134,7 +151,8 @@ export function TasksManagementSection() {
         throw new Error(json?.error || "Не удалось сменить цикл заданий");
       }
       setRotation(json?.rotation || null);
-      setNotice("Цикл заданий переключён вручную");
+      await load({ showSpinner: false, clearNotice: false });
+      setNotice("Текущие задания переключены вручную");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Ошибка смены цикла");
     } finally {
@@ -146,18 +164,18 @@ export function TasksManagementSection() {
     <Card variant="darkGlass" className="mb-6">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="text-xl font-bold text-[#fffffe]">
-            Управление заданиями
-          </h3>
+          <h3 className="text-xl font-bold text-[#fffffe]">Текущие задания</h3>
           <p className="text-sm text-[#abd1c6]">
-            Редактируйте задания, цену и включение. Ротация влияет на текущий
-            цикл.
+            На публичной странице показывается по одному заданию каждого уровня:
+            лёгкое, среднее и сложное.
           </p>
         </div>
         <div className="flex flex-col items-end gap-2 text-right">
           <p className="text-sm text-[#abd1c6]">
             До авто-смены:{" "}
-            <span className="font-bold text-[#f9bc60]">{formatMsLeft(msLeft)}</span>
+            <span className="font-bold text-[#f9bc60]">
+              {formatMsLeft(msLeft)}
+            </span>
           </p>
           <Button
             type="button"
@@ -186,7 +204,7 @@ export function TasksManagementSection() {
                   <div className="flex items-center gap-3">
                     <span>{getDifficultyLabel(difficulty)}</span>
                     <span className="rounded bg-[#f9bc60]/20 px-2 py-0.5 text-xs text-[#f9bc60]">
-                      {grouped[difficulty].length} шт.
+                      {grouped[difficulty].length ? "текущее" : "нет активного"}
                     </span>
                   </div>
                 </AccordionTrigger>
@@ -205,15 +223,18 @@ export function TasksManagementSection() {
                             <input
                               type="checkbox"
                               checked={task.isActive}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                const nextTask = {
+                                  ...task,
+                                  isActive: e.target.checked,
+                                };
                                 setTasks((prev) =>
                                   prev.map((item) =>
-                                    item.id === task.id
-                                      ? { ...item, isActive: e.target.checked }
-                                      : item,
+                                    item.id === task.id ? nextTask : item,
                                   ),
-                                )
-                              }
+                                );
+                                void patchTask(nextTask);
+                              }}
                             />
                             активно
                           </label>
@@ -230,6 +251,7 @@ export function TasksManagementSection() {
                                 ),
                               )
                             }
+                            onBlur={() => void patchTask(task)}
                             className="border-[#abd1c6]/30 bg-[#001e1d]/60 text-[#fffffe]"
                           />
                           <Input
@@ -240,11 +262,15 @@ export function TasksManagementSection() {
                               setTasks((prev) =>
                                 prev.map((item) =>
                                   item.id === task.id
-                                    ? { ...item, reward: Number(e.target.value || 0) }
+                                    ? {
+                                        ...item,
+                                        reward: Number(e.target.value || 0),
+                                      }
                                     : item,
                                 ),
                               )
                             }
+                            onBlur={() => void patchTask(task)}
                             className="border-[#abd1c6]/30 bg-[#001e1d]/60 text-[#fffffe]"
                           />
                         </div>
@@ -259,6 +285,7 @@ export function TasksManagementSection() {
                               ),
                             )
                           }
+                          onBlur={() => void patchTask(task)}
                           rows={3}
                           className="mt-2 w-full rounded-md border border-[#abd1c6]/30 bg-[#001e1d]/60 px-3 py-2 text-sm text-[#fffffe] outline-none focus:border-[#f9bc60]/60"
                         />

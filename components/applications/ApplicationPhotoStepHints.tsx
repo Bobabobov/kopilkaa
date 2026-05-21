@@ -126,16 +126,16 @@ export function ApplicationPhotoReportHints({
       </div>
       <div className="space-y-3 px-4 py-4 sm:px-5 sm:py-5">
         <p className="text-sm leading-relaxed text-[#abd1c6]/95">
-          Если у вас уже была{" "}
+          У вас уже есть{" "}
           <span className="font-semibold text-[#e8f4f0]">
-            одобренная заявка раньше
+            одобренная заявка
           </span>
-          , нужно подтвердить, как вы потратили ту помощь. В блоке ниже —
-          минимум{" "}
+          , поэтому перед новой заявкой нужно подтвердить, как была потрачена
+          полученная помощь. Загрузите минимум{" "}
           <span className="font-semibold text-[#38bdf8]">
             {REPORT_PHOTOS_MIN} разных снимка
           </span>
-          , по смыслу совпадающих с двумя пунктами:
+          : по одному подтверждению для каждого пункта ниже.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-xl border border-white/[0.08] bg-[#001e1d]/45 p-3.5 sm:p-4">
@@ -166,8 +166,8 @@ export function ApplicationPhotoReportHints({
           </div>
         </div>
         <p className="text-xs leading-relaxed text-[#94a1b2]">
-          Загрузите файлы в одном поле ниже: главное — чтобы среди них были
-          снимки по обоим пунктам. Видит только администратор.
+          Это отдельный отчёт по прошлой помощи, не фото к текущей заявке.
+          Файлы видит только администратор.
         </p>
       </div>
     </div>

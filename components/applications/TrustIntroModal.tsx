@@ -88,6 +88,7 @@ export function TrustIntroModal({
           step={step}
           checked={checked}
           onCheckedChange={onCheckedChange}
+          onStepChange={setStep}
         />
         <TrustIntroFooter
           step={step}

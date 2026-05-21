@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GoodDeedSubmissionStatus } from "@prisma/client";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { getGoodDeedCycleKey } from "@/lib/goodDeedTasksAdmin";
-import { getWeekInfo, pickReplacementTask, pickTasksForWeek } from "@/lib/goodDeeds";
+import {
+  getAllManagedGoodDeedTasks,
+  getCurrentGoodDeedTasks,
+  getGoodDeedCycleKey,
+} from "@/lib/goodDeedTasksAdmin";
+import { getWeekInfo } from "@/lib/goodDeeds";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
@@ -20,42 +25,53 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const taskId = String(body?.taskId || "").trim();
     if (!taskId) {
-      return NextResponse.json({ error: "Не указано задание" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Не указано задание" },
+        { status: 400 },
+      );
     }
 
     const week = getWeekInfo(new Date());
     const cycleKey = await getGoodDeedCycleKey(week.key);
-    const weekTasks = pickTasksForWeek(cycleKey);
-    const weekTaskIds = weekTasks.map((task) => task.id);
+    const currentTasks = await getCurrentGoodDeedTasks();
+    const currentTask = currentTasks.find((task) => task.id === taskId);
 
-    if (!weekTaskIds.includes(taskId)) {
+    if (!currentTask) {
       return NextResponse.json(
         { error: "Можно заменить только задание текущей недели" },
         { status: 400 },
       );
     }
 
-    const [alreadyUsed, existingSubmission] = await Promise.all([
-      prisma.goodDeedWeekPreference.findUnique({
-        where: {
-          userId_weekKey: {
-            userId: session.uid,
-            weekKey: cycleKey,
+    const [alreadyUsed, existingSubmission, approvedSubmissions] =
+      await Promise.all([
+        prisma.goodDeedWeekPreference.findUnique({
+          where: {
+            userId_weekKey: {
+              userId: session.uid,
+              weekKey: cycleKey,
+            },
           },
-        },
-        select: { id: true },
-      }),
-      prisma.goodDeedSubmission.findUnique({
-        where: {
-          userId_weekKey_taskKey: {
-            userId: session.uid,
-            weekKey: cycleKey,
-            taskKey: taskId,
+          select: { id: true },
+        }),
+        prisma.goodDeedSubmission.findUnique({
+          where: {
+            userId_weekKey_taskKey: {
+              userId: session.uid,
+              weekKey: cycleKey,
+              taskKey: taskId,
+            },
           },
-        },
-        select: { id: true },
-      }),
-    ]);
+          select: { id: true },
+        }),
+        prisma.goodDeedSubmission.findMany({
+          where: {
+            userId: session.uid,
+            status: GoodDeedSubmissionStatus.APPROVED,
+          },
+          select: { taskKey: true },
+        }),
+      ]);
 
     if (alreadyUsed) {
       return NextResponse.json(
@@ -71,7 +87,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const replacement = pickReplacementTask(week.key, session.uid, weekTaskIds);
+    const approvedTaskIds = new Set(
+      approvedSubmissions.map((submission) => submission.taskKey),
+    );
+    const replacements = (await getAllManagedGoodDeedTasks()).filter(
+      (task) =>
+        task.isActive &&
+        task.difficulty === currentTask.difficulty &&
+        task.id !== currentTask.id &&
+        !approvedTaskIds.has(task.id),
+    );
+    const replacement =
+      replacements.length > 0
+        ? replacements[
+            hashReplacementIndex(
+              cycleKey,
+              session.uid,
+              taskId,
+              replacements.length,
+            )
+          ]
+        : null;
+
     if (!replacement) {
       return NextResponse.json(
         { error: "Сейчас нет доступной замены" },
@@ -99,4 +136,19 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+function hashReplacementIndex(
+  cycleKey: string,
+  userId: string,
+  taskId: string,
+  size: number,
+): number {
+  let hash = 0;
+  const seed = `${cycleKey}:${userId}:${taskId}`;
+  for (const char of seed) {
+    hash = (hash * 33 + char.charCodeAt(0)) >>> 0;
+  }
+
+  return hash % size;
 }

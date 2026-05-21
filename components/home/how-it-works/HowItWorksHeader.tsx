@@ -2,14 +2,18 @@
 
 import { motion } from "framer-motion";
 import { ListOrdered } from "lucide-react";
+import { useMobileReducedMotion } from "./useMobileReducedMotion";
 
 export function HowItWorksHeader() {
+  const reduceMotion = useMobileReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+      animate={reduceMotion ? { opacity: 1, y: 0 } : undefined}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
+      transition={reduceMotion ? undefined : { duration: 0.6 }}
       className="text-center mb-14"
     >
       <span

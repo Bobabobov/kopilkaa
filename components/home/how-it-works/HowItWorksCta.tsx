@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
+import { useMobileReducedMotion } from "./useMobileReducedMotion";
 
 interface HowItWorksCtaProps {
   loading: boolean;
@@ -9,12 +10,15 @@ interface HowItWorksCtaProps {
 }
 
 export function HowItWorksCta({ loading, onStartClick }: HowItWorksCtaProps) {
+  const reduceMotion = useMobileReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+      animate={reduceMotion ? { opacity: 1, y: 0 } : undefined}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: 0.35 }}
+      transition={reduceMotion ? undefined : { duration: 0.5, delay: 0.35 }}
       className="text-center mt-12"
     >
       <button

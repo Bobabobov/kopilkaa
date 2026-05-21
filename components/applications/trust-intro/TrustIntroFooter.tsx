@@ -1,8 +1,9 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { TRUST_INTRO_STEP_COUNT } from "./constants";
+import { useTrustIntroReducedMotion } from "./stepMotion";
 
 type Props = {
   step: number;
@@ -19,14 +20,14 @@ export function TrustIntroFooter({
   onNext,
   onContinue,
 }: Props) {
-  const reducedMotion = useReducedMotion();
+  const reducedMotion = useTrustIntroReducedMotion();
   const atFirst = step === 0;
   const atLast = step === TRUST_INTRO_STEP_COUNT - 1;
 
   return (
     <div
       className={cn(
-        "shrink-0 border-t border-white/10 bg-[#001e1d]/95 px-4 pt-3 backdrop-blur-md",
+        "shrink-0 border-t border-white/10 bg-[#001e1d]/95 px-4 pt-3 backdrop-blur-none sm:backdrop-blur-md",
         "pb-[max(12px,env(safe-area-inset-bottom))] sm:rounded-b-[24px]",
       )}
     >
@@ -36,17 +37,11 @@ export function TrustIntroFooter({
             type="button"
             onClick={onBack}
             disabled={atFirst}
-            whileHover={
-              atFirst || reducedMotion ? undefined : { scale: 1.02 }
-            }
-            whileTap={
-              atFirst || reducedMotion ? undefined : { scale: 0.97 }
-            }
+            whileHover={atFirst || reducedMotion ? undefined : { scale: 1.02 }}
+            whileTap={atFirst || reducedMotion ? undefined : { scale: 0.97 }}
             className={cn(
               "min-h-[48px] flex-1 rounded-xl border border-[#abd1c6]/30 py-3 text-sm font-semibold text-[#abd1c6] transition-opacity",
-              atFirst
-                ? "pointer-events-none opacity-35"
-                : "",
+              atFirst ? "pointer-events-none opacity-35" : "",
             )}
           >
             Назад
@@ -75,9 +70,7 @@ export function TrustIntroFooter({
             whileHover={
               !checked || reducedMotion ? undefined : { scale: 1.02, y: -1 }
             }
-            whileTap={
-              !checked || reducedMotion ? undefined : { scale: 0.98 }
-            }
+            whileTap={!checked || reducedMotion ? undefined : { scale: 0.98 }}
             className={cn(
               "min-h-[48px] w-full rounded-xl py-3.5 text-sm font-semibold transition-all sm:flex-1 sm:py-3",
               checked

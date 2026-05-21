@@ -1,11 +1,12 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   trustIntroStaggerContainer,
   trustIntroStaggerItem,
   trustIntroStaggerItemReduced,
+  useTrustIntroReducedMotion,
 } from "./stepMotion";
 
 type Props = {
@@ -14,8 +15,10 @@ type Props = {
 };
 
 export function StepAcknowledge({ checked, onCheckedChange }: Props) {
-  const reducedMotion = useReducedMotion();
-  const item = reducedMotion ? trustIntroStaggerItemReduced : trustIntroStaggerItem;
+  const reducedMotion = useTrustIntroReducedMotion();
+  const item = reducedMotion
+    ? trustIntroStaggerItemReduced
+    : trustIntroStaggerItem;
 
   return (
     <motion.div

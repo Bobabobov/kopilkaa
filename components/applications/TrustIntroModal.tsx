@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { TRUST_INTRO_STEP_COUNT } from "./trust-intro/constants";
 import { TrustIntroHeader } from "./trust-intro/TrustIntroHeader";
 import { TrustIntroStepPanel } from "./trust-intro/TrustIntroStepPanel";
 import { TrustIntroFooter } from "./trust-intro/TrustIntroFooter";
+import { useTrustIntroReducedMotion } from "./trust-intro/stepMotion";
 
 type Props = {
   open: boolean;
@@ -21,7 +22,7 @@ export function TrustIntroModal({
   onCheckedChange,
   onConfirm,
 }: Props) {
-  const reducedMotion = useReducedMotion();
+  const reducedMotion = useTrustIntroReducedMotion();
   const [step, setStep] = useState(0);
 
   useEffect(() => {
@@ -60,7 +61,7 @@ export function TrustIntroModal({
       aria-labelledby="trust-intro-title"
     >
       <div
-        className="absolute inset-0 bg-[#001e1d]/85 backdrop-blur-md"
+        className="absolute inset-0 bg-[#001e1d]/88 backdrop-blur-none sm:bg-[#001e1d]/85 sm:backdrop-blur-md"
         aria-hidden
       />
 
@@ -88,7 +89,6 @@ export function TrustIntroModal({
           step={step}
           checked={checked}
           onCheckedChange={onCheckedChange}
-          onStepChange={setStep}
         />
         <TrustIntroFooter
           step={step}

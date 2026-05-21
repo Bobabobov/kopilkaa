@@ -1,11 +1,12 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import {
   trustIntroStaggerContainer,
   trustIntroStaggerItem,
   trustIntroStaggerItemReduced,
+  useTrustIntroReducedMotion,
 } from "./stepMotion";
 
 const chips = [
@@ -27,8 +28,10 @@ const chips = [
 ] as const;
 
 export function StepWelcome() {
-  const reducedMotion = useReducedMotion();
-  const item = reducedMotion ? trustIntroStaggerItemReduced : trustIntroStaggerItem;
+  const reducedMotion = useTrustIntroReducedMotion();
+  const item = reducedMotion
+    ? trustIntroStaggerItemReduced
+    : trustIntroStaggerItem;
 
   return (
     <motion.div
@@ -43,11 +46,7 @@ export function StepWelcome() {
       >
         <motion.span
           className="inline-flex"
-          animate={
-            reducedMotion
-              ? undefined
-              : { rotate: [0, -8, 8, 0] }
-          }
+          animate={reducedMotion ? undefined : { rotate: [0, -8, 8, 0] }}
           transition={{
             duration: 3.5,
             repeat: Number.POSITIVE_INFINITY,

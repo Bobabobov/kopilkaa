@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-} from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createPortal } from "react-dom";
 import { useEffect } from "react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
@@ -90,21 +86,21 @@ export default function ApplicationSubmitConfirmModal({
             animate={{ opacity: 1 }}
             exit={reducedMotion ? undefined : { opacity: 0 }}
             transition={backdropTransition}
-            className="absolute inset-0 bg-[#001e1d]/55 backdrop-blur-[4px]"
+            className="absolute inset-0 bg-[#001e1d]/72 backdrop-blur-none sm:bg-[#001e1d]/55 sm:backdrop-blur-[4px]"
             onClick={() => !busy && onClose()}
             aria-hidden
           />
 
           <motion.div
-            initial={
-              reducedMotion ? false : { opacity: 0, y: 16, scale: 0.98 }
-            }
+            initial={reducedMotion ? false : { opacity: 0, y: 16, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reducedMotion ? undefined : { opacity: 0, y: 12, scale: 0.99 }}
+            exit={
+              reducedMotion ? undefined : { opacity: 0, y: 12, scale: 0.99 }
+            }
             transition={panelTransition}
             className={cn(
               "relative z-10 w-full max-w-[420px] overflow-hidden rounded-2xl border shadow-xl",
-              "border-[#abd1c6]/25 bg-[#004643]/92 backdrop-blur-md",
+              "border-[#abd1c6]/25 bg-[#004643]/95 backdrop-blur-none sm:bg-[#004643]/92 sm:backdrop-blur-md",
               "ring-1 ring-white/[0.06]",
             )}
           >
@@ -142,9 +138,7 @@ export default function ApplicationSubmitConfirmModal({
                 type="button"
                 disabled={busy}
                 onClick={onClose}
-                whileHover={
-                  reducedMotion || busy ? undefined : { scale: 1.01 }
-                }
+                whileHover={reducedMotion || busy ? undefined : { scale: 1.01 }}
                 whileTap={reducedMotion || busy ? undefined : { scale: 0.99 }}
                 className={cn(
                   "min-h-[46px] w-full rounded-xl px-5 text-sm font-semibold transition-colors sm:min-w-[140px] sm:w-auto",
@@ -158,9 +152,7 @@ export default function ApplicationSubmitConfirmModal({
                 type="button"
                 disabled={busy}
                 onClick={() => void onConfirm()}
-                whileHover={
-                  reducedMotion || busy ? undefined : { scale: 1.02 }
-                }
+                whileHover={reducedMotion || busy ? undefined : { scale: 1.02 }}
                 whileTap={reducedMotion || busy ? undefined : { scale: 0.98 }}
                 className={cn(
                   "min-h-[46px] w-full rounded-xl px-6 text-sm font-bold text-[#001e1d] sm:w-auto",

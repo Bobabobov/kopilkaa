@@ -1,11 +1,12 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import {
   trustIntroStaggerContainer,
   trustIntroStaggerItem,
   trustIntroStaggerItemReduced,
+  useTrustIntroReducedMotion,
 } from "./stepMotion";
 
 const flowSteps = [
@@ -27,8 +28,10 @@ const flowSteps = [
 ] as const;
 
 export function StepReports() {
-  const reducedMotion = useReducedMotion();
-  const item = reducedMotion ? trustIntroStaggerItemReduced : trustIntroStaggerItem;
+  const reducedMotion = useTrustIntroReducedMotion();
+  const item = reducedMotion
+    ? trustIntroStaggerItemReduced
+    : trustIntroStaggerItem;
 
   return (
     <motion.section

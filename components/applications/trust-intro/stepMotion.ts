@@ -1,4 +1,35 @@
-import type { Variants } from "framer-motion";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useReducedMotion, type Variants } from "framer-motion";
+
+export function useTrustIntroReducedMotion(): boolean {
+  const reducedMotion = useReducedMotion();
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function"
+    ) {
+      return;
+    }
+
+    const mq = window.matchMedia("(max-width: 639px)");
+    const update = () => setIsMobileViewport(mq.matches);
+    update();
+
+    if (mq.addEventListener) {
+      mq.addEventListener("change", update);
+      return () => mq.removeEventListener("change", update);
+    }
+
+    mq.addListener(update);
+    return () => mq.removeListener(update);
+  }, []);
+
+  return Boolean(reducedMotion || isMobileViewport);
+}
 
 /** Смена шагов: вертикальный сдвиг — естественнее для bottom sheet */
 export const trustIntroStepTransition = {

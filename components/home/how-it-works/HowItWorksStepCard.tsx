@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { User, FileText, Clock, Banknote } from "lucide-react";
 import type { HowItWorksStep } from "./config";
+import { useMobileReducedMotion } from "./useMobileReducedMotion";
 
 const STEP_ICONS = {
   User,
@@ -22,16 +23,20 @@ export function HowItWorksStepCard({
   index,
   steps,
 }: HowItWorksStepCardProps) {
+  const reduceMotion = useMobileReducedMotion();
   const Icon = STEP_ICONS[step.icon as keyof typeof STEP_ICONS];
   const nextStep = steps[index + 1];
   const accent = "#f9bc60";
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      animate={reduceMotion ? { opacity: 1, y: 0 } : undefined}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.08 }}
+      transition={
+        reduceMotion ? undefined : { duration: 0.5, delay: index * 0.08 }
+      }
       className="relative h-full"
     >
       {index < steps.length - 1 && nextStep && (
@@ -45,16 +50,14 @@ export function HowItWorksStepCard({
       )}
 
       <div
-        className="relative h-full rounded-2xl p-6 sm:p-7 overflow-hidden transition-all duration-300 md:hover:scale-[1.02] group"
+        className="relative h-full rounded-2xl p-6 sm:p-7 overflow-hidden transition-transform duration-300 md:hover:scale-[1.02] group shadow-[0_2px_12px_rgba(0,0,0,0.18),0_0_0_1px_rgba(255,255,255,0.08)] md:shadow-[0_4px_24px_rgba(0,0,0,0.2),0_0_0_1px_rgba(255,255,255,0.08)]"
         style={{
           background:
             "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-          boxShadow:
-            "0 4px 24px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.08)",
         }}
       >
         <div
-          className="absolute top-0 right-0 w-28 h-28 rounded-full blur-2xl opacity-25 group-hover:opacity-40 transition-opacity"
+          className="absolute top-0 right-0 w-24 h-24 rounded-full blur-md opacity-15 transition-opacity md:w-28 md:h-28 md:blur-2xl md:opacity-25 md:group-hover:opacity-40"
           style={{ backgroundColor: accent }}
         />
 

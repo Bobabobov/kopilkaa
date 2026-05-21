@@ -1,16 +1,19 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import {
   trustIntroStaggerContainer,
   trustIntroStaggerItem,
   trustIntroStaggerItemReduced,
+  useTrustIntroReducedMotion,
 } from "./stepMotion";
 
 export function StepRestrictions() {
-  const reducedMotion = useReducedMotion();
-  const item = reducedMotion ? trustIntroStaggerItemReduced : trustIntroStaggerItem;
+  const reducedMotion = useTrustIntroReducedMotion();
+  const item = reducedMotion
+    ? trustIntroStaggerItemReduced
+    : trustIntroStaggerItem;
 
   return (
     <motion.section
@@ -22,7 +25,7 @@ export function StepRestrictions() {
     >
       <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-[#e16162]/70" />
       <motion.div
-        className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-[#e16162]/22 blur-3xl pointer-events-none"
+        className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-[#e16162]/22 blur-xl sm:blur-3xl pointer-events-none"
         aria-hidden
         animate={
           reducedMotion

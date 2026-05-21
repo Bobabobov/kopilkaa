@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { Children, type ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+import { Children, type ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
+} from "@/components/ui/carousel";
 
 const CAROUSEL_NAV = cn(
-  'h-9 w-9 rounded-full border border-[#abd1c6]/35 bg-[#001e1d]/95 text-[#f9bc60]',
-  'shadow-[0_4px_16px_rgba(0,0,0,0.35)]',
-  'hover:bg-[#001e1d] hover:border-[#f9bc60]/50',
-  'disabled:opacity-25',
+  "h-9 w-9 rounded-full border border-[#abd1c6]/35 bg-[#001e1d]/95 text-[#f9bc60]",
+  "shadow-[0_4px_16px_rgba(0,0,0,0.35)]",
+  "hover:bg-[#001e1d] hover:border-[#f9bc60]/50",
+  "disabled:opacity-25",
 );
 
 interface HomeSectionLayoutProps {
@@ -33,8 +33,8 @@ interface HomeSectionLayoutProps {
 export function HomeSectionLayout({
   children,
   ariaLabel,
-  gridClassName = 'md:grid-cols-3',
-  slideBasis = 'basis-[90%]',
+  gridClassName = "md:grid-cols-3",
+  slideBasis = "basis-[90%]",
 }: HomeSectionLayoutProps) {
   const items = Children.toArray(children);
 
@@ -47,16 +47,18 @@ export function HomeSectionLayout({
       <div className="md:hidden" aria-label={ariaLabel}>
         <Carousel
           opts={{
-            align: 'start',
-            containScroll: 'trimSnaps',
+            align: "start",
+            containScroll: "trimSnaps",
+            dragFree: false,
+            skipSnaps: false,
           }}
           className="w-full px-10"
         >
-          <CarouselContent className="-ml-3">
+          <CarouselContent className="-ml-3 select-none [touch-action:pan-y]">
             {items.map((child, index) => (
               <CarouselItem
                 key={index}
-                className={cn('pl-3', slideBasis)}
+                className={cn("pl-3 [backface-visibility:hidden]", slideBasis)}
               >
                 {child}
               </CarouselItem>
@@ -66,21 +68,21 @@ export function HomeSectionLayout({
             variant="outline"
             className={cn(
               CAROUSEL_NAV,
-              'left-0 top-1/2 -translate-y-1/2 border-[#abd1c6]/35',
+              "left-0 top-1/2 -translate-y-1/2 border-[#abd1c6]/35",
             )}
           />
           <CarouselNext
             variant="outline"
             className={cn(
               CAROUSEL_NAV,
-              'right-0 top-1/2 -translate-y-1/2 border-[#abd1c6]/35',
+              "right-0 top-1/2 -translate-y-1/2 border-[#abd1c6]/35",
             )}
           />
         </Carousel>
       </div>
 
       <div
-        className={cn('hidden md:grid gap-6 lg:gap-8', gridClassName)}
+        className={cn("hidden md:grid gap-6 lg:gap-8", gridClassName)}
         aria-label={ariaLabel}
       >
         {items.map((child, index) => (

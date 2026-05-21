@@ -119,21 +119,7 @@ export default function AuthModalRoot() {
       document.body.style.width = "100%";
       document.documentElement.style.overflow = "hidden";
 
-      const preventScroll = (e: Event) => {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      };
-
-      document.addEventListener("wheel", preventScroll, { passive: false });
-      document.addEventListener("touchmove", preventScroll, { passive: false });
-      document.addEventListener("scroll", preventScroll, { passive: false });
-
       return () => {
-        document.removeEventListener("wheel", preventScroll);
-        document.removeEventListener("touchmove", preventScroll);
-        document.removeEventListener("scroll", preventScroll);
-
         document.body.style.overflow = "";
         document.body.style.position = "";
         document.body.style.top = "";

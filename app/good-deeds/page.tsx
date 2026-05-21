@@ -52,24 +52,6 @@ export default function GoodDeedsPage() {
     );
   }, [load]);
 
-  useEffect(() => {
-    const reloadOnFocus = () => {
-      if (document.visibilityState === "visible") {
-        load().catch((error) =>
-          logRouteCatchError("[GoodDeedsPage] load (focus)", error),
-        );
-      }
-    };
-
-    window.addEventListener("focus", reloadOnFocus);
-    document.addEventListener("visibilitychange", reloadOnFocus);
-
-    return () => {
-      window.removeEventListener("focus", reloadOnFocus);
-      document.removeEventListener("visibilitychange", reloadOnFocus);
-    };
-  }, [load]);
-
   const onFilesChange = (taskId: string, fileList: FileList | null) => {
     const selected = fileList ? Array.from(fileList) : [];
     setFilesByTask((prev) => ({ ...prev, [taskId]: selected }));

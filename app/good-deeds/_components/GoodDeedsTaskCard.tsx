@@ -53,6 +53,7 @@ type Props = {
   isRerolling: boolean;
   canReroll: boolean;
   isAuthenticated: boolean;
+  submissionsClosed?: boolean;
   /** Компактный вид для боковой панели */
   variant?: "default" | "compact";
 };
@@ -72,6 +73,7 @@ export function GoodDeedsTaskCard({
   isRerolling,
   canReroll,
   isAuthenticated,
+  submissionsClosed = false,
   variant = "default",
 }: Props) {
   const compact = variant === "compact";
@@ -80,6 +82,7 @@ export function GoodDeedsTaskCard({
   const storyHelp = GOOD_DEED_STORY_EXTRA_HELP[task.id];
   const storyPlaceholder =
     storyHelp?.placeholder ?? DEFAULT_GOOD_DEED_STORY_PLACEHOLDER;
+  const formDisabled = !isAuthenticated || submissionsClosed;
 
   const [workspaceOpen, setWorkspaceOpen] = useState(status !== null);
 
@@ -142,22 +145,21 @@ export function GoodDeedsTaskCard({
     >
       <CardHeader
         className={cn(
-          'mb-0 flex flex-row items-start justify-between gap-3 pb-2',
-          compact && 'gap-3 pb-1.5',
+          "mb-0 flex flex-row items-start justify-between gap-3 pb-2",
+          compact && "gap-3 pb-1.5",
         )}
       >
         <div
-          className={cn(
-            'min-w-0 flex-1 space-y-2',
-            compact && 'space-y-1.5',
-          )}
+          className={cn("min-w-0 flex-1 space-y-2", compact && "space-y-1.5")}
         >
           {slotName ? (
             <div className="flex flex-wrap items-center gap-2">
               <Badge
                 className={cn(
-                  'border-0 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] px-2.5 font-bold tabular-nums text-[#001e1d] shadow-sm ring-1 ring-white/15',
-                  compact ? 'h-6 min-w-[1.5rem] justify-center text-[11px]' : 'text-xs',
+                  "border-0 bg-gradient-to-br from-[#f9bc60] to-[#e8a545] px-2.5 font-bold tabular-nums text-[#001e1d] shadow-sm ring-1 ring-white/15",
+                  compact
+                    ? "h-6 min-w-[1.5rem] justify-center text-[11px]"
+                    : "text-xs",
                 )}
               >
                 {badgeNumber}
@@ -165,8 +167,8 @@ export function GoodDeedsTaskCard({
               <Badge
                 variant="outline"
                 className={cn(
-                  'border-[#f9bc60]/40 bg-[#f9bc60]/12 font-semibold capitalize text-[#ffe8c2] shadow-sm backdrop-blur-[2px]',
-                  compact ? 'h-6 px-2.5 text-[11px]' : 'text-xs',
+                  "border-[#f9bc60]/40 bg-[#f9bc60]/12 font-semibold capitalize text-[#ffe8c2] shadow-sm backdrop-blur-[2px]",
+                  compact ? "h-6 px-2.5 text-[11px]" : "text-xs",
                 )}
               >
                 {displayTierLabel(slotName)}
@@ -176,8 +178,8 @@ export function GoodDeedsTaskCard({
             <Badge
               variant="secondary"
               className={cn(
-                'font-bold tabular-nums',
-                compact ? 'text-xs' : 'text-sm',
+                "font-bold tabular-nums",
+                compact ? "text-xs" : "text-sm",
               )}
             >
               {badgeNumber}
@@ -185,14 +187,14 @@ export function GoodDeedsTaskCard({
           )}
           <div
             className={cn(
-              'flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2',
-              useTierColumnLayout && 'block',
+              "flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2",
+              useTierColumnLayout && "block",
             )}
           >
             <h2
               className={cn(
-                'min-w-0 font-bold leading-tight text-[#fffffe]',
-                compact ? 'text-base' : 'text-lg sm:text-xl',
+                "min-w-0 font-bold leading-tight text-[#fffffe]",
+                compact ? "text-base" : "text-lg sm:text-xl",
               )}
             >
               {task.title}
@@ -205,7 +207,7 @@ export function GoodDeedsTaskCard({
                 {statusMeta && (
                   <span
                     className={cn(
-                      'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold',
+                      "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold",
                       statusMeta.className,
                     )}
                   >
@@ -237,13 +239,16 @@ export function GoodDeedsTaskCard({
         </div>
         {useTierColumnLayout ? (
           <div className="flex shrink-0 flex-col items-end gap-1.5 pt-0.5 text-right">
-            <Badge variant="secondary" className="font-semibold whitespace-nowrap">
+            <Badge
+              variant="secondary"
+              className="font-semibold whitespace-nowrap"
+            >
               +{task.reward} {bonusWord(task.reward)}
             </Badge>
             {statusMeta ? (
               <span
                 className={cn(
-                  'inline-flex max-w-[9rem] items-center justify-end rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-tight',
+                  "inline-flex max-w-[9rem] items-center justify-end rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-tight",
                   statusMeta.className,
                 )}
               >
@@ -302,14 +307,17 @@ export function GoodDeedsTaskCard({
           {!showPendingPreview && (
             <Button
               type="button"
-              onClick={() => setWorkspaceOpen(true)}
+              onClick={() => {
+                if (!submissionsClosed) setWorkspaceOpen(true);
+              }}
+              disabled={submissionsClosed}
               className={cn(
-                'w-full rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] shadow-sm shadow-black/20 hover:bg-[#f7b24a]',
-                compact ? 'h-10 text-sm sm:h-11' : 'h-10',
-                canReroll && 'sm:min-w-[200px] sm:flex-1',
+                "w-full rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] shadow-sm shadow-black/20 hover:bg-[#f7b24a]",
+                compact ? "h-10 text-sm sm:h-11" : "h-10",
+                canReroll && "sm:min-w-[200px] sm:flex-1",
               )}
             >
-              Открыть
+              {submissionsClosed ? "Приём закрыт" : "Открыть"}
             </Button>
           )}
         </CardFooter>
@@ -397,13 +405,13 @@ export function GoodDeedsTaskCard({
                     value={storyText}
                     maxLength={MAX_GOOD_DEED_STORY_CHARS}
                     rows={compact ? 4 : 5}
-                    disabled={!isAuthenticated}
+                    disabled={formDisabled}
                     placeholder={storyPlaceholder}
                     onChange={(e) => onStoryTextChange(e.target.value)}
                     className={cn(
                       "min-h-[96px] w-full resize-y rounded-2xl border border-[#abd1c6]/25 bg-[#001e1d]/55 px-3 py-2.5 text-sm leading-relaxed text-[#fffffe] placeholder:text-[#5c6d7a]",
                       "outline-none transition focus:border-[#f9bc60]/45 focus:ring-2 focus:ring-[#f9bc60]/15",
-                      !isAuthenticated && "cursor-not-allowed opacity-50",
+                      formDisabled && "cursor-not-allowed opacity-50",
                     )}
                   />
                 </div>
@@ -432,7 +440,7 @@ export function GoodDeedsTaskCard({
                     className={cn(
                       "rounded-2xl border border-dashed border-[#abd1c6]/35 bg-[#001e1d]/40 text-center transition",
                       compact ? "px-3 py-4" : "px-4 py-6",
-                      !isAuthenticated && "opacity-60",
+                      formDisabled && "opacity-60",
                     )}
                   >
                     <input
@@ -440,7 +448,7 @@ export function GoodDeedsTaskCard({
                       type="file"
                       multiple
                       accept="image/*,video/mp4,video/webm"
-                      disabled={!isAuthenticated}
+                      disabled={formDisabled}
                       onChange={(e) => onFilesChange(e.currentTarget.files)}
                       className="sr-only"
                     />
@@ -494,7 +502,7 @@ export function GoodDeedsTaskCard({
                 onClick={onSubmit}
                 disabled={
                   isSubmitting ||
-                  !isAuthenticated ||
+                  formDisabled ||
                   selectedFiles.length < 1 ||
                   storyText.trim().length < MIN_GOOD_DEED_STORY_CHARS
                 }
@@ -504,7 +512,7 @@ export function GoodDeedsTaskCard({
                 )}
               >
                 <Upload className="h-4 w-4" />
-                Отправить
+                {submissionsClosed ? "Приём закрыт" : "Отправить"}
               </Button>
               {canReroll && (
                 <Button

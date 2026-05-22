@@ -14,6 +14,10 @@ import {
   MAX_GOOD_DEED_STORY_CHARS,
   MIN_GOOD_DEED_STORY_CHARS,
 } from "@/lib/goodDeeds";
+import {
+  GOOD_DEEDS_SUBMISSIONS_CLOSED,
+  GOOD_DEEDS_SUBMISSIONS_CLOSED_MESSAGE,
+} from "@/lib/goodDeedsSubmissions";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 const MAX_MEDIA = 5;
@@ -22,6 +26,13 @@ const MIN_MEDIA = 1;
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  if (GOOD_DEEDS_SUBMISSIONS_CLOSED) {
+    return NextResponse.json(
+      { error: GOOD_DEEDS_SUBMISSIONS_CLOSED_MESSAGE },
+      { status: 403 },
+    );
+  }
+
   const session = await getAuthUser(req);
   if (!session?.uid) {
     return NextResponse.json(

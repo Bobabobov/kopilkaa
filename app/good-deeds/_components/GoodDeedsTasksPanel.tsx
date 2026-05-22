@@ -1,22 +1,17 @@
-'use client';
+"use client";
 
-import { ClipboardList } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/Card';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { GoodDeedsTaskCard } from './GoodDeedsTaskCard';
-import type { GoodDeedDifficulty, GoodDeedTaskView } from '../types';
+import { ClipboardList } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { GoodDeedsTaskCard } from "./GoodDeedsTaskCard";
+import type { GoodDeedDifficulty, GoodDeedTaskView } from "../types";
 
 const TIER: Record<GoodDeedDifficulty, { n: number; name: string }> = {
-  EASY: { n: 1, name: 'лёгкое' },
-  MEDIUM: { n: 2, name: 'среднее' },
-  HARD: { n: 3, name: 'сложное' },
+  EASY: { n: 1, name: "лёгкое" },
+  MEDIUM: { n: 2, name: "среднее" },
+  HARD: { n: 3, name: "сложное" },
 };
 
 type WeeklyProgress = {
@@ -37,6 +32,8 @@ type Props = {
   onSubmit: (taskId: string) => void;
   submittingTaskId: string | null;
   isAuthenticated: boolean;
+  submissionsClosed?: boolean;
+  submissionsClosedMessage?: string;
 };
 
 export function GoodDeedsTasksPanel({
@@ -50,6 +47,8 @@ export function GoodDeedsTasksPanel({
   onSubmit,
   submittingTaskId,
   isAuthenticated,
+  submissionsClosed = false,
+  submissionsClosedMessage,
 }: Props) {
   const { approved, pending, rejected, total } = weeklyProgress;
   const progressPercent =
@@ -69,17 +68,20 @@ export function GoodDeedsTasksPanel({
         <CardHeader className="mb-0 flex flex-col items-stretch gap-1 border-b border-white/[0.06] pb-5 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
           <div className="min-w-0 flex-1 space-y-2">
             <CardTitle
-              icon={<ClipboardList className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />}
+              icon={
+                <ClipboardList className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
+              }
               className="[&_h3]:text-xl [&_h3]:sm:text-2xl"
             >
               Задания недели
             </CardTitle>
             <p className="max-w-3xl text-sm leading-relaxed text-[#abd1c6] sm:text-[15px]">
-              Три уровня:{' '}
-              <span className="font-medium text-[#e8f4ef]/95">1 — лёгкое</span>,{' '}
-              <span className="font-medium text-[#e8f4ef]/95">2 — среднее</span>,{' '}
-              <span className="font-medium text-[#e8f4ef]/95">3 — сложное</span>.
-              Набор обновляется раз в неделю:{' '}
+              Три уровня:{" "}
+              <span className="font-medium text-[#e8f4ef]/95">1 — лёгкое</span>,{" "}
+              <span className="font-medium text-[#e8f4ef]/95">2 — среднее</span>
+              ,{" "}
+              <span className="font-medium text-[#e8f4ef]/95">3 — сложное</span>
+              . Набор обновляется раз в неделю:{" "}
               <span className="whitespace-nowrap text-[#f9bc60]/95">
                 {weekLabel}
               </span>
@@ -89,6 +91,13 @@ export function GoodDeedsTasksPanel({
         </CardHeader>
 
         <CardContent className="space-y-6 pt-6">
+          {submissionsClosed ? (
+            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm leading-relaxed text-amber-100 sm:px-5">
+              {submissionsClosedMessage ??
+                "Подача добрых дел временно закрыта."}
+            </div>
+          ) : null}
+
           {total > 0 ? (
             <div className="space-y-3 rounded-2xl border border-white/[0.06] bg-black/15 px-4 py-4 sm:px-5">
               <div className="flex flex-wrap items-center justify-between gap-2 gap-y-1">
@@ -140,7 +149,7 @@ export function GoodDeedsTasksPanel({
                         slotName={tier.name}
                         task={task}
                         variant="compact"
-                        storyText={storyByTask[task.id] ?? ''}
+                        storyText={storyByTask[task.id] ?? ""}
                         onStoryTextChange={(value) =>
                           onStoryChange(task.id, value)
                         }
@@ -152,6 +161,7 @@ export function GoodDeedsTasksPanel({
                         isRerolling={false}
                         canReroll={false}
                         isAuthenticated={isAuthenticated}
+                        submissionsClosed={submissionsClosed}
                       />
                     </div>
                   );

@@ -10,6 +10,10 @@ import { GoodDeedsTasksPanel } from "./_components/GoodDeedsTasksPanel";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { MIN_GOOD_DEED_STORY_CHARS } from "@/lib/goodDeeds";
+import {
+  GOOD_DEEDS_SUBMISSIONS_CLOSED,
+  GOOD_DEEDS_SUBMISSIONS_CLOSED_MESSAGE,
+} from "@/lib/goodDeedsSubmissions";
 import type { GoodDeedsResponse } from "./types";
 import { throwIfApiFailed, logRouteCatchError } from "@/lib/api/parseApiError";
 
@@ -62,6 +66,15 @@ export default function GoodDeedsPage() {
   };
 
   const submitTask = async (taskId: string) => {
+    if (GOOD_DEEDS_SUBMISSIONS_CLOSED) {
+      showToast(
+        "warning",
+        "Приём закрыт",
+        GOOD_DEEDS_SUBMISSIONS_CLOSED_MESSAGE,
+      );
+      return;
+    }
+
     if (!data?.viewer?.isAuthenticated) {
       showToast(
         "warning",
@@ -199,6 +212,8 @@ export default function GoodDeedsPage() {
                 onSubmit={submitTask}
                 submittingTaskId={submittingTaskId}
                 isAuthenticated={data.viewer.isAuthenticated}
+                submissionsClosed={GOOD_DEEDS_SUBMISSIONS_CLOSED}
+                submissionsClosedMessage={GOOD_DEEDS_SUBMISSIONS_CLOSED_MESSAGE}
               />
             ) : (
               <Card

@@ -3,41 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
-import { sortStoryCommentThreads } from "@/lib/stories/storyComments";
+import {
+  sortStoryCommentThreads,
+  type StoryCommentThread,
+} from "@/lib/stories/storyComments";
 
-export interface StoryCommentUser {
-  id: string;
-  name: string;
-  username: string | null;
-  avatar: string | null;
-  avatarFrame: string | null;
-  vkLink?: string | null;
-  telegramLink?: string | null;
-  youtubeLink?: string | null;
-  markedAsDeceiver?: boolean;
-  isSelf: boolean;
-}
-
-export interface StoryCommentReplyTarget {
-  commentId: string;
-  user: StoryCommentUser;
-}
-
-export interface StoryCommentItem {
-  id: string;
-  parentId: string | null;
-  content: string;
-  createdAt: string;
-  updatedAt?: string;
-  isEdited?: boolean;
-  canEdit?: boolean;
-  canDelete?: boolean;
-  likeCount?: number;
-  isLiked?: boolean;
-  replyTo: StoryCommentReplyTarget | null;
-  user: StoryCommentUser;
-  replies?: StoryCommentItem[];
-}
+export type StoryCommentItem = StoryCommentThread;
+export type StoryCommentUser = StoryCommentItem["user"];
+export type StoryCommentReplyTarget = NonNullable<StoryCommentItem["replyTo"]>;
 
 export interface StoryCommentsViewer {
   isAuthenticated: boolean;

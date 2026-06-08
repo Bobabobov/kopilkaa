@@ -14,6 +14,7 @@ import { GuestActionsMenu } from "./header/GuestActionsMenu";
 import { AvatarBlock } from "./header/AvatarBlock";
 import { HeaderIdentity } from "./header/HeaderIdentity";
 import { CtaRow } from "./header/CtaRow";
+import { ProfileCustomizationActions } from "./header/ProfileCustomizationActions";
 import { useCoverStyle } from "./hooks/useCoverStyle";
 
 type User = {
@@ -24,6 +25,7 @@ type User = {
   createdAt: string;
   avatar?: string | null;
   headerTheme?: string | null;
+  headerCover?: string | null;
   hideEmail?: boolean;
   vkLink?: string | null;
   telegramLink?: string | null;
@@ -45,8 +47,7 @@ interface ProfileHeaderCardProps {
   onDeclineIncoming?: () => Promise<void> | void;
   onRemoveFriend?: () => Promise<void> | void;
   onThemeChange?: (theme: string | null) => void;
-  headerBackground?: string | null;
-  onBackgroundChange?: () => void;
+  onCoverChange?: (coverUrl: string | null) => void;
   onOpenSettings?: () => void;
   onAvatarChange?: (avatarUrl: string | null) => void;
 }
@@ -66,14 +67,16 @@ export default function ProfileHeaderCard({
   onDeclineIncoming,
   onRemoveFriend,
   onThemeChange,
-  headerBackground,
-  onBackgroundChange,
+  onCoverChange,
   onOpenSettings,
   onAvatarChange,
 }: ProfileHeaderCardProps) {
   const [currentAvatar, setCurrentAvatar] = useState(user.avatar || null);
   const [currentHeaderTheme, setCurrentHeaderTheme] = useState(
     user.headerTheme,
+  );
+  const [currentHeaderCover, setCurrentHeaderCover] = useState<string | null>(
+    user.headerCover ?? null,
   );
   const [showHeaderCustomization, setShowHeaderCustomization] = useState(false);
   const [isApplicationsModalOpen, setIsApplicationsModalOpen] = useState(false);
@@ -108,7 +111,8 @@ export default function ProfileHeaderCard({
   useEffect(() => {
     setCurrentAvatar(user.avatar || null);
     setCurrentHeaderTheme(user.headerTheme);
-  }, [user.avatar, user.headerTheme]);
+    setCurrentHeaderCover(user.headerCover ?? null);
+  }, [user.avatar, user.headerTheme, user.headerCover]);
 
   useEffect(() => {
     const handleOpenApplicationsModal = () => setIsApplicationsModalOpen(true);
@@ -160,9 +164,14 @@ export default function ProfileHeaderCard({
 
   const coverStyle = useCoverStyle({
     theme,
-    headerBackground,
+    headerCover: currentHeaderCover,
     backgroundColor,
   });
+  const hasCustomCover = Boolean(currentHeaderCover);
+  const contentTextShadowClass =
+    isColorTheme || hasCustomCover
+      ? "[text-shadow:0_1px_8px_rgba(0,0,0,0.85)]"
+      : "";
 
   return (
     <motion.div
@@ -177,34 +186,18 @@ export default function ProfileHeaderCard({
           className="relative w-full max-w-full min-h-[180px] xs:min-h-[200px] sm:min-h-[240px] md:min-h-[280px] overflow-hidden"
           style={coverStyle}
         >
-          {isOwner && (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={onOpenSettings}
-              className="absolute top-2 right-2 xs:top-3 xs:right-3 sm:top-4 sm:right-4 z-20 inline-flex items-center gap-1.5 xs:gap-2 rounded-lg bg-black/40 hover:bg-black/55 border border-white/20 px-2.5 py-1.5 xs:px-3 xs:py-1.5 sm:px-3.5 sm:py-2 text-sm font-semibold text-white transition-all duration-200 backdrop-blur-sm"
-              aria-label="Редактировать профиль"
-            >
-              <svg
-                className="w-4 h-4 flex-shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c0 .69.4 1.3 1.01 1.58.61.28 1.32.17 1.81-.31l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06c-.49.48-.6 1.2-.31 1.81.28.61.89 1.01 1.58 1.01h.09a2 2 0 1 1 0 4h-.09c-.69 0-1.3.4-1.58 1.01-.28.61-.17 1.32.31 1.81l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1c.28-.61.17-1.32-.31-1.81l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06c.48.49 1.2.6 1.81.31.61-.28 1.01-.89 1.01-1.58V3a2 2 0 1 1 4 0v.09c0 .69.4 1.3 1.01 1.58.61.28 1.32.17 1.81-.31l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06c-.48.49-.6 1.2-.31 1.81.28.61.89 1.01 1.58 1.01H21a2 2 0 1 1 0 4h-.09c-.69 0-1.3.4-1.58 1.01-.28.61-.17 1.32.31 1.81Z" />
-              </svg>
-              <span className="hidden xs:inline">Редактировать</span>
-            </motion.button>
+          {/* Scrim: для цвета Иттена — без затемнения; для своей обложки — только низ; для тем-картинок — как раньше */}
+          {hasCustomCover && !isColorTheme && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[34%] bg-gradient-to-t from-black/25 to-transparent" />
           )}
-          {/* Затемняющий градиент для читаемости */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
+          {!hasCustomCover && !isColorTheme && (
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+          )}
 
           {/* Контент поверх баннера — max-w-full чтобы ширина не зависела от наличия соцсетей */}
-          <div className="relative z-10 w-full max-w-full min-w-0 px-3 xs:px-4 sm:px-6 md:px-8 pb-4 xs:pb-6 sm:pb-8 pt-16 xs:pt-20 sm:pt-24 md:pt-28 box-border">
+          <div
+            className={`relative z-10 w-full max-w-full min-w-0 px-3 xs:px-4 sm:px-6 md:px-8 pb-4 xs:pb-6 sm:pb-8 pt-16 xs:pt-20 sm:pt-24 md:pt-28 box-border ${contentTextShadowClass}`}
+          >
             {/* Основной контент: Аватар и информация в одну линию */}
             <div className="flex flex-col sm:flex-row items-start gap-2 xs:gap-3 sm:gap-4 md:gap-5 min-w-0 w-full max-w-full">
               <AvatarBlock
@@ -215,16 +208,6 @@ export default function ProfileHeaderCard({
                 onAvatarChange={(val) => {
                   setCurrentAvatar(val);
                   onAvatarChange?.(val);
-                }}
-                onOpenCover={() => {
-                  setShowHeaderCustomization(true);
-                  onBackgroundChange?.();
-                }}
-                onTriggerAvatar={() => {
-                  const fileInput = document.querySelector(
-                    'input[data-avatar-file-input="true"]',
-                  ) as HTMLInputElement | null;
-                  if (fileInput) fileInput.click();
                 }}
               />
 
@@ -255,15 +238,38 @@ export default function ProfileHeaderCard({
             </div>
           </div>
         </div>
+
+        {isOwner && (
+          <div className="mt-2 sm:mt-2.5">
+            <ProfileCustomizationActions
+              onOpenCover={() => setShowHeaderCustomization(true)}
+              onTriggerAvatar={() => {
+                const fileInput = document.querySelector(
+                  'input[data-avatar-file-input="true"]',
+                ) as HTMLInputElement | null;
+                if (fileInput) fileInput.click();
+              }}
+              onOpenSettings={onOpenSettings}
+            />
+          </div>
+        )}
       </div>
 
       {isOwner && (
         <>
           <HeaderCustomization
-            user={{ ...user, headerTheme: currentHeaderTheme }}
+            user={{
+              ...user,
+              headerTheme: currentHeaderTheme,
+              headerCover: currentHeaderCover,
+            }}
             onThemeChange={(theme) => {
               setCurrentHeaderTheme(theme);
               onThemeChange?.(theme);
+            }}
+            onCoverChange={(coverUrl) => {
+              setCurrentHeaderCover(coverUrl);
+              onCoverChange?.(coverUrl);
             }}
             isOpen={showHeaderCustomization}
             onClose={() => setShowHeaderCustomization(false)}

@@ -34,6 +34,7 @@ export async function GET(
       name: true,
       avatar: true,
       headerTheme: true,
+      headerCover: true,
       avatarFrame: true,
       hideEmail: true,
       vkLink: true,

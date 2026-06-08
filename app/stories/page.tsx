@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 import StoriesPageClient from "./_components/StoriesPageClient";
+
+export const dynamic = "force-dynamic";
 import type { Story } from "@/hooks/stories/useStories";
 import { getInternalApiBaseUrl } from "@/lib/siteOrigin";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
@@ -25,15 +27,15 @@ async function fetchWithCookies(
   });
 }
 
-async function fetchTopStories(): Promise<Story[]> {
+async function fetchRandomStory(): Promise<Story | null> {
   try {
-    const res = await fetchWithCookies(`${baseUrl}/api/stories/top?limit=10`);
-    if (!res.ok) return [];
+    const res = await fetchWithCookies(`${baseUrl}/api/stories/random`);
+    if (!res.ok) return null;
     const data = await res.json();
-    return Array.isArray(data.items) ? data.items : [];
+    return data.item && typeof data.item.id === "string" ? data.item : null;
   } catch (error) {
-    logRouteCatchError("[StoriesPage] fetchTopStories", error);
-    return [];
+    logRouteCatchError("[StoriesPage] fetchRandomStory", error);
+    return null;
   }
 }
 
@@ -71,14 +73,14 @@ async function fetchFirstStoriesPage(): Promise<FirstPageResult> {
 }
 
 export default async function StoriesPage() {
-  const [initialTopStories, firstPage, initialTotalPaid] = await Promise.all([
-    fetchTopStories(),
+  const [initialRandomStory, firstPage, initialTotalPaid] = await Promise.all([
+    fetchRandomStory(),
     fetchFirstStoriesPage(),
     fetchStoriesSummary(),
   ]);
   return (
     <StoriesPageClient
-      initialTopStories={initialTopStories}
+      initialRandomStory={initialRandomStory}
       initialStories={firstPage.items}
       initialStoriesHasMore={firstPage.hasMore}
       initialTotalPaid={initialTotalPaid}

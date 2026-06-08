@@ -6,7 +6,7 @@ import type { BaseEditorProps } from "./types";
 
 interface NameEditorProps extends BaseEditorProps {
   currentName: string;
-  onSave: (name: string) => void;
+  onSave: (name: string) => void | Promise<void>;
 }
 
 export function NameEditor({ currentName, onSave, disabled }: NameEditorProps) {
@@ -17,9 +17,9 @@ export function NameEditor({ currentName, onSave, disabled }: NameEditorProps) {
     setValue(currentName);
   }, [currentName]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (value.trim() && value.trim() !== currentName) {
-      onSave(value.trim());
+      await onSave(value.trim());
     }
     setIsEditing(false);
   };

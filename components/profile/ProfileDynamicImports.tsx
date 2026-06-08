@@ -101,15 +101,6 @@ const ProfileRecentActivityLoading = () => (
   </div>
 );
 
-// Loading компонент для MotivationalCard
-const MotivationalCardLoading = () => (
-  <div className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 p-4 sm:p-5 md:p-6 min-h-[150px]">
-    <div className="animate-pulse space-y-4">
-      <div className="h-20 bg-[#abd1c6]/10 rounded-lg"></div>
-    </div>
-  </div>
-);
-
 // Динамические импорты
 export const ProfileHeaderCard = dynamicComponent(
   () => import("@/components/profile/ProfileHeaderCard"),
@@ -147,14 +138,6 @@ export const ProfileRecentActivity = dynamicComponent(
   () => import("@/components/profile/sections/ProfileRecentActivity"),
   {
     loading: ProfileRecentActivityLoading,
-    ssr: false,
-  },
-);
-
-export const MotivationalCard = dynamicComponent(
-  () => import("@/components/profile/sections/MotivationalCard"),
-  {
-    loading: MotivationalCardLoading,
     ssr: false,
   },
 );

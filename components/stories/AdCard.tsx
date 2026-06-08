@@ -102,12 +102,11 @@ export function AdCard({ index }: AdCardProps) {
       onClick={() => router.push("/stories/ad")}
     >
       <div
-        className="bg-gradient-to-br from-[#004643]/95 to-[#001e1d]/95 backdrop-blur-xl rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 border border-[#f9bc60]/40 hover:-translate-y-2 hover:scale-[1.02] h-full max-w-full overflow-hidden flex flex-col group-hover:border-[#f9bc60]/60 cursor-pointer"
+        className="relative rounded-2xl p-5 h-full max-w-full overflow-hidden flex flex-col cursor-pointer border border-[#f9bc60]/30 backdrop-blur-xl transition-all duration-400 hover:-translate-y-1.5 hover:border-[#f9bc60]/50 group-hover:shadow-[0_16px_40px_-12px_rgba(249,188,96,0.3)]"
         style={{
           background:
-            "linear-gradient(135deg, rgba(0,70,67,0.95) 0%, rgba(0,30,29,0.95) 50%, rgba(249,188,96,0.1) 100%)",
-          boxShadow:
-            "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1)",
+            "linear-gradient(160deg, rgba(249,188,96,0.14) 0%, rgba(255,255,255,0.06) 40%, rgba(0,30,29,0.45) 100%)",
+          boxShadow: "0 12px 36px -14px rgba(0,0,0,0.5)",
         }}
       >
         {/* Рекламная метка */}
@@ -163,7 +162,7 @@ export function AdCard({ index }: AdCardProps) {
         {/* Контент */}
         <div className="flex flex-col flex-1 min-w-0">
           {/* Заголовок */}
-          <h3 className="text-xl font-bold transition-all duration-300 line-clamp-2 break-words overflow-hidden mb-3 h-16 group-hover:text-[#f9bc60] group-hover:scale-[1.02] text-[#fffffe]">
+          <h3 className="text-lg font-bold transition-colors duration-300 line-clamp-2 break-words overflow-hidden mb-3 group-hover:text-[#f9bc60] text-[#fffffe]">
             {cardTitle}
           </h3>
 
@@ -173,7 +172,7 @@ export function AdCard({ index }: AdCardProps) {
           </p>
 
           {/* Метаданные */}
-          <div className="bg-gradient-to-r from-[#abd1c6]/80 to-[#94c4b8]/70 rounded-2xl p-3 border-2 border-[#abd1c6]/60 shadow-lg flex-shrink-0 transition-all duration-300 group-hover:shadow-xl group-hover:border-[#f9bc60]/40 group-hover:bg-gradient-to-r group-hover:from-[#abd1c6]/90 group-hover:to-[#94c4b8]/80">
+          <div className="rounded-xl p-3 border border-white/12 bg-white/[0.06] backdrop-blur-sm flex-shrink-0 transition-colors group-hover:border-[#f9bc60]/30">
             <div className="flex items-center justify-between text-xs">
               {!hasActiveAd && (
                 <div className="flex items-center gap-2">

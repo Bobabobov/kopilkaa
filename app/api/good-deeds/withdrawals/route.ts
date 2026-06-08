@@ -9,6 +9,7 @@ import {
   MIN_WITHDRAWAL_BONUSES,
 } from "@/lib/goodDeeds";
 import { digitsFingerprint } from "@/lib/admin/requisitesFingerprint";
+import { BONUS_WITHDRAWAL_BLOCKED_MESSAGE } from "@/lib/admin/bonusWithdrawalBlock";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +61,13 @@ export async function POST(req: NextRequest) {
     }
 
     const wallet = await computeGoodDeedBonusWallet(session.uid);
+
+    if (wallet.withdrawalBlocked) {
+      return NextResponse.json(
+        { error: BONUS_WITHDRAWAL_BLOCKED_MESSAGE },
+        { status: 403 },
+      );
+    }
 
     if (wallet.hasPendingWithdrawal) {
       return NextResponse.json(

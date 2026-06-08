@@ -3,6 +3,10 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import {
+  createEmptyStoryReactionCounts,
+  type StoryReactionType,
+} from "@/lib/stories/reactions";
 
 export const dynamic = "force-dynamic";
 
@@ -48,19 +52,48 @@ export async function GET(
       },
     });
 
-    // Проверяем, какие истории лайкнул текущий пользователь
-    let likedSet: Set<string> | null = null;
+    const storyIds = stories.map((story) => story.id);
+    const reactionCountsByStory = new Map<
+      string,
+      Record<StoryReactionType, number>
+    >();
+
+    if (storyIds.length) {
+      const reactionGroups = await prisma.storyLike
+        .groupBy({
+          by: ["applicationId", "type"],
+          where: { applicationId: { in: storyIds } },
+          _count: { _all: true },
+        })
+        .catch(() => []);
+
+      for (const group of reactionGroups) {
+        const current =
+          reactionCountsByStory.get(group.applicationId) ||
+          createEmptyStoryReactionCounts();
+        current[group.type as StoryReactionType] = group._count._all;
+        reactionCountsByStory.set(group.applicationId, current);
+      }
+    }
+
+    // Проверяем, какие реакции оставил текущий пользователь
+    let userReactionByStory: Map<string, StoryReactionType> | null = null;
     if (viewerId && stories.length) {
-      const likes = await prisma.storyLike
+      const reactions = await prisma.storyLike
         .findMany({
           where: {
             userId: viewerId,
-            applicationId: { in: stories.map((s) => s.id) },
+            applicationId: { in: storyIds },
           },
-          select: { applicationId: true },
+          select: { applicationId: true, type: true },
         })
         .catch(() => []);
-      likedSet = new Set(likes.map((l) => l.applicationId));
+      userReactionByStory = new Map(
+        reactions.map((reaction) => [
+          reaction.applicationId,
+          reaction.type as StoryReactionType,
+        ]),
+      );
     }
 
     // Санитизируем email
@@ -69,7 +102,12 @@ export async function GET(
       user: story.user
         ? sanitizeEmailForViewer(story.user, viewerId || "")
         : story.user,
-      userLiked: likedSet ? likedSet.has(story.id) : false,
+      reactionCounts:
+        reactionCountsByStory.get(story.id) || createEmptyStoryReactionCounts(),
+      userLiked: userReactionByStory
+        ? userReactionByStory.has(story.id)
+        : false,
+      userReaction: userReactionByStory?.get(story.id) ?? null,
     }));
 
     return NextResponse.json({ stories: safeStories });

@@ -7,6 +7,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatRelativeDate } from "@/lib/time";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import {
+  STORY_REACTION_TYPES,
+  type StoryReactionCounts,
+} from "@/lib/stories/reactions";
+import { StoryReactionIcon } from "@/components/stories/StoryReactionIcon";
 
 type StoryData = {
   id: string;
@@ -15,6 +20,7 @@ type StoryData = {
   createdAt: string;
   images: { url: string; sort: number }[];
   _count: { likes: number };
+  reactionCounts?: StoryReactionCounts;
 };
 
 interface ProfileStoriesSectionProps {
@@ -207,7 +213,16 @@ export default function ProfileStoriesSection({
                         <>
                           <span>•</span>
                           <div className="flex items-center gap-1">
-                            <LucideIcons.Heart className="w-3 h-3" />
+                            {STORY_REACTION_TYPES.filter(
+                              (type) => (story.reactionCounts?.[type] ?? 0) > 0,
+                            ).map((type) => (
+                              <StoryReactionIcon
+                                key={type}
+                                type={type}
+                                size="xs"
+                                className="shrink-0"
+                              />
+                            ))}
                             <span>{story._count.likes}</span>
                           </div>
                         </>

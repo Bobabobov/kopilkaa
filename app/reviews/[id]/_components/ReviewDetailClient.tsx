@@ -169,6 +169,7 @@ export default function ReviewDetailClient({
               prev < review.images.length - 1 ? prev + 1 : 0,
             );
           }}
+          onSelectIndex={setLightboxIndex}
         />
       )}
     </main>

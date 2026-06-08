@@ -11,6 +11,7 @@ import AuthModalRoot from "@/components/auth/AuthModalRoot";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import ApplicationStatusModalGate from "@/components/notifications/ApplicationStatusModalGate";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import KopiExperience from "@/components/kopi/KopiExperience";
 import { shouldShowMobileBottomNav } from "@/lib/navigation/mobileBottomNav";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
       <Footer />
       <MobileBottomNav />
       <ScrollToTop />
+      <KopiExperience />
       <Suspense fallback={null}>
         <AuthModalRoot />
       </Suspense>

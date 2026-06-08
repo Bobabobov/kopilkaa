@@ -18,17 +18,46 @@ export async function getAllowedAdminUser(): Promise<AllowedAdminUser | null> {
   const session = await getSession();
   if (!session?.uid) return null;
 
-  const allowedEmails = getAllowedEmails();
-  if (!allowedEmails.length) return null;
-
   const user = await prisma.user.findUnique({
     where: { id: session.uid },
-    select: { id: true, email: true },
+    select: { id: true, email: true, role: true },
   });
 
-  if (!user?.email) return null;
+  if (!user) return null;
 
-  if (!allowedEmails.includes(user.email.toLowerCase())) return null;
+  const isAdmin = await isUserAllowedAdmin(user.id, session.role, user);
+  if (!isAdmin) return null;
 
-  return { id: user.id, email: user.email };
+  return { id: user.id, email: user.email ?? "" };
+}
+
+type AdminUserSnapshot = {
+  email: string | null;
+  role: string;
+};
+
+/**
+ * Админ: роль ADMIN в сессии/БД или email из ADMIN_EMAILS (как доступ к /admin).
+ */
+export async function isUserAllowedAdmin(
+  userId: string,
+  sessionRole?: string | null,
+  cachedUser?: AdminUserSnapshot | null,
+): Promise<boolean> {
+  if (sessionRole === "ADMIN") return true;
+
+  const user =
+    cachedUser ??
+    (await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, role: true },
+    }));
+
+  if (!user) return false;
+  if (user.role === "ADMIN") return true;
+
+  const allowedEmails = getAllowedEmails();
+  if (!allowedEmails.length || !user.email) return false;
+
+  return allowedEmails.includes(user.email.toLowerCase());
 }

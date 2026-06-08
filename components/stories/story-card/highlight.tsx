@@ -24,7 +24,7 @@ export function renderHighlightedText(text: string, query: string) {
     idx % 2 === 1 ? (
       <mark
         key={`${part}-${idx}`}
-        className="bg-[#f9bc60]/35 text-[#001e1d] px-1 rounded-sm"
+        className="bg-[#f9bc60]/30 text-[#fffffe] px-1 rounded-sm"
       >
         {part}
       </mark>

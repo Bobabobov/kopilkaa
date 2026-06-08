@@ -4,12 +4,60 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { publicStoryWhereById } from "@/lib/stories/publicStoryWhere";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import {
+  isStoryReactionType,
+  normalizeStoryReactionCounts,
+  type StoryReactionType,
+} from "@/lib/stories/reactions";
 
 function isValidStoryId(id: string) {
   return /^[a-zA-Z0-9_-]+$/.test(id);
 }
 
 export const dynamic = "force-dynamic";
+
+const noCacheHeaders = {
+  "Cache-Control": "no-cache, no-store, must-revalidate",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
+async function getReactionSummary(storyId: string, userId: string) {
+  const [reactionGroups, userReaction] = await Promise.all([
+    prisma.storyLike.groupBy({
+      by: ["type"],
+      where: { applicationId: storyId },
+      _count: { _all: true },
+    }),
+    prisma.storyLike.findUnique({
+      where: {
+        userId_applicationId: {
+          userId,
+          applicationId: storyId,
+        },
+      },
+      select: { type: true },
+    }),
+  ]);
+
+  const reactionCounts = normalizeStoryReactionCounts(
+    reactionGroups.map((group) => ({
+      type: group.type as StoryReactionType,
+      count: group._count._all,
+    })),
+  );
+  const count = Object.values(reactionCounts).reduce(
+    (sum, value) => sum + value,
+    0,
+  );
+
+  return {
+    count,
+    userLiked: Boolean(userReaction),
+    userReaction: (userReaction?.type as StoryReactionType | undefined) ?? null,
+    reactionCounts,
+  };
+}
 
 export async function POST(
   request: Request,
@@ -41,34 +89,44 @@ export async function POST(
       );
     }
 
-    // Проверяем, не лайкнул ли уже пользователь
-    const existingLike = await prisma.storyLike.findFirst({
-      where: {
-        applicationId: storyId,
-        userId: userId,
-      },
-    });
+    const body = await request.json().catch(() => null);
+    const requestedType =
+      body && typeof body === "object" && "type" in body ? body.type : "HEART";
+    const reactionType = isStoryReactionType(requestedType)
+      ? requestedType
+      : null;
 
-    if (existingLike) {
-      return NextResponse.json({ error: "Уже лайкнуто" }, { status: 400 });
+    if (!reactionType) {
+      return NextResponse.json(
+        { error: "Некорректный тип реакции" },
+        { status: 400 },
+      );
     }
 
-    // Создаем лайк
-    await prisma.storyLike.create({
-      data: {
+    await prisma.storyLike.upsert({
+      where: {
+        userId_applicationId: {
+          userId,
+          applicationId: storyId,
+        },
+      },
+      create: {
         applicationId: storyId,
-        userId: userId,
+        userId,
+        type: reactionType,
+      },
+      update: {
+        type: reactionType,
       },
     });
 
     return NextResponse.json(
-      { message: "Лайк добавлен" },
       {
-        headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
+        message: "Реакция сохранена",
+        ...(await getReactionSummary(storyId, userId)),
+      },
+      {
+        headers: noCacheHeaders,
       },
     );
   } catch (error) {
@@ -107,13 +165,12 @@ export async function DELETE(
     }
 
     return NextResponse.json(
-      { message: "Лайк удален" },
       {
-        headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
+        message: "Реакция удалена",
+        ...(await getReactionSummary(storyId, userId)),
+      },
+      {
+        headers: noCacheHeaders,
       },
     );
   } catch (error) {

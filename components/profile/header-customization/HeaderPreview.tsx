@@ -1,5 +1,7 @@
 "use client";
 
+import { buildUploadUrl } from "@/lib/uploads/url";
+
 interface HeaderPreviewProps {
   selectedThemeConfig: {
     background: string;
@@ -11,38 +13,51 @@ interface HeaderPreviewProps {
   };
   themeName: string;
   selectedColor: string | null;
+  headerCover?: string | null;
 }
 
 export function HeaderPreview({
   selectedThemeConfig,
   themeName,
   selectedColor,
+  headerCover,
 }: HeaderPreviewProps) {
+  const coverPreviewUrl = headerCover ? buildUploadUrl(headerCover) : null;
+
+  const previewStyle = coverPreviewUrl
+    ? {
+        backgroundImage: `url(${coverPreviewUrl})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
+      }
+    : selectedThemeConfig.background === "image"
+      ? {
+          backgroundImage: `url(${(selectedThemeConfig as { image?: string }).image})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+          backgroundRepeat: "no-repeat",
+        }
+      : selectedThemeConfig.background === "gradient"
+        ? {
+            backgroundImage: (selectedThemeConfig as { gradient?: string })
+              .gradient,
+          }
+        : selectedThemeConfig.background === "color"
+          ? {
+              background:
+                (selectedThemeConfig as { color?: string }).color || "#004643",
+            }
+          : {
+              background: "linear-gradient(135deg,#1fe0ba,#0a4c43)",
+            };
+
   return (
     <div className="rounded-2xl border border-[#abd1c6]/20 bg-[#001e1d]/60 overflow-hidden shadow-lg">
-      <div
-        className="h-36 sm:h-40 w-full relative"
-        style={
-          selectedThemeConfig.background === "image"
-            ? {
-                backgroundImage: `url(${(selectedThemeConfig as any).image})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center center",
-                backgroundRepeat: "no-repeat",
-              }
-            : selectedThemeConfig.background === "gradient"
-              ? { backgroundImage: (selectedThemeConfig as any).gradient }
-              : selectedThemeConfig.background === "color"
-                ? {
-                    background:
-                      (selectedThemeConfig as any).color || "#004643",
-                  }
-                : {
-                    background: "linear-gradient(135deg,#1fe0ba,#0a4c43)",
-                  }
-        }
-      >
-        <div className="absolute inset-0 bg-black/12" />
+      <div className="relative h-36 w-full sm:h-40" style={previewStyle}>
+        {selectedThemeConfig.background !== "color" && !coverPreviewUrl && (
+          <div className="absolute inset-0 bg-black/12" />
+        )}
         <div className="absolute inset-0 px-6 sm:px-8 py-5 flex items-center justify-between">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 text-xs font-semibold text-white">
@@ -57,8 +72,12 @@ export function HeaderPreview({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-semibold text-white">
-              {selectedColor ? "Своя палитра" : themeName}
+            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white">
+              {coverPreviewUrl
+                ? "Своя обложка"
+                : selectedColor
+                  ? "Своя палитра"
+                  : themeName}
             </span>
           </div>
         </div>

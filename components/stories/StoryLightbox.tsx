@@ -1,10 +1,11 @@
-// components/stories/StoryLightbox.tsx
 "use client";
-import { useEffect, useRef, useState } from "react";
+
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
+import { buildUploadUrl } from "@/lib/uploads/url";
+import { cn } from "@/lib/utils";
 
 interface StoryLightboxProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface StoryLightboxProps {
   onClose: () => void;
   onPrevious: () => void;
   onNext: () => void;
+  onSelectIndex?: (index: number) => void;
 }
 
 export function StoryLightbox({
@@ -22,32 +24,89 @@ export function StoryLightbox({
   onClose,
   onPrevious,
   onNext,
+  onSelectIndex,
 }: StoryLightboxProps) {
-  const touchStartXRef = useRef<number | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const scrollLockRef = useRef<number | null>(null);
   const [failedUrls, setFailedUrls] = useState<Record<string, boolean>>({});
+  const [mounted, setMounted] = useState(false);
+
+  const onCloseRef = useRef(onClose);
+  const onPreviousRef = useRef(onPrevious);
+  const onNextRef = useRef(onNext);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft") onPrevious();
-      if (e.key === "ArrowRight") onNext();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    onCloseRef.current = onClose;
+    onPreviousRef.current = onPrevious;
+    onNextRef.current = onNext;
   }, [onClose, onPrevious, onNext]);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const scrollY = window.scrollY;
+    scrollLockRef.current = scrollY;
+
+    const prevOverflow = document.body.style.overflow;
+    const prevPosition = document.body.style.position;
+    const prevTop = document.body.style.top;
+    const prevWidth = document.body.style.width;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        onPreviousRef.current();
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        onNextRef.current();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown, true);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown, true);
+      document.body.style.overflow = prevOverflow;
+      document.body.style.position = prevPosition;
+      document.body.style.top = prevTop;
+      document.body.style.width = prevWidth;
+
+      if (scrollLockRef.current !== null) {
+        window.scrollTo(0, scrollLockRef.current);
+        scrollLockRef.current = null;
+      }
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     if (!isOpen || images.length === 0) return;
+
     const preload = (url?: string) => {
       if (!url) return;
       const img = new window.Image();
       img.src = url;
     };
+
     const current = images[currentIndex]?.url
       ? buildUploadUrl(images[currentIndex].url, { variant: "full" })
       : undefined;
-    const prev = images[(currentIndex - 1 + images.length) % images.length]
-      ?.url
+    const prev = images[(currentIndex - 1 + images.length) % images.length]?.url
       ? buildUploadUrl(
           images[(currentIndex - 1 + images.length) % images.length].url,
           { variant: "full" },
@@ -58,158 +117,215 @@ export function StoryLightbox({
           variant: "full",
         })
       : undefined;
+
     preload(current);
     preload(prev);
     preload(next);
   }, [isOpen, images, currentIndex]);
 
-  if (!isOpen || images.length === 0) return null;
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }, []);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartXRef.current = e.touches[0]?.clientX ?? null;
-  };
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const start = touchStartRef.current;
+    const touch = e.changedTouches[0];
+    touchStartRef.current = null;
+    if (!start || !touch) return;
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartXRef.current === null) return;
-    const endX = e.changedTouches[0]?.clientX ?? null;
-    if (endX === null) return;
-    const delta = endX - touchStartXRef.current;
-    const threshold = 50;
-    if (Math.abs(delta) < threshold) return;
-    if (delta > 0) {
-      onPrevious();
-    } else {
-      onNext();
-    }
-  };
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
 
-  const fullUrl = buildUploadUrl(images[currentIndex].url, { variant: "full" });
-  const shouldBypassOptimization =
-    isUploadUrl(fullUrl) || isExternalUrl(fullUrl);
+    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+    e.preventDefault();
+    if (deltaX > 0) onPreviousRef.current();
+    else onNextRef.current();
+  }, []);
+
+  if (!mounted) return null;
+
+  const fullUrl = images[currentIndex]
+    ? buildUploadUrl(images[currentIndex].url, { variant: "full" })
+    : "";
   const isFailed = failedUrls[fullUrl];
+  const hasMultiple = images.length > 1;
 
-  const content = (
-    <div
-      className="fixed inset-0 z-[999] bg-black flex items-center justify-center overflow-hidden min-h-screen"
-      style={{
-        minHeight: "100dvh",
-        paddingTop: "env(safe-area-inset-top)",
-        paddingRight: "env(safe-area-inset-right)",
-        paddingBottom: "env(safe-area-inset-bottom)",
-        paddingLeft: "env(safe-area-inset-left)",
-      }}
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Просмотр изображений"
-    >
-      <div
-        className="relative w-full h-full flex items-center justify-center min-h-0"
-        onClick={(e) => e.stopPropagation()}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        {/* Кнопка закрытия — всегда видна, safe area, крупный тап */}
-        <button
-          type="button"
-          className="absolute z-[30] p-3 sm:p-3.5 rounded-full bg-black/60 hover:bg-black/80 text-white border border-white/20 shadow-lg min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && images.length > 0 && (
+        <motion.div
+          key="story-lightbox"
+          className="fixed inset-0 z-[9999]"
           style={{
-            top: "max(0.5rem, env(safe-area-inset-top, 0px))",
-            right: "max(0.5rem, env(safe-area-inset-right, 0px))",
+            paddingTop: "env(safe-area-inset-top)",
+            paddingRight: "env(safe-area-inset-right)",
+            paddingBottom: "env(safe-area-inset-bottom)",
+            paddingLeft: "env(safe-area-inset-left)",
           }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          aria-label="Закрыть просмотр"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Просмотр фотографий"
+          onClick={onClose}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
-          <LucideIcons.X size="lg" className="w-6 h-6 sm:w-7 sm:h-7" />
-        </button>
+          <div className="absolute inset-0 bg-[#001e1d]/94 backdrop-blur-md" />
 
-        {/* Навигация: кликабельные зоны по краям */}
-        {images.length > 1 && (
-          <>
-            <button
-              type="button"
-              className="absolute left-0 top-0 h-full w-1/4 sm:w-1/6 cursor-pointer z-10"
-              onClick={(e) => {
-                e.stopPropagation();
-                onPrevious();
-              }}
-              aria-label="Предыдущее изображение"
-            />
-            <button
-              type="button"
-              className="absolute right-0 top-0 h-full w-1/4 sm:w-1/6 cursor-pointer z-10"
-              onClick={(e) => {
-                e.stopPropagation();
-                onNext();
-              }}
-              aria-label="Следующее изображение"
-            />
-          </>
-        )}
-
-        {/* Изображение — родитель с явной высотой для Next/Image fill (Context7/Next.js) */}
-        <div
-          className="relative flex-1 min-w-0 min-h-[50vh] flex items-center justify-center px-2 py-14 sm:py-16"
-          style={{
-            maxHeight: "calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 4rem)",
-          }}
-        >
-          <div className="relative w-full h-full min-h-[40vh] max-w-6xl max-h-full">
-            {isFailed ? (
-              <div className="flex h-full min-h-[200px] w-full flex-col items-center justify-center gap-3 text-white/80">
-                <LucideIcons.Image size="lg" />
-                Изображение недоступно
-              </div>
-            ) : (
-              <Image
-                src={fullUrl}
-                alt={`Фото ${currentIndex + 1}`}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1200px) 95vw, 1400px"
-                className="object-contain pointer-events-none select-none"
-                draggable={false}
-                unoptimized={shouldBypassOptimization}
-                onError={() =>
-                  setFailedUrls((prev) => ({ ...prev, [fullUrl]: true }))
-                }
-              />
+          <button
+            type="button"
+            className={cn(
+              "fixed z-[10002] inline-flex items-center gap-2 rounded-full",
+              "bg-[#fffffe] text-[#001e1d] shadow-[0_8px_28px_rgba(0,0,0,0.45)]",
+              "px-4 py-2.5 text-sm font-bold",
+              "transition-transform active:scale-95",
             )}
-          </div>
-        </div>
-
-        {/* Визуальные стрелки (без клика) */}
-        {images.length > 1 && (
-          <>
-            <div className="pointer-events-none absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-black/50 text-white z-10">
-              <LucideIcons.ChevronLeft size="lg" />
-            </div>
-            <div className="pointer-events-none absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-black/50 text-white z-10">
-              <LucideIcons.ChevronRight size="lg" />
-            </div>
-          </>
-        )}
-
-        {/* Счетчик изображений — с учётом safe area снизу */}
-        {images.length > 1 && (
-          <div
-            className="absolute left-0 right-0 text-center z-10"
             style={{
-              bottom: "max(0.75rem, env(safe-area-inset-bottom))",
+              top: "max(0.75rem, env(safe-area-inset-top, 0px))",
+              right: "max(0.75rem, env(safe-area-inset-right, 0px))",
             }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            aria-label="Закрыть просмотр"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm">
-              <LucideIcons.Image size="sm" />
-              {currentIndex + 1} из {images.length}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+            <LucideIcons.X size="sm" />
+            <span>Закрыть</span>
+          </button>
 
-  if (typeof document === "undefined") return null;
-  return createPortal(content, document.body);
+          <div className="pointer-events-none relative z-[10001] flex h-full min-h-0 flex-col">
+            <div
+              className="pointer-events-auto shrink-0 px-4 py-3 sm:px-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3.5 py-1.5 text-sm font-medium text-[#fffffe] backdrop-blur-sm">
+                <LucideIcons.Image size="sm" className="text-[#f9bc60]" />
+                {currentIndex + 1} / {images.length}
+              </div>
+            </div>
+
+            <div className="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-4">
+              {hasMultiple && (
+                <button
+                  type="button"
+                  className="pointer-events-auto absolute left-1 sm:left-3 z-10 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/50 text-[#fffffe] backdrop-blur-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPrevious();
+                  }}
+                  aria-label="Предыдущее фото"
+                >
+                  <LucideIcons.ChevronLeft size="lg" />
+                </button>
+              )}
+
+              <motion.div
+                key={currentIndex}
+                className="pointer-events-auto flex max-h-full w-full max-w-5xl items-center justify-center px-10 sm:px-14"
+                initial={{ opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {isFailed ? (
+                  <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-8 py-12 text-[#abd1c6]">
+                    <LucideIcons.Image size="lg" />
+                    Изображение недоступно
+                  </div>
+                ) : (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={fullUrl}
+                    alt={`Фото ${currentIndex + 1}`}
+                    className="max-h-[calc(100dvh-11rem)] w-auto max-w-full rounded-xl object-contain shadow-[0_24px_64px_-20px_rgba(0,0,0,0.65)]"
+                    draggable={false}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClose();
+                    }}
+                    onError={() =>
+                      setFailedUrls((prev) => ({ ...prev, [fullUrl]: true }))
+                    }
+                  />
+                )}
+              </motion.div>
+
+              {hasMultiple && (
+                <button
+                  type="button"
+                  className="pointer-events-auto absolute right-1 sm:right-3 z-10 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/50 text-[#fffffe] backdrop-blur-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onNext();
+                  }}
+                  aria-label="Следующее фото"
+                >
+                  <LucideIcons.ChevronRight size="lg" />
+                </button>
+              )}
+            </div>
+
+            {hasMultiple && onSelectIndex && (
+              <div
+                className="pointer-events-auto shrink-0 border-t border-white/[0.08] bg-black/35 px-4 py-3 sm:px-6 backdrop-blur-sm"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="mx-auto flex max-w-3xl gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
+                  {images.map((image, index) => {
+                    const thumbUrl = buildUploadUrl(image.url, {
+                      variant: "thumb",
+                    });
+                    const isActive = index === currentIndex;
+
+                    return (
+                      <button
+                        key={`${image.url}-${index}`}
+                        type="button"
+                        onClick={() => onSelectIndex(index)}
+                        className={cn(
+                          "relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-all",
+                          isActive
+                            ? "border-[#f9bc60] scale-105 shadow-[0_0_0_2px_rgba(249,188,96,0.25)]"
+                            : "border-transparent opacity-70 hover:border-white/30 hover:opacity-100",
+                        )}
+                        aria-label={`Показать фото ${index + 1}`}
+                        aria-current={isActive}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={thumbUrl}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="pointer-events-auto mx-4 mb-4 mt-2 shrink-0 rounded-xl border border-white/15 bg-[#f9bc60] py-3.5 text-sm font-bold text-[#001e1d] sm:hidden"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+            >
+              Закрыть просмотр
+            </button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body,
+  );
 }

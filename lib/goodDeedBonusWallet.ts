@@ -10,12 +10,13 @@ export type GoodDeedBonusWallet = {
   pendingWithdrawalBonuses: number;
   withdrawnBonuses: number;
   hasPendingWithdrawal: boolean;
+  withdrawalBlocked: boolean;
 };
 
 export async function computeGoodDeedBonusWallet(
   userId: string,
 ): Promise<GoodDeedBonusWallet> {
-  const [earnedRow, grantsRow] = await Promise.all([
+  const [earnedRow, grantsRow, userRow] = await Promise.all([
     prisma.goodDeedSubmission.aggregate({
       where: {
         userId,
@@ -26,6 +27,10 @@ export async function computeGoodDeedBonusWallet(
     prisma.goodDeedBonusGrant.aggregate({
       where: { userId },
       _sum: { amountBonuses: true },
+    }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { bonusWithdrawalBlocked: true },
     }),
   ]);
   const totalEarnedBonuses =
@@ -61,5 +66,6 @@ export async function computeGoodDeedBonusWallet(
     pendingWithdrawalBonuses,
     withdrawnBonuses,
     hasPendingWithdrawal: pendingCount > 0,
+    withdrawalBlocked: userRow?.bonusWithdrawalBlocked ?? false,
   };
 }

@@ -4,6 +4,10 @@
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import LikeButton from "./LikeButton";
 import { ShareStoryButton } from "./ShareStoryButton";
+import type {
+  StoryReactionCounts,
+  StoryReactionType,
+} from "@/lib/stories/reactions";
 
 interface StoryMetadataProps {
   story: {
@@ -16,24 +20,26 @@ interface StoryMetadataProps {
   };
   liked: boolean;
   likesCount: number;
-  onLike: () => void;
+  selectedReaction?: StoryReactionType | null;
+  reactionCounts?: StoryReactionCounts;
+  onLike: (type?: StoryReactionType) => void;
   isAuthenticated?: boolean | null;
   isAd?: boolean;
   storyId?: string;
   storyTitle?: string;
-  isLiking?: boolean;
 }
 
 export default function StoryMetadata({
   story,
   liked,
   likesCount,
+  selectedReaction,
+  reactionCounts,
   onLike,
   isAuthenticated,
   isAd = false,
   storyId,
   storyTitle,
-  isLiking = false,
 }: StoryMetadataProps) {
   const readTime = Math.max(1, Math.ceil((story.story?.length || 0) / 200));
 
@@ -48,15 +54,14 @@ export default function StoryMetadata({
         <LikeButton
           liked={liked}
           likesCount={likesCount}
-          onLike={onLike}
+          selectedReaction={selectedReaction}
+          reactionCounts={reactionCounts}
+          onLike={(_, type) => onLike(type)}
           isAuthenticated={isAuthenticated}
-          isLiking={isLiking}
         />
       )}
 
-      {storyId && (
-        <ShareStoryButton storyId={storyId} title={storyTitle} />
-      )}
+      {storyId && <ShareStoryButton storyId={storyId} title={storyTitle} />}
     </div>
   );
 }

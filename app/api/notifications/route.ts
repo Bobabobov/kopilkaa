@@ -4,6 +4,14 @@ import { prisma } from "@/lib/db";
 import { formatTimeAgo } from "@/lib/time";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { NextResponse } from "next/server";
+import {
+  fetchStoryCommentNotifications,
+  fetchStoryCommentReplyNotifications,
+} from "@/lib/notifications/storyCommentNotifications";
+import {
+  STORY_REACTION_META,
+  type StoryReactionType,
+} from "@/lib/stories/reactions";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +37,13 @@ export async function GET(request: Request) {
       withdrawalId?: string;
       goodDeedSubmissionId?: string;
       requesterId?: string;
+      storyCommentId?: string;
       adminComment?: string | null;
       status?: string;
     };
     const notifications: NotificationItem[] = [];
 
-    // Получаем новые лайки (последние 20 для группировки) с обработкой ошибок
+    // Получаем новые реакции на истории (последние 20 для группировки) с обработкой ошибок
     const recentLikes = await prisma.storyLike
       .findMany({
         where: {
@@ -64,7 +73,7 @@ export async function GET(request: Request) {
       })
       .catch(() => []);
 
-    // Группируем лайки по пользователю и истории (только последний лайк от каждого)
+    // Группируем реакции по пользователю и истории (только последняя реакция от каждого)
     const groupedLikes = new Map();
     recentLikes.forEach((like) => {
       const key = `${like.userId}_${like.applicationId}`;
@@ -76,7 +85,7 @@ export async function GET(request: Request) {
       }
     });
 
-    // Добавляем только уникальные лайки как уведомления (берем последние 10)
+    // Добавляем только уникальные реакции как уведомления (берем последние 10)
     Array.from(groupedLikes.values())
       .sort(
         (a, b) =>
@@ -88,12 +97,15 @@ export async function GET(request: Request) {
         const safeName =
           safeUser.name ||
           (safeUser.email ? safeUser.email.split("@")[0] : "Пользователь");
+        const reactionMeta =
+          STORY_REACTION_META[like.type as StoryReactionType] ||
+          STORY_REACTION_META.HEART;
 
         notifications.push({
           id: `like_${like.userId}_${like.applicationId}`,
           type: "like",
-          title: "Новый лайк",
-          message: `${safeName} лайкнул вашу историю "${like.application.title}"`,
+          title: "Новая реакция",
+          message: `${safeName} оставил реакцию «${reactionMeta.label}» на вашу историю «${like.application.title}»`,
           avatar: safeUser.avatar,
           createdAt: like.createdAt,
           timestamp: formatTimeAgo(new Date(like.createdAt)),
@@ -101,6 +113,16 @@ export async function GET(request: Request) {
           applicationId: like.applicationId,
         });
       });
+
+    const [storyCommentNotifications, storyCommentReplyNotifications] =
+      await Promise.all([
+        fetchStoryCommentNotifications(userId, 10),
+        fetchStoryCommentReplyNotifications(userId, 10),
+      ]);
+    notifications.push(
+      ...storyCommentNotifications,
+      ...storyCommentReplyNotifications,
+    );
 
     // Получаем входящие заявки в друзья
     const pendingFriendRequests = await prisma.friendship
@@ -298,7 +320,9 @@ export async function GET(request: Request) {
       notifications.push({
         id: `good_deed_${submission.id}_${submission.status}`,
         type: "good_deed_submission_status",
-        title: isApproved ? "Доброе дело подтверждено" : "Доброе дело отклонено",
+        title: isApproved
+          ? "Доброе дело подтверждено"
+          : "Доброе дело отклонено",
         message: isApproved
           ? `✅ Ваш отчёт по заданию "${submission.taskTitle}" подтвержден.`
           : `❌ Ваш отчёт по заданию "${submission.taskTitle}" отклонен.`,

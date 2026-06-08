@@ -7,8 +7,12 @@ export async function loadUserApi(): Promise<{
   user: SettingsUser | null;
 }> {
   const response = await fetch("/api/profile/me", { cache: "no-store" });
-  if (!response.ok) throw new Error("Failed to load user data");
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(
+      getMessageFromApiJson(data, "Не удалось загрузить данные профиля"),
+    );
+  }
   return { user: data.user ?? null };
 }
 
@@ -81,12 +85,6 @@ export async function patchPasswordApi(
       getMessageFromApiJson(data, "Ошибка изменения пароля"),
     );
   }
-}
-
-export async function fetchExportBlob(): Promise<Blob> {
-  const response = await fetch("/api/profile/export");
-  if (!response.ok) throw new Error("Не удалось экспортировать данные");
-  return response.blob();
 }
 
 export async function deleteAccountApi(): Promise<void> {

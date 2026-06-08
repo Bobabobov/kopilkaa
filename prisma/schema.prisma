@@ -15,14 +15,18 @@ enum ApplicationStatus {
   CONTEST
 }
 
-/** Категория запрашиваемой помощи (шаг формы и требования к фото) */
+/**
+ * Категория запрашиваемой помощи (шаг формы и требования к фото)
+ */
 enum ApplicationCategory {
   FOOD_DRINKS
   HOUSEHOLD_ESSENTIALS
   TRANSPORT_COMMS
   SMALL_GIFT
   EVERYDAY_SUPPORT
-  /** Значение из старых БД; в форме не используется, нужно для чтения заявок */
+  /**
+   * Значение из старых БД; в форме не используется, нужно для чтения заявок
+   */
   GAME_OR_SERVICE
 }
 
@@ -38,77 +42,87 @@ enum GoodDeedMediaType {
 }
 
 model User {
-  id                  String    @id @default(cuid())
-  email               String?   @unique
-  username            String?   @unique
-  passwordHash        String
-  name                String?
-  avatar              String?
-  avatarUpdatedAt     DateTime?
-  phone               String?   @unique
-  phoneVerified       Boolean   @default(false)
-  /** Подтверждение владения email (регистрация по паролю); OAuth/Telegram выставляют true при создании. */
-  emailVerified       Boolean   @default(false)
-  telegramId          String?   @unique
-  telegramUsername    String?
-  googleId            String?   @unique
-  googleEmail         String?
-  vkLink              String?
-  telegramLink        String?
-  youtubeLink         String?
-  referralCode       String?   @unique // уникальный код для реферальной программы
-  headerTheme         String?   @default("default")
+  id                   String    @id @default(cuid())
+  email                String?   @unique
+  username             String?   @unique
+  passwordHash         String
+  name                 String?
+  avatar               String?
+  avatarUpdatedAt      DateTime?
+  phone                String?   @unique
+  phoneVerified        Boolean   @default(false)
+  /**
+   * Подтверждение владения email (регистрация по паролю); OAuth/Telegram выставляют true при создании.
+   */
+  emailVerified        Boolean   @default(false)
+  telegramId           String?   @unique
+  telegramUsername     String?
+  googleId             String?   @unique
+  googleEmail          String?
+  vkLink               String?
+  telegramLink         String?
+  youtubeLink          String?
+  referralCode         String?   @unique // уникальный код для реферальной программы
+  headerTheme          String?   @default("default")
   headerThemeUpdatedAt DateTime?
-  headerDominantColor String? // Доминантный цвет из обложки
-  avatarFrame         String?   @default("none")
-  customFrameData     String? // JSON данные пользовательских рамок
+  /// Своя обложка профиля (URL загрузки), видна всем пользователям
+  headerCover          String?
+  headerDominantColor  String? // Доминантный цвет из обложки
+  avatarFrame          String?   @default("none")
+  customFrameData      String? // JSON данные пользовательских рамок
   // Ручной override для уникального HERO_BADGE (используется только для оплат > 5000).
   // Примеры значений: "custom" (или любое непустое значение как флаг).
-  heroBadgeOverride   String?
+  heroBadgeOverride    String?
   // Если true — пользователь скрыт из витрины /heroes (история поддержек не удаляется).
-  hideFromHeroes      Boolean   @default(false)
-  hideEmail           Boolean   @default(true) // Скрывать email в профиле по умолчанию
-  role                String    @default("USER")
-  createdAt           DateTime  @default(now())
-  lastSeen            DateTime  @default(now())
-  lastCommentAt       DateTime? // Время последнего комментария для кулдауна
-  trustDelta          Int       @default(0)
+  hideFromHeroes       Boolean   @default(false)
+  hideEmail            Boolean   @default(true) // Скрывать email в профиле по умолчанию
+  role                 String    @default("USER")
+  createdAt            DateTime  @default(now())
+  lastSeen             DateTime  @default(now())
+  lastCommentAt        DateTime? // Время последнего комментария для кулдауна
+  trustDelta           Int       @default(0)
+  /// Админ может запретить вывод бонусов (заявки на вывод отклоняются на стороне UI).
+  bonusWithdrawalBlocked Boolean   @default(false)
 
-  applications         Application[]
-  userTree             UserTree?
-  referralClicks              ReferralClick[] @relation("ReferralClickReferrer")
-  referralRegistrations       ReferralRegistration[] @relation("ReferralRegistrationReferrer")
-  referralRegistrationsAsReferred ReferralRegistration[] @relation("ReferralRegistrationReferred")
-  friendshipsSent      Friendship[]          @relation("FriendshipRequester")
-  friendshipsReceived  Friendship[]          @relation("FriendshipReceiver")
-  pageVisits           PageVisit[]
-  storyLikes           StoryLike[]
-  donations            Donation[]
-  phoneLoginCodes      PhoneLoginCode[]
-  emailVerificationTokens EmailVerificationToken[]
-  projectNewsPosts     ProjectNewsPost[]
-  projectNewsReactions ProjectNewsReaction[]
-  reviews              Review[]
-  goodDeedSubmissions  GoodDeedSubmission[] @relation("GoodDeedAuthor")
-  goodDeedWeekPreferences GoodDeedWeekPreference[]
-  goodDeedWithdrawalRequests GoodDeedWithdrawalRequest[] @relation("GoodDeedWithdrawalRequester")
-  goodDeedBonusGrants  GoodDeedBonusGrant[] @relation("GoodDeedBonusGrantRecipient")
-  reviewedGoodDeeds    GoodDeedSubmission[] @relation("GoodDeedReviewer")
-  reviewedGoodDeedWithdrawals GoodDeedWithdrawalRequest[] @relation("GoodDeedWithdrawalReviewer")
-  grantedGoodDeedBonuses GoodDeedBonusGrant[] @relation("GoodDeedBonusGrantAdmin")
-  isBanned             Boolean               @default(false)
-  bannedUntil          DateTime?
-  bannedReason         String?
-  /** Публичная метка админа: красный бейдж «Обманывал» на всём сайте. */
-  markedAsDeceiver     Boolean               @default(false)
+  applications                    Application[]
+  userTree                        UserTree?
+  referralClicks                  ReferralClick[]             @relation("ReferralClickReferrer")
+  referralRegistrations           ReferralRegistration[]      @relation("ReferralRegistrationReferrer")
+  referralRegistrationsAsReferred ReferralRegistration[]      @relation("ReferralRegistrationReferred")
+  friendshipsSent                 Friendship[]                @relation("FriendshipRequester")
+  friendshipsReceived             Friendship[]                @relation("FriendshipReceiver")
+  pageVisits                      PageVisit[]
+  storyLikes                      StoryLike[]
+  storyComments                   StoryComment[]
+  storyCommentLikes               StoryCommentLike[]
+  donations                       Donation[]
+  phoneLoginCodes                 PhoneLoginCode[]
+  emailVerificationTokens         EmailVerificationToken[]
+  reviews                         Review[]
+  goodDeedSubmissions             GoodDeedSubmission[]        @relation("GoodDeedAuthor")
+  goodDeedWeekPreferences         GoodDeedWeekPreference[]
+  goodDeedWithdrawalRequests      GoodDeedWithdrawalRequest[] @relation("GoodDeedWithdrawalRequester")
+  goodDeedBonusGrants             GoodDeedBonusGrant[]        @relation("GoodDeedBonusGrantRecipient")
+  reviewedGoodDeeds               GoodDeedSubmission[]        @relation("GoodDeedReviewer")
+  reviewedGoodDeedWithdrawals     GoodDeedWithdrawalRequest[] @relation("GoodDeedWithdrawalReviewer")
+  grantedGoodDeedBonuses          GoodDeedBonusGrant[]        @relation("GoodDeedBonusGrantAdmin")
+  dailyBonusState                 DailyBonusState?
+  dailyBonusClaims                DailyBonusClaim[]
+  isBanned                        Boolean                     @default(false)
+  bannedUntil                     DateTime?
+  bannedReason                    String?
+  /**
+   * Публичная метка админа: красный бейдж «Обманывал» на всём сайте.
+   */
+  markedAsDeceiver                Boolean                     @default(false)
 }
 
 // Реферальная программа: фиксируем клики по ссылке и успешную регистрацию по этой ссылке.
 model ReferralClick {
-  id              String   @id @default(cuid())
+  id             String   @id @default(cuid())
   referrerUserId String
-  referrer        User     @relation("ReferralClickReferrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
-  visitorId      String   // идентификатор “посетителя” из cookie
+  referrer       User     @relation("ReferralClickReferrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
+  visitorId      String // идентификатор “посетителя” из cookie
   createdAt      DateTime @default(now())
 
   @@unique([referrerUserId, visitorId])
@@ -117,13 +131,13 @@ model ReferralClick {
 }
 
 model ReferralRegistration {
-  id              String   @id @default(cuid())
+  id             String    @id @default(cuid())
   referrerUserId String
-  referrer        User     @relation("ReferralRegistrationReferrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
-  referredUserId String   @unique
-  referredUser   User     @relation("ReferralRegistrationReferred", fields: [referredUserId], references: [id], onDelete: Cascade)
-  visitorId      String   // тот же visitorId из cookie, чтобы начислять максимум 1 бонус на “человека” с одного устройства
-  createdAt      DateTime @default(now())
+  referrer       User      @relation("ReferralRegistrationReferrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
+  referredUserId String    @unique
+  referredUser   User      @relation("ReferralRegistrationReferred", fields: [referredUserId], references: [id], onDelete: Cascade)
+  visitorId      String // тот же visitorId из cookie, чтобы начислять максимум 1 бонус на “человека” с одного устройства
+  createdAt      DateTime  @default(now())
   bonusGrantedAt DateTime?
 
   @@index([referrerUserId])
@@ -134,31 +148,40 @@ model Application {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  title        String
-  summary      String
-  story        String
-  /** Категория помощи — влияет на подсказки к фото до заявки и к отчёту */
-  category     ApplicationCategory @default(EVERYDAY_SUPPORT)
-  amount       Int               @default(0)
-  payment      String
-  /** Нормализованные цифры из payment (>=10) для поиска связанных аккаунтов по всей базе */
-  paymentFingerprint String?
-  status       ApplicationStatus  @default(PENDING)
-  publishInStories Boolean        @default(false)
-  countTowardsTrust Boolean      @default(false)
-  /** При решении по заявке админ включил «Понизить уровень на 1» */
-  trustDecreasedAtDecision Boolean @default(false)
-  adminComment String?
-  filledMs     Int?
-  /** Время от первого до последнего изменения поля «Подробная история» (мс); для детекции вставки+ожидания */
-  storyEditMs  Int?
-  submitterIp  String?           // IP при подаче заявки (для админки: поиск дублей)
-  clientDevice String?           // Устройство при подаче: desktop/android/ios/other
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  title                    String
+  summary                  String
+  story                    String
+  /**
+   * Категория помощи — влияет на подсказки к фото до заявки и к отчёту
+   */
+  category                 ApplicationCategory @default(EVERYDAY_SUPPORT)
+  amount                   Int                 @default(0)
+  payment                  String
+  /**
+   * Нормализованные цифры из payment (>=10) для поиска связанных аккаунтов по всей базе
+   */
+  paymentFingerprint       String?
+  status                   ApplicationStatus   @default(PENDING)
+  publishInStories         Boolean             @default(false)
+  countTowardsTrust        Boolean             @default(false)
+  /**
+   * При решении по заявке админ включил «Понизить уровень на 1»
+   */
+  trustDecreasedAtDecision Boolean             @default(false)
+  adminComment             String?
+  filledMs                 Int?
+  /**
+   * Время от первого до последнего изменения поля «Подробная история» (мс); для детекции вставки+ожидания
+   */
+  storyEditMs              Int?
+  submitterIp              String? // IP при подаче заявки (для админки: поиск дублей)
+  clientDevice             String? // Устройство при подаче: desktop/android/ios/other
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
 
   images       ApplicationImage[]
   likes        StoryLike[]
+  comments     StoryComment[]
   review       Review?
   reportImages ApplicationReportImage[]
 
@@ -263,7 +286,9 @@ model PhoneLoginCode {
   @@index([expiresAt])
 }
 
-/** Одноразовые токены подтверждения email (в БД хранится только SHA-256 открытого токена). */
+/**
+ * Одноразовые токены подтверждения email (в БД хранится только SHA-256 открытого токена).
+ */
 model EmailVerificationToken {
   id        String   @id @default(cuid())
   userId    String
@@ -290,97 +315,63 @@ model PageVisit {
   @@index([visitDate])
 }
 
-// Модель для лайков историй
+enum StoryReactionType {
+  HEART
+  THUMBS_UP
+  FIRE
+}
+
+// Модель для реакций на истории
 model StoryLike {
-  id            String      @id @default(cuid())
+  id            String            @id @default(cuid())
   userId        String
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   applicationId String
-  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  createdAt     DateTime    @default(now())
+  application   Application       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  type          StoryReactionType @default(HEART)
+  createdAt     DateTime          @default(now())
 
   @@unique([userId, applicationId])
   @@index([userId])
   @@index([applicationId])
-  @@index([createdAt])
-}
-
-enum ProjectNewsMediaType {
-  IMAGE
-  VIDEO
-}
-
-enum ProjectNewsReactionType {
-  LIKE
-  DISLIKE
-}
-
-enum ProjectNewsBadge {
-  UPDATE
-  PLANS
-  THOUGHTS
-  IMPORTANT
-}
-
-// Вспомогательная таблица для enum в SQLite - сохраняем, чтобы Prisma не удаляла её
-// Эта таблица создаётся автоматически для enum ProjectNewsBadge в SQLite и содержит 4 записи
-model ProjectNewsBadgeTable {
-  value String @id
-
-  @@map("ProjectNewsBadge")
-}
-
-model ProjectNewsPost {
-  id       String @id @default(cuid())
-  authorId String
-  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
-
-  title       String?
-  badge       ProjectNewsBadge?
-  content     String
-  isPublished Boolean           @default(true)
-
-  likesCount    Int @default(0)
-  dislikesCount Int @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  media     ProjectNewsMedia[]
-  reactions ProjectNewsReaction[]
-
-  @@index([authorId])
-  @@index([createdAt])
-  @@index([isPublished])
-}
-
-model ProjectNewsMedia {
-  id     String               @id @default(cuid())
-  postId String
-  post   ProjectNewsPost      @relation(fields: [postId], references: [id], onDelete: Cascade)
-  url    String
-  type   ProjectNewsMediaType
-  sort   Int                  @default(0)
-
-  @@index([postId])
-  @@index([sort])
-}
-
-model ProjectNewsReaction {
-  id     String          @id @default(cuid())
-  postId String
-  post   ProjectNewsPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  userId String
-  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  type      ProjectNewsReactionType
-  createdAt DateTime                @default(now())
-  updatedAt DateTime                @updatedAt
-
-  @@unique([postId, userId])
-  @@index([postId])
-  @@index([userId])
   @@index([type])
+  @@index([createdAt])
+}
+
+/// Комментарии к опубликованным историям (/stories/:id)
+model StoryComment {
+  id            String         @id @default(cuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String
+  application   Application    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  parentId      String?
+  parent        StoryComment?  @relation("StoryCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies       StoryComment[] @relation("StoryCommentReplies")
+  content       String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  likes         StoryCommentLike[]
+
+  @@index([applicationId])
+  @@index([userId])
+  @@index([parentId])
+  @@index([createdAt])
+}
+
+/// Лайки комментариев к историям
+model StoryCommentLike {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentId String
+  comment   StoryComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, commentId])
+  @@index([userId])
+  @@index([commentId])
+  @@index([createdAt])
 }
 
 model Advertisement {
@@ -403,14 +394,14 @@ model Advertisement {
 }
 
 model Review {
-  id            String     @id @default(cuid())
+  id            String        @id @default(cuid())
   userId        String
-  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  applicationId String?    @unique // заявка, по которой оставлен отзыв (обязательный отзыв между заявками)
-  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applicationId String?       @unique // заявка, по которой оставлен отзыв (обязательный отзыв между заявками)
+  application   Application?  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
   content       String
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   images        ReviewImage[]
 
   @@index([userId])
@@ -419,22 +410,22 @@ model Review {
 }
 
 model ReviewImage {
-  id       String  @id @default(cuid())
+  id       String @id @default(cuid())
   reviewId String
-  review   Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
   url      String
-  sort     Int     @default(0)
+  sort     Int    @default(0)
 
   @@index([reviewId])
   @@index([sort])
 }
 
 model GoodDeedSubmission {
-  id          String                   @id @default(cuid())
-  userId      String
-  user        User                     @relation("GoodDeedAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  id           String  @id @default(cuid())
+  userId       String
+  user         User    @relation("GoodDeedAuthor", fields: [userId], references: [id], onDelete: Cascade)
   reviewedById String?
-  reviewedBy  User?                    @relation("GoodDeedReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedBy   User?   @relation("GoodDeedReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
 
   taskKey         String
   taskTitle       String
@@ -510,21 +501,23 @@ enum GoodDeedWithdrawalStatus {
 }
 
 model GoodDeedWithdrawalRequest {
-  id            String                   @id @default(cuid())
-  userId        String
-  user          User                     @relation("GoodDeedWithdrawalRequester", fields: [userId], references: [id], onDelete: Cascade)
-  amountBonuses Int
-  bankName      String
-  details       String
-  /** Цифры из реквизитов вывода (>=10) — связь с заявками и другими пользователями */
+  id                 String                   @id @default(cuid())
+  userId             String
+  user               User                     @relation("GoodDeedWithdrawalRequester", fields: [userId], references: [id], onDelete: Cascade)
+  amountBonuses      Int
+  bankName           String
+  details            String
+  /**
+   * Цифры из реквизитов вывода (>=10) — связь с заявками и другими пользователями
+   */
   detailsFingerprint String?
-  status        GoodDeedWithdrawalStatus @default(PENDING)
-  adminComment  String?
-  reviewedAt    DateTime?
-  reviewedById  String?
-  reviewedBy    User?                    @relation("GoodDeedWithdrawalReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
-  createdAt     DateTime                 @default(now())
-  updatedAt     DateTime                 @updatedAt
+  status             GoodDeedWithdrawalStatus @default(PENDING)
+  adminComment       String?
+  reviewedAt         DateTime?
+  reviewedById       String?
+  reviewedBy         User?                    @relation("GoodDeedWithdrawalReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
 
   @@index([userId])
   @@index([status])
@@ -558,6 +551,34 @@ model GoodDeedBonusGrant {
 
   @@index([userId])
   @@index([grantedById])
+  @@index([createdAt])
+}
+
+/// Состояние ежедневного бонуса «Копи любит постоянство» (1 строка на пользователя).
+model DailyBonusState {
+  userId        String    @id
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Текущая серия после последнего успешного получения бонуса.
+  currentStreak Int       @default(0)
+  /// Ключ календарного дня UTC (YYYY-MM-DD) последнего получения.
+  lastClaimDate String?
+  lastClaimAt   DateTime?
+  updatedAt     DateTime  @updatedAt
+}
+
+/// Журнал получений ежедневного бонуса (защита от повторных запросов за сутки).
+model DailyBonusClaim {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  claimDate      String
+  dailyBonus     Int
+  milestoneBonus Int      @default(0)
+  streakAfter    Int
+  createdAt      DateTime @default(now())
+
+  @@unique([userId, claimDate])
+  @@index([userId])
   @@index([createdAt])
 }
 
@@ -596,4 +617,3 @@ model AdRequest {
   @@index([createdAt])
   @@index([email])
 }
-

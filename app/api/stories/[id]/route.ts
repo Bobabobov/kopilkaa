@@ -5,6 +5,10 @@ import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 import { publicStoryWhereById } from "@/lib/stories/publicStoryWhere";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import {
+  normalizeStoryReactionCounts,
+  type StoryReactionType,
+} from "@/lib/stories/reactions";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +22,10 @@ export async function GET(
   try {
     decodedId = decodeURIComponent(id);
   } catch (error) {
-    logRouteCatchError(`[API GET /api/stories/${id}] decodeURIComponent`, error);
+    logRouteCatchError(
+      `[API GET /api/stories/${id}] decodeURIComponent`,
+      error,
+    );
   }
 
   // Валидация ID (не модифицируем входные данные)
@@ -64,16 +71,31 @@ export async function GET(
     return Response.json({ error: "Not found" }, { status: 404 });
   }
 
-  // Проверяем, лайкнул ли текущий пользователь
+  const reactionGroups = await prisma.storyLike.groupBy({
+    by: ["type"],
+    where: { applicationId: finalId },
+    _count: { _all: true },
+  });
+  const reactionCounts = normalizeStoryReactionCounts(
+    reactionGroups.map((group) => ({
+      type: group.type as StoryReactionType,
+      count: group._count._all,
+    })),
+  );
+
+  // Проверяем, какую реакцию поставил текущий пользователь
   let userLiked = false;
+  let userReaction: StoryReactionType | null = null;
   if (session?.uid) {
     const userLike = await prisma.storyLike.findFirst({
       where: {
         applicationId: finalId,
         userId: session.uid,
       },
+      select: { type: true },
     });
     userLiked = !!userLike;
+    userReaction = (userLike?.type as StoryReactionType | undefined) ?? null;
   }
 
   return Response.json(
@@ -85,6 +107,8 @@ export async function GET(
         ? sanitizeEmailForViewer(story.user, session?.uid ?? "")
         : story.user,
       userLiked,
+      userReaction,
+      reactionCounts,
     },
     {
       headers: {

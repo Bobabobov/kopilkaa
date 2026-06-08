@@ -11,6 +11,8 @@ export function getNotificationIcon(
   switch (type) {
     case "like":
       return <LucideIcons.Heart className="text-red-500" size="sm" />;
+    case "story_comment":
+      return <LucideIcons.MessageCircle className="text-[#f9bc60]" size="sm" />;
     case "friend_request":
       return <LucideIcons.UserPlus className="text-[#f9bc60]" size="sm" />;
     case "application_status":

@@ -8,7 +8,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import ProfilePreloadInitializer from "@/components/performance/ProfilePreloadInitializer";
 import BanCheck from "@/components/auth/BanCheck";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
-import CookieConsentBanner from "@/components/layout/CookieConsentBanner";
 import MetrikaSpaTracker from "@/components/analytics/MetrikaSpaTracker";
 import YandexMetrikaCounter from "@/components/analytics/YandexMetrikaCounter";
 import GlobalClickSpark from "@/components/ui/GlobalClickSpark";
@@ -157,7 +156,6 @@ export default function RootLayout({
             <BanCheck>
               <ProtectedLayout>{children}</ProtectedLayout>
             </BanCheck>
-            <CookieConsentBanner />
           </TooltipProvider>
         </BeautifulNotificationsProvider>
       </body>

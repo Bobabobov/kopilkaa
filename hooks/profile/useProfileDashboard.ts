@@ -14,6 +14,7 @@ interface User {
   name?: string | null;
   avatar?: string | null;
   headerTheme?: string | null;
+  headerCover?: string | null;
   avatarFrame?: string | null;
   hideEmail?: boolean;
   vkLink?: string | null;
@@ -89,11 +90,21 @@ export interface LevelStats {
   pending: number;
 }
 
+export interface ProfileBonusWallet {
+  totalEarnedBonuses: number;
+  availableBonuses: number;
+  pendingWithdrawalBonuses: number;
+  withdrawnBonuses: number;
+  hasPendingWithdrawal: boolean;
+  withdrawalBlocked: boolean;
+}
+
 interface ProfileDashboardData {
   user: User;
   friends: Friend[];
   receivedRequests: Friend[];
   stats: Stats;
+  bonusWallet: ProfileBonusWallet;
   notifications: Notification[];
   trust?: TrustSnapshot;
   levelStats?: LevelStats;
@@ -213,7 +224,10 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       try {
         await fetchDataFallback();
       } catch (fallbackError) {
-        logRouteCatchError("[useProfileDashboard] fetchDataFallback", fallbackError);
+        logRouteCatchError(
+          "[useProfileDashboard] fetchDataFallback",
+          fallbackError,
+        );
       }
     } finally {
       setLoading(false);
@@ -287,6 +301,14 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       friends: [],
       receivedRequests: [],
       stats: normalizedStats || {},
+      bonusWallet: statsData?.bonusWallet ?? {
+        totalEarnedBonuses: 0,
+        availableBonuses: 0,
+        pendingWithdrawalBonuses: 0,
+        withdrawnBonuses: 0,
+        hasPendingWithdrawal: false,
+        withdrawalBlocked: false,
+      },
       notifications: [],
       trust: normalizedStats?.trust ?? statsData?.trust,
     };

@@ -4,6 +4,7 @@ export interface Notification {
   id: string;
   type:
     | "like"
+    | "story_comment"
     | "system"
     | "application_status"
     | "withdrawal_status"
@@ -18,6 +19,7 @@ export interface Notification {
   isRead: boolean;
   rarity?: string;
   applicationId?: string;
+  storyCommentId?: string;
   withdrawalId?: string;
   goodDeedSubmissionId?: string;
   status?: "APPROVED" | "REJECTED" | "CONTEST";

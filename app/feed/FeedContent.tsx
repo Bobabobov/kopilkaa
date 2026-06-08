@@ -140,8 +140,13 @@ export default function FeedContent() {
       } else {
         router.push("/applications");
       }
-    } else if (notification.type === "like" && notification.applicationId) {
-      router.push(`/stories/${notification.applicationId}`);
+    } else if (
+      (notification.type === "like" || notification.type === "story_comment") &&
+      notification.applicationId
+    ) {
+      const hash =
+        notification.type === "story_comment" ? "#story-comments" : "";
+      router.push(`/stories/${notification.applicationId}${hash}`);
     } else if (notification.type === "friend_request") {
       router.push("/friends?tab=received");
     } else if (

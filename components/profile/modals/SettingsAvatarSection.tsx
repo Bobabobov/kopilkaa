@@ -1,5 +1,6 @@
 import type { SettingsUser } from "../hooks/useSettings";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { buildUploadUrl } from "@/lib/uploads/url";
 
 interface SettingsAvatarSectionProps {
   user: SettingsUser;
@@ -16,13 +17,17 @@ export function SettingsAvatarSection({
   onUpload,
   onDelete,
 }: SettingsAvatarSectionProps) {
+  const avatarPreview = user.avatar
+    ? buildUploadUrl(resolveAvatarUrl(user.avatar), { variant: "thumb" })
+    : null;
+
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-5">
       <div className="flex items-center gap-4">
         <div className="w-20 h-20 rounded-full border border-white/10 bg-[#001e1d]/30 overflow-hidden flex items-center justify-center">
-          {user.avatar ? (
+          {avatarPreview ? (
             <img
-              src={resolveAvatarUrl(user.avatar)}
+              src={avatarPreview}
               alt="Аватар"
               className="w-full h-full object-cover"
               onError={(e) => {

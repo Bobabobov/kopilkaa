@@ -1,13 +1,21 @@
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { StoriesPageBackground } from "@/app/stories/_components/stories-ui/StoriesPageBackground";
+import { cn } from "@/lib/utils";
+import {
+  storiesGlassPanel,
+  storiesGlassShine,
+} from "@/app/stories/_components/stories-ui/glassStyles";
 
 export function StoryPageNotFound() {
   return (
-    <div className="min-h-screen">
+    <div data-stories-page className="relative min-h-screen">
+      <StoriesPageBackground />
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-2xl border border-[#abd1c6]/25 bg-[#001e1d]/40 p-8 shadow-xl text-center">
+        <div className={cn(storiesGlassPanel, "w-full max-w-md p-8 text-center")}>
+          <div className={storiesGlassShine} />
           <span
-            className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#abd1c6]/20 text-[#abd1c6] mb-5"
+            className="relative inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] text-[#abd1c6] mb-5"
             aria-hidden
           >
             <LucideIcons.BookOpen size="xl" />
@@ -20,7 +28,7 @@ export function StoryPageNotFound() {
           </p>
           <Link
             href="/stories"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#f9bc60] px-6 py-3 font-semibold text-[#001e1d] transition-all duration-300 hover:bg-[#e8a545] hover:shadow-[0_8px_24px_rgba(249,188,96,0.3)]"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] px-6 py-3 font-semibold text-[#001e1d] transition-all duration-300 hover:shadow-[0_8px_24px_rgba(249,188,96,0.3)]"
           >
             <LucideIcons.ArrowLeft size="sm" />
             Вернуться к историям

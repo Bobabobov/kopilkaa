@@ -229,6 +229,7 @@ function StoryAdImagesInner({ images = [], title }: StoryAdImagesProps) {
         onClose={closeLightbox}
         onPrevious={handlePrevious}
         onNext={handleNext}
+        onSelectIndex={setCurrentIndex}
       />
     </section>
   );

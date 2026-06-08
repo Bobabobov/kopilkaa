@@ -1,7 +1,7 @@
 // components/profile/SettingsModal.tsx
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSettings } from "../hooks/useSettings";
@@ -14,7 +14,9 @@ import {
 import {
   SettingsLoading,
   SettingsUnauthorized,
+  ErrorState,
 } from "../settings/ProfileStates";
+import { SettingsAccountSection } from "./SettingsAccountSection";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { SettingsSection } from "./SettingsFields";
 import { useSettingsModalLifecycle } from "./hooks/useSettingsModalLifecycle";
@@ -27,24 +29,32 @@ import { SettingsMetaInfo } from "./SettingsMetaInfo";
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onProfileUpdated?: () => void | Promise<void>;
 }
 
-export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
+export default function SettingsModal({
+  isOpen,
+  onClose,
+  onProfileUpdated,
+}: SettingsModalProps) {
   const { ToastComponent } = useBeautifulToast();
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
-  const { mounted } = useSettingsModalLifecycle({ isOpen, onClose, dialogRef });
 
   const {
-    // Состояние
     user,
     loading,
+    loadError,
     saving,
-
-    // Локальные уведомления
     localNotification,
-
-    // Действия
+    isChangingPassword,
+    setIsChangingPassword,
+    passwordData,
+    setPasswordData,
+    passwordError,
+    handlePasswordSubmit,
+    cancelPasswordChange,
+    loadUser,
     handleUsernameChange,
     handleNameChange,
     handleEmailChange,
@@ -52,8 +62,22 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     handleSocialLinkChange,
     handleAvatarUpload,
     handleAvatarDelete,
+    handleDeleteAccount,
     showLocalNotification,
   } = useSettings();
+
+  const handleClose = useCallback(() => {
+    if (user) {
+      void onProfileUpdated?.();
+    }
+    onClose();
+  }, [user, onProfileUpdated, onClose]);
+
+  const { mounted } = useSettingsModalLifecycle({
+    isOpen,
+    onClose: handleClose,
+    dialogRef,
+  });
 
   const handleCopy = async (text: string) => {
     try {
@@ -78,7 +102,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-black/60 backdrop-blur-md z-[999] flex items-end sm:items-center justify-center p-2 sm:p-4"
-        onClick={onClose}
+        onClick={handleClose}
       >
         <motion.div
           key="settings-modal-content"
@@ -103,13 +127,19 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           aria-describedby="profile-settings-desc"
           tabIndex={-1}
         >
-          <SettingsModalHeader onClose={onClose} />
+          <SettingsModalHeader onClose={handleClose} />
           <SettingsLocalNotification notification={localNotification} />
 
           {/* Контент */}
           <div className="flex-1 p-4 sm:p-6 overflow-y-auto overscroll-contain">
             {loading ? (
               <SettingsLoading />
+            ) : loadError ? (
+              <ErrorState
+                title="Не удалось загрузить настройки"
+                message={loadError}
+                onRetry={() => void loadUser()}
+              />
             ) : !user ? (
               <SettingsUnauthorized />
             ) : (
@@ -167,6 +197,20 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   user={user}
                   saving={saving}
                   onCopy={handleCopy}
+                />
+
+                <SettingsAccountSection
+                  saving={saving}
+                  isChangingPassword={isChangingPassword}
+                  passwordData={passwordData}
+                  passwordError={passwordError}
+                  onStartPasswordChange={() => setIsChangingPassword(true)}
+                  onCancelPasswordChange={cancelPasswordChange}
+                  onPasswordSubmit={() => void handlePasswordSubmit()}
+                  onPasswordFieldChange={(field, value) =>
+                    setPasswordData({ [field]: value })
+                  }
+                  onDeleteAccount={handleDeleteAccount}
                 />
               </div>
             )}

@@ -32,9 +32,11 @@ export function ReadingProgressBar() {
     };
   }, []);
 
+  const scale = Math.min(1, Math.max(0, progress / 100));
+
   return (
     <div
-      className="fixed left-0 top-0 z-50 h-0.5 sm:h-1 bg-[#001e1d]/25"
+      className="fixed left-0 top-0 z-[60] h-0.5 sm:h-1 w-full overflow-hidden bg-[#001e1d]/40"
       role="progressbar"
       aria-label="Прогресс чтения страницы"
       aria-valuenow={Math.round(progress)}
@@ -42,8 +44,8 @@ export function ReadingProgressBar() {
       aria-valuemax={100}
     >
       <div
-        className="h-full rounded-r-full bg-gradient-to-r from-[#f9bc60] to-[#e8a545] ease-out motion-safe:transition-all motion-safe:duration-150 shadow-[0_0_8px_rgba(249,188,96,0.4)]"
-        style={{ width: `${progress}%` }}
+        className="h-full w-full origin-left rounded-r-full bg-gradient-to-r from-[#f9bc60] to-[#e8a545] shadow-[0_0_8px_rgba(249,188,96,0.4)] will-change-transform"
+        style={{ transform: `scaleX(${scale})` }}
       />
     </div>
   );

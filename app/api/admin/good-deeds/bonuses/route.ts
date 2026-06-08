@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
+import {
+  ADMIN_BONUS_DEDUCT_COMMENT,
+  ADMIN_BONUS_GRANT_COMMENT,
+} from "@/lib/admin/bonusWithdrawalBlock";
 import { prisma } from "@/lib/db";
+import { computeGoodDeedBonusWallet } from "@/lib/goodDeedBonusWallet";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +18,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => ({}));
     const userId = String(body?.userId ?? "").trim();
+    const action = body?.action === "deduct" ? "deduct" : "grant";
     const amountRaw = body?.amountBonuses;
     const amountBonuses =
       typeof amountRaw === "number"
@@ -32,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     if (amountBonuses > 10000) {
       return NextResponse.json(
-        { error: "Слишком большое начисление за раз" },
+        { error: "Слишком большое изменение за раз" },
         { status: 400 },
       );
     }
@@ -48,20 +54,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (action === "deduct") {
+      const wallet = await computeGoodDeedBonusWallet(userId);
+      if (amountBonuses > wallet.availableBonuses) {
+        return NextResponse.json(
+          {
+            error: `Нельзя списать больше доступного баланса (${wallet.availableBonuses})`,
+          },
+          { status: 400 },
+        );
+      }
+
+      await prisma.goodDeedBonusGrant.create({
+        data: {
+          userId,
+          amountBonuses: -amountBonuses,
+          comment: comment || ADMIN_BONUS_DEDUCT_COMMENT,
+          grantedById: admin.id,
+        },
+      });
+
+      return NextResponse.json({ ok: true, action: "deduct" });
+    }
+
     await prisma.goodDeedBonusGrant.create({
       data: {
         userId,
         amountBonuses,
-        comment: comment || null,
+        comment: comment || ADMIN_BONUS_GRANT_COMMENT,
         grantedById: admin.id,
       },
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, action: "grant" });
   } catch (error) {
     console.error("POST /api/admin/good-deeds/bonuses error:", error);
     return NextResponse.json(
-      { error: "Не удалось начислить бонусы" },
+      { error: "Не удалось изменить баланс бонусов" },
       { status: 500 },
     );
   }

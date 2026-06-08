@@ -333,14 +333,100 @@ function StoryAdGalleryInner({
   }
 
   return (
-    <section className="mb-10" aria-label="Галерея">
-      <div className="mb-4 flex items-start justify-between gap-4 sm:mb-5">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-[#fffffe] sm:text-xl">
-          <LucideIcons.Image size="md" className="text-[#f9bc60]" aria-hidden />
-          Галерея
+    <section className="mb-10 w-full max-w-3xl" aria-label="Галерея">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-base font-bold text-[#fffffe] sm:text-lg">
+          <LucideIcons.Image size="sm" className="text-[#f9bc60]" aria-hidden />
+          Фотографии
         </h2>
+        <span className="text-xs font-medium text-[#abd1c6]/65">
+          {sorted.length}
+        </span>
       </div>
-      {inner}
+
+      <div
+        className={[
+          "grid gap-2.5 sm:gap-3",
+          sorted.length === 1 ? "grid-cols-1" : "grid-cols-2 sm:grid-cols-3",
+        ].join(" ")}
+      >
+        {sorted.map((image, index) => {
+          const fbStep = uploadFallbackStep[image.url] ?? 0;
+          const previewUrl =
+            image.type === "VIDEO"
+              ? videoSrc(image.url)
+              : imageSrcForStep(image.url, fbStep);
+          const isFailed =
+            failedUrls[previewUrl] ||
+            failedUrls[image.url] ||
+            failedUrls[buildPreviewUrl(image.url)];
+
+          return (
+            <button
+              key={`${image.url}-${index}-${image.type}`}
+              type="button"
+              className={[
+                "group relative aspect-square overflow-hidden rounded-xl",
+                "border border-white/10 bg-[#001e1d]/30",
+                "transition-colors hover:border-[#f9bc60]/35",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/60",
+              ].join(" ")}
+              onClick={() => {
+                if (!isFailed) openLightbox(index);
+              }}
+              disabled={isFailed}
+              aria-label={`Открыть ${image.type === "VIDEO" ? "видео" : "фото"} ${index + 1}`}
+            >
+              {isFailed ? (
+                <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-xs text-[#abd1c6]/70">
+                  <LucideIcons.Image size="sm" />
+                  Недоступно
+                </div>
+              ) : image.type === "VIDEO" ? (
+                <video
+                  src={previewUrl}
+                  muted
+                  playsInline
+                  preload="metadata"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <img
+                  src={previewUrl}
+                  alt={`${title || "Галерея"} — ${index + 1}`}
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  onError={() => {
+                    if (fbStep < 2) {
+                      setUploadFallbackStep((prev) => ({
+                        ...prev,
+                        [image.url]: fbStep + 1,
+                      }));
+                      return;
+                    }
+                    setFailedUrls((prev) => ({
+                      ...prev,
+                      [previewUrl]: true,
+                      [image.url]: true,
+                      [buildPreviewUrl(image.url)]: true,
+                    }));
+                  }}
+                />
+              )}
+              {image.type === "VIDEO" && (
+                <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/55 text-[#f9bc60]">
+                    <LucideIcons.Play size="sm" />
+                  </span>
+                </span>
+              )}
+              <span className="absolute bottom-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+                <LucideIcons.ZoomIn size="xs" />
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       <GoodDeedsMediaLightbox
         isOpen={isOpen}

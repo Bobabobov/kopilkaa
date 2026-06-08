@@ -32,11 +32,7 @@ import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 import { uploadApplicationPhotos } from "./upload";
 import { postApplication } from "./submitApi";
 import { clearFormStorage } from "./storage";
-import type { ActivityModalState } from "./types";
-import {
-  consumePendingSubmissionSuccess,
-  savePendingApplication,
-} from "@/lib/applications/pendingSubmission";
+import { consumePendingSubmissionSuccess } from "@/lib/applications/pendingSubmission";
 
 export function useApplicationFormState() {
   const { user, loadingAuth } = useApplicationFormAuth();
@@ -64,11 +60,6 @@ export function useApplicationFormState() {
   const [introOpen, setIntroOpen] = useState(false);
   const [introChecked, setIntroChecked] = useState(false);
   const [hpCompany, setHpCompany] = useState("");
-  const [activityModal, setActivityModal] = useState<ActivityModalState>({
-    isOpen: false,
-    activityType: null,
-    message: "",
-  });
   const [validationScrollTrigger, setValidationScrollTrigger] = useState(0);
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
@@ -433,21 +424,6 @@ export function useApplicationFormState() {
             ),
           );
         }
-        if (r.status === 403 && (d?.requiresActivity as boolean)) {
-          savePendingApplication(pendingPayload);
-          setActivityModal({
-            isOpen: true,
-            activityType:
-              (d?.activityType as ActivityModalState["activityType"]) ??
-              "LIKE_STORY",
-            message: getMessageFromApiJson(
-              d,
-              "Для создания заявки требуется активность",
-            ),
-          });
-          setErr(null);
-          return;
-        }
         if (r.status === 429) {
           if (typeof d?.leftMs === "number") {
             setLeft(d.leftMs as number);
@@ -583,7 +559,5 @@ export function useApplicationFormState() {
     formStartedAtRef,
     formStartKey,
     handleAmountInputChange,
-    activityModal,
-    setActivityModal,
   };
 }

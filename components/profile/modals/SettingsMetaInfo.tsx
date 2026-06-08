@@ -1,4 +1,4 @@
-import { CopyField, ReadOnlyField, SettingsSection } from "./SettingsFields";
+import { CopyField, ReadOnlyField } from "./SettingsFields";
 import { getPublicProfilePath } from "@/lib/profileUrl";
 import type { SettingsUser } from "../hooks/useSettings";
 
@@ -22,14 +22,6 @@ export function SettingsMetaInfo({
   return (
     <>
       <CopyField
-        label="Технический ID"
-        value={user.id}
-        copyValue={user.id}
-        onCopy={onCopy}
-        disabled={saving}
-      />
-
-      <CopyField
         label="Ссылка на профиль"
         value={url}
         copyValue={url}
@@ -48,12 +40,6 @@ export function SettingsMetaInfo({
           "ru-RU",
         )}
       />
-
-      <SettingsSection title="Пароль">
-        <div className="p-4 bg-[#001e1d]/20 rounded-xl border border-[#abd1c6]/20">
-          <p className="text-[#abd1c6]">Изменение пароля временно недоступно</p>
-        </div>
-      </SettingsSection>
     </>
   );
 }

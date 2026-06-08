@@ -7,6 +7,7 @@ export {
   NameEditor,
   UsernameEditor,
   EmailVisibilityToggle,
+  PasswordEditor,
   SocialLinkEditor,
   type BaseEditorProps,
   type SocialType,

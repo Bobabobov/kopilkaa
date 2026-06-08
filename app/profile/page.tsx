@@ -72,23 +72,25 @@ function ProfilePageContent() {
       ? trustSnapshot.progressCurrent
       : progressCurrent;
   const progressTotalResolved =
-    trustSnapshot != null &&
-    typeof trustSnapshot.progressTotal === "number"
+    trustSnapshot != null && typeof trustSnapshot.progressTotal === "number"
       ? trustSnapshot.progressTotal
       : progressTotal;
-  const progressTextResolved =
-    trustSnapshot?.progressText ?? progressText;
+  const progressTextResolved = trustSnapshot?.progressText ?? progressText;
   const progressValueResolved =
     progressTotalResolved != null &&
     progressTotalResolved > 0 &&
     progressCurrentResolved != null
-      ? Math.min(1, Math.max(0, progressCurrentResolved / progressTotalResolved))
+      ? Math.min(
+          1,
+          Math.max(0, progressCurrentResolved / progressTotalResolved),
+        )
       : progressValue;
 
   // Обработка обновлений профиля
-  const { handleThemeChange, handleAvatarChange } = useProfileUpdates({
-    refetch,
-  });
+  const { handleThemeChange, handleCoverChange, handleAvatarChange } =
+    useProfileUpdates({
+      refetch,
+    });
 
   if (loading) {
     return <ProfileLoading />;
@@ -103,6 +105,14 @@ function ProfilePageContent() {
   }
 
   const levelStats = profileData?.levelStats ?? null;
+  const bonusWallet = profileData?.bonusWallet ?? {
+    totalEarnedBonuses: 0,
+    availableBonuses: 0,
+    pendingWithdrawalBonuses: 0,
+    withdrawnBonuses: 0,
+    hasPendingWithdrawal: false,
+    withdrawalBlocked: false,
+  };
 
   return (
     <>
@@ -115,9 +125,12 @@ function ProfilePageContent() {
         trustProgressCurrent={progressCurrentResolved}
         trustProgressTotal={progressTotalResolved}
         levelStats={levelStats}
+        bonusWallet={bonusWallet}
         onThemeChange={handleThemeChange}
+        onCoverChange={handleCoverChange}
         onAvatarChange={handleAvatarChange}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
+        onBonusClaimed={refetch}
       />
 
       {/* Модальное окно настроек */}
@@ -125,6 +138,7 @@ function ProfilePageContent() {
         <SettingsModal
           isOpen={isSettingsModalOpen}
           onClose={() => setIsSettingsModalOpen(false)}
+          onProfileUpdated={refetch}
         />
       )}
     </>

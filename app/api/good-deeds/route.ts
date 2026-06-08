@@ -131,6 +131,7 @@ export async function GET(req: NextRequest) {
       pendingWithdrawalBonuses: 0,
       withdrawnBonuses: 0,
       hasPendingWithdrawal: false,
+      withdrawalBlocked: false,
     };
 
     if (session?.uid) {

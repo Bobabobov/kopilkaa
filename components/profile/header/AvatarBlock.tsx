@@ -24,8 +24,6 @@ interface AvatarBlockProps {
   currentAvatar: string | null;
   status: UserStatus;
   onAvatarChange?: (val: string | null) => void;
-  onOpenCover?: () => void;
-  onTriggerAvatar?: () => void;
 }
 
 export function AvatarBlock({
@@ -34,8 +32,6 @@ export function AvatarBlock({
   currentAvatar,
   status,
   onAvatarChange,
-  onOpenCover,
-  onTriggerAvatar,
 }: AvatarBlockProps) {
   const [avatarSrc, setAvatarSrc] = useState(
     resolveAvatarUrl(user.avatar || DEFAULT_AVATAR),
@@ -80,45 +76,6 @@ export function AvatarBlock({
             }`}
           />
           <span className="text-white/90 truncate">{statusLabel}</span>
-        </div>
-        <div className="mt-2 xs:mt-3 flex flex-wrap gap-1.5 xs:gap-2">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onOpenCover}
-            className="flex items-center justify-center gap-1 xs:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-2 xs:px-2.5 py-1 xs:py-1.5 text-xs font-medium text-white transition-all duration-200"
-            title="Изменить обложку"
-          >
-            <svg
-              className="w-3.5 h-3.5 xs:w-4 xs:h-4 flex-shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              <path d="M4 7h3l2-3h6l2 3h3v12H4z" />
-              <circle cx="12" cy="13" r="3.5" />
-            </svg>
-            <span className="hidden xs:inline">Обложка</span>
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onTriggerAvatar}
-            className="flex items-center justify-center gap-1 xs:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-2 xs:px-2.5 py-1 xs:py-1.5 text-xs font-medium text-white transition-all duration-200"
-            title="Изменить аватар"
-          >
-            <svg
-              className="w-3.5 h-3.5 xs:w-4 xs:h-4 flex-shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            <span className="hidden xs:inline">Аватар</span>
-          </motion.button>
         </div>
       </div>
     );

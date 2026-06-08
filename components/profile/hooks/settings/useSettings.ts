@@ -7,12 +7,13 @@ import { useProfileHandlers } from "./handlers/profileHandlers";
 import { useSocialHandler } from "./handlers/socialHandler";
 import { useAvatarHandlers } from "./handlers/avatarHandlers";
 import { usePasswordHandlers } from "./handlers/passwordHandlers";
-import { useExportDeleteHandlers } from "./handlers/exportDeleteHandlers";
+import { useDeleteAccountHandler } from "./handlers/deleteAccountHandler";
 import type { UseSettingsReturn, SettingsUser } from "./types";
 
 export function useSettings(): UseSettingsReturn {
   const [user, setUser] = useState<SettingsUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordDataState, setPasswordDataState] = useState({
@@ -33,10 +34,16 @@ export function useSettings(): UseSettingsReturn {
   const loadUser = useCallback(async () => {
     try {
       setLoading(true);
+      setLoadError(null);
       const { user: u } = await loadUserApi();
       setUser(u);
-    } catch {
-      // keep user null on error
+    } catch (error) {
+      setUser(null);
+      setLoadError(
+        error instanceof Error
+          ? error.message
+          : "Не удалось загрузить данные профиля",
+      );
     } finally {
       setLoading(false);
     }
@@ -69,15 +76,15 @@ export function useSettings(): UseSettingsReturn {
       passwordDataState,
       setPasswordData,
       setIsChangingPassword,
+      setSaving,
     );
 
-  const { handleExportData, handleDeleteAccount } = useExportDeleteHandlers(
-    showLocalNotification,
-  );
+  const { handleDeleteAccount } = useDeleteAccountHandler(showLocalNotification);
 
   return {
     user,
     loading,
+    loadError,
     saving,
     isChangingPassword,
     setIsChangingPassword,
@@ -98,7 +105,6 @@ export function useSettings(): UseSettingsReturn {
     handlePasswordChange,
     handlePasswordSubmit,
     cancelPasswordChange,
-    handleExportData,
     handleDeleteAccount,
     showLocalNotification,
   };

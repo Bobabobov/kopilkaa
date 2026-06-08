@@ -4,6 +4,10 @@ import { getAuthUser } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { publicStoryWhereById } from "@/lib/stories/publicStoryWhere";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import {
+  normalizeStoryReactionCounts,
+  type StoryReactionType,
+} from "@/lib/stories/reactions";
 
 export const dynamic = "force-dynamic";
 
@@ -41,11 +45,24 @@ export async function GET(
       return Response.json({ error: "Story not found" }, { status: 404 });
     }
 
-    const likeCount = await prisma.storyLike.count({
+    const reactionGroups = await prisma.storyLike.groupBy({
+      by: ["type"],
       where: { applicationId: id },
+      _count: { _all: true },
     });
+    const reactionCounts = normalizeStoryReactionCounts(
+      reactionGroups.map((group) => ({
+        type: group.type as StoryReactionType,
+        count: group._count._all,
+      })),
+    );
+    const likeCount = Object.values(reactionCounts).reduce(
+      (sum, value) => sum + value,
+      0,
+    );
 
     let userLiked = false;
+    let userReaction: StoryReactionType | null = null;
     if (session?.uid) {
       const userLike = await prisma.storyLike.findUnique({
         where: {
@@ -54,8 +71,10 @@ export async function GET(
             applicationId: id,
           },
         },
+        select: { type: true },
       });
       userLiked = Boolean(userLike);
+      userReaction = (userLike?.type as StoryReactionType | undefined) ?? null;
     }
 
     const likes = session?.uid
@@ -73,8 +92,11 @@ export async function GET(
     return Response.json({
       count: likeCount,
       userLiked,
+      userReaction,
+      reactionCounts,
       likes: likes.map((like) => ({
         id: like.id,
+        type: like.type,
         user: like.user
           ? sanitizeEmailForViewer(like.user, session?.uid ?? "")
           : like.user,

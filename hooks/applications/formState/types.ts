@@ -11,14 +11,6 @@ export type UserShape = {
   role?: "USER" | "ADMIN";
 };
 
-export type ActivityType = "LIKE_STORY";
-
-export interface ActivityModalState {
-  isOpen: boolean;
-  activityType: ActivityType | null;
-  message: string;
-}
-
 export interface StoredFormData {
   title: string;
   summary: string;

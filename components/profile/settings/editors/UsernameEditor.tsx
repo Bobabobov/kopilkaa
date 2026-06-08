@@ -6,7 +6,7 @@ import type { BaseEditorProps } from "./types";
 
 interface UsernameEditorProps extends BaseEditorProps {
   currentUsername?: string | null;
-  onSave: (username: string) => void;
+  onSave: (username: string) => void | Promise<void>;
 }
 
 export function UsernameEditor({
@@ -42,7 +42,7 @@ export function UsernameEditor({
     return null;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const nextError = validate(value);
     setError(nextError);
     if (nextError) return;
@@ -52,7 +52,7 @@ export function UsernameEditor({
       setIsEditing(false);
       return;
     }
-    onSave(normalized);
+    await onSave(normalized);
     setIsEditing(false);
   };
 

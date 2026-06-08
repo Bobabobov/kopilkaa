@@ -21,6 +21,7 @@ export function usePasswordHandlers(
   passwordData: PasswordData,
   setPasswordData: (d: Partial<PasswordData>) => void,
   setIsChangingPassword: (v: boolean) => void,
+  setSaving: (v: boolean) => void,
 ) {
   const handlePasswordChange = useCallback(
     async (oldPassword: string, newPassword: string): Promise<boolean> => {
@@ -58,17 +59,22 @@ export function usePasswordHandlers(
       return;
     }
 
-    const success = await handlePasswordChange(
-      passwordData.oldPassword,
-      passwordData.newPassword,
-    );
-    if (success) {
-      setPasswordData({
-        oldPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-      setIsChangingPassword(false);
+    setSaving(true);
+    try {
+      const success = await handlePasswordChange(
+        passwordData.oldPassword,
+        passwordData.newPassword,
+      );
+      if (success) {
+        setPasswordData({
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setIsChangingPassword(false);
+      }
+    } finally {
+      setSaving(false);
     }
   }, [
     passwordData,
@@ -76,6 +82,7 @@ export function usePasswordHandlers(
     setIsChangingPassword,
     handlePasswordChange,
     setPasswordError,
+    setSaving,
   ]);
 
   const cancelPasswordChange = useCallback(() => {

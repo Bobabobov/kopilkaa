@@ -62,8 +62,8 @@ export default function AdminGoodDeedsClient() {
               variant="outline"
               className="rounded-xl border-[#abd1c6]/35 text-[#abd1c6] hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/10 hover:text-[#fffffe]"
             >
-              <Link href="/admin/good-deeds/withdrawals">
-                Заявки на вывод
+              <Link href="/admin/bonuses">
+                Бонусы и вывод
                 <ExternalLink className="ml-2 h-4 w-4" />
               </Link>
             </Button>

@@ -11,7 +11,7 @@ interface SocialLinkEditorProps extends BaseEditorProps {
   placeholder: string;
   value?: string | null;
   type: SocialType;
-  onSave: (link: string) => void;
+  onSave: (link: string) => void | Promise<void>;
 }
 
 export function SocialLinkEditor({
@@ -110,12 +110,12 @@ export function SocialLinkEditor({
     return true;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (disabled) return;
 
     const trimmedValue = inputValue.trim();
     if (!trimmedValue) {
-      onSave("");
+      await onSave("");
       setError(null);
       setIsEditing(false);
       return;
@@ -123,7 +123,7 @@ export function SocialLinkEditor({
 
     const normalized = normalizeInput(trimmedValue);
     if (validateLink(normalized)) {
-      onSave(normalized);
+      await onSave(normalized);
       setIsEditing(false);
     }
   };
@@ -211,7 +211,7 @@ export function SocialLinkEditor({
         </button>
         {value && (
           <button
-            onClick={() => onSave("")}
+            onClick={() => void onSave("")}
             disabled={disabled}
             className="w-full sm:w-auto px-4 py-2.5 sm:py-3 bg-transparent border border-[#abd1c6]/40 text-[#abd1c6] rounded-xl hover:border-[#abd1c6] transition-colors"
           >

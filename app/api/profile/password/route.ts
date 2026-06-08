@@ -1,6 +1,7 @@
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export async function PATCH(req: Request) {
   try {
@@ -62,7 +63,7 @@ export async function PATCH(req: Request) {
 
     return Response.json({ success: true });
   } catch (error) {
-    console.error("Error changing password:", error);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    logRouteCatchError("[API PATCH /api/profile/password]", error);
+    return Response.json({ error: "Не удалось изменить пароль" }, { status: 500 });
   }
 }

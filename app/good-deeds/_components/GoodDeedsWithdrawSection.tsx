@@ -15,6 +15,7 @@ import {
 } from "@/lib/goodDeeds";
 import type { GoodDeedsResponse } from "../types";
 import { throwIfApiFailed } from "@/lib/api/parseApiError";
+import { BONUS_WITHDRAWAL_BLOCKED_MESSAGE } from "@/lib/admin/bonusWithdrawalBlock";
 
 type Stats = Pick<
   GoodDeedsResponse["stats"],
@@ -23,6 +24,7 @@ type Stats = Pick<
   | "pendingWithdrawalBonuses"
   | "withdrawnBonuses"
   | "hasPendingWithdrawal"
+  | "withdrawalBlocked"
 >;
 
 type Props = {
@@ -65,7 +67,8 @@ export function GoodDeedsWithdrawSection({
 
   const canOpen =
     stats.availableBonuses >= MIN_WITHDRAWAL_BONUSES &&
-    !stats.hasPendingWithdrawal;
+    !stats.hasPendingWithdrawal &&
+    !stats.withdrawalBlocked;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -275,17 +278,25 @@ export function GoodDeedsWithdrawSection({
           </Badge>
         )}
 
+        {stats.withdrawalBlocked && (
+          <Badge className="w-fit border-rose-500/40 bg-rose-500/15 text-rose-100">
+            {BONUS_WITHDRAWAL_BLOCKED_MESSAGE}
+          </Badge>
+        )}
+
         <Button
           type="button"
           disabled={!canOpen}
           onClick={() => setOpen(true)}
           className="h-11 w-full rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] shadow-lg shadow-[#f9bc60]/15 hover:bg-[#f7b24a] disabled:cursor-not-allowed disabled:opacity-45"
         >
-          {stats.hasPendingWithdrawal
-            ? "Ожидайте решения по заявке"
-            : stats.availableBonuses < MIN_WITHDRAWAL_BONUSES
-              ? `Вывод от ${MIN_WITHDRAWAL_BONUSES} бонусов`
-              : "Вывести бонусы"}
+          {stats.withdrawalBlocked
+            ? "Вывод заблокирован"
+            : stats.hasPendingWithdrawal
+              ? "Ожидайте решения по заявке"
+              : stats.availableBonuses < MIN_WITHDRAWAL_BONUSES
+                ? `Вывод от ${MIN_WITHDRAWAL_BONUSES} бонусов`
+                : "Вывести бонусы"}
         </Button>
       </div>
 

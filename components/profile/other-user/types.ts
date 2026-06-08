@@ -9,6 +9,7 @@ export type OtherUserProfileUser = {
   createdAt: string;
   avatar?: string | null;
   headerTheme?: string | null;
+  headerCover?: string | null;
   avatarFrame?: string | null;
   hideEmail?: boolean;
   vkLink?: string | null;

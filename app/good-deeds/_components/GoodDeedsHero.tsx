@@ -13,6 +13,7 @@ type WithdrawStats = Pick<
   | "pendingWithdrawalBonuses"
   | "withdrawnBonuses"
   | "hasPendingWithdrawal"
+  | "withdrawalBlocked"
 >;
 
 type Props = {

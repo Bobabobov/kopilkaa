@@ -1,7 +1,5 @@
-import AdminGoodDeedWithdrawalsClient from "./AdminGoodDeedWithdrawalsClient";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
-export default function AdminGoodDeedWithdrawalsPage() {
-  return <AdminGoodDeedWithdrawalsClient />;
+export default function AdminGoodDeedWithdrawalsRedirectPage() {
+  redirect("/admin/bonuses?tab=withdrawals");
 }

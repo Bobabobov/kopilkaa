@@ -5,6 +5,10 @@ import { getSession } from "@/lib/auth";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
+import {
+  createEmptyStoryReactionCounts,
+  type StoryReactionType,
+} from "@/lib/stories/reactions";
 
 export const dynamic = "force-dynamic";
 
@@ -278,25 +282,58 @@ export async function GET(req: Request) {
       finalTotal = matches.length;
     }
 
-    // userLiked батчем (без N+1)
-    let likedSet: Set<string> | null = null;
+    const storyIds = finalItems.map((row) => row.id);
+    const reactionCountsByStory = new Map<
+      string,
+      Record<StoryReactionType, number>
+    >();
+
+    if (storyIds.length) {
+      const reactionGroups = await prisma.storyLike
+        .groupBy({
+          by: ["applicationId", "type"],
+          where: { applicationId: { in: storyIds } },
+          _count: { _all: true },
+        })
+        .catch(() => []);
+
+      for (const group of reactionGroups) {
+        const applicationId = group.applicationId;
+        const current =
+          reactionCountsByStory.get(applicationId) ||
+          createEmptyStoryReactionCounts();
+        current[group.type as StoryReactionType] = group._count._all;
+        reactionCountsByStory.set(applicationId, current);
+      }
+    }
+
+    // userReaction батчем (без N+1)
+    let userReactionByStory: Map<string, StoryReactionType> | null = null;
     if (viewerId && finalItems.length) {
-      const likes = await prisma.storyLike
+      const reactions = await prisma.storyLike
         .findMany({
           where: {
             userId: viewerId,
-            applicationId: { in: finalItems.map((row) => row.id) },
+            applicationId: { in: storyIds },
           },
-          select: { applicationId: true },
+          select: { applicationId: true, type: true },
         })
         .catch(() => []);
-      likedSet = new Set(likes.map((l) => l.applicationId));
+      userReactionByStory = new Map(
+        reactions.map((reaction) => [
+          reaction.applicationId,
+          reaction.type as StoryReactionType,
+        ]),
+      );
     }
 
     const safeItems = finalItems.map((it) => ({
       ...it,
       user: it.user ? sanitizeEmailForViewer(it.user, viewerId || "") : it.user,
-      userLiked: likedSet ? likedSet.has(it.id) : false,
+      reactionCounts:
+        reactionCountsByStory.get(it.id) || createEmptyStoryReactionCounts(),
+      userLiked: userReactionByStory ? userReactionByStory.has(it.id) : false,
+      userReaction: userReactionByStory?.get(it.id) ?? null,
       isContestWinner: it.status === "CONTEST" && it.publishInStories,
     }));
 

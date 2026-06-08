@@ -6,6 +6,7 @@ import { createHash } from "crypto";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { computeGoodDeedBonusWallet } from "@/lib/goodDeedBonusWallet";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,7 @@ export async function GET(request: NextRequest) {
       receivedRequestsData,
       applications,
       notifications,
+      bonusWallet,
     ] = await Promise.all([
       // Основные данные пользователя
       prisma.user
@@ -42,6 +44,7 @@ export async function GET(request: NextRequest) {
             telegramLink: true,
             youtubeLink: true,
             headerTheme: true,
+            headerCover: true,
             avatarFrame: true,
             hideEmail: true,
             createdAt: true,
@@ -173,6 +176,18 @@ export async function GET(request: NextRequest) {
           take: 10, // Последние 10 уведомлений
         })
         .catch(() => []),
+
+      computeGoodDeedBonusWallet(userId).catch((error) => {
+        logRouteCatchError("GET /api/profile/dashboard bonusWallet:", error);
+        return {
+          totalEarnedBonuses: 0,
+          availableBonuses: 0,
+          pendingWithdrawalBonuses: 0,
+          withdrawnBonuses: 0,
+          hasPendingWithdrawal: false,
+          withdrawalBlocked: false,
+        };
+      }),
     ]);
 
     if (!user) {
@@ -191,6 +206,14 @@ export async function GET(request: NextRequest) {
           approvedAmount: 0,
           friendsCount: 0,
           pendingFriendRequests: 0,
+        },
+        bonusWallet: {
+          totalEarnedBonuses: 0,
+          availableBonuses: 0,
+          pendingWithdrawalBonuses: 0,
+          withdrawnBonuses: 0,
+          hasPendingWithdrawal: false,
+          withdrawalBlocked: false,
         },
         notifications: [],
       });
@@ -249,14 +272,8 @@ export async function GET(request: NextRequest) {
       createdAt: friendship.createdAt,
       requesterId: friendship.requesterId,
       receiverId: friendship.receiverId,
-      requester: sanitizeEmailForViewer(
-        friendship.requester as any,
-        userId,
-      ),
-      receiver: sanitizeEmailForViewer(
-        friendship.receiver as any,
-        userId,
-      ),
+      requester: sanitizeEmailForViewer(friendship.requester as any, userId),
+      receiver: sanitizeEmailForViewer(friendship.receiver as any, userId),
     }));
 
     // Форматируем уведомления
@@ -278,11 +295,13 @@ export async function GET(request: NextRequest) {
         username: user.username ?? "",
         avatar: user.avatar ?? "",
         headerTheme: user.headerTheme ?? "",
+        headerCover: user.headerCover ?? "",
         avatarFrame: user.avatarFrame ?? "",
         hideEmail: Boolean(user.hideEmail),
         lastSeen: user.lastSeen ? new Date(user.lastSeen).getTime() : 0,
       },
       stats,
+      bonusWallet,
       trust,
       levelStats,
       latest: {
@@ -319,6 +338,7 @@ export async function GET(request: NextRequest) {
           : req.requester,
       })),
       stats: { ...stats, trust },
+      bonusWallet,
       notifications: formattedNotifications,
       trust,
       levelStats,

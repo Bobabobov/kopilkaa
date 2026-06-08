@@ -86,7 +86,7 @@ export function formatDateFull(date: Date | string): string {
   });
 }
 
-/** Дата и время для новостей/постов (день месяц год, час:мин) */
+/** Дата и время для постов (день месяц год, час:мин) */
 export function formatDateTimeShort(date: Date | string): string {
   const d = toDate(date);
   if (Number.isNaN(d.getTime())) return "";

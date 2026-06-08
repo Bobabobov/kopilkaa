@@ -8,6 +8,7 @@ interface UseProfileUpdatesProps {
 
 interface UseProfileUpdatesReturn {
   handleThemeChange: (newTheme: string | null) => Promise<void>;
+  handleCoverChange: (coverUrl: string | null) => Promise<void>;
   handleAvatarChange: (avatarUrl: string | null) => Promise<void>;
 }
 
@@ -16,6 +17,13 @@ export function useProfileUpdates({
 }: UseProfileUpdatesProps): UseProfileUpdatesReturn {
   const handleThemeChange = useCallback(
     async (_newTheme: string | null) => {
+      await refetch();
+    },
+    [refetch],
+  );
+
+  const handleCoverChange = useCallback(
+    async (_coverUrl: string | null) => {
       await refetch();
     },
     [refetch],
@@ -30,6 +38,7 @@ export function useProfileUpdates({
 
   return {
     handleThemeChange,
+    handleCoverChange,
     handleAvatarChange,
   };
 }

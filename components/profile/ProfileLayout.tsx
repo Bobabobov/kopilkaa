@@ -5,19 +5,20 @@
 import { motion } from "framer-motion";
 import { ProfileTrustAndStatsCard } from "@/components/profile/ProfileTrustAndStatsCard";
 import type { TrustLevel } from "@/lib/trustLevel";
-import type { LevelStats } from "@/hooks/profile/useProfileDashboard";
-import ProfileReviewSection from "./sections/ProfileReviewSection";
+import type {
+  LevelStats,
+  ProfileBonusWallet,
+} from "@/hooks/profile/useProfileDashboard";
 import ProfileStoriesSection from "./sections/ProfileStoriesSection";
 import {
   ProfileHeaderCard,
   ProfileFriendsSection,
-  ProfileRecentActivity,
-  MotivationalCard,
 } from "./ProfileDynamicImports";
 import ProfileReferralProgramCard from "./ProfileReferralProgramCard";
+import { ProfileBonusesCard } from "./ProfileBonusesCard";
+import { ProfileDailyBonusCard } from "./ProfileDailyBonusCard";
 import { ProfileStatsStrip } from "./ProfileStatsStrip";
 import { ProfileSectionTitle } from "./ProfileSectionTitle";
-import { Card } from "@/components/ui/Card";
 
 interface ProfileLayoutProps {
   user: {
@@ -29,6 +30,7 @@ interface ProfileLayoutProps {
     createdAt: string;
     avatar?: string | null;
     headerTheme?: string | null;
+    headerCover?: string | null;
     hideEmail?: boolean;
     vkLink?: string | null;
     telegramLink?: string | null;
@@ -42,9 +44,12 @@ interface ProfileLayoutProps {
   trustProgressCurrent: number | null;
   trustProgressTotal: number | null;
   levelStats?: LevelStats | null;
+  bonusWallet: ProfileBonusWallet;
   onThemeChange: (newTheme: string | null) => Promise<void>;
+  onCoverChange: (coverUrl: string | null) => Promise<void>;
   onAvatarChange: (avatarUrl: string | null) => Promise<void>;
   onOpenSettings: () => void;
+  onBonusClaimed?: () => void;
 }
 
 export default function ProfileLayout({
@@ -56,9 +61,12 @@ export default function ProfileLayout({
   trustProgressCurrent,
   trustProgressTotal,
   levelStats,
+  bonusWallet,
   onThemeChange,
+  onCoverChange,
   onAvatarChange,
   onOpenSettings,
+  onBonusClaimed,
 }: ProfileLayoutProps) {
   const container = {
     hidden: { opacity: 0 },
@@ -89,7 +97,7 @@ export default function ProfileLayout({
               isOwner
               friendshipStatus="friends"
               onThemeChange={onThemeChange}
-              onBackgroundChange={() => {}}
+              onCoverChange={onCoverChange}
               onOpenSettings={onOpenSettings}
               onAvatarChange={onAvatarChange}
             />
@@ -122,26 +130,23 @@ export default function ProfileLayout({
                 className="space-y-5 sm:space-y-6"
               >
                 <motion.div variants={item} className="space-y-2">
-                  <ProfileSectionTitle icon="Lightbulb" title="Мотивация" />
-                  <Card variant="darkGlass" padding="lg" hoverable>
-                    <MotivationalCard />
-                  </Card>
+                  <ProfileSectionTitle
+                    icon="Coins"
+                    title="Бонусы"
+                    subtitle="Добрые дела, рефералы и другое"
+                  />
+                  <ProfileBonusesCard wallet={bonusWallet} />
                 </motion.div>
                 <motion.div variants={item} className="space-y-2">
                   <ProfileSectionTitle
-                    icon="MessageCircle"
-                    title="Отзыв"
-                    subtitle="Ваш отзыв о помощи"
+                    icon="Zap"
+                    title="Ежедневный бонус"
+                    subtitle="Копи любит постоянство"
                   />
-                  <ProfileReviewSection userId={user.id} isOwner />
+                  <ProfileDailyBonusCard onBonusClaimed={onBonusClaimed} />
                 </motion.div>
-                <motion.div variants={item} className="space-y-2">
-                  <ProfileSectionTitle
-                    icon="Activity"
-                    title="Активность"
-                    subtitle="Последние действия"
-                  />
-                  <ProfileRecentActivity />
+                <motion.div variants={item}>
+                  <ProfileStoriesSection userId={user.id} isOwner />
                 </motion.div>
               </motion.div>
             </section>
@@ -184,13 +189,6 @@ export default function ProfileLayout({
                 transition={{ duration: 0.35, delay: 0.15 }}
               >
                 <ProfileFriendsSection />
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.2 }}
-              >
-                <ProfileStoriesSection userId={user.id} isOwner />
               </motion.div>
             </aside>
           </div>

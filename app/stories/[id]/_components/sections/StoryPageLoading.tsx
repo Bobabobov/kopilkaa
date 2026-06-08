@@ -1,16 +1,25 @@
+import { StoriesPageBackground } from "@/app/stories/_components/stories-ui/StoriesPageBackground";
+import { cn } from "@/lib/utils";
+import {
+  storiesGlassPanel,
+  storiesGlassShine,
+} from "@/app/stories/_components/stories-ui/glassStyles";
+
 export function StoryPageLoading() {
   return (
-    <div className="min-h-screen">
+    <div data-stories-page className="relative min-h-screen">
+      <StoriesPageBackground />
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4">
         <div
-          className="w-full max-w-md rounded-2xl border border-[#abd1c6]/25 bg-[#001e1d]/40 p-8 shadow-xl text-center"
+          className={cn(storiesGlassPanel, "w-full max-w-md p-8 text-center")}
           role="status"
           aria-live="polite"
           aria-busy="true"
         >
+          <div className={storiesGlassShine} />
           <span className="sr-only">Загрузка истории…</span>
-          <div className="mx-auto mb-5 h-14 w-14 animate-spin rounded-full border-2 border-[#abd1c6]/30 border-t-[#f9bc60]" />
-          <p className="text-[#abd1c6] font-medium">Загрузка истории...</p>
+          <div className="relative mx-auto mb-5 h-14 w-14 animate-spin rounded-full border-2 border-white/15 border-t-[#f9bc60]" />
+          <p className="text-[#fffffe] font-semibold">Загрузка истории...</p>
           <p className="mt-2 text-sm text-[#abd1c6]/70">Секунду</p>
         </div>
       </div>

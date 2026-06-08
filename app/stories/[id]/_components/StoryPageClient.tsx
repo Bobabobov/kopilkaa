@@ -1,17 +1,15 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
 import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
 import { useAuth } from "@/hooks/useAuth";
 import {
-  StoryHeader,
   StoryContent,
   StoryImages,
   StoryActions,
-  StoryMetadata,
   StoryNavigation,
 } from "@/components/stories";
 import { StoryPageLoading } from "./sections/StoryPageLoading";
@@ -19,8 +17,28 @@ import { StoryPageError } from "./sections/StoryPageError";
 import { StoryPageNotFound } from "./sections/StoryPageNotFound";
 import { ReadingProgressBar } from "./ReadingProgressBar";
 import { StoryMoreStories } from "./StoryMoreStories";
+import { StoryPageHero } from "./StoryPageHero";
+import { StoryPageSidebar } from "./StoryPageSidebar";
+import { StoryPageReactions } from "./StoryPageReactions";
+import { StoryCommentsSection } from "@/components/stories/StoryCommentsSection";
+import { StoriesPageBackground } from "@/app/stories/_components/stories-ui/StoriesPageBackground";
 import StoryAdLanding from "./StoryAdLanding";
-import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
+import {
+  getMessageFromApiJson,
+  logRouteCatchError,
+} from "@/lib/api/parseApiError";
+import {
+  createEmptyStoryReactionCounts,
+  type StoryReactionCounts,
+  type StoryReactionType,
+} from "@/lib/stories/reactions";
+import {
+  applyOptimisticReactionToggle,
+  createReactionStateFromStory,
+  syncReactionStateFromApi,
+  type StoryReactionState,
+} from "@/lib/stories/reactionToggle";
+import { submitStoryReaction } from "@/lib/stories/submitStoryReaction";
 
 export interface Story {
   id: string;
@@ -42,6 +60,8 @@ export interface Story {
     likes: number;
   };
   userLiked?: boolean;
+  userReaction?: StoryReactionType | null;
+  reactionCounts?: StoryReactionCounts;
   advertiserLink?: string;
   advertiserWebsite?: string;
   advertiserTelegram?: string;
@@ -113,11 +133,24 @@ export default function StoryPageClient({
     storyId === "ad" || (!initialStory && !initialError),
   );
   const [error, setError] = useState<string | null>(initialError);
-  const [liked, setLiked] = useState(initialStory?.userLiked ?? false);
+  const [selectedReaction, setSelectedReaction] =
+    useState<StoryReactionType | null>(
+      initialStory?.userReaction ?? (initialStory?.userLiked ? "HEART" : null),
+    );
   const [likesCount, setLikesCount] = useState(
     initialStory?._count?.likes ?? 0,
   );
-  const [isLiking, setIsLiking] = useState(false);
+  const [reactionCounts, setReactionCounts] = useState<StoryReactionCounts>(
+    initialStory?.reactionCounts ?? createEmptyStoryReactionCounts(),
+  );
+  const liked = Boolean(selectedReaction);
+  const reactionRequestSeq = useRef(0);
+
+  const applyReactionState = useCallback((state: StoryReactionState) => {
+    setSelectedReaction(state.selectedReaction);
+    setReactionCounts(state.reactionCounts);
+    setLikesCount(state.likesCount);
+  }, []);
 
   // При открытии страницы истории всегда показывать сверху (текст, а не низ)
   useEffect(() => {
@@ -192,14 +225,17 @@ export default function StoryPageClient({
               likes: 0,
             },
             userLiked: false,
+            userReaction: null,
+            reactionCounts: createEmptyStoryReactionCounts(),
             advertiserLink,
             advertiserWebsite: config.advertiserWebsite || undefined,
             advertiserTelegram: config.advertiserTelegram || undefined,
           };
 
           setStory(adStory);
-          setLiked(false);
+          setSelectedReaction(null);
           setLikesCount(0);
+          setReactionCounts(createEmptyStoryReactionCounts());
           setLoading(false);
           setError(null);
           return;
@@ -237,14 +273,17 @@ export default function StoryPageClient({
         likes: 0,
       },
       userLiked: false,
+      userReaction: null,
+      reactionCounts: createEmptyStoryReactionCounts(),
       advertiserLink: "/advertising",
       advertiserWebsite: undefined,
       advertiserTelegram: undefined,
     };
 
     setStory(fallbackStory);
-    setLiked(false);
+    setSelectedReaction(null);
     setLikesCount(0);
+    setReactionCounts(createEmptyStoryReactionCounts());
     setLoading(false);
     setError(null);
   };
@@ -264,8 +303,13 @@ export default function StoryPageClient({
 
       const data = body as Story;
       setStory(data);
-      setLiked(data.userLiked || false);
+      setSelectedReaction(
+        data.userReaction ?? (data.userLiked ? "HEART" : null),
+      );
       setLikesCount(data._count?.likes || 0);
+      setReactionCounts(
+        data.reactionCounts ?? createEmptyStoryReactionCounts(),
+      );
     } catch (err) {
       logRouteCatchError("[StoryPageClient] loadStory", err);
       setError("Не удалось загрузить историю");
@@ -278,8 +322,13 @@ export default function StoryPageClient({
   useEffect(() => {
     setStory(initialStory);
     setError(initialError);
-    setLiked(initialStory?.userLiked ?? false);
+    setSelectedReaction(
+      initialStory?.userReaction ?? (initialStory?.userLiked ? "HEART" : null),
+    );
     setLikesCount(initialStory?._count?.likes ?? 0);
+    setReactionCounts(
+      initialStory?.reactionCounts ?? createEmptyStoryReactionCounts(),
+    );
   }, [storyId, initialStory, initialError]);
 
   useEffect(() => {
@@ -308,60 +357,76 @@ export default function StoryPageClient({
         );
       }
     } catch (err) {
-      logRouteCatchError("[StoryPageClient] stories-read-ids localStorage", err);
+      logRouteCatchError(
+        "[StoryPageClient] stories-read-ids localStorage",
+        err,
+      );
     }
   }, [story?.id]);
 
-  const handleLike = useCallback(async () => {
-    if (!story) return;
+  const handleLike = useCallback(
+    async (type: StoryReactionType = "HEART") => {
+      if (!story) return;
 
-    if (!isAuthenticated) {
-      pushAuth("signup");
-      return;
-    }
-
-    setIsLiking(true);
-    try {
-      const method = liked ? "DELETE" : "POST";
-      const response = await fetch(`/api/stories/${story.id}/like`, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          pushAuth("signup");
-          return;
-        }
-        const errorData = await response.json().catch(() => null);
-        logRouteCatchError(
-          "[StoryPageClient] like",
-          new Error(getMessageFromApiJson(errorData, `Код ${response.status}`)),
-        );
+      if (!isAuthenticated) {
+        pushAuth("signup");
         return;
       }
 
-      const newLikedState = !liked;
-      setLiked(newLikedState);
-      setLikesCount((prev) => (liked ? prev - 1 : prev + 1));
+      const before = createReactionStateFromStory({
+        userReaction: selectedReaction,
+        reactionCounts,
+        _count: { likes: likesCount },
+      });
+      const { next, method } = applyOptimisticReactionToggle(before, type);
+      applyReactionState(next);
 
-      if (method === "POST") {
-        const submitted = await submitPendingApplicationIfNeeded();
-        if (submitted && typeof window !== "undefined") {
-          window.location.href = "/applications";
+      const requestId = ++reactionRequestSeq.current;
+
+      try {
+        const result = await submitStoryReaction(story.id, method, type);
+
+        if (requestId !== reactionRequestSeq.current) return;
+
+        if (!result.ok) {
+          if (result.status === 401) {
+            applyReactionState(before);
+            pushAuth("signup");
+            return;
+          }
+          applyReactionState(before);
+          logRouteCatchError(
+            "[StoryPageClient] like",
+            new Error(result.error ?? `Код ${result.status}`),
+          );
           return;
         }
-      }
 
-      await loadStory(story.id);
-    } catch (err) {
-      logRouteCatchError("[StoryPageClient] handleLike", err);
-    } finally {
-      setIsLiking(false);
-    }
-  }, [story?.id, liked, isAuthenticated, pushAuth]);
+        applyReactionState(syncReactionStateFromApi(result.data, next));
+
+        if (method === "POST") {
+          const submitted = await submitPendingApplicationIfNeeded();
+          if (submitted && typeof window !== "undefined") {
+            window.location.href = "/applications";
+          }
+        }
+      } catch (err) {
+        if (requestId === reactionRequestSeq.current) {
+          applyReactionState(before);
+        }
+        logRouteCatchError("[StoryPageClient] handleLike", err);
+      }
+    },
+    [
+      story,
+      selectedReaction,
+      reactionCounts,
+      likesCount,
+      isAuthenticated,
+      pushAuth,
+      applyReactionState,
+    ],
+  );
 
   if (loading) {
     return <StoryPageLoading />;
@@ -379,72 +444,82 @@ export default function StoryPageClient({
     return <StoryAdLanding story={story} />;
   }
 
+  const authorName =
+    story.user?.name || story.user?.email || "Неизвестный автор";
+  const sortedImages = [...(story.images ?? [])].sort((a, b) => a.sort - b.sort);
+  const storyBody = story.story?.trim();
+  const summaryText = story.summary?.trim();
+  const contentForBody =
+    storyBody ?? (summaryText ? null : "Текст истории недоступен.");
+  const readTime = Math.max(
+    1,
+    Math.ceil(
+      (storyBody?.length || summaryText?.length || 0) / 200,
+    ),
+  );
+
   return (
-    <div className="min-h-screen">
+    <div data-stories-page className="relative min-h-screen">
+      <StoriesPageBackground />
       <ReadingProgressBar />
+
       <div className="relative z-10">
-        <StoryNavigation />
+        <div className="container mx-auto max-w-6xl px-4 sm:px-6 pt-6 sm:pt-8 pb-14 sm:pb-20">
+          <StoryNavigation />
 
-        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
-          <div className="mx-auto max-w-4xl">
-            <main id="story-content">
-              <article className="relative overflow-hidden rounded-2xl sm:rounded-[1.75rem] border border-[#abd1c6]/20 bg-gradient-to-b from-[#004643]/40 via-[#003d3a]/25 to-transparent backdrop-blur-sm p-5 sm:p-8 md:p-10 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.25)]">
-                <div className="hidden sm:block absolute -top-20 -right-20 h-40 w-40 rounded-full bg-[#f9bc60]/10 blur-3xl pointer-events-none" />
-                <div className="hidden sm:block absolute -bottom-20 -left-20 h-32 w-32 rounded-full bg-[#abd1c6]/10 blur-3xl pointer-events-none" />
-                <div className="relative">
-                  <StoryHeader
-                    title={story.title}
-                    author={
-                      story.user?.name || story.user?.email || "Неизвестный автор"
-                    }
-                    authorId={story.user?.id}
-                    authorAvatar={story.user?.avatar}
-                    createdAt={story.createdAt}
-                    isAd={story.id === "ad"}
-                    isContestWinner={!!story.isContestWinner}
-                    authorExternalUrl={
-                      story.id === "ad" ? story.advertiserLink : undefined
-                    }
-                  />
+          <StoryPageHero
+            title={story.title}
+            summary={summaryText}
+            author={authorName}
+            authorId={story.user?.id}
+            authorAvatar={story.user?.avatar}
+            createdAt={story.createdAt}
+            isContestWinner={!!story.isContestWinner}
+            readTime={readTime}
+            imagesCount={sortedImages.length}
+          />
 
-                  <StoryMetadata
-                    story={story}
-                    liked={liked}
-                    likesCount={likesCount}
-                    onLike={handleLike}
-                    isAuthenticated={isAuthenticated}
-                    isAd={story.id === "ad"}
-                    storyId={story.id}
-                    storyTitle={story.title}
-                    isLiking={isLiking}
-                  />
+          <div className="mt-6 lg:mt-8 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-8 lg:gap-10 items-start">
+            <main id="story-content" className="min-w-0">
+              {contentForBody && (
+                <StoryContent
+                  content={contentForBody}
+                  footer={
+                    <StoryPageReactions
+                      liked={liked}
+                      likesCount={likesCount}
+                      selectedReaction={selectedReaction}
+                      reactionCounts={reactionCounts}
+                      onLike={handleLike}
+                      isAuthenticated={isAuthenticated}
+                      storyId={story.id}
+                      storyTitle={story.title}
+                    />
+                  }
+                />
+              )}
 
-                  <div className="mb-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-[#94a1b2]">
-                      Текст истории
-                    </span>
-                  </div>
-                  <StoryContent
-                    content={
-                      story.story || story.summary || "Текст истории недоступен."
-                    }
-                    isAd={story.id === "ad"}
-                  />
+              {sortedImages.length > 0 && (
+                <StoryImages images={sortedImages} title={story.title} />
+              )}
 
-                  {story.images && story.images.length > 0 && (
-                    <StoryImages images={story.images} title={story.title} />
-                  )}
+              <StoryActions />
 
-                  <StoryActions
-                    isAd={story.id === "ad"}
-                    advertiserLink={story.advertiserLink}
-                  />
-                </div>
-              </article>
-
-              {story.id !== "ad" && <StoryMoreStories />}
+              <StoryCommentsSection
+                storyId={story.id}
+                isAuthenticated={isAuthenticated}
+                onAuthRequired={() => pushAuth("signup")}
+              />
             </main>
+
+            <StoryPageSidebar
+              author={authorName}
+              authorId={story.user?.id}
+              authorAvatar={story.user?.avatar}
+            />
           </div>
+
+          <StoryMoreStories />
         </div>
       </div>
     </div>

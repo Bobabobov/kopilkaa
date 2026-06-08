@@ -5,6 +5,7 @@ import type { Route } from "next";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
+import { clearAuthCache } from "@/hooks/useAuth";
 
 type User = {
   id: string;
@@ -107,6 +108,7 @@ export default function NavAuth({
   const logout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
+      clearAuthCache();
       setUser(null);
       notifyAuthChange(false);
       // Перенаправляем на главную страницу

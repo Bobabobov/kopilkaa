@@ -13,3 +13,4 @@ export { default as StoryContent } from "./StoryContent";
 export { default as StoryImages } from "./StoryImages";
 export { default as StoryActions } from "./StoryActions";
 export { default as LikeButton } from "./LikeButton";
+export { StoryCommentsSection } from "./StoryCommentsSection";

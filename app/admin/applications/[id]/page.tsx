@@ -21,7 +21,7 @@ import ApplicationStory from "./_components/ApplicationStory";
 import ApplicationSuspicionBlock from "./_components/ApplicationSuspicionBlock";
 import ApplicationAdminComment from "./_components/ApplicationAdminComment";
 import ApplicationFooter from "./_components/ApplicationFooter";
-import ApplicationImageLightbox from "./_components/ApplicationImageLightbox";
+import { StoryLightbox } from "@/components/stories/StoryLightbox";
 import ApplicationReviewBlock from "./_components/ApplicationReviewBlock";
 import ApplicationPreviousReviewBlock from "./_components/ApplicationPreviousReviewBlock";
 import AdminSection from "./_components/AdminSection";
@@ -129,17 +129,6 @@ export default function AdminApplicationPage({
   const handleCopyError = (message: string) => {
     showToast("error", "Ошибка копирования", message);
   };
-
-  useEffect(() => {
-    if (!lbOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLbOpen(false);
-      if (e.key === "ArrowLeft") handleLightboxPrevious();
-      if (e.key === "ArrowRight") handleLightboxNext();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [lbOpen, item?.images.length]);
 
   if (loading)
     return (
@@ -738,13 +727,14 @@ export default function AdminApplicationPage({
       </motion.div>
 
       {/* Лайтбокс */}
-      <ApplicationImageLightbox
+      <StoryLightbox
         isOpen={lbOpen}
         images={item.images}
         currentIndex={lbIndex}
         onClose={() => setLbOpen(false)}
         onPrevious={handleLightboxPrevious}
         onNext={handleLightboxNext}
+        onSelectIndex={setLbIndex}
       />
 
       {/* Красивый Toast */}

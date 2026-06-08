@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
@@ -8,6 +8,18 @@ import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubm
 import { StoryCardContent } from "./story-card/StoryCardContent";
 import type { Story } from "./story-card/types";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import {
+  createEmptyStoryReactionCounts,
+  type StoryReactionCounts,
+  type StoryReactionType,
+} from "@/lib/stories/reactions";
+import {
+  applyOptimisticReactionToggle,
+  createReactionStateFromStory,
+  syncReactionStateFromApi,
+  type StoryReactionState,
+} from "@/lib/stories/reactionToggle";
+import { submitStoryReaction } from "@/lib/stories/submitStoryReaction";
 
 interface StoryCardProps {
   story: Story;
@@ -27,9 +39,22 @@ function StoryCardInner({
   isRead = false,
 }: StoryCardProps) {
   const router = useRouter();
-  const [liked, setLiked] = useState(!!story.userLiked);
+  const [selectedReaction, setSelectedReaction] =
+    useState<StoryReactionType | null>(
+      story.userReaction ?? (story.userLiked ? "HEART" : null),
+    );
   const [likesCount, setLikesCount] = useState(story._count?.likes || 0);
-  const [isLiking, setIsLiking] = useState(false);
+  const [reactionCounts, setReactionCounts] = useState<StoryReactionCounts>(
+    story.reactionCounts ?? createEmptyStoryReactionCounts(),
+  );
+  const liked = Boolean(selectedReaction);
+  const reactionRequestSeq = useRef(0);
+
+  const applyReactionState = useCallback((state: StoryReactionState) => {
+    setSelectedReaction(state.selectedReaction);
+    setReactionCounts(state.reactionCounts);
+    setLikesCount(state.likesCount);
+  }, []);
 
   const authorName =
     story.user?.name ||
@@ -59,72 +84,84 @@ function StoryCardInner({
     [handleCardClick],
   );
 
-  const handleLike = useCallback(async (e?: React.MouseEvent) => {
-    e?.preventDefault();
-    e?.stopPropagation();
+  const handleLike = useCallback(
+    async (e?: React.MouseEvent, type: StoryReactionType = "HEART") => {
+      e?.preventDefault();
+      e?.stopPropagation();
 
-    if (isLiking) return;
-
-    // Проверяем авторизацию
-    if (!isAuthenticated) {
-      router.push(
-        buildAuthModalUrl({
-          pathname: window.location.pathname,
-          search: window.location.search,
-          modal: "auth/signup",
-        }),
-      );
-      return;
-    }
-
-    try {
-      setIsLiking(true);
-      const method = liked ? "DELETE" : "POST";
-      const response = await fetch(`/api/stories/${story.id}/like`, {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push(
-            buildAuthModalUrl({
-              pathname: window.location.pathname,
-              search: window.location.search,
-              modal: "auth/signup",
-            }),
-          );
-          return;
-        }
-        const errorData = await response.json();
-        logRouteCatchError(
-          "[StoryCard] like",
-          new Error(
-            String(errorData.error || errorData.message || response.status),
-          ),
+      if (!isAuthenticated) {
+        router.push(
+          buildAuthModalUrl({
+            pathname: window.location.pathname,
+            search: window.location.search,
+            modal: "auth/signup",
+          }),
         );
         return;
       }
 
-      // Обновляем локально для мгновенной реакции
-      const newLikedState = !liked;
-      setLiked(newLikedState);
-      setLikesCount((prev) => (liked ? prev - 1 : prev + 1));
+      const before = createReactionStateFromStory({
+        userReaction: selectedReaction,
+        reactionCounts,
+        _count: { likes: likesCount },
+      });
+      const { next, method } = applyOptimisticReactionToggle(before, type);
+      applyReactionState(next);
 
-      if (method === "POST") {
-        const submitted = await submitPendingApplicationIfNeeded();
-        if (submitted && typeof window !== "undefined") {
-          window.location.href = "/applications";
+      const requestId = ++reactionRequestSeq.current;
+
+      try {
+        const result = await submitStoryReaction(story.id, method, type);
+
+        if (requestId !== reactionRequestSeq.current) return;
+
+        if (!result.ok) {
+          if (result.status === 401) {
+            applyReactionState(before);
+            router.push(
+              buildAuthModalUrl({
+                pathname: window.location.pathname,
+                search: window.location.search,
+                modal: "auth/signup",
+              }),
+            );
+            return;
+          }
+          applyReactionState(before);
+          logRouteCatchError(
+            "[StoryCard] like",
+            new Error(result.error ?? `Код ${result.status}`),
+          );
+          return;
         }
+
+        applyReactionState(
+          syncReactionStateFromApi(result.data, next),
+        );
+
+        if (method === "POST") {
+          const submitted = await submitPendingApplicationIfNeeded();
+          if (submitted && typeof window !== "undefined") {
+            window.location.href = "/applications";
+          }
+        }
+      } catch (error) {
+        if (requestId === reactionRequestSeq.current) {
+          applyReactionState(before);
+        }
+        logRouteCatchError("[StoryCard] handleLike", error);
       }
-    } catch (error) {
-      logRouteCatchError("[StoryCard] handleLike", error);
-    } finally {
-      setIsLiking(false);
-    }
-  }, [story.id, isAuthenticated, liked, router]);
+    },
+    [
+      story.id,
+      isAuthenticated,
+      selectedReaction,
+      reactionCounts,
+      likesCount,
+      router,
+      applyReactionState,
+    ],
+  );
 
   const renderCardContent = () => (
     <StoryCardContent
@@ -132,7 +169,8 @@ function StoryCardInner({
       isRead={isRead}
       liked={liked}
       likesCount={likesCount}
-      isLiking={isLiking}
+      selectedReaction={selectedReaction}
+      reactionCounts={reactionCounts}
       isAuthenticated={isAuthenticated}
       query={query}
       authorName={authorName}

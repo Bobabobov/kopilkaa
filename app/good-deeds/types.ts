@@ -27,6 +27,7 @@ export type GoodDeedsResponse = {
     /** Уже одобрено к выплате (выплачено). */
     withdrawnBonuses: number;
     hasPendingWithdrawal: boolean;
+    withdrawalBlocked: boolean;
   };
   feed: {
     id: string;

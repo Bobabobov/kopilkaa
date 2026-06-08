@@ -14,17 +14,15 @@ export function AdminHeader() {
     { href: "/admin/users", label: "Пользователи" },
     { href: "/admin/referrals", label: "Рефералы" },
     { href: "/admin/good-deeds", label: "Добрые дела" },
-    { href: "/admin/good-deeds/withdrawals", label: "Вывод бонусов" },
+    { href: "/admin/bonuses", label: "Бонусы" },
     { href: "/admin/heroes", label: "Герои" },
     { href: "/admin/balance", label: "Баланс" },
     { href: "/admin/ads", label: "Реклама" },
   ];
 
   const isNavItemActive = (href: string) => {
-    if (href === "/admin/referrals") {
-      return (
-        pathname === href || pathname.startsWith(`${href}/`)
-      );
+    if (href === "/admin/referrals" || href === "/admin/bonuses") {
+      return pathname === href || pathname.startsWith(`${href}/`);
     }
     return pathname === href;
   };

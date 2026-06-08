@@ -97,9 +97,12 @@ import {
   FlaskConical,
   Gift,
   Sparkles,
+  Flame,
   ClipboardList,
   Play,
   Ruler,
+  PiggyBank,
+  CalendarCheck,
 } from "lucide-react";
 
 interface IconProps {
@@ -261,6 +264,18 @@ export const LucideIcons = {
 
   Sparkles: ({ className = "", size = "md" }: IconProps) => (
     <Sparkles className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  Flame: ({ className = "", size = "md" }: IconProps) => (
+    <Flame className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  PiggyBank: ({ className = "", size = "md" }: IconProps) => (
+    <PiggyBank className={`${sizeClasses[size]} ${className}`} />
+  ),
+
+  CalendarCheck: ({ className = "", size = "md" }: IconProps) => (
+    <CalendarCheck className={`${sizeClasses[size]} ${className}`} />
   ),
 
   ClipboardList: ({ className = "", size = "md" }: IconProps) => (

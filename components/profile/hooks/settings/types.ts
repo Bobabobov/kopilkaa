@@ -18,6 +18,7 @@ export type SettingsUser = {
 export interface UseSettingsReturn {
   user: SettingsUser | null;
   loading: boolean;
+  loadError: string | null;
   saving: boolean;
 
   isChangingPassword: boolean;
@@ -56,7 +57,6 @@ export interface UseSettingsReturn {
   ) => Promise<boolean>;
   handlePasswordSubmit: () => Promise<void>;
   cancelPasswordChange: () => void;
-  handleExportData: () => Promise<void>;
   handleDeleteAccount: () => Promise<void>;
   showLocalNotification: (
     type: "success" | "error" | "info",

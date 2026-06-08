@@ -14,7 +14,6 @@ import {
   LIMITS,
 } from "@/hooks/applications/useApplicationFormState";
 import TrustIntroModal from "@/components/applications/TrustIntroModal";
-import ActivityRequirementModal from "@/components/applications/ActivityRequirementModal";
 import SuccessScreen from "@/components/applications/SuccessScreen";
 import PageHeader from "@/components/applications/PageHeader";
 
@@ -99,8 +98,6 @@ export default function ApplicationsPageClient() {
     setSubmitted,
     requiresReview,
     approvedCount,
-    activityModal,
-    setActivityModal,
   } = state;
 
   const [trustInfoOpen, setTrustInfoOpen] = useState(false);
@@ -226,21 +223,6 @@ export default function ApplicationsPageClient() {
         open={trustInfoOpen}
         onClose={() => setTrustInfoOpen(false)}
       />
-
-      {activityModal.activityType && (
-        <ActivityRequirementModal
-          isOpen={activityModal.isOpen}
-          onClose={() =>
-            setActivityModal({
-              isOpen: false,
-              activityType: null,
-              message: "",
-            })
-          }
-          activityType={activityModal.activityType}
-          message={activityModal.message}
-        />
-      )}
 
       <PageHeader />
 

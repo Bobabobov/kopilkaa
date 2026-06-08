@@ -9,10 +9,6 @@ import {
 import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 import { ApplicationCategory, ApplicationStatus, Prisma } from "@prisma/client";
 import {
-  checkActivityRequirement,
-  isActivityRequirementMet,
-} from "@/lib/activity/checkActivityRequirement";
-import {
   isApplicationCategory,
   isSubmittableApplicationCategory,
   REPORT_PHOTOS_MIN,
@@ -242,12 +238,10 @@ export async function POST(req: Request) {
       }
     }
 
-    // Проверка уровня доверия и допустимой суммы (кроме администраторов и вайтлиста)
     const trust = await computeUserTrustSnapshot(session.uid);
 
-    if (session.role !== "ADMIN" && !isWhitelisted) {
-      // Требование отзыва ТОЛЬКО перед 2-й заявкой:
-      // если есть хотя бы 1 одобренная заявка, но ещё ни одного отзыва — блокируем подачу
+    // Отзыв перед 2-й заявкой (вайтлист по email без изменений)
+    if (!isWhitelisted) {
       if (trust.approvedApplications >= 1) {
         const anyApplicationReview = await prisma.review.findFirst({
           where: { userId: session.uid },
@@ -264,10 +258,10 @@ export async function POST(req: Request) {
           );
         }
       }
+    }
 
-      const needActivity = trust.approvedApplications >= 3;
-      const lastForActivity = needActivity ? lastByUser : null;
-
+    // Ориентир суммы по уровню доверия (кроме администраторов и вайтлиста)
+    if (session.role !== "ADMIN" && !isWhitelisted) {
       if (amountNumber < trust.limits.min || amountNumber > trust.limits.max) {
         const minText = trust.limits.min.toLocaleString("ru-RU");
         const maxText = trust.limits.max.toLocaleString("ru-RU");
@@ -277,30 +271,6 @@ export async function POST(req: Request) {
           },
           { status: 400 },
         );
-      }
-
-      if (needActivity) {
-        const lastApplicationAt = lastForActivity?.createdAt ?? null;
-        const requirement = {
-          type: "LIKE_STORY" as const,
-          message:
-            "Для каждой 3-й и последующей заявки поставьте лайк любой истории.",
-        };
-        const isMet = await isActivityRequirementMet(
-          session.uid,
-          requirement,
-          lastApplicationAt,
-        );
-        if (!isMet) {
-          return Response.json(
-            {
-              error: requirement.message,
-              requiresActivity: true,
-              activityType: requirement.type,
-            },
-            { status: 403 },
-          );
-        }
       }
     }
 

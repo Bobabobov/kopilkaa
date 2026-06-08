@@ -6,7 +6,7 @@ import type { BaseEditorProps } from "./types";
 
 interface EmailEditorProps extends BaseEditorProps {
   currentEmail: string;
-  onSave: (email: string) => void;
+  onSave: (email: string) => void | Promise<void>;
 }
 
 export function EmailEditor({
@@ -27,13 +27,13 @@ export function EmailEditor({
     return emailRegex.test(email);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (
       value.trim() &&
       value.trim() !== currentEmail &&
       validateEmail(value.trim())
     ) {
-      onSave(value.trim());
+      await onSave(value.trim());
     }
     setIsEditing(false);
   };

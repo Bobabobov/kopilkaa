@@ -1,21 +1,28 @@
-// components/stories/StoryNavigation.tsx
 "use client";
 
 import Link from "next/link";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { cn } from "@/lib/utils";
+import { storiesGlassPill } from "@/app/stories/_components/stories-ui/glassStyles";
 
 export default function StoryNavigation() {
   return (
-    <nav className="pt-20 sm:pt-24 px-4 sm:px-6" aria-label="Навигация">
-      <div className="max-w-4xl mx-auto">
-        <Link
-          href="/stories"
-          className="inline-flex items-center gap-2 rounded-xl border border-[#abd1c6]/30 bg-[#001e1d]/60 backdrop-blur-sm px-4 py-2.5 text-sm font-semibold text-[#abd1c6] transition-all duration-300 hover:border-[#f9bc60]/50 hover:bg-[#f9bc60]/15 hover:text-[#f9bc60] hover:shadow-[0_4px_20px_rgba(249,188,96,0.15)]"
-        >
-          <LucideIcons.ArrowLeft size="sm" />
-          К списку историй
-        </Link>
-      </div>
+    <nav
+      className="mb-5 sm:mb-6 flex items-center"
+      aria-label="Навигация по истории"
+    >
+      <Link
+        href="/stories"
+        className={cn(
+          storiesGlassPill,
+          "font-semibold text-[#fffffe]",
+          "transition-colors hover:border-[#f9bc60]/35 hover:bg-[#f9bc60]/10 hover:text-[#f9bc60]",
+        )}
+      >
+        <LucideIcons.ArrowLeft size="sm" />
+        <span className="hidden sm:inline">К списку историй</span>
+        <span className="sm:hidden">Назад</span>
+      </Link>
     </nav>
   );
 }

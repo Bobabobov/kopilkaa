@@ -1,3 +1,8 @@
+import type {
+  StoryReactionCounts,
+  StoryReactionType,
+} from "@/lib/stories/reactions";
+
 export interface Story {
   id: string;
   title: string;
@@ -18,4 +23,6 @@ export interface Story {
     likes: number;
   };
   userLiked?: boolean;
+  userReaction?: StoryReactionType | null;
+  reactionCounts?: StoryReactionCounts;
 }

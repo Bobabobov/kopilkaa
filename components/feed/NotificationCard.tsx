@@ -32,6 +32,9 @@ const getNotificationAccent = (
   if (type === "like") {
     return `bg-gradient-to-r from-red-500/${opacity} to-pink-500/${opacity}`;
   }
+  if (type === "story_comment") {
+    return `bg-gradient-to-r from-[#f9bc60]/${opacity} to-amber-500/${opacity}`;
+  }
   if (type === "friend_request") {
     return `bg-gradient-to-r from-[#f9bc60]/${opacity} to-[#e16162]/${opacity}`;
   }
@@ -50,20 +53,25 @@ const getNotificationAccent = (
   return `bg-gradient-to-r from-[#abd1c6]/${opacity} to-[#004643]/${opacity}`;
 };
 
-// Извлекаем имя пользователя из message для лайков
+// Извлекаем имя пользователя из message (лайки, реакции, комментарии)
 const extractUserNameFromMessage = (message: string): string | null => {
-  const match = message.match(/^([^"]+)\s+лайкнул/);
+  const match = message.match(
+    /^(.+?)\s+(?:лайкнул|оставил реакцию|оставил комментарий|ответил)/i,
+  );
   return match ? match[1].trim() : null;
 };
 
 // Извлекаем название истории из message
 const extractStoryTitleFromMessage = (message: string): string | null => {
-  const match = message.match(/"([^"]+)"/);
-  return match ? match[1] : null;
+  const guillemetMatch = message.match(/истори[иейю]\s*«([^»]+)»/i);
+  if (guillemetMatch) return guillemetMatch[1];
+  const quoteMatch = message.match(/"([^"]+)"/);
+  return quoteMatch ? quoteMatch[1] : null;
 };
 
 const TYPE_LABELS: Record<string, string> = {
   like: "Лайк",
+  story_comment: "Комментарий",
   friend_request: "Друзья",
   application_status: "Заявка",
   withdrawal_status: "Выплата",
@@ -78,13 +86,15 @@ export default function NotificationCard({
 }: NotificationCardProps) {
   const isUnread = isNotificationUnread(notification, lastViewedTimestamp);
   const userName =
-    notification.type === "like"
+    notification.type === "like" || notification.type === "story_comment"
       ? extractUserNameFromMessage(notification.message)
       : notification.type === "friend_request"
         ? notification.message.split(" хочет")[0]
         : null;
   const storyTitle =
-    notification.type === "like" || notification.type === "application_status"
+    notification.type === "like" ||
+    notification.type === "story_comment" ||
+    notification.type === "application_status"
       ? extractStoryTitleFromMessage(notification.message)
       : null;
 
@@ -131,6 +141,7 @@ export default function NotificationCard({
             <div className="flex-shrink-0">
               {notification.avatar &&
               (notification.type === "like" ||
+                notification.type === "story_comment" ||
                 notification.type === "friend_request") ? (
                 <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl overflow-hidden border-2 border-[#abd1c6]/30 shadow-lg">
                   <img
@@ -178,6 +189,8 @@ export default function NotificationCard({
                   className={cn(
                     "text-[10px] font-medium px-2 py-0 rounded-md",
                     notification.type === "like" && "bg-red-500/15 text-red-400 border-red-500/30",
+                    notification.type === "story_comment" &&
+                      "bg-[#f9bc60]/15 text-[#f9bc60] border-[#f9bc60]/30",
                     notification.type === "friend_request" && "bg-[#f9bc60]/15 text-[#f9bc60] border-[#f9bc60]/30",
                     (notification.type === "application_status" ||
                       notification.type === "withdrawal_status") &&
@@ -220,6 +233,28 @@ export default function NotificationCard({
                     {storyTitle && (
                       <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-[#004643]/40 border border-[#abd1c6]/20">
                         <LucideIcons.FileText className="w-4 h-4 text-[#abd1c6]/60 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm text-[#abd1c6]/70 truncate">
+                          {storyTitle}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {notification.type === "story_comment" && (
+                  <>
+                    <p className="text-sm sm:text-base text-[#abd1c6]/70 leading-relaxed">
+                      {userName && (
+                        <span className="font-medium text-[#abd1c6]/90">
+                          {userName}
+                        </span>
+                      )}
+                      {userName && " оставил(а) комментарий под вашей историей"}
+                      {!userName && notification.message}
+                    </p>
+                    {storyTitle && (
+                      <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-[#004643]/40 border border-[#abd1c6]/20">
+                        <LucideIcons.MessageCircle className="w-4 h-4 text-[#f9bc60]/80 flex-shrink-0" />
                         <span className="text-xs sm:text-sm text-[#abd1c6]/70 truncate">
                           {storyTitle}
                         </span>

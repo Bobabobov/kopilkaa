@@ -1,43 +1,45 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import Link from "next/link";
-import { StoriesHeader, StoriesLoading } from "@/components/stories";
+import { StoriesLoading } from "@/components/stories";
 import { useStories } from "@/hooks/stories/useStories";
 import type { Story as StoryItem } from "@/hooks/stories/useStories";
 import { useAuth } from "@/hooks/useAuth";
-import { LucideIcons } from "@/components/ui/LucideIcons";
-import { Card, CardContent } from "@/components/ui/Card";
 import { StoriesEmptyWithAd } from "./sections/StoriesEmptyWithAd";
-import { TopStoriesSection } from "./top-stories";
-import { StoriesSummaryBanner } from "./sections/StoriesSummaryBanner";
+import { StoriesInsightsRow } from "./sections/StoriesInsightsRow";
 import { StoriesGrid } from "./sections/StoriesGrid";
+import { StoriesPageHeader } from "./StoriesPageHeader";
+import { StoriesPageBackground } from "./stories-ui/StoriesPageBackground";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 interface StoriesPageClientProps {
-  initialTopStories?: StoryItem[];
+  initialRandomStory?: StoryItem | null;
   initialStories?: StoryItem[];
   initialStoriesHasMore?: boolean;
   initialTotalPaid?: number | null;
 }
 
 export default function StoriesPageClient({
-  initialTopStories = [],
+  initialRandomStory = null,
   initialStories = [],
   initialStoriesHasMore = true,
   initialTotalPaid = null,
 }: StoriesPageClientProps) {
   const { isAuthenticated } = useAuth();
   const [readStoryIds, setReadStoryIds] = useState<Set<string>>(new Set());
-  const [topStories, setTopStories] = useState<StoryItem[]>(initialTopStories);
-  const [topLoading, setTopLoading] = useState(initialTopStories.length === 0);
+  const [randomStory, setRandomStory] = useState<StoryItem | null>(
+    initialRandomStory,
+  );
+  const [randomLoading, setRandomLoading] = useState(
+    initialRandomStory === null,
+  );
   const [totalPaid, setTotalPaid] = useState<number | null>(initialTotalPaid);
   const restoredRef = useRef(false);
 
   useEffect(() => {
-    setTopStories(initialTopStories);
-    setTopLoading(initialTopStories.length === 0);
-  }, [initialTopStories]);
+    setRandomStory(initialRandomStory);
+    setRandomLoading(initialRandomStory === null);
+  }, [initialRandomStory]);
 
   const {
     stories,
@@ -58,7 +60,6 @@ export default function StoriesPageClient({
   });
 
   const hasQuery = query.trim().length > 0;
-  // Учитываем prefers-reduced-motion: не анимируем карточки, если пользователь просит меньше движения
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
   useEffect(() => {
@@ -83,7 +84,6 @@ export default function StoriesPageClient({
     mq.addListener(handler);
     return () => mq.removeListener(handler);
   }, []);
-  // Анимируем карточки только при первой загрузке и если пользователь не просит меньше движения
   const shouldAnimate =
     !prefersReducedMotion &&
     !isMobileViewport &&
@@ -93,8 +93,6 @@ export default function StoriesPageClient({
   const autoLoadLimit = isMobileViewport ? 2 : 3;
   const autoLoadEnabled = currentPage < autoLoadLimit;
 
-  // Intersection Observer для бесконечной прокрутки: переподписываемся при
-  // появлении сетки (stories.length > 0), чтобы ref был уже в DOM
   useEffect(() => {
     if (!stories.length) return;
     if (!autoLoadEnabled) return;
@@ -128,9 +126,6 @@ export default function StoriesPageClient({
     autoLoadEnabled,
   ]);
 
-  // Восстановление скролла после возврата из истории: повторяем попытку по мере
-  // подгрузки страниц (бесконечный скролл), т.к. при первом рендере контента
-  // может быть мало и браузер ограничит скролл высотой документа.
   useEffect(() => {
     if (restoredRef.current) return;
     if (loading) return;
@@ -164,7 +159,6 @@ export default function StoriesPageClient({
         return;
       }
 
-      // Контента ещё мало; если страниц больше нет — сдаёмся и остаёмся где есть
       if (!hasMore && !loadingMore) {
         sessionStorage.removeItem("stories-scroll");
         restoredRef.current = true;
@@ -179,34 +173,38 @@ export default function StoriesPageClient({
   }, [loading, stories.length, hasMore, loadingMore]);
 
   useEffect(() => {
-    if (initialTopStories.length > 0) return;
+    if (initialRandomStory !== null) return;
     let isMounted = true;
-    const loadTopStories = async () => {
+    const loadRandomStory = async () => {
       try {
-        setTopLoading(true);
-        const response = await fetch("/api/stories/top?limit=10", {
+        setRandomLoading(true);
+        const response = await fetch("/api/stories/random", {
           cache: "no-store",
         });
         if (!response.ok) return;
         const data = await response.json();
-        if (isMounted && Array.isArray(data.items)) {
-          setTopStories(data.items);
+        if (
+          isMounted &&
+          data.item &&
+          typeof data.item.id === "string"
+        ) {
+          setRandomStory(data.item);
         }
       } catch (error) {
-        logRouteCatchError("[StoriesPageClient] loadTopStories", error);
+        logRouteCatchError("[StoriesPageClient] loadRandomStory", error);
       } finally {
         if (isMounted) {
-          setTopLoading(false);
+          setRandomLoading(false);
         }
       }
     };
 
-    loadTopStories();
+    loadRandomStory();
 
     return () => {
       isMounted = false;
     };
-  }, [initialTopStories.length]);
+  }, [initialRandomStory]);
 
   useEffect(() => {
     if (initialTotalPaid !== null) return;
@@ -289,11 +287,13 @@ export default function StoriesPageClient({
   }, []);
 
   return (
-    <div className="min-h-screen relative">
-      <StoriesHeader query={query} onQueryChange={setQuery} />
+    <div className="relative min-h-screen" data-stories-page>
+      <StoriesPageBackground />
+
+      <StoriesPageHeader query={query} onQueryChange={setQuery} />
 
       <main
-        className="relative z-10"
+        className="relative z-10 pb-12"
         id="stories-main"
         aria-label="Список историй платформы"
       >
@@ -303,85 +303,13 @@ export default function StoriesPageClient({
           <StoriesEmptyWithAd hasQuery={hasQuery} />
         ) : (
           <>
-            {!hasQuery && !topLoading && topStories.length > 0 && (
-              <TopStoriesSection
-                topStories={topStories}
+            {!hasQuery && (
+              <StoriesInsightsRow
+                randomStory={randomStory}
+                randomLoading={randomLoading}
+                totalPaid={totalPaid}
                 readStoryIds={readStoryIds}
               />
-            )}
-            {totalPaid !== null && !hasQuery && (
-              <StoriesSummaryBanner totalPaid={totalPaid} />
-            )}
-
-            {!hasQuery && stories.length > 0 && (
-              <div className="container mx-auto px-4 pb-4 flex flex-wrap items-center justify-center gap-3">
-                {readStoryIds.size > 0 && (
-                  <div className="inline-flex items-center gap-2 rounded-full border border-[#abd1c6]/30 bg-[#004643]/40 backdrop-blur-sm px-4 py-2.5 text-sm">
-                    <span
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f9bc60]/20 text-[#f9bc60]"
-                      aria-hidden
-                    >
-                      <LucideIcons.BookOpen className="h-4 w-4" />
-                    </span>
-                    <span className="text-[#fffffe] font-medium">
-                      Вы прочитали{" "}
-                      <span className="font-bold text-[#f9bc60] tabular-nums">
-                        {readStoryIds.size}
-                      </span>{" "}
-                      {readStoryIds.size === 1
-                        ? "историю"
-                        : readStoryIds.size < 5
-                          ? "истории"
-                          : "историй"}
-                    </span>
-                  </div>
-                )}
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#abd1c6]/25 bg-[#001e1d]/40 backdrop-blur-sm px-4 py-2 text-sm text-[#abd1c6]/90">
-                  <span
-                    className="flex h-6 w-6 items-center justify-center rounded-full bg-[#e16162]/20 text-[#e16162]"
-                    aria-hidden
-                  >
-                    <LucideIcons.Heart className="h-3.5 w-3.5 fill-[#e16162]/80" />
-                  </span>
-                  <span>Лайк — это поддержка автора истории</span>
-                </div>
-              </div>
-            )}
-
-            {!hasQuery && (
-              <div className="container mx-auto px-4 pb-6 flex justify-center">
-                <Link
-                  href="/applications"
-                  className="group block w-full max-w-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#001e1d] rounded-2xl"
-                >
-                  <Card
-                    variant="darkGlass"
-                    padding="sm"
-                    className="overflow-hidden transition-all duration-300 hover:border-[#f9bc60]/30 hover:shadow-[0_12px_40px_-12px_rgba(249,188,96,0.2)]"
-                  >
-                    <CardContent className="flex items-center gap-4 p-4">
-                      <span
-                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#f9bc60]/30 to-[#e8a545]/20 text-[#f9bc60] transition-transform duration-300 group-hover:scale-110"
-                        aria-hidden
-                      >
-                        <LucideIcons.Edit3 className="h-6 w-6" />
-                      </span>
-                      <div className="min-w-0 flex-1 text-left">
-                        <p className="font-semibold text-[#fffffe] group-hover:text-[#f9bc60] transition-colors">
-                          Рассказать свою историю
-                        </p>
-                        <p className="text-xs text-[#abd1c6]/90 mt-0.5">
-                          Подать заявку на поддержку
-                        </p>
-                      </div>
-                      <LucideIcons.ArrowRight
-                        className="h-5 w-5 shrink-0 text-[#abd1c6]/70 group-hover:text-[#f9bc60] group-hover:translate-x-1 transition-all duration-300"
-                        aria-hidden
-                      />
-                    </CardContent>
-                  </Card>
-                </Link>
-              </div>
             )}
 
             <StoriesGrid

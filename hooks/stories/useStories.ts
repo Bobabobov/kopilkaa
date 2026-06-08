@@ -1,6 +1,13 @@
 // hooks/stories/useStories.ts
 import { useState, useEffect, useRef, useCallback } from "react";
-import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
+import {
+  getMessageFromApiJson,
+  logRouteCatchError,
+} from "@/lib/api/parseApiError";
+import type {
+  StoryReactionCounts,
+  StoryReactionType,
+} from "@/lib/stories/reactions";
 
 export interface Story {
   id: string;
@@ -22,6 +29,8 @@ export interface Story {
     likes: number;
   };
   userLiked?: boolean;
+  userReaction?: StoryReactionType | null;
+  reactionCounts?: StoryReactionCounts;
 }
 
 interface StoriesResponse {

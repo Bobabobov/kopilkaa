@@ -11,6 +11,7 @@ import { getAllHeaderThemes, getHeaderTheme } from "@/lib/header-customization";
 import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
 import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
 import { HeaderPreview } from "./header-customization/HeaderPreview";
+import { HeaderCoverSection } from "./header-customization/HeaderCoverSection";
 import { ColorWheelSection } from "./header-customization/ColorWheelSection";
 import { ThemeGrid } from "./header-customization/ThemeGrid";
 
@@ -22,11 +23,13 @@ interface User {
   createdAt: string;
   avatar?: string | null;
   headerTheme?: string | null;
+  headerCover?: string | null;
 }
 
 interface HeaderCustomizationProps {
   user: User;
   onThemeChange: (theme: string) => void;
+  onCoverChange: (coverUrl: string | null) => void;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -34,6 +37,7 @@ interface HeaderCustomizationProps {
 export default function HeaderCustomization({
   user,
   onThemeChange,
+  onCoverChange,
   isOpen,
   onClose,
 }: HeaderCustomizationProps) {
@@ -43,6 +47,9 @@ export default function HeaderCustomization({
   );
   const [selectedColor, setSelectedColor] = useState<string | null>(
     user.headerTheme?.startsWith("color:") ? user.headerTheme : null,
+  );
+  const [currentHeaderCover, setCurrentHeaderCover] = useState<string | null>(
+    user.headerCover ?? null,
   );
   const [saving, setSaving] = useState(false);
   const { showToast, ToastComponent } = useBeautifulToast();
@@ -72,6 +79,12 @@ export default function HeaderCustomization({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentHeaderCover(user.headerCover ?? null);
+    }
+  }, [isOpen, user.headerCover]);
 
   // Блокировка прокрутки и Escape
   useEffect(() => {
@@ -195,10 +208,10 @@ export default function HeaderCustomization({
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-[#fffffe]">
-                  Тема заголовка
+                  Обложка профиля
                 </h2>
                 <p className="text-[#9fc9bd]">
-                  Выберите тему для заголовка вашего профиля
+                  Загрузите своё изображение или выберите готовую тему
                 </p>
               </div>
             </div>
@@ -225,10 +238,19 @@ export default function HeaderCustomization({
 
         {/* Content */}
         <div className="overflow-y-auto p-6 space-y-6">
+          <HeaderCoverSection
+            headerCover={currentHeaderCover}
+            onCoverChange={(coverUrl) => {
+              setCurrentHeaderCover(coverUrl);
+              onCoverChange(coverUrl);
+            }}
+          />
+
           <HeaderPreview
             selectedThemeConfig={selectedThemeConfig}
             themeName={themeName}
             selectedColor={selectedColor}
+            headerCover={currentHeaderCover}
           />
 
           <ColorWheelSection

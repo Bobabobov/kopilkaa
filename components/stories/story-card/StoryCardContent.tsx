@@ -53,7 +53,7 @@ export function StoryCardContent({
   const shouldBypassOptimization =
     isUploadUrl(previewImage) || isExternalUrl(previewImage);
 
-  const isWinner = story.isContestWinner;
+  const isWinner = story.isContestWinner === true;
   const safeAuthorAvatar = resolveAvatarUrl(story.user?.avatar);
 
   return (

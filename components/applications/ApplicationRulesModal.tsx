@@ -414,7 +414,11 @@ export function ApplicationRulesModal({
                           accent="red"
                           title={item.title}
                           hint={item.hint}
-                          badge={item.important ? "Важно" : undefined}
+                          badge={
+                            "important" in item && item.important
+                              ? "Важно"
+                              : undefined
+                          }
                           icon={<item.Icon size="xs" />}
                         />
                       ))}

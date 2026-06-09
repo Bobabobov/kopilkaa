@@ -10,15 +10,22 @@ interface TelegramWidgetProps {
 }
 
 const TELEGRAM_NETWORK_HINT =
-  "Не загружается? Попробуйте сменить регион сети (VPN) или войдите по почте.";
+  "Не загружается? Попробуйте сменить регион сети или войдите по почте.";
 
 function TelegramNetworkHint({ className = "" }: { className?: string }) {
   return (
-    <p
-      className={`text-[11px] text-center text-[#abd1c6]/55 leading-snug ${className}`}
+    <div
+      className={`flex items-start gap-2.5 rounded-xl border border-[#f9bc60]/35 bg-[#f9bc60]/10 px-3.5 py-3 ${className}`}
+      role="note"
     >
-      {TELEGRAM_NETWORK_HINT}
-    </p>
+      <LucideIcons.Info
+        size="sm"
+        className="mt-0.5 flex-shrink-0 text-[#f9bc60]"
+      />
+      <p className="text-xs sm:text-sm text-[#fffffe] leading-snug font-medium">
+        {TELEGRAM_NETWORK_HINT}
+      </p>
+    </div>
   );
 }
 
@@ -71,7 +78,7 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
 
     script.onerror = () => {
       setError(
-        "Не удалось загрузить Telegram. Смените регион сети (VPN) или войдите через Google или по почте.",
+        "Не удалось загрузить Telegram. Смените регион сети или войдите через Google или по почте.",
       );
       setIsReady(false);
       if (timeoutId) clearTimeout(timeoutId);
@@ -85,7 +92,7 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     timeoutId = setTimeout(() => {
       if (!isReady) {
         setError(
-          "Таймаут загрузки Telegram. Смените регион сети (VPN) или войдите через Google или по почте.",
+          "Таймаут загрузки Telegram. Смените регион сети или войдите через Google или по почте.",
         );
       }
     }, 10000);
@@ -141,7 +148,7 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
             </svg>
             <span>Войти через Telegram</span>
           </motion.button>
-          <TelegramNetworkHint className="mt-2.5" />
+          <TelegramNetworkHint className="mt-3" />
 
           {showWidget && (
             <div

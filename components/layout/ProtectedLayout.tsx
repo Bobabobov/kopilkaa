@@ -2,18 +2,33 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import TopBanner from "./TopBanner";
 import Header from "./Header";
 import Footer from "./Footer";
-import ScrollToTop from "@/components/ui/ScrollToTop";
-import { Suspense } from "react";
-import AuthModalRoot from "@/components/auth/AuthModalRoot";
 import UniversalBackground from "@/components/ui/UniversalBackground";
-import ApplicationStatusModalGate from "@/components/notifications/ApplicationStatusModalGate";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
-import KopiExperience from "@/components/kopi/KopiExperience";
 import { shouldShowMobileBottomNav } from "@/lib/navigation/mobileBottomNav";
 import { cn } from "@/lib/utils";
+
+const ScrollToTop = dynamic(() => import("@/components/ui/ScrollToTop"), {
+  ssr: false,
+});
+
+const KopiExperience = dynamic(
+  () => import("@/components/kopi/KopiExperience"),
+  { ssr: false },
+);
+
+const ApplicationStatusModalGate = dynamic(
+  () => import("@/components/notifications/ApplicationStatusModalGate"),
+  { ssr: false },
+);
+
+const AuthModalRoot = dynamic(() => import("@/components/auth/AuthModalRoot"), {
+  ssr: false,
+});
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -22,7 +37,6 @@ interface ProtectedLayoutProps {
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const pathname = usePathname();
 
-  // На странице /banned не показываем Header и Footer
   if (pathname === "/banned") {
     return (
       <>
@@ -45,7 +59,9 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
       <ApplicationStatusModalGate />
       <TopBanner />
       <Header />
-      <main className="flex-1 container-p mx-auto w-full min-w-0 overflow-x-hidden">{children}</main>
+      <main className="flex-1 container-p mx-auto w-full min-w-0 overflow-x-hidden">
+        {children}
+      </main>
       <Footer />
       <MobileBottomNav />
       <ScrollToTop />

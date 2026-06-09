@@ -1,5 +1,7 @@
 import StatsLoader from "@/components/home/StatsLoader";
 import HomePageClient from "@/components/home/HomePageClient";
+import { getRecentApplications } from "@/lib/applications/getRecentApplications";
+import { getTopDonors } from "@/lib/donations/getTopDonors";
 
 export const dynamic = "force-dynamic";
 
@@ -77,7 +79,7 @@ const faqStructuredData = {
       name: "Что такое «Добрые дела» и как это работает?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Это отдельный раздел с еженедельными заданиями. Вы выбираете уровень сложности, выполняете задания в реальной жизни и отправляете отчёт с фото или видео. После проверки модератором за подтверждённые задания начисляются бонусы.",
+        text: "Это отдельный раздел с еженедельными заданиями. Вы выбираете уровень сложности, выполняете задания в реальной жизни и отправляете отчёт с фото и видео. После проверки модератором за подтверждённые задания начисляются бонусы.",
       },
     },
     {
@@ -100,15 +102,11 @@ const faqStructuredData = {
 };
 
 export default async function HomePage() {
-  // Загружаем статистику на сервере с кэшированием через Next.js
-  let stats = fallbackStats;
-
-  try {
-    stats = await StatsLoader();
-  } catch (error) {
-    console.error("Error loading stats:", error);
-    // Используем fallback, чтобы страница всегда рендерилась
-  }
+  const [stats, recentApplications, topDonors] = await Promise.all([
+    StatsLoader().catch(() => fallbackStats),
+    getRecentApplications(3),
+    getTopDonors(3),
+  ]);
 
   return (
     <>
@@ -118,7 +116,11 @@ export default async function HomePage() {
           __html: JSON.stringify(faqStructuredData).replace(/</g, "\\u003c"),
         }}
       />
-      <HomePageClient initialStats={stats} />
+      <HomePageClient
+        initialStats={stats}
+        recentApplications={recentApplications}
+        topDonors={topDonors}
+      />
     </>
   );
 }

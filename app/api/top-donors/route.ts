@@ -1,107 +1,17 @@
 // app/api/top-donors/route.ts
-import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { getSafeExternalUrl } from "@/lib/safeExternalUrl";
-import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
+import { getTopDonors } from "@/lib/donations/getTopDonors";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    // Топ считаем агрегацией в БД (не грузим все донаты/пользователей целиком)
-    const aggregates = await prisma.donation
-      .groupBy({
-        by: ["userId"],
-        where: { type: "SUPPORT" },
-        _sum: { amount: true },
-        orderBy: { _sum: { amount: "desc" } },
-      })
-      .catch(() => []);
-
-    type SupportAggRow = { userId: string; _sum: { amount: number | null } };
-
-    const topAggs = aggregates
-      .filter((a) => typeof a.userId === "string" && a.userId.length > 0)
-      .slice(0, 3) as SupportAggRow[];
-
-    if (!topAggs.length) {
-      return NextResponse.json(
-        { success: true, donors: [] },
-        {
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
-            Expires: "0",
-          },
-        },
-      );
-    }
-
-    const userIds = topAggs.map((a) => a.userId);
-    const users = await prisma.user
-      .findMany({
-        where: { id: { in: userIds } },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          hideEmail: true,
-          avatar: true,
-          vkLink: true,
-          telegramLink: true,
-          youtubeLink: true,
-          ...USER_PUBLIC_BADGE_SELECT,
-        },
-      })
-      .catch(() => []);
-    const byId = new Map(users.map((u) => [u.id, u]));
-
-    type TopDonorBase = {
-      id: string;
-      name: string;
-      avatar: string | null;
-      vkLink: string | null;
-      telegramLink: string | null;
-      youtubeLink: string | null;
-      markedAsDeceiver: boolean;
-      totalAmount: number;
-    };
-
-    const donors: TopDonorBase[] = topAggs
-      .map((agg) => {
-        const user = byId.get(agg.userId);
-        if (!user) return null;
-        const totalAmount = agg._sum.amount ?? 0;
-        const fallbackName =
-          !user.hideEmail && user.email
-            ? user.email.split("@")[0]
-            : "Пользователь";
-        return {
-          id: user.id,
-          name: user.name || fallbackName,
-          avatar: user.avatar,
-          vkLink: getSafeExternalUrl(user.vkLink),
-          telegramLink: getSafeExternalUrl(user.telegramLink),
-          youtubeLink: getSafeExternalUrl(user.youtubeLink),
-          markedAsDeceiver: user.markedAsDeceiver,
-          totalAmount,
-        };
-      })
-      .filter((row): row is TopDonorBase => row !== null);
+    const donors = await getTopDonors(3);
 
     return NextResponse.json(
-      {
-        success: true,
-        donors: donors.map((donor, index) => ({
-          ...donor,
-          position: index + 1,
-          isTop: index === 0,
-          amount: donor.totalAmount.toLocaleString("ru-RU"),
-        })),
-      },
+      { success: true, donors },
       {
         headers: {
-          // Публичные данные: короткий кеш для снижения нагрузки
           "Cache-Control":
             "public, max-age=30, s-maxage=30, stale-while-revalidate=60",
         },

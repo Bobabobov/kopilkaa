@@ -101,6 +101,9 @@ export async function GET(
         case "webm":
           contentType = "video/webm";
           break;
+        case "mov":
+          contentType = "video/quicktime";
+          break;
       }
 
       const widthFromVariant =

@@ -332,12 +332,15 @@ function StoryAdGalleryInner({
     return <div className="relative w-full">{inner}</div>;
   }
 
+  const hasVideo = sorted.some((item) => item.type === "VIDEO");
+  const galleryTitle = hasVideo ? "Медиа" : "Фотографии";
+
   return (
     <section className="mb-10 w-full max-w-3xl" aria-label="Галерея">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-base font-bold text-[#fffffe] sm:text-lg">
           <LucideIcons.Image size="sm" className="text-[#f9bc60]" aria-hidden />
-          Фотографии
+          {galleryTitle}
         </h2>
         <span className="text-xs font-medium text-[#abd1c6]/65">
           {sorted.length}

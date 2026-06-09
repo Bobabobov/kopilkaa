@@ -132,11 +132,7 @@ export default function NotificationItem({
               className={`w-full h-full flex items-center justify-center ${getNotificationBackgroundColor(notification.type, notification.status)}`}
             >
               <div className={iconSize}>
-                {getNotificationIcon(
-                  notification.type,
-                  notification.rarity,
-                  notification.status,
-                )}
+                {getNotificationIcon(notification.type, notification.status)}
               </div>
             </div>
           )}

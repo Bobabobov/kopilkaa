@@ -8,7 +8,7 @@ import {
   getManagedTaskById,
 } from "@/lib/goodDeedTasksAdmin";
 import {
-  getWeekInfo,
+  hasGoodDeedPhotoAndVideoUrls,
   inferMediaTypeFromUrl,
   isSafeUploadUrl,
   MAX_GOOD_DEED_STORY_CHARS,
@@ -21,7 +21,7 @@ import {
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 const MAX_MEDIA = 5;
-const MIN_MEDIA = 1;
+const MIN_MEDIA = 2;
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     if (mediaUrls.length < MIN_MEDIA) {
       return NextResponse.json(
-        { error: "Добавьте хотя бы одно фото или видео" },
+        { error: "Добавьте фото и видео — оба файла обязательны" },
         { status: 400 },
       );
     }
@@ -87,12 +87,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const week = getWeekInfo(new Date());
-    const cycleKey = await getGoodDeedCycleKey(week.key);
+    const cycleKey = await getGoodDeedCycleKey();
     const task = await getManagedTaskById(taskId);
     if (!task) {
       return NextResponse.json(
-        { error: "Это задание недоступно на текущей неделе" },
+        { error: "Это задание недоступно в текущем наборе" },
         { status: 400 },
       );
     }
@@ -126,7 +125,7 @@ export async function POST(req: NextRequest) {
 
     if (!allowedTaskIds.has(task.id)) {
       return NextResponse.json(
-        { error: "Это задание недоступно на текущей неделе" },
+        { error: "Это задание недоступно в текущем наборе" },
         { status: 400 },
       );
     }
@@ -142,6 +141,16 @@ export async function POST(req: NextRequest) {
           { status: 400 },
         );
       }
+    }
+
+    if (!hasGoodDeedPhotoAndVideoUrls(sanitizedMedia)) {
+      return NextResponse.json(
+        {
+          error:
+            "Нужны фото и видео: на фото — видно «Копилка», в видео — видно и слышно",
+        },
+        { status: 400 },
+      );
     }
 
     const existing = await prisma.goodDeedSubmission.findUnique({

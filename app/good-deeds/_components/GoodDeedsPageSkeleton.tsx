@@ -1,55 +1,59 @@
-import { Card } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import {
+  goodDeedsGlassPanel,
+  goodDeedsGlassShine,
+} from "./good-deeds-ui/glassStyles";
+
+function GlassSkeleton({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn(goodDeedsGlassPanel, className)}>
+      <div className={goodDeedsGlassShine} />
+      <div className="relative">{children}</div>
+    </div>
+  );
+}
 
 export function GoodDeedsPageSkeleton() {
   return (
     <div
-      className="space-y-8"
+      className="space-y-5 sm:space-y-6"
       role="status"
       aria-live="polite"
       aria-busy="true"
     >
       <span className="sr-only">Загрузка раздела «Добрые дела»…</span>
-      <Card variant="darkGlass" padding="lg" className="overflow-hidden">
-        <Skeleton className="h-6 w-40 rounded-full" />
-        <Skeleton className="mt-4 h-10 w-3/4 max-w-md rounded-lg" />
-        <Skeleton className="mt-3 h-4 w-full max-w-xl rounded-md" />
-      </Card>
 
-      <div>
-        <Skeleton className="h-8 w-48 rounded-lg" />
-        <Skeleton className="mt-2 h-4 w-full max-w-xl rounded-md" />
-        <Skeleton className="mt-2 h-4 w-64 rounded-md" />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i} variant="darkGlass" padding="sm">
-            <div className="flex gap-3">
-              <Skeleton className="h-10 w-10 shrink-0 rounded-2xl" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-3/4 rounded-md" />
-                <Skeleton className="h-3 w-full rounded-md" />
-              </div>
-            </div>
-            <Skeleton className="mt-4 h-16 w-full rounded-xl" />
-          </Card>
-        ))}
-      </div>
-
-      <div className="space-y-4 pt-4">
-        <Skeleton className="h-8 w-40 rounded-lg" />
-        <Skeleton className="h-4 w-full max-w-md rounded-md" />
-        <Card variant="darkGlass" padding="lg">
-          <div className="flex gap-4">
-            <Skeleton className="h-12 w-12 shrink-0 rounded-full" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-5 w-1/2 rounded-md" />
-              <Skeleton className="h-4 w-full rounded-md" />
-            </div>
+      <GlassSkeleton className="px-4 py-5 sm:px-6">
+        <div className="flex gap-3">
+          <Skeleton className="h-12 w-12 shrink-0 rounded-xl" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-7 w-40 rounded-lg" />
+            <Skeleton className="h-4 w-full max-w-md rounded-md" />
           </div>
-          <Skeleton className="mt-4 aspect-video w-full rounded-2xl" />
-        </Card>
+        </div>
+      </GlassSkeleton>
+
+      <GlassSkeleton className="px-4 py-4 sm:px-5">
+        <Skeleton className="h-5 w-56 rounded-md" />
+        <Skeleton className="mt-2 h-4 w-full max-w-lg rounded-md" />
+        <Skeleton className="mt-4 h-10 w-48 rounded-xl" />
+      </GlassSkeleton>
+
+      <GlassSkeleton className="px-4 py-4">
+        <Skeleton className="h-6 w-36 rounded-lg" />
+      </GlassSkeleton>
+
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="aspect-[4/5] rounded-2xl" />
+        ))}
       </div>
     </div>
   );

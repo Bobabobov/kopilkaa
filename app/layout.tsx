@@ -1,16 +1,25 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import Script from "next/script";
 import "./globals.css";
 import { BeautifulNotificationsProvider } from "@/components/ui/BeautifulNotificationsProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import ProfilePreloadInitializer from "@/components/performance/ProfilePreloadInitializer";
 import BanCheck from "@/components/auth/BanCheck";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import MetrikaSpaTracker from "@/components/analytics/MetrikaSpaTracker";
 import YandexMetrikaCounter from "@/components/analytics/YandexMetrikaCounter";
-import GlobalClickSpark from "@/components/ui/GlobalClickSpark";
+
+const GlobalClickSpark = dynamic(
+  () => import("@/components/ui/GlobalClickSpark"),
+  { ssr: false },
+);
+
+const ProfilePreloadInitializer = dynamic(
+  () => import("@/components/performance/ProfilePreloadInitializer"),
+  { ssr: false },
+);
 
 const inter = Inter({ subsets: ["latin", "cyrillic"], preload: false });
 
@@ -125,7 +134,7 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <Script
           id="polyfill-findLast"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `if (typeof Array.prototype.findLast !== "function") { Array.prototype.findLast = function(predicate) { for (var i = this.length - 1; i >= 0; i--) { if (predicate(this[i], i, this)) return this[i]; } return undefined; }; }`,
           }}

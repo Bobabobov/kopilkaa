@@ -1,7 +1,11 @@
 "use client";
 
 import { throwIfApiFailed } from "@/lib/api/parseApiError";
-import { UPLOAD_LIMITS, hasAllowedPhotoType } from "./constants";
+import {
+  formatUploadMb,
+  UPLOAD_LIMITS,
+  hasAllowedPhotoType,
+} from "./constants";
 import type { LocalImage } from "./types";
 
 /** Таймаут загрузки фото: в браузере Telegram и на мобильном интернете может быть медленно */
@@ -33,7 +37,7 @@ export async function uploadApplicationPhotos(
   const tooBig = filesToUpload.find((f) => f.size > UPLOAD_LIMITS.maxFileBytes);
   if (tooBig) {
     throw new Error(
-      `Файл "${tooBig.name}" слишком большой. Максимум: 5 МБ на фото.`,
+      `Файл "${tooBig.name}" слишком большой. Максимум ${formatUploadMb(UPLOAD_LIMITS.maxFileBytes)} на фото.`,
     );
   }
   const wrongType = filesToUpload.find((f) => !hasAllowedPhotoType(f));
@@ -44,9 +48,8 @@ export async function uploadApplicationPhotos(
   }
   const totalBytes = filesToUpload.reduce((sum, f) => sum + f.size, 0);
   if (totalBytes > UPLOAD_LIMITS.maxTotalBytes) {
-    const mb = (UPLOAD_LIMITS.maxTotalBytes / (1024 * 1024)).toFixed(0);
     throw new Error(
-      `Слишком большой общий размер фото. Максимум: ${mb} МБ на все фото вместе. Уменьшите/замените фото.`,
+      `Слишком большой общий размер фото. Максимум ${formatUploadMb(UPLOAD_LIMITS.maxTotalBytes)} на все фото вместе. Уменьшите или замените фото.`,
     );
   }
 

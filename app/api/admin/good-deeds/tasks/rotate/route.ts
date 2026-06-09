@@ -17,7 +17,6 @@ export async function POST() {
       success: true,
       rotation: {
         version: rotation.version,
-        nextRotationAt: rotation.nextRotationAt.toISOString(),
         lastRotatedAt: rotation.lastRotatedAt.toISOString(),
       },
     });

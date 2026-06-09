@@ -25,7 +25,6 @@ type ManagedTask = {
 
 type RotationPayload = {
   version: number;
-  nextRotationAt: string;
   lastRotatedAt: string;
 };
 
@@ -40,13 +39,14 @@ function getDifficultyLabel(difficulty: Difficulty): string {
   return "Тяжёлые";
 }
 
-function formatMsLeft(ms: number): string {
-  if (ms <= 0) return "идёт обновление...";
-  const totalSec = Math.floor(ms / 1000);
-  const days = Math.floor(totalSec / 86400);
-  const hours = Math.floor((totalSec % 86400) / 3600);
-  const minutes = Math.floor((totalSec % 3600) / 60);
-  return `${days}д ${hours}ч ${minutes}м`;
+function formatRotationDate(iso: string): string {
+  return new Date(iso).toLocaleString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export function TasksManagementSection() {
@@ -56,12 +56,6 @@ export function TasksManagementSection() {
   const [notice, setNotice] = useState<string | null>(null);
   const [tasks, setTasks] = useState<ManagedTask[]>([]);
   const [rotation, setRotation] = useState<RotationPayload | null>(null);
-  const [nowTs, setNowTs] = useState(Date.now());
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setNowTs(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
 
   const load = async (options: LoadOptions = {}) => {
     const { showSpinner = true, clearNotice = true } = options;
@@ -102,11 +96,6 @@ export function TasksManagementSection() {
     };
   }, [tasks]);
 
-  const msLeft = useMemo(() => {
-    if (!rotation?.nextRotationAt) return 0;
-    return Math.max(0, new Date(rotation.nextRotationAt).getTime() - nowTs);
-  }, [rotation?.nextRotationAt, nowTs]);
-
   const patchTask = async (task: ManagedTask) => {
     setSavingId(task.id);
     setNotice(null);
@@ -140,6 +129,14 @@ export function TasksManagementSection() {
   };
 
   const rotateNow = async () => {
+    if (
+      !window.confirm(
+        "Сменить набор заданий на сайте? Участникам откроется новый цикл отчётов.",
+      )
+    ) {
+      return;
+    }
+
     setRotating(true);
     setNotice(null);
     try {
@@ -148,13 +145,13 @@ export function TasksManagementSection() {
       });
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json?.error || "Не удалось сменить цикл заданий");
+        throw new Error(json?.error || "Не удалось сменить набор заданий");
       }
       setRotation(json?.rotation || null);
       await load({ showSpinner: false, clearNotice: false });
-      setNotice("Текущие задания переключены вручную");
+      setNotice("Набор заданий обновлён вручную");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Ошибка смены цикла");
+      setNotice(error instanceof Error ? error.message : "Ошибка смены набора");
     } finally {
       setRotating(false);
     }
@@ -166,17 +163,20 @@ export function TasksManagementSection() {
         <div>
           <h3 className="text-xl font-bold text-[#fffffe]">Текущие задания</h3>
           <p className="text-sm text-[#abd1c6]">
-            На публичной странице показывается по одному заданию каждого уровня:
-            лёгкое, среднее и сложное.
+            На публичной странице показывается по одному заданию каждого уровня.
+            Смена набора — только вручную, автоматической ротации нет.
           </p>
         </div>
         <div className="flex flex-col items-end gap-2 text-right">
-          <p className="text-sm text-[#abd1c6]">
-            До авто-смены:{" "}
-            <span className="font-bold text-[#f9bc60]">
-              {formatMsLeft(msLeft)}
-            </span>
-          </p>
+          {rotation ? (
+            <p className="text-xs text-[#abd1c6]">
+              Цикл v{rotation.version}
+              <br />
+              <span className="text-[#94a1b2]">
+                с {formatRotationDate(rotation.lastRotatedAt)}
+              </span>
+            </p>
+          ) : null}
           <Button
             type="button"
             size="sm"
@@ -184,7 +184,7 @@ export function TasksManagementSection() {
             onClick={rotateNow}
             className="rounded-lg bg-[#f9bc60] text-[#001e1d] hover:bg-[#ffca7a]"
           >
-            Сменить задания сейчас
+            {rotating ? "Смена…" : "Сменить набор заданий"}
           </Button>
         </div>
       </div>

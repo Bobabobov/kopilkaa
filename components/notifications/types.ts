@@ -17,7 +17,6 @@ export interface Notification {
   timestamp: string;
   createdAt: string;
   isRead: boolean;
-  rarity?: string;
   applicationId?: string;
   storyCommentId?: string;
   withdrawalId?: string;

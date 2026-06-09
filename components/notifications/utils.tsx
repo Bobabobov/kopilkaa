@@ -3,11 +3,7 @@
 
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
-export function getNotificationIcon(
-  type: string,
-  _rarity?: string,
-  status?: string,
-) {
+export function getNotificationIcon(type: string, status?: string) {
   switch (type) {
     case "like":
       return <LucideIcons.Heart className="text-red-500" size="sm" />;

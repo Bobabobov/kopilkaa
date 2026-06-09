@@ -1,4 +1,5 @@
-"use client";
+import type { RecentApplicationItem } from "@/lib/applications/getRecentApplications";
+import type { TopDonorItem } from "@/lib/donations/getTopDonors";
 
 export type HeroStats = {
   collected: number;
@@ -9,4 +10,10 @@ export type HeroStats = {
 
 export interface HeroSectionProps {
   stats: HeroStats;
+}
+
+export interface HomePageContentProps {
+  initialStats: HeroStats;
+  recentApplications: RecentApplicationItem[];
+  topDonors: TopDonorItem[];
 }

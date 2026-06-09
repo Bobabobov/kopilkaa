@@ -7,7 +7,6 @@ import {
   getCurrentGoodDeedTasks,
   getGoodDeedCycleKey,
 } from "@/lib/goodDeedTasksAdmin";
-import { getWeekInfo } from "@/lib/goodDeeds";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
@@ -31,14 +30,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const week = getWeekInfo(new Date());
-    const cycleKey = await getGoodDeedCycleKey(week.key);
+    const cycleKey = await getGoodDeedCycleKey();
     const currentTasks = await getCurrentGoodDeedTasks();
     const currentTask = currentTasks.find((task) => task.id === taskId);
 
     if (!currentTask) {
       return NextResponse.json(
-        { error: "Можно заменить только задание текущей недели" },
+        { error: "Можно заменить только задание из текущего набора" },
         { status: 400 },
       );
     }

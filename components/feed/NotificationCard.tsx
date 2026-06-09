@@ -24,7 +24,6 @@ interface NotificationCardProps {
 const getNotificationAccent = (
   type: string,
   status?: string,
-  rarity?: string,
   isRead?: boolean,
 ) => {
   const opacity = isRead ? "20" : "40";
@@ -128,7 +127,6 @@ export default function NotificationCard({
             getNotificationAccent(
               notification.type,
               notification.status,
-              notification.rarity,
               !isUnread,
             ),
             isUnread && "shadow-[0_0_12px_rgba(249,188,96,0.25)]",
@@ -173,7 +171,6 @@ export default function NotificationCard({
                 >
                   {getNotificationIcon(
                     notification.type,
-                    notification.rarity,
                     notification.status,
                   )}
                 </div>

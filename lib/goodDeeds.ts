@@ -36,7 +36,7 @@ export const GOOD_DEED_STORY_EXTRA_HELP: Partial<
       notice?: string;
       /** Плейсхолдер textarea */
       placeholder?: string;
-      /** Строка под подписью «Фото или видео» */
+      /** Строка под подписью «Фото и видео» */
       fileUploadHint?: string;
     }
   >
@@ -46,6 +46,33 @@ export const GOOD_DEED_STORY_EXTRA_HELP: Partial<
     fileUploadHint: "Скрин того отзыва, что уже висит на площадке.",
   },
 };
+
+/** Обязательное требование к медиа в отчёте о добром деле. */
+export const GOOD_DEED_MEDIA_REQUIREMENT_NOTICE =
+  'Чтобы модерация прошла успешно, приложите фото и видео доброго дела: на фото — видно упоминание сайта «Копилка», в видео — видно и слышно. Без этого модерация не будет пройдена.';
+
+export const GOOD_DEED_MEDIA_FILE_HINT =
+  'На фото — видно упоминание «Копилка», в видео — видно и слышно.';
+
+export const GOOD_DEED_PHOTO_FILE_HINT =
+  'На фото должно быть видно упоминание сайта «Копилка».';
+
+export const GOOD_DEED_VIDEO_FILE_HINTS = [
+  'В видео должно быть видно упоминание сайта «Копилка».',
+  'В видео должно быть слышно упоминание сайта «Копилка».',
+] as const;
+
+/** В отчёте нужны и фото, и видео. */
+export function hasGoodDeedPhotoAndVideoFiles(files: File[]): boolean {
+  const hasImage = files.some((file) => file.type.startsWith("image/"));
+  const hasVideo = files.some((file) => file.type.startsWith("video/"));
+  return hasImage && hasVideo;
+}
+
+export function hasGoodDeedPhotoAndVideoUrls(urls: string[]): boolean {
+  const types = urls.map((url) => inferMediaTypeFromUrl(url));
+  return types.includes("IMAGE") && types.includes("VIDEO");
+}
 
 /** Минимальная длина рассказа при отправке отчёта о добром деле. */
 export const MIN_GOOD_DEED_STORY_CHARS = 100;
@@ -325,7 +352,11 @@ export function isSafeUploadUrl(url: string): boolean {
 
 export function inferMediaTypeFromUrl(url: string): "IMAGE" | "VIDEO" {
   const lower = url.toLowerCase();
-  if (lower.endsWith(".mp4") || lower.endsWith(".webm")) {
+  if (
+    lower.endsWith(".mp4") ||
+    lower.endsWith(".webm") ||
+    lower.endsWith(".mov")
+  ) {
     return "VIDEO";
   }
   return "IMAGE";

@@ -5,17 +5,18 @@ import { ChevronUp, RefreshCcw, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/Card";
+import { goodDeedsGlassCard } from "./good-deeds-ui/glassStyles";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
   DEFAULT_GOOD_DEED_STORY_PLACEHOLDER,
   GOOD_DEED_STORY_EXTRA_HELP,
+  hasGoodDeedPhotoAndVideoFiles,
   MAX_GOOD_DEED_STORY_CHARS,
   MIN_GOOD_DEED_STORY_CHARS,
 } from "@/lib/goodDeeds";
@@ -38,7 +39,7 @@ function displayTierLabel(name: string): string {
 
 type Props = {
   index: number;
-  /** Номер слота недели (1–3), если отличается от порядка в списке */
+  /** Номер слота (1–3), если отличается от порядка в списке */
   slotNumber?: number;
   /** Подпись уровня: «лёгкое», «среднее», «сложное» */
   slotName?: string;
@@ -134,13 +135,13 @@ export function GoodDeedsTaskCard({
           : null;
 
   return (
-    <Card
-      variant="darkGlass"
-      padding={compact ? "sm" : "md"}
+    <div
       className={cn(
-        "overflow-hidden border-white/[0.08] transition duration-200 hover:border-[#f9bc60]/20 hover:shadow-lg hover:shadow-black/25",
-        status === "APPROVED" && "ring-1 ring-emerald-500/25",
-        compact && "shadow-md",
+        goodDeedsGlassCard,
+        "flex h-full w-full min-h-0 flex-col p-4 sm:p-5",
+        "hover:border-[#f9bc60]/25",
+        status === "APPROVED" && "ring-1 ring-emerald-500/30",
+        status === "PENDING" && "ring-1 ring-amber-500/20",
       )}
     >
       <CardHeader
@@ -421,7 +422,7 @@ export function GoodDeedsTaskCard({
                       htmlFor={`good-deed-files-${task.id}`}
                       className={cn("text-[#abd1c6]", compact && "text-xs")}
                     >
-                      {compact ? "Фото или видео" : "Фото или видео (до 5)"}
+                      {compact ? "Фото и видео" : "Фото и видео (до 5)"}
                     </Label>
                     {storyHelp?.fileUploadHint && (
                       <p
@@ -503,7 +504,7 @@ export function GoodDeedsTaskCard({
                 disabled={
                   isSubmitting ||
                   formDisabled ||
-                  selectedFiles.length < 1 ||
+                  !hasGoodDeedPhotoAndVideoFiles(selectedFiles) ||
                   storyText.trim().length < MIN_GOOD_DEED_STORY_CHARS
                 }
                 className={cn(
@@ -535,6 +536,6 @@ export function GoodDeedsTaskCard({
           )}
         </>
       )}
-    </Card>
+    </div>
   );
 }

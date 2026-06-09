@@ -33,7 +33,7 @@ export function ModerationFilters({
           <input
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
-            placeholder="Поиск: задание, неделя, пользователь, текст истории..."
+            placeholder="Поиск: задание, цикл, пользователь, текст истории..."
             className="w-full rounded-xl border border-[#abd1c6]/25 bg-[#003b3a]/70 pl-9 pr-3 py-2.5 text-sm text-[#fffffe] placeholder:text-[#94a1b2] outline-none focus:border-[#f9bc60]"
           />
         </div>

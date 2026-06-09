@@ -9,6 +9,19 @@ interface TelegramWidgetProps {
   checkingAuth: boolean;
 }
 
+const TELEGRAM_NETWORK_HINT =
+  "Не загружается? Попробуйте сменить регион сети (VPN) или войдите по почте.";
+
+function TelegramNetworkHint({ className = "" }: { className?: string }) {
+  return (
+    <p
+      className={`text-[11px] text-center text-[#abd1c6]/55 leading-snug ${className}`}
+    >
+      {TELEGRAM_NETWORK_HINT}
+    </p>
+  );
+}
+
 export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
   const modalContainerRef = useRef<HTMLDivElement | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -58,7 +71,7 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
 
     script.onerror = () => {
       setError(
-        "Не удалось загрузить Telegram. Попробуйте войти через Google или по почте.",
+        "Не удалось загрузить Telegram. Смените регион сети (VPN) или войдите через Google или по почте.",
       );
       setIsReady(false);
       if (timeoutId) clearTimeout(timeoutId);
@@ -72,7 +85,7 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
     timeoutId = setTimeout(() => {
       if (!isReady) {
         setError(
-          "Таймаут загрузки Telegram. Попробуйте войти через Google или по почте.",
+          "Таймаут загрузки Telegram. Смените регион сети (VPN) или войдите через Google или по почте.",
         );
       }
     }, 10000);
@@ -128,6 +141,7 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
             </svg>
             <span>Войти через Telegram</span>
           </motion.button>
+          <TelegramNetworkHint className="mt-2.5" />
 
           {showWidget && (
             <div
@@ -153,6 +167,7 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
                   ref={modalContainerRef}
                   className="flex justify-center min-h-[44px]"
                 />
+                <TelegramNetworkHint className="mt-4 px-1" />
               </div>
             </div>
           )}

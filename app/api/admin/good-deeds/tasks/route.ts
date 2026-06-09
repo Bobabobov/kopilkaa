@@ -25,7 +25,6 @@ export async function GET() {
       tasks,
       rotation: {
         version: rotation.version,
-        nextRotationAt: rotation.nextRotationAt.toISOString(),
         lastRotatedAt: rotation.lastRotatedAt.toISOString(),
       },
     });

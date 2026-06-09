@@ -6,9 +6,13 @@ import { randomUUID } from "crypto";
 import sharp from "sharp";
 import { getAuthUser } from "@/lib/auth";
 import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
+import {
+  getMaxUploadBytesForMime,
+  UPLOAD_ALLOWED_IMAGE_MIMES,
+  UPLOAD_ALLOWED_VIDEO_MIMES,
+} from "@/lib/uploads/limits";
 
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-const ADMIN_MAX_SIZE = 20 * 1024 * 1024; // 20MB для админов
+export const maxDuration = 120;
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
@@ -28,6 +32,7 @@ function inferMimeFromFilename(filename: string): string | null {
     heif: "image/heif",
     mp4: "video/mp4",
     webm: "video/webm",
+    mov: "video/quicktime",
   };
   return map[ext] ?? null;
 }
@@ -74,45 +79,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Файлы не переданы" }, { status: 400 });
     }
 
-    // Администратор может загружать файлы большего размера
-    const maxSize = session.role === "ADMIN" ? ADMIN_MAX_SIZE : MAX_SIZE;
-
-    // Проверяем размер каждого файла
-    for (const file of files) {
-      if (file.size > maxSize) {
-        const maxSizeMB = Math.round(maxSize / (1024 * 1024));
-        return NextResponse.json(
-          { error: `Файл ${file.name} больше ${maxSizeMB} МБ` },
-          { status: 400 },
-        );
-      }
-    }
-
-    // Проверяем типы файлов (картинки + видео для TopBanner)
-    const allowedTypes = new Set([
-      "image/jpeg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-      "image/heic",
-      "image/heif",
-      "video/mp4",
-      "video/webm",
+    const isAdmin = session.role === "ADMIN";
+    const allowedTypes = new Set<string>([
+      ...UPLOAD_ALLOWED_IMAGE_MIMES,
+      ...UPLOAD_ALLOWED_VIDEO_MIMES,
     ]);
 
     const normalizedTypes: string[] = [];
     for (const file of files) {
       const normalized = normalizeUploadMime(file.type || "", file.name || "");
       if (!normalized || !allowedTypes.has(normalized)) {
-        const hint =
-          file.type || "не указан";
+        const hint = file.type || "не указан";
         return NextResponse.json(
           {
-            error: `Неподдерживаемый тип файла (${hint}). Загрузите JPEG, PNG, WebP, HEIC/HEIF или видео MP4/WebM.`,
+            error: `Неподдерживаемый тип файла (${hint}). Загрузите JPEG, PNG, WebP, HEIC/HEIF или видео MP4, MOV, WebM.`,
           },
           { status: 400 },
         );
       }
+
+      const maxSize = getMaxUploadBytesForMime(normalized, isAdmin);
+      if (file.size > maxSize) {
+        const maxSizeMB = Math.round(maxSize / (1024 * 1024));
+        const kind = normalized.startsWith("video/") ? "видео" : "фото";
+        return NextResponse.json(
+          {
+            error: `Файл ${file.name} больше ${maxSizeMB} МБ (лимит для ${kind})`,
+          },
+          { status: 400 },
+        );
+      }
+
       normalizedTypes.push(normalized);
     }
 
@@ -155,6 +152,7 @@ export async function POST(req: NextRequest) {
         "image/webp": ".webp",
         "video/mp4": ".mp4",
         "video/webm": ".webm",
+        "video/quicktime": ".mov",
       };
       const ext =
         mimeToExt[effectiveType] ||

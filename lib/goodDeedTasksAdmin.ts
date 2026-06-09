@@ -6,7 +6,6 @@ import {
 } from "@/lib/goodDeeds";
 
 const ROTATION_STATE_ID = "singleton";
-const ROTATION_MS = 7 * 24 * 60 * 60 * 1000;
 
 export type ManagedGoodDeedTask = GoodDeedTaskTemplate & {
   isActive: boolean;
@@ -26,6 +25,14 @@ function toManagedTask(
     isActive: true,
     sortOrder,
   };
+}
+
+export function formatGoodDeedCycleLabel(lastRotatedAt: Date): string {
+  return `Активен с ${lastRotatedAt.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })}`;
 }
 
 export async function ensureGoodDeedTasksSeeded(): Promise<void> {
@@ -117,9 +124,9 @@ export async function getManagedTaskById(
   return allTasks.find((task) => task.id === taskId) || null;
 }
 
+/** Состояние цикла заданий — меняется только вручную из админки. */
 export async function getTaskRotationState(): Promise<{
   version: number;
-  nextRotationAt: Date;
   lastRotatedAt: Date;
 }> {
   const now = new Date();
@@ -133,49 +140,25 @@ export async function getTaskRotationState(): Promise<{
         id: ROTATION_STATE_ID,
         version: 0,
         lastRotatedAt: now,
-        nextRotationAt: new Date(now.getTime() + ROTATION_MS),
+        // Поле остаётся в схеме; авто-ротация отключена.
+        nextRotationAt: now,
       },
     });
     return {
       version: created.version,
-      nextRotationAt: created.nextRotationAt,
       lastRotatedAt: created.lastRotatedAt,
     };
   }
 
-  if (existing.nextRotationAt.getTime() > now.getTime()) {
-    return {
-      version: existing.version,
-      nextRotationAt: existing.nextRotationAt,
-      lastRotatedAt: existing.lastRotatedAt,
-    };
-  }
-
-  const passedPeriods =
-    Math.floor(
-      (now.getTime() - existing.nextRotationAt.getTime()) / ROTATION_MS,
-    ) + 1;
-  const updated = await prisma.goodDeedTaskRotationState.update({
-    where: { id: ROTATION_STATE_ID },
-    data: {
-      version: { increment: passedPeriods },
-      lastRotatedAt: now,
-      nextRotationAt: new Date(
-        existing.nextRotationAt.getTime() + passedPeriods * ROTATION_MS,
-      ),
-    },
-  });
-
   return {
-    version: updated.version,
-    nextRotationAt: updated.nextRotationAt,
-    lastRotatedAt: updated.lastRotatedAt,
+    version: existing.version,
+    lastRotatedAt: existing.lastRotatedAt,
   };
 }
 
+/** Ручная смена набора заданий (админка). */
 export async function rotateTasksNow(): Promise<{
   version: number;
-  nextRotationAt: Date;
   lastRotatedAt: Date;
 }> {
   const now = new Date();
@@ -185,23 +168,23 @@ export async function rotateTasksNow(): Promise<{
       id: ROTATION_STATE_ID,
       version: 1,
       lastRotatedAt: now,
-      nextRotationAt: new Date(now.getTime() + ROTATION_MS),
+      nextRotationAt: now,
     },
     update: {
       version: { increment: 1 },
       lastRotatedAt: now,
-      nextRotationAt: new Date(now.getTime() + ROTATION_MS),
+      nextRotationAt: now,
     },
   });
 
   return {
     version: updated.version,
-    nextRotationAt: updated.nextRotationAt,
     lastRotatedAt: updated.lastRotatedAt,
   };
 }
 
-export async function getGoodDeedCycleKey(baseKey: string): Promise<string> {
+/** Ключ цикла отчётов — только версия ротации, без календарной недели. */
+export async function getGoodDeedCycleKey(): Promise<string> {
   const rotation = await getTaskRotationState();
-  return `${baseKey}:v${rotation.version}`;
+  return `good-deed:v${rotation.version}`;
 }

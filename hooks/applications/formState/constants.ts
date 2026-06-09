@@ -1,5 +1,13 @@
 "use client";
 
+import {
+  formatUploadMegabytes,
+  getUploadSizeLimitLabel,
+  UPLOAD_ALLOWED_IMAGE_MIMES,
+  UPLOAD_MAX_IMAGE_BYTES,
+  UPLOAD_PHOTO_ACCEPT,
+} from "@/lib/uploads/limits";
+
 export const SAVE_KEY_BASE = "application_form_data";
 export const TRUST_ACK_KEY_BASE = "application_trust_ack";
 export const POLICY_ACK_KEY_BASE = "application_policy_ack";
@@ -19,31 +27,31 @@ export const LIMITS = {
 } as const;
 
 export const UPLOAD_LIMITS = {
-  maxFileBytes: 5 * 1024 * 1024,
-  maxTotalBytes: 10 * 1024 * 1024,
-  allowedMimeTypes: [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/heic",
-    "image/heif",
-  ],
+  maxFileBytes: UPLOAD_MAX_IMAGE_BYTES,
+  maxTotalBytes: UPLOAD_MAX_IMAGE_BYTES * LIMITS.maxPhotos,
+  allowedMimeTypes: UPLOAD_ALLOWED_IMAGE_MIMES,
   allowedExtensions: [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"],
 } as const;
 
-export const ACCEPTED_PHOTO_TYPES = [
-  ...UPLOAD_LIMITS.allowedMimeTypes,
-  ...UPLOAD_LIMITS.allowedExtensions,
-].join(",");
+export const ACCEPTED_PHOTO_TYPES = UPLOAD_PHOTO_ACCEPT;
 
 export function formatUploadMb(bytes: number): string {
-  return `${Math.round(bytes / (1024 * 1024))} МБ`;
+  return `${formatUploadMegabytes(bytes)} МБ`;
+}
+
+export function getApplicationPhotoUploadHint(maxPhotos: number): string {
+  const totalMb = formatUploadMegabytes(
+    UPLOAD_MAX_IMAGE_BYTES * maxPhotos,
+  );
+  return `JPG, PNG, WebP, HEIC · ${getUploadSizeLimitLabel("photo")} на фото, до ${totalMb} МБ суммарно`;
 }
 
 export function hasAllowedPhotoType(file: File): boolean {
   const type = file.type.trim().toLowerCase();
+  if (type === "image/jpg" || type === "image/pjpeg") return true;
   if (
     type &&
+    type !== "application/octet-stream" &&
     (UPLOAD_LIMITS.allowedMimeTypes as readonly string[]).includes(type)
   ) {
     return true;

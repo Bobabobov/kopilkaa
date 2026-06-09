@@ -12,7 +12,13 @@ export type GoodDeedTaskView = {
 };
 
 export type GoodDeedsResponse = {
-  week: { key: string; label: string };
+  /** Текущий цикл заданий (меняется вручную в админке). */
+  cycle: {
+    key: string;
+    version: number;
+    label: string;
+    lastRotatedAt: string;
+  };
   /** По одному активному заданию на уровень: лёгкое → среднее → сложное. */
   weeklyTasks: GoodDeedTaskView[];
   stats: {
@@ -53,7 +59,7 @@ export type GoodDeedsResponse = {
   viewer: {
     isAuthenticated: boolean;
   };
-  /** Прогресс по трём слотам недели (одобрено / на проверке / всего слотов). */
+  /** Прогресс по трём слотам текущего набора. */
   weeklyProgress: {
     approved: number;
     pending: number;

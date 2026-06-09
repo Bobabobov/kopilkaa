@@ -7,6 +7,7 @@ import {
   ACCEPTED_PHOTO_TYPES,
   UPLOAD_LIMITS,
   formatUploadMb,
+  getApplicationPhotoUploadHint,
   hasAllowedPhotoType,
 } from "@/hooks/applications/formState/constants";
 
@@ -274,11 +275,18 @@ export default function PhotoUpload({
           >
             Перетащите сюда или нажмите «Добавить фото»
           </p>
-          {subtitle && (
-            <p className={`text-xs mt-2 ${isDark ? "text-[#94a1b2]" : "text-gray-500 dark:text-gray-400"}`}>
+          {subtitle ? (
+            <p
+              className={`text-xs mt-2 ${isDark ? "text-[#94a1b2]" : "text-gray-500 dark:text-gray-400"}`}
+            >
               {subtitle}
             </p>
-          )}
+          ) : null}
+          <p
+            className={`text-xs mt-2 ${isDark ? "text-[#94a1b2]" : "text-gray-500 dark:text-gray-400"}`}
+          >
+            {getApplicationPhotoUploadHint(maxPhotos)}
+          </p>
         </div>
       )}
       {displayError && (

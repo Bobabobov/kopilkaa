@@ -8,8 +8,7 @@
 
 | Категория | Результат |
 | --------- | --------- |
-| **Разбиение крупных файлов** | 9 монолитов разнесены по модулям; точки входа — тонкие оркестраторы |
-| **Удаление фичи** | Achievements (достижения) полностью убраны: страницы, API, модели, компоненты |
+| **Разбиение крупных файлов** | 8 монолитов разнесены по модулям; точки входа — тонкие оркестраторы |
 | **Обработка ошибок (API)** | 11+ роутов приведены к try/catch, единому формату `{ error: string }`, логированию |
 | **Документация** | ARCHITECTURE, ERROR_HANDLING, LOGS, REFACTORING_AUDIT |
 | **Тесты** | Vitest; тесты для `lib/utils` (cn) и `lib/time` (formatTimeAgo, formatRelativeDate) |
@@ -30,7 +29,6 @@
 | HowItWorks | ~258 строк | how-it-works/ (config, Header, StepCard, Disclaimer, Cta, useHowItWorksAuth); ~36 строк |
 | OtherUserProfile | ~236 строк | types, useOtherUserProfile, BackLink, Content; профиль ~90 строк |
 | HeroSection | ~195 строк | hero-section/ (types, Headline, Cta, Ads, Stats); секция ~27 строк |
-| **Achievements** | — | **Полное удаление**: страницы, API, lib, компоненты, Prisma-модели |
 
 ---
 

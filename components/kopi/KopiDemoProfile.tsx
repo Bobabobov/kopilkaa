@@ -150,8 +150,8 @@ export default function KopiDemoProfile() {
               <h2 className="text-lg font-bold text-[#fffffe]">Бонусы и активность</h2>
             </div>
             <p className="text-sm leading-relaxed text-[#abd1c6]">
-              Баллы за «Добрые дела», достижения и реферальная программа — всё
-              собрано в одном месте.
+              Баллы за «Добрые дела» и реферальная программа — всё собрано в одном
+              месте.
             </p>
           </div>
         </motion.div>

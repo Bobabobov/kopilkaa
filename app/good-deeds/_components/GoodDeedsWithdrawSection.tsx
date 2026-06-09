@@ -234,7 +234,7 @@ export function GoodDeedsWithdrawSection({
 
   return (
     <>
-      <div className="flex w-full flex-col gap-3 rounded-2xl border border-[#abd1c6]/20 bg-[#001e1d]/45 p-4 shadow-inner sm:min-w-[260px] lg:max-w-sm">
+      <div className="flex w-full flex-col gap-3 rounded-2xl border border-white/[0.12] bg-[#001e1d]/55 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md sm:min-w-[260px]">
         <div className="flex items-start gap-3">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f9bc60]/15 text-[#f9bc60]">
             <Wallet className="h-5 w-5" />

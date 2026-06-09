@@ -190,13 +190,6 @@ export function FriendsList({
                       Друг с {friendSince || "—"}
                     </span>
                   </span>
-                  <span
-                    className="inline-flex items-center gap-1 text-[#f9bc60]"
-                    title="Достижения пользователя"
-                  >
-                    <LucideIcons.Crown size="xs" className="text-[#f9bc60]" />
-                    Достижения
-                  </span>
                 </div>
               </div>
             </Link>

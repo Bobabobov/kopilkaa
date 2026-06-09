@@ -8,11 +8,11 @@ import {
   mapFeedRowToGoodDeedsApiItem,
 } from "@/lib/goodDeedPublicFeed";
 import {
+  formatGoodDeedCycleLabel,
   getCurrentGoodDeedTasks,
   getGoodDeedCycleKey,
   getTaskRotationState,
 } from "@/lib/goodDeedTasksAdmin";
-import { getWeekInfo } from "@/lib/goodDeeds";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
@@ -20,8 +20,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   try {
     const session = await getAuthUser(req);
-    const weekInfo = getWeekInfo(new Date());
-    const cycleKey = await getGoodDeedCycleKey(weekInfo.key);
+    const cycleKey = await getGoodDeedCycleKey();
     const rotationState = await getTaskRotationState();
     const currentTasks = await getCurrentGoodDeedTasks();
 
@@ -154,11 +153,11 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({
-      week: weekInfo,
       cycle: {
         key: cycleKey,
-        nextRotationAt: rotationState.nextRotationAt.toISOString(),
         version: rotationState.version,
+        lastRotatedAt: rotationState.lastRotatedAt.toISOString(),
+        label: formatGoodDeedCycleLabel(rotationState.lastRotatedAt),
       },
       weeklyTasks,
       stats: {

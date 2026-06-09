@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Trophy, Heart, ArrowRight, Link2Off } from "lucide-react";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
@@ -11,67 +10,16 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import { HomeSectionLayout } from "@/components/home/HomeSectionLayout";
+import type { TopDonorItem } from "@/lib/donations/getTopDonors";
 
-interface Donor {
-  id: string;
-  name: string;
-  amount: string;
-  avatar?: string | null;
-  vkLink?: string | null;
-  telegramLink?: string | null;
-  youtubeLink?: string | null;
-  markedAsDeceiver?: boolean;
-  position?: number;
+interface TopDonorsInlineProps {
+  donors: TopDonorItem[];
 }
 
-/**
- * Блок «Топ‑донатёры» в стиле секции «Истории успеха».
- * Показывается между статистикой и блоком «Как это работает».
- */
-export default function TopDonorsInline() {
-  const [donors, setDonors] = useState<Donor[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function TopDonorsInline({ donors }: TopDonorsInlineProps) {
   const [failedAvatars, setFailedAvatars] = useState<Record<string, boolean>>(
     {},
   );
-
-  useEffect(() => {
-    const fetchTopDonors = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/top-donors", { cache: "no-store" });
-        if (!response.ok) return;
-
-        const data = await response.json();
-        if (!data.success || !Array.isArray(data.donors)) return;
-
-        setDonors((data.donors as Donor[]).slice(0, 3));
-      } catch (error) {
-        if (process.env.NODE_ENV !== "production") {
-          console.error("Error fetching top donors (inline):", error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTopDonors();
-  }, []);
-
-  if (loading) {
-    return (
-      <section className="pt-6 pb-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-[#2f7a67]/10 border-t-[#2f7a67]" />
-            <p className="mt-4 text-sm" style={{ color: "#3f5a52" }}>
-              Загружаем топ‑донатёров...
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   if (donors.length === 0) {
     return null;
@@ -89,13 +37,7 @@ export default function TopDonorsInline() {
   return (
     <section className="pt-10 pb-20 px-4" id="top-donors">
       <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12">
           <span
             className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider mb-4"
             style={{ color: "#f9bc60", letterSpacing: "0.12em" }}
@@ -128,7 +70,7 @@ export default function TopDonorsInline() {
               </span>
             </div>
           )}
-        </motion.div>
+        </div>
 
         <HomeSectionLayout ariaLabel="Топ донатёры">
           {donors.map((donor, index) => {
@@ -151,14 +93,7 @@ export default function TopDonorsInline() {
                     : "bg-[#94a1b2] text-[#001e1d]";
 
             return (
-              <motion.div
-                key={donor.id}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.08 }}
-                className="h-full"
-              >
+              <div key={donor.id} className="h-full">
                 <Link
                   href={`/profile/${donor.id}`}
                   className="block h-full group"
@@ -313,18 +248,12 @@ export default function TopDonorsInline() {
                     )}
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             );
           })}
         </HomeSectionLayout>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.25 }}
-          className="text-center mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
+        <div className="text-center mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/support"
             className="inline-flex items-center gap-2 px-8 py-4 text-base font-bold rounded-xl transition-all duration-300 md:hover:scale-[1.02] md:hover:shadow-lg"
@@ -349,7 +278,7 @@ export default function TopDonorsInline() {
             Посмотреть всех героев
             <ArrowRight className="w-5 h-5" />
           </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

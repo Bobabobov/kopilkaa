@@ -8,7 +8,7 @@ import {
   type TelegramAuthData,
 } from "@/lib/telegramAuth";
 import { checkUserBan } from "@/lib/ban-check";
-import { scheduleTelegramAvatarSync } from "@/lib/telegramAvatarSync";
+import { commitTelegramAvatarOnAuth } from "@/lib/telegramAvatarSync";
 import {
   REFERRAL_CODE_COOKIE,
   REFERRAL_VISITOR_COOKIE,
@@ -93,6 +93,14 @@ async function authenticateTelegram(
     const telegramUsername = tgData.username || null;
     const telegramPhoto = tgData.photo_url || null;
 
+    console.info("[telegram-auth]", {
+      telegramId: String(tgData.id),
+      hasPhotoUrl: Boolean(telegramPhoto),
+      photoRestricted: Boolean(
+        telegramPhoto?.includes("t.me/i/userpic"),
+      ),
+    });
+
     const session = await getSession();
 
     // Проверяем, существует ли пользователь из сессии (после очистки БД сессия может остаться, а пользователя уже нет)
@@ -130,6 +138,17 @@ async function authenticateTelegram(
         updateData.telegramLink = `https://t.me/${telegramUsername}`;
       }
 
+      const linkedAvatar = await commitTelegramAvatarOnAuth({
+        userId: sessionUser.id,
+        telegramId,
+        widgetPhotoUrl: telegramPhoto,
+        currentAvatar: existingUser?.avatar,
+        avatarUpdatedAt: existingUser?.avatarUpdatedAt,
+      });
+      if (linkedAvatar) {
+        updateData.avatar = linkedAvatar;
+      }
+
       const updated = await prisma.user.update({
         where: { id: sessionUser.id },
         data: updateData,
@@ -141,15 +160,6 @@ async function authenticateTelegram(
           avatar: true,
           telegramLink: true,
         },
-      });
-
-      scheduleTelegramAvatarSync({
-        userId: sessionUser.id,
-        telegramId,
-        widgetPhotoUrl: telegramPhoto,
-        currentAvatar: existingUser?.avatar,
-        avatarUpdatedAt: existingUser?.avatarUpdatedAt,
-        skipCooldown: true,
       });
 
       return {
@@ -242,6 +252,31 @@ async function authenticateTelegram(
         },
       });
       createdNewUserId = user.id;
+
+      const newUserAvatar = await commitTelegramAvatarOnAuth({
+        userId: user.id,
+        telegramId,
+        widgetPhotoUrl: telegramPhoto,
+        currentAvatar: user.avatar,
+        avatarUpdatedAt: user.avatarUpdatedAt,
+      });
+      if (newUserAvatar) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { avatar: newUserAvatar },
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            role: true,
+            name: true,
+            avatar: true,
+            avatarUpdatedAt: true,
+            telegramId: true,
+            telegramUsername: true,
+          },
+        });
+      }
     } else {
       // Пользователь с таким Telegram уже есть — обновляем при необходимости
       const updateData: any = {};
@@ -249,6 +284,17 @@ async function authenticateTelegram(
       if (telegramUsername && user.telegramUsername !== telegramUsername) {
         updateData.telegramUsername = telegramUsername;
         updateData.telegramLink = `https://t.me/${telegramUsername}`;
+      }
+
+      const returningAvatar = await commitTelegramAvatarOnAuth({
+        userId: user.id,
+        telegramId,
+        widgetPhotoUrl: telegramPhoto,
+        currentAvatar: user.avatar,
+        avatarUpdatedAt: user.avatarUpdatedAt,
+      });
+      if (returningAvatar) {
+        updateData.avatar = returningAvatar;
       }
 
       if (Object.keys(updateData).length > 0) {
@@ -269,15 +315,6 @@ async function authenticateTelegram(
         });
       }
     }
-
-    scheduleTelegramAvatarSync({
-      userId: user.id,
-      telegramId,
-      widgetPhotoUrl: telegramPhoto,
-      currentAvatar: user.avatar,
-      avatarUpdatedAt: user.avatarUpdatedAt,
-      skipCooldown: true,
-    });
 
     // Проверяем блокировку перед входом
     const banStatus = await checkUserBan(user.id);
@@ -372,9 +409,34 @@ async function authenticateTelegram(
   }
 }
 
+function parseTelegramAuthBody(raw: unknown): TelegramAuthData | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  const id = Number(o.id);
+  const auth_date = Number(o.auth_date);
+  const hash = typeof o.hash === "string" ? o.hash.trim() : "";
+  if (!Number.isFinite(id) || id <= 0 || !Number.isFinite(auth_date) || !hash) {
+    return null;
+  }
+  const data: TelegramAuthData = { id, auth_date, hash };
+  if (typeof o.first_name === "string" && o.first_name) {
+    data.first_name = o.first_name;
+  }
+  if (typeof o.last_name === "string" && o.last_name) {
+    data.last_name = o.last_name;
+  }
+  if (typeof o.username === "string" && o.username) {
+    data.username = o.username;
+  }
+  if (typeof o.photo_url === "string" && o.photo_url) {
+    data.photo_url = o.photo_url;
+  }
+  return data;
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
-  const tgData = body?.telegram as TelegramAuthData | undefined;
+  const tgData = parseTelegramAuthBody(body?.telegram) ?? undefined;
   const result = await authenticateTelegram(req, tgData);
 
   if (!result.ok) {

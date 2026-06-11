@@ -49,6 +49,18 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "cdn1.telesco.pe",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn2.telesco.pe",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn3.telesco.pe",
+      },
+      {
+        protocol: "https",
         hostname: "api.telegram.org",
       },
     ],

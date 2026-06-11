@@ -1,7 +1,7 @@
 export const DEFAULT_AVATAR = "/default-avatar.png";
 
 const TELEGRAM_RESTRICTED_USERPIC_RE = /^https?:\/\/t\.me\/i\/userpic\//i;
-const TELEGRAM_CDN_RE = /^https?:\/\/cdn\d*\.telesco\.pe\//i;
+const TELEGRAM_CDN_RE = /^https?:\/\/([\w-]+\.)*telesco\.pe\//i;
 const TELEGRAM_BOT_FILE_RE = /^https?:\/\/api\.telegram\.org\/file\/bot/i;
 
 export const isRestrictedTelegramAvatarUrl = (url?: string | null): boolean => {

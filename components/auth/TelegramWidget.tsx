@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface TelegramWidgetProps {
-  /** Колбэк для data-onauth (не используется при data-auth-url). */
-  onAuth?: (user: unknown) => Promise<void>;
+  onAuth: (user: unknown) => Promise<void>;
   checkingAuth: boolean;
 }
 
@@ -31,15 +29,24 @@ function TelegramNetworkHint({ className = "" }: { className?: string }) {
 }
 
 /**
- * Официальный Telegram Login Widget (legacy iframe).
+ * Telegram Login Widget (legacy).
  * @see https://core.telegram.org/widgets/login-legacy
- * Используем data-auth-url — редирект на сервер с id/hash для проверки подписи.
+ * data-onauth → колбэк с полным объектом (включая photo_url) → POST /api/auth/telegram
  */
-export function TelegramWidget({ checkingAuth }: TelegramWidgetProps) {
+export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    (window as Window & { onTelegramAuth?: (user: unknown) => void }).onTelegramAuth =
+      (user: unknown) => {
+        void onAuth(user);
+      };
+
+    return () => {
+      delete (window as Window & { onTelegramAuth?: unknown }).onTelegramAuth;
+    };
+  }, [onAuth]);
 
   useEffect(() => {
     if (checkingAuth) return;
@@ -54,10 +61,6 @@ export function TelegramWidget({ checkingAuth }: TelegramWidgetProps) {
     if (!container) return;
 
     const cleanBotUsername = botUsername.replace(/^@/, "");
-    const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
-    const next = encodeURIComponent(`${pathname}${search}`);
-    const authUrl = `${window.location.origin}/api/auth/telegram?next=${next}`;
-
     container.innerHTML = "";
 
     const script = document.createElement("script");
@@ -68,7 +71,7 @@ export function TelegramWidget({ checkingAuth }: TelegramWidgetProps) {
     script.setAttribute("data-radius", "12");
     script.setAttribute("data-lang", "ru");
     script.setAttribute("data-request-access", "write");
-    script.setAttribute("data-auth-url", authUrl);
+    script.setAttribute("data-onauth", "onTelegramAuth(user)");
 
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
@@ -85,8 +88,7 @@ export function TelegramWidget({ checkingAuth }: TelegramWidgetProps) {
     };
 
     timeoutId = setTimeout(() => {
-      const hasIframe = container.querySelector("iframe");
-      if (!hasIframe) {
+      if (!container.querySelector("iframe")) {
         setError(
           "Таймаут загрузки Telegram. Смените регион сети или войдите через Google или по почте.",
         );
@@ -99,7 +101,7 @@ export function TelegramWidget({ checkingAuth }: TelegramWidgetProps) {
       container.innerHTML = "";
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [checkingAuth, pathname, searchParams]);
+  }, [checkingAuth]);
 
   if (!process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME) {
     return (

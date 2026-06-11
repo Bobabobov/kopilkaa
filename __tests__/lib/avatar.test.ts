@@ -56,6 +56,15 @@ describe("shouldSyncAvatarFromTelegram", () => {
   it("разрешает синхронизацию после удаления аватара", () => {
     expect(shouldSyncAvatarFromTelegram(null, new Date())).toBe(true);
   });
+
+  it("разрешает обновление внешнего CDN-аватара Telegram", () => {
+    expect(
+      shouldSyncAvatarFromTelegram(
+        "https://cdn4.telesco.pe/file/abc/photo.jpg",
+        null,
+      ),
+    ).toBe(true);
+  });
 });
 
 describe("resolveAvatarUrl", () => {

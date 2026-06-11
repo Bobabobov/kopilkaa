@@ -43,6 +43,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "t.me",
       },
+      {
+        protocol: "https",
+        hostname: "cdn4.telesco.pe",
+      },
+      {
+        protocol: "https",
+        hostname: "api.telegram.org",
+      },
     ],
   },
 
@@ -80,6 +88,15 @@ const nextConfig = {
   // Оптимизация headers
   async headers() {
     return [
+      {
+        source: "/((?!_next/static|_next/image|favicon.ico|api/).*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, must-revalidate",
+          },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [

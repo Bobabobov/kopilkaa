@@ -1,4 +1,5 @@
 import {
+  isTelegramHostedAvatarUrl,
   isUsableTelegramPhotoUrl,
   shouldSyncAvatarFromTelegram,
 } from "@/lib/avatar";
@@ -17,7 +18,15 @@ export async function resolveTelegramPhotoSource(
   return fetchTelegramProfilePhotoUrl(telegramId);
 }
 
-export async function downloadTelegramAvatar(params: {
+function canPersistTelegramPhotoUrl(url: string): boolean {
+  return isUsableTelegramPhotoUrl(url) || isTelegramHostedAvatarUrl(url);
+}
+
+/**
+ * Сохраняет аватар локально; если VPS не достучится до Telegram CDN/API —
+ * записывает прямую ссылку (в браузере пользователя она обычно открывается).
+ */
+export async function persistTelegramAvatar(params: {
   userId: string;
   telegramId: string;
   widgetPhotoUrl?: string | null;
@@ -43,32 +52,49 @@ export async function downloadTelegramAvatar(params: {
   if (!sourceUrl) return null;
 
   const saved = await saveRemoteImageAsAvatar(sourceUrl, userId);
-  if (!saved) {
+  if (saved) return saved;
+
+  if (canPersistTelegramPhotoUrl(sourceUrl)) {
     console.warn(
-      `[telegram-avatar] не удалось скачать аватар для пользователя ${userId}`,
+      `[telegram-avatar] локальное скачивание недоступно, сохраняем внешний URL для ${userId}`,
     );
+    return sourceUrl;
   }
-  return saved;
+
+  console.warn(
+    `[telegram-avatar] не удалось получить аватар для пользователя ${userId}`,
+  );
+  return null;
 }
 
-/** Фоновая подтяжка аватара для уже залогиненных Telegram-пользователей. */
+/** @deprecated Используйте persistTelegramAvatar */
+export const downloadTelegramAvatar = persistTelegramAvatar;
+
+/** Фоновая подтяжка аватара — не блокирует вход и API-ответы. */
 export function scheduleTelegramAvatarSync(params: {
   userId: string;
   telegramId: string;
+  widgetPhotoUrl?: string | null;
   currentAvatar?: string | null;
   avatarUpdatedAt?: Date | null;
+  /** Сразу после входа — без 15-минутного cooldown. */
+  skipCooldown?: boolean;
 }): void {
   if (!shouldSyncAvatarFromTelegram(params.currentAvatar, params.avatarUpdatedAt)) {
     return;
   }
 
-  const now = Date.now();
-  const last = lastAttemptByUser.get(params.userId) ?? 0;
-  if (now - last < SYNC_COOLDOWN_MS) return;
-  lastAttemptByUser.set(params.userId, now);
+  if (!params.skipCooldown) {
+    const now = Date.now();
+    const last = lastAttemptByUser.get(params.userId) ?? 0;
+    if (now - last < SYNC_COOLDOWN_MS) return;
+    lastAttemptByUser.set(params.userId, now);
+  } else {
+    lastAttemptByUser.set(params.userId, Date.now());
+  }
 
   void (async () => {
-    const saved = await downloadTelegramAvatar(params);
+    const saved = await persistTelegramAvatar(params);
     if (!saved) return;
 
     await prisma.user.update({

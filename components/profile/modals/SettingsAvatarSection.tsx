@@ -1,6 +1,7 @@
 import type { SettingsUser } from "../hooks/useSettings";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { buildUploadUrl } from "@/lib/uploads/url";
+import { TelegramAvatarSyncButton } from "../TelegramAvatarSyncButton";
 
 interface SettingsAvatarSectionProps {
   user: SettingsUser;
@@ -8,6 +9,8 @@ interface SettingsAvatarSectionProps {
   avatarInputRef: React.RefObject<HTMLInputElement | null>;
   onUpload: (file: File) => Promise<void>;
   onDelete: () => Promise<void>;
+  onTelegramAvatarSynced?: (avatarUrl: string) => void;
+  onTelegramAvatarError?: (message: string) => void;
 }
 
 export function SettingsAvatarSection({
@@ -16,7 +19,10 @@ export function SettingsAvatarSection({
   avatarInputRef,
   onUpload,
   onDelete,
+  onTelegramAvatarSynced,
+  onTelegramAvatarError,
 }: SettingsAvatarSectionProps) {
+  const hasTelegram = Boolean(user.telegramLink?.trim());
   const avatarPreview = user.avatar
     ? buildUploadUrl(resolveAvatarUrl(user.avatar), { variant: "thumb" })
     : null;
@@ -82,6 +88,13 @@ export function SettingsAvatarSection({
           >
             Удалить
           </button>
+        )}
+        {hasTelegram && onTelegramAvatarSynced && onTelegramAvatarError && (
+          <TelegramAvatarSyncButton
+            disabled={saving}
+            onSynced={onTelegramAvatarSynced}
+            onError={onTelegramAvatarError}
+          />
         )}
       </div>
     </div>

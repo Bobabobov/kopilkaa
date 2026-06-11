@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSession, attachSessionToResponse } from "@/lib/auth";
 import { verifyTelegramAuth, TelegramAuthData } from "@/lib/telegramAuth";
 import { checkUserBan } from "@/lib/ban-check";
-import { downloadTelegramAvatar } from "@/lib/telegramAvatarSync";
+import { scheduleTelegramAvatarSync } from "@/lib/telegramAvatarSync";
 import {
   REFERRAL_CODE_COOKIE,
   REFERRAL_VISITOR_COOKIE,
@@ -115,17 +115,6 @@ async function authenticateTelegram(
         telegramUsername,
       };
 
-      const saved = await downloadTelegramAvatar({
-        userId: sessionUser.id,
-        telegramId,
-        widgetPhotoUrl: telegramPhoto,
-        currentAvatar: existingUser?.avatar,
-        avatarUpdatedAt: existingUser?.avatarUpdatedAt,
-      });
-      if (saved) {
-        updateData.avatar = saved;
-      }
-
       // Автоматически добавляем публичную ссылку на Telegram-профиль
       if (telegramUsername) {
         updateData.telegramLink = `https://t.me/${telegramUsername}`;
@@ -142,6 +131,15 @@ async function authenticateTelegram(
           avatar: true,
           telegramLink: true,
         },
+      });
+
+      scheduleTelegramAvatarSync({
+        userId: sessionUser.id,
+        telegramId,
+        widgetPhotoUrl: telegramPhoto,
+        currentAvatar: existingUser?.avatar,
+        avatarUpdatedAt: existingUser?.avatarUpdatedAt,
+        skipCooldown: true,
       });
 
       return {
@@ -234,31 +232,6 @@ async function authenticateTelegram(
         },
       });
       createdNewUserId = user.id;
-
-      const savedForNewUser = await downloadTelegramAvatar({
-        userId: user.id,
-        telegramId,
-        widgetPhotoUrl: telegramPhoto,
-        currentAvatar: user.avatar,
-        avatarUpdatedAt: user.avatarUpdatedAt,
-      });
-      if (savedForNewUser) {
-        user = await prisma.user.update({
-          where: { id: user.id },
-          data: { avatar: savedForNewUser },
-          select: {
-            id: true,
-            email: true,
-            username: true,
-            role: true,
-            name: true,
-            avatar: true,
-            avatarUpdatedAt: true,
-            telegramId: true,
-            telegramUsername: true,
-          },
-        });
-      }
     } else {
       // Пользователь с таким Telegram уже есть — обновляем при необходимости
       const updateData: any = {};
@@ -266,17 +239,6 @@ async function authenticateTelegram(
       if (telegramUsername && user.telegramUsername !== telegramUsername) {
         updateData.telegramUsername = telegramUsername;
         updateData.telegramLink = `https://t.me/${telegramUsername}`;
-      }
-
-      const saved = await downloadTelegramAvatar({
-        userId: user.id,
-        telegramId,
-        widgetPhotoUrl: telegramPhoto,
-        currentAvatar: user.avatar,
-        avatarUpdatedAt: user.avatarUpdatedAt,
-      });
-      if (saved) {
-        updateData.avatar = saved;
       }
 
       if (Object.keys(updateData).length > 0) {
@@ -297,6 +259,15 @@ async function authenticateTelegram(
         });
       }
     }
+
+    scheduleTelegramAvatarSync({
+      userId: user.id,
+      telegramId,
+      widgetPhotoUrl: telegramPhoto,
+      currentAvatar: user.avatar,
+      avatarUpdatedAt: user.avatarUpdatedAt,
+      skipCooldown: true,
+    });
 
     // Проверяем блокировку перед входом
     const banStatus = await checkUserBan(user.id);

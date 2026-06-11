@@ -61,6 +61,7 @@ export default function SettingsModal({
     handleSocialLinkChange,
     handleAvatarUpload,
     handleAvatarDelete,
+    handleAvatarChange,
     handleDeleteAccount,
     showLocalNotification,
   } = useSettings();
@@ -126,6 +127,17 @@ export default function SettingsModal({
               avatarInputRef={avatarInputRef}
               onUpload={handleAvatarUpload}
               onDelete={handleAvatarDelete}
+              onTelegramAvatarSynced={(avatarUrl) => {
+                handleAvatarChange(avatarUrl);
+                showLocalNotification(
+                  "success",
+                  "Готово",
+                  "Аватар обновлён из Telegram",
+                );
+              }}
+              onTelegramAvatarError={(message) => {
+                showLocalNotification("error", "Telegram", message);
+              }}
             />
 
             <SettingsSection title="Имя">

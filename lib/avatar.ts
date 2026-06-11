@@ -1,10 +1,18 @@
 export const DEFAULT_AVATAR = "/default-avatar.png";
 
 const TELEGRAM_RESTRICTED_USERPIC_RE = /^https?:\/\/t\.me\/i\/userpic\//i;
+const TELEGRAM_CDN_RE = /^https?:\/\/cdn\d*\.telesco\.pe\//i;
+const TELEGRAM_BOT_FILE_RE = /^https?:\/\/api\.telegram\.org\/file\/bot/i;
 
 export const isRestrictedTelegramAvatarUrl = (url?: string | null): boolean => {
   if (!url) return false;
   return TELEGRAM_RESTRICTED_USERPIC_RE.test(url);
+};
+
+/** Публичный CDN/Bot API URL Telegram (можно показывать напрямую в браузере). */
+export const isTelegramHostedAvatarUrl = (url?: string | null): boolean => {
+  if (!url) return false;
+  return TELEGRAM_CDN_RE.test(url) || TELEGRAM_BOT_FILE_RE.test(url);
 };
 
 export const isDefaultAvatarUrl = (url?: string | null): boolean => {
@@ -30,6 +38,7 @@ export const shouldSyncAvatarFromTelegram = (
 ): boolean => {
   if (isDefaultAvatarUrl(avatar)) return true;
   if (isRestrictedTelegramAvatarUrl(avatar)) return true;
+  if (isTelegramHostedAvatarUrl(avatar)) return true;
   if (!avatar) return true;
   // Ручная загрузка/удаление помечается avatarUpdatedAt — не перезаписываем свой аватар.
   if (avatarUpdatedAt) return false;

@@ -1,3 +1,46 @@
+import dns from "node:dns";
+
+const FETCH_ATTEMPTS = 3;
+const FETCH_TIMEOUT_MS = 12_000;
+
+/** На части VPS IPv6 «висит» — Node пробует оба стека и падает с fetch failed. */
+if (typeof dns.setDefaultResultOrder === "function") {
+  dns.setDefaultResultOrder("ipv4first");
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isTransientFetchError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  if (error.name === "AbortError") return true;
+  const msg = error.message.toLowerCase();
+  return msg.includes("fetch failed") || msg.includes("network");
+}
+
+async function fetchTelegramBotJson<T>(
+  url: string,
+): Promise<T | null> {
+  for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+    try {
+      const res = await fetch(url, {
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) return null;
+      return (await res.json()) as T;
+    } catch (error) {
+      if (isTransientFetchError(error) && attempt < FETCH_ATTEMPTS) {
+        await sleep(400 * attempt * attempt);
+        continue;
+      }
+      throw error;
+    }
+  }
+  return null;
+}
+
 /**
  * Получает URL аватара через Telegram Bot API, когда Login Widget
  * не отдаёт photo_url (приватность) или присылает заглушку userpic.
@@ -11,33 +54,25 @@ export async function fetchTelegramProfilePhotoUrl(
   const apiBase = `https://api.telegram.org/bot${token}`;
 
   try {
-    const photosRes = await fetch(
-      `${apiBase}/getUserProfilePhotos?user_id=${encodeURIComponent(telegramId)}&limit=1`,
-      { signal: AbortSignal.timeout(15_000) },
-    );
-    if (!photosRes.ok) return null;
-
-    const photosData = (await photosRes.json()) as {
+    const photosData = await fetchTelegramBotJson<{
       ok?: boolean;
       result?: { photos?: Array<Array<{ file_id?: string }>> };
-    };
-    const sizes = photosData.result?.photos?.[0];
-    if (!photosData.ok || !sizes?.length) return null;
+    }>(
+      `${apiBase}/getUserProfilePhotos?user_id=${encodeURIComponent(telegramId)}&limit=1`,
+    );
+    const sizes = photosData?.result?.photos?.[0];
+    if (!photosData?.ok || !sizes?.length) return null;
 
     const largest = sizes[sizes.length - 1];
     if (!largest?.file_id) return null;
 
-    const fileRes = await fetch(
-      `${apiBase}/getFile?file_id=${encodeURIComponent(largest.file_id)}`,
-      { signal: AbortSignal.timeout(15_000) },
-    );
-    if (!fileRes.ok) return null;
-
-    const fileData = (await fileRes.json()) as {
+    const fileData = await fetchTelegramBotJson<{
       ok?: boolean;
       result?: { file_path?: string };
-    };
-    if (!fileData.ok || !fileData.result?.file_path) return null;
+    }>(
+      `${apiBase}/getFile?file_id=${encodeURIComponent(largest.file_id)}`,
+    );
+    if (!fileData?.ok || !fileData.result?.file_path) return null;
 
     return `${apiBase}/${fileData.result.file_path}`;
   } catch (error) {

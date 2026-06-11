@@ -157,6 +157,7 @@ export type GlassModalProps = {
   hideHeader?: boolean;
   panelClassName?: string;
   bodyClassName?: string;
+  footerClassName?: string;
   backdropClassName?: string;
   ariaLabelledBy?: string;
   ariaDescribedBy?: string;
@@ -185,6 +186,7 @@ export function GlassModal({
   hideHeader = false,
   panelClassName,
   bodyClassName,
+  footerClassName,
   backdropClassName,
   ariaLabelledBy,
   ariaDescribedBy,
@@ -297,7 +299,12 @@ export function GlassModal({
             </div>
 
             {footer && (
-              <div className="relative shrink-0 border-t border-white/[0.12] bg-white/[0.04] px-4 py-4 backdrop-blur-xl sm:px-5">
+              <div
+                className={cn(
+                  "relative shrink-0 border-t border-white/[0.12] bg-white/[0.04] px-4 py-4 backdrop-blur-xl sm:px-5",
+                  footerClassName,
+                )}
+              >
                 {footer}
               </div>
             )}

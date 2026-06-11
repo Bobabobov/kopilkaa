@@ -21,7 +21,6 @@ export function TrustIntroFooter({
   onContinue,
 }: Props) {
   const reducedMotion = useTrustIntroReducedMotion();
-  const atFirst = step === 0;
   const atLast = step === TRUST_INTRO_STEP_COUNT - 1;
 
   return (
@@ -36,13 +35,9 @@ export function TrustIntroFooter({
           <motion.button
             type="button"
             onClick={onBack}
-            disabled={atFirst}
-            whileHover={atFirst || reducedMotion ? undefined : { scale: 1.02 }}
-            whileTap={atFirst || reducedMotion ? undefined : { scale: 0.97 }}
-            className={cn(
-              "min-h-[48px] flex-1 rounded-xl border border-[#abd1c6]/30 py-3 text-sm font-semibold text-[#abd1c6] transition-opacity",
-              atFirst ? "pointer-events-none opacity-35" : "",
-            )}
+            whileHover={reducedMotion ? undefined : { scale: 1.02 }}
+            whileTap={reducedMotion ? undefined : { scale: 0.97 }}
+            className="min-h-[48px] flex-1 rounded-xl border border-[#abd1c6]/30 py-3 text-sm font-semibold text-[#abd1c6] transition-opacity"
           >
             Назад
           </motion.button>

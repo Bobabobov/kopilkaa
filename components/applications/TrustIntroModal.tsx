@@ -12,6 +12,7 @@ type Props = {
   checked: boolean;
   onCheckedChange: (val: boolean) => void;
   onConfirm: () => void;
+  onExit: () => void;
 };
 
 export function TrustIntroModal({
@@ -19,6 +20,7 @@ export function TrustIntroModal({
   checked,
   onCheckedChange,
   onConfirm,
+  onExit,
 }: Props) {
   const [step, setStep] = useState(0);
 
@@ -28,7 +30,13 @@ export function TrustIntroModal({
 
   const goNext = () =>
     setStep((s) => Math.min(TRUST_INTRO_STEP_COUNT - 1, s + 1));
-  const goBack = () => setStep((s) => Math.max(0, s - 1));
+  const goBack = () => {
+    if (step === 0) {
+      onExit();
+      return;
+    }
+    setStep((s) => Math.max(0, s - 1));
+  };
   const handleContinue = () => {
     if (!checked) return;
     onConfirm();
@@ -41,24 +49,32 @@ export function TrustIntroModal({
       size="lg"
       zIndex={60}
       align="end"
-      maxHeight="min(92dvh, 900px)"
+      maxHeight="min(88svh, 900px)"
+      panelClassName="max-h-[88vh]"
       hideHeader
       showCloseButton={false}
       closeOnBackdropClick={false}
-      bodyClassName="flex flex-col overflow-hidden p-0"
+      bodyClassName="p-0"
+      headerAfter={
+        <div className="shrink-0">
+          <TrustIntroHeader step={step} />
+        </div>
+      }
+      footer={
+        <TrustIntroFooter
+          step={step}
+          checked={checked}
+          onBack={goBack}
+          onNext={goNext}
+          onContinue={handleContinue}
+        />
+      }
+      footerClassName="p-0 border-0 bg-transparent backdrop-blur-none"
     >
-      <TrustIntroHeader step={step} />
       <TrustIntroStepPanel
         step={step}
         checked={checked}
         onCheckedChange={onCheckedChange}
-      />
-      <TrustIntroFooter
-        step={step}
-        checked={checked}
-        onBack={goBack}
-        onNext={goNext}
-        onContinue={handleContinue}
       />
     </GlassModal>
   );

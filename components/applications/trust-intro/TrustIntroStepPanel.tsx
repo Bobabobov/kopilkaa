@@ -66,7 +66,7 @@ export function TrustIntroStepPanel({ step, checked, onCheckedChange }: Props) {
   };
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5 sm:py-5">
+    <div className="px-4 py-4 sm:px-5 sm:py-5">
       {isMobileViewport ? (
         <div className="space-y-4">{renderStepContent(step)}</div>
       ) : (

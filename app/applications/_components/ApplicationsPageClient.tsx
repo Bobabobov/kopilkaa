@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { usePageTimeTracking } from "@/hooks/ui/usePageTimeTracking";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import TrustHowItWorksModal from "@/components/applications/TrustHowItWorksModal";
 import ApplicationsForm from "@/components/applications/ApplicationsForm";
 import {
@@ -102,6 +103,7 @@ export default function ApplicationsPageClient() {
 
   const [trustInfoOpen, setTrustInfoOpen] = useState(false);
   const reducedMotion = useReducedMotion();
+  const router = useRouter();
 
   if (loadingAuth) {
     return (
@@ -217,6 +219,7 @@ export default function ApplicationsPageClient() {
         onConfirm={() => {
           setIntroOpen(false);
         }}
+        onExit={() => router.push("/")}
       />
 
       <TrustHowItWorksModal

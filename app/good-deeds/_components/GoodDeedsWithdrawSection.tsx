@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { createPortal } from "react-dom";
 import { Wallet } from "lucide-react";
+import { GlassModal } from "@/components/ui/GlassModal";
 import type { ToastType } from "@/components/ui/BeautifulToast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,15 +43,10 @@ export function GoodDeedsWithdrawSection({
   onSuccess,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [amountBonuses, setAmountBonuses] = useState("");
   const [bankName, setBankName] = useState("");
   const [details, setDetails] = useState("");
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -131,32 +125,42 @@ export function GoodDeedsWithdrawSection({
     }
   };
 
-  const modal =
-    mounted &&
-    open &&
-    createPortal(
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9400] flex items-center justify-center p-4"
-        onClick={() => setOpen(false)}
-      >
-        <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 16 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          onClick={(e) => e.stopPropagation()}
-          className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#abd1c6]/25 bg-gradient-to-br from-[#004643] to-[#001e1d] p-6 shadow-2xl"
-        >
-          <h2 className="text-xl font-black text-[#fffffe]">Вывод бонусов</h2>
-          <p className="mt-2 text-sm leading-relaxed text-[#abd1c6]/95">
-            1 бонус = 1 ₽. Минимальный вывод — {MIN_WITHDRAWAL_BONUSES} бонусов.
-            Укажите банк и реквизиты (номер карты, счёт, телефон для СБП и
-            т.д.).
-          </p>
-
-          <form className="mt-6 space-y-4" onSubmit={submit}>
+  const withdrawModal = (
+    <GlassModal
+      open={open}
+      onClose={() => setOpen(false)}
+      size="lg"
+      zIndex={9400}
+      title="Вывод бонусов"
+      icon={<Wallet className="h-4 w-4 text-[#f9bc60]" />}
+      subtitle={
+        <>
+          1 бонус = 1 ₽. Минимальный вывод — {MIN_WITHDRAWAL_BONUSES} бонусов.
+          Укажите банк и реквизиты (номер карты, счёт, телефон для СБП и т.д.).
+        </>
+      }
+      footer={
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-xl border-[#abd1c6]/35"
+            onClick={() => setOpen(false)}
+          >
+            Отмена
+          </Button>
+          <Button
+            type="submit"
+            form="good-deeds-withdraw-form"
+            disabled={submitting}
+            className="rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] hover:bg-[#f7b24a]"
+          >
+            {submitting ? "Отправка…" : "Отправить заявку"}
+          </Button>
+        </div>
+      }
+    >
+      <form id="good-deeds-withdraw-form" className="space-y-4" onSubmit={submit}>
             <div>
               <Label htmlFor="wd-amount" className="text-[#abd1c6]">
                 Сумма (бонусы)
@@ -209,28 +213,9 @@ export function GoodDeedsWithdrawSection({
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="rounded-xl border-[#abd1c6]/35"
-                onClick={() => setOpen(false)}
-              >
-                Отмена
-              </Button>
-              <Button
-                type="submit"
-                disabled={submitting}
-                className="rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] hover:bg-[#f7b24a]"
-              >
-                {submitting ? "Отправка…" : "Отправить заявку"}
-              </Button>
-            </div>
-          </form>
-        </motion.div>
-      </motion.div>,
-      document.body,
-    );
+      </form>
+    </GlassModal>
+  );
 
   return (
     <>
@@ -300,7 +285,7 @@ export function GoodDeedsWithdrawSection({
         </Button>
       </div>
 
-      {modal}
+      {withdrawModal}
     </>
   );
 }

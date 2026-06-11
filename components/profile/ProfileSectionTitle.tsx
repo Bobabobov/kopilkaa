@@ -1,10 +1,13 @@
 "use client";
 
+import { ProfileImageIcon } from "@/components/profile/ProfileImageIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import type { ComponentType } from "react";
 
 interface ProfileSectionTitleProps {
-  icon: keyof typeof LucideIcons;
+  icon?: keyof typeof LucideIcons;
+  imageSrc?: string;
+  imageAlt?: string;
   title: string;
   /** Опциональный подзаголовок под заголовком */
   subtitle?: string;
@@ -13,24 +16,31 @@ interface ProfileSectionTitleProps {
 
 export function ProfileSectionTitle({
   icon: iconKey,
+  imageSrc,
+  imageAlt = "",
   title,
   subtitle,
   className = "",
 }: ProfileSectionTitleProps) {
-  const Icon = LucideIcons[iconKey] as ComponentType<{ className?: string }> | undefined;
+  const Icon = iconKey
+    ? (LucideIcons[iconKey] as ComponentType<{ className?: string }> | undefined)
+    : undefined;
+
   return (
     <div
       className={`flex items-center gap-2.5 sm:gap-3 ${className}`}
       aria-hidden
     >
-      {Icon && (
+      {imageSrc ? (
+        <ProfileImageIcon src={imageSrc} alt={imageAlt} size="md" />
+      ) : Icon ? (
         <div
           className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-[#f9bc60]"
           style={{ background: "rgba(249, 188, 96, 0.15)" }}
         >
           <Icon className="h-4 w-4" />
         </div>
-      )}
+      ) : null}
       <div>
         <h3
           className="text-sm font-semibold uppercase tracking-wider"

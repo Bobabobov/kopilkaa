@@ -1,160 +1,151 @@
-import type { ApplicationStatus } from "@/types/admin";
-import { motion } from "framer-motion";
+"use client";
+
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface AdminFiltersSectionProps {
   q: string;
-  status: "ALL" | ApplicationStatus;
   minAmount: string;
   maxAmount: string;
   sortBy: "date" | "amount" | "status";
   sortOrder: "asc" | "desc";
   onSearchChange: (query: string) => void;
-  onStatusChange: (status: "ALL" | ApplicationStatus) => void;
   onMinAmountChange: (amount: string) => void;
   onMaxAmountChange: (amount: string) => void;
   onSortByChange: (sortBy: "date" | "amount" | "status") => void;
   onSortOrderChange: (order: "asc" | "desc") => void;
 }
 
+const SORT_OPTIONS = [
+  { sortBy: "date" as const, sortOrder: "desc" as const, label: "Сначала новые" },
+  { sortBy: "date" as const, sortOrder: "asc" as const, label: "Сначала старые" },
+  {
+    sortBy: "amount" as const,
+    sortOrder: "desc" as const,
+    label: "Сумма: от большей",
+  },
+  {
+    sortBy: "amount" as const,
+    sortOrder: "asc" as const,
+    label: "Сумма: от меньшей",
+  },
+  {
+    sortBy: "status" as const,
+    sortOrder: "asc" as const,
+    label: "По статусу (А→Я)",
+  },
+  {
+    sortBy: "status" as const,
+    sortOrder: "desc" as const,
+    label: "По статусу (Я→А)",
+  },
+];
+
+const fieldClass =
+  "w-full rounded-xl border border-[#abd1c6]/25 bg-[#003b3a]/70 px-3 py-2.5 text-sm text-[#fffffe] placeholder:text-[#94a1b2] outline-none focus:border-[#f9bc60] min-h-[44px]";
+
+const labelClass = "block text-xs font-bold text-[#abd1c6] mb-1.5";
+
 export function AdminFiltersSection({
   q,
-  status,
   minAmount,
   maxAmount,
   sortBy,
   sortOrder,
   onSearchChange,
-  onStatusChange,
   onMinAmountChange,
   onMaxAmountChange,
   onSortByChange,
   onSortOrderChange,
 }: AdminFiltersSectionProps) {
+  const sortValue = `${sortBy}-${sortOrder}`;
+
+  const handleSortChange = (value: string) => {
+    const option = SORT_OPTIONS.find(
+      (o) => `${o.sortBy}-${o.sortOrder}` === value,
+    );
+    if (!option) return;
+    onSortByChange(option.sortBy);
+    onSortOrderChange(option.sortOrder);
+  };
+
   return (
-    <motion.div
-      key="filters"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        <div className="lg:col-span-1 sm:col-span-2">
-          <label className="block text-xs font-black text-[#abd1c6] mb-2">
-            Поиск
+    <div className="pt-5 border-t border-[#abd1c6]/15">
+      <div className="flex items-center gap-2 mb-3">
+        <LucideIcons.Search size="sm" className="text-[#f9bc60]" />
+        <h3 className="text-sm font-bold text-[#fffffe]">Поиск и сортировка</h3>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-3">
+        <div className="flex-1 min-w-0">
+          <label htmlFor="admin-search" className={labelClass}>
+            Поиск по истории, нику, почте и тексту заявки
           </label>
           <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#abd1c6]">
-              <LucideIcons.Search size="sm" />
-            </div>
+            <LucideIcons.Search
+              size="sm"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a1b2]"
+            />
             <input
+              id="admin-search"
               value={q}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Заголовок/описание…"
-              className="w-full pl-10 pr-3 py-3 rounded-xl bg-[#001e1d]/60 border border-[#abd1c6]/25 focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all text-[#fffffe] placeholder:text-[#abd1c6]/60 text-sm min-h-[44px]"
+              placeholder="История, ник, имя, email, заголовок, реквизиты…"
+              className={`${fieldClass} pl-10`}
             />
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs font-black text-[#abd1c6] mb-2">
-            Статус
+        <div className="w-full lg:w-56 flex-shrink-0">
+          <label htmlFor="admin-sort" className={labelClass}>
+            Порядок списка
           </label>
           <select
-            value={status}
-            onChange={(e) =>
-              onStatusChange(e.target.value as "ALL" | ApplicationStatus)
-            }
-            className="w-full px-3 py-3 rounded-xl bg-[#001e1d]/60 border border-[#abd1c6]/25 focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all text-[#fffffe] text-sm min-h-[44px]"
+            id="admin-sort"
+            value={sortValue}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className={fieldClass}
           >
-            <option value="ALL" className="bg-[#001e1d]">
-              Все
-            </option>
-            <option value="PENDING" className="bg-[#001e1d]">
-              В обработке
-            </option>
-            <option value="APPROVED" className="bg-[#001e1d]">
-              Одобрено
-            </option>
-            <option value="REJECTED" className="bg-[#001e1d]">
-              Отказано
-            </option>
-            <option value="CONTEST" className="bg-[#001e1d]">
-              Конкурс
-            </option>
-          </select>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-black text-[#abd1c6] mb-2">
-              Сумма от
-            </label>
-            <input
-              type="number"
-              value={minAmount}
-              onChange={(e) => onMinAmountChange(e.target.value)}
-              placeholder="0"
-              className="w-full px-3 py-3 rounded-xl bg-[#001e1d]/60 border border-[#abd1c6]/25 focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all text-[#fffffe] placeholder:text-[#abd1c6]/60 text-sm min-h-[44px]"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-black text-[#abd1c6] mb-2">
-              Сумма до
-            </label>
-            <input
-              type="number"
-              value={maxAmount}
-              onChange={(e) => onMaxAmountChange(e.target.value)}
-              placeholder="∞"
-              className="w-full px-3 py-3 rounded-xl bg-[#001e1d]/60 border border-[#abd1c6]/25 focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all text-[#fffffe] placeholder:text-[#abd1c6]/60 text-sm min-h-[44px]"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-xs font-black text-[#abd1c6] mb-2">
-            Сортировка
-          </label>
-          <select
-            value={sortBy}
-            onChange={(e) =>
-              onSortByChange(e.target.value as "date" | "amount" | "status")
-            }
-            className="w-full px-3 py-3 rounded-xl bg-[#001e1d]/60 border border-[#abd1c6]/25 focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all text-[#fffffe] text-sm min-h-[44px]"
-          >
-            <option value="date" className="bg-[#001e1d]">
-              По дате
-            </option>
-            <option value="amount" className="bg-[#001e1d]">
-              По сумме
-            </option>
-            <option value="status" className="bg-[#001e1d]">
-              По статусу
-            </option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs font-black text-[#abd1c6] mb-2">
-            Порядок
-          </label>
-          <select
-            value={sortOrder}
-            onChange={(e) => onSortOrderChange(e.target.value as "asc" | "desc")}
-            className="w-full px-3 py-3 rounded-xl bg-[#001e1d]/60 border border-[#abd1c6]/25 focus:ring-2 focus:ring-[#f9bc60] focus:border-[#f9bc60] transition-all text-[#fffffe] text-sm min-h-[44px]"
-          >
-            <option value="desc" className="bg-[#001e1d]">
-              По убыванию
-            </option>
-            <option value="asc" className="bg-[#001e1d]">
-              По возрастанию
-            </option>
+            {SORT_OPTIONS.map((option) => (
+              <option
+                key={`${option.sortBy}-${option.sortOrder}`}
+                value={`${option.sortBy}-${option.sortOrder}`}
+                className="bg-[#001e1d]"
+              >
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
       </div>
-    </motion.div>
+
+      <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="sm:col-span-2">
+          <label htmlFor="admin-min-amount" className={labelClass}>
+            Сумма от, ₽
+          </label>
+          <input
+            id="admin-min-amount"
+            type="number"
+            value={minAmount}
+            onChange={(e) => onMinAmountChange(e.target.value)}
+            placeholder="Без ограничения"
+            className={fieldClass}
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <label htmlFor="admin-max-amount" className={labelClass}>
+            Сумма до, ₽
+          </label>
+          <input
+            id="admin-max-amount"
+            type="number"
+            value={maxAmount}
+            onChange={(e) => onMaxAmountChange(e.target.value)}
+            placeholder="Без ограничения"
+            className={fieldClass}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
-

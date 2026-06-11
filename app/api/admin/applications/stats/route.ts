@@ -11,12 +11,11 @@ export async function GET() {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const [pending, approved, rejected, contest, total, totalAmount] =
+    const [pending, approved, rejected, total, totalAmount] =
       await Promise.all([
         prisma.application.count({ where: { status: "PENDING" } }),
         prisma.application.count({ where: { status: "APPROVED" } }),
         prisma.application.count({ where: { status: "REJECTED" } }),
-        prisma.application.count({ where: { status: "CONTEST" } }),
         prisma.application.count(),
         prisma.application
           .aggregate({
@@ -29,7 +28,6 @@ export async function GET() {
       pending,
       approved,
       rejected,
-      contest,
       total,
       totalAmount,
     });

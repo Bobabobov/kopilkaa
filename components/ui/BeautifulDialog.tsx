@@ -1,8 +1,9 @@
-// components/ui/BeautifulDialog.tsx
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import { GlassModal } from "@/components/ui/GlassModal";
+import { LucideIcons } from "@/components/ui/LucideIcons";
+import { cn } from "@/lib/utils";
 
 export type DialogType = "alert" | "confirm" | "prompt";
 
@@ -19,6 +20,22 @@ export interface BeautifulDialogProps {
   promptValue?: string;
   onPromptChange?: (value: string) => void;
   placeholder?: string;
+}
+
+const dialogIconClass: Record<DialogType, string> = {
+  alert: "text-[#e16162]",
+  confirm: "text-[#f9bc60]",
+  prompt: "text-[#abd1c6]",
+};
+
+function DialogIcon({ type }: { type: DialogType }) {
+  if (type === "alert") {
+    return <LucideIcons.AlertTriangle className="h-5 w-5" />;
+  }
+  if (type === "confirm") {
+    return <LucideIcons.HelpCircle className="h-5 w-5" />;
+  }
+  return <LucideIcons.MessageCircle className="h-5 w-5" />;
 }
 
 export default function BeautifulDialog({
@@ -38,32 +55,8 @@ export default function BeautifulDialog({
   const [inputValue, setInputValue] = useState(promptValue);
 
   useEffect(() => {
-    if (show) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [show]);
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        handleCancel();
-      }
-    };
-
-    if (show) {
-      document.addEventListener("keydown", handleEscape);
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [show]);
+    if (show) setInputValue(promptValue);
+  }, [promptValue, show]);
 
   const handleConfirm = () => {
     if (type === "prompt" && onPromptChange) {
@@ -78,157 +71,59 @@ export default function BeautifulDialog({
     onClose();
   };
 
-  const getIcon = () => {
-    switch (type) {
-      case "alert":
-        return (
-          <svg
-            className="w-8 h-8 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-            />
-          </svg>
-        );
-      case "confirm":
-        return (
-          <svg
-            className="w-8 h-8 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        );
-      case "prompt":
-        return (
-          <svg
-            className="w-8 h-8 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-            />
-          </svg>
-        );
-    }
-  };
-
-  const getGradient = () => {
-    switch (type) {
-      case "alert":
-        return "from-red-500 to-rose-500";
-      case "confirm":
-        return "from-[#f9bc60] to-[#abd1c6]";
-      case "prompt":
-        return "from-[#abd1c6] to-[#f9bc60]";
-    }
-  };
-
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            transition={{
-              type: "spring",
-              stiffness: 400,
-              damping: 25,
-              duration: 0.4,
-            }}
-            className="relative w-full max-w-md"
+    <GlassModal
+      show={show}
+      onClose={onClose}
+      size="md"
+      title={title}
+      icon={
+        <span className={dialogIconClass[type]}>
+          <DialogIcon type={type} />
+        </span>
+      }
+      footer={
+        <div className="flex flex-wrap justify-end gap-3">
+          {(type === "confirm" || type === "prompt") && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2 text-sm font-medium text-[#abd1c6] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-colors hover:bg-white/10 hover:text-white"
+            >
+              {cancelText}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={handleConfirm}
+            className={cn(
+              "rounded-xl px-4 py-2 text-sm font-semibold shadow-[0_8px_24px_rgba(0,0,0,0.25)] transition-colors",
+              type === "alert"
+                ? "bg-[#e16162] text-white hover:bg-[#c95556]"
+                : "bg-[#f9bc60] text-[#001e1d] hover:bg-[#e8a545]",
+            )}
           >
-            {/* Фоновое свечение */}
-            <div
-              className={`absolute inset-0 bg-gradient-to-r ${getGradient()} rounded-2xl blur-sm opacity-20 scale-105`}
-            ></div>
+            {confirmText}
+          </button>
+        </div>
+      }
+    >
+      <p className="text-sm leading-relaxed text-[#abd1c6]">{message}</p>
 
-            {/* Основная плашка */}
-            <div className="relative bg-[#001e1d]/95 rounded-2xl shadow-2xl border border-[#abd1c6]/20 backdrop-blur-sm p-6">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div
-                    className={`w-12 h-12 bg-gradient-to-r ${getGradient()} rounded-full flex items-center justify-center shadow-lg`}
-                  >
-                    {getIcon()}
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-semibold text-[#fffffe] mb-2">
-                    {title}
-                  </h3>
-                  <p className="text-sm text-[#abd1c6] leading-relaxed mb-4">
-                    {message}
-                  </p>
-
-                  {/* Поле ввода для prompt */}
-                  {type === "prompt" && (
-                    <div className="mb-4">
-                      <input
-                        type="text"
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        placeholder={placeholder}
-                        className="w-full px-3 py-2 border border-[#abd1c6]/20 rounded-lg bg-[#001e1d]/40 text-[#fffffe] placeholder-[#abd1c6]/60 focus:outline-none focus:ring-2 focus:ring-[#f9bc60] focus:border-transparent"
-                        autoFocus
-                      />
-                    </div>
-                  )}
-
-                  {/* Кнопки */}
-                  <div className="flex gap-3 justify-end">
-                    {(type === "confirm" || type === "prompt") && (
-                      <button
-                        onClick={handleCancel}
-                        className="px-4 py-2 text-sm font-medium text-[#abd1c6] bg-[#001e1d]/40 hover:bg-[#001e1d]/55 border border-[#abd1c6]/20 rounded-lg transition-colors duration-200"
-                      >
-                        {cancelText}
-                      </button>
-                    )}
-                    <button
-                      onClick={handleConfirm}
-                      className="px-4 py-2 text-sm font-semibold text-[#001e1d] bg-[#f9bc60] hover:bg-[#e8a545] rounded-lg transition-colors duration-200 shadow-lg"
-                    >
-                      {confirmText}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
+      {type === "prompt" && (
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(event) => setInputValue(event.target.value)}
+          placeholder={placeholder}
+          className="mt-4 w-full rounded-xl border border-white/15 bg-black/20 px-3 py-2.5 text-sm text-white placeholder:text-[#94a1b2] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] outline-none transition-colors focus:border-[#f9bc60]/40 focus:ring-2 focus:ring-[#f9bc60]/20"
+          autoFocus
+        />
       )}
-    </AnimatePresence>
+    </GlassModal>
   );
 }
 
-// Хук для удобного использования
 export function useBeautifulDialog() {
   const [dialog, setDialog] = useState<{
     show: boolean;

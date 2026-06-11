@@ -1,6 +1,7 @@
 import {
   GoodDeedSubmissionStatus,
   GoodDeedWithdrawalStatus,
+  type Prisma,
 } from "@prisma/client";
 import { prisma } from "@/lib/db";
 
@@ -13,22 +14,23 @@ export type GoodDeedBonusWallet = {
   withdrawalBlocked: boolean;
 };
 
-export async function computeGoodDeedBonusWallet(
+async function aggregateGoodDeedBonusWallet(
+  db: Prisma.TransactionClient | typeof prisma,
   userId: string,
 ): Promise<GoodDeedBonusWallet> {
   const [earnedRow, grantsRow, userRow] = await Promise.all([
-    prisma.goodDeedSubmission.aggregate({
+    db.goodDeedSubmission.aggregate({
       where: {
         userId,
         status: GoodDeedSubmissionStatus.APPROVED,
       },
       _sum: { reward: true },
     }),
-    prisma.goodDeedBonusGrant.aggregate({
+    db.goodDeedBonusGrant.aggregate({
       where: { userId },
       _sum: { amountBonuses: true },
     }),
-    prisma.user.findUnique({
+    db.user.findUnique({
       where: { id: userId },
       select: { bonusWithdrawalBlocked: true },
     }),
@@ -36,7 +38,7 @@ export async function computeGoodDeedBonusWallet(
   const totalEarnedBonuses =
     (earnedRow._sum.reward ?? 0) + (grantsRow._sum.amountBonuses ?? 0);
 
-  const withdrawals = await prisma.goodDeedWithdrawalRequest.findMany({
+  const withdrawals = await db.goodDeedWithdrawalRequest.findMany({
     where: { userId },
     select: { status: true, amountBonuses: true },
   });
@@ -68,4 +70,17 @@ export async function computeGoodDeedBonusWallet(
     hasPendingWithdrawal: pendingCount > 0,
     withdrawalBlocked: userRow?.bonusWithdrawalBlocked ?? false,
   };
+}
+
+export async function computeGoodDeedBonusWallet(
+  userId: string,
+): Promise<GoodDeedBonusWallet> {
+  return aggregateGoodDeedBonusWallet(prisma, userId);
+}
+
+export async function computeGoodDeedBonusWalletInTx(
+  tx: Prisma.TransactionClient,
+  userId: string,
+): Promise<GoodDeedBonusWallet> {
+  return aggregateGoodDeedBonusWallet(tx, userId);
 }

@@ -1,7 +1,13 @@
 "use client";
+
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/Card";
 import { ProfileFriendsHeader } from "./friends/ProfileFriendsHeader";
 import { ProfileFriendsLoading } from "./friends/ProfileFriendsLoading";
 import { ProfileFriendsError } from "./friends/ProfileFriendsError";
@@ -26,7 +32,6 @@ export default function ProfileFriendsSection() {
     try {
       setLoading(true);
       setError(null);
-      // Получаем ID текущего пользователя
       const meRes = await fetch("/api/profile/me", { cache: "no-store" });
       if (meRes.ok) {
         const meData = await meRes.json();
@@ -67,7 +72,6 @@ export default function ProfileFriendsSection() {
         const newRequests = receivedData.friendships || [];
         setReceivedRequests(newRequests);
 
-        // Загружаем последнюю прочитанную заявку из localStorage
         const savedLastRead = localStorage.getItem("lastReadFriendRequestId");
         setLastReadRequestId(savedLastRead);
       }
@@ -85,12 +89,12 @@ export default function ProfileFriendsSection() {
   }, []);
 
   useEffect(() => {
-    fetchFriends();
+    void fetchFriends();
   }, [fetchFriends]);
 
   useEffect(() => {
     const handleFriendRequestNotification = () => {
-      fetchFriends();
+      void fetchFriends();
     };
 
     window.addEventListener(
@@ -107,7 +111,7 @@ export default function ProfileFriendsSection() {
 
   useEffect(() => {
     const handleFriendsUpdated = () => {
-      fetchFriends();
+      void fetchFriends();
     };
 
     window.addEventListener("friends-updated", handleFriendsUpdated);
@@ -116,25 +120,23 @@ export default function ProfileFriendsSection() {
     };
   }, [fetchFriends]);
 
-  // Определяем количество новых заявок в друзья
   const getNewRequestsCount = () => {
-    if (!lastReadRequestId || receivedRequests.length === 0)
+    if (!lastReadRequestId || receivedRequests.length === 0) {
       return receivedRequests.length;
+    }
 
-    // Находим индекс последней прочитанной заявки
     const lastReadIndex = receivedRequests.findIndex(
       (request) => request.id === lastReadRequestId,
     );
 
-    // Если не найдена или это первая заявка, считаем все как новые
-    if (lastReadIndex === -1) return receivedRequests.length;
+    if (lastReadIndex === -1) {
+      return receivedRequests.length;
+    }
 
-    // Возвращаем количество заявок после последней прочитанной
     return lastReadIndex;
   };
 
   const newRequestsCount = getNewRequestsCount();
-
   const totalFriends = friends.length;
   const pendingRequests = receivedRequests.length;
   const sentRequestsCount = sentRequests.length;
@@ -149,21 +151,21 @@ export default function ProfileFriendsSection() {
   };
 
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="bg-[#004643]/60 backdrop-blur-sm rounded-xl border border-[#abd1c6]/20 overflow-hidden"
-      >
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <Card variant="darkGlass" padding="md" className="border-white/[0.08]">
         <ProfileFriendsHeader
           totalFriends={totalFriends}
           pendingRequests={pendingRequests}
           onAllClick={() => goToFriends("friends")}
         />
 
-        {/* Контент */}
-        <div className="p-4 sm:p-5 md:p-6">
+        <Separator className="my-4 bg-white/10" />
+
+        <CardContent className="space-y-0 !p-0">
           <AnimatePresence mode="wait">
             {loading ? (
               <ProfileFriendsLoading />
@@ -192,8 +194,8 @@ export default function ProfileFriendsSection() {
               />
             )}
           </AnimatePresence>
-        </div>
-      </motion.div>
-    </>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

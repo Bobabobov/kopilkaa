@@ -44,9 +44,6 @@ const getNotificationAccent = (
     if (status === "REJECTED") {
       return `bg-gradient-to-r from-red-500/${opacity} to-rose-500/${opacity}`;
     }
-    if (status === "CONTEST") {
-      return `bg-gradient-to-r from-violet-500/${opacity} to-purple-500/${opacity}`;
-    }
     return `bg-gradient-to-r from-blue-500/${opacity} to-indigo-500/${opacity}`;
   }
   return `bg-gradient-to-r from-[#abd1c6]/${opacity} to-[#004643]/${opacity}`;
@@ -269,13 +266,6 @@ export default function NotificationCard({
                           Ваша заявка была{" "}
                           <span className="font-medium text-green-400">
                             одобрена
-                          </span>
-                        </>
-                      ) : notification.status === "CONTEST" ? (
-                        <>
-                          Ваша заявка{" "}
-                          <span className="font-medium text-violet-400">
-                            участвует в конкурсе
                           </span>
                         </>
                       ) : (

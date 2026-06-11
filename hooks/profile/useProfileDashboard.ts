@@ -133,7 +133,9 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
   // Очищаем кэш при инициализации хука для предотвращения устаревших данных
   const [isInitialized, setIsInitialized] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (options?: { silent?: boolean }) => {
+    const silent = options?.silent ?? false;
+
     try {
       setError(null);
 
@@ -148,7 +150,9 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
         return;
       }
 
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
 
       const response = await fetch("/api/profile/dashboard", {
         method: "GET",
@@ -317,9 +321,10 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
   }, []);
 
   const refetch = useCallback(async () => {
-    // Очищаем кэш при принудительном обновлении
+    // Очищаем кэш при принудительном обновлении.
+    // silent: не снимаем UI профиля — иначе теряется локальное состояние (модалки и т.п.).
     profileCache.clear();
-    await fetchData();
+    await fetchData({ silent: true });
   }, [fetchData]);
 
   useEffect(() => {

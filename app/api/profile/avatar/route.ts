@@ -6,6 +6,8 @@ import { randomUUID } from "crypto";
 import { writeFile, mkdir } from "fs/promises";
 import { extname } from "path";
 import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
+import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
+import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
 
 export const runtime = "nodejs";
 // Увеличиваем лимит размера тела запроса для загрузки файлов
@@ -85,6 +87,13 @@ export async function POST(req: NextRequest) {
       data: { avatar: avatarUrl, avatarUpdatedAt: new Date() },
     });
 
+    checkAndUnlockAchievement(
+      session.uid,
+      ACHIEVEMENT_SLUGS.PROFILE_STYLE,
+    ).catch((error) => {
+      console.error("[POST /api/profile/avatar] profile-style achievement:", error);
+    });
+
     return NextResponse.json({
       ok: true,
       avatar: avatarUrl,
@@ -114,6 +123,16 @@ export async function DELETE(request: Request) {
     await prisma.user.update({
       where: { id: session.uid },
       data: { avatar: null, avatarUpdatedAt: new Date() },
+    });
+
+    checkAndUnlockAchievement(
+      session.uid,
+      ACHIEVEMENT_SLUGS.PROFILE_STYLE,
+    ).catch((error) => {
+      console.error(
+        "[DELETE /api/profile/avatar] profile-style achievement:",
+        error,
+      );
     });
 
     return NextResponse.json({

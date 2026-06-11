@@ -1,13 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useMemo } from "react";
+import { motion } from "framer-motion";
 import type { ApplicationItem, ApplicationStatus, Stats } from "@/types/admin";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Card } from "@/components/ui/Card";
 import { AdminOverviewSection } from "./AdminOverviewSection";
 import { AdminFiltersSection } from "./AdminFiltersSection";
-
-type TabId = "overview" | "filters";
 
 interface AdminUnifiedWorkspaceProps {
   stats: Stats | null;
@@ -35,6 +34,24 @@ function hoursSince(dateString: string): number | null {
   return Math.max(0, Math.floor((Date.now() - t) / (1000 * 60 * 60)));
 }
 
+function hasActiveFilters(
+  q: string,
+  status: "ALL" | ApplicationStatus,
+  minAmount: string,
+  maxAmount: string,
+  sortBy: "date" | "amount" | "status",
+  sortOrder: "asc" | "desc",
+): boolean {
+  return (
+    q.trim().length > 0 ||
+    status !== "ALL" ||
+    minAmount !== "" ||
+    maxAmount !== "" ||
+    sortBy !== "date" ||
+    sortOrder !== "desc"
+  );
+}
+
 export default function AdminUnifiedWorkspace({
   stats,
   items,
@@ -52,101 +69,85 @@ export default function AdminUnifiedWorkspace({
   onSortOrderChange,
   onReset,
 }: AdminUnifiedWorkspaceProps) {
-  const [tab, setTab] = useState<TabId>("overview");
-
   const pendingItems = useMemo(
     () => items.filter((item) => item.status === "PENDING"),
     [items],
   );
   const newestPending = pendingItems[0] ?? null;
-  const newestPendingAge = newestPending ? hoursSince(newestPending.createdAt) : null;
+  const newestPendingAge = newestPending
+    ? hoursSince(newestPending.createdAt)
+    : null;
 
-  const tabButton = (id: TabId, label: string, icon: keyof typeof LucideIcons) => {
-    const Icon = LucideIcons[icon];
-    const active = tab === id;
-    return (
-      <button
-        type="button"
-        onClick={() => setTab(id)}
-        className={`flex items-center gap-2 rounded-xl px-3 py-2 text-xs sm:text-sm font-black transition-colors min-h-[44px] ${
-          active
-            ? "bg-[#f9bc60] text-[#001e1d]"
-            : "bg-[#001e1d]/60 text-[#abd1c6] hover:text-[#fffffe] border border-[#abd1c6]/20"
-        }`}
-        aria-pressed={active}
-      >
-        <Icon size="sm" className={active ? "text-[#001e1d]" : "text-[#abd1c6]"} />
-        {label}
-      </button>
-    );
-  };
+  const filtersActive = hasActiveFilters(
+    q,
+    status,
+    minAmount,
+    maxAmount,
+    sortBy,
+    sortOrder,
+  );
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 20 }}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, delay: 0.15 }}
-      className="mb-6 sm:mb-8 rounded-2xl sm:rounded-3xl border border-[#abd1c6]/20 bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] shadow-2xl overflow-hidden"
+      transition={{ duration: 0.35, delay: 0.1 }}
+      className="mb-6"
     >
-      <div className="p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-          <div className="min-w-0">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] flex items-center justify-center shadow-lg">
-                <LucideIcons.LayoutGrid size="sm" className="text-[#001e1d]" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-lg sm:text-2xl font-black text-[#fffffe] truncate">
-                  Рабочее место админа
-                </h2>
-                <p className="text-xs sm:text-sm text-[#abd1c6]">
-                  Всё важное в одном месте: обзор и фильтры по заявкам.
-                </p>
-              </div>
+      <Card variant="darkGlass" padding="md" className="space-y-0">
+        <div className="flex items-center justify-between gap-3 pb-4 border-b border-[#abd1c6]/10">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#f9bc60]/15">
+              <LucideIcons.LayoutGrid size="sm" className="text-[#001e1d]" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg font-black text-[#fffffe]">
+                Рабочее место
+              </h2>
+              <p className="text-xs sm:text-sm text-[#abd1c6]/80">
+                Статистика, фильтры и быстрый доступ к очереди
+              </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {tabButton("overview", "Обзор", "BarChart3")}
-            {tabButton("filters", "Фильтры", "Filter")}
+          {filtersActive ? (
             <button
               type="button"
               onClick={onReset}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs sm:text-sm font-black min-h-[44px] bg-[#001e1d]/60 text-[#abd1c6] hover:text-[#fffffe] border border-[#abd1c6]/20 transition-colors"
+              className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-[#abd1c6] hover:text-[#fffffe] border border-[#abd1c6]/25 hover:border-[#f9bc60]/40 hover:bg-[#f9bc60]/10 transition-colors flex-shrink-0 min-h-[40px]"
             >
-              <LucideIcons.RefreshCw size="sm" className="text-[#abd1c6]" />
-              Сброс
+              <LucideIcons.RefreshCw size="sm" />
+              <span className="hidden sm:inline">Сбросить фильтры</span>
+              <span className="sm:hidden">Сброс</span>
             </button>
-          </div>
+          ) : null}
         </div>
 
-        <AnimatePresence mode="wait">
-          {tab === "overview" ? (
-            <AdminOverviewSection
-              stats={stats}
-              pendingCount={stats?.pending ?? 0}
-              newestId={newestPending?.id ?? null}
-              newestTitle={newestPending?.title ?? null}
-              newestAgeHours={newestPendingAge}
-            />
-          ) : (
-            <AdminFiltersSection
-              q={q}
-              status={status}
-              minAmount={minAmount}
-              maxAmount={maxAmount}
-              sortBy={sortBy}
-              sortOrder={sortOrder}
-              onSearchChange={onSearchChange}
-              onStatusChange={onStatusChange}
-              onMinAmountChange={onMinAmountChange}
-              onMaxAmountChange={onMaxAmountChange}
-              onSortByChange={onSortByChange}
-              onSortOrderChange={onSortOrderChange}
-            />
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.section>
+        <div className="pt-4">
+          <AdminOverviewSection
+            stats={stats}
+            status={status}
+            shownCount={items.length}
+            newestId={newestPending?.id ?? null}
+            newestTitle={newestPending?.title ?? null}
+            newestAgeHours={newestPendingAge}
+            onStatusChange={onStatusChange}
+          />
+        </div>
+
+        <AdminFiltersSection
+          q={q}
+          minAmount={minAmount}
+          maxAmount={maxAmount}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSearchChange={onSearchChange}
+          onMinAmountChange={onMinAmountChange}
+          onMaxAmountChange={onMaxAmountChange}
+          onSortByChange={onSortByChange}
+          onSortOrderChange={onSortOrderChange}
+        />
+      </Card>
+    </motion.div>
   );
 }

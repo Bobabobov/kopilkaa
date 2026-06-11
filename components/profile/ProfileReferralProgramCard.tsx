@@ -14,9 +14,8 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/Card";
-import { LucideIcons } from "@/components/ui/LucideIcons";
+import { ProfileImageIcon } from "@/components/profile/ProfileImageIcon";
 
 type ReferralProgramResponse = {
   ok: boolean;
@@ -156,13 +155,16 @@ export default function ProfileReferralProgramCard() {
       <Card variant="darkGlass" padding="md" className="border-white/[0.08]">
         <CardHeader className="!mb-0 flex flex-col gap-3">
           <div className="flex flex-wrap items-start justify-between gap-2">
-            <CardTitle
-              icon={
-                <LucideIcons.Users className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
-              }
-            >
-              Реферальная программа
-            </CardTitle>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <ProfileImageIcon
+                src="/icon/pig15.png"
+                alt="Реферальная программа"
+                size="sm"
+              />
+              <h3 className="text-base font-bold text-[#fffffe] sm:text-lg">
+                Реферальная программа
+              </h3>
+            </div>
             <Badge
               variant={availability.available ? "success" : "secondary"}
               className="shrink-0"

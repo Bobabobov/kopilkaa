@@ -12,10 +12,7 @@ import type { Prisma } from "@prisma/client";
 export const dynamic = "force-dynamic";
 
 const publicStoryWhere: Prisma.ApplicationWhereInput = {
-  OR: [
-    { status: "APPROVED" },
-    { status: "CONTEST", publishInStories: true },
-  ],
+  status: "APPROVED",
 };
 
 const storySelect = {
@@ -41,8 +38,6 @@ const storySelect = {
     },
   },
   _count: { select: { likes: true } },
-  status: true,
-  publishInStories: true,
 } satisfies Prisma.ApplicationSelect;
 
 export async function GET() {
@@ -116,7 +111,6 @@ export async function GET() {
       reactionCounts,
       userLiked,
       userReaction,
-      isContestWinner: raw.status === "CONTEST" && raw.publishInStories,
     };
 
     return new Response(JSON.stringify({ item }), {

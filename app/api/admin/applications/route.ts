@@ -1,6 +1,9 @@
 // app/api/admin/applications/route.ts
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
+import { buildApplicationSearchWhere } from "@/lib/admin/applicationSearch";
+import { buildApplicationIntegrityBatch } from "@/lib/admin/buildApplicationIntegrityBatch";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 
 export const dynamic = "force-dynamic";
@@ -23,31 +26,41 @@ export async function GET(req: Request) {
     const minAmount = searchParams.get("minAmount");
     const maxAmount = searchParams.get("maxAmount");
     const sortBy = searchParams.get("sortBy") || "date";
-    const sortOrder = searchParams.get("sortOrder") || "desc";
+    const sortOrder =
+      searchParams.get("sortOrder") === "asc" ? "asc" : "desc";
 
-    const where: any = {};
-    if (status !== "ALL") where.status = status;
+    const filters: Prisma.ApplicationWhereInput[] = [];
 
-    // Фильтрация по сумме
+    if (
+      status === "PENDING" ||
+      status === "APPROVED" ||
+      status === "REJECTED"
+    ) {
+      filters.push({ status });
+    }
+
+    const amountFilter: Prisma.IntFilter = {};
     if (minAmount && !isNaN(Number(minAmount))) {
-      where.amount = { ...where.amount, gte: Number(minAmount) };
+      amountFilter.gte = Number(minAmount);
     }
     if (maxAmount && !isNaN(Number(maxAmount))) {
-      where.amount = { ...where.amount, lte: Number(maxAmount) };
+      amountFilter.lte = Number(maxAmount);
+    }
+    if (Object.keys(amountFilter).length > 0) {
+      filters.push({ amount: amountFilter });
     }
 
     if (q) {
-      where.OR = [
-        { title: { contains: q } },
-        { summary: { contains: q } },
-        { story: { contains: q } },
-        { payment: { contains: q } },
-        { user: { email: { contains: q } } },
-        ...(isNaN(Number(q)) ? [] : [{ amount: Number(q) }]),
-      ];
+      const textSearch = await buildApplicationSearchWhere(prisma, q);
+      if (textSearch) {
+        filters.push(textSearch);
+      }
     }
 
-    const orderBy: any = {};
+    const where: Prisma.ApplicationWhereInput =
+      filters.length > 1 ? { AND: filters } : filters[0] ?? {};
+
+    const orderBy: Prisma.ApplicationOrderByWithRelationInput = {};
     if (sortBy === "date") {
       orderBy.createdAt = sortOrder;
     } else if (sortBy === "amount") {
@@ -71,8 +84,9 @@ export async function GET(req: Request) {
           story: true,
           amount: true,
           payment: true,
+          paymentFingerprint: true,
+          submitterIp: true,
           status: true,
-          publishInStories: true,
           adminComment: true,
           clientDevice: true,
           createdAt: true,
@@ -85,10 +99,12 @@ export async function GET(req: Request) {
               email: true,
               id: true,
               name: true,
+              username: true,
               avatar: true,
               avatarFrame: true,
               hideEmail: true,
               trustDelta: true,
+              markedAsDeceiver: true,
             },
           },
           images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
@@ -97,9 +113,20 @@ export async function GET(req: Request) {
       prisma.application.count({ where }),
     ]);
 
-    const safeItems = items.map((it: any) => ({
+    const integrityMap = await buildApplicationIntegrityBatch(items);
+
+    const safeItems = items.map((it) => ({
       ...it,
       story: sanitizeApplicationStoryHtml(it.story),
+      integrity: integrityMap.get(it.id) ?? {
+        isClean: true,
+        verdict: "Заявка чистая",
+        reasons: [{ key: "unknown", message: "Проверка недоступна" }],
+        submitterIp: it.submitterIp ?? null,
+        sameIpCount: 0,
+        samePaymentCount: 0,
+        links: { sameIp: [], samePayment: [] },
+      },
     }));
 
     return Response.json(

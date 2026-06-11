@@ -1,4 +1,7 @@
-import { LucideIcons } from "@/components/ui/LucideIcons";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { CardHeader } from "@/components/ui/Card";
+import { ProfileImageIcon } from "@/components/profile/ProfileImageIcon";
 
 interface ProfileFriendsHeaderProps {
   totalFriends: number;
@@ -11,31 +14,41 @@ export function ProfileFriendsHeader({
   pendingRequests,
   onAllClick,
 }: ProfileFriendsHeaderProps) {
-  return (
-    <div className="p-4 sm:p-5 md:p-6 border-b border-[#abd1c6]/10">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#f9bc60]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-            <LucideIcons.Users className="text-[#f9bc60]" size="sm" />
-          </div>
-          <div className="min-w-0">
-            <h3 className="text-base sm:text-lg font-semibold text-[#fffffe] truncate">
-              Мои друзья
-            </h3>
-            <p className="text-[10px] sm:text-xs text-[#abd1c6] mt-0.5 truncate">
-              {totalFriends > 0 ? `${totalFriends} друзей` : "Список друзей"}
-              {pendingRequests > 0 && ` · ${pendingRequests} заявок`}
-            </p>
-          </div>
-        </div>
+  const subtitle =
+    totalFriends > 0
+      ? `${totalFriends} ${totalFriends === 1 ? "друг" : totalFriends < 5 ? "друга" : "друзей"}`
+      : "Список друзей";
 
-        <button
-          onClick={onAllClick}
-          className="text-xs text-[#f9bc60] hover:text-[#e8a545] transition-colors flex-shrink-0 whitespace-nowrap"
-        >
-          Все
-        </button>
+  return (
+    <CardHeader className="!mb-0 flex flex-col gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <ProfileImageIcon src="/icon/pig.png" alt="Мои друзья" size="sm" />
+          <h3 className="text-base font-bold text-[#fffffe] sm:text-lg">
+            Мои друзья
+          </h3>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {pendingRequests > 0 && (
+            <Badge variant="default" className="font-semibold">
+              {pendingRequests} заявок
+            </Badge>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-[#abd1c6]/25 bg-transparent text-[#fffffe] hover:bg-white/5 hover:text-[#fffffe]"
+            onClick={onAllClick}
+          >
+            Все
+          </Button>
+        </div>
       </div>
-    </div>
+      <p className="text-xs leading-relaxed text-[#abd1c6] sm:text-sm">
+        {subtitle}
+        {pendingRequests > 0 && " · есть новые заявки"}
+      </p>
+    </CardHeader>
   );
 }

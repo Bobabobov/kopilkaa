@@ -1,9 +1,4 @@
-import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
-import { LucideIcons } from "@/components/ui/LucideIcons";
 import { SocialLinks } from "./SocialLinks";
-import { FriendActions, type FriendshipStatus } from "./FriendActions";
-import { GuestActionsMenu } from "./GuestActionsMenu";
 
 type SocialUser = {
   vkLink?: string | null;
@@ -12,78 +7,18 @@ type SocialUser = {
 };
 
 interface CtaRowProps {
-  isOwner: boolean;
   hasSocialLinks: boolean;
   user: { id: string } & SocialUser;
-  friendshipStatus: FriendshipStatus;
-  onSendRequest?: () => Promise<void> | void;
-  onAcceptIncoming?: () => Promise<void> | void;
-  onDeclineIncoming?: () => Promise<void> | void;
-  onRemoveFriend?: () => Promise<void> | void;
-  guestActionsButtonRef: React.RefObject<HTMLElement | null>;
-  guestMenuStyle: { top: number; right: number };
-  mounted: boolean;
-  isGuestActionsOpen: boolean;
-  setIsGuestActionsOpen: (v: boolean | ((p: boolean) => boolean)) => void;
 }
 
-export function CtaRow({
-  isOwner,
-  hasSocialLinks,
-  user,
-  friendshipStatus,
-  onSendRequest,
-  onAcceptIncoming,
-  onDeclineIncoming,
-  onRemoveFriend,
-  guestActionsButtonRef,
-  guestMenuStyle,
-  mounted,
-  isGuestActionsOpen,
-  setIsGuestActionsOpen,
-}: CtaRowProps) {
-  /* Фиксированная ширина под 3 иконки соцсетей (3×36px + 2×gap) — шапка не меняет ширину между профилями */
-  const socialSlotWidth = "8rem";
+export function CtaRow({ hasSocialLinks, user }: CtaRowProps) {
+  if (!hasSocialLinks) {
+    return null;
+  }
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5 xs:gap-2 sm:gap-3 min-w-0 w-full max-w-full">
-      <div
-        className="shrink-0 overflow-hidden flex items-center"
-        style={{ width: socialSlotWidth, minWidth: socialSlotWidth, maxWidth: socialSlotWidth }}
-      >
-        {hasSocialLinks && <SocialLinks user={user} />}
-      </div>
-      {!isOwner && (
-        <>
-          <FriendActions
-            isOwner={isOwner}
-            status={friendshipStatus}
-            onSendRequest={onSendRequest}
-            onAcceptIncoming={onAcceptIncoming}
-            onDeclineIncoming={onDeclineIncoming}
-            onRemoveFriend={onRemoveFriend}
-          />
-          <button
-            ref={guestActionsButtonRef as React.RefObject<HTMLButtonElement>}
-            onClick={() => setIsGuestActionsOpen((v) => !v)}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2 text-sm font-medium text-white transition-all duration-200 whitespace-nowrap"
-            aria-label="Меню действий гостя"
-          >
-            <LucideIcons.More size="sm" />
-            <span className="hidden sm:inline">Ещё</span>
-          </button>
-          {mounted &&
-            isGuestActionsOpen &&
-            createPortal(
-              <GuestActionsMenu
-                isOpen={isGuestActionsOpen}
-                style={guestMenuStyle}
-                onClose={() => setIsGuestActionsOpen(false)}
-              />,
-              document.body,
-            )}
-        </>
-      )}
+    <div className="flex min-w-0 w-full max-w-full flex-wrap items-center gap-1.5 xs:gap-2 sm:gap-3">
+      <SocialLinks user={user} />
     </div>
   );
 }

@@ -53,7 +53,6 @@ export function StoryCardContent({
   const shouldBypassOptimization =
     isUploadUrl(previewImage) || isExternalUrl(previewImage);
 
-  const isWinner = story.isContestWinner === true;
   const safeAuthorAvatar = resolveAvatarUrl(story.user?.avatar);
 
   return (
@@ -63,37 +62,13 @@ export function StoryCardContent({
       aria-label={`Открыть историю: ${story.title}`}
       onClick={onCardClick}
       onKeyDown={onCardKeyDown}
-      className={`relative rounded-2xl p-0 h-full max-w-full overflow-hidden flex flex-col group cursor-pointer transition-[transform,border-color,box-shadow] duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#004643] hover:-translate-y-1.5 border backdrop-blur-xl ${
-        isWinner
-          ? "border-[#f9bc60]/45 ring-1 ring-[#f9bc60]/25 hover:border-[#f9bc60]/65 shadow-[0_16px_40px_-12px_rgba(249,188,96,0.35)]"
-          : "border-white/[0.14] hover:border-white/25 shadow-[0_12px_36px_-14px_rgba(0,0,0,0.5)] hover:shadow-[0_18px_44px_-14px_rgba(249,188,96,0.2)]"
-      }`}
+      className="relative rounded-2xl p-0 h-full max-w-full overflow-hidden flex flex-col group cursor-pointer transition-[transform,border-color,box-shadow] duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#004643] hover:-translate-y-1.5 border border-white/[0.14] hover:border-white/25 shadow-[0_12px_36px_-14px_rgba(0,0,0,0.5)] hover:shadow-[0_18px_44px_-14px_rgba(249,188,96,0.2)] backdrop-blur-xl"
       style={{
-        background: isWinner
-          ? "linear-gradient(160deg, rgba(249,188,96,0.18) 0%, rgba(255,255,255,0.08) 40%, rgba(0,30,29,0.4) 100%)"
-          : "linear-gradient(160deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 50%, rgba(0,70,67,0.25) 100%)",
+        background:
+          "linear-gradient(160deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 50%, rgba(0,70,67,0.25) 100%)",
       }}
     >
-      {isWinner && (
-        <div className="pointer-events-none absolute inset-0 z-0 rounded-2xl overflow-hidden opacity-60">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(249,188,96,0.15),transparent)]" />
-        </div>
-      )}
-      {/* Лёгкий блик по верхнему краю карточки */}
-      <div
-        className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-px rounded-t-3xl ${
-          isWinner
-            ? "bg-gradient-to-r from-transparent via-[#f9bc60]/70 to-transparent"
-            : "bg-gradient-to-r from-transparent via-[#abd1c6]/40 to-transparent"
-        }`}
-      />
-
-      {isWinner && (
-        <div className="absolute top-4 right-4 z-20 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#001e1d] shadow-[0_4px_14px_rgba(249,188,96,0.45)] ring-2 ring-[#001e1d]/20 border border-[#fff]/30">
-          <LucideIcons.Trophy size="sm" className="w-4 h-4 shrink-0" />
-          <span>Победитель конкурса</span>
-        </div>
-      )}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px rounded-t-3xl bg-gradient-to-r from-transparent via-[#abd1c6]/40 to-transparent" />
 
       {isRead && (
         <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#abd1c6]/90 backdrop-blur-sm text-[#001e1d] text-xs font-bold uppercase tracking-wide shadow-md border border-white/20">
@@ -102,13 +77,7 @@ export function StoryCardContent({
         </div>
       )}
 
-      <div
-        className={`absolute inset-0 transition-opacity duration-300 rounded-2xl pointer-events-none ${
-          isWinner
-            ? "bg-gradient-to-br from-[#f9bc60]/5 via-[#f9bc60]/10 to-[#f9bc60]/5 group-hover:from-[#f9bc60]/10 group-hover:via-[#f9bc60]/15 group-hover:to-[#f9bc60]/10"
-            : "bg-gradient-to-br from-[#f9bc60]/0 via-[#f9bc60]/0 to-[#f9bc60]/0 group-hover:from-[#f9bc60]/5 group-hover:via-[#f9bc60]/10 group-hover:to-[#f9bc60]/5"
-        }`}
-      />
+      <div className="absolute inset-0 transition-opacity duration-300 rounded-2xl pointer-events-none bg-gradient-to-br from-[#f9bc60]/0 via-[#f9bc60]/0 to-[#f9bc60]/0 group-hover:from-[#f9bc60]/5 group-hover:via-[#f9bc60]/10 group-hover:to-[#f9bc60]/5" />
 
       <div className="relative mb-0 rounded-t-2xl overflow-hidden flex-shrink-0">
         <div className="relative w-full h-48 sm:h-52 overflow-hidden">
@@ -125,11 +94,7 @@ export function StoryCardContent({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent transition-opacity duration-500 group-hover:opacity-90 pointer-events-none" />
 
-          <div
-            className={`absolute bottom-0 left-0 right-0 bg-gradient-to-r from-[#f9bc60] via-[#e8a545] to-[#f9bc60] transition-[height] duration-500 shadow-lg shadow-[#f9bc60]/50 ${
-              isWinner ? "h-2.5 group-hover:h-3.5" : "h-2 group-hover:h-3"
-            }`}
-          />
+          <div className="absolute bottom-0 left-0 right-0 h-2 group-hover:h-3 bg-gradient-to-r from-[#f9bc60] via-[#e8a545] to-[#f9bc60] transition-[height] duration-500 shadow-lg shadow-[#f9bc60]/50" />
 
           <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/0 to-white/0 group-hover:via-white/20 transition-opacity duration-500 opacity-0 group-hover:opacity-100 pointer-events-none" />
 
@@ -140,10 +105,7 @@ export function StoryCardContent({
             </span>
           </div>
 
-          <StoryCardTopReactions
-            reactionCounts={reactionCounts}
-            isWinner={isWinner}
-          />
+          <StoryCardTopReactions reactionCounts={reactionCounts} />
         </div>
       </div>
 
@@ -217,33 +179,17 @@ export function StoryCardContent({
                 {Math.ceil(story.summary.length / 200)} мин
               </span>
             </div>
-            {amountText &&
-              (isWinner ? (
-                <div className="flex-shrink-0 rounded-xl border border-[#f9bc60]/35 bg-[#f9bc60]/12 px-3 py-2">
-                  <div className="flex items-center gap-2">
-                    <LucideIcons.Trophy size="sm" className="h-4 w-4 text-[#f9bc60]" />
-                    <span className="text-sm font-bold tabular-nums text-[#f9bc60]">
-                      {amountText} ₽
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 border border-[#f9bc60]/30 bg-[#f9bc60]/10 flex-shrink-0">
-                  <LucideIcons.Ruble size="xs" className="text-[#f9bc60]" />
-                  <span className="text-sm font-bold tabular-nums text-[#f9bc60]">
-                    {amountText} ₽
-                  </span>
-                </div>
-              ))}
+            {amountText && (
+              <div className="flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 border border-[#f9bc60]/30 bg-[#f9bc60]/10 flex-shrink-0">
+                <LucideIcons.Ruble size="xs" className="text-[#f9bc60]" />
+                <span className="text-sm font-bold tabular-nums text-[#f9bc60]">
+                  {amountText} ₽
+                </span>
+              </div>
+            )}
           </div>
 
-          {isWinner && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1.5 rounded-b-3xl bg-gradient-to-r from-[#f9bc60]/80 via-[#e8a545] to-[#f9bc60]/80 z-10" />
-          )}
-
-          <div
-            className={`flex items-center justify-between gap-3 pt-2 border-t transition-colors duration-300 ${isWinner ? "border-[#f9bc60]/25" : "border-white/[0.08]"}`}
-          >
+          <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/[0.08] transition-colors duration-300">
             <LikeButton
               liked={liked}
               likesCount={likesCount}

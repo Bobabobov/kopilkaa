@@ -10,6 +10,7 @@ import {
   readReferralCookies,
   tryAwardReferralBonusForNewUser,
 } from "@/lib/referralProgram";
+import { grantWelcomeAchievement } from "@/lib/achievements/unlock";
 
 export const runtime = "nodejs";
 
@@ -90,6 +91,10 @@ export async function POST(req: Request) {
         visitorId: referralCookies.visitorId,
       });
     }
+
+    await grantWelcomeAchievement(user.id).catch((error) => {
+      console.error("[API Error] /api/auth/register: welcome achievement:", error);
+    });
 
     let delivery:
       | { mode: "sent" }

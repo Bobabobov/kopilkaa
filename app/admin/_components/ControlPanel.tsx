@@ -139,9 +139,6 @@ export default function ControlPanel({
               <option value="REJECTED" className="bg-[#001e1d]">
                 Отказано
               </option>
-              <option value="CONTEST" className="bg-[#001e1d]">
-                Конкурс
-              </option>
             </select>
           </div>
 

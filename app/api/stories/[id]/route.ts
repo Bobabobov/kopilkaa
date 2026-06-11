@@ -45,8 +45,6 @@ export async function GET(
       summary: true,
       story: true,
       createdAt: true,
-      status: true,
-      publishInStories: true,
       images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
       user: {
         select: {
@@ -101,7 +99,6 @@ export async function GET(
   return Response.json(
     {
       ...story,
-      isContestWinner: story.status === "CONTEST" && story.publishInStories,
       story: sanitizeApplicationStoryHtml(story.story || ""),
       user: story.user
         ? sanitizeEmailForViewer(story.user, session?.uid ?? "")

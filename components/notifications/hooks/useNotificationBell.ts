@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Notification } from "../types";
+import { getNotificationHref } from "@/lib/notifications/navigation";
 
 export function useNotificationBell() {
   const router = useRouter();
@@ -178,39 +179,9 @@ export function useNotificationBell() {
 
   const handleNotificationClick = useCallback(
     (notification: Notification) => {
-      if (
-        notification.type === "application_status" &&
-        notification.applicationId
-      ) {
-        if (notification.status === "APPROVED") {
-          router.push(`/stories/${notification.applicationId}`);
-        } else {
-          router.push("/applications");
-        }
-        setIsOpen(false);
-      } else if (
-        notification.type === "withdrawal_status" &&
-        notification.withdrawalId
-      ) {
-        router.push("/good-deeds");
-        setIsOpen(false);
-      } else if (
-        notification.type === "good_deed_submission_status" &&
-        notification.goodDeedSubmissionId
-      ) {
-        router.push("/good-deeds");
-        setIsOpen(false);
-      } else if (
-        (notification.type === "like" ||
-          notification.type === "story_comment") &&
-        notification.applicationId
-      ) {
-        const hash =
-          notification.type === "story_comment" ? "#story-comments" : "";
-        router.push(`/stories/${notification.applicationId}${hash}`);
-        setIsOpen(false);
-      } else if (notification.type === "friend_request") {
-        router.push("/friends?tab=received");
+      const href = getNotificationHref(notification);
+      if (href) {
+        router.push(href);
         setIsOpen(false);
       }
     },

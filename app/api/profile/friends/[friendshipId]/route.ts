@@ -3,6 +3,8 @@ import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
+import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
+import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
 
 export async function PATCH(
   request: Request,
@@ -70,6 +72,27 @@ export async function PATCH(
         },
       },
     });
+
+    if (status === "ACCEPTED") {
+      checkAndUnlockAchievement(
+        updatedFriendship.requesterId,
+        ACHIEVEMENT_SLUGS.FIRST_FRIEND,
+      ).catch((error) => {
+        console.error(
+          "[PATCH /api/profile/friends] first-friend achievement (requester):",
+          error,
+        );
+      });
+      checkAndUnlockAchievement(
+        updatedFriendship.receiverId,
+        ACHIEVEMENT_SLUGS.FIRST_FRIEND,
+      ).catch((error) => {
+        console.error(
+          "[PATCH /api/profile/friends] first-friend achievement (receiver):",
+          error,
+        );
+      });
+    }
 
     const safe = {
       ...updatedFriendship,

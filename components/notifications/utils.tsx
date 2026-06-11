@@ -20,9 +20,6 @@ export function getNotificationIcon(type: string, status?: string) {
       if (status === "REJECTED") {
         return <LucideIcons.XCircle className="text-red-500" size="sm" />;
       }
-      if (status === "CONTEST") {
-        return <LucideIcons.Trophy className="text-[#9b87f5]" size="sm" />;
-      }
       return <LucideIcons.FileText className="text-blue-500" size="sm" />;
     default:
       return <LucideIcons.Info className="text-blue-500" size="sm" />;
@@ -48,9 +45,6 @@ export function getNotificationBackgroundColor(
     status === "REJECTED"
   ) {
     return "bg-red-500/20";
-  }
-  if (type === "application_status" && status === "CONTEST") {
-    return "bg-[#9b87f5]/20";
   }
   return "bg-[#abd1c6]/20";
 }

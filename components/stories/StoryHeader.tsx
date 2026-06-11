@@ -13,7 +13,6 @@ interface StoryHeaderProps {
   createdAt?: string;
   isAd?: boolean;
   authorExternalUrl?: string;
-  isContestWinner?: boolean;
 }
 
 export default function StoryHeader({
@@ -24,7 +23,6 @@ export default function StoryHeader({
   createdAt,
   isAd = false,
   authorExternalUrl,
-  isContestWinner = false,
 }: StoryHeaderProps) {
   const safeAuthorAvatar = resolveAvatarUrl(authorAvatar);
 
@@ -35,13 +33,6 @@ export default function StoryHeader({
           <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse" />
           <span>Рекламная история</span>
           <span className="w-2 h-2 rounded-full bg-[#f9bc60] animate-pulse" />
-        </div>
-      )}
-
-      {isContestWinner && !isAd && (
-        <div className="inline-flex items-center gap-2 px-4 py-2 mb-5 rounded-xl border border-[#f9bc60]/50 bg-[#f9bc60]/15 text-sm font-bold uppercase tracking-wider text-[#f9bc60]">
-          <LucideIcons.Trophy size="xs" />
-          <span>Победитель конкурса</span>
         </div>
       )}
 

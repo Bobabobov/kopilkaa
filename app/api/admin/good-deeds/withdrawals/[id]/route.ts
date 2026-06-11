@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoodDeedWithdrawalStatus } from "@prisma/client";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
+import { syncWithdrawalStatusNotification } from "@/lib/notifications/userNotificationService";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,7 @@ export async function PATCH(
 
     const existing = await prisma.goodDeedWithdrawalRequest.findUnique({
       where: { id },
-      select: { id: true, status: true },
+      select: { id: true, status: true, userId: true, amountBonuses: true },
     });
 
     if (!existing) {
@@ -54,6 +55,17 @@ export async function PATCH(
         reviewedAt: new Date(),
         reviewedById: admin.id,
       },
+    });
+
+    await syncWithdrawalStatusNotification({
+      userId: existing.userId,
+      withdrawalId: id,
+      amountBonuses: existing.amountBonuses,
+      status:
+        nextStatus === GoodDeedWithdrawalStatus.APPROVED
+          ? "APPROVED"
+          : "REJECTED",
+      adminComment: adminComment || null,
     });
 
     return NextResponse.json({ ok: true });

@@ -17,8 +17,9 @@ import {
 import ProfileReferralProgramCard from "./ProfileReferralProgramCard";
 import { ProfileBonusesCard } from "./ProfileBonusesCard";
 import { ProfileDailyBonusCard } from "./ProfileDailyBonusCard";
-import { ProfileStatsStrip } from "./ProfileStatsStrip";
+import { ProfileAchievementShowcaseStrip } from "@/components/profile/achievements/ProfileAchievementShowcaseStrip";
 import { ProfileSectionTitle } from "./ProfileSectionTitle";
+import ProfileAchievementsSection from "./sections/ProfileAchievementsSection";
 
 interface ProfileLayoutProps {
   user: {
@@ -95,7 +96,6 @@ export default function ProfileLayout({
             <ProfileHeaderCard
               user={user}
               isOwner
-              friendshipStatus="friends"
               onThemeChange={onThemeChange}
               onCoverChange={onCoverChange}
               onOpenSettings={onOpenSettings}
@@ -103,11 +103,7 @@ export default function ProfileLayout({
             />
           </header>
 
-          <ProfileStatsStrip
-            trustStatus={trustStatus}
-            trustSupportText={trustSupportText}
-            joinedAt={user.createdAt}
-          />
+          <ProfileAchievementShowcaseStrip userId={user.id} isOwner />
 
           <div className="my-4 sm:my-5 h-px bg-white/10" aria-hidden />
 
@@ -131,7 +127,8 @@ export default function ProfileLayout({
               >
                 <motion.div variants={item} className="space-y-2">
                   <ProfileSectionTitle
-                    icon="Coins"
+                    imageSrc="/icon/pig3.png"
+                    imageAlt="Бонусы"
                     title="Бонусы"
                     subtitle="Добрые дела, рефералы и другое"
                   />
@@ -139,9 +136,10 @@ export default function ProfileLayout({
                 </motion.div>
                 <motion.div variants={item} className="space-y-2">
                   <ProfileSectionTitle
-                    icon="Zap"
+                    imageSrc="/icon/pig8.png"
+                    imageAlt="Копилка"
                     title="Ежедневный бонус"
-                    subtitle="Копи любит постоянство"
+                    subtitle="Заходите каждый день — серия открывает дополнительные награды"
                   />
                   <ProfileDailyBonusCard onBonusClaimed={onBonusClaimed} />
                 </motion.div>
@@ -162,7 +160,8 @@ export default function ProfileLayout({
                 className="space-y-2"
               >
                 <ProfileSectionTitle
-                  icon="Shield"
+                  imageSrc="/icon/pig6.png"
+                  imageAlt="Доверие"
                   title="Доверие"
                   subtitle="Уровень и поддержка"
                 />
@@ -175,6 +174,13 @@ export default function ProfileLayout({
                   progressTotal={trustProgressTotal}
                   levelStats={levelStats ?? undefined}
                 />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.11 }}
+              >
+                <ProfileAchievementsSection userId={user.id} />
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 12 }}

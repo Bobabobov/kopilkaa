@@ -2,49 +2,25 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ApplicationItem, ApplicationStatus } from "../types";
+import { ApplicationItem } from "../types";
 import ApplicationCard from "./ApplicationCard";
 
 interface ApplicationsGridProps {
   applications: ApplicationItem[];
   loading: boolean;
+  isSearchPending?: boolean;
   error: string | null;
   visibleEmails: Set<string>;
   onToggleEmail: (id: string) => void;
-  onEdit: (
-    id: string,
-    status: ApplicationStatus,
-    comment: string,
-    publishInStories: boolean,
-    decreaseTrustOnDecision?: boolean,
-  ) => void;
-  onQuickApprove: (
-    id: string,
-    status: ApplicationStatus,
-    comment: string,
-    decreaseTrustOnDecision?: boolean,
-  ) => void;
-  onQuickReject: (
-    id: string,
-    status: ApplicationStatus,
-    comment: string,
-    decreaseTrustOnDecision?: boolean,
-  ) => void;
-  onDelete: (id: string, title: string) => void;
-  onToggleTrust?: (id: string, next: boolean) => void;
 }
 
 export default function ApplicationsGrid({
   applications,
   loading,
+  isSearchPending = false,
   error,
   visibleEmails,
   onToggleEmail,
-  onEdit,
-  onQuickApprove,
-  onQuickReject,
-  onDelete,
-  onToggleTrust,
 }: ApplicationsGridProps) {
   if (loading) {
     return (
@@ -58,11 +34,6 @@ export default function ApplicationsGrid({
               <div className="h-6 bg-[#abd1c6]/20 rounded w-3/4"></div>
               <div className="h-4 bg-[#abd1c6]/20 rounded w-1/2"></div>
               <div className="h-20 bg-[#abd1c6]/20 rounded"></div>
-              <div className="flex gap-2">
-                <div className="h-8 bg-[#abd1c6]/20 rounded w-20"></div>
-                <div className="h-8 bg-[#abd1c6]/20 rounded w-20"></div>
-                <div className="h-8 bg-[#abd1c6]/20 rounded w-20"></div>
-              </div>
             </div>
           </div>
         ))}
@@ -159,6 +130,9 @@ export default function ApplicationsGrid({
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:gap-6">
+      {isSearchPending ? (
+        <p className="text-xs text-[#abd1c6]/80 px-1">Обновляем результаты поиска…</p>
+      ) : null}
       {applications.map((application, index) => (
         <ApplicationCard
           key={application.id}
@@ -166,11 +140,6 @@ export default function ApplicationsGrid({
           index={index}
           visibleEmails={visibleEmails}
           onToggleEmail={onToggleEmail}
-          onEdit={onEdit}
-          onQuickApprove={onQuickApprove}
-          onQuickReject={onQuickReject}
-          onDelete={onDelete}
-          onToggleTrust={onToggleTrust}
         />
       ))}
     </div>

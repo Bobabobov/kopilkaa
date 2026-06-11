@@ -24,6 +24,8 @@ import {
   resolveStoryCommentPermissions,
   validateStoryCommentContent,
 } from "@/lib/stories/storyComments";
+import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
+import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
 
 export const dynamic = "force-dynamic";
 
@@ -310,6 +312,15 @@ export async function POST(
     });
 
     const viewer = await buildViewerState(userId, session.role);
+
+    checkAndUnlockAchievement(userId, ACHIEVEMENT_SLUGS.COMMENTS_10).catch(
+      (error) => {
+        logRouteCatchError(
+          "POST /api/stories/[id]/comments story-voice achievement",
+          error,
+        );
+      },
+    );
 
     return NextResponse.json(
       {

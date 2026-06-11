@@ -1,5 +1,5 @@
 // app/admin/applications/[id]/types.ts
-export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED" | "CONTEST";
+export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export type SameApplicationRef = {
   id: string;
@@ -49,14 +49,13 @@ export type ApplicationItem = {
   payment: string;
   bankName?: string | null;
   status: ApplicationStatus;
-  publishInStories: boolean;
   adminComment: string | null;
   filledMs?: number | null;
   storyEditMs?: number | null;
   submitterIp?: string | null;
   clientDevice?: string | null;
   createdAt: string;
-  user: { email: string; id: string };
+  user: { email: string; id: string; name?: string | null; avatar?: string | null };
   images: { url: string; sort: number }[];
   samePaymentApplications?: SameApplicationRef[];
   sameIpApplications?: SameApplicationRef[];

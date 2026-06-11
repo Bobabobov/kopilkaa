@@ -4,7 +4,7 @@
  */
 import type { TrustLevel } from "@/lib/trustLevel";
 
-export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED" | "CONTEST";
+export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export type ApplicationItem = {
   id: string;
@@ -15,7 +15,6 @@ export type ApplicationItem = {
   payment: string;
   bankName?: string | null;
   status: ApplicationStatus;
-  publishInStories: boolean;
   adminComment: string | null;
   createdAt: string;
   countTowardsTrust: boolean;
@@ -25,19 +24,55 @@ export type ApplicationItem = {
     email: string;
     id: string;
     name: string | null;
+    username?: string | null;
     avatar: string | null;
     avatarFrame: string | null;
     hideEmail: boolean;
     trustDelta?: number;
   };
   images: { url: string; sort: number }[];
+  integrity?: ApplicationIntegrity;
+};
+
+export type ApplicationIntegrityLink = {
+  kind: "application" | "withdrawal";
+  id: string;
+  userId: string;
+  userLabel: string;
+  userAvatar: string | null;
+  title?: string;
+  status?: ApplicationStatus;
+};
+
+export type ApplicationIntegrityAccount = {
+  userId: string;
+  userLabel: string;
+  userAvatar: string | null;
+};
+
+export type ApplicationIntegrityReason = {
+  key: string;
+  message: string;
+  accounts?: ApplicationIntegrityAccount[];
+};
+
+export type ApplicationIntegrity = {
+  isClean: boolean;
+  verdict: string;
+  reasons: ApplicationIntegrityReason[];
+  submitterIp: string | null;
+  sameIpCount: number;
+  samePaymentCount: number;
+  links: {
+    sameIp: ApplicationIntegrityLink[];
+    samePayment: ApplicationIntegrityLink[];
+  };
 };
 
 export type Stats = {
   pending: number;
   approved: number;
   rejected: number;
-  contest: number;
   total: number;
   totalAmount: number;
 };
@@ -47,7 +82,7 @@ export type StatusModal = {
   status: ApplicationStatus;
   comment: string;
   decreaseTrustOnDecision: boolean;
-  publishInStories: boolean;
+  linkedAccounts?: ApplicationIntegrityAccount[];
 };
 
 export type LightboxState = {

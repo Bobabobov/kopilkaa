@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { GlassModal } from "@/components/ui/GlassModal";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface TelegramWidgetProps {
@@ -150,34 +151,29 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
           </motion.button>
           <TelegramNetworkHint className="mt-3" />
 
-          {showWidget && (
-            <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              onClick={() => setShowWidget(false)}
-            >
-              <div
-                className="bg-[#0f1f1c] rounded-2xl p-6 max-w-md w-full border border-white/[0.08] shadow-xl"
-                onClick={(e) => e.stopPropagation()}
+          <GlassModal
+            open={showWidget}
+            onClose={() => setShowWidget(false)}
+            size="md"
+            zIndex={50}
+            title="Вход через Telegram"
+            icon={
+              <svg
+                className="h-4 w-4 text-[#2AABEE]"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-[#fffffe]">
-                    Вход через Telegram
-                  </h3>
-                  <button
-                    onClick={() => setShowWidget(false)}
-                    className="text-[#abd1c6] hover:text-[#fffffe] transition-colors"
-                  >
-                    <LucideIcons.X size="sm" />
-                  </button>
-                </div>
-                <div
-                  ref={modalContainerRef}
-                  className="flex justify-center min-h-[44px]"
-                />
-                <TelegramNetworkHint className="mt-4 px-1" />
-              </div>
-            </div>
-          )}
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.17 1.858-.896 6.37-1.264 8.445-.15.85-.444 1.133-.73 1.16-.62.055-1.09-.41-1.69-.803-.93-.64-1.456-1.04-2.36-1.666-1.045-.71-.368-1.1.228-1.777.157-.177 2.848-2.616 2.9-2.84.007-.03.014-.15-.056-.212-.07-.057-.173-.037-.248-.022-.106.023-1.79 1.14-5.06 3.345-.48.33-.914.49-1.302.48-.428-.01-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.78.026-.2.4-.405 1.1-.615 4.33-1.89 7.22-3.14 8.66-3.75 4.2-1.8 5.07-2.11 5.64-2.13.13-.01.41-.03.6.034.18.06.3.2.34.33.04.13.07.43.03.66z" />
+              </svg>
+            }
+          >
+            <div
+              ref={modalContainerRef}
+              className="flex min-h-[44px] justify-center"
+            />
+            <TelegramNetworkHint className="mt-4 px-1" />
+          </GlassModal>
         </>
       )}
     </div>

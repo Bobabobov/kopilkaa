@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatRelativeDate } from "@/lib/time";
+import { ProfileImageIcon } from "@/components/profile/ProfileImageIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 import {
@@ -99,9 +100,11 @@ export default function ProfileStoriesSection({
         </div>
         <div className="relative z-10 p-4 sm:p-5 md:p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center shadow-lg">
-              <LucideIcons.BookOpen className="w-5 h-5 text-[#f9bc60]" />
-            </div>
+            <ProfileImageIcon
+              src="/icon/pig4.png"
+              alt={isOwner ? "Мои истории" : "Истории"}
+              size="md"
+            />
             <div>
               <h3 className="text-lg font-bold text-white">
                 {isOwner ? "Мои истории" : "Истории"}
@@ -142,9 +145,11 @@ export default function ProfileStoriesSection({
       <div className="relative z-10 p-4 sm:p-5 md:p-6">
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f9bc60]/20 to-[#f9bc60]/10 border-2 border-[#f9bc60]/40 flex items-center justify-center shadow-lg">
-            <LucideIcons.BookOpen className="w-5 h-5 text-[#f9bc60]" />
-          </div>
+          <ProfileImageIcon
+            src="/icon/pig4.png"
+            alt={isOwner ? "Мои истории" : "Истории"}
+            size="md"
+          />
           <div>
             <h3 className="text-lg font-bold text-white">
               {isOwner ? "Мои истории" : "Истории"}

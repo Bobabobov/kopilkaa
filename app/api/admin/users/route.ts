@@ -15,39 +15,7 @@ export const dynamic = "force-dynamic";
 
 type UserRef = { id: string; email: string | null; name: string | null };
 
-/** Подтягивает отпечатки для старых заявок/выводов (порция за запрос, без тяжёлого полного скана). */
-async function backfillMissingFingerprints(): Promise<void> {
-  const apps = await prisma.application.findMany({
-    where: { paymentFingerprint: null },
-    take: 300,
-    select: { id: true, payment: true },
-  });
-  if (apps.length) {
-    await prisma.$transaction(
-      apps.map((row) =>
-        prisma.application.update({
-          where: { id: row.id },
-          data: { paymentFingerprint: digitsFingerprint(row.payment) },
-        }),
-      ),
-    );
-  }
-  const wds = await prisma.goodDeedWithdrawalRequest.findMany({
-    where: { detailsFingerprint: null },
-    take: 200,
-    select: { id: true, details: true },
-  });
-  if (wds.length) {
-    await prisma.$transaction(
-      wds.map((row) =>
-        prisma.goodDeedWithdrawalRequest.update({
-          where: { id: row.id },
-          data: { detailsFingerprint: digitsFingerprint(row.details) },
-        }),
-      ),
-    );
-  }
-}
+import { backfillMissingFingerprints } from "@/lib/admin/backfillFingerprints";
 
 // GET /api/admin/users - получить список пользователей для админа
 export async function GET(request: Request) {

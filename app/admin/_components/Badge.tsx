@@ -24,11 +24,6 @@ export default function Badge({ status }: BadgeProps) {
       className:
         "bg-[#e16162]/12 text-[#e16162] border border-[#e16162]/35",
     },
-    CONTEST: {
-      label: "Конкурс",
-      className:
-        "bg-[#9b87f5]/12 text-[#9b87f5] border border-[#9b87f5]/35",
-    },
   };
 
   const badge = config[status] ?? {

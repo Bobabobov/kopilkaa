@@ -47,7 +47,6 @@ export interface Story {
   story?: string;
   previewImageUrl?: string;
   createdAt?: string;
-  isContestWinner?: boolean;
   images?: Array<{ url: string; sort: number }>;
   user?: {
     id: string;
@@ -474,7 +473,6 @@ export default function StoryPageClient({
             authorId={story.user?.id}
             authorAvatar={story.user?.avatar}
             createdAt={story.createdAt}
-            isContestWinner={!!story.isContestWinner}
             readTime={readTime}
             imagesCount={sortedImages.length}
           />

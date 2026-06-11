@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { Notification } from "./types";
+import { getNotificationHref } from "@/lib/notifications/navigation";
 import {
   getNotificationIcon,
   getNotificationBackgroundColor,
@@ -36,34 +37,9 @@ export default function NotificationItem({
       return;
     }
 
-    if (
-      notification.type === "application_status" &&
-      notification.applicationId
-    ) {
-      if (notification.status === "APPROVED") {
-        router.push(`/stories/${notification.applicationId}`);
-      } else {
-        router.push("/applications");
-      }
-    } else if (
-      notification.type === "withdrawal_status" &&
-      notification.withdrawalId
-    ) {
-      router.push("/good-deeds");
-    } else if (
-      notification.type === "good_deed_submission_status" &&
-      notification.goodDeedSubmissionId
-    ) {
-      router.push("/good-deeds");
-    } else if (
-      (notification.type === "like" || notification.type === "story_comment") &&
-      notification.applicationId
-    ) {
-      const hash =
-        notification.type === "story_comment" ? "#story-comments" : "";
-      router.push(`/stories/${notification.applicationId}${hash}`);
-    } else if (notification.type === "friend_request") {
-      router.push("/friends?tab=received");
+    const href = getNotificationHref(notification);
+    if (href) {
+      router.push(href);
     }
   };
 

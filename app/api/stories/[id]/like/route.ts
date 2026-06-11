@@ -9,6 +9,8 @@ import {
   normalizeStoryReactionCounts,
   type StoryReactionType,
 } from "@/lib/stories/reactions";
+import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
+import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
 
 function isValidStoryId(id: string) {
   return /^[a-zA-Z0-9_-]+$/.test(id);
@@ -118,6 +120,16 @@ export async function POST(
       update: {
         type: reactionType,
       },
+    });
+
+    checkAndUnlockAchievement(
+      userId,
+      ACHIEVEMENT_SLUGS.REACTIONS_10_STORIES,
+    ).catch((error) => {
+      logRouteCatchError(
+        "POST /api/stories/[id]/like warm-heart achievement",
+        error,
+      );
     });
 
     return NextResponse.json(

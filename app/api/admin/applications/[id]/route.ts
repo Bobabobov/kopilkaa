@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { publish } from "@/lib/sse";
 import { sendStatusEmail } from "@/lib/email";
+import { syncApplicationStatusNotification } from "@/lib/notifications/userNotificationService";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
 import { getReferralBonusAmount } from "@/lib/referralProgram";
 
@@ -12,7 +13,7 @@ type SameRef = {
   id: string;
   createdAt: Date;
   user: { id: string; email: string | null; name: string | null };
-  status: "PENDING" | "APPROVED" | "REJECTED" | "CONTEST";
+  status: "PENDING" | "APPROVED" | "REJECTED";
   title: string | null;
   summary: string | null;
   amount: number | null;
@@ -40,7 +41,6 @@ export async function GET(
         amount: true,
         payment: true,
         status: true,
-        publishInStories: true,
         adminComment: true,
         filledMs: true,
         storyEditMs: true,
@@ -50,7 +50,9 @@ export async function GET(
         updatedAt: true,
         countTowardsTrust: true,
         trustDecreasedAtDecision: true,
-        user: { select: { email: true, id: true, trustDelta: true } },
+        user: {
+          select: { email: true, id: true, name: true, avatar: true, trustDelta: true },
+        },
         images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
         review: {
           select: {
@@ -222,23 +224,18 @@ export async function PATCH(
     | "PENDING"
     | "APPROVED"
     | "REJECTED"
-    | "CONTEST"
     | undefined;
-  const publishInStories =
-    typeof body?.publishInStories === "boolean"
-      ? body.publishInStories
-      : undefined;
   const decreaseTrustOnDecision = Boolean(body?.decreaseTrustOnDecision);
   const adminComment =
     typeof body?.adminComment === "string" ? body.adminComment : undefined;
   if (
     !status ||
-    !["PENDING", "APPROVED", "REJECTED", "CONTEST"].includes(status)
+    !["PENDING", "APPROVED", "REJECTED"].includes(status)
   )
     return Response.json({ error: "Invalid status" }, { status: 400 });
 
   try {
-    const item = await prisma.$transaction(async (tx) => {
+    const { updated: item, previousStatus } = await prisma.$transaction(async (tx) => {
       const previous = await tx.application.findUnique({
         where: { id },
         select: { status: true, userId: true },
@@ -252,7 +249,6 @@ export async function PATCH(
         data: {
           status,
           adminComment: adminComment ?? null,
-          publishInStories: status === "CONTEST" ? !!publishInStories : false,
           ...(status === "APPROVED" || status === "REJECTED"
             ? { trustDecreasedAtDecision: decreaseTrustOnDecision }
             : {}),
@@ -317,8 +313,18 @@ export async function PATCH(
         }
       }
 
-      return updated;
+      return { updated, previousStatus: previous.status };
     });
+
+    if (item.user?.id && previousStatus !== status) {
+      await syncApplicationStatusNotification({
+        userId: item.user.id,
+        applicationId: item.id,
+        title: item.title,
+        status,
+        adminComment: item.adminComment,
+      });
+    }
 
     if (
       item.user?.email &&

@@ -11,6 +11,7 @@ import {
   readReferralCookies,
   tryAwardReferralBonusForNewUser,
 } from "@/lib/referralProgram";
+import { grantWelcomeAchievement } from "@/lib/achievements/unlock";
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 
@@ -319,6 +320,13 @@ export async function POST(req: NextRequest) {
           visitorId: referralCookies.visitorId,
         });
       }
+
+      await grantWelcomeAchievement(createdNewUserId).catch((error) => {
+        console.error(
+          "[API Error] /api/auth/google: welcome achievement:",
+          error,
+        );
+      });
     }
 
     const res = NextResponse.json({

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { useNotifications } from "@/components/notifications/hooks/useNotifications";
 import { Notification } from "@/components/notifications/types";
+import { getNotificationHref } from "@/lib/notifications/navigation";
 import { isNotificationUnread } from "@/components/notifications/utils";
 import FeedHeader from "@/components/feed/FeedHeader";
 import FeedFilters, { FilterType } from "@/components/feed/FeedFilters";
@@ -131,29 +132,9 @@ export default function FeedContent() {
   }, [refetch]);
 
   const handleNotificationClick = (notification: Notification) => {
-    if (
-      notification.type === "application_status" &&
-      notification.applicationId
-    ) {
-      if (notification.status === "APPROVED") {
-        router.push(`/stories/${notification.applicationId}`);
-      } else {
-        router.push("/applications");
-      }
-    } else if (
-      (notification.type === "like" || notification.type === "story_comment") &&
-      notification.applicationId
-    ) {
-      const hash =
-        notification.type === "story_comment" ? "#story-comments" : "";
-      router.push(`/stories/${notification.applicationId}${hash}`);
-    } else if (notification.type === "friend_request") {
-      router.push("/friends?tab=received");
-    } else if (
-      notification.type === "withdrawal_status" &&
-      notification.withdrawalId
-    ) {
-      router.push("/good-deeds");
+    const href = getNotificationHref(notification);
+    if (href) {
+      router.push(href);
     }
   };
 

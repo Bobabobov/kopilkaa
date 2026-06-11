@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { GlassModal, GlassModalCloseButton } from "@/components/ui/GlassModal";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -10,7 +9,6 @@ import {
   CheckCircle2,
   HeartHandshake,
   Upload,
-  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,10 +32,6 @@ import {
   getTaskStatusMeta,
   TASK_TIER,
 } from "./goodDeedsTaskUi";
-import {
-  goodDeedsGlassPanel,
-  goodDeedsGlassShine,
-} from "./good-deeds-ui/glassStyles";
 import {
   getUploadSizeLimitLabel,
   UPLOAD_PHOTO_ACCEPT,
@@ -88,53 +82,16 @@ export function GoodDeedsSubmitModal({
   submissionsClosed = false,
   submissionsClosedMessage,
 }: Props) {
-  const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<Step>("pick");
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const selectedTask = tasks.find((t) => t.id === selectedTaskId) ?? null;
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
     if (!open) return;
     setStep(initialTaskId ? "form" : "pick");
     setSelectedTaskId(initialTaskId ?? null);
   }, [open, initialTaskId]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const scrollY = window.scrollY;
-    const originalBodyOverflow = document.body.style.overflow;
-    const originalBodyPosition = document.body.style.position;
-    const originalBodyTop = document.body.style.top;
-    const originalBodyWidth = document.body.style.width;
-    const originalHtmlOverflow = document.documentElement.style.overflow;
-
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
-    document.documentElement.style.overflow = "hidden";
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = originalBodyOverflow;
-      document.body.style.position = originalBodyPosition;
-      document.body.style.top = originalBodyTop;
-      document.body.style.width = originalBodyWidth;
-      document.documentElement.style.overflow = originalHtmlOverflow;
-      window.scrollTo(0, scrollY);
-    };
-  }, [open, onClose]);
 
   const pickTask = (task: GoodDeedTaskView) => {
     if (!canSubmitGoodDeedTask(task.submissionStatus)) return;
@@ -147,8 +104,6 @@ export function GoodDeedsSubmitModal({
     if (!selectedTaskId) return;
     onSubmit(selectedTaskId);
   };
-
-  if (!mounted) return null;
 
   const storyText = selectedTaskId ? (storyByTask[selectedTaskId] ?? "") : "";
   const selectedFiles = selectedTaskId ? (filesByTask[selectedTaskId] ?? []) : [];
@@ -164,70 +119,71 @@ export function GoodDeedsSubmitModal({
     file.type.startsWith("video/"),
   );
 
-  return createPortal(
-    <AnimatePresence>
-      {open ? (
-        <motion.div
-          key="good-deeds-submit-modal"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[9400] flex items-end justify-center overflow-hidden p-0 sm:items-center sm:p-4"
-          onClick={onClose}
-        >
-          <div className="absolute inset-0 bg-black/75 backdrop-blur-md" />
-
-          <motion.div
-            initial={{ opacity: 0, y: 40, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 28, scale: 0.98 }}
-            transition={{ type: "spring", damping: 30, stiffness: 340 }}
-            onClick={(e) => e.stopPropagation()}
-            className={cn(
-              goodDeedsGlassPanel,
-              "relative z-10 flex max-h-[min(92vh,820px)] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl sm:rounded-3xl",
-            )}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="good-deeds-submit-title"
-          >
-            <div className={goodDeedsGlassShine} />
-
-            <div className="relative flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.08] px-5 py-4 sm:px-6">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#f9bc60]/25 bg-[#f9bc60]/10 text-[#f9bc60]">
-                    <HeartHandshake className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#abd1c6]/75">
-                      {step === "pick" ? "Шаг 1 из 2" : "Шаг 2 из 2"}
-                    </p>
-                    <h2
-                      id="good-deeds-submit-title"
-                      className="text-lg font-black text-[#fffffe] sm:text-xl"
-                    >
-                      {step === "pick"
-                        ? "Сделать доброе дело"
-                        : selectedTask?.title ?? "Ваш отчёт"}
-                    </h2>
-                  </div>
-                </div>
+  return (
+    <GlassModal
+      open={open}
+      onClose={onClose}
+      hideHeader
+      showCloseButton={false}
+      size="2xl"
+      align="end"
+      zIndex={9400}
+      maxHeight="min(92dvh, 820px)"
+      bodyClassName="p-0"
+      ariaLabelledBy="good-deeds-submit-title"
+      header={
+        <div className="relative flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.08] px-5 py-4 sm:px-6">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#f9bc60]/25 bg-[#f9bc60]/10 text-[#f9bc60]">
+                <HeartHandshake className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#abd1c6]/75">
+                  {step === "pick" ? "Шаг 1 из 2" : "Шаг 2 из 2"}
+                </p>
+                <h2
+                  id="good-deeds-submit-title"
+                  className="text-lg font-black text-[#fffffe] sm:text-xl"
+                >
+                  {step === "pick"
+                    ? "Сделать доброе дело"
+                    : selectedTask?.title ?? "Ваш отчёт"}
+                </h2>
               </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-xl border border-white/10 p-2 text-[#abd1c6] transition hover:bg-white/10 hover:text-[#fffffe]"
-                aria-label="Закрыть"
-              >
-                <X className="h-5 w-5" />
-              </button>
             </div>
-
-            <div
-              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4 sm:px-6 sm:py-5"
-              style={{ WebkitOverflowScrolling: "touch" }}
-            >
+          </div>
+          <GlassModalCloseButton onClose={onClose} />
+        </div>
+      }
+      footer={
+        step === "form" && selectedTask && !submissionsClosed ? (
+          <Button
+            type="button"
+            disabled={
+              isSubmitting ||
+              !hasPhotoAndVideo ||
+              storyText.trim().length < MIN_GOOD_DEED_STORY_CHARS
+            }
+            onClick={handleSubmit}
+            className="h-11 w-full rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] hover:bg-[#f7b24a]"
+          >
+            {isSubmitting ? (
+              "Отправка…"
+            ) : (
+              <>
+                <CheckCircle2 className="h-4 w-4" />
+                Отправить на проверку
+              </>
+            )}
+          </Button>
+        ) : undefined
+      }
+    >
+      <div
+        className="px-5 py-4 sm:px-6 sm:py-5"
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
               {submissionsClosed ? (
                 <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
                   {submissionsClosedMessage ??
@@ -464,36 +420,8 @@ export function GoodDeedsSubmitModal({
                   </div>
                 </div>
               ) : null}
-            </div>
-
-            {step === "form" && selectedTask && !submissionsClosed ? (
-              <div className="relative shrink-0 border-t border-white/[0.08] bg-[#001e1d]/40 px-5 py-4 backdrop-blur-sm sm:px-6">
-                <Button
-                  type="button"
-                  disabled={
-                    isSubmitting ||
-                    !hasPhotoAndVideo ||
-                    storyText.trim().length < MIN_GOOD_DEED_STORY_CHARS
-                  }
-                  onClick={handleSubmit}
-                  className="h-11 w-full rounded-xl bg-[#f9bc60] font-semibold text-[#001e1d] hover:bg-[#f7b24a]"
-                >
-                  {isSubmitting ? (
-                    "Отправка…"
-                  ) : (
-                    <>
-                      <CheckCircle2 className="h-4 w-4" />
-                      Отправить на проверку
-                    </>
-                  )}
-                </Button>
-              </div>
-            ) : null}
-          </motion.div>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>,
-    document.body,
+      </div>
+    </GlassModal>
   );
 }
 

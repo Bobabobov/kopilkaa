@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { cn } from "@/lib/utils";
 
 export type FriendshipStatus = "none" | "requested" | "incoming" | "friends";
 
 interface FriendActionsProps {
   isOwner: boolean;
   status: FriendshipStatus;
+  centered?: boolean;
   onSendRequest?: () => Promise<void> | void;
   onAcceptIncoming?: () => Promise<void> | void;
   onDeclineIncoming?: () => Promise<void> | void;
@@ -15,6 +17,7 @@ interface FriendActionsProps {
 export function FriendActions({
   isOwner,
   status,
+  centered = false,
   onSendRequest,
   onAcceptIncoming,
   onDeclineIncoming,
@@ -22,9 +25,14 @@ export function FriendActions({
 }: FriendActionsProps) {
   if (isOwner) return null;
 
+  const rowClass = cn(
+    "flex flex-wrap items-center gap-2",
+    centered && "justify-center",
+  );
+
   if (status === "friends") {
     return (
-      <div className="flex flex-wrap items-center gap-2">
+      <div className={rowClass}>
         <span className="inline-flex items-center justify-center gap-2 rounded-lg bg-white/10 border border-white/20 px-4 py-2 text-sm font-medium text-white">
           <LucideIcons.Check className="w-4 h-4 mr-1" /> Друзья
         </span>
@@ -35,7 +43,9 @@ export function FriendActions({
             title="Удалить из друзей"
           >
             <LucideIcons.UserMinus size="sm" className="flex-shrink-0" />
-            <span className="hidden sm:inline">Удалить из друзей</span>
+            <span className={centered ? "inline" : "hidden sm:inline"}>
+              Удалить из друзей
+            </span>
           </button>
         )}
       </div>
@@ -44,11 +54,11 @@ export function FriendActions({
 
   if (status === "incoming") {
     return (
-      <div className="flex flex-col gap-2">
+      <div className={cn("flex flex-col gap-2", centered && "items-center")}>
         <p className="text-xs text-white/70 text-center">
           Пользователь отправил вам заявку
         </p>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={rowClass}>
           <button
             onClick={onAcceptIncoming}
             className="inline-flex items-center justify-center gap-1 xs:gap-1.5 rounded-lg bg-emerald-500/80 hover:bg-emerald-500 border border-emerald-400/50 px-3 py-1.5 xs:px-4 xs:py-2 text-xs xs:text-sm font-medium text-white transition-all duration-200"
@@ -70,7 +80,12 @@ export function FriendActions({
 
   if (status === "requested") {
     return (
-      <div className="text-center px-4 py-2 rounded-lg text-sm font-medium bg-white/10 border border-white/20 text-white">
+      <div
+        className={cn(
+          "rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-center text-sm font-medium text-white",
+          centered && "mx-auto w-fit",
+        )}
+      >
         Заявка отправлена
       </div>
     );
@@ -85,7 +100,9 @@ export function FriendActions({
       title="Добавить в друзья"
     >
       <LucideIcons.UserPlus size="sm" className="flex-shrink-0" />
-      <span className="hidden xs:inline">Добавить в друзья</span>
+      <span className={centered ? "inline" : "hidden xs:inline"}>
+        Добавить в друзья
+      </span>
     </motion.button>
   );
 }

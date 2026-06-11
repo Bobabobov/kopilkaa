@@ -77,8 +77,6 @@ function RandomStoryCardInner({ story, isRead }: RandomStoryCardProps) {
         storiesGlassCard,
         "group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#004643]",
         "hover:-translate-y-0.5 hover:border-white/20",
-        story.isContestWinner &&
-          "border-[#f9bc60]/40 ring-1 ring-[#f9bc60]/20 hover:border-[#f9bc60]/55 hover:shadow-[0_16px_40px_-12px_rgba(249,188,96,0.35)]",
       )}
     >
       <div
@@ -102,13 +100,6 @@ function RandomStoryCardInner({ story, isRead }: RandomStoryCardProps) {
           }}
         />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-[#001e1d]/88" />
-
-        {story.isContestWinner && (
-          <div className="absolute top-2 right-2 z-[3] inline-flex items-center gap-1 rounded-lg bg-[#001e1d]/95 backdrop-blur-sm px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#f9bc60] shadow-lg ring-1 ring-[#f9bc60]/50 border border-[#f9bc60]/30">
-            <LucideIcons.Trophy size="xs" className="h-3.5 w-3.5 shrink-0" />
-            Победитель конкурса
-          </div>
-        )}
 
         <div className="absolute bottom-2 left-2 right-2 z-[3] flex items-center gap-1.5">
           {story.user?.id ? (
@@ -239,7 +230,6 @@ export const RandomStoryCard = memo(RandomStoryCardInner, (prev, next) => {
     prev.story.summary === next.story.summary &&
     prev.story._count?.likes === next.story._count?.likes &&
     prev.story.amount === next.story.amount &&
-    prev.story.isContestWinner === next.story.isContestWinner &&
     prev.story.images?.[0]?.url === next.story.images?.[0]?.url &&
     prev.story.user?.id === next.story.user?.id &&
     prev.story.user?.avatar === next.story.user?.avatar

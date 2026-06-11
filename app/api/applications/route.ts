@@ -18,6 +18,8 @@ import {
   normalizeClientIp,
 } from "@/lib/http/clientIp";
 import { digitsFingerprint } from "@/lib/admin/requisitesFingerprint";
+import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
+import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -364,6 +366,12 @@ export async function POST(req: Request) {
     });
 
     publish("stats:dirty", {});
+
+    checkAndUnlockAchievement(session.uid, ACHIEVEMENT_SLUGS.FIRST_APPLICATION).catch(
+      (error) => {
+        console.error("[POST /api/applications] first-step achievement:", error);
+      },
+    );
 
     return Response.json({ ok: true, id: result.id });
   } catch (error) {

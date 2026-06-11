@@ -52,14 +52,7 @@ export async function GET(req: Request) {
           ? { createdAt: "asc" as const }
           : { createdAt: "desc" as const };
 
-    const statusFilter: Prisma.ApplicationWhereInput = {
-      OR: [
-        { status: "APPROVED" },
-        { status: "CONTEST", publishInStories: true },
-      ],
-    };
-
-    const andClauses: Prisma.ApplicationWhereInput[] = [statusFilter];
+    const andClauses: Prisma.ApplicationWhereInput[] = [{ status: "APPROVED" }];
 
     if (normalizedQuery) {
       const tokens = normalizedQuery.split(" ").filter(Boolean).slice(0, 6);
@@ -143,7 +136,6 @@ export async function GET(req: Request) {
             },
             _count: { select: { likes: true } },
             status: true,
-            publishInStories: true,
           },
         })
         .catch(() => []),
@@ -195,7 +187,7 @@ export async function GET(req: Request) {
 
       const candidateItems = await prisma.application
         .findMany({
-          where: statusFilter,
+          where: { status: "APPROVED" },
           orderBy: { createdAt: "desc" },
           take: 500,
           select: {
@@ -223,7 +215,6 @@ export async function GET(req: Request) {
             },
             _count: { select: { likes: true } },
             status: true,
-            publishInStories: true,
           },
         })
         .catch(() => []);
@@ -334,7 +325,6 @@ export async function GET(req: Request) {
         reactionCountsByStory.get(it.id) || createEmptyStoryReactionCounts(),
       userLiked: userReactionByStory ? userReactionByStory.has(it.id) : false,
       userReaction: userReactionByStory?.get(it.id) ?? null,
-      isContestWinner: it.status === "CONTEST" && it.publishInStories,
     }));
 
     const responseData = {

@@ -12,7 +12,6 @@ interface StoryPageHeroProps {
   authorId?: string;
   authorAvatar?: string | null;
   createdAt?: string;
-  isContestWinner?: boolean;
   readTime?: number;
   imagesCount?: number;
 }
@@ -32,7 +31,6 @@ export function StoryPageHero({
   authorId,
   authorAvatar,
   createdAt,
-  isContestWinner = false,
   readTime = 1,
   imagesCount = 0,
 }: StoryPageHeroProps) {
@@ -52,15 +50,6 @@ export function StoryPageHero({
         <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#f9bc60]/85">
           История
         </span>
-        {isContestWinner && (
-          <>
-            <MetaDot />
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#f9bc60]">
-              <LucideIcons.Trophy size="xs" />
-              Победитель конкурса
-            </span>
-          </>
-        )}
       </div>
 
       <h1 className="max-w-3xl text-2xl sm:text-[1.75rem] lg:text-[2rem] font-black leading-snug tracking-tight text-[#fffffe]">

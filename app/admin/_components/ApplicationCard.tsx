@@ -2,40 +2,19 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ApplicationItem, ApplicationStatus } from "../types";
+import type { ApplicationItem } from "../types";
 import ApplicationCardHeader from "./ApplicationCardHeader";
-import ApplicationCardActions from "./ApplicationCardActions";
 import ApplicationCardSummary from "./ApplicationCardSummary";
 import ApplicationCardPayment from "./ApplicationCardPayment";
 import ApplicationCardStory from "./ApplicationCardStory";
 import ApplicationCardFooter from "./ApplicationCardFooter";
+import { ApplicationCardIntegrity } from "./ApplicationCardIntegrity";
 
 interface ApplicationCardProps {
   application: ApplicationItem;
   index: number;
   visibleEmails: Set<string>;
   onToggleEmail: (id: string) => void;
-  onEdit: (
-    id: string,
-    status: ApplicationStatus,
-    comment: string,
-    publishInStories: boolean,
-    decreaseTrustOnDecision?: boolean,
-  ) => void;
-  onQuickApprove: (
-    id: string,
-    status: ApplicationStatus,
-    comment: string,
-    decreaseTrustOnDecision?: boolean,
-  ) => void;
-  onQuickReject: (
-    id: string,
-    status: ApplicationStatus,
-    comment: string,
-    decreaseTrustOnDecision?: boolean,
-  ) => void;
-  onDelete: (id: string, title: string) => void;
-  onToggleTrust?: (id: string, next: boolean) => void;
 }
 
 export default function ApplicationCard({
@@ -43,11 +22,6 @@ export default function ApplicationCard({
   index,
   visibleEmails,
   onToggleEmail,
-  onEdit,
-  onQuickApprove,
-  onQuickReject,
-  onDelete,
-  onToggleTrust,
 }: ApplicationCardProps) {
   return (
     <motion.div
@@ -71,23 +45,18 @@ export default function ApplicationCard({
       <div className="absolute inset-0 bg-gradient-to-r from-[#f9bc60]/5 via-[#abd1c6]/5 to-[#f9bc60]/5 group-hover:from-[#f9bc60]/10 group-hover:via-[#abd1c6]/10 group-hover:to-[#f9bc60]/10 transition-all duration-500"></div>
 
       <div className="relative min-w-0">
-        <div className="flex flex-col gap-3 mb-4 sm:mb-6 min-w-0">
+        <div className="mb-4 sm:mb-6 min-w-0">
           <ApplicationCardHeader
             application={it}
             visibleEmails={visibleEmails}
             onToggleEmail={onToggleEmail}
           />
-          <div className="min-w-0">
-            <ApplicationCardActions
-              application={it}
-              onEdit={onEdit}
-              onQuickApprove={onQuickApprove}
-              onQuickReject={onQuickReject}
-              onDelete={onDelete}
-              onToggleTrust={onToggleTrust}
-            />
-          </div>
         </div>
+
+        <ApplicationCardIntegrity
+          applicationId={it.id}
+          integrity={it.integrity}
+        />
 
         <ApplicationCardSummary summary={it.summary} />
 

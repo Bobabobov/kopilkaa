@@ -1,8 +1,9 @@
 // app/admin/hooks/useAdminApplications.ts
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { ApplicationItem, Stats } from "@/types/admin";
+import { applicationMatchesClientSearch } from "@/lib/admin/applicationSearch";
 import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 interface UseAdminApplicationsProps {
@@ -10,8 +11,10 @@ interface UseAdminApplicationsProps {
 }
 
 interface UseAdminApplicationsReturn {
-  // Состояние
   items: ApplicationItem[];
+  /** Список с мгновенной клиентской фильтрацией при вводе */
+  displayItems: ApplicationItem[];
+  isSearchPending: boolean;
   loading: boolean;
   loadingMore: boolean;
   error: string | null;
@@ -19,12 +22,11 @@ interface UseAdminApplicationsReturn {
   hasMore: boolean;
   stats: Stats | null;
 
-  // Фильтры
   q: string;
   setQ: (query: string) => void;
-  status: "ALL" | "PENDING" | "APPROVED" | "REJECTED" | "CONTEST";
+  status: "ALL" | "PENDING" | "APPROVED" | "REJECTED";
   setStatus: (
-    status: "ALL" | "PENDING" | "APPROVED" | "REJECTED" | "CONTEST",
+    status: "ALL" | "PENDING" | "APPROVED" | "REJECTED",
   ) => void;
   minAmount: string;
   setMinAmount: (amount: string) => void;
@@ -35,7 +37,6 @@ interface UseAdminApplicationsReturn {
   sortOrder: "asc" | "desc";
   setSortOrder: (order: "asc" | "desc") => void;
 
-  // Действия
   loadMore: () => Promise<void>;
   refreshStats: () => Promise<void>;
   refreshApplications: () => Promise<void>;
@@ -43,20 +44,42 @@ interface UseAdminApplicationsReturn {
   visibleEmails: Set<string>;
 }
 
+const SEARCH_DEBOUNCE_MS = 300;
+
+function buildListParams(
+  page: number,
+  debouncedQ: string,
+  status: UseAdminApplicationsReturn["status"],
+  minAmount: string,
+  maxAmount: string,
+  sortBy: UseAdminApplicationsReturn["sortBy"],
+  sortOrder: UseAdminApplicationsReturn["sortOrder"],
+): URLSearchParams {
+  return new URLSearchParams({
+    page: page.toString(),
+    limit: "20",
+    ...(debouncedQ && { q: debouncedQ }),
+    ...(status !== "ALL" && { status }),
+    ...(minAmount && { minAmount }),
+    ...(maxAmount && { maxAmount }),
+    ...(sortBy && { sortBy }),
+    ...(sortOrder && { sortOrder }),
+  });
+}
+
 export function useAdminApplications({
   initialPage = 1,
 }: UseAdminApplicationsProps = {}): UseAdminApplicationsReturn {
-  // Фильтры/поиск
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [status, setStatus] = useState<
-    "ALL" | "PENDING" | "APPROVED" | "REJECTED" | "CONTEST"
+    "ALL" | "PENDING" | "APPROVED" | "REJECTED"
   >("ALL");
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "amount" | "status">("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  // Список
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [items, setItems] = useState<ApplicationItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,10 +90,36 @@ export function useAdminApplications({
   const [visibleEmails, setVisibleEmails] = useState<Set<string>>(new Set());
   const [canStream, setCanStream] = useState(false);
 
-  // Загрузка данных. При смене фильтров передать 1, чтобы запросить первую страницу.
-  const loadMore = useCallback(
-    async (overridePage?: number) => {
-      const page = overridePage ?? currentPage;
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const fetchGenerationRef = useRef(0);
+  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  const isSearchPending = q.trim() !== debouncedQ.trim();
+
+  const displayItems = useMemo(() => {
+    const query = q.trim();
+    if (!query) return items;
+    return items.filter((item) => applicationMatchesClientSearch(item, query));
+  }, [items, q]);
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setDebouncedQ(q.trim());
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(handle);
+  }, [q]);
+
+  const fetchApplications = useCallback(
+    async (page: number, replace: boolean) => {
+      const generation = ++fetchGenerationRef.current;
+
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+
       try {
         if (page === 1) {
           setLoading(true);
@@ -79,25 +128,34 @@ export function useAdminApplications({
         }
         setError(null);
 
-        const params = new URLSearchParams({
-          page: page.toString(),
-          limit: "20",
-          ...(q && { q }),
-          ...(status !== "ALL" && { status }),
-          ...(minAmount && { minAmount }),
-          ...(maxAmount && { maxAmount }),
-          ...(sortBy && { sortBy }),
-          ...(sortOrder && { sortOrder }),
+        const params = buildListParams(
+          page,
+          debouncedQ,
+          status,
+          minAmount,
+          maxAmount,
+          sortBy,
+          sortOrder,
+        );
+
+        const response = await fetch(`/api/admin/applications?${params}`, {
+          cache: "no-store",
+          signal: abortController.signal,
         });
 
-        const response = await fetch(`/api/admin/applications?${params}`);
+        if (abortController.signal.aborted) return;
+        if (generation !== fetchGenerationRef.current) return;
+
         const data = await response.json().catch(() => null);
         if (!response.ok) {
           throw new Error(
             getMessageFromApiJson(data, "Не удалось загрузить список заявок"),
           );
         }
-        const newItems = data?.items || [];
+
+        const newItems: ApplicationItem[] = data?.items || [];
+
+        if (generation !== fetchGenerationRef.current) return;
 
         if (page === 1) {
           setItems(newItems);
@@ -108,19 +166,31 @@ export function useAdminApplications({
         setHasMore(page < (data?.pages || 1));
         setCurrentPage(page + 1);
       } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return;
+        if (generation !== fetchGenerationRef.current) return;
         console.error("Failed to load applications:", err);
         setError(
           err instanceof Error ? err.message : "Ошибка загрузки заявок",
         );
+        if (page === 1) {
+          setItems([]);
+        }
       } finally {
-        setLoading(false);
-        setLoadingMore(false);
+        if (generation === fetchGenerationRef.current) {
+          setLoading(false);
+          setLoadingMore(false);
+        }
       }
     },
-    [currentPage, q, status, minAmount, maxAmount, sortBy, sortOrder],
+    [debouncedQ, status, minAmount, maxAmount, sortBy, sortOrder],
   );
 
-  // Загрузка статистики
+  const loadMore = useCallback(async () => {
+    if (loading || loadingMore || !hasMore) return;
+    const page = currentPage;
+    await fetchApplications(page, false);
+  }, [loading, loadingMore, hasMore, currentPage, fetchApplications]);
+
   const refreshStats = useCallback(async () => {
     try {
       const response = await fetch("/api/admin/stats");
@@ -132,12 +202,10 @@ export function useAdminApplications({
         setCanStream(true);
         const data = await response.json();
         if (data.success && data.data?.applications) {
-          // Преобразуем структуру данных в ожидаемый формат
           setStats({
             pending: data.data.applications.pending,
             approved: data.data.applications.approved,
             rejected: data.data.applications.rejected,
-            contest: data.data.applications.contest ?? 0,
             total: data.data.applications.total,
             totalAmount: data.data.applications.totalAmount,
           });
@@ -149,7 +217,6 @@ export function useAdminApplications({
     }
   }, []);
 
-  // Переключение видимости email
   const toggleEmail = useCallback((id: string) => {
     setVisibleEmails((prev) => {
       const newSet = new Set(prev);
@@ -162,85 +229,31 @@ export function useAdminApplications({
     });
   }, []);
 
-  // Debounced обновление для избежания множественных запросов
-  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Обновление списка заявок (перезагрузка первой страницы)
   const refreshApplications = useCallback(async () => {
-    // Отменяем предыдущее обновление, если оно еще не выполнилось
     if (refreshTimeoutRef.current) {
       clearTimeout(refreshTimeoutRef.current);
     }
 
-    refreshTimeoutRef.current = setTimeout(async () => {
-      try {
-        setError(null);
-
-        // Не показываем loading если это быстрое обновление через SSE
-        const isQuickRefresh = items.length > 0;
-        if (!isQuickRefresh) {
-          setLoading(true);
-        }
-
-        setCurrentPage(1);
-
-        const params = new URLSearchParams({
-          page: "1",
-          limit: "20",
-          ...(q && { q }),
-          ...(status !== "ALL" && { status }),
-          ...(minAmount && { minAmount }),
-          ...(maxAmount && { maxAmount }),
-          ...(sortBy && { sortBy }),
-          ...(sortOrder && { sortOrder }),
-        });
-
-        const response = await fetch(`/api/admin/applications?${params}`, {
-          cache: "no-store",
-        });
-
-        const data = await response.json().catch(() => null);
-        if (!response.ok) {
-          throw new Error(
-            getMessageFromApiJson(data, "Не удалось обновить список заявок"),
-          );
-        }
-        const newItems = data?.items || [];
-
-        setItems(newItems);
-        setHasMore(1 < (data?.pages || 1));
-        setCurrentPage(2);
-      } catch (err) {
-        console.error("Failed to refresh applications:", err);
-        setError(
-          err instanceof Error ? err.message : "Ошибка обновления заявок",
-        );
-      } finally {
-        setLoading(false);
-      }
+    refreshTimeoutRef.current = setTimeout(() => {
+      setCurrentPage(1);
+      setHasMore(true);
+      void fetchApplications(1, true);
     }, 50);
-  }, [q, status, minAmount, maxAmount, sortBy, sortOrder, items.length]);
+  }, [fetchApplications]);
 
-  // Загрузка при изменении фильтров — всегда запрашиваем страницу 1
   useEffect(() => {
     setCurrentPage(1);
     setHasMore(true);
-    loadMore(1);
-  }, [q, status, minAmount, maxAmount, sortBy, sortOrder]);
+    void fetchApplications(1, true);
+  }, [debouncedQ, status, minAmount, maxAmount, sortBy, sortOrder, fetchApplications]);
 
-  // Загрузка статистики при монтировании
   useEffect(() => {
     refreshStats();
   }, [refreshStats]);
 
-  // SSE подключение для real-time обновлений
-  const eventSourceRef = useRef<EventSource | null>(null);
-
   useEffect(() => {
-    if (!canStream) {
-      return;
-    }
-    // Подключаемся к SSE
+    if (!canStream) return;
+
     const connectSSE = () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
@@ -252,15 +265,12 @@ export function useAdminApplications({
       eventSource.addEventListener("application:update", () => {
         refreshApplications();
       });
-
       eventSource.addEventListener("application:created", () => {
         refreshApplications();
       });
-
       eventSource.addEventListener("application:delete", () => {
         refreshApplications();
       });
-
       eventSource.addEventListener("stats:dirty", () => {
         refreshStats();
       });
@@ -273,7 +283,6 @@ export function useAdminApplications({
 
     connectSSE();
 
-    // Очистка при размонтировании
     return () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
@@ -283,20 +292,23 @@ export function useAdminApplications({
         clearTimeout(refreshTimeoutRef.current);
         refreshTimeoutRef.current = null;
       }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
     };
   }, [refreshApplications, refreshStats, canStream]);
 
   return {
-    // Состояние
     items,
+    displayItems,
+    isSearchPending,
     loading,
     loadingMore,
     error,
     currentPage,
     hasMore,
     stats,
-
-    // Фильтры
     q,
     setQ,
     status,
@@ -309,8 +321,6 @@ export function useAdminApplications({
     setSortBy,
     sortOrder,
     setSortOrder,
-
-    // Действия
     loadMore,
     refreshStats,
     refreshApplications,

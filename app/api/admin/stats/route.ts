@@ -13,7 +13,7 @@ export async function GET() {
     }
 
     // Статистика по заявкам с обработкой ошибок
-    const [pending, approved, rejected, contest, total, totalAmount] =
+    const [pending, approved, rejected, total, totalAmount] =
       await Promise.all([
         prisma.application
           .count({ where: { status: "PENDING" } })
@@ -23,9 +23,6 @@ export async function GET() {
           .catch(() => 0),
         prisma.application
           .count({ where: { status: "REJECTED" } })
-          .catch(() => 0),
-        prisma.application
-          .count({ where: { status: "CONTEST" } })
           .catch(() => 0),
         prisma.application.count().catch(() => 0),
         prisma.application
@@ -50,7 +47,6 @@ export async function GET() {
             pending,
             approved,
             rejected,
-            contest,
             total,
             totalAmount,
           },

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ApplicationStatus } from "@/types/admin";
+import type { ApplicationStatus, ApplicationIntegrityAccount } from "@/types/admin";
 import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 interface UseAdminActionsProps {
@@ -18,19 +18,20 @@ export function useAdminActions({
     status: ApplicationStatus;
     comment: string;
     decreaseTrustOnDecision: boolean;
-    publishInStories: boolean;
+    linkedAccounts?: ApplicationIntegrityAccount[];
   }>({
     id: "",
     status: "PENDING",
     comment: "",
     decreaseTrustOnDecision: false,
-    publishInStories: false,
+    linkedAccounts: [],
   });
 
   const [deleteModal, setDeleteModal] = useState<{
     id: string;
     title: string;
   }>({ id: "", title: "" });
+
   const toggleTrust = async (id: string, next: boolean) => {
     try {
       const response = await fetch(`/api/admin/applications/${id}/trust`, {
@@ -55,7 +56,6 @@ export function useAdminActions({
     }
   };
 
-  // Быстрое обновление статуса
   const quickUpdate = async (
     id: string,
     newStatus: ApplicationStatus,
@@ -85,7 +85,6 @@ export function useAdminActions({
         `Заявка ${newStatus === "APPROVED" ? "одобрена" : "отклонена"}!`,
       );
 
-      // Обновляем данные
       await Promise.all([refreshStats(), refreshApplications()]);
     } catch (err) {
       console.error("Failed to update application:", err);
@@ -96,7 +95,6 @@ export function useAdminActions({
     }
   };
 
-  // Обновление статуса через модалку
   const updateStatus = async () => {
     try {
       const response = await fetch(`/api/admin/applications/${modal.id}`, {
@@ -106,7 +104,6 @@ export function useAdminActions({
           status: modal.status,
           adminComment: modal.comment,
           decreaseTrustOnDecision: Boolean(modal.decreaseTrustOnDecision),
-          publishInStories: modal.publishInStories,
         }),
       });
 
@@ -119,16 +116,14 @@ export function useAdminActions({
 
       showToast("success", "Статус заявки обновлен!");
 
-      // Закрываем модалку
       setModal({
         id: "",
         status: "PENDING",
         comment: "",
         decreaseTrustOnDecision: false,
-        publishInStories: false,
+        linkedAccounts: [],
       });
 
-      // Обновляем данные
       await Promise.all([refreshStats(), refreshApplications()]);
     } catch (err) {
       console.error("Failed to update application:", err);
@@ -139,7 +134,6 @@ export function useAdminActions({
     }
   };
 
-  // Удаление заявки
   const deleteApplication = async () => {
     try {
       const response = await fetch(
@@ -157,11 +151,7 @@ export function useAdminActions({
       }
 
       showToast("success", "Заявка удалена!");
-
-      // Закрываем модалку
       setDeleteModal({ id: "", title: "" });
-
-      // Обновляем данные
       await Promise.all([refreshStats(), refreshApplications()]);
     } catch (err) {
       console.error("Failed to delete application:", err);
@@ -172,20 +162,19 @@ export function useAdminActions({
     }
   };
 
-  // Обработчики для ApplicationCard
   const handleEdit = (
     id: string,
     status: ApplicationStatus,
     comment: string,
-    publishInStories: boolean,
     decreaseTrustOnDecision?: boolean,
+    linkedAccounts?: ApplicationIntegrityAccount[],
   ) => {
     setModal({
       id,
       status,
       comment,
       decreaseTrustOnDecision: decreaseTrustOnDecision ?? false,
-      publishInStories,
+      linkedAccounts: linkedAccounts ?? [],
     });
   };
 

@@ -2,15 +2,16 @@
 
 import { motion } from "framer-motion";
 import ProfileHeaderCard from "@/components/profile/ProfileHeaderCard";
+import { FriendActions } from "@/components/profile/header/FriendActions";
 import TrustLevelCard from "@/components/profile/TrustLevelCard";
 import ProfileReviewSection from "@/components/profile/sections/ProfileReviewSection";
 import ProfileStoriesSection from "@/components/profile/sections/ProfileStoriesSection";
 import MutualFriends from "./widgets/MutualFriends";
 import OtherUserPersonalStats from "./OtherUserPersonalStats";
-import OtherUserActivity from "./OtherUserActivity";
 import { OtherUserProfileBackLink } from "./OtherUserProfileBackLink";
-import { ProfileStatsStrip } from "@/components/profile/ProfileStatsStrip";
+import { ProfileAchievementShowcaseStrip } from "@/components/profile/achievements/ProfileAchievementShowcaseStrip";
 import { ProfileSectionTitle } from "@/components/profile/ProfileSectionTitle";
+import ProfileAchievementsSection from "@/components/profile/sections/ProfileAchievementsSection";
 import { Separator } from "@/components/ui/separator";
 import type { OtherUserProfileUser } from "./types";
 import type { TrustLevel } from "@/lib/trustLevel";
@@ -52,24 +53,27 @@ export function OtherUserProfileContent({
           <OtherUserProfileBackLink />
 
           <header>
-          <ProfileHeaderCard
-            user={user}
-            isOwner={false}
-            friendshipStatus={friendshipStatus}
-            onSendRequest={onSendRequest}
-            onAcceptIncoming={onAcceptIncoming}
-            onDeclineIncoming={onDeclineIncoming}
-            onRemoveFriend={onRemoveFriend}
-          />
+          <ProfileHeaderCard user={user} isOwner={false} />
           </header>
 
-          <MutualFriends userId={resolvedUserId} />
+          <div className="flex justify-center px-2">
+            <FriendActions
+              isOwner={false}
+              status={friendshipStatus}
+              centered
+              onSendRequest={onSendRequest}
+              onAcceptIncoming={onAcceptIncoming}
+              onDeclineIncoming={onDeclineIncoming}
+              onRemoveFriend={onRemoveFriend}
+            />
+          </div>
 
-          <ProfileStatsStrip
-            trustStatus={trustDerived.trustStatus}
-            trustSupportText={trustDerived.supportText}
-            joinedAt={user.createdAt}
+          <ProfileAchievementShowcaseStrip
+            userId={resolvedUserId}
+            isOwner={false}
           />
+
+          <MutualFriends userId={resolvedUserId} />
 
           <Separator className="my-2 sm:my-4" />
 
@@ -97,7 +101,12 @@ export function OtherUserProfileContent({
                 variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
                 className="space-y-2"
               >
-                <ProfileSectionTitle icon="Shield" title="Доверие" subtitle="Уровень участника" />
+                <ProfileSectionTitle
+                  imageSrc="/icon/pig6.png"
+                  imageAlt="Доверие"
+                  title="Доверие"
+                  subtitle="Уровень участника"
+                />
                 <TrustLevelCard
                   status={trustDerived.trustStatus}
                   supportText={trustDerived.supportText}
@@ -114,13 +123,6 @@ export function OtherUserProfileContent({
                 variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
                 className="space-y-2"
               >
-                <ProfileSectionTitle icon="MessageCircle" title="Отзыв" />
-                <ProfileReviewSection userId={resolvedUserId} isOwner={false} />
-              </motion.div>
-              <motion.div
-                variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
-                className="space-y-2"
-              >
                 <ProfileSectionTitle icon="BarChart3" title="Статистика" />
                 <OtherUserPersonalStats userId={resolvedUserId} />
               </motion.div>
@@ -128,8 +130,8 @@ export function OtherUserProfileContent({
                 variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
                 className="space-y-2"
               >
-                <ProfileSectionTitle icon="Activity" title="Активность" />
-                <OtherUserActivity userId={resolvedUserId} />
+                <ProfileSectionTitle icon="MessageCircle" title="Отзыв" />
+                <ProfileReviewSection userId={resolvedUserId} isOwner={false} />
               </motion.div>
             </motion.div>
             </section>
@@ -144,6 +146,16 @@ export function OtherUserProfileContent({
                 transition={{ duration: 0.35, delay: 0.1 }}
               >
                 <ProfileStoriesSection userId={resolvedUserId} isOwner={false} />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.12 }}
+              >
+                <ProfileAchievementsSection
+                  userId={resolvedUserId}
+                  isOwner={false}
+                />
               </motion.div>
             </aside>
           </main>

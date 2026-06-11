@@ -7,12 +7,10 @@ import { cn } from "@/lib/utils";
 
 interface StoryCardTopReactionsProps {
   reactionCounts: StoryReactionCounts;
-  isWinner: boolean;
 }
 
 export function StoryCardTopReactions({
   reactionCounts,
-  isWinner,
 }: StoryCardTopReactionsProps) {
   const items = STORY_REACTION_TYPES.filter(
     (type) => reactionCounts[type] > 0,
@@ -30,7 +28,7 @@ export function StoryCardTopReactions({
         "shadow-[0_4px_18px_rgba(0,0,0,0.4)] ring-1 ring-white/40",
         "transition-[transform,box-shadow] duration-300",
         "group-hover:scale-[1.04] group-hover:shadow-[0_6px_22px_rgba(249,188,96,0.55)]",
-        isWinner ? "top-16 right-4" : "top-4 right-4",
+        "top-4 right-4",
       )}
       aria-label="Реакции на историю"
     >

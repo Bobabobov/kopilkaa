@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
+import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
+import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
 
 export const REFERRAL_VISITOR_COOKIE = "kopilka_ref_visitor";
 export const REFERRAL_CODE_COOKIE = "kopilka_ref_code";
@@ -97,6 +99,12 @@ export async function tryAwardReferralBonusForNewUser(params: {
         visitorId: params.visitorId,
       },
     });
+
+    checkAndUnlockAchievement(referrer.id, ACHIEVEMENT_SLUGS.REFERRAL_5).catch(
+      (error) => {
+        console.error("[referral] referral-5 achievement:", error);
+      },
+    );
 
     return { awarded: true };
   } catch (err: any) {

@@ -3,22 +3,20 @@
 
 import { useState, useEffect, useRef } from "react";
 import ApplicationsGrid from "./_components/ApplicationsGrid";
-import StatusModal from "./_components/StatusModal";
 import ImageLightbox from "./_components/ImageLightbox";
 import AdminLoading from "./_components/AdminLoading";
 import { AdminHeader } from "./_components/AdminHeader";
-import { DeleteModal } from "./_components/DeleteModal";
 import { AdminLoadingIndicator } from "./_components/AdminLoadingIndicator";
 import { AdminEndMessage } from "./_components/AdminEndMessage";
 import AdminUnifiedWorkspace from "./_components/AdminUnifiedWorkspace";
-import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useAdminApplications } from "@/hooks/admin/useAdminApplications";
-import { useAdminActions } from "@/hooks/admin/useAdminActions";
 
 export default function AdminClient() {
   const {
     // Состояние
     items,
+    displayItems,
+    isSearchPending,
     loading,
     loadingMore,
     error,
@@ -41,8 +39,6 @@ export default function AdminClient() {
 
     // Действия
     loadMore,
-    refreshStats,
-    refreshApplications,
     toggleEmail,
     visibleEmails,
   } = useAdminApplications();
@@ -61,28 +57,6 @@ export default function AdminClient() {
     currentIndex: 0,
   });
 
-  const { showToast } = useBeautifulToast();
-
-  // Используем хук для действий админа
-  const {
-    modal,
-    setModal,
-    deleteModal,
-    setDeleteModal,
-    updateStatus,
-    deleteApplication,
-    handleEdit,
-    handleQuickApprove,
-    handleQuickReject,
-    handleDelete,
-    toggleTrust,
-  } = useAdminActions({
-    refreshStats,
-    refreshApplications,
-    showToast,
-  });
-
-  // Intersection Observer для бесконечной прокрутки
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -141,7 +115,7 @@ export default function AdminClient() {
 
           <AdminUnifiedWorkspace
             stats={stats}
-            items={items}
+            items={displayItems}
             q={q}
             status={status}
             minAmount={minAmount}
@@ -160,16 +134,12 @@ export default function AdminClient() {
           {/* Список заявок */}
           <div className="mt-8">
             <ApplicationsGrid
-              applications={items}
-              loading={loading}
+              applications={displayItems}
+              loading={loading && displayItems.length === 0}
+              isSearchPending={isSearchPending || (loading && q.trim().length > 0)}
               error={error}
               visibleEmails={visibleEmails}
               onToggleEmail={toggleEmail}
-              onEdit={handleEdit}
-              onQuickApprove={handleQuickApprove}
-              onQuickReject={handleQuickReject}
-              onDelete={handleDelete}
-              onToggleTrust={toggleTrust}
             />
 
             {/* Индикатор загрузки следующих заявок */}
@@ -181,54 +151,10 @@ export default function AdminClient() {
             )}
 
             {/* Сообщение о конце списка */}
-            <AdminEndMessage hasMore={hasMore} itemsCount={items.length} />
+            <AdminEndMessage hasMore={hasMore} itemsCount={displayItems.length} />
           </div>
         </div>
       </div>
-
-      {/* Модалка статуса */}
-      <StatusModal
-        modal={modal}
-        onClose={() =>
-          setModal({
-            id: "",
-            status: "PENDING",
-            comment: "",
-            decreaseTrustOnDecision: false,
-            publishInStories: false,
-          })
-        }
-        onStatusChange={(status) =>
-          setModal((prev) => ({
-            ...prev,
-            status,
-            decreaseTrustOnDecision:
-              status === "APPROVED" || status === "REJECTED"
-                ? prev.decreaseTrustOnDecision
-                : false, // «Конкурс» не одобряет и не отклоняет
-            publishInStories:
-              status === "CONTEST" ? prev.publishInStories : false,
-          }))
-        }
-        onCommentChange={(comment) =>
-          setModal((prev) => ({ ...prev, comment }))
-        }
-        onDecreaseTrustChange={(next) =>
-          setModal((prev) => ({ ...prev, decreaseTrustOnDecision: next }))
-        }
-        onPublishChange={(publishInStories) =>
-          setModal((prev) => ({ ...prev, publishInStories }))
-        }
-        onSave={updateStatus}
-      />
-
-      {/* Модалка удаления */}
-      <DeleteModal
-        id={deleteModal.id}
-        title={deleteModal.title}
-        onClose={() => setDeleteModal({ id: "", title: "" })}
-        onConfirm={deleteApplication}
-      />
 
       {/* Лайтбокс изображений */}
       <ImageLightbox
@@ -245,3 +171,5 @@ export default function AdminClient() {
     </div>
   );
 }
+
+

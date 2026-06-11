@@ -6,6 +6,8 @@ import { writeFile, mkdir } from "fs/promises";
 import { extname } from "path";
 import { getUploadDir, getUploadFilePath } from "@/lib/uploads/paths";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
+import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -63,6 +65,16 @@ export async function POST(req: NextRequest) {
         headerCover: coverUrl,
         headerThemeUpdatedAt: new Date(),
       },
+    });
+
+    checkAndUnlockAchievement(
+      session.uid,
+      ACHIEVEMENT_SLUGS.PROFILE_STYLE,
+    ).catch((error) => {
+      logRouteCatchError(
+        "POST /api/profile/header-cover profile-style achievement:",
+        error,
+      );
     });
 
     return NextResponse.json({

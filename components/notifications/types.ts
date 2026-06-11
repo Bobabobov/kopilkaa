@@ -21,9 +21,14 @@ export interface Notification {
   storyCommentId?: string;
   withdrawalId?: string;
   goodDeedSubmissionId?: string;
-  status?: "APPROVED" | "REJECTED" | "CONTEST";
+  status?: "APPROVED" | "REJECTED";
   friendshipId?: string;
   requesterId?: string;
+  linkedAccounts?: Array<{
+    userId: string;
+    userLabel: string;
+    userAvatar: string | null;
+  }>;
 }
 
 export type NotificationType = Notification["type"];

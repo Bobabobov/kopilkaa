@@ -11,6 +11,8 @@ import {
 import { ApplicationStatus, type Prisma } from "@prisma/client";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
+import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
+import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
 
 export const dynamic = "force-dynamic";
 
@@ -384,6 +386,15 @@ export async function POST(req: NextRequest) {
     });
 
     const mapped = (await mapReviews([result], viewerId))[0] ?? null;
+
+    checkAndUnlockAchievement(viewerId, ACHIEVEMENT_SLUGS.LEFT_REVIEW).catch(
+      (error) => {
+        logRouteCatchError(
+          "[API POST /api/reviews] left-review achievement",
+          error,
+        );
+      },
+    );
 
     return NextResponse.json({ review: mapped }, { status: 200 });
   } catch (error) {

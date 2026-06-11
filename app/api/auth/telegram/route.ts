@@ -6,11 +6,16 @@ import { verifyTelegramAuth, TelegramAuthData } from "@/lib/telegramAuth";
 import { checkUserBan } from "@/lib/ban-check";
 import { saveRemoteImageAsAvatar } from "@/lib/uploads/saveRemoteImage";
 import {
+  isUsableTelegramPhotoUrl,
+  shouldSyncAvatarFromTelegram,
+} from "@/lib/avatar";
+import {
   REFERRAL_CODE_COOKIE,
   REFERRAL_VISITOR_COOKIE,
   readReferralCookies,
   tryAwardReferralBonusForNewUser,
 } from "@/lib/referralProgram";
+import { grantWelcomeAchievement } from "@/lib/achievements/unlock";
 
 export const runtime = "nodejs";
 
@@ -45,6 +50,17 @@ function getPublicOrigin(req: NextRequest): string {
     return "https://kopilka-online.ru";
   }
   return `${proto}://${host}`;
+}
+
+async function trySyncTelegramAvatar(
+  telegramPhoto: string | null,
+  ownerId: string,
+  currentAvatar: string | null | undefined,
+  avatarUpdatedAt: Date | null | undefined,
+): Promise<string | null> {
+  if (!isUsableTelegramPhotoUrl(telegramPhoto)) return null;
+  if (!shouldSyncAvatarFromTelegram(currentAvatar, avatarUpdatedAt)) return null;
+  return saveRemoteImageAsAvatar(telegramPhoto, ownerId);
 }
 
 async function authenticateTelegram(
@@ -103,18 +119,25 @@ async function authenticateTelegram(
         };
       }
 
+      const existingUser = await prisma.user.findUnique({
+        where: { id: sessionUser.id },
+        select: { avatar: true, avatarUpdatedAt: true },
+      });
+
       // Пользователь уже залогинен — привязываем Telegram к его аккаунту
       const updateData: any = {
         telegramId,
         telegramUsername,
       };
 
-      // Если Телеграм прислал аватар — сохраняем его как аватар профиля
-      if (telegramPhoto) {
-        const saved = await saveRemoteImageAsAvatar(telegramPhoto, telegramId);
-        if (saved) {
-          updateData.avatar = saved;
-        }
+      const saved = await trySyncTelegramAvatar(
+        telegramPhoto,
+        telegramId,
+        existingUser?.avatar,
+        existingUser?.avatarUpdatedAt,
+      );
+      if (saved) {
+        updateData.avatar = saved;
       }
 
       // Автоматически добавляем публичную ссылку на Telegram-профиль
@@ -167,6 +190,7 @@ async function authenticateTelegram(
         role: true,
         name: true,
         avatar: true,
+        avatarUpdatedAt: true,
         telegramId: true,
         telegramUsername: true,
       },
@@ -204,12 +228,14 @@ async function authenticateTelegram(
         emailVerified: true,
       };
 
-      // Сохраняем аватар из Telegram, если есть
-      if (telegramPhoto) {
-        const saved = await saveRemoteImageAsAvatar(telegramPhoto, telegramId);
-        if (saved) {
-          createData.avatar = saved;
-        }
+      const saved = await trySyncTelegramAvatar(
+        telegramPhoto,
+        telegramId,
+        null,
+        null,
+      );
+      if (saved) {
+        createData.avatar = saved;
       }
 
       // Автоматически выставляем публичную ссылку на Telegram
@@ -240,11 +266,14 @@ async function authenticateTelegram(
         updateData.telegramLink = `https://t.me/${telegramUsername}`;
       }
 
-      if (telegramPhoto && !user.avatar) {
-        const saved = await saveRemoteImageAsAvatar(telegramPhoto, telegramId);
-        if (saved) {
-          updateData.avatar = saved;
-        }
+      const saved = await trySyncTelegramAvatar(
+        telegramPhoto,
+        telegramId,
+        user.avatar,
+        user.avatarUpdatedAt,
+      );
+      if (saved) {
+        updateData.avatar = saved;
       }
 
       if (Object.keys(updateData).length > 0) {
@@ -258,6 +287,7 @@ async function authenticateTelegram(
             role: true,
             name: true,
             avatar: true,
+            avatarUpdatedAt: true,
             telegramId: true,
             telegramUsername: true,
           },
@@ -288,6 +318,13 @@ async function authenticateTelegram(
           visitorId: referralCookies.visitorId,
         });
       }
+
+      await grantWelcomeAchievement(createdNewUserId).catch((error) => {
+        console.error(
+          "[API Error] /api/auth/telegram: welcome achievement:",
+          error,
+        );
+      });
     }
 
     const res = NextResponse.json({

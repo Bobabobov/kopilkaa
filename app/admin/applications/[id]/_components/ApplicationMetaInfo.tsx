@@ -1,9 +1,16 @@
 // app/admin/applications/[id]/components/ApplicationMetaInfo.tsx
 "use client";
+
+import Link from "next/link";
 import { motion } from "framer-motion";
+import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface ApplicationMetaInfoProps {
   amount: number;
+  userId: string;
+  userName?: string | null;
+  userAvatar?: string | null;
   userEmail: string;
   summary: string;
   onCopyEmail: (email: string) => void;
@@ -12,14 +19,28 @@ interface ApplicationMetaInfoProps {
   categoryLabel?: string | null;
 }
 
+function getAuthorLabel(
+  name: string | null | undefined,
+  email: string,
+): string {
+  if (name?.trim()) return name.trim();
+  const local = email.split("@")[0]?.trim();
+  return local || "Пользователь";
+}
+
 export default function ApplicationMetaInfo({
   amount,
+  userId,
+  userName,
+  userAvatar,
   userEmail,
   summary,
   onCopyEmail,
   filledMs,
   categoryLabel,
 }: ApplicationMetaInfoProps) {
+  const authorLabel = getAuthorLabel(userName, userEmail);
+  const avatarUrl = resolveAvatarUrl(userAvatar);
   const formattedTime = (() => {
     if (typeof filledMs !== "number" || !Number.isFinite(filledMs)) return null;
     const totalSec = Math.max(0, Math.round(filledMs / 1000));
@@ -49,49 +70,47 @@ export default function ApplicationMetaInfo({
         </div>
 
         {/* Автор */}
-        <div className="flex items-center gap-2 text-sm rounded-2xl p-2.5 sm:p-4 border border-[#abd1c6]/35 bg-[#001e1d]/40 backdrop-blur-sm min-w-0 overflow-hidden shadow-[0_12px_30px_rgba(0,0,0,0.28)]">
-          <svg
-            className="w-4 h-4 flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            style={{ color: "#abd1c6" }}
+        <div className="rounded-2xl border border-[#abd1c6]/35 bg-[#001e1d]/40 backdrop-blur-sm min-w-0 overflow-hidden shadow-[0_12px_30px_rgba(0,0,0,0.28)] p-2.5 sm:p-3">
+          <div className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-[#abd1c6]/80 mb-2">
+            Автор
+          </div>
+          <Link
+            href={`/profile/${userId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-2.5 min-w-0 rounded-xl border border-transparent px-1 py-0.5 -mx-1 transition-colors hover:border-[#f9bc60]/30 hover:bg-white/5"
+            title="Открыть профиль автора"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            <img
+              src={avatarUrl}
+              alt=""
+              className="h-10 w-10 sm:h-11 sm:w-11 flex-shrink-0 rounded-full object-cover ring-2 ring-[#abd1c6]/25 group-hover:ring-[#f9bc60]/45 transition-all"
+              loading="lazy"
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_AVATAR;
+              }}
             />
-          </svg>
-          <span className="font-medium text-[#abd1c6]">Автор:</span>
+            <div className="min-w-0 flex-1">
+              <span className="block truncate text-sm sm:text-base font-bold text-[#f9bc60] group-hover:text-[#e8a545] group-hover:underline">
+                {authorLabel}
+              </span>
+              <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-[#abd1c6]/75">
+                <LucideIcons.ExternalLink size="xs" />
+                Профиль
+              </span>
+            </div>
+          </Link>
           <button
+            type="button"
             onClick={() => onCopyEmail(userEmail)}
-            className="group relative flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:border-[#f9bc60]/40 hover:bg-white/10 transition-all duration-200"
-            title="Нажмите чтобы скопировать email"
+            className="mt-2 group flex w-full items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-left transition-all duration-200 hover:border-[#f9bc60]/40 hover:bg-white/10"
+            title="Нажмите, чтобы скопировать email"
           >
-            <span className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none text-[#f9bc60]">
+            <LucideIcons.Mail size="xs" className="flex-shrink-0 text-[#abd1c6]/70" />
+            <span className="min-w-0 flex-1 truncate text-xs font-medium text-[#abd1c6]">
               {userEmail.replace(/(.{2}).*(@.*)/, "$1***$2")}
             </span>
-            <svg
-              className="w-3 h-3 group-hover:scale-110 transition-transform duration-200 flex-shrink-0 text-[#f9bc60]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-              />
-            </svg>
+            <LucideIcons.Copy size="xs" className="flex-shrink-0 text-[#f9bc60]/80 group-hover:scale-110 transition-transform" />
           </button>
         </div>
 

@@ -1,20 +1,18 @@
-import { motion } from "framer-motion";
-import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { getUserStatus } from "@/lib/userStatus";
+import { LucideIcons } from "@/components/ui/LucideIcons";
 import type { Friendship } from "./types";
 
 interface FriendPreviewCardProps {
   friendship: Friendship;
   currentUserId: string | null;
-  index: number;
+  index?: number;
   onOpenProfile: (userId: string) => void;
 }
 
 export function FriendPreviewCard({
   friendship,
   currentUserId,
-  index,
   onOpenProfile,
 }: FriendPreviewCardProps) {
   const friend =
@@ -26,20 +24,17 @@ export function FriendPreviewCard({
   const isOnline = status.status === "online";
 
   return (
-    <motion.div
-      key={friendship.id}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay: index * 0.05 }}
+    <button
+      type="button"
       onClick={() => onOpenProfile(friend.id)}
-      className="flex items-center gap-2 xs:gap-3 p-2.5 xs:p-3 rounded-lg hover:bg-[#001e1d]/30 cursor-pointer transition-colors"
+      className="flex w-full items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-white/[0.05] first:rounded-t-xl last:rounded-b-xl"
     >
-      <div className="relative">
-        <div className="w-10 h-10 xs:w-12 xs:h-12 rounded-lg overflow-hidden bg-[#004643] flex items-center justify-center">
+      <div className="relative shrink-0">
+        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-[#004643]/40 sm:h-11 sm:w-11">
           <img
             src={resolveAvatarUrl(friend.avatar)}
             alt={friend.name || "Аватар"}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
             onError={(e) => {
               e.currentTarget.src = DEFAULT_AVATAR;
             }}
@@ -47,24 +42,19 @@ export function FriendPreviewCard({
         </div>
 
         {isOnline && (
-          <div className="absolute -bottom-0.5 -right-0.5 w-3 xs:w-3.5 xs:h-3.5 h-3 bg-[#10B981] rounded-full border-2 border-[#001e1d]" />
+          <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#001e1d] bg-[#10B981]" />
         )}
       </div>
 
-      <div className="flex-1 min-w-0">
-        <p className="text-[#fffffe] font-medium text-xs xs:text-sm truncate">
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-[#fffffe]">
           {friend.name ||
             (friend.email ? friend.email.split("@")[0] : "Пользователь")}
         </p>
-        <p className="text-[#abd1c6] text-[10px] xs:text-xs mt-0.5">
-          {status.text}
-        </p>
+        <p className="mt-0.5 text-xs text-[#abd1c6]">{status.text}</p>
       </div>
 
-      <LucideIcons.ChevronRight
-        className="text-[#abd1c6] flex-shrink-0"
-        size="sm"
-      />
-    </motion.div>
+      <LucideIcons.ChevronRight className="shrink-0 text-[#abd1c6]" size="sm" />
+    </button>
   );
 }

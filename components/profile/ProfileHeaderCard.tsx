@@ -1,22 +1,17 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import HeaderCustomization from "./HeaderCustomization";
 import ApplicationsModal from "./modals/ApplicationsModal";
 import { getHeaderTheme } from "@/lib/header-customization";
-import { useFloatingMenu } from "./hooks/useFloatingMenu";
 import { useUserStatus } from "./hooks/useUserStatus";
-import { SocialLinks } from "./header/SocialLinks";
-import { FriendActions, type FriendshipStatus } from "./header/FriendActions";
-import { GuestActionsMenu } from "./header/GuestActionsMenu";
 import { AvatarBlock } from "./header/AvatarBlock";
 import { HeaderIdentity } from "./header/HeaderIdentity";
 import { CtaRow } from "./header/CtaRow";
 import { ProfileCustomizationActions } from "./header/ProfileCustomizationActions";
 import { useCoverStyle } from "./hooks/useCoverStyle";
-
 type User = {
   id: string;
   email: string | null;
@@ -41,11 +36,6 @@ type User = {
 interface ProfileHeaderCardProps {
   user: User;
   isOwner: boolean;
-  friendshipStatus?: FriendshipStatus;
-  onSendRequest?: () => Promise<void> | void;
-  onAcceptIncoming?: () => Promise<void> | void;
-  onDeclineIncoming?: () => Promise<void> | void;
-  onRemoveFriend?: () => Promise<void> | void;
   onThemeChange?: (theme: string | null) => void;
   onCoverChange?: (coverUrl: string | null) => void;
   onOpenSettings?: () => void;
@@ -61,11 +51,6 @@ const formatDate = (value: string) =>
 export default function ProfileHeaderCard({
   user,
   isOwner,
-  friendshipStatus = "none",
-  onSendRequest,
-  onAcceptIncoming,
-  onDeclineIncoming,
-  onRemoveFriend,
   onThemeChange,
   onCoverChange,
   onOpenSettings,
@@ -80,22 +65,11 @@ export default function ProfileHeaderCard({
   );
   const [showHeaderCustomization, setShowHeaderCustomization] = useState(false);
   const [isApplicationsModalOpen, setIsApplicationsModalOpen] = useState(false);
-  const [isGuestActionsOpen, setIsGuestActionsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const guestActionsButtonRef = useRef<HTMLElement | null>(null);
-
   const status = useUserStatus(user.lastSeen || null);
   const theme = useMemo(
     () => getHeaderTheme(currentHeaderTheme || "default"),
     [currentHeaderTheme],
   );
-  const guestMenuStyle = useFloatingMenu({
-    isOpen: isGuestActionsOpen,
-    anchorRef: guestActionsButtonRef,
-    menuSelector: '[data-menu="guest"]',
-    onClose: () => setIsGuestActionsOpen(false),
-  });
-
   const isColorTheme = theme.background === "color";
   const backgroundColor = isColorTheme ? (theme as any).color : null;
   const hasSocialLinks = !!(
@@ -103,10 +77,6 @@ export default function ProfileHeaderCard({
     user.telegramLink ||
     user.youtubeLink
   );
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     setCurrentAvatar(user.avatar || null);
@@ -219,21 +189,7 @@ export default function ProfileHeaderCard({
                   markedAsDeceiver={user.markedAsDeceiver}
                 />
 
-                <CtaRow
-                  isOwner={isOwner}
-                  hasSocialLinks={hasSocialLinks}
-                  user={user}
-                  friendshipStatus={friendshipStatus}
-                  onSendRequest={onSendRequest}
-                  onAcceptIncoming={onAcceptIncoming}
-                  onDeclineIncoming={onDeclineIncoming}
-                  onRemoveFriend={onRemoveFriend}
-                  guestActionsButtonRef={guestActionsButtonRef}
-                  guestMenuStyle={guestMenuStyle}
-                  mounted={mounted}
-                  isGuestActionsOpen={isGuestActionsOpen}
-                  setIsGuestActionsOpen={setIsGuestActionsOpen}
-                />
+                <CtaRow hasSocialLinks={hasSocialLinks} user={user} />
               </div>
             </div>
           </div>

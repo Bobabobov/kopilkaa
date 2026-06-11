@@ -12,6 +12,9 @@ import {
   TASKS_PER_WEEK,
 } from "@/lib/goodDeeds";
 import { prisma } from "@/lib/db";
+import { syncGoodDeedStatusNotification } from "@/lib/notifications/userNotificationService";
+import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
+import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
 
 export const dynamic = "force-dynamic";
 
@@ -54,11 +57,20 @@ export async function PATCH(
     }
 
     if (action === "reject") {
-      const updated = await prisma.goodDeedSubmission.updateMany({
-        where: {
-          id,
-          status: GoodDeedSubmissionStatus.PENDING,
-        },
+      const submission = await prisma.goodDeedSubmission.findFirst({
+        where: { id, status: GoodDeedSubmissionStatus.PENDING },
+        select: { userId: true, taskTitle: true },
+      });
+
+      if (!submission) {
+        return NextResponse.json(
+          { error: "Задание не найдено или уже обработано" },
+          { status: 409 },
+        );
+      }
+
+      await prisma.goodDeedSubmission.update({
+        where: { id },
         data: {
           status: GoodDeedSubmissionStatus.REJECTED,
           reviewedAt: new Date(),
@@ -67,12 +79,13 @@ export async function PATCH(
         },
       });
 
-      if (updated.count === 0) {
-        return NextResponse.json(
-          { error: "Задание не найдено или уже обработано" },
-          { status: 409 },
-        );
-      }
+      await syncGoodDeedStatusNotification({
+        userId: submission.userId,
+        submissionId: id,
+        taskTitle: submission.taskTitle,
+        status: "REJECTED",
+        adminComment: adminComment || null,
+      });
 
       return NextResponse.json({ success: true });
     }
@@ -80,7 +93,13 @@ export async function PATCH(
     const approvalMeta = await prisma.$transaction(async (tx) => {
       const pending = await tx.goodDeedSubmission.findFirst({
         where: { id, status: GoodDeedSubmissionStatus.PENDING },
-        select: { id: true, userId: true, weekKey: true, taskKey: true },
+        select: {
+          id: true,
+          userId: true,
+          weekKey: true,
+          taskKey: true,
+          taskTitle: true,
+        },
       });
 
       if (!pending) {
@@ -139,6 +158,8 @@ export async function PATCH(
       }
 
       return {
+        userId: pending.userId,
+        taskTitle: pending.taskTitle,
         firstFeedBonusGranted: firstFeedBonus > 0,
         categoryCompletionBonus,
       };
@@ -150,6 +171,24 @@ export async function PATCH(
         { status: 409 },
       );
     }
+
+    await syncGoodDeedStatusNotification({
+      userId: approvalMeta.userId,
+      submissionId: id,
+      taskTitle: approvalMeta.taskTitle,
+      status: "APPROVED",
+      adminComment: adminComment || null,
+    });
+
+    checkAndUnlockAchievement(
+      approvalMeta.userId,
+      ACHIEVEMENT_SLUGS.GOOD_DEED,
+    ).catch((error) => {
+      console.error(
+        "[PATCH /api/admin/good-deeds/submissions] good-deed achievement:",
+        error,
+      );
+    });
 
     return NextResponse.json({
       success: true,

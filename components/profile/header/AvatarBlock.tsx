@@ -7,11 +7,10 @@ import AvatarUpload from "../AvatarUpload";
 import type { UserStatus } from "../hooks/useUserStatus";
 import { resolveAvatarUrl } from "@/lib/avatar";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
-
 const DEFAULT_AVATAR = "/default-avatar.png";
 
 type AvatarUser = {
-  id?: string;
+  id: string;
   name?: string | null;
   email: string | null;
   hideEmail?: boolean;

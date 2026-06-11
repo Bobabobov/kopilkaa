@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { checkUserBan } from "@/lib/ban-check";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { trackLoginVisit } from "@/lib/achievements/unlock";
 
 type SocialLinkType = "vk" | "telegram" | "youtube";
 
@@ -222,6 +223,10 @@ export async function GET(request: Request) {
           logRouteCatchError("[API GET /api/profile/me] lastSeen", e),
         );
     }
+
+    trackLoginVisit(session.uid).catch((error) =>
+      logRouteCatchError("[API GET /api/profile/me] login streak", error),
+    );
 
     // Нормализуем пользователя: если есть telegramUsername, но нет telegramLink,
     // подставляем ссылку автоматически, чтобы профиль видел привязку Телеграма

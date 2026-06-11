@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 interface ApplicationFooterProps {
   createdAt: string;
-  status: "PENDING" | "APPROVED" | "REJECTED" | "CONTEST";
+  status: "PENDING" | "APPROVED" | "REJECTED";
   applicationId: string;
   onDelete: () => void;
 }

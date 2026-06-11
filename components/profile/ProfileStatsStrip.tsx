@@ -7,7 +7,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { LucideIcons } from "@/components/ui/LucideIcons";
+import { ProfileImageIcon } from "@/components/profile/ProfileImageIcon";
 import { getTrustLabel } from "@/lib/trustLevel";
 import type { TrustLevel } from "@/lib/trustLevel";
 
@@ -53,8 +53,13 @@ export function ProfileStatsStrip({
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex cursor-help items-center gap-2">
-            <span className="flex items-center gap-1.5 text-xs text-[#abd1c6]/90 uppercase tracking-wider">
-              <LucideIcons.Shield className="w-3.5 h-3.5 text-[#f9bc60]/80" />
+            <span className="flex items-center gap-2 text-xs text-[#abd1c6]/90 uppercase tracking-wider">
+              <ProfileImageIcon
+                src="/icon/pig6.png"
+                alt=""
+                size="sm"
+                className="drop-shadow-[0_3px_12px_rgba(249,188,96,0.4)]"
+              />
               Доверие
             </span>
             <Badge variant="default" className="font-semibold">

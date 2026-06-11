@@ -1,9 +1,7 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
-import { useScrollLock } from "@/hooks/ui/useScrollLock";
 import { PreSupportModal } from "./PreSupportModal";
 import { PreSupportContent } from "./one-time/PreSupportContent";
 import { SupportHeader } from "./one-time/SupportHeader";
@@ -32,28 +30,11 @@ export default function OneTimeSupport({
   const [isPreSupportOpen, setIsPreSupportOpen] = useState(false);
   const [profile, setProfile] = useState<PreSupportProfile | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
   const dalinkUrl = "https://dalink.to/kopilkaonline";
   const suggestedTag = useMemo(
     () => (profile?.username ? `@${profile.username}` : "@username"),
     [profile?.username],
   );
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useScrollLock(isPreSupportOpen);
-
-  useEffect(() => {
-    if (!isPreSupportOpen) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsPreSupportOpen(false);
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [isPreSupportOpen]);
 
   async function ensureProfileLoaded() {
     if (profile !== null || isLoadingProfile) return;
@@ -94,21 +75,6 @@ export default function OneTimeSupport({
     modal: "auth/signup",
   });
 
-  function renderPreSupportModal() {
-    return (
-      <PreSupportModal onClose={closePreSupport}>
-        <PreSupportContent
-          profile={profile}
-          suggestedTag={suggestedTag}
-          dalinkUrl={dalinkUrl}
-          authUrl={authUrl}
-          onClose={closePreSupport}
-          onCopy={copyText}
-        />
-      </PreSupportModal>
-    );
-  }
-
   return (
     <section className="py-6 sm:py-8 px-3 sm:px-4">
       <div className="max-w-4xl mx-auto">
@@ -129,10 +95,16 @@ export default function OneTimeSupport({
             }}
           />
 
-          {/* Pre-support modal */}
-          {mounted && isPreSupportOpen
-            ? createPortal(renderPreSupportModal(), document.body)
-            : null}
+          <PreSupportModal open={isPreSupportOpen} onClose={closePreSupport}>
+            <PreSupportContent
+              profile={profile}
+              suggestedTag={suggestedTag}
+              dalinkUrl={dalinkUrl}
+              authUrl={authUrl}
+              onClose={closePreSupport}
+              onCopy={copyText}
+            />
+          </PreSupportModal>
 
           <AmountButtons
             amounts={predefinedAmounts}

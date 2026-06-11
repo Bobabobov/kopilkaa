@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
@@ -24,49 +23,10 @@ export default function DonateButton({
     isAuthed: boolean;
   } | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
   const suggestedTag = useMemo(
     () => (profile?.username ? `@${profile.username}` : "@username"),
     [profile?.username],
   );
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isPreSupportOpen) return;
-
-    // soft scroll lock: lock background but allow scrolling inside modal
-    const scrollY = window.scrollY;
-    const originalOverflow = document.body.style.overflow;
-    const originalPosition = document.body.style.position;
-    const originalTop = document.body.style.top;
-    const originalWidth = document.body.style.width;
-    const originalHtmlOverflow = document.documentElement.style.overflow;
-
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
-    document.documentElement.style.overflow = "hidden";
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsPreSupportOpen(false);
-    };
-    document.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = originalOverflow;
-      document.body.style.position = originalPosition;
-      document.body.style.top = originalTop;
-      document.body.style.width = originalWidth;
-      document.documentElement.style.overflow = originalHtmlOverflow;
-      window.scrollTo(0, scrollY);
-    };
-  }, [isPreSupportOpen]);
 
   async function ensureProfileLoaded() {
     if (profile !== null || isLoadingProfile) return;
@@ -139,9 +99,7 @@ export default function DonateButton({
             <span>Пополнить копилку</span>
           </span>
         </motion.button>
-        {mounted && preSupportModal
-          ? createPortal(preSupportModal, document.body)
-          : null}
+        {preSupportModal}
       </div>
     );
   }
@@ -162,9 +120,7 @@ export default function DonateButton({
         <LucideIcons.Heart size="sm" />
         <span>Пополнить копилку</span>
       </button>
-      {mounted && preSupportModal
-        ? createPortal(preSupportModal, document.body)
-        : null}
+      {preSupportModal}
     </div>
   );
 }

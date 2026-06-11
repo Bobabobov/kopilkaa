@@ -25,6 +25,8 @@ import { StoryLightbox } from "@/components/stories/StoryLightbox";
 import ApplicationReviewBlock from "./_components/ApplicationReviewBlock";
 import ApplicationPreviousReviewBlock from "./_components/ApplicationPreviousReviewBlock";
 import AdminSection from "./_components/AdminSection";
+import { AdminQuickReplies } from "@/app/admin/_components/AdminQuickReplies";
+import { collectLinkedAccountsFromRefs } from "@/lib/admin/buildMultiAccountRejectComment";
 import type { ApplicationItem, ApplicationStatus } from "./types";
 import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
@@ -47,7 +49,6 @@ export default function AdminApplicationPage({
   );
   const [editStatus, setEditStatus] = useState<ApplicationStatus>("PENDING");
   const [editComment, setEditComment] = useState("");
-  const [editPublishInStories, setEditPublishInStories] = useState(false);
 
   const deleteApplication = async () => {
     try {
@@ -86,7 +87,6 @@ export default function AdminApplicationPage({
           );
           setEditStatus(d.item.status);
           setEditComment(d.item.adminComment || "");
-          setEditPublishInStories(Boolean(d.item.publishInStories));
           setDecreaseOnDecision(Boolean(d.item.trustDecreasedAtDecision));
         } else {
           setErr(getMessageFromApiJson(d, "Заявка не найдена"));
@@ -260,8 +260,6 @@ export default function AdminApplicationPage({
           status: editStatus,
           adminComment: editComment,
           decreaseTrustOnDecision: Boolean(decreaseOnDecision),
-          publishInStories:
-            editStatus === "CONTEST" ? editPublishInStories : false,
         }),
       });
       if (!response.ok) {
@@ -275,16 +273,12 @@ export default function AdminApplicationPage({
               ...prev,
               status: updated.status,
               adminComment: updated.adminComment,
-              publishInStories: updated.publishInStories,
               trustDecreasedAtDecision: updated.trustDecreasedAtDecision,
             }
           : prev,
       );
       setEditStatus(updated?.status ?? editStatus);
       setEditComment(updated?.adminComment ?? editComment);
-      setEditPublishInStories(
-        updated?.publishInStories ?? editPublishInStories,
-      );
       showToast("success", "Статус заявки обновлен!");
     } catch (error) {
       console.error("Failed to update application via form", error);
@@ -421,6 +415,9 @@ export default function AdminApplicationPage({
             >
               <ApplicationMetaInfo
                 amount={item.amount}
+                userId={item.user.id}
+                userName={item.user.name}
+                userAvatar={item.user.avatar}
                 userEmail={item.user.email}
                 summary={item.summary}
                 filledMs={item.filledMs}
@@ -642,18 +639,13 @@ export default function AdminApplicationPage({
                   <select
                     className="w-full px-4 py-2.5 bg-transparent border border-white/10 rounded-2xl focus:ring-2 focus:ring-[#f9bc60]/45 focus:border-[#f9bc60]/30 transition-all duration-200 text-[#fffffe] outline-none text-sm"
                     value={editStatus}
-                    onChange={(e) => {
-                      const next = e.target.value as ApplicationStatus;
-                      setEditStatus(next);
-                      if (next !== "CONTEST") {
-                        setEditPublishInStories(false);
-                      }
-                    }}
+                    onChange={(e) =>
+                      setEditStatus(e.target.value as ApplicationStatus)
+                    }
                   >
                     <option value="PENDING">⏳ В обработке</option>
                     <option value="APPROVED">✅ Одобрено</option>
                     <option value="REJECTED">❌ Отказано</option>
-                    <option value="CONTEST">🏆 Конкурс</option>
                   </select>
                 </div>
 
@@ -667,44 +659,20 @@ export default function AdminApplicationPage({
                     onChange={(e) => setEditComment(e.target.value)}
                     placeholder="Причина решения / уточнения для автора..."
                   />
+                  <AdminQuickReplies
+                    mode="insert"
+                    linkedAccounts={collectLinkedAccountsFromRefs(
+                      item.sameIpApplications ?? [],
+                      item.samePaymentApplications ?? [],
+                      item.user.id,
+                    )}
+                    onInsert={setEditComment}
+                    className="mt-3"
+                  />
                   <p className="mt-1 text-[11px] text-[#abd1c6]">
                     Этот комментарий увидит пользователь в уведомлении и в модальном окне.
                   </p>
                 </div>
-
-                {editStatus === "CONTEST" && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setEditPublishInStories((prev) => !prev)
-                    }
-                    className="w-full flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="inline-flex w-9 h-9 rounded-xl bg-[#f9bc60]/12 border border-[#f9bc60]/25 items-center justify-center flex-shrink-0">
-                        <LucideIcons.Trophy size="sm" className="text-[#f9bc60]" />
-                      </span>
-                      <div className="min-w-0 text-left">
-                        <p className="text-sm font-semibold text-[#fffffe]">
-                          Публиковать в /stories
-                        </p>
-                        <p className="text-xs text-[#abd1c6]">
-                          Отметить как победителя конкурса
-                        </p>
-                      </div>
-                    </div>
-                    <span className="relative inline-flex h-5 w-9 items-center rounded-full border border-white/10 bg-white/10 flex-shrink-0">
-                      <span
-                        className={[
-                          "absolute h-4 w-4 rounded-full transition-transform",
-                          editPublishInStories
-                            ? "translate-x-[18px] bg-[#10B981]"
-                            : "translate-x-[2px] bg-[#abd1c6]/60",
-                        ].join(" ")}
-                      />
-                    </span>
-                  </button>
-                )}
 
                 <button
                   type="button"

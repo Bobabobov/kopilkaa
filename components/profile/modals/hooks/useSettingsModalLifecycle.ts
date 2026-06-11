@@ -1,61 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface UseSettingsModalLifecycleParams {
   isOpen: boolean;
-  onClose: () => void;
   dialogRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export function useSettingsModalLifecycle({
   isOpen,
-  onClose,
   dialogRef,
 }: UseSettingsModalLifecycleParams) {
-  const [mounted, setMounted] = useState(false);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
 
-  // Монтирование для Portal
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Управление клавишами и блокировка скролла
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-
-    const scrollY = window.scrollY;
-    const originalOverflow = document.body.style.overflow;
-    const originalPosition = document.body.style.position;
-    const originalTop = document.body.style.top;
-    const originalWidth = document.body.style.width;
-    const originalHtmlOverflow = document.documentElement.style.overflow;
-
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
-    document.documentElement.style.overflow = "hidden";
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = originalOverflow;
-      document.body.style.position = originalPosition;
-      document.body.style.top = originalTop;
-      document.body.style.width = originalWidth;
-      document.documentElement.style.overflow = originalHtmlOverflow;
-      window.scrollTo(0, scrollY);
-    };
-  }, [isOpen, onClose]);
-
-  // Focus trap + restore focus
+  // Focus trap + restore focus (scroll lock и Escape — в GlassModal)
   useEffect(() => {
     if (!isOpen) return;
     lastActiveElementRef.current = document.activeElement as HTMLElement | null;
@@ -116,5 +72,5 @@ export function useSettingsModalLifecycle({
     };
   }, [isOpen, dialogRef]);
 
-  return { mounted, lastActiveElementRef };
+  return { lastActiveElementRef };
 }

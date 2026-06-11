@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ProfileImageIcon } from "@/components/profile/ProfileImageIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 export function FriendsPageHeader({
@@ -18,9 +19,12 @@ export function FriendsPageHeader({
       </div>
       <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#f9bc60] to-[#e8a545] flex items-center justify-center shadow-lg flex-shrink-0">
-            <LucideIcons.UsersRound size="lg" className="text-[#0f2d2a]" />
-          </div>
+          <ProfileImageIcon
+            src="/icon/pig.png"
+            alt="Мои друзья"
+            size="lg"
+            className="h-12 w-12 sm:h-14 sm:w-14 flex-shrink-0"
+          />
           <div className="min-w-0">
             <p className="text-xs sm:text-sm font-semibold text-[#abd1c6] uppercase tracking-wide">
               Раздел друзей

@@ -30,11 +30,6 @@ function getStatusBadge(status: ApplicationItem["status"]) {
         label: "Отказано",
         className: "bg-[#e16162]/12 text-[#e16162] border border-[#e16162]/35",
       };
-    case "CONTEST":
-      return {
-        label: "Конкурс",
-        className: "bg-[#9b87f5]/12 text-[#9b87f5] border border-[#9b87f5]/35",
-      };
     default:
       return {
         label: status,
@@ -101,15 +96,6 @@ export default function ApplicationCardHeader({
               Влияет на доверие
             </span>
           )}
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-sm">
-            <span className="text-[#abd1c6]/80 font-semibold">ID</span>
-            <span
-              className="font-mono text-[#fffffe] font-bold break-all"
-              title={it.id}
-            >
-              {it.id}
-            </span>
-          </span>
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[#abd1c6] backdrop-blur-sm">
             <span className="inline-flex w-5 h-5 items-center justify-center rounded-full bg-white/10 border border-white/10">
               <span className="block w-2 h-2 rounded-full bg-[#f9bc60]" />

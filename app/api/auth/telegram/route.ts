@@ -252,6 +252,7 @@ async function authenticateTelegram(
           role: true,
           name: true,
           avatar: true,
+          avatarUpdatedAt: true,
           telegramId: true,
           telegramUsername: true,
         },

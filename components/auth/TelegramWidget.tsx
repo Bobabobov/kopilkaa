@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { GlassModal } from "@/components/ui/GlassModal";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface TelegramWidgetProps {
-  onAuth: (user: any) => Promise<void>;
+  /** @deprecated OAuth-редирект, колбэк не используется */
+  onAuth?: (user: unknown) => Promise<void>;
   checkingAuth: boolean;
 }
 
@@ -30,89 +30,18 @@ function TelegramNetworkHint({ className = "" }: { className?: string }) {
   );
 }
 
-export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
-  const modalContainerRef = useRef<HTMLDivElement | null>(null);
-  const [isReady, setIsReady] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showWidget, setShowWidget] = useState(false);
+export function TelegramWidget({ checkingAuth }: TelegramWidgetProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  useEffect(() => {
-    (window as any).onTelegramAuth = async (user: any) => {
-      await onAuth(user);
-    };
+  const handleTelegramLogin = () => {
+    if (checkingAuth) return;
 
-    return () => {
-      delete (window as any).onTelegramAuth;
-    };
-  }, [onAuth]);
+    const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
+    const next = encodeURIComponent(`${pathname}${search}`);
+    window.location.href = `/api/auth/telegram/start?next=${next}`;
+  };
 
-  useEffect(() => {
-    if (!showWidget || checkingAuth) return;
-
-    const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
-    if (!botUsername) {
-      setError("Telegram авторизация недоступна");
-      return;
-    }
-
-    const cleanBotUsername = botUsername.replace(/^@/, "");
-    if (!modalContainerRef.current) return;
-
-    const script = document.createElement("script");
-    script.src = "https://telegram.org/js/telegram-widget.js?22";
-    script.async = true;
-    script.setAttribute("data-telegram-login", cleanBotUsername);
-    script.setAttribute("data-size", "large");
-    script.setAttribute("data-radius", "12");
-    script.setAttribute("data-lang", "ru");
-    script.setAttribute("data-request-access", "write");
-    script.setAttribute("data-onauth", "onTelegramAuth(user)");
-    const next = encodeURIComponent(
-      `${window.location.pathname}${window.location.search}`,
-    );
-    script.setAttribute(
-      "data-auth-url",
-      `${window.location.origin}/api/auth/telegram?next=${next}`,
-    );
-
-    let timeoutId: NodeJS.Timeout | null = null;
-
-    script.onerror = () => {
-      setError(
-        "Не удалось загрузить Telegram. Смените регион сети или войдите через Google или по почте.",
-      );
-      setIsReady(false);
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-
-    script.onload = () => {
-      setIsReady(true);
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-
-    timeoutId = setTimeout(() => {
-      if (!isReady) {
-        setError(
-          "Таймаут загрузки Telegram. Смените регион сети или войдите через Google или по почте.",
-        );
-      }
-    }, 10000);
-
-    const targetContainer = modalContainerRef.current;
-    if (targetContainer) {
-      targetContainer.innerHTML = "";
-      targetContainer.appendChild(script);
-    }
-
-    return () => {
-      if (modalContainerRef.current) {
-        modalContainerRef.current.innerHTML = "";
-      }
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [showWidget, checkingAuth, isReady]);
-
-  // Если Telegram Bot Username не задан, показываем заглушку
   if (!process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME) {
     return (
       <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] text-[#6b7280] flex items-center justify-center gap-2.5 border border-[#1f2937]/50 cursor-not-allowed">
@@ -124,58 +53,26 @@ export function TelegramWidget({ onAuth, checkingAuth }: TelegramWidgetProps) {
 
   return (
     <div className="w-full">
-      {error && (
-        <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] text-[#6b7280] flex items-center justify-center gap-2.5 border border-[#1f2937]/50">
-          <LucideIcons.AlertCircle size="sm" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {!error && (
-        <>
-          <motion.button
-            onClick={() => setShowWidget(true)}
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm border border-white/20 text-[#fffffe] hover:border-[#f9bc60]/50 hover:text-[#f9bc60] flex items-center justify-center gap-2.5 transition-all relative z-10"
-            style={{ background: "rgba(255,255,255,0.05)" }}
-          >
-            <svg
-              className="w-5 h-5 flex-shrink-0"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.17 1.858-.896 6.37-1.264 8.445-.15.85-.444 1.133-.73 1.16-.62.055-1.09-.41-1.69-.803-.93-.64-1.456-1.04-2.36-1.666-1.045-.71-.368-1.1.228-1.777.157-.177 2.848-2.616 2.9-2.84.007-.03.014-.15-.056-.212-.07-.057-.173-.037-.248-.022-.106.023-1.79 1.14-5.06 3.345-.48.33-.914.49-1.302.48-.428-.01-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.78.026-.2.4-.405 1.1-.615 4.33-1.89 7.22-3.14 8.66-3.75 4.2-1.8 5.07-2.11 5.64-2.13.13-.01.41-.03.6.034.18.06.3.2.34.33.04.13.07.43.03.66z" />
-            </svg>
-            <span>Войти через Telegram</span>
-          </motion.button>
-          <TelegramNetworkHint className="mt-3" />
-
-          <GlassModal
-            open={showWidget}
-            onClose={() => setShowWidget(false)}
-            size="md"
-            zIndex={50}
-            title="Вход через Telegram"
-            icon={
-              <svg
-                className="h-4 w-4 text-[#2AABEE]"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden
-              >
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.17 1.858-.896 6.37-1.264 8.445-.15.85-.444 1.133-.73 1.16-.62.055-1.09-.41-1.69-.803-.93-.64-1.456-1.04-2.36-1.666-1.045-.71-.368-1.1.228-1.777.157-.177 2.848-2.616 2.9-2.84.007-.03.014-.15-.056-.212-.07-.057-.173-.037-.248-.022-.106.023-1.79 1.14-5.06 3.345-.48.33-.914.49-1.302.48-.428-.01-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.78.026-.2.4-.405 1.1-.615 4.33-1.89 7.22-3.14 8.66-3.75 4.2-1.8 5.07-2.11 5.64-2.13.13-.01.41-.03.6.034.18.06.3.2.34.33.04.13.07.43.03.66z" />
-              </svg>
-            }
-          >
-            <div
-              ref={modalContainerRef}
-              className="flex min-h-[44px] justify-center"
-            />
-            <TelegramNetworkHint className="mt-4 px-1" />
-          </GlassModal>
-        </>
-      )}
+      <motion.button
+        type="button"
+        onClick={handleTelegramLogin}
+        disabled={checkingAuth}
+        whileHover={{ scale: 1.02, y: -2 }}
+        whileTap={{ scale: 0.98 }}
+        className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm border border-white/20 text-[#fffffe] hover:border-[#f9bc60]/50 hover:text-[#f9bc60] disabled:opacity-50 flex items-center justify-center gap-2.5 transition-all relative z-10"
+        style={{ background: "rgba(255,255,255,0.05)" }}
+      >
+        <svg
+          className="w-5 h-5 flex-shrink-0"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden
+        >
+          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.17 1.858-.896 6.37-1.264 8.445-.15.85-.444 1.133-.73 1.16-.62.055-1.09-.41-1.69-.803-.93-.64-1.456-1.04-2.36-1.666-1.045-.71-.368-1.1.228-1.777.157-.177 2.848-2.616 2.9-2.84.007-.03.014-.15-.056-.212-.07-.057-.173-.037-.248-.022-.106.023-1.79 1.14-5.06 3.345-.48.33-.914.49-1.302.48-.428-.01-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.78.026-.2.4-.405 1.1-.615 4.33-1.89 7.22-3.14 8.66-3.75 4.2-1.8 5.07-2.11 5.64-2.13.13-.01.41-.03.6.034.18.06.3.2.34.33.04.13.07.43.03.66z" />
+        </svg>
+        <span>Войти через Telegram</span>
+      </motion.button>
+      <TelegramNetworkHint className="mt-3" />
     </div>
   );
 }

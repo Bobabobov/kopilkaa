@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import AvatarUpload from "../AvatarUpload";
 import type { UserStatus } from "../hooks/useUserStatus";
-import { resolveAvatarUrl } from "@/lib/avatar";
+import { needsNoReferrerAvatar, resolveAvatarUrl } from "@/lib/avatar";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 const DEFAULT_AVATAR = "/default-avatar.png";
 
@@ -90,6 +90,9 @@ export function AvatarBlock({
           sizes="(max-width: 640px) 96px, 128px"
           className="object-cover transition-none duration-0 transform-none hover:transform-none hover:scale-100 hover:brightness-100"
           unoptimized={shouldBypassOptimization}
+          referrerPolicy={
+            needsNoReferrerAvatar(user.avatar) ? "no-referrer" : undefined
+          }
           onError={() => setAvatarFailed(true)}
         />
         <span

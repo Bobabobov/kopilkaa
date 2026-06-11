@@ -1,7 +1,11 @@
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
-import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
+import {
+  DEFAULT_AVATAR,
+  needsNoReferrerAvatar,
+  resolveAvatarUrl,
+} from "@/lib/avatar";
 import { cn } from "@/lib/utils";
 
 const Avatar = React.forwardRef<
@@ -22,10 +26,17 @@ Avatar.displayName = AvatarPrimitive.Root.displayName;
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
->(({ className, src, onError, ...props }, ref) => (
+>(({ className, src, onError, ...props }, ref) => {
+  const resolvedSrc = typeof src === "string" ? resolveAvatarUrl(src) : src;
+  return (
   <AvatarPrimitive.Image
     ref={ref}
-    src={typeof src === "string" ? resolveAvatarUrl(src) : src}
+    src={resolvedSrc}
+    referrerPolicy={
+      typeof src === "string" && needsNoReferrerAvatar(src)
+        ? "no-referrer"
+        : undefined
+    }
     className={cn("aspect-square h-full w-full", className)}
     onError={(event) => {
       const img = event.currentTarget;
@@ -35,7 +46,8 @@ const AvatarImage = React.forwardRef<
     }}
     {...props}
   />
-));
+  );
+});
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
 const AvatarFallback = React.forwardRef<

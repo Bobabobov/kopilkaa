@@ -68,9 +68,12 @@ describe("shouldSyncAvatarFromTelegram", () => {
 });
 
 describe("resolveAvatarUrl", () => {
-  it("подставляет дефолт для ограниченного userpic", () => {
-    expect(
-      resolveAvatarUrl("https://t.me/i/userpic/320/abc.jpg"),
-    ).toBe(DEFAULT_AVATAR);
+  it("подставляет дефолт при пустом значении", () => {
+    expect(resolveAvatarUrl(null)).toBe(DEFAULT_AVATAR);
+  });
+
+  it("сохраняет userpic URL для попытки показа в браузере", () => {
+    const userpic = "https://t.me/i/userpic/320/abc.jpg";
+    expect(resolveAvatarUrl(userpic)).toBe(userpic);
   });
 });

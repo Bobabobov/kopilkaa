@@ -46,8 +46,13 @@ export const shouldSyncAvatarFromTelegram = (
   return false;
 };
 
+/** Внешние URL Telegram — для img лучше no-referrer (CDN/userpic режет Referer). */
+export const needsNoReferrerAvatar = (url?: string | null): boolean => {
+  if (!url) return false;
+  return isTelegramHostedAvatarUrl(url) || isRestrictedTelegramAvatarUrl(url);
+};
+
 export const resolveAvatarUrl = (url?: string | null): string => {
   if (!url) return DEFAULT_AVATAR;
-  if (isRestrictedTelegramAvatarUrl(url)) return DEFAULT_AVATAR;
   return url;
 };

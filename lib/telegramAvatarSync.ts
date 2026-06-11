@@ -63,16 +63,21 @@ export async function commitTelegramAvatarOnAuth(params: {
     return null;
   }
 
-  if (isUsableTelegramPhotoUrl(widgetPhotoUrl)) {
+  if (
+    widgetPhotoUrl &&
+    (isUsableTelegramPhotoUrl(widgetPhotoUrl) ||
+      isRestrictedTelegramAvatarUrl(widgetPhotoUrl))
+  ) {
+    if (isRestrictedTelegramAvatarUrl(widgetPhotoUrl)) {
+      console.info(
+        `[telegram-avatar] user ${userId}: сохраняем userpic URL для показа в браузере`,
+      );
+    }
     scheduleLocalAvatarDownload(userId, widgetPhotoUrl);
     return widgetPhotoUrl;
   }
 
-  if (isRestrictedTelegramAvatarUrl(widgetPhotoUrl)) {
-    console.warn(
-      `[telegram-avatar] user ${userId}: Telegram отдал приватный userpic`,
-    );
-  } else if (!widgetPhotoUrl) {
+  if (!widgetPhotoUrl) {
     console.warn(
       `[telegram-avatar] user ${userId}: Telegram не передал photo_url`,
     );
@@ -109,7 +114,11 @@ export async function persistTelegramAvatar(params: {
     return null;
   }
 
-  if (isUsableTelegramPhotoUrl(widgetPhotoUrl)) {
+  if (
+    widgetPhotoUrl &&
+    (isUsableTelegramPhotoUrl(widgetPhotoUrl) ||
+      isRestrictedTelegramAvatarUrl(widgetPhotoUrl))
+  ) {
     const saved = await saveRemoteImageAsAvatar(widgetPhotoUrl, userId);
     if (saved) return saved;
     return widgetPhotoUrl;

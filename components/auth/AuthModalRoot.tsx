@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthModal } from "./AuthModal";
 import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import { tryUploadTelegramAvatarFromBrowser } from "@/lib/telegramAvatarClientUpload";
 
 type AuthMode = "login" | "signup";
 
@@ -151,6 +152,10 @@ export default function AuthModalRoot() {
         console.error("Ошибка ответа /api/auth/telegram:", data);
         setError(getMessageFromApiJson(data, "Ошибка входа через Telegram"));
         return;
+      }
+
+      if (typeof user?.photo_url === "string" && user.photo_url) {
+        await tryUploadTelegramAvatarFromBrowser(user.photo_url);
       }
 
       window.location.href = safeNext || "/profile";

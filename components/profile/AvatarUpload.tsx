@@ -7,6 +7,11 @@ import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { submitPendingApplicationIfNeeded } from "@/lib/applications/pendingSubmission";
 import { getMessageFromApiJson, logRouteCatchError } from "@/lib/api/parseApiError";
+import {
+  DEFAULT_AVATAR,
+  needsNoReferrerAvatar,
+  resolveAvatarUrl,
+} from "@/lib/avatar";
 
 interface AvatarUploadProps {
   currentAvatar?: string | null;
@@ -128,7 +133,9 @@ export default function AvatarUpload({
     }
   };
 
-  const displayAvatar = preview || currentAvatar;
+  const displayAvatar = preview || resolveAvatarUrl(currentAvatar);
+  const showLetterFallback =
+    !preview && (!currentAvatar || displayAvatar === DEFAULT_AVATAR);
   const avatarLetter =
     userName && userName[0] ? userName[0].toUpperCase() : "?";
 
@@ -153,12 +160,17 @@ export default function AvatarUpload({
             {/* Декоративное свечение */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#f9bc60]/20 via-transparent to-[#abd1c6]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl xs:rounded-2xl" />
 
-            {displayAvatar ? (
+            {!showLetterFallback ? (
               <motion.img
                 src={displayAvatar}
                 alt="Аватарка"
                 className="w-full h-full object-cover rounded-xl xs:rounded-2xl relative z-10"
                 whileHover={{ scale: 1.05 }}
+                referrerPolicy={
+                  needsNoReferrerAvatar(currentAvatar)
+                    ? "no-referrer"
+                    : undefined
+                }
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                 }}

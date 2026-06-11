@@ -9,7 +9,7 @@ interface SettingsAvatarSectionProps {
   avatarInputRef: React.RefObject<HTMLInputElement | null>;
   onUpload: (file: File) => Promise<void>;
   onDelete: () => Promise<void>;
-  onTelegramAvatarSynced?: (avatarUrl: string) => void;
+  onTelegramAvatarSynced?: (avatarUrl: string | null, message: string) => void;
   onTelegramAvatarError?: (message: string) => void;
 }
 
@@ -22,7 +22,6 @@ export function SettingsAvatarSection({
   onTelegramAvatarSynced,
   onTelegramAvatarError,
 }: SettingsAvatarSectionProps) {
-  const hasTelegram = Boolean(user.telegramLink?.trim());
   const avatarPreview = user.avatar
     ? buildUploadUrl(resolveAvatarUrl(user.avatar), { variant: "thumb" })
     : null;
@@ -89,7 +88,7 @@ export function SettingsAvatarSection({
             Удалить
           </button>
         )}
-        {hasTelegram && onTelegramAvatarSynced && onTelegramAvatarError && (
+        {onTelegramAvatarSynced && onTelegramAvatarError && (
           <TelegramAvatarSyncButton
             disabled={saving}
             onSynced={onTelegramAvatarSynced}

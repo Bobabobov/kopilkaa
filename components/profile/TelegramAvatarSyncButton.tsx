@@ -5,7 +5,7 @@ import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 interface TelegramAvatarSyncButtonProps {
   disabled?: boolean;
-  onSynced: (avatarUrl: string) => void;
+  onSynced: (avatarUrl: string | null, message: string) => void;
   onError: (message: string) => void;
 }
 
@@ -19,14 +19,14 @@ export function TelegramAvatarSyncButton({
   const [busy, setBusy] = useState(false);
 
   const handleTelegramUser = useCallback(
-    async (tgUser: { photo_url?: string }) => {
+    async (tgUser: Record<string, unknown>) => {
       try {
         setBusy(true);
         const r = await fetch("/api/profile/avatar/sync-telegram", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ photoUrl: tgUser.photo_url || null }),
+          body: JSON.stringify({ telegram: tgUser }),
         });
         const data = await r.json().catch(() => ({}));
         if (!r.ok || !data?.ok) {
@@ -35,9 +35,13 @@ export function TelegramAvatarSyncButton({
           );
           return;
         }
-        if (typeof data.avatar === "string") {
-          onSynced(data.avatar);
-        }
+        const message =
+          typeof data.message === "string"
+            ? data.message
+            : "Аватар обновлён из Telegram";
+        const avatar =
+          typeof data.avatar === "string" ? data.avatar : null;
+        onSynced(avatar, message);
         setOpen(false);
       } catch (error) {
         onError(
@@ -55,7 +59,7 @@ export function TelegramAvatarSyncButton({
 
     (window as Window & { onTelegramAvatarSync?: (user: unknown) => void })
       .onTelegramAvatarSync = (user: unknown) => {
-      void handleTelegramUser((user || {}) as { photo_url?: string });
+      void handleTelegramUser((user || {}) as Record<string, unknown>);
     };
 
     const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME?.replace(

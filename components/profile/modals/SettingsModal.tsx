@@ -127,13 +127,9 @@ export default function SettingsModal({
               avatarInputRef={avatarInputRef}
               onUpload={handleAvatarUpload}
               onDelete={handleAvatarDelete}
-              onTelegramAvatarSynced={(avatarUrl) => {
-                handleAvatarChange(avatarUrl);
-                showLocalNotification(
-                  "success",
-                  "Готово",
-                  "Аватар обновлён из Telegram",
-                );
+              onTelegramAvatarSynced={(avatarUrl, message) => {
+                if (avatarUrl) handleAvatarChange(avatarUrl);
+                showLocalNotification("success", "Готово", message);
               }}
               onTelegramAvatarError={(message) => {
                 showLocalNotification("error", "Telegram", message);

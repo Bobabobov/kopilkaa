@@ -28,11 +28,13 @@ export const shouldSyncAvatarFromTelegram = (
   avatar: string | null | undefined,
   avatarUpdatedAt: Date | null | undefined,
 ): boolean => {
-  if (avatarUpdatedAt) return false;
   if (isDefaultAvatarUrl(avatar)) return true;
   if (isRestrictedTelegramAvatarUrl(avatar)) return true;
-  if (avatar?.startsWith("/api/uploads/avatar_")) return true;
-  return !avatar;
+  if (!avatar) return true;
+  // Ручная загрузка/удаление помечается avatarUpdatedAt — не перезаписываем свой аватар.
+  if (avatarUpdatedAt) return false;
+  if (avatar.startsWith("/api/uploads/avatar_")) return true;
+  return false;
 };
 
 export const resolveAvatarUrl = (url?: string | null): string => {

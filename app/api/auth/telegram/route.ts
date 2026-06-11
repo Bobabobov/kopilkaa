@@ -4,11 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSession, attachSessionToResponse } from "@/lib/auth";
 import { verifyTelegramAuth, TelegramAuthData } from "@/lib/telegramAuth";
 import { checkUserBan } from "@/lib/ban-check";
-import { saveRemoteImageAsAvatar } from "@/lib/uploads/saveRemoteImage";
-import {
-  isUsableTelegramPhotoUrl,
-  shouldSyncAvatarFromTelegram,
-} from "@/lib/avatar";
+import { downloadTelegramAvatar } from "@/lib/telegramAvatarSync";
 import {
   REFERRAL_CODE_COOKIE,
   REFERRAL_VISITOR_COOKIE,
@@ -50,17 +46,6 @@ function getPublicOrigin(req: NextRequest): string {
     return "https://kopilka-online.ru";
   }
   return `${proto}://${host}`;
-}
-
-async function trySyncTelegramAvatar(
-  telegramPhoto: string | null,
-  ownerId: string,
-  currentAvatar: string | null | undefined,
-  avatarUpdatedAt: Date | null | undefined,
-): Promise<string | null> {
-  if (!isUsableTelegramPhotoUrl(telegramPhoto)) return null;
-  if (!shouldSyncAvatarFromTelegram(currentAvatar, avatarUpdatedAt)) return null;
-  return saveRemoteImageAsAvatar(telegramPhoto, ownerId);
 }
 
 async function authenticateTelegram(
@@ -130,12 +115,13 @@ async function authenticateTelegram(
         telegramUsername,
       };
 
-      const saved = await trySyncTelegramAvatar(
-        telegramPhoto,
+      const saved = await downloadTelegramAvatar({
+        userId: sessionUser.id,
         telegramId,
-        existingUser?.avatar,
-        existingUser?.avatarUpdatedAt,
-      );
+        widgetPhotoUrl: telegramPhoto,
+        currentAvatar: existingUser?.avatar,
+        avatarUpdatedAt: existingUser?.avatarUpdatedAt,
+      });
       if (saved) {
         updateData.avatar = saved;
       }
@@ -228,16 +214,6 @@ async function authenticateTelegram(
         emailVerified: true,
       };
 
-      const saved = await trySyncTelegramAvatar(
-        telegramPhoto,
-        telegramId,
-        null,
-        null,
-      );
-      if (saved) {
-        createData.avatar = saved;
-      }
-
       // Автоматически выставляем публичную ссылку на Telegram
       if (telegramUsername) {
         createData.telegramLink = `https://t.me/${telegramUsername}`;
@@ -258,6 +234,31 @@ async function authenticateTelegram(
         },
       });
       createdNewUserId = user.id;
+
+      const savedForNewUser = await downloadTelegramAvatar({
+        userId: user.id,
+        telegramId,
+        widgetPhotoUrl: telegramPhoto,
+        currentAvatar: user.avatar,
+        avatarUpdatedAt: user.avatarUpdatedAt,
+      });
+      if (savedForNewUser) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { avatar: savedForNewUser },
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            role: true,
+            name: true,
+            avatar: true,
+            avatarUpdatedAt: true,
+            telegramId: true,
+            telegramUsername: true,
+          },
+        });
+      }
     } else {
       // Пользователь с таким Telegram уже есть — обновляем при необходимости
       const updateData: any = {};
@@ -267,12 +268,13 @@ async function authenticateTelegram(
         updateData.telegramLink = `https://t.me/${telegramUsername}`;
       }
 
-      const saved = await trySyncTelegramAvatar(
-        telegramPhoto,
+      const saved = await downloadTelegramAvatar({
+        userId: user.id,
         telegramId,
-        user.avatar,
-        user.avatarUpdatedAt,
-      );
+        widgetPhotoUrl: telegramPhoto,
+        currentAvatar: user.avatar,
+        avatarUpdatedAt: user.avatarUpdatedAt,
+      });
       if (saved) {
         updateData.avatar = saved;
       }

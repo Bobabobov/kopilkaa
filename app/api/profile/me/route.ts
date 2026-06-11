@@ -5,6 +5,7 @@ import { checkUserBan } from "@/lib/ban-check";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 import { trackLoginVisit } from "@/lib/achievements/unlock";
+import { scheduleTelegramAvatarSync } from "@/lib/telegramAvatarSync";
 
 type SocialLinkType = "vk" | "telegram" | "youtube";
 
@@ -183,6 +184,8 @@ export async function GET(request: Request) {
         createdAt: true,
         name: true,
         avatar: true,
+        avatarUpdatedAt: true,
+        telegramId: true,
         vkLink: true,
         telegramLink: true,
         telegramUsername: true,
@@ -228,15 +231,31 @@ export async function GET(request: Request) {
       logRouteCatchError("[API GET /api/profile/me] login streak", error),
     );
 
+    if (user?.telegramId) {
+      scheduleTelegramAvatarSync({
+        userId: user.id,
+        telegramId: user.telegramId,
+        currentAvatar: user.avatar,
+        avatarUpdatedAt: user.avatarUpdatedAt,
+      });
+    }
+
     // Нормализуем пользователя: если есть telegramUsername, но нет telegramLink,
     // подставляем ссылку автоматически, чтобы профиль видел привязку Телеграма
+    const publicUser = user
+      ? (() => {
+          const { telegramId: _tgId, avatarUpdatedAt: _avatarAt, ...rest } =
+            user;
+          return rest;
+        })()
+      : null;
     const normalizedUser =
-      user && user.telegramUsername && !user.telegramLink
+      publicUser && publicUser.telegramUsername && !publicUser.telegramLink
         ? {
-            ...user,
-            telegramLink: `https://t.me/${user.telegramUsername}`,
+            ...publicUser,
+            telegramLink: `https://t.me/${publicUser.telegramUsername}`,
           }
-        : user;
+        : publicUser;
 
     // Флаг допуска в админку рассчитываем по той же логике, что и на серверных маршрутах
     const allowedAdmin = await getAllowedAdminUser();

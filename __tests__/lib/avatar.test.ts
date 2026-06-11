@@ -52,6 +52,10 @@ describe("shouldSyncAvatarFromTelegram", () => {
       shouldSyncAvatarFromTelegram("/api/uploads/avatar_123_abc.jpg", new Date()),
     ).toBe(false);
   });
+
+  it("разрешает синхронизацию после удаления аватара", () => {
+    expect(shouldSyncAvatarFromTelegram(null, new Date())).toBe(true);
+  });
 });
 
 describe("resolveAvatarUrl", () => {

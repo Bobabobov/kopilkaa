@@ -1,11 +1,11 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface TelegramWidgetProps {
-  /** @deprecated OAuth-редирект, колбэк не используется */
+  /** Колбэк для data-onauth (не используется при data-auth-url). */
   onAuth?: (user: unknown) => Promise<void>;
   checkingAuth: boolean;
 }
@@ -30,17 +30,76 @@ function TelegramNetworkHint({ className = "" }: { className?: string }) {
   );
 }
 
+/**
+ * Официальный Telegram Login Widget (legacy iframe).
+ * @see https://core.telegram.org/widgets/login-legacy
+ * Используем data-auth-url — редирект на сервер с id/hash для проверки подписи.
+ */
 export function TelegramWidget({ checkingAuth }: TelegramWidgetProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const handleTelegramLogin = () => {
+  useEffect(() => {
     if (checkingAuth) return;
 
+    const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME;
+    if (!botUsername) {
+      setError("Telegram авторизация недоступна");
+      return;
+    }
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const cleanBotUsername = botUsername.replace(/^@/, "");
     const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
     const next = encodeURIComponent(`${pathname}${search}`);
-    window.location.href = `/api/auth/telegram/start?next=${next}`;
-  };
+    const authUrl = `${window.location.origin}/api/auth/telegram?next=${next}`;
+
+    container.innerHTML = "";
+
+    const script = document.createElement("script");
+    script.src = "https://telegram.org/js/telegram-widget.js?22";
+    script.async = true;
+    script.setAttribute("data-telegram-login", cleanBotUsername);
+    script.setAttribute("data-size", "large");
+    script.setAttribute("data-radius", "12");
+    script.setAttribute("data-lang", "ru");
+    script.setAttribute("data-request-access", "write");
+    script.setAttribute("data-auth-url", authUrl);
+
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    script.onerror = () => {
+      setError(
+        "Не удалось загрузить Telegram. Смените регион сети или войдите через Google или по почте.",
+      );
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+
+    script.onload = () => {
+      setError(null);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+
+    timeoutId = setTimeout(() => {
+      const hasIframe = container.querySelector("iframe");
+      if (!hasIframe) {
+        setError(
+          "Таймаут загрузки Telegram. Смените регион сети или войдите через Google или по почте.",
+        );
+      }
+    }, 12_000);
+
+    container.appendChild(script);
+
+    return () => {
+      container.innerHTML = "";
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [checkingAuth, pathname, searchParams]);
 
   if (!process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME) {
     return (
@@ -53,25 +112,17 @@ export function TelegramWidget({ checkingAuth }: TelegramWidgetProps) {
 
   return (
     <div className="w-full">
-      <motion.button
-        type="button"
-        onClick={handleTelegramLogin}
-        disabled={checkingAuth}
-        whileHover={{ scale: 1.02, y: -2 }}
-        whileTap={{ scale: 0.98 }}
-        className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm border border-white/20 text-[#fffffe] hover:border-[#f9bc60]/50 hover:text-[#f9bc60] disabled:opacity-50 flex items-center justify-center gap-2.5 transition-all relative z-10"
-        style={{ background: "rgba(255,255,255,0.05)" }}
-      >
-        <svg
-          className="w-5 h-5 flex-shrink-0"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden
-        >
-          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.17 1.858-.896 6.37-1.264 8.445-.15.85-.444 1.133-.73 1.16-.62.055-1.09-.41-1.69-.803-.93-.64-1.456-1.04-2.36-1.666-1.045-.71-.368-1.1.228-1.777.157-.177 2.848-2.616 2.9-2.84.007-.03.014-.15-.056-.212-.07-.057-.173-.037-.248-.022-.106.023-1.79 1.14-5.06 3.345-.48.33-.914.49-1.302.48-.428-.01-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.78.026-.2.4-.405 1.1-.615 4.33-1.89 7.22-3.14 8.66-3.75 4.2-1.8 5.07-2.11 5.64-2.13.13-.01.41-.03.6.034.18.06.3.2.34.33.04.13.07.43.03.66z" />
-        </svg>
-        <span>Войти через Telegram</span>
-      </motion.button>
+      {error ? (
+        <div className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#1f2937] to-[#374151] text-[#abd1c6] flex items-center justify-center gap-2.5 border border-[#1f2937]/50 text-center">
+          <LucideIcons.AlertCircle size="sm" className="flex-shrink-0" />
+          <span>{error}</span>
+        </div>
+      ) : (
+        <div
+          ref={containerRef}
+          className="flex min-h-[44px] w-full items-center justify-center"
+        />
+      )}
       <TelegramNetworkHint className="mt-3" />
     </div>
   );

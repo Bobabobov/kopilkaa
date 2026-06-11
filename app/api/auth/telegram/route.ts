@@ -2,7 +2,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession, attachSessionToResponse } from "@/lib/auth";
-import { verifyTelegramAuth, TelegramAuthData } from "@/lib/telegramAuth";
+import {
+  verifyTelegramAuth,
+  parseTelegramAuthSearchParams,
+  type TelegramAuthData,
+} from "@/lib/telegramAuth";
 import { checkUserBan } from "@/lib/ban-check";
 import { scheduleTelegramAvatarSync } from "@/lib/telegramAvatarSync";
 import {
@@ -22,6 +26,8 @@ function getSafeNext(raw: string | null): string {
   if (v.startsWith("//")) return "/profile";
   if (v.includes("://")) return "/profile";
   if (v.includes("\n") || v.includes("\r")) return "/profile";
+  // После входа не возвращаем на модалку авторизации.
+  if (v.includes("modal=auth")) return "/profile";
   return v;
 }
 
@@ -63,6 +69,10 @@ async function authenticateTelegram(
     let createdNewUserId: string | null = null;
 
     if (!tgData || typeof tgData.id !== "number" || !tgData.hash) {
+      console.warn("[API /api/auth/telegram] некорректные данные:", {
+        hasId: Boolean(tgData && "id" in tgData),
+        hasHash: Boolean(tgData?.hash),
+      });
       return {
         ok: false,
         status: 400,
@@ -387,19 +397,11 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
-  const tgData: TelegramAuthData = {
-    id: Number(sp.get("id")),
-    first_name: sp.get("first_name") || undefined,
-    last_name: sp.get("last_name") || undefined,
-    username: sp.get("username") || undefined,
-    photo_url: sp.get("photo_url") || undefined,
-    auth_date: Number(sp.get("auth_date")),
-    hash: sp.get("hash") || "",
-  };
+  const tgData = parseTelegramAuthSearchParams(sp);
 
   const next = getSafeNext(sp.get("next"));
   const publicOrigin = getPublicOrigin(req);
-  const result = await authenticateTelegram(req, tgData);
+  const result = await authenticateTelegram(req, tgData ?? undefined);
 
   if (!result.ok) {
     const failUrl = new URL("/", publicOrigin);

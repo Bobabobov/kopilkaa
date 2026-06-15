@@ -63,6 +63,7 @@ export default function KopiDemoApplication() {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          data-kopi-tour="application-form"
           className="overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(165deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.03)_100%)] shadow-[0_8px_40px_rgba(0,0,0,0.25)]"
         >
           <div className="border-b border-white/10 px-5 py-6 sm:px-8">

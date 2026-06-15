@@ -24,6 +24,12 @@ import {
 import {
   KOPI_TOUR_FINISH_MESSAGE,
   KOPI_TOUR_STEPS,
+  findWelcomeSubStepIndex,
+  getFirstWelcomeSubStepIndex,
+  getLastWelcomeSubStepIndex,
+  getTourProgressPercent,
+  resolveActiveTourView,
+  type ActiveTourView,
 } from '@/lib/kopi/tourSteps';
 
 const GUEST_TOUR_INVITE_MS = 900;
@@ -36,7 +42,9 @@ export interface KopiTourStateValue {
   isTourActive: boolean;
   isFirstVisit: boolean;
   tourStepIndex: number;
+  tourSubStepIndex: number;
   tourStep: (typeof KOPI_TOUR_STEPS)[number] | null;
+  tourActiveView: ActiveTourView | null;
   tourProgress: number;
   canResumeTour: boolean;
 }
@@ -69,6 +77,7 @@ export function KopiTourProvider({ children }: { children: ReactNode }) {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [isTourActive, setIsTourActive] = useState(false);
   const [tourStepIndex, setTourStepIndex] = useState(0);
+  const [tourSubStepIndex, setTourSubStepIndex] = useState(0);
   const [canResumeTour, setCanResumeTour] = useState(true);
   const [isFirstVisit, setIsFirstVisit] = useState(() => !hasSeenTourOffer());
 
@@ -177,16 +186,17 @@ export function KopiTourProvider({ children }: { children: ReactNode }) {
   useEffect(() => () => clearInviteTimer(), [clearInviteTimer]);
 
   const navigateToStep = useCallback(
-    (index: number) => {
+    (index: number, welcomeSubIndex?: number) => {
       const step = KOPI_TOUR_STEPS[index];
       if (!step) return;
-      // В экскурсии всегда демо-маршруты из конфига (в т.ч. /applications/demo).
       const route = step.route;
       setTourStepIndex(index);
+      setTourSubStepIndex(
+        index === 0 ? (welcomeSubIndex ?? getFirstWelcomeSubStepIndex()) : 0,
+      );
       if (pathname !== route) {
         router.push(route);
       }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     [pathname, router],
   );
@@ -200,8 +210,10 @@ export function KopiTourProvider({ children }: { children: ReactNode }) {
     clearInviteTimer();
     setIsTourActive(true);
     setIsAssistantOpen(false);
+    const firstHomeSubIndex = getFirstWelcomeSubStepIndex();
     setTourStepIndex(0);
-    navigateToStep(0);
+    setTourSubStepIndex(firstHomeSubIndex);
+    navigateToStep(0, firstHomeSubIndex);
   }, [navigateToStep, clearInviteTimer]);
 
   const dismissInvite = useCallback(() => {
@@ -226,18 +238,55 @@ export function KopiTourProvider({ children }: { children: ReactNode }) {
   }, [pathname, router]);
 
   const nextTourStep = useCallback(() => {
+    if (tourStepIndex === 0) {
+      const nextSubIndex = findWelcomeSubStepIndex(tourSubStepIndex + 1, 'next');
+      if (nextSubIndex !== null) {
+        setTourSubStepIndex(nextSubIndex);
+        return;
+      }
+
+      const nextIndex = 1;
+      if (nextIndex >= KOPI_TOUR_STEPS.length) {
+        finishTour();
+        return;
+      }
+      navigateToStep(nextIndex);
+      return;
+    }
+
     const nextIndex = tourStepIndex + 1;
     if (nextIndex >= KOPI_TOUR_STEPS.length) {
       finishTour();
       return;
     }
     navigateToStep(nextIndex);
-  }, [tourStepIndex, navigateToStep, finishTour]);
+  }, [tourStepIndex, tourSubStepIndex, navigateToStep, finishTour]);
 
   const prevTourStep = useCallback(() => {
-    if (tourStepIndex <= 0) return;
+    if (tourStepIndex === 0) {
+      const prevSubIndex = findWelcomeSubStepIndex(tourSubStepIndex - 1, 'prev');
+      if (prevSubIndex !== null) {
+        setTourSubStepIndex(prevSubIndex);
+      }
+      return;
+    }
+
+    if (tourStepIndex === 1) {
+      const lastHomeSubIndex = getLastWelcomeSubStepIndex();
+      if (pathname !== '/') {
+        router.push('/');
+      }
+      setTourStepIndex(0);
+      window.setTimeout(() => {
+        setTourSubStepIndex(
+          findWelcomeSubStepIndex(lastHomeSubIndex, 'prev') ?? lastHomeSubIndex,
+        );
+      }, 360);
+      return;
+    }
+
     navigateToStep(tourStepIndex - 1);
-  }, [tourStepIndex, navigateToStep]);
+  }, [tourStepIndex, tourSubStepIndex, navigateToStep, pathname, router]);
 
   const skipTour = useCallback(() => {
     markTourCompleted();
@@ -248,8 +297,11 @@ export function KopiTourProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const tourStep = isTourActive ? KOPI_TOUR_STEPS[tourStepIndex] ?? null : null;
+  const tourActiveView = isTourActive
+    ? resolveActiveTourView(tourStepIndex, tourSubStepIndex, isGuest === true)
+    : null;
   const tourProgress = isTourActive
-    ? ((tourStepIndex + 1) / KOPI_TOUR_STEPS.length) * 100
+    ? getTourProgressPercent(tourStepIndex, tourSubStepIndex)
     : 0;
 
   const stateValue = useMemo<KopiTourStateValue>(
@@ -261,7 +313,9 @@ export function KopiTourProvider({ children }: { children: ReactNode }) {
       isTourActive,
       isFirstVisit,
       tourStepIndex,
+      tourSubStepIndex,
       tourStep,
+      tourActiveView,
       tourProgress,
       canResumeTour,
     }),
@@ -273,7 +327,9 @@ export function KopiTourProvider({ children }: { children: ReactNode }) {
       isTourActive,
       isFirstVisit,
       tourStepIndex,
+      tourSubStepIndex,
       tourStep,
+      tourActiveView,
       tourProgress,
       canResumeTour,
     ],

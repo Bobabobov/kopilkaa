@@ -12,7 +12,7 @@ export default function HowItWorks() {
   const { loading, handleStartClick } = useHowItWorksAuth();
 
   return (
-    <section className="py-20 px-4" id="how-it-works">
+    <section className="py-20 px-4" id="how-it-works" data-kopi-tour="welcome-how">
       <div className="max-w-6xl mx-auto">
         <HowItWorksHeader />
 

@@ -116,4 +116,4 @@ export function useTourPanelPeekThrough(
   };
 
   return { isPeekMode, panelInteractionProps, panelRef };
-}
+};

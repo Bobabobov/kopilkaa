@@ -17,6 +17,9 @@ export const KOPI_WELCOME =
 export const KOPI_WELCOME_AUTH =
   'Привет! Я Копи — помогу с заявкой, навигацией по сайту и ответами на частые вопросы.';
 
+/** Официальный Telegram-канал «Копилка» */
+export const KOPI_TELEGRAM_GROUP_URL = 'https://t.me/+8iwXRABVt5tkMmVi';
+
 export const KOPI_APPLICATION_STEPS: KopiApplicationStep[] = [
   {
     title: 'Войдите в аккаунт',

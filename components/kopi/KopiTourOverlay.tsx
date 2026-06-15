@@ -24,8 +24,7 @@ import { KopiTourProgressBar } from '@/components/kopi/KopiTourCenterShell';
 import {
   KOPI_TOUR_STEP_COUNT,
   KOPI_TOUR_STEPS,
-  getTourStepHeadline,
-  getTourStepHighlight,
+  getFirstWelcomeSubStepIndex,
 } from '@/lib/kopi/tourSteps';
 import { shouldShowMobileBottomNav } from '@/lib/navigation/mobileBottomNav';
 import { useTourPanelPeekThrough } from '@/hooks/kopi/useTourPanelPeekThrough';
@@ -62,19 +61,22 @@ export default function KopiTourOverlay() {
   const pathname = usePathname();
   const reducedMotion = useReducedMotion();
   const hasBottomNav = shouldShowMobileBottomNav(pathname);
-  const { isTourActive, tourStepIndex, tourProgress, isGuest } =
+  const { isTourActive, tourStepIndex, tourSubStepIndex, tourProgress, tourActiveView } =
     useKopiTourState();
   const { nextTourStep, prevTourStep, skipTour, finishTour } =
     useKopiTourActions();
 
   const step = KOPI_TOUR_STEPS[tourStepIndex];
-  const atFirst = tourStepIndex === 0;
+  const atFirst =
+    tourStepIndex === 0 && tourSubStepIndex <= getFirstWelcomeSubStepIndex();
   const atLast = tourStepIndex >= KOPI_TOUR_STEP_COUNT - 1;
   const StepIcon = step ? STEP_ICONS[step.id as keyof typeof STEP_ICONS] ?? Home : Home;
-  const headline = step ? getTourStepHeadline(step, isGuest) : '';
+  const headline = tourActiveView?.headline ?? '';
+  const highlight = tourActiveView?.highlight ?? '';
+  const stepLabel = tourActiveView?.stepLabel ?? '';
   const { isPeekMode, panelInteractionProps } = useTourPanelPeekThrough(
     isTourActive,
-    step?.id,
+    tourActiveView?.segmentId ?? step?.id,
   );
 
   return (
@@ -122,7 +124,10 @@ export default function KopiTourOverlay() {
 
             <div className="relative flex items-center justify-between gap-3 px-5 pb-2 pt-4 sm:px-7 sm:pt-5">
               <p className="hidden text-xs font-semibold uppercase tracking-[0.14em] text-[#f9bc60] sm:block">
-                Шаг {tourStepIndex + 1} из {KOPI_TOUR_STEP_COUNT} · {step.headerTitle}
+                {stepLabel}
+                <span className="ml-2 font-normal normal-case tracking-normal text-[#abd1c6]/75">
+                  — смотрите выделенный блок
+                </span>
               </p>
               <span className="sm:hidden" aria-hidden />
               <button
@@ -152,10 +157,10 @@ export default function KopiTourOverlay() {
 
                 <div className="min-w-0 sm:hidden">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#f9bc60]">
-                    Шаг {tourStepIndex + 1} из {KOPI_TOUR_STEP_COUNT}
+                    {stepLabel}
                   </p>
                   <p className="truncate pr-2 text-base font-semibold text-[#fffffe]">
-                    {step.headerTitle}
+                    {tourActiveView?.badge ?? step.headerTitle}
                   </p>
                 </div>
               </div>
@@ -163,7 +168,7 @@ export default function KopiTourOverlay() {
               <div className="min-w-0 flex-1">
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
-                    key={step.id}
+                    key={tourActiveView?.segmentId ?? step.id}
                     initial={reducedMotion ? false : { opacity: 0, x: 8 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={reducedMotion ? { opacity: 1 } : { opacity: 0, x: -8 }}
@@ -176,7 +181,7 @@ export default function KopiTourOverlay() {
                       {headline}
                     </h2>
                     <p className="mt-2 text-pretty text-[15px] leading-relaxed text-[#abd1c6] sm:text-base">
-                      {renderHighlight(getTourStepHighlight(step, isGuest))}
+                      {renderHighlight(highlight)}
                     </p>
                   </motion.div>
                 </AnimatePresence>

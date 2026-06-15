@@ -295,6 +295,7 @@ export default function StoriesPageClient({
       <main
         className="relative z-10 pb-12"
         id="stories-main"
+        data-kopi-tour="stories-content"
         aria-label="Список историй платформы"
       >
         {loading ? (

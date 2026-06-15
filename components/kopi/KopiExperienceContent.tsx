@@ -5,6 +5,7 @@ import {
   KopiAssistant,
   KopiTourInviteModal,
   KopiTourOverlay,
+  KopiTourSpotlight,
 } from '@/components/kopi/KopiDynamicImports';
 
 export default function KopiExperienceContent() {
@@ -12,6 +13,7 @@ export default function KopiExperienceContent() {
     <>
       <KopiAssistant />
       <KopiTourInviteModal />
+      <KopiTourSpotlight />
       <KopiTourOverlay />
       <CookieConsentBanner />
     </>

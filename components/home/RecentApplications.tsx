@@ -23,7 +23,7 @@ export default function RecentApplications({
   }
 
   return (
-    <section className="pt-10 pb-24 px-4" id="recent-applications">
+    <section className="pt-10 pb-24 px-4" id="recent-applications" data-kopi-tour="welcome-recent">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
           <span

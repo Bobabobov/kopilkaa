@@ -1,9 +1,8 @@
 'use client';
 
-import Image from 'next/image';
-import { motion } from 'framer-motion';
 import { Compass } from 'lucide-react';
 import { GlassModal, GlassModalCloseButton } from '@/components/ui/GlassModal';
+import { KopiAvatar } from '@/components/kopi/KopiAssistantParts';
 import { useKopiTourActions, useKopiTourState } from '@/components/kopi/KopiTourContext';
 import { KopiTourStepBadge } from '@/components/kopi/KopiTourCenterShell';
 
@@ -28,20 +27,7 @@ export default function KopiTourInviteModal() {
             <GlassModalCloseButton onClose={dismissInvite} />
           </div>
           <div className="flex justify-center">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#f9bc60]/40 bg-[#004643]/80 shadow-[0_0_32px_rgba(249,188,96,0.2)]">
-              <motion.div
-                animate={{ y: [0, -5, 0] }}
-                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <Image
-                  src="/FAQ.png"
-                  alt="Копи"
-                  width={72}
-                  height={72}
-                  className="h-16 w-16 object-contain"
-                />
-              </motion.div>
-            </div>
+            <KopiAvatar size="lg" showOnline animate />
           </div>
         </div>
       }

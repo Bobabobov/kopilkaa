@@ -130,7 +130,9 @@ export default function RootLayout({
 
   return (
     <html lang="ru" suppressHydrationWarning className="dark">
-      <head></head>
+      <head>
+        <meta name="verify-admitad" content="8c47fb6499" />
+      </head>
       <body className={inter.className} suppressHydrationWarning>
         <Script
           id="polyfill-findLast"

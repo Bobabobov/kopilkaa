@@ -63,6 +63,7 @@ export default function KopiDemoProfile() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
+          data-kopi-tour="profile-card"
           className="overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(165deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.03)_100%)] shadow-[0_8px_40px_rgba(0,0,0,0.25)]"
         >
           <div className="relative h-28 sm:h-36 bg-[linear-gradient(135deg,#004643_0%,#001e1d_100%)]">

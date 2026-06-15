@@ -12,12 +12,14 @@ export default function HeroSection({ stats }: HeroSectionProps) {
     <section className="relative px-4 pt-12 pb-8 sm:pt-16 sm:pb-10">
       <div className="mx-auto max-w-6xl">
         <div className="text-center max-w-4xl mx-auto">
-          <HeroSectionHeadline />
+          <div data-kopi-tour="welcome-intro">
+            <HeroSectionHeadline />
+            <HeroSectionForWho />
+            <HeroSectionCta />
+          </div>
           <div className="mb-10">
             <HeroSectionStats stats={stats} />
           </div>
-          <HeroSectionForWho />
-          <HeroSectionCta />
           <HeroSectionAds />
         </div>
       </div>

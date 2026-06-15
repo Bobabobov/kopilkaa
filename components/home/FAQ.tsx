@@ -35,7 +35,7 @@ const FAQ_ICONS: Record<string, LucideIcon> = {
 
 export default function FAQ() {
   return (
-    <section className="py-20 px-4" id="faq">
+    <section className="py-20 px-4" id="faq" data-kopi-tour="welcome-faq">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <span

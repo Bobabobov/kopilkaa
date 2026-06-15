@@ -83,7 +83,7 @@ export function HeroSectionStats({ stats }: HeroSectionStatsProps) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto" data-kopi-tour="welcome-stats">
       <Card
         variant="darkGlass"
         padding="none"

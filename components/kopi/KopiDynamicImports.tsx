@@ -16,6 +16,11 @@ export const KopiTourOverlay = dynamic(
   { ssr: false },
 );
 
+export const KopiTourSpotlight = dynamic(
+  () => import('@/components/kopi/KopiTourSpotlight'),
+  { ssr: false },
+);
+
 export const CookieConsentBanner = dynamic(
   () => import('@/components/layout/CookieConsentBanner'),
   { ssr: false },

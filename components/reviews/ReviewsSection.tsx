@@ -183,6 +183,7 @@ export function ReviewsSection() {
       {/* ——— Секция: Отзывы ——— */}
       <motion.section
         id="reviews-new"
+        data-kopi-tour="reviews-feed"
         variants={sectionVariants}
         initial="hidden"
         animate="visible"

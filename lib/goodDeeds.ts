@@ -83,7 +83,7 @@ export const MAX_GOOD_DEED_STORY_CHARS = 10000;
 export const BONUS_RUB_RATE = 1;
 
 /** Минимум бонусов для заявки на вывод на карту / по реквизитам. */
-export const MIN_WITHDRAWAL_BONUSES = 100;
+export const MIN_WITHDRAWAL_BONUSES = 10;
 
 /** Лимиты полей заявки на вывод. */
 export const MAX_WITHDRAWAL_BANK_LEN = 160;

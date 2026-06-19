@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { AdminHeader } from "../../_components/AdminHeader";
 import { throwIfApiFailed } from "@/lib/api/parseApiError";
+import { MIN_WITHDRAWAL_BONUSES } from "@/lib/goodDeeds";
 
 type WithdrawItem = {
   id: string;
@@ -146,7 +147,8 @@ export default function AdminGoodDeedWithdrawalsClient() {
             Вывод бонусов за добрые дела
           </h2>
           <p className="text-[#abd1c6]/90">
-            Пользователи подают заявку от 100 бонусов (1 бонус = 1 ₽). После
+            Пользователи подают заявку от {MIN_WITHDRAWAL_BONUSES} бонусов (1
+            бонус = 1 ₽). После
             одобрения переведите средства на указанные реквизиты.
           </p>
         </Card>

@@ -1,6 +1,7 @@
 import type { Route } from 'next';
 import type { ComponentType } from 'react';
 import { LucideIcons } from '@/components/ui/LucideIcons';
+import { isFullscreenGameRoute } from '@/lib/navigation/fullscreenRoutes';
 
 export interface MobileBottomNavItem {
   href: Route;
@@ -48,5 +49,6 @@ export const MOBILE_BOTTOM_NAV_ITEMS: MobileBottomNavItem[] = [
 export function shouldShowMobileBottomNav(pathname: string): boolean {
   if (pathname === '/banned') return false;
   if (pathname.startsWith('/admin')) return false;
+  if (isFullscreenGameRoute(pathname)) return false;
   return true;
 }

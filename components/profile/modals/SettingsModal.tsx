@@ -16,6 +16,7 @@ import {
   ErrorState,
 } from "../settings/ProfileStates";
 import { SettingsAccountSection } from "./SettingsAccountSection";
+import { SettingsNotificationsSection } from "./SettingsNotificationsSection";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { SettingsSection } from "./SettingsFields";
 import { useSettingsModalLifecycle } from "./hooks/useSettingsModalLifecycle";
@@ -177,6 +178,8 @@ export default function SettingsModal({
               saving={saving}
               onCopy={handleCopy}
             />
+
+            <SettingsNotificationsSection />
 
             <SettingsAccountSection
               saving={saving}

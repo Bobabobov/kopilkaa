@@ -11,6 +11,7 @@ const links: { href: Route; label: string }[] = [
   { href: "/reviews", label: "Отзывы" },
   { href: "/applications", label: "Заявка" },
   { href: "/good-deeds", label: "Добрые дела" },
+  { href: "/vyzhivanie", label: "Выживание" },
   { href: "/heroes", label: "Герои" },
   { href: "/advertising", label: "Реклама" },
 ];

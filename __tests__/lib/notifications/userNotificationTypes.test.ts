@@ -37,6 +37,7 @@ describe("mapUserNotificationRow", () => {
       ],
     }),
     createdAt: new Date("2026-06-10T12:00:00.000Z"),
+    updatedAt: new Date("2026-06-16T12:00:00.000Z"),
     modalDismissedAt: null,
     timestamp: "только что",
   };
@@ -49,6 +50,7 @@ describe("mapUserNotificationRow", () => {
     expect(notification.applicationId).toBe("app1");
     expect(notification.linkedAccounts).toHaveLength(1);
     expect(notification.isRead).toBe(false);
+    expect(notification.createdAt).toBe("2026-06-16T12:00:00.000Z");
   });
 
   it("должно помечать isRead когда modalDismissedAt задан", () => {

@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface Spark {
   x: number;
@@ -10,11 +11,12 @@ interface Spark {
 }
 
 export default function GlobalClickSpark() {
+  const pathname = usePathname();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sparksRef = useRef<Spark[]>([]);
   const animationFrameRef = useRef<number | null>(null);
 
-  const sparkColor = "#c28642";
+  const sparkColor = '#c28642';
   const sparkSize = 10;
   const sparkRadius = 20;
   const sparkCount = 10;
@@ -26,27 +28,29 @@ export default function GlobalClickSpark() {
 
   // Создание canvas без постоянного RAF: анимация стартует только после клика.
   useEffect(() => {
-    const disableForTouch = window.matchMedia("(pointer: coarse)").matches;
+    if (pathname?.startsWith('/vyzhivanie')) return;
+
+    const disableForTouch = window.matchMedia('(pointer: coarse)').matches;
     const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
+      '(prefers-reduced-motion: reduce)',
     ).matches;
 
     if (disableForTouch || reduceMotion) return;
 
-    const canvas = document.createElement("canvas");
-    canvas.style.position = "fixed";
-    canvas.style.top = "0";
-    canvas.style.left = "0";
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
-    canvas.style.pointerEvents = "none";
-    canvas.style.zIndex = "9999";
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = '9999';
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     document.body.appendChild(canvas);
     canvasRef.current = canvas;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     // Обновляем размер при изменении окна
@@ -54,7 +58,7 @@ export default function GlobalClickSpark() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
     const animate = (timestamp: number) => {
       if (!ctx) return;
@@ -103,7 +107,7 @@ export default function GlobalClickSpark() {
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === "CANVAS") return;
+      if (target.tagName === 'CANVAS') return;
 
       const x = e.clientX;
       const y = e.clientY;
@@ -120,11 +124,11 @@ export default function GlobalClickSpark() {
       startAnimation();
     };
 
-    document.addEventListener("click", handleClick, true);
+    document.addEventListener('click', handleClick, true);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
-      document.removeEventListener("click", handleClick, true);
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('click', handleClick, true);
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
@@ -133,7 +137,15 @@ export default function GlobalClickSpark() {
         canvas.parentElement.removeChild(canvas);
       }
     };
-  }, [easeFunc, sparkColor, sparkSize, sparkRadius, sparkCount, duration]);
+  }, [
+    easeFunc,
+    pathname,
+    sparkColor,
+    sparkSize,
+    sparkRadius,
+    sparkCount,
+    duration,
+  ]);
 
   return null; // Компонент не рендерит ничего, работает через DOM API
 }

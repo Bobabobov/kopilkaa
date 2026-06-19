@@ -13,6 +13,9 @@ export const ACHIEVEMENT_SLUGS = {
   PROFILE_STYLE: "profile-style",
   DAILY_BONUS_CLAIMED: "daily-bonus-claimed",
   DAILY_BONUS_RISK: "tried-luck",
+  TONTINE_JOINED: "tontine-joined",
+  TONTINE_SURVIVOR_7: "tontine-survivor-7",
+  TONTINE_WINNER: "tontine-winner",
 } as const;
 
 export type AchievementSlug =
@@ -161,5 +164,38 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     rarity: "UNCOMMON",
     targetValue: 1,
     sortOrder: 115,
+  },
+  {
+    slug: ACHIEVEMENT_SLUGS.TONTINE_JOINED,
+    name: "В игре",
+    description:
+      "Вы вступили в «Выживание» — ежедневная отметка решает всё. Пропустили день — и вы вне игры.",
+    hint: "Вступите в игру «Выживание» на сайте",
+    icon: "/Achievements/bonus.png",
+    rarity: "COMMON",
+    targetValue: 1,
+    sortOrder: 120,
+  },
+  {
+    slug: ACHIEVEMENT_SLUGS.TONTINE_SURVIVOR_7,
+    name: "Неделя выживания",
+    description:
+      "Семь дней подряд вы отмечались в игре. Дисциплина сильнее случайности.",
+    hint: "Отмечайтесь в «Выживании» 7 дней подряд",
+    icon: "/Achievements/week.png",
+    rarity: "UNCOMMON",
+    targetValue: 7,
+    sortOrder: 125,
+  },
+  {
+    slug: ACHIEVEMENT_SLUGS.TONTINE_WINNER,
+    name: "Последний выживший",
+    description:
+      "Вы победили в раунде «Выживание» и выиграли 30 000 ₽. Редкая честь.",
+    hint: "Останьтесь последним живым участником раунда",
+    icon: "/Achievements/pig17.png",
+    rarity: "LEGENDARY",
+    targetValue: 1,
+    sortOrder: 130,
   },
 ];

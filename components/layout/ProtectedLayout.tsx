@@ -10,6 +10,7 @@ import Footer from "./Footer";
 import UniversalBackground from "@/components/ui/UniversalBackground";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { shouldShowMobileBottomNav } from "@/lib/navigation/mobileBottomNav";
+import { isFullscreenGameRoute } from "@/lib/navigation/fullscreenRoutes";
 import { cn } from "@/lib/utils";
 
 const ScrollToTop = dynamic(() => import("@/components/ui/ScrollToTop"), {
@@ -23,6 +24,16 @@ const KopiExperience = dynamic(
 
 const ApplicationStatusModalGate = dynamic(
   () => import("@/components/notifications/ApplicationStatusModalGate"),
+  { ssr: false },
+);
+
+const PushNotificationPromptGate = dynamic(
+  () => import("@/components/notifications/PushNotificationPromptGate"),
+  { ssr: false },
+);
+
+const BrowserNotificationBridge = dynamic(
+  () => import("@/components/notifications/BrowserNotificationBridge"),
   { ssr: false },
 );
 
@@ -46,6 +57,22 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     );
   }
 
+  if (isFullscreenGameRoute(pathname)) {
+    return (
+      <>
+        <ApplicationStatusModalGate />
+        <PushNotificationPromptGate />
+        <BrowserNotificationBridge />
+        <main className="fixed inset-0 z-40 h-[100dvh] w-full overflow-hidden">
+          {children}
+        </main>
+        <Suspense fallback={null}>
+          <AuthModalRoot />
+        </Suspense>
+      </>
+    );
+  }
+
   const showBottomNav = shouldShowMobileBottomNav(pathname);
 
   return (
@@ -57,6 +84,8 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     >
       <UniversalBackground />
       <ApplicationStatusModalGate />
+      <PushNotificationPromptGate />
+      <BrowserNotificationBridge />
       <TopBanner />
       <Header />
       <main className="flex-1 container-p mx-auto w-full min-w-0 overflow-x-hidden">

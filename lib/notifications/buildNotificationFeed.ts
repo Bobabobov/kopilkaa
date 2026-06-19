@@ -165,7 +165,7 @@ export async function buildNotificationFeed(
   const pendingStatusModal = pendingRow
     ? mapUserNotificationRow({
         ...pendingRow,
-        timestamp: formatTimeAgo(pendingRow.createdAt),
+        timestamp: formatTimeAgo(pendingRow.updatedAt),
       })
     : null;
 

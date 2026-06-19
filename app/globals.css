@@ -154,6 +154,241 @@
     animation: slideUp 0.4s ease-out;
   }
 
+  @keyframes vyzhivanieGlitchJitter {
+    0%,
+    91%,
+    100% {
+      transform: translate3d(0, 0, 0);
+      filter: none;
+    }
+    92% {
+      transform: translate3d(2px, -1px, 0);
+      filter: hue-rotate(-18deg) saturate(1.35);
+    }
+    94% {
+      transform: translate3d(-3px, 1px, 0);
+      filter: hue-rotate(14deg) saturate(1.5);
+    }
+    96% {
+      transform: translate3d(1px, 2px, 0);
+      filter: contrast(1.35);
+    }
+    98% {
+      transform: translate3d(-1px, -2px, 0);
+      filter: hue-rotate(-8deg) saturate(1.25);
+    }
+  }
+
+  @keyframes vyzhivanieGlitchSlice {
+    0%,
+    88%,
+    100% {
+      opacity: 0;
+      transform: translateX(0);
+    }
+    89% {
+      opacity: 0.7;
+      transform: translateX(-18px);
+    }
+    91% {
+      opacity: 0.25;
+      transform: translateX(22px);
+    }
+    93% {
+      opacity: 0.8;
+      transform: translateX(-8px);
+    }
+    95% {
+      opacity: 0.15;
+      transform: translateX(14px);
+    }
+  }
+
+  @keyframes vyzhivanieGlitchText {
+    0%,
+    86%,
+    100% {
+      text-shadow:
+        0 0 10px rgba(248, 113, 113, 0.22),
+        0 0 0 transparent;
+      transform: translateX(0);
+    }
+    88% {
+      text-shadow:
+        2px 0 0 rgba(34, 211, 238, 0.75),
+        -2px 0 0 rgba(248, 113, 113, 0.75);
+      transform: translateX(-1px);
+    }
+    91% {
+      text-shadow:
+        -3px 0 0 rgba(34, 211, 238, 0.65),
+        3px 0 0 rgba(248, 113, 113, 0.65);
+      transform: translateX(2px);
+    }
+    94% {
+      text-shadow:
+        1px 0 0 rgba(34, 211, 238, 0.55),
+        -1px 0 0 rgba(248, 113, 113, 0.55);
+      transform: translateX(-2px);
+    }
+  }
+
+  @keyframes vyzhivanieGlitchButton {
+    0%,
+    82%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    84% {
+      transform: translate3d(-2px, 1px, 0) scale(1.02);
+    }
+    87% {
+      transform: translate3d(2px, -1px, 0) scale(1.03);
+    }
+    90% {
+      transform: translate3d(-1px, -1px, 0) scale(1.01);
+    }
+  }
+
+  .vyzhivanie-glitch-panel {
+    animation: vyzhivanieGlitchJitter 4.7s steps(1, end) infinite;
+  }
+
+  .vyzhivanie-glitch-panel::before,
+  .vyzhivanie-glitch-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0;
+    z-index: 1;
+  }
+
+  .vyzhivanie-glitch-panel::before {
+    background:
+      linear-gradient(transparent 12%, rgba(34, 211, 238, 0.22) 12% 15%, transparent 15% 58%, rgba(34, 211, 238, 0.18) 58% 61%, transparent 61%),
+      linear-gradient(90deg, rgba(34, 211, 238, 0.22), transparent 34%);
+    animation: vyzhivanieGlitchSlice 3.2s steps(1, end) infinite;
+  }
+
+  .vyzhivanie-glitch-panel::after {
+    background:
+      linear-gradient(transparent 25%, rgba(248, 113, 113, 0.24) 25% 29%, transparent 29% 74%, rgba(248, 113, 113, 0.18) 74% 77%, transparent 77%),
+      linear-gradient(90deg, transparent 62%, rgba(248, 113, 113, 0.2));
+    animation: vyzhivanieGlitchSlice 4.1s steps(1, end) infinite reverse;
+  }
+
+  .vyzhivanie-glitch-text {
+    animation: vyzhivanieGlitchText 3.6s steps(1, end) infinite;
+  }
+
+  .vyzhivanie-glitch-button {
+    animation:
+      pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite,
+      vyzhivanieGlitchButton 3.9s steps(1, end) infinite;
+  }
+
+  .vyzhivanie-action-button {
+    isolation: isolate;
+  }
+
+  .vyzhivanie-action-button::before,
+  .vyzhivanie-action-button::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity 160ms ease,
+      transform 160ms ease;
+  }
+
+  .vyzhivanie-action-button::before {
+    inset: -10px;
+    border: 1px solid rgba(34, 211, 238, 0.52);
+    box-shadow:
+      0 0 22px rgba(34, 211, 238, 0.32),
+      inset 0 0 18px rgba(244, 114, 182, 0.18);
+    transform: scale(0.94);
+  }
+
+  .vyzhivanie-action-button::after {
+    inset: 0;
+    background:
+      linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent),
+      repeating-linear-gradient(0deg, transparent 0 5px, rgba(255, 255, 255, 0.12) 6px);
+    transform: translateX(-120%) skewX(-16deg);
+    mix-blend-mode: screen;
+  }
+
+  .vyzhivanie-action-button:hover::before,
+  .vyzhivanie-action-button:focus-visible::before {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .vyzhivanie-action-button:hover::after,
+  .vyzhivanie-action-button:focus-visible::after {
+    opacity: 1;
+    transform: translateX(120%) skewX(-16deg);
+    transition-duration: 520ms;
+  }
+
+  .vyzhivanie-action-button:active {
+    transform: translateY(2px) scale(0.98) !important;
+    filter: saturate(1.45) contrast(1.18);
+  }
+
+  .vyzhivanie-action-button:active::before {
+    opacity: 1;
+    transform: scale(1.08);
+    border-color: rgba(248, 113, 113, 0.9);
+    box-shadow:
+      0 0 30px rgba(248, 113, 113, 0.5),
+      inset 0 0 24px rgba(34, 211, 238, 0.22);
+  }
+
+  .vyzhivanie-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(248, 113, 113, 0.75) rgba(2, 6, 23, 0.92);
+  }
+
+  .vyzhivanie-scrollbar::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .vyzhivanie-scrollbar::-webkit-scrollbar-track {
+    background:
+      linear-gradient(180deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.94));
+    border-left: 1px solid rgba(51, 65, 85, 0.85);
+  }
+
+  .vyzhivanie-scrollbar::-webkit-scrollbar-thumb {
+    background:
+      linear-gradient(180deg, rgba(248, 113, 113, 0.9), rgba(249, 188, 96, 0.72));
+    border: 2px solid rgba(2, 6, 23, 0.96);
+    box-shadow: 0 0 12px rgba(248, 113, 113, 0.45);
+  }
+
+  .vyzhivanie-scrollbar::-webkit-scrollbar-thumb:hover {
+    background:
+      linear-gradient(180deg, rgba(34, 211, 238, 0.85), rgba(248, 113, 113, 0.9));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vyzhivanie-glitch-panel,
+    .vyzhivanie-glitch-panel::before,
+    .vyzhivanie-glitch-panel::after,
+    .vyzhivanie-glitch-text,
+    .vyzhivanie-glitch-button,
+    .vyzhivanie-action-button::before,
+    .vyzhivanie-action-button::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
   .card {
     @apply rounded-2xl shadow-soft p-8 backdrop-blur-xl border;
     background: rgba(255, 255, 254, 0.85);

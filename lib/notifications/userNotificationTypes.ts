@@ -44,11 +44,13 @@ export function mapUserNotificationRow(row: {
   adminComment: string | null;
   payload: string | null;
   createdAt: Date;
+  updatedAt?: Date;
   modalDismissedAt: Date | null;
   timestamp: string;
 }): Notification {
   const payload = parseNotificationPayload(row.payload);
   const status = row.status as "APPROVED" | "REJECTED";
+  const eventAt = row.updatedAt ?? row.createdAt;
 
   const base: Notification = {
     id: row.id,
@@ -57,7 +59,7 @@ export function mapUserNotificationRow(row: {
     message: row.message,
     adminComment: row.adminComment,
     avatar: null,
-    createdAt: row.createdAt.toISOString(),
+    createdAt: eventAt.toISOString(),
     timestamp: row.timestamp,
     isRead: row.modalDismissedAt !== null,
     status,

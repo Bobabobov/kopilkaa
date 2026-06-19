@@ -178,7 +178,7 @@ export async function fetchUserStatusNotifications(userId: string) {
 
   return rows.map((row) => ({
     ...row,
-    timestamp: formatTimeAgo(row.createdAt),
+    timestamp: formatTimeAgo(row.updatedAt),
   }));
 }
 

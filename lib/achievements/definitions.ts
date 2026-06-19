@@ -194,7 +194,7 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
       "Вы победили в раунде «Выживание» и выиграли 30 000 ₽. Редкая честь.",
     hint: "Останьтесь последним живым участником раунда",
     icon: "/Achievements/pig17.png",
-    rarity: "LEGENDARY",
+    rarity: "EPIC",
     targetValue: 1,
     sortOrder: 130,
   },

@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Loader2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { formatRub } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import type { TontineStatusResponse } from '../types';
@@ -213,6 +213,23 @@ function getGraveChatReply(data: TontineStatusResponse): string {
   return 'Я с живыми не разговариваю.';
 }
 
+function getHudCollapsedLabel(
+  data: TontineStatusResponse,
+  flags: {
+    canJoin: boolean;
+    canCheckIn: boolean;
+    checkedIn: boolean;
+    isEliminated: boolean;
+  },
+): string {
+  if (flags.isEliminated) return 'Выбыл';
+  if (flags.canJoin) return 'Вступить в раунд';
+  if (flags.canCheckIn) return 'Пора нажать';
+  if (flags.checkedIn) return 'Отметка принята';
+  if (!data.isAuthenticated) return 'Гость';
+  return 'Смотритель на связи';
+}
+
 function sanitizeGraveChatInput(value: string): string {
   return value
     .normalize('NFKC')
@@ -257,6 +274,13 @@ export function VyzhivanieGameHud({
   const [sentChatMessage, setSentChatMessage] = useState<string | null>(null);
   const [chatReply, setChatReply] = useState<string | null>(null);
   const [keeperProfileOpen, setKeeperProfileOpen] = useState(false);
+  const [hudExpanded, setHudExpanded] = useState(true);
+  const hudCollapsedLabel = getHudCollapsedLabel(data, {
+    canJoin,
+    canCheckIn,
+    checkedIn,
+    isEliminated,
+  });
 
   useEffect(() => {
     setTypedMessage('');
@@ -347,7 +371,10 @@ export function VyzhivanieGameHud({
         className={cn(
           'vyzhivanie-glitch-panel pointer-events-auto absolute z-10 overflow-hidden border border-[#5b6470] bg-[#020202]/97 font-mono text-[#e5e7eb] shadow-[0_26px_92px_rgba(0,0,0,0.95),0_0_0_2px_rgba(0,0,0,0.98),0_0_52px_rgba(127,29,29,0.34),inset_0_0_0_1px_rgba(255,255,255,0.09),inset_0_0_44px_rgba(127,29,29,0.18)] backdrop-blur-sm',
           compact
-            ? 'inset-x-2 bottom-2 max-h-[44vh] overflow-y-auto'
+            ? cn(
+                'inset-x-2 bottom-2',
+                hudExpanded ? 'max-h-[44vh] overflow-y-auto' : '',
+              )
             : 'inset-x-2 bottom-14 sm:inset-x-4',
         )}
       >
@@ -369,6 +396,46 @@ export function VyzhivanieGameHud({
         <div className="pointer-events-none absolute bottom-10 left-24 h-1 w-32 animate-pulse bg-[#7c3aed]/30 blur-[1px]" />
         <div className="pointer-events-none absolute bottom-16 right-28 h-1 w-24 animate-pulse bg-red-500/30 blur-[1px]" />
 
+        <div className="relative z-10 flex items-center justify-between gap-2 border-b border-[#334155] bg-[linear-gradient(90deg,rgba(127,29,29,0.22),rgba(0,0,0,0.92))] px-3 py-2">
+          <span
+            className={cn(
+              'min-w-0 truncate text-[10px] font-black uppercase tracking-[0.16em]',
+              isEliminated
+                ? 'text-red-300'
+                : canCheckIn
+                  ? 'text-orange-300'
+                  : checkedIn
+                    ? 'text-emerald-300'
+                    : canJoin
+                      ? 'text-[#f9bc60]'
+                      : 'text-[#94a3b8]',
+            )}
+          >
+            {hudCollapsedLabel}
+          </span>
+          <button
+            type="button"
+            onClick={() => setHudExpanded((open) => !open)}
+            className="inline-flex shrink-0 items-center gap-1 border border-[#4b5563] bg-black/60 px-2 py-1 text-[9px] uppercase tracking-[0.14em] text-[#d1d5db] transition-colors hover:border-cyan-300/60 hover:text-cyan-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300/70"
+            aria-expanded={hudExpanded}
+            aria-label={hudExpanded ? 'Свернуть панель' : 'Развернуть панель'}
+          >
+            {hudExpanded ? (
+              <>
+                Свернуть
+                <ChevronDown className="h-4 w-4" aria-hidden />
+              </>
+            ) : (
+              <>
+                Развернуть
+                <ChevronUp className="h-4 w-4" aria-hidden />
+              </>
+            )}
+          </button>
+        </div>
+
+        {hudExpanded ? (
+          <>
         <div
           className={cn(
             'relative border-b border-red-950/60 bg-[linear-gradient(90deg,rgba(127,29,29,0.26),rgba(0,0,0,0.90),rgba(30,41,59,0.22))] px-4 py-2 pl-8 text-[9px] uppercase tracking-[0.35em] text-red-200/80',
@@ -653,6 +720,8 @@ export function VyzhivanieGameHud({
             ) : null}
           </div>
         </div>
+          </>
+        ) : null}
       </div>
 
       {!isEliminated ? (

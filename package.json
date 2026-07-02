@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "cross-env PORT=3000 NEXT_DIST_DIR=.next-dev next dev",
     "build": "next build",
+    "deploy:server": "prisma migrate deploy && prisma generate && npm run build",
     "start": "next start -H 0.0.0.0 -p 3000",
     "postinstall": "prisma generate",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx -f unix",

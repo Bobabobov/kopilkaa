@@ -347,6 +347,7 @@ export async function verifySchulteClicks(
   );
 
   if (!session) {
+    console.error('[Games] odd-number: active session not found', { userId });
     return buildGameOverResult('no_active_session', false, null, 0, null, 0);
   }
 
@@ -408,6 +409,37 @@ export async function verifySchulteClicks(
     null,
     progress,
   );
+}
+
+export async function acknowledgeOddNumberReady(
+  userId: string,
+): Promise<{ serverStartTime: number; timeLimitMs: number } | null> {
+  const session = await peekRuntimeSession<SchulteSession>(
+    userId,
+    ODD_NUMBER_SESSION_KEY,
+  );
+
+  if (!session) {
+    return null;
+  }
+
+  const startTime = Date.now();
+
+  await saveRuntimeSession<SchulteSession>({
+    userId,
+    gameKey: ODD_NUMBER_SESSION_KEY,
+    payload: {
+      ...session,
+      startTime,
+      expiresAt: startTime + SESSION_TTL_MS,
+    },
+    expiresAtMs: startTime + SESSION_TTL_MS,
+  });
+
+  return {
+    serverStartTime: startTime,
+    timeLimitMs: TIME_LIMIT_MS,
+  };
 }
 
 export async function hasActiveOddNumberSession(userId: string): Promise<boolean> {

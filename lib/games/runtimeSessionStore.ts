@@ -10,66 +10,46 @@ export interface RuntimeSessionRecord<TPayload> {
   expiresAtMs: number;
 }
 
-let tableReadyPromise: Promise<void> | null = null;
-
-async function ensureRuntimeSessionsTable(db: DbClient): Promise<void> {
-  if (tableReadyPromise) {
-    return tableReadyPromise;
-  }
-
-  tableReadyPromise = (async () => {
-    await db.$executeRawUnsafe(
-      `
-      CREATE TABLE IF NOT EXISTS game_runtime_sessions (
-        user_id TEXT NOT NULL,
-        game_key TEXT NOT NULL,
-        payload_json TEXT NOT NULL,
-        expires_at_ms BIGINT NOT NULL,
-        updated_at_ms BIGINT NOT NULL,
-        PRIMARY KEY (user_id, game_key)
-      )
-      `,
-    );
-  })();
-
-  await tableReadyPromise;
+function getRuntimeSessionDelegate(
+  db: DbClient,
+): Prisma.GameRuntimeSessionDelegate {
+  return (db as typeof prisma).gameRuntimeSession;
 }
 
 async function cleanupExpired(db: DbClient): Promise<void> {
-  await db.$executeRaw`
-    DELETE FROM game_runtime_sessions
-    WHERE expires_at_ms <= ${Date.now()}
-  `;
+  await getRuntimeSessionDelegate(db).deleteMany({
+    where: {
+      expiresAt: {
+        lte: new Date(),
+      },
+    },
+  });
 }
 
 export async function saveRuntimeSession<TPayload>(
   input: RuntimeSessionRecord<TPayload>,
   db: DbClient = prisma,
 ): Promise<void> {
-  await ensureRuntimeSessionsTable(db);
   await cleanupExpired(db);
 
-  await db.$executeRaw`
-    INSERT INTO game_runtime_sessions (
-      user_id,
-      game_key,
-      payload_json,
-      expires_at_ms,
-      updated_at_ms
-    )
-    VALUES (
-      ${input.userId},
-      ${input.gameKey},
-      ${JSON.stringify(input.payload)},
-      ${input.expiresAtMs},
-      ${Date.now()}
-    )
-    ON CONFLICT (user_id, game_key)
-    DO UPDATE SET
-      payload_json = excluded.payload_json,
-      expires_at_ms = excluded.expires_at_ms,
-      updated_at_ms = excluded.updated_at_ms
-  `;
+  await getRuntimeSessionDelegate(db).upsert({
+    where: {
+      userId_gameKey: {
+        userId: input.userId,
+        gameKey: input.gameKey,
+      },
+    },
+    create: {
+      userId: input.userId,
+      gameKey: input.gameKey,
+      payloadJson: JSON.stringify(input.payload),
+      expiresAt: new Date(input.expiresAtMs),
+    },
+    update: {
+      payloadJson: JSON.stringify(input.payload),
+      expiresAt: new Date(input.expiresAtMs),
+    },
+  });
 }
 
 export async function peekRuntimeSession<TPayload>(
@@ -77,23 +57,29 @@ export async function peekRuntimeSession<TPayload>(
   gameKey: string,
   db: DbClient = prisma,
 ): Promise<TPayload | null> {
-  await ensureRuntimeSessionsTable(db);
   await cleanupExpired(db);
 
-  const rows = await db.$queryRaw<Array<{ payload_json: string }>>`
-    SELECT payload_json
-    FROM game_runtime_sessions
-    WHERE user_id = ${userId}
-      AND game_key = ${gameKey}
-      AND expires_at_ms > ${Date.now()}
-    LIMIT 1
-  `;
+  const row = await getRuntimeSessionDelegate(db).findUnique({
+    where: {
+      userId_gameKey: {
+        userId,
+        gameKey,
+      },
+    },
+    select: {
+      payloadJson: true,
+      expiresAt: true,
+    },
+  });
 
-  if (!rows[0]?.payload_json) {
+  if (!row || row.expiresAt.getTime() <= Date.now()) {
+    if (row) {
+      await deleteRuntimeSession(userId, gameKey, db);
+    }
     return null;
   }
 
-  return JSON.parse(rows[0].payload_json) as TPayload;
+  return JSON.parse(row.payloadJson) as TPayload;
 }
 
 export async function takeRuntimeSession<TPayload>(
@@ -101,20 +87,12 @@ export async function takeRuntimeSession<TPayload>(
   gameKey: string,
   db: DbClient = prisma,
 ): Promise<TPayload | null> {
-  await ensureRuntimeSessionsTable(db);
-  await cleanupExpired(db);
-
   const payload = await peekRuntimeSession<TPayload>(userId, gameKey, db);
   if (!payload) {
     return null;
   }
 
-  await db.$executeRaw`
-    DELETE FROM game_runtime_sessions
-    WHERE user_id = ${userId}
-      AND game_key = ${gameKey}
-  `;
-
+  await deleteRuntimeSession(userId, gameKey, db);
   return payload;
 }
 
@@ -123,10 +101,10 @@ export async function deleteRuntimeSession(
   gameKey: string,
   db: DbClient = prisma,
 ): Promise<void> {
-  await ensureRuntimeSessionsTable(db);
-  await db.$executeRaw`
-    DELETE FROM game_runtime_sessions
-    WHERE user_id = ${userId}
-      AND game_key = ${gameKey}
-  `;
+  await getRuntimeSessionDelegate(db).deleteMany({
+    where: {
+      userId,
+      gameKey,
+    },
+  });
 }

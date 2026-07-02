@@ -503,6 +503,7 @@ export async function submitMathSprintAnswer(
   );
 
   if (!session) {
+    console.error('[Games] math-sprint: active session not found', { userId });
     return {
       won: false,
       reason: 'no_active_session',
@@ -563,6 +564,37 @@ export async function submitMathSprintAnswer(
     reward,
     balanceAfter,
     difficulty: session.difficulty,
+  };
+}
+
+export async function acknowledgeMathSprintReady(
+  userId: string,
+): Promise<{ serverStartTime: number; timeLimitMs: number } | null> {
+  const session = await peekRuntimeSession<MathSprintSession>(
+    userId,
+    MATH_SPRINT_SESSION_KEY,
+  );
+
+  if (!session) {
+    return null;
+  }
+
+  const startTime = Date.now();
+
+  await saveRuntimeSession<MathSprintSession>({
+    userId,
+    gameKey: MATH_SPRINT_SESSION_KEY,
+    payload: {
+      ...session,
+      startTime,
+      expiresAt: startTime + SESSION_TTL_MS,
+    },
+    expiresAtMs: startTime + SESSION_TTL_MS,
+  });
+
+  return {
+    serverStartTime: startTime,
+    timeLimitMs: TIME_LIMIT_MS,
   };
 }
 

@@ -299,6 +299,7 @@ export async function verifyQuickBalanceChoices(
   );
 
   if (!session) {
+    console.error('[Games] quick-balance: active session not found', { userId });
     return buildLossResult('no_active_session', 0, null);
   }
 

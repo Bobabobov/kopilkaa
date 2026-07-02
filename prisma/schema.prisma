@@ -872,3 +872,15 @@ model SiteFeedback {
   @@index([userId])
   @@index([topic])
 }
+
+/// Активные игровые сессии (раунд в процессе) — общее хранилище для всех инстансов.
+model GameRuntimeSession {
+  userId      String
+  gameKey     String
+  payloadJson String
+  expiresAt   DateTime
+  updatedAt   DateTime @updatedAt
+
+  @@id([userId, gameKey])
+  @@index([expiresAt])
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   DAILY_ATTEMPT_LIMIT,
@@ -114,9 +114,10 @@ export default function MathSprintPageClient({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const timerStartRef = useRef<number | null>(null);
-  const serverStartTimeRef = useRef<number | null>(null);
   const timerFrameRef = useRef<number | null>(null);
+  const serverStartTimeRef = useRef<number | null>(null);
+  const timerStartRef = useRef<number | null>(null);
+  const readyBootstrappedRef = useRef(false);
   const hasTimedOutRef = useRef(false);
 
   const activeConfig = MATH_SPRINT_DIFFICULTIES[difficulty];
@@ -240,6 +241,45 @@ export default function MathSprintPageClient({
     };
   }, [stopTimer]);
 
+  useLayoutEffect(() => {
+    if (phase !== 'playing' || !questionText || readyBootstrappedRef.current) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const response = await fetch('/api/games/math/ready', {
+          method: 'POST',
+          cache: 'no-store',
+        });
+        const raw = await response.json().catch(() => null);
+
+        if (cancelled) {
+          return;
+        }
+
+        if (response.ok && raw?.data?.serverStartTime) {
+          readyBootstrappedRef.current = true;
+          startTimer(raw.data.serverStartTime);
+          return;
+        }
+      } catch {
+        // fallback ниже
+      }
+
+      if (!cancelled) {
+        readyBootstrappedRef.current = true;
+        startTimer(Date.now());
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [phase, questionText, startTimer]);
+
   const handleStart = useCallback(async () => {
     if (!canStart) {
       return;
@@ -247,6 +287,7 @@ export default function MathSprintPageClient({
 
     setError(null);
     setResult(null);
+    readyBootstrappedRef.current = false;
     setIsSubmitting(true);
 
     try {
@@ -273,7 +314,6 @@ export default function MathSprintPageClient({
       setPurchasedAttemptsAvailable(payload.data.purchasedAttemptsAvailable);
       setTimeLeftMs(TIME_LIMIT_MS);
       setPhase('playing');
-      startTimer(payload.data.serverStartTime);
     } catch (startError) {
       setPhase('idle');
       setError(
@@ -284,7 +324,7 @@ export default function MathSprintPageClient({
     } finally {
       setIsSubmitting(false);
     }
-  }, [canStart, difficulty, startTimer]);
+  }, [canStart, difficulty]);
 
   const handleAnswer = useCallback(
     async (selectedAnswer: number) => {
@@ -342,6 +382,7 @@ export default function MathSprintPageClient({
     timerStartRef.current = null;
     serverStartTimeRef.current = null;
     hasTimedOutRef.current = false;
+    readyBootstrappedRef.current = false;
     setQuestionText('');
     setOptions([]);
     setResult(null);

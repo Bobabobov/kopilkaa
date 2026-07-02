@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   DAILY_ATTEMPT_LIMIT,
@@ -113,6 +113,7 @@ export default function OddNumberPageClient({
 
   const timerFrameRef = useRef<number | null>(null);
   const serverStartTimeRef = useRef<number | null>(null);
+  const readyBootstrappedRef = useRef(false);
   const hasTimedOutRef = useRef(false);
   const gameOverRef = useRef(false);
   const playerClicksRef = useRef<number[]>([]);
@@ -241,6 +242,45 @@ export default function OddNumberPageClient({
     };
   }, [stopTimer]);
 
+  useLayoutEffect(() => {
+    if (phase !== 'playing' || cells.length === 0 || readyBootstrappedRef.current) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const response = await fetch('/api/games/odd-number/ready', {
+          method: 'POST',
+          cache: 'no-store',
+        });
+        const raw = await response.json().catch(() => null);
+
+        if (cancelled) {
+          return;
+        }
+
+        if (response.ok && raw?.data?.serverStartTime) {
+          readyBootstrappedRef.current = true;
+          startTimer(raw.data.serverStartTime);
+          return;
+        }
+      } catch {
+        // fallback ниже
+      }
+
+      if (!cancelled) {
+        readyBootstrappedRef.current = true;
+        startTimer(Date.now());
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cells.length, phase, startTimer]);
+
   const handleStart = useCallback(async () => {
     if (!canStart) {
       return;
@@ -252,6 +292,7 @@ export default function OddNumberPageClient({
     playerClicksRef.current = [];
     setCompletedValues(new Set());
     setWrongIndex(null);
+    readyBootstrappedRef.current = false;
     setIsStarting(true);
 
     try {
@@ -276,7 +317,6 @@ export default function OddNumberPageClient({
       setPurchasedAttemptsAvailable(payload.data.purchasedAttemptsAvailable);
       setTimeLeftMs(TIME_LIMIT_MS);
       setPhase('playing');
-      startTimer(payload.data.serverStartTime);
     } catch (startError) {
       setPhase('idle');
       setError(
@@ -287,7 +327,7 @@ export default function OddNumberPageClient({
     } finally {
       setIsStarting(false);
     }
-  }, [canStart, setPurchasedAttemptsAvailable, startTimer]);
+  }, [canStart, setPurchasedAttemptsAvailable]);
 
   const handleCellClick = useCallback(
     (index: number) => {
@@ -337,6 +377,7 @@ export default function OddNumberPageClient({
     stopTimer();
     serverStartTimeRef.current = null;
     hasTimedOutRef.current = false;
+    readyBootstrappedRef.current = false;
     gameOverRef.current = false;
     playerClicksRef.current = [];
     nextExpectedRef.current = 1;

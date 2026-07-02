@@ -88,6 +88,7 @@ export function isColorConflictDifficulty(
 }
 
 const SESSION_TTL_MS = 5 * 60_000;
+const READY_START_GRACE_MS = 1200;
 
 interface ColorConflictSession {
   userId: string;
@@ -576,7 +577,7 @@ export async function acknowledgeColorConflictRoundReady(
     return null;
   }
 
-  const startTime = Date.now();
+  const startTime = Date.now() + READY_START_GRACE_MS;
 
   await saveRuntimeSession<ColorConflictSession>({
     userId,

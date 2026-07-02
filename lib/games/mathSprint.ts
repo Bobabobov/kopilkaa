@@ -67,6 +67,7 @@ export function isMathSprintDifficulty(
 }
 
 const SESSION_TTL_MS = TIME_LIMIT_MS + 60_000;
+const READY_START_GRACE_MS = 1200;
 
 interface MathSprintSession {
   userId: string;
@@ -579,7 +580,7 @@ export async function acknowledgeMathSprintReady(
     return null;
   }
 
-  const startTime = Date.now();
+  const startTime = Date.now() + READY_START_GRACE_MS;
 
   await saveRuntimeSession<MathSprintSession>({
     userId,

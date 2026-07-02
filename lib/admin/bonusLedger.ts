@@ -178,7 +178,7 @@ function collectBonusLedgerEvents(data: BonusLedgerRawData): BonusLedgerEvent[] 
   }
 
   for (const tx of data.transactions) {
-    if (tx.amount <= 0 && tx.type !== BONUS_TRANSACTION_TYPES.APPLICATION_SUBMIT_FEE) {
+    if (tx.type !== BONUS_TRANSACTION_TYPES.APPLICATION_SUBMIT_FEE) {
       continue;
     }
     const isFree =

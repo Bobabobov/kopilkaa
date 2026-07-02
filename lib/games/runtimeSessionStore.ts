@@ -36,13 +36,10 @@ async function ensureRuntimeSessionsTable(db: DbClient): Promise<void> {
 }
 
 async function cleanupExpired(db: DbClient): Promise<void> {
-  await db.$executeRawUnsafe(
-    `
+  await db.$executeRaw`
     DELETE FROM game_runtime_sessions
-    WHERE expires_at_ms <= ?
-    `,
-    Date.now(),
-  );
+    WHERE expires_at_ms <= ${Date.now()}
+  `;
 }
 
 export async function saveRuntimeSession<TPayload>(
@@ -52,8 +49,7 @@ export async function saveRuntimeSession<TPayload>(
   await ensureRuntimeSessionsTable(db);
   await cleanupExpired(db);
 
-  await db.$executeRawUnsafe(
-    `
+  await db.$executeRaw`
     INSERT INTO game_runtime_sessions (
       user_id,
       game_key,
@@ -61,19 +57,19 @@ export async function saveRuntimeSession<TPayload>(
       expires_at_ms,
       updated_at_ms
     )
-    VALUES (?, ?, ?, ?, ?)
+    VALUES (
+      ${input.userId},
+      ${input.gameKey},
+      ${JSON.stringify(input.payload)},
+      ${input.expiresAtMs},
+      ${Date.now()}
+    )
     ON CONFLICT (user_id, game_key)
     DO UPDATE SET
       payload_json = excluded.payload_json,
       expires_at_ms = excluded.expires_at_ms,
       updated_at_ms = excluded.updated_at_ms
-    `,
-    input.userId,
-    input.gameKey,
-    JSON.stringify(input.payload),
-    input.expiresAtMs,
-    Date.now(),
-  );
+  `;
 }
 
 export async function peekRuntimeSession<TPayload>(
@@ -84,17 +80,14 @@ export async function peekRuntimeSession<TPayload>(
   await ensureRuntimeSessionsTable(db);
   await cleanupExpired(db);
 
-  const rows = await db.$queryRawUnsafe<Array<{ payload_json: string }>>(
-    `
+  const rows = await db.$queryRaw<Array<{ payload_json: string }>>`
     SELECT payload_json
     FROM game_runtime_sessions
-    WHERE user_id = ? AND game_key = ? AND expires_at_ms > ?
+    WHERE user_id = ${userId}
+      AND game_key = ${gameKey}
+      AND expires_at_ms > ${Date.now()}
     LIMIT 1
-    `,
-    userId,
-    gameKey,
-    Date.now(),
-  );
+  `;
 
   if (!rows[0]?.payload_json) {
     return null;
@@ -116,14 +109,11 @@ export async function takeRuntimeSession<TPayload>(
     return null;
   }
 
-  await db.$executeRawUnsafe(
-    `
+  await db.$executeRaw`
     DELETE FROM game_runtime_sessions
-    WHERE user_id = ? AND game_key = ?
-    `,
-    userId,
-    gameKey,
-  );
+    WHERE user_id = ${userId}
+      AND game_key = ${gameKey}
+  `;
 
   return payload;
 }
@@ -134,12 +124,9 @@ export async function deleteRuntimeSession(
   db: DbClient = prisma,
 ): Promise<void> {
   await ensureRuntimeSessionsTable(db);
-  await db.$executeRawUnsafe(
-    `
+  await db.$executeRaw`
     DELETE FROM game_runtime_sessions
-    WHERE user_id = ? AND game_key = ?
-    `,
-    userId,
-    gameKey,
-  );
+    WHERE user_id = ${userId}
+      AND game_key = ${gameKey}
+  `;
 }

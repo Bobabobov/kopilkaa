@@ -1,5 +1,4 @@
 import { Prisma } from '@prisma/client';
-import { isUserAllowedAdmin } from '@/lib/adminAccess';
 import { prisma } from '@/lib/db';
 import { toUtcDayKey } from '@/lib/dailyBonus/dayKey';
 import { computeGoodDeedBonusWalletInTx } from '@/lib/goodDeedBonusWallet';
@@ -45,7 +44,11 @@ export class GameAttemptPurchaseDailyLimitError extends Error {
 }
 
 async function hasUnlimitedGameAttempts(userId: string): Promise<boolean> {
-  return isUserAllowedAdmin(userId);
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+  return user?.role === 'ADMIN';
 }
 
 function getUtcDayBounds(): { start: Date; end: Date } {

@@ -123,34 +123,34 @@ export function ProfileTrustAndStatsCard({
     ? [
         {
           label: "Одобрено (в уровень)",
-          value: levelStats.approvedCounting,
+          value: levelStats.approvedCounting ?? 0,
           variant: "success",
           icon: "CheckCircle",
         },
         {
           label: "Одобрено (без уровня)",
-          value: levelStats.approvedWithoutLevel,
+          value: levelStats.approvedWithoutLevel ?? 0,
           variant: "muted",
         },
         {
           label: "Одобрено с понижением",
-          value: levelStats.approvedWithLevelDecrease,
+          value: levelStats.approvedWithLevelDecrease ?? 0,
           variant: "warning",
         },
         {
           label: "В процессе",
-          value: levelStats.pending,
+          value: levelStats.pending ?? 0,
           variant: "warning",
           icon: "Clock",
         },
         {
           label: "Отклонено",
-          value: levelStats.rejectedTotal,
+          value: levelStats.rejectedTotal ?? 0,
           variant: "muted",
         },
         {
           label: "Отклонено с понижением",
-          value: levelStats.rejectedWithLevelDecrease,
+          value: levelStats.rejectedWithLevelDecrease ?? 0,
           variant: "danger",
           icon: "TrendingDown",
         },
@@ -158,9 +158,9 @@ export function ProfileTrustAndStatsCard({
     : [];
 
   const totalApplications = levelStats
-    ? levelStats.approvedTotal +
-      levelStats.rejectedTotal +
-      levelStats.pending
+    ? (levelStats.approvedTotal ?? 0) +
+      (levelStats.rejectedTotal ?? 0) +
+      (levelStats.pending ?? 0)
     : 0;
 
   return (

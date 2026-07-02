@@ -97,6 +97,11 @@ type BonusLedgerRawData = {
   withdrawals: BonusLedgerWithdrawalRow[];
 };
 
+type GameLedgerMeta = {
+  title: string;
+  categoryLabel: string;
+};
+
 const BONUS_SOURCE_CATEGORIES: BonusSourceCategory[] = [
   'goodDeeds',
   'referrals',
@@ -178,37 +183,72 @@ function collectBonusLedgerEvents(data: BonusLedgerRawData): BonusLedgerEvent[] 
   }
 
   for (const tx of data.transactions) {
-    if (tx.type !== BONUS_TRANSACTION_TYPES.APPLICATION_SUBMIT_FEE) {
-      continue;
-    }
-    const isFree =
-      tx.description === BONUS_TRANSACTION_DESCRIPTIONS.FIRST_APPLICATION_FREE;
-    if (isFree || tx.amount <= 0) {
+    if (tx.type === BONUS_TRANSACTION_TYPES.APPLICATION_SUBMIT_FEE) {
+      const isFree =
+        tx.description === BONUS_TRANSACTION_DESCRIPTIONS.FIRST_APPLICATION_FREE;
+      if (isFree || tx.amount <= 0) {
+        events.push({
+          id: `tx-${tx.id}`,
+          kind: 'info',
+          amountBonuses: 0,
+          category: 'application',
+          categoryLabel: 'Заявка',
+          title: 'Первая заявка',
+          description: 'Подача первой заявки — без списания бонусов',
+          createdAt: tx.createdAt.toISOString(),
+          applicationId: tx.applicationId,
+        });
+        continue;
+      }
+
       events.push({
         id: `tx-${tx.id}`,
-        kind: 'info',
-        amountBonuses: 0,
+        kind: 'spend',
+        amountBonuses: -tx.amount,
         category: 'application',
         categoryLabel: 'Заявка',
-        title: 'Первая заявка',
-        description: 'Подача первой заявки — без списания бонусов',
+        title: 'Подача заявки',
+        description: `Списание бонусов за подачу заявки (${tx.amount} бон.)`,
         createdAt: tx.createdAt.toISOString(),
         applicationId: tx.applicationId,
       });
       continue;
     }
 
-    events.push({
-      id: `tx-${tx.id}`,
-      kind: 'spend',
-      amountBonuses: -tx.amount,
-      category: 'application',
-      categoryLabel: 'Заявка',
-      title: 'Подача заявки',
-      description: `Списание бонусов за подачу заявки (${tx.amount} бон.)`,
-      createdAt: tx.createdAt.toISOString(),
-      applicationId: tx.applicationId,
-    });
+    const gameMeta = mapGameLedgerMeta(tx.type);
+    if (gameMeta) {
+      events.push({
+        id: `tx-${tx.id}`,
+        kind: tx.amount > 0 ? 'spend' : 'info',
+        amountBonuses: tx.amount > 0 ? -tx.amount : 0,
+        category: 'other',
+        categoryLabel: gameMeta.categoryLabel,
+        title: gameMeta.title,
+        description:
+          tx.description?.trim() ||
+          (tx.amount > 0
+            ? `Списание за игровое действие (${tx.amount} бон.)`
+            : 'Игровое событие'),
+        createdAt: tx.createdAt.toISOString(),
+        applicationId: tx.applicationId,
+      });
+      continue;
+    }
+
+    if (tx.type === 'GAMES_DAILY_QUEST_REWARD') {
+      events.push({
+        id: `tx-${tx.id}`,
+        kind: 'info',
+        amountBonuses: 0,
+        category: 'other',
+        categoryLabel: 'Игры',
+        title: 'Ежедневный квест',
+        description: tx.description?.trim() || 'Награда за ежедневный квест',
+        createdAt: tx.createdAt.toISOString(),
+        applicationId: tx.applicationId,
+      });
+      continue;
+    }
   }
 
   for (const row of data.withdrawals) {
@@ -243,6 +283,55 @@ function collectBonusLedgerEvents(data: BonusLedgerRawData): BonusLedgerEvent[] 
   return events.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
+}
+
+function mapGameLedgerMeta(txType: string): GameLedgerMeta | null {
+  const gameTxPrefixes: Array<{
+    prefix: string;
+    categoryLabel: string;
+    title: string;
+  }> = [
+    {
+      prefix: 'GAMES_MATH_SPRINT_',
+      categoryLabel: 'Игра · Математический спринт',
+      title: 'Математический спринт',
+    },
+    {
+      prefix: 'GAMES_QUICK_BALANCE_',
+      categoryLabel: 'Игра · Быстрый баланс',
+      title: 'Быстрый баланс',
+    },
+    {
+      prefix: 'GAMES_ODD_NUMBER_SCHULTE_',
+      categoryLabel: 'Игра · Лишнее число',
+      title: 'Лишнее число',
+    },
+    {
+      prefix: 'GAMES_SEQUENCE_',
+      categoryLabel: 'Игра · Секретная последовательность',
+      title: 'Секретная последовательность',
+    },
+    {
+      prefix: 'GAMES_COLOR_CONFLICT_',
+      categoryLabel: 'Игра · Цветовой конфликт',
+      title: 'Цветовой конфликт',
+    },
+    {
+      prefix: 'GAMES_BONUS_GENERATOR_',
+      categoryLabel: 'Игра · Генератор бонусов',
+      title: 'Генератор бонусов',
+    },
+  ];
+
+  const matched = gameTxPrefixes.find((item) => txType.startsWith(item.prefix));
+  if (!matched) {
+    return null;
+  }
+
+  return {
+    title: matched.title,
+    categoryLabel: matched.categoryLabel,
+  };
 }
 
 function groupRowsByUserId<T extends { userId: string }>(

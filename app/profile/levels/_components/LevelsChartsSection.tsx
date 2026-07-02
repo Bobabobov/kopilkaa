@@ -14,6 +14,7 @@ import {
   ReferenceLine,
   Cell,
 } from 'recharts';
+import type { TooltipProps } from 'recharts';
 import { BarChart3, LineChart, TrendingUp } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -34,17 +35,12 @@ function ChartTooltip({
   payload,
   label,
   valueLabel,
-}: {
-  active?: boolean;
-  payload?: ReadonlyArray<{
-    value: number;
-    payload?: HonorLimitChartPoint | XpCurveChartPoint;
-  }>;
-  label?: string;
+}: TooltipProps<number, string> & {
   valueLabel: string;
 }) {
   if (!active || !payload?.length) return null;
   const point = payload[0];
+  if (typeof point?.value !== 'number') return null;
   const headline =
     point.payload && 'headline' in point.payload
       ? point.payload.headline

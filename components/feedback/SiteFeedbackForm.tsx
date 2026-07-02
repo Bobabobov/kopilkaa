@@ -327,14 +327,17 @@ export function SiteFeedbackForm({
 export function SiteFeedbackSubmitButton({
   isSubmitting,
   className,
+  onClick,
 }: {
   isSubmitting?: boolean;
   className?: string;
+  onClick?: () => void;
 }) {
   return (
     <Button
-      type='submit'
+      type='button'
       form='site-feedback-form'
+      onClick={onClick}
       disabled={isSubmitting}
       className={cn(
         'w-full rounded-xl bg-[#f9bc60] py-2.5 text-[#001e1d] shadow-[0_8px_24px_rgba(249,188,96,0.25)] hover:bg-[#f9bc60]/90 sm:w-auto sm:min-w-[160px]',

@@ -189,6 +189,13 @@ export default function SiteFeedbackGate() {
     }, 2200);
   };
 
+  const handleSubmitClick = () => {
+    const form = document.getElementById('site-feedback-form');
+    if (form instanceof HTMLFormElement) {
+      form.requestSubmit();
+    }
+  };
+
   return (
     <GlassModal
       open={open}
@@ -210,7 +217,10 @@ export default function SiteFeedbackGate() {
             >
               Спросить позже
             </button>
-            <SiteFeedbackSubmitButton isSubmitting={isSubmitting} />
+            <SiteFeedbackSubmitButton
+              isSubmitting={isSubmitting}
+              onClick={handleSubmitClick}
+            />
           </div>
         )
       }

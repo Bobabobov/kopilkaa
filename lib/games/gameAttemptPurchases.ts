@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import { isUserAllowedAdmin } from '@/lib/adminAccess';
 import { prisma } from '@/lib/db';
 import { toUtcDayKey } from '@/lib/dailyBonus/dayKey';
 import { computeGoodDeedBonusWalletInTx } from '@/lib/goodDeedBonusWallet';
@@ -41,6 +42,10 @@ export class GameAttemptPurchaseDailyLimitError extends Error {
     );
     this.name = 'GameAttemptPurchaseDailyLimitError';
   }
+}
+
+async function hasUnlimitedGameAttempts(userId: string): Promise<boolean> {
+  return isUserAllowedAdmin(userId);
 }
 
 function getUtcDayBounds(): { start: Date; end: Date } {
@@ -88,6 +93,10 @@ export async function countGameAttemptPurchasesToday(
   types: GameAttemptTransactionTypes,
   db: Prisma.TransactionClient | typeof prisma = prisma,
 ): Promise<number> {
+  const unlimitedAttempts = await hasUnlimitedGameAttempts(userId);
+  if (unlimitedAttempts) {
+    return 0;
+  }
   return countTransactionsToday(userId, types.ATTEMPT_PURCHASE, db);
 }
 
@@ -102,6 +111,11 @@ export async function getGamePurchasedAttemptsAvailable(
   types: GameAttemptTransactionTypes,
   db: Prisma.TransactionClient | typeof prisma = prisma,
 ): Promise<number> {
+  const unlimitedAttempts = await hasUnlimitedGameAttempts(userId);
+  if (unlimitedAttempts) {
+    return 1;
+  }
+
   const [purchased, used] = await Promise.all([
     countTransactionsToday(userId, types.ATTEMPT_PURCHASE, db),
     countTransactionsToday(userId, types.EXTRA_START, db),
@@ -116,6 +130,18 @@ export async function purchaseGameAttempt(
   purchaseDescription: string,
   attemptCost: number,
 ): Promise<GameAttemptPurchaseResult> {
+  const unlimitedAttempts = await hasUnlimitedGameAttempts(userId);
+  if (unlimitedAttempts) {
+    const wallet = await computeGoodDeedBonusWalletInTx(prisma, userId);
+    return {
+      balanceAfter: wallet.availableBonuses,
+      purchasedAttemptsAvailable: 1,
+      dailyAttemptPurchasesUsed: 0,
+      dailyAttemptPurchasesRemaining: MAX_DAILY_ATTEMPT_PURCHASES,
+      cost: 0,
+    };
+  }
+
   return prisma.$transaction(async (tx) => {
     await lockUserRowIfSupported(tx, userId);
 

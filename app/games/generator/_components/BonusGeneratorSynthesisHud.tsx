@@ -23,7 +23,7 @@ function resolveStepLabel(phase: BonusGeneratorPhase, progress: number): string 
   if (phase === 'idle') return 'Готов к синтезу';
   if (phase === 'result') return 'Синтез завершён';
 
-  let label = SYNTHESIS_STEPS[0].label;
+  let label: (typeof SYNTHESIS_STEPS)[number]['label'] = SYNTHESIS_STEPS[0].label;
   for (const step of SYNTHESIS_STEPS) {
     if (progress >= step.threshold) {
       label = step.label;

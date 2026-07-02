@@ -5,6 +5,8 @@ import { computeGoodDeedBonusWallet } from '@/lib/goodDeedBonusWallet';
 import { getQuickBalancePlayerStats } from '@/lib/games/quickBalance';
 import QuickBalancePageClient from './_components/QuickBalancePageClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function QuickBalancePage() {
   const session = await getSession();
 

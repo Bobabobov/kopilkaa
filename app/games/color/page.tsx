@@ -5,6 +5,8 @@ import { computeGoodDeedBonusWallet } from '@/lib/goodDeedBonusWallet';
 import { getColorConflictPlayerStats } from '@/lib/games/colorConflict';
 import ColorConflictPageClient from './_components/ColorConflictPageClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ColorConflictPage() {
   const session = await getSession();
 

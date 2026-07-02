@@ -4,6 +4,8 @@ import { buildAuthModalUrl } from '@/lib/authModalUrl';
 import { computeGoodDeedBonusWallet } from '@/lib/goodDeedBonusWallet';
 import BonusGeneratorPageClient from './_components/BonusGeneratorPageClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function BonusGeneratorPage() {
   const session = await getSession();
 

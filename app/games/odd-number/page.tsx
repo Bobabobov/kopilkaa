@@ -5,6 +5,8 @@ import { computeGoodDeedBonusWallet } from '@/lib/goodDeedBonusWallet';
 import { getOddNumberPlayerStats } from '@/lib/games/oddNumberSchulte';
 import OddNumberPageClient from './_components/OddNumberPageClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function OddNumberPage() {
   const session = await getSession();
 

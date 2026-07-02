@@ -5,6 +5,8 @@ import { computeGoodDeedBonusWallet } from '@/lib/goodDeedBonusWallet';
 import { getMathSprintPlayerStats } from '@/lib/games/mathSprint';
 import MathSprintPageClient from './_components/MathSprintPageClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function MathSprintPage() {
   const session = await getSession();
 

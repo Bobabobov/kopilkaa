@@ -36,7 +36,10 @@ function ChartTooltip({
   valueLabel,
 }: {
   active?: boolean;
-  payload?: Array<{ value: number; payload?: HonorLimitChartPoint | XpCurveChartPoint }>;
+  payload?: ReadonlyArray<{
+    value: number;
+    payload?: HonorLimitChartPoint | XpCurveChartPoint;
+  }>;
   label?: string;
   valueLabel: string;
 }) {

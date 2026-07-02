@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import {
   MATH_SPRINT_DIFFICULTIES,
   type MathSprintAnswerResult,
-} from '@/lib/games/mathSprint';
+} from '@/lib/games/shared/mathSprint';
 import { celebrateMathSprintWin } from '@/lib/games/mathSprintConfetti';
 import { LucideIcons } from '@/components/ui/LucideIcons';
 import { cn } from '@/lib/utils';

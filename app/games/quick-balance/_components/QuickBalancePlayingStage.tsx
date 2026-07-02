@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import type { QuickBalanceComparison } from '@/lib/games/quickBalance';
-import type { QuickBalanceRoundView } from '@/lib/games/quickBalance';
+import type { QuickBalanceComparison } from '@/lib/games/shared/quickBalance';
+import type { QuickBalanceRoundView } from '@/lib/games/shared/quickBalance';
 import { cn } from '@/lib/utils';
 
 interface QuickBalancePlayingStageProps {

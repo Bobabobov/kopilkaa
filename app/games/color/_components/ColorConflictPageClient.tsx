@@ -10,7 +10,7 @@ import {
   type ColorConflictDifficulty,
   type ColorConflictOptionView,
   type ColorConflictRoundPayload,
-} from '@/lib/games/colorConflict';
+} from '@/lib/games/shared/colorConflict';
 import { getMessageFromApiJson } from '@/lib/api/parseApiError';
 import { invalidateProfileCache } from '@/hooks/profile/useProfileDashboard';
 import { NumberTicker } from '@/app/games/_components/effects/NumberTicker';

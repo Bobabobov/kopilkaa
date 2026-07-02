@@ -9,7 +9,7 @@ import {
   TIME_LIMIT_MS,
   type MathSprintAnswerResult,
   type MathSprintDifficulty,
-} from '@/lib/games/mathSprint';
+} from '@/lib/games/shared/mathSprint';
 import { getMessageFromApiJson } from '@/lib/api/parseApiError';
 import { invalidateProfileCache } from '@/hooks/profile/useProfileDashboard';
 import { NumberTicker } from '@/app/games/_components/effects/NumberTicker';

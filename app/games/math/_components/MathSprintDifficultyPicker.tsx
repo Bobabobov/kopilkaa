@@ -5,7 +5,7 @@ import {
   MATH_SPRINT_DIFFICULTIES,
   TIME_LIMIT_MS,
   type MathSprintDifficulty,
-} from '@/lib/games/mathSprint';
+} from '@/lib/games/shared/mathSprint';
 import { cn } from '@/lib/utils';
 
 const DIFFICULTY_ORDER: MathSprintDifficulty[] = ['easy', 'medium', 'hard'];

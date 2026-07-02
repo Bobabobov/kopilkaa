@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import {
   COLOR_CONFLICT_DIFFICULTIES,
   type ColorConflictAnswerResult,
-} from '@/lib/games/colorConflict';
+} from '@/lib/games/shared/colorConflict';
 import { celebrateColorConflictWin } from '@/lib/games/colorConflictConfetti';
 import { LucideIcons } from '@/components/ui/LucideIcons';
 

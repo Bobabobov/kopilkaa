@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   COLOR_CONFLICT_DIFFICULTIES,
   type ColorConflictDifficulty,
-} from '@/lib/games/colorConflict';
+} from '@/lib/games/shared/colorConflict';
 import { cn } from '@/lib/utils';
 
 const DIFFICULTY_ORDER: ColorConflictDifficulty[] = ['easy', 'medium', 'hard'];

@@ -11,7 +11,7 @@ import {
   WIN_REWARD,
   type OddNumberAnswerResult,
   type OddNumberCell,
-} from '@/lib/games/oddNumberSchulte';
+} from '@/lib/games/shared/oddNumberSchulte';
 import { getMessageFromApiJson } from '@/lib/api/parseApiError';
 import { invalidateProfileCache } from '@/hooks/profile/useProfileDashboard';
 import { NumberTicker } from '@/app/games/_components/effects/NumberTicker';

@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import type { QuickBalanceVerifyResult } from '@/lib/games/quickBalance';
-import { ROUNDS_IN_SERIES, TIME_LIMIT_MS } from '@/lib/games/quickBalance';
+import type { QuickBalanceVerifyResult } from '@/lib/games/shared/quickBalance';
+import { ROUNDS_IN_SERIES, TIME_LIMIT_MS } from '@/lib/games/shared/quickBalance';
 import { celebrateQuickBalanceWin } from '@/lib/games/quickBalanceConfetti';
 import { LucideIcons } from '@/components/ui/LucideIcons';
 import { cn } from '@/lib/utils';

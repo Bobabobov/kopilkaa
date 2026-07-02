@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { TIME_LIMIT_MS, type MathSprintDifficulty } from '@/lib/games/mathSprint';
+import { TIME_LIMIT_MS, type MathSprintDifficulty } from '@/lib/games/shared/mathSprint';
 import { cn } from '@/lib/utils';
 import { MathSprintDifficultyBadge } from './MathSprintDifficultyPicker';
 

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import type { OddNumberCell } from '@/lib/games/oddNumberSchulte';
+import type { OddNumberCell } from '@/lib/games/shared/oddNumberSchulte';
 
 interface OddNumberGridProps {
   cells: OddNumberCell[];

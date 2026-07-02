@@ -12,7 +12,7 @@ import {
   type QuickBalanceComparison,
   type QuickBalanceRoundView,
   type QuickBalanceVerifyResult,
-} from '@/lib/games/quickBalance';
+} from '@/lib/games/shared/quickBalance';
 import {
   evaluateBalanceExpression,
   getComparisonFromValues,

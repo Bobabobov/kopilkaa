@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import type { OddNumberAnswerResult } from '@/lib/games/oddNumberSchulte';
-import { TARGET_COUNT, TIME_LIMIT_MS } from '@/lib/games/oddNumberSchulte';
+import type { OddNumberAnswerResult } from '@/lib/games/shared/oddNumberSchulte';
+import { TARGET_COUNT, TIME_LIMIT_MS } from '@/lib/games/shared/oddNumberSchulte';
 import { celebrateOddNumberWin } from '@/lib/games/oddNumberSchulteConfetti';
 import { LucideIcons } from '@/components/ui/LucideIcons';
 import { cn } from '@/lib/utils';

@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import {
   MAX_DAILY_ATTEMPT_PURCHASES,
   getDailyAttemptPurchasesRemaining,
-} from '@/lib/games/gameAttemptPurchases';
+} from '@/lib/games/shared/gameAttemptPurchases';
 import {
   type GameStakeDifficulty,
   getExtraAttemptCost,

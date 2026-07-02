@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { MAX_DAILY_ATTEMPT_PURCHASES } from '@/lib/games/gameAttemptPurchases';
+import { MAX_DAILY_ATTEMPT_PURCHASES } from '@/lib/games/shared/gameAttemptPurchases';
 import { LucideIcons } from '@/components/ui/LucideIcons';
 import { cn } from '@/lib/utils';
 

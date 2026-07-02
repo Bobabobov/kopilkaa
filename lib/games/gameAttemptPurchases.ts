@@ -2,8 +2,15 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db';
 import { toUtcDayKey } from '@/lib/dailyBonus/dayKey';
 import { computeGoodDeedBonusWalletInTx } from '@/lib/goodDeedBonusWallet';
+import {
+  MAX_DAILY_ATTEMPT_PURCHASES,
+  getDailyAttemptPurchasesRemaining,
+} from '@/lib/games/shared/gameAttemptPurchases';
 
-export const MAX_DAILY_ATTEMPT_PURCHASES = 5;
+export {
+  MAX_DAILY_ATTEMPT_PURCHASES,
+  getDailyAttemptPurchasesRemaining,
+} from '@/lib/games/shared/gameAttemptPurchases';
 
 /** @deprecated Используйте getExtraAttemptCost из extraAttemptCost.ts */
 export const EXTRA_ATTEMPT_COST = 7;
@@ -103,11 +110,6 @@ export async function countGameAttemptPurchasesToday(
   return countTransactionsToday(userId, types.ATTEMPT_PURCHASE, db);
 }
 
-export function getDailyAttemptPurchasesRemaining(
-  purchasesToday: number,
-): number {
-  return Math.max(0, MAX_DAILY_ATTEMPT_PURCHASES - purchasesToday);
-}
 
 export async function getGamePurchasedAttemptsAvailable(
   userId: string,

@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const ready = acknowledgeColorConflictRoundReady(session.uid);
+    const ready = await acknowledgeColorConflictRoundReady(session.uid);
 
     if (!ready) {
       return Response.json(

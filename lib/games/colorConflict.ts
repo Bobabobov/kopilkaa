@@ -565,9 +565,9 @@ export interface ColorConflictReadyPayload {
 }
 
 /** Сбрасывает таймер раунда после того, как клиент прокрутил экран к игре. */
-export function acknowledgeColorConflictRoundReady(
+export async function acknowledgeColorConflictRoundReady(
   userId: string,
-): ColorConflictReadyPayload | null {
+): Promise<ColorConflictReadyPayload | null> {
   const session = await peekRuntimeSession<ColorConflictSession>(
     userId,
     COLOR_CONFLICT_SESSION_KEY,

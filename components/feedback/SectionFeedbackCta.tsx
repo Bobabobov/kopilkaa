@@ -10,7 +10,11 @@ import {
   type SectionFeedbackVariant,
 } from './sectionFeedbackStyles';
 
-export type SectionFeedbackLayout = 'banner' | 'compact' | 'footer-row';
+export type SectionFeedbackLayout =
+  | 'banner'
+  | 'compact'
+  | 'footer-row'
+  | 'footer-card';
 
 interface SectionFeedbackCtaProps {
   variant: SectionFeedbackVariant;

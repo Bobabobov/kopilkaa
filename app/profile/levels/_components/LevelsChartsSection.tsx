@@ -14,7 +14,6 @@ import {
   ReferenceLine,
   Cell,
 } from 'recharts';
-import type { TooltipProps } from 'recharts';
 import { BarChart3, LineChart, TrendingUp } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -35,20 +34,30 @@ function ChartTooltip({
   payload,
   label,
   valueLabel,
-}: TooltipProps<number, string> & {
+}: {
+  active?: boolean;
+  payload?: ReadonlyArray<{
+    value?: unknown;
+    payload?: unknown;
+  }>;
+  label?: unknown;
   valueLabel: string;
 }) {
   if (!active || !payload?.length) return null;
   const point = payload[0];
   if (typeof point?.value !== 'number') return null;
   const headline =
-    point.payload && 'headline' in point.payload
-      ? point.payload.headline
+    point.payload &&
+    typeof point.payload === 'object' &&
+    'headline' in point.payload &&
+    typeof (point.payload as { headline?: unknown }).headline === 'string'
+      ? (point.payload as { headline: string }).headline
       : undefined;
+  const labelText = typeof label === 'string' ? label : '';
 
   return (
     <div className="rounded-xl border border-[#f9bc60]/25 bg-[#001e1d]/95 px-3 py-2.5 text-xs shadow-xl backdrop-blur-md">
-      <p className="font-semibold text-[#f9bc60]">{label}</p>
+      <p className="font-semibold text-[#f9bc60]">{labelText}</p>
       {headline ? (
         <p className="mt-0.5 text-[#abd1c6]">{headline}</p>
       ) : null}

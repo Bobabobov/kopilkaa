@@ -15,6 +15,7 @@ interface MathSprintPlayingStageProps {
   questionText: string;
   options: number[];
   timeLeftMs: number;
+  isRoundReady: boolean;
   isSubmitting: boolean;
   answerFeedback: AnswerFeedback | null;
   onAnswer: (value: number) => void;
@@ -25,11 +26,14 @@ export function MathSprintPlayingStage({
   questionText,
   options,
   timeLeftMs,
+  isRoundReady,
   isSubmitting,
   answerFeedback,
   onAnswer,
 }: MathSprintPlayingStageProps) {
-  const progressPercent = Math.max(0, Math.min(100, (timeLeftMs / TIME_LIMIT_MS) * 100));
+  const progressPercent = isRoundReady
+    ? Math.max(0, Math.min(100, (timeLeftMs / TIME_LIMIT_MS) * 100))
+    : 100;
   const isUrgent = progressPercent <= 35;
 
   return (
@@ -58,10 +62,16 @@ export function MathSprintPlayingStage({
           <span
             className={cn(
               'tabular-nums',
-              isUrgent ? 'text-red-400' : 'text-emerald-400',
+              !isRoundReady
+                ? 'text-violet-400'
+                : isUrgent
+                  ? 'text-red-400'
+                  : 'text-emerald-400',
             )}
           >
-            {(timeLeftMs / 1000).toFixed(1)}s
+            {!isRoundReady
+              ? 'Старт…'
+              : `${(timeLeftMs / 1000).toFixed(1)}s`}
           </span>
         </div>
         <div className='relative h-1 overflow-hidden rounded-full bg-zinc-800/60'>
@@ -89,9 +99,9 @@ export function MathSprintPlayingStage({
             <motion.button
               key={`${option}-${index}`}
               type='button'
-              disabled={isSubmitting}
-              whileHover={isSubmitting ? undefined : { scale: 1.02 }}
-              whileTap={isSubmitting ? undefined : { scale: 0.95 }}
+              disabled={isSubmitting || !isRoundReady}
+              whileHover={isSubmitting || !isRoundReady ? undefined : { scale: 1.02 }}
+              whileTap={isSubmitting || !isRoundReady ? undefined : { scale: 0.95 }}
               onClick={() => onAnswer(option)}
               className={cn(
                 'transform-gpu rounded-xl border border-zinc-800 bg-zinc-950/80 py-4 font-mono text-xl text-zinc-200 transition-all will-change-transform',

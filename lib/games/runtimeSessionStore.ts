@@ -30,26 +30,35 @@ export async function saveRuntimeSession<TPayload>(
   input: RuntimeSessionRecord<TPayload>,
   db: DbClient = prisma,
 ): Promise<void> {
-  await cleanupExpired(db);
+  try {
+    await cleanupExpired(db);
 
-  await getRuntimeSessionDelegate(db).upsert({
-    where: {
-      userId_gameKey: {
+    await getRuntimeSessionDelegate(db).upsert({
+      where: {
+        userId_gameKey: {
+          userId: input.userId,
+          gameKey: input.gameKey,
+        },
+      },
+      create: {
         userId: input.userId,
         gameKey: input.gameKey,
+        payloadJson: JSON.stringify(input.payload),
+        expiresAt: new Date(input.expiresAtMs),
       },
-    },
-    create: {
+      update: {
+        payloadJson: JSON.stringify(input.payload),
+        expiresAt: new Date(input.expiresAtMs),
+      },
+    });
+  } catch (error) {
+    console.error('[Games] runtime session save failed', {
       userId: input.userId,
       gameKey: input.gameKey,
-      payloadJson: JSON.stringify(input.payload),
-      expiresAt: new Date(input.expiresAtMs),
-    },
-    update: {
-      payloadJson: JSON.stringify(input.payload),
-      expiresAt: new Date(input.expiresAtMs),
-    },
-  });
+      error,
+    });
+    throw error;
+  }
 }
 
 export async function peekRuntimeSession<TPayload>(

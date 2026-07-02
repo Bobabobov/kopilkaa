@@ -99,6 +99,7 @@ interface ColorConflictSession {
   reward: number;
   timeLimitMs: number;
   startTime: number;
+  timerStarted: boolean;
   expiresAt: number;
 }
 const COLOR_CONFLICT_SESSION_KEY = 'color-conflict';
@@ -343,7 +344,7 @@ export async function startColorConflictGame(
 ): Promise<ColorConflictStartPayload> {
   const config = COLOR_CONFLICT_DIFFICULTIES[difficulty];
   const round = generateRound();
-  const startTime = Date.now();
+  const createdAt = Date.now();
 
   const balances = await prisma.$transaction(async (tx) => {
     await lockUserRowIfSupported(tx, userId);
@@ -409,8 +410,9 @@ export async function startColorConflictGame(
     seriesTarget: config.seriesTarget,
     reward: config.reward,
     timeLimitMs: config.timeLimitMs,
-    startTime,
-    expiresAt: startTime + SESSION_TTL_MS,
+    startTime: 0,
+    timerStarted: false,
+    expiresAt: createdAt + SESSION_TTL_MS,
   };
 
   await saveRuntimeSession<ColorConflictSession>({
@@ -427,7 +429,7 @@ export async function startColorConflictGame(
     dailyAttemptsUsed: balances.dailyAttemptsUsed,
     dailyAttemptsLeft: balances.dailyAttemptsLeft,
     purchasedAttemptsAvailable: balances.purchasedAttemptsAvailable,
-    ...buildRoundPayload(session, round, startTime),
+    ...buildRoundPayload(session, round, createdAt),
   };
 }
 
@@ -441,6 +443,7 @@ export async function submitColorConflictAnswer(
   );
 
   if (!session) {
+    console.error('[Games] color-conflict: active session not found', { userId });
     return buildGameOverResult(
       null,
       'no_active_session',
@@ -449,6 +452,23 @@ export async function submitColorConflictAnswer(
       0,
       null,
       0,
+    );
+  }
+
+  if (!session.timerStarted || session.startTime <= 0) {
+    console.error('[Games] color-conflict: timer not started yet', {
+      userId,
+      timerStarted: session.timerStarted,
+      startTime: session.startTime,
+    });
+    return buildGameOverResult(
+      session,
+      'no_active_session',
+      null,
+      false,
+      0,
+      null,
+      session.streakIndex,
     );
   }
 
@@ -517,7 +537,7 @@ export async function submitColorConflictAnswer(
   }
 
   const nextRound = generateRound();
-  const nextStartTime = Date.now();
+  const nextCreatedAt = Date.now();
 
   await saveRuntimeSession<ColorConflictSession>({
     userId,
@@ -526,10 +546,11 @@ export async function submitColorConflictAnswer(
       ...session,
       streakIndex: nextStreakIndex,
       correctAnswer: nextRound.correctAnswer,
-      startTime: nextStartTime,
-      expiresAt: nextStartTime + SESSION_TTL_MS,
+      startTime: 0,
+      timerStarted: false,
+      expiresAt: nextCreatedAt + SESSION_TTL_MS,
     },
-    expiresAtMs: nextStartTime + SESSION_TTL_MS,
+    expiresAtMs: nextCreatedAt + SESSION_TTL_MS,
   });
 
   return {
@@ -545,7 +566,7 @@ export async function submitColorConflictAnswer(
     nextRound: buildRoundPayload(
       { ...session, streakIndex: nextStreakIndex },
       nextRound,
-      nextStartTime,
+      nextCreatedAt,
     ),
   };
 }
@@ -574,6 +595,7 @@ export async function acknowledgeColorConflictRoundReady(
     COLOR_CONFLICT_SESSION_KEY,
   );
   if (!session) {
+    console.error('[Games] color-conflict: ready without active session', { userId });
     return null;
   }
 
@@ -585,6 +607,7 @@ export async function acknowledgeColorConflictRoundReady(
     payload: {
       ...session,
       startTime,
+      timerStarted: true,
       expiresAt: startTime + SESSION_TTL_MS,
     },
     expiresAtMs: startTime + SESSION_TTL_MS,

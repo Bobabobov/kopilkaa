@@ -113,9 +113,9 @@ export default function MathSprintPageClient({
   const [answerFeedback, setAnswerFeedback] = useState<AnswerFeedback | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRoundReady, setIsRoundReady] = useState(false);
 
   const timerFrameRef = useRef<number | null>(null);
-  const serverStartTimeRef = useRef<number | null>(null);
   const timerStartRef = useRef<number | null>(null);
   const readyBootstrappedRef = useRef(false);
   const hasTimedOutRef = useRef(false);
@@ -208,21 +208,21 @@ export default function MathSprintPageClient({
   }, [difficulty, isSubmitting, stopTimer]);
 
   const startTimer = useCallback(
-    (serverStartTime: number) => {
-      serverStartTimeRef.current = serverStartTime;
+    (limitMs: number = TIME_LIMIT_MS) => {
       timerStartRef.current = performance.now();
       hasTimedOutRef.current = false;
+      setTimeLeftMs(limitMs);
 
       const tick = () => {
-        if (timerStartRef.current === null || serverStartTimeRef.current === null) {
+        if (timerStartRef.current === null) {
           return;
         }
 
-        const serverElapsed = Date.now() - serverStartTimeRef.current;
-        const remaining = Math.max(0, TIME_LIMIT_MS - serverElapsed);
+        const elapsed = performance.now() - timerStartRef.current;
+        const remaining = Math.max(0, limitMs - elapsed);
         setTimeLeftMs(remaining);
 
-        if (remaining <= 0 || serverElapsed > TIME_LIMIT_MS) {
+        if (remaining <= 0) {
           void finishWithTimeout();
           return;
         }
@@ -247,6 +247,7 @@ export default function MathSprintPageClient({
     }
 
     let cancelled = false;
+    setIsRoundReady(false);
 
     void (async () => {
       try {
@@ -260,9 +261,10 @@ export default function MathSprintPageClient({
           return;
         }
 
-        if (response.ok && raw?.data?.serverStartTime) {
+        if (response.ok && raw?.data?.timeLimitMs) {
           readyBootstrappedRef.current = true;
-          startTimer(raw.data.serverStartTime);
+          startTimer(raw.data.timeLimitMs);
+          setIsRoundReady(true);
           return;
         }
       } catch {
@@ -271,7 +273,8 @@ export default function MathSprintPageClient({
 
       if (!cancelled) {
         readyBootstrappedRef.current = true;
-        startTimer(Date.now());
+        startTimer(TIME_LIMIT_MS);
+        setIsRoundReady(true);
       }
     })();
 
@@ -288,6 +291,7 @@ export default function MathSprintPageClient({
     setError(null);
     setResult(null);
     readyBootstrappedRef.current = false;
+    setIsRoundReady(false);
     setIsSubmitting(true);
 
     try {
@@ -328,7 +332,7 @@ export default function MathSprintPageClient({
 
   const handleAnswer = useCallback(
     async (selectedAnswer: number) => {
-      if (phase !== 'playing' || isSubmitting || hasTimedOutRef.current) {
+      if (phase !== 'playing' || isSubmitting || hasTimedOutRef.current || !isRoundReady) {
         return;
       }
 
@@ -374,15 +378,15 @@ export default function MathSprintPageClient({
         setIsSubmitting(false);
       }
     },
-    [isSubmitting, phase, stopTimer],
+    [isSubmitting, isRoundReady, phase, stopTimer],
   );
 
   const handlePlayAgain = useCallback(() => {
     stopTimer();
     timerStartRef.current = null;
-    serverStartTimeRef.current = null;
     hasTimedOutRef.current = false;
     readyBootstrappedRef.current = false;
+    setIsRoundReady(false);
     setQuestionText('');
     setOptions([]);
     setResult(null);
@@ -565,6 +569,7 @@ export default function MathSprintPageClient({
                       questionText={questionText}
                       options={options}
                       timeLeftMs={timeLeftMs}
+                      isRoundReady={isRoundReady}
                       isSubmitting={isSubmitting}
                       answerFeedback={answerFeedback}
                       onAnswer={(value) => void handleAnswer(value)}

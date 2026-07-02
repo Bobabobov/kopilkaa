@@ -126,7 +126,6 @@ export default function ColorConflictPageClient({
   const [roundFlash, setRoundFlash] = useState(false);
   const [isRoundReady, setIsRoundReady] = useState(false);
 
-  const serverStartTimeRef = useRef<number | null>(null);
   const timerFrameRef = useRef<number | null>(null);
   const hasTimedOutRef = useRef(false);
   const gameArenaRef = useRef<HTMLDivElement>(null);
@@ -237,21 +236,17 @@ export default function ColorConflictPageClient({
   ]);
 
   const startTimer = useCallback(
-    (serverStartTime: number, limitMs: number) => {
-      serverStartTimeRef.current = serverStartTime;
+    (limitMs: number) => {
       hasTimedOutRef.current = false;
       setTimeLeftMs(limitMs);
+      const localStart = performance.now();
 
       const tick = () => {
-        if (serverStartTimeRef.current === null) {
-          return;
-        }
-
-        const serverElapsed = Date.now() - serverStartTimeRef.current;
-        const remaining = Math.max(0, limitMs - serverElapsed);
+        const elapsed = performance.now() - localStart;
+        const remaining = Math.max(0, limitMs - elapsed);
         setTimeLeftMs(remaining);
 
-        if (remaining <= 0 || serverElapsed > limitMs) {
+        if (remaining <= 0) {
           void finishWithTimeout();
           return;
         }
@@ -291,9 +286,9 @@ export default function ColorConflictPageClient({
 
         const raw = await response.json().catch(() => null);
 
-        if (response.ok && raw?.data?.serverStartTime) {
+        if (response.ok && raw?.data?.timeLimitMs) {
           timerBootstrappedKeyRef.current = roundKey;
-          startTimer(raw.data.serverStartTime, raw.data.timeLimitMs);
+          startTimer(raw.data.timeLimitMs);
           setIsRoundReady(true);
           return;
         }
@@ -302,7 +297,7 @@ export default function ColorConflictPageClient({
       }
 
       timerBootstrappedKeyRef.current = roundKey;
-      startTimer(roundState.serverStartTime, roundState.timeLimitMs);
+      startTimer(roundState.timeLimitMs);
       setIsRoundReady(true);
     },
     [startTimer],
@@ -442,7 +437,6 @@ export default function ColorConflictPageClient({
 
   const handlePlayAgain = useCallback(() => {
     stopTimer();
-    serverStartTimeRef.current = null;
     hasTimedOutRef.current = false;
     timerBootstrappedKeyRef.current = null;
     setIsRoundReady(false);

@@ -75,6 +75,7 @@ interface MathSprintSession {
   correctAnswer: number;
   reward: number;
   startTime: number;
+  timerStarted: boolean;
   expiresAt: number;
 }
 const MATH_SPRINT_SESSION_KEY = 'math-sprint';
@@ -465,7 +466,7 @@ export async function generateMathQuestion(
     };
   });
 
-  const startTime = Date.now();
+  const createdAt = Date.now();
 
   await saveRuntimeSession<MathSprintSession>({
     userId,
@@ -475,10 +476,11 @@ export async function generateMathQuestion(
       difficulty,
       correctAnswer,
       reward: config.reward,
-      startTime,
-      expiresAt: startTime + SESSION_TTL_MS,
+      startTime: 0,
+      timerStarted: false,
+      expiresAt: createdAt + SESSION_TTL_MS,
     },
-    expiresAtMs: startTime + SESSION_TTL_MS,
+    expiresAtMs: createdAt + SESSION_TTL_MS,
   });
 
   return {
@@ -487,7 +489,7 @@ export async function generateMathQuestion(
     options: answerOptions,
     balanceBefore: result.balanceBefore,
     balanceAfter: result.balanceAfter,
-    serverStartTime: startTime,
+    serverStartTime: createdAt,
     dailyAttemptsUsed: result.dailyAttemptsUsed,
     dailyAttemptsLeft: result.dailyAttemptsLeft,
     purchasedAttemptsAvailable: result.purchasedAttemptsAvailable,
@@ -512,6 +514,22 @@ export async function submitMathSprintAnswer(
       reward: 0,
       balanceAfter: null,
       difficulty: null,
+    };
+  }
+
+  if (!session.timerStarted || session.startTime <= 0) {
+    console.error('[Games] math-sprint: timer not started yet', {
+      userId,
+      timerStarted: session.timerStarted,
+      startTime: session.startTime,
+    });
+    return {
+      won: false,
+      reason: 'no_active_session',
+      reactionMs: null,
+      reward: 0,
+      balanceAfter: null,
+      difficulty: session.difficulty,
     };
   }
 
@@ -577,6 +595,7 @@ export async function acknowledgeMathSprintReady(
   );
 
   if (!session) {
+    console.error('[Games] math-sprint: ready without active session', { userId });
     return null;
   }
 
@@ -588,6 +607,7 @@ export async function acknowledgeMathSprintReady(
     payload: {
       ...session,
       startTime,
+      timerStarted: true,
       expiresAt: startTime + SESSION_TTL_MS,
     },
     expiresAtMs: startTime + SESSION_TTL_MS,

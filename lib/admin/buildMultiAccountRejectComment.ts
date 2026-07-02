@@ -44,6 +44,15 @@ export function collectLinkedAccounts(
       });
     }
   }
+  for (const link of integrity.links.sameDevice) {
+    if (!map.has(link.userId)) {
+      map.set(link.userId, {
+        userId: link.userId,
+        userLabel: link.userLabel,
+        userAvatar: link.userAvatar,
+      });
+    }
+  }
   return [...map.values()];
 }
 
@@ -83,7 +92,7 @@ export function buildMultiAccountRejectComment(
   linkedAccounts: ApplicationIntegrityAccount[],
 ): string {
   if (linkedAccounts.length === 0) {
-    return `${MULTI_ACCOUNT_INTRO}\n\nСвязанные аккаунты по IP и реквизитам в системе не обнаружены.`;
+    return `${MULTI_ACCOUNT_INTRO}\n\nСвязанные аккаунты по IP, реквизитам и устройству в системе не обнаружены.`;
   }
 
   const lines = linkedAccounts.map((a) => `— ${a.userLabel}`);

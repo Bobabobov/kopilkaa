@@ -59,7 +59,7 @@ export default function TipsSidebar({
               size="sm"
               className="text-green-500 mt-0.5 flex-shrink-0"
             />
-            <span>Проверьте реквизиты перед отправкой</span>
+            <span>Проверьте номер СБП перед отправкой</span>
           </div>
         </div>
       </div>

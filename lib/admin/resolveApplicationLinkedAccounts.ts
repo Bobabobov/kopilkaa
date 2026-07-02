@@ -18,12 +18,12 @@ export async function resolveApplicationLinkedAccounts(
       payment: true,
       paymentFingerprint: true,
       submitterIp: true,
+      deviceFingerprint: true,
       status: true,
       user: {
         select: {
           name: true,
           email: true,
-          markedAsDeceiver: true,
         },
       },
     },
@@ -39,6 +39,7 @@ export async function resolveApplicationLinkedAccounts(
       payment: app.payment,
       paymentFingerprint: app.paymentFingerprint,
       submitterIp: app.submitterIp,
+      deviceFingerprint: app.deviceFingerprint,
       status: app.status,
       user: app.user,
     },

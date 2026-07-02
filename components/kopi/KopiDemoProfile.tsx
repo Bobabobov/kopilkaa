@@ -7,7 +7,6 @@ import {
   BookOpen,
   ClipboardList,
   Gift,
-  Shield,
   Sparkles,
   Star,
   Users,
@@ -94,20 +93,7 @@ export default function KopiDemoProfile() {
               </Badge>
             </div>
 
-            <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-[#f9bc60]" />
-                <span className="text-sm text-[#abd1c6]">Уровень доверия:</span>
-                <Badge variant="default">Уровень 2</Badge>
-              </div>
-              <span className="hidden h-5 w-px bg-white/10 sm:inline" />
-              <p className="text-sm text-[#abd1c6]">
-                Поддержка:{' '}
-                <span className="font-semibold text-[#f9bc60]">до 15 000 ₽</span>
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {DEMO_STATS.map((stat, index) => {
                 const Icon = stat.icon;
                 return (

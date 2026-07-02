@@ -29,7 +29,6 @@ type DeedPayload = {
     vkLink?: string | null;
     telegramLink?: string | null;
     youtubeLink?: string | null;
-    markedAsDeceiver?: boolean;
   };
 };
 
@@ -116,7 +115,6 @@ export function GoodDeedDeedClient({ id }: { id: string }) {
             authorId={deed.user.id}
             authorAvatar={deed.user.avatar}
             authorUsername={deed.user.username}
-            markedAsDeceiver={deed.user.markedAsDeceiver}
             createdAt={deed.updatedAt}
             readTime={readTime}
             mediaCount={deed.media.length}
@@ -145,7 +143,6 @@ export function GoodDeedDeedClient({ id }: { id: string }) {
               authorId={deed.user.id}
               authorAvatar={deed.user.avatar}
               authorUsername={deed.user.username}
-              markedAsDeceiver={deed.user.markedAsDeceiver}
               vkLink={deed.user.vkLink}
               telegramLink={deed.user.telegramLink}
               youtubeLink={deed.user.youtubeLink}

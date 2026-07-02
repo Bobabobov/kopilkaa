@@ -45,9 +45,9 @@ export function buildApplicationIntegrity(input: {
   applicationId: string;
   userId: string;
   submitterIp: string | null;
-  markedAsDeceiver: boolean;
   sameIpMatches: IntegrityMatch[];
   samePaymentMatches: IntegrityMatch[];
+  sameDeviceMatches?: IntegrityMatch[];
 }): ApplicationIntegrity {
   const reasons: ApplicationIntegrityReason[] = [];
 
@@ -55,13 +55,9 @@ export function buildApplicationIntegrity(input: {
   const samePayment = input.samePaymentMatches.filter(
     (m) => m.userId !== input.userId,
   );
-
-  if (input.markedAsDeceiver) {
-    reasons.push({
-      key: "deceiver",
-      message: "Пользователь помечен админом как «Обманывал»",
-    });
-  }
+  const sameDevice = (input.sameDeviceMatches ?? []).filter(
+    (m) => m.userId !== input.userId,
+  );
 
   if (sameIp.length > 0) {
     const ipPart = input.submitterIp ? ` ${input.submitterIp}` : "";
@@ -93,6 +89,14 @@ export function buildApplicationIntegrity(input: {
     });
   }
 
+  if (sameDevice.length > 0) {
+    reasons.push({
+      key: "same-device",
+      message: `С этого устройства заявки подавали другие аккаунты (${sameDevice.length})`,
+      accounts: uniqueAccounts(sameDevice),
+    });
+  }
+
   const toLink = (m: IntegrityMatch): ApplicationIntegrityLink => ({
     kind: m.kind,
     id: m.id,
@@ -113,16 +117,18 @@ export function buildApplicationIntegrity(input: {
           {
             key: "clean",
             message:
-              "Совпадений по IP и реквизитам с другими аккаунтами не найдено",
+              "Совпадений по IP, реквизитам и устройству с другими аккаунтами не найдено",
           },
         ]
       : reasons,
     submitterIp: input.submitterIp,
     sameIpCount: sameIp.length,
     samePaymentCount: paymentApps.length + paymentWithdrawals.length,
+    sameDeviceCount: sameDevice.length,
     links: {
       sameIp: sameIp.slice(0, MAX_LINKS).map(toLink),
       samePayment: samePayment.slice(0, MAX_LINKS).map(toLink),
+      sameDevice: sameDevice.slice(0, MAX_LINKS).map(toLink),
     },
   };
 }

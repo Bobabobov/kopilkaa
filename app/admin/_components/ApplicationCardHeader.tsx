@@ -90,12 +90,6 @@ export default function ApplicationCardHeader({
             <span className="w-1.5 h-1.5 rounded-full bg-current" />
             {statusBadge.label}
           </span>
-          {it.countTowardsTrust && (
-            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-bold bg-white/5 text-[#abd1c6] border border-white/10 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#f9bc60]" />
-              Влияет на доверие
-            </span>
-          )}
           <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[#abd1c6] backdrop-blur-sm">
             <span className="inline-flex w-5 h-5 items-center justify-center rounded-full bg-white/10 border border-white/10">
               <span className="block w-2 h-2 rounded-full bg-[#f9bc60]" />
@@ -115,13 +109,25 @@ export default function ApplicationCardHeader({
           {it.title}
         </Link>
 
-        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] rounded-xl sm:rounded-2xl border border-[#f9bc60]/50 shadow-lg w-fit">
-          <span className="text-[#001e1d] font-black text-base sm:text-lg">
-            ₽{it.amount.toLocaleString()}
-          </span>
-          <span className="text-xs sm:text-sm text-[#001e1d] font-bold">
-            Сумма запроса
-          </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] rounded-xl sm:rounded-2xl border border-[#f9bc60]/50 shadow-lg w-fit">
+            <span className="text-[#001e1d] font-black text-base sm:text-lg">
+              ₽{it.amount.toLocaleString("ru-RU")}
+            </span>
+            <span className="text-xs sm:text-sm text-[#001e1d] font-bold">
+              Запрошенная сумма
+            </span>
+          </div>
+          {it.desiredAmount != null && it.desiredAmount > it.amount && (
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border border-[#abd1c6]/35 bg-[#004643]/60 w-fit">
+              <span className="text-[#fffffe] font-black text-base sm:text-lg">
+                ₽{it.desiredAmount.toLocaleString("ru-RU")}
+              </span>
+              <span className="text-xs sm:text-sm text-[#abd1c6] font-bold">
+                Желаемая сумма
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

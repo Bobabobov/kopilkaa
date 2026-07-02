@@ -6,10 +6,10 @@ export default function manifest(): MetadataRoute.Manifest {
   ).replace(/\/$/, "");
 
   return {
-    name: "Копилка — платформа взаимной помощи",
+    name: "Копилка Online — платформа живых историй",
     short_name: "Копилка",
     description:
-      "Платформа для оказания взаимной помощи людям в трудной жизненной ситуации",
+      "Медиа-платформа уникальных жизненных историй с выплатой поощрительных гонораров авторам",
     start_url: "/",
     display: "standalone",
     background_color: "#004643",

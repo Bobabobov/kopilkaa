@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { AdminHeader } from "../_components/AdminHeader";
+import { AdminPage } from "../_components/AdminPage";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import Link from "next/link";
 import { getPublicProfilePath } from "@/lib/profileUrl";
@@ -153,22 +153,18 @@ export default function AdminHeroesClient() {
   const profilePath = result?.user ? getPublicProfilePath(result.user) : null;
 
   return (
-    <div className="min-h-screen relative">
-      <div className="relative z-10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">
-          <AdminHeader />
-
+    <AdminPage
+      title="Герои"
+      description="Ручное добавление поддержавших для раздела /heroes."
+    >
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-[#001e1d] via-[#004643]/90 to-[#001e1d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl border border-[#abd1c6]/20"
+            className="rounded-2xl border border-[#abd1c6]/20 bg-[#004643]/20 p-4 sm:p-6 md:p-8"
           >
             <div className="flex items-start justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-xl sm:text-2xl font-black text-[#fffffe]">
-                  Герои — ручное добавление
-                </h2>
-                <p className="mt-2 text-sm text-[#abd1c6] leading-relaxed max-w-2xl">
+                <p className="text-sm text-[#abd1c6] leading-relaxed max-w-2xl">
                   Добавляйте поддержавших вручную, чтобы они появились в{" "}
                   <Link
                     className="text-[#f9bc60] hover:underline font-semibold"
@@ -342,8 +338,6 @@ export default function AdminHeroesClient() {
               </div>
             </div>
           </motion.div>
-        </div>
-      </div>
-    </div>
+    </AdminPage>
   );
 }

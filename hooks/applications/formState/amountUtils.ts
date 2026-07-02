@@ -29,7 +29,7 @@ export function caretPosForDigitIndex(
 export function createHandleAmountInputChange(
   setAmount: (value: string) => void,
   isAdmin: boolean,
-  trustLimitsMax: number,
+  amountMax: number,
   amountInputRef: React.RefObject<HTMLInputElement | null>,
 ) {
   return (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +42,7 @@ export function createHandleAmountInputChange(
       const numeric = parseInt(nextDigits, 10);
       if (Number.isFinite(numeric)) {
         clampedDigits = (
-          isAdmin ? numeric : Math.min(numeric, trustLimitsMax)
+          isAdmin ? numeric : Math.min(numeric, amountMax)
         ).toString();
       }
     }

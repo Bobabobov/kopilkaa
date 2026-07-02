@@ -92,10 +92,10 @@ export async function syncApplicationStatusNotification(params: {
   }
 
   const isApproved = params.status === "APPROVED";
-  const displayTitle = isApproved ? "Заявка одобрена" : "Заявка отклонена";
+  const displayTitle = isApproved ? "История одобрена" : "История отклонена";
   const displayMessage = isApproved
-    ? `✅ Ваша заявка «${params.title || "Без названия"}» была одобрена.`
-    : `❌ Ваша заявка «${params.title || "Без названия"}» была отклонена.`;
+    ? `✅ Ваша история «${params.title || "Без названия"}» была одобрена.`
+    : `❌ Ваша история «${params.title || "Без названия"}» была отклонена.`;
 
   let payload: StatusNotificationPayload | undefined;
 
@@ -139,8 +139,8 @@ export async function syncWithdrawalStatusNotification(params: {
     status: params.status,
     title: isApproved ? "Выплата одобрена" : "Выплата отклонена",
     message: isApproved
-      ? `✅ Ваша заявка на выплату ${params.amountBonuses} бонусов была одобрена.`
-      : `❌ Ваша заявка на выплату ${params.amountBonuses} бонусов была отклонена.`,
+      ? `✅ Ваш запрос на получение гонорара ${params.amountBonuses} бонусов был одобрен.`
+      : `❌ Ваш запрос на получение гонорара ${params.amountBonuses} бонусов был отклонён.`,
     adminComment: params.adminComment ?? null,
     payload: { withdrawalId: params.withdrawalId },
   });

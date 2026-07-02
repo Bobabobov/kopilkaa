@@ -49,7 +49,7 @@ export default function HeaderCustomization({
     user.headerCover ?? null,
   );
   const [saving, setSaving] = useState(false);
-  const { showToast, ToastComponent } = useBeautifulToast();
+  const { showToast } = useBeautifulToast();
   const selectedThemeKey = selectedColor ? selectedColor : selectedTheme;
   const selectedThemeConfig = selectedColor
     ? {
@@ -244,7 +244,6 @@ export default function HeaderCustomization({
           />
         </div>
       </GlassModal>
-      <ToastComponent />
     </>
   );
 }

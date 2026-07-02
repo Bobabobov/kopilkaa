@@ -23,6 +23,19 @@ export function formatRub(amount: number | null | undefined, showSymbol = true):
 }
 
 /**
+ * Форматирует опыт уровня: целые или с одним знаком после запятой.
+ */
+export function formatExperience(xp: number | null | undefined): string {
+  if (xp == null || !Number.isFinite(xp)) return '0';
+
+  return new Intl.NumberFormat('ru-RU', {
+    maximumFractionDigits: 1,
+  })
+    .format(xp)
+    .replace(/\u00A0/g, ' ');
+}
+
+/**
  * Форматирует число с разделителями тысяч: "1 234"
  * Без символа валюты.
  */

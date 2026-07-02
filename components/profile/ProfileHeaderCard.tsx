@@ -9,6 +9,7 @@ import { getHeaderTheme } from "@/lib/header-customization";
 import { useUserStatus } from "./hooks/useUserStatus";
 import { AvatarBlock } from "./header/AvatarBlock";
 import { HeaderIdentity } from "./header/HeaderIdentity";
+import { ProfileLevelBadge } from "./header/ProfileLevelBadge";
 import { CtaRow } from "./header/CtaRow";
 import { ProfileCustomizationActions } from "./header/ProfileCustomizationActions";
 import { useCoverStyle } from "./hooks/useCoverStyle";
@@ -36,6 +37,7 @@ type User = {
 interface ProfileHeaderCardProps {
   user: User;
   isOwner: boolean;
+  profileLevel?: number;
   onThemeChange?: (theme: string | null) => void;
   onCoverChange?: (coverUrl: string | null) => void;
   onOpenSettings?: () => void;
@@ -51,6 +53,7 @@ const formatDate = (value: string) =>
 export default function ProfileHeaderCard({
   user,
   isOwner,
+  profileLevel,
   onThemeChange,
   onCoverChange,
   onOpenSettings,
@@ -164,6 +167,15 @@ export default function ProfileHeaderCard({
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
           )}
 
+          {profileLevel != null && profileLevel >= 1 && (
+            <div className="absolute right-3 top-3 z-20 xs:right-4 xs:top-4 sm:right-5 sm:top-5 md:right-6 md:top-6">
+              <ProfileLevelBadge
+                level={profileLevel}
+                href={isOwner ? '/profile/levels' : undefined}
+              />
+            </div>
+          )}
+
           {/* Контент поверх баннера — max-w-full чтобы ширина не зависела от наличия соцсетей */}
           <div
             className={`relative z-10 w-full max-w-full min-w-0 px-3 xs:px-4 sm:px-6 md:px-8 pb-4 xs:pb-6 sm:pb-8 pt-16 xs:pt-20 sm:pt-24 md:pt-28 box-border ${contentTextShadowClass}`}
@@ -186,7 +198,6 @@ export default function ProfileHeaderCard({
                   name={user.name}
                   role={user.role}
                   status={status}
-                  markedAsDeceiver={user.markedAsDeceiver}
                 />
 
                 <CtaRow hasSocialLinks={hasSocialLinks} user={user} />

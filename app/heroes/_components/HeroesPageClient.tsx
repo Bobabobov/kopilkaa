@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import HeroesHero from "@/components/heroes/HeroesHero";
 import HeroesContent from "@/components/heroes/HeroesContent";
 import HeroesLoading from "@/components/heroes/HeroesLoading";
+import { SectionFeedbackCta } from "@/components/feedback/SectionFeedbackCta";
 import {
   getMessageFromApiJson,
   logRouteCatchError,
@@ -177,6 +178,9 @@ export default function HeroesPageClient({
       </div>
       <div className="relative z-10">
         <HeroesHero />
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-6">
+          <SectionFeedbackCta variant="heroes" />
+        </div>
         <HeroesContent
           topThree={topThree}
           heroes={heroes}

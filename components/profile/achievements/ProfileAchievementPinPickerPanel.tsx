@@ -9,23 +9,13 @@ import {
 import { createPortal } from "react-dom";
 import { ProfileAchievementBadge } from "@/components/profile/achievements/ProfileAchievementBadge";
 import { PROFILE_ACHIEVEMENT_PINS_UPDATED_EVENT } from "@/components/profile/achievements/profileAchievementPinsEvents";
+import {
+  fetchPinPickerData,
+  invalidatePinPickerCache,
+} from "@/components/profile/achievements/profileAchievementPinPickerCache";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { getMessageFromApiJson } from "@/lib/api/parseApiError";
-
-type AchievementItem = {
-  slug: string;
-  name: string;
-  icon: string;
-  unlocked: boolean;
-};
-
-type AchievementsResponse = {
-  success: boolean;
-  data: {
-    items: AchievementItem[];
-    pinnedSlugs: string[];
-  };
-};
+import { cn } from "@/lib/utils";
 
 type ProfileAchievementPinPickerPanelProps = {
   userId: string;
@@ -38,7 +28,9 @@ export function ProfileAchievementPinPickerPanel({
   anchorRef,
   onClose,
 }: ProfileAchievementPinPickerPanelProps) {
-  const [items, setItems] = useState<AchievementItem[]>([]);
+  const [items, setItems] = useState<
+    { slug: string; name: string; icon: string }[]
+  >([]);
   const [pinnedSlugs, setPinnedSlugs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingSlug, setSavingSlug] = useState<string | null>(null);
@@ -83,9 +75,14 @@ export function ProfileAchievementPinPickerPanel({
       if (event.key === "Escape") onClose();
     };
 
-    document.addEventListener("mousedown", handlePointerDown);
+    // Откладываем, чтобы клик по «Изменить» не закрывал только что открытую панель.
+    const timer = window.setTimeout(() => {
+      document.addEventListener("mousedown", handlePointerDown);
+    }, 0);
+
     document.addEventListener("keydown", handleEscape);
     return () => {
+      window.clearTimeout(timer);
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleEscape);
     };
@@ -95,23 +92,9 @@ export function ProfileAchievementPinPickerPanel({
     setError(null);
     setLoading(true);
     try {
-      const response = await fetch("/api/profile/achievements", {
-        cache: "no-store",
-      });
-      const json = (await response.json().catch(() => null)) as
-        | AchievementsResponse
-        | { error?: string }
-        | null;
-
-      if (!response.ok) {
-        throw new Error(
-          getMessageFromApiJson(json, "Не удалось загрузить достижения"),
-        );
-      }
-
-      const payload = json as AchievementsResponse;
-      setItems(payload.data.items.filter((item) => item.unlocked));
-      setPinnedSlugs(payload.data.pinnedSlugs ?? []);
+      const data = await fetchPinPickerData();
+      setItems(data.unlockedItems);
+      setPinnedSlugs(data.pinnedSlugs);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Не удалось загрузить достижения",
@@ -151,6 +134,7 @@ export function ProfileAchievementPinPickerPanel({
 
       const updated = json?.data?.pinnedSlugs ?? nextPinned;
       setPinnedSlugs(updated);
+      invalidatePinPickerCache();
       window.dispatchEvent(
         new CustomEvent(PROFILE_ACHIEVEMENT_PINS_UPDATED_EVENT, {
           detail: { userId },
@@ -170,7 +154,7 @@ export function ProfileAchievementPinPickerPanel({
   return createPortal(
     <div
       data-achievement-pin-picker="true"
-      className="fixed z-[99999] w-[min(100vw-1.5rem,18rem)] rounded-xl border border-[#abd1c6]/25 bg-[#001e1d]/95 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md"
+      className="fixed z-[99999] w-[min(100vw-1.5rem,18rem)] rounded-xl border border-emerald-500/20 bg-emerald-950/95 p-3 shadow-xl backdrop-blur-md"
       style={{
         top: `${position.top}px`,
         right: `${position.right}px`,
@@ -179,13 +163,13 @@ export function ProfileAchievementPinPickerPanel({
       aria-label="Выбор достижений для профиля"
     >
       <div className="mb-2 flex items-center justify-between gap-2">
-        <p className="text-xs font-semibold text-[#f9bc60]">
+        <p className="text-xs font-semibold text-emerald-400">
           Достижения в профиле ({pinnedSlugs.length})
         </p>
         <button
           type="button"
           onClick={onClose}
-          className="rounded-md p-1 text-[#94a1b2] hover:bg-white/10 hover:text-white"
+          className="rounded-md p-1 text-zinc-500 hover:bg-emerald-950/60 hover:text-zinc-200"
           aria-label="Закрыть"
         >
           <LucideIcons.X className="h-4 w-4" />
@@ -193,13 +177,13 @@ export function ProfileAchievementPinPickerPanel({
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-6 text-[#94a1b2]">
-          <LucideIcons.Loader2 className="h-5 w-5 animate-spin" />
+        <div className="flex items-center justify-center py-6 text-zinc-500">
+          <LucideIcons.Loader2 className="h-5 w-5 animate-spin text-emerald-400" />
         </div>
       ) : items.length === 0 ? (
-        <p className="py-3 text-xs leading-relaxed text-[#94a1b2]">
-          Пока нет полученных достижений. Выполняйте задания на сайте — они появятся
-          здесь.
+        <p className="py-3 text-xs leading-relaxed text-zinc-400">
+          Пока нет полученных достижений. Выполняйте задания на сайте — они
+          появятся здесь.
         </p>
       ) : (
         <ul className="custom-scrollbar max-h-56 space-y-1 overflow-y-auto overscroll-contain touch-pan-y pr-1">
@@ -213,11 +197,12 @@ export function ProfileAchievementPinPickerPanel({
                   type="button"
                   disabled={disabled}
                   onClick={() => void togglePin(item.slug)}
-                  className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors disabled:opacity-50",
                     isPinned
-                      ? "bg-[#f9bc60]/15 text-white"
-                      : "text-[#abd1c6] hover:bg-white/5"
-                  } disabled:opacity-50`}
+                      ? "bg-emerald-500/15 text-zinc-100"
+                      : "text-zinc-400 hover:bg-emerald-950/50",
+                  )}
                 >
                   <ProfileAchievementBadge
                     icon={item.icon}
@@ -228,9 +213,9 @@ export function ProfileAchievementPinPickerPanel({
                     {item.name}
                   </span>
                   {savingSlug === item.slug ? (
-                    <LucideIcons.Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
+                    <LucideIcons.Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-emerald-400" />
                   ) : isPinned ? (
-                    <LucideIcons.Check className="h-3.5 w-3.5 shrink-0 text-[#f9bc60]" />
+                    <LucideIcons.Check className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
                   ) : (
                     <LucideIcons.Plus className="h-3.5 w-3.5 shrink-0 opacity-60" />
                   )}
@@ -241,7 +226,7 @@ export function ProfileAchievementPinPickerPanel({
         </ul>
       )}
 
-      {error && <p className="mt-2 text-[11px] text-[#e16162]">{error}</p>}
+      {error && <p className="mt-2 text-[11px] text-red-400">{error}</p>}
     </div>,
     document.body,
   );

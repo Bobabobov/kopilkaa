@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 import {
-  getPinnedSlugsForUser,
   getProfileAchievementShowcase,
+  getProfilePinPickerPayload,
   updateProfileAchievementPins,
 } from "@/lib/achievements/pins";
 
@@ -17,14 +17,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const [pinnedSlugs, showcase] = await Promise.all([
-      getPinnedSlugsForUser(session.uid),
-      getProfileAchievementShowcase(session.uid),
-    ]);
+    const data = await getProfilePinPickerPayload(session.uid);
 
     return NextResponse.json({
       success: true,
-      data: { pinnedSlugs, showcase },
+      data,
     });
   } catch (error) {
     logRouteCatchError("GET /api/profile/achievements/pins:", error);

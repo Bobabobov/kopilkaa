@@ -4,13 +4,12 @@ import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { useOtherUserData } from "./hooks/useOtherUserData";
-import { useOtherUserTrust } from "./hooks/useOtherUserTrust";
 import { useOtherUserFriendship } from "./hooks/useOtherUserFriendship";
 import type { OtherUserProfileUser } from "./types";
 
 export function useOtherUserProfile(userId: string) {
   const router = useRouter();
-  const { showToast, ToastComponent } = useBeautifulToast();
+  const { showToast } = useBeautifulToast();
 
   const emitFriendEvents = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -21,12 +20,6 @@ export function useOtherUserProfile(userId: string) {
 
   const { user, loading, isAuthenticated, currentUserId, resolvedUserId } =
     useOtherUserData({ userId });
-
-  const { approvedApplications, trustDerived } = useOtherUserTrust({
-    isAuthenticated,
-    resolvedUserId,
-    fallbackUserId: userId,
-  });
 
   const {
     friendship,
@@ -57,8 +50,6 @@ export function useOtherUserProfile(userId: string) {
     isAuthenticated,
     currentUserId,
     resolvedUserId,
-    ToastComponent,
-    trustDerived,
     friendship,
     friendshipStatus,
     sendFriendRequest,

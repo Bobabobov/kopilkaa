@@ -15,7 +15,7 @@ type ApplicationRulesModalProps = {
   onClose: () => void;
 };
 
-type RulesTab = "how" | "allowed" | "forbidden" | "reports";
+type RulesTab = "how" | "allowed" | "forbidden" | "reviews";
 
 const TABS: {
   id: RulesTab;
@@ -27,30 +27,30 @@ const TABS: {
   {
     id: "how",
     label: "Как",
-    title: "Как подать заявку",
-    subtitle: "Четыре шага от входа до отчёта",
+    title: "Как опубликовать историю",
+    subtitle: "Три шага от входа до гонорара",
     Icon: LucideIcons.ClipboardList,
   },
   {
     id: "allowed",
     label: "Можно",
     title: "Что можно",
-    subtitle: "Ситуации, с которыми Копилка помогает",
+    subtitle: "Темы историй, которые мы публикуем",
     Icon: LucideIcons.CheckCircle2,
   },
   {
     id: "forbidden",
     label: "Нельзя",
     title: "Что нельзя",
-    subtitle: "Заявки, которые не одобряются",
+    subtitle: "Темы, которые не публикуются",
     Icon: LucideIcons.AlertTriangle,
   },
   {
-    id: "reports",
-    label: "Отчёты",
-    title: "Отчёты",
-    subtitle: "Правила после одобренной помощи",
-    Icon: LucideIcons.Camera,
+    id: "reviews",
+    label: "Отзывы",
+    title: "Отзывы",
+    subtitle: "После первого полученного гонорара",
+    Icon: LucideIcons.MessageCircle,
   },
 ];
 
@@ -66,14 +66,9 @@ const HOW_STEPS = [
     Icon: LucideIcons.Edit3,
   },
   {
-    title: "Отправка",
-    hint: "Ждёте решения админа",
+    title: "Проверка",
+    hint: "Ожидайте модерацию текста",
     Icon: LucideIcons.Send,
-  },
-  {
-    title: "Отчёт",
-    hint: "После одобрения — фото результата",
-    Icon: LucideIcons.Image,
   },
 ] as const;
 
@@ -100,7 +95,7 @@ const ALLOWED = [
   },
   {
     title: "Обычная жизненная ситуация",
-    hint: "Небольшая помощь без обязательств",
+    hint: "Живой рассказ о вашей мелкой бытовой хотелке",
     Icon: LucideIcons.Heart,
   },
 ] as const;
@@ -123,8 +118,8 @@ const FORBIDDEN = [
     Icon: LucideIcons.TestTube,
   },
   {
-    title: "Дробление одной цели на много заявок",
-    hint: "Одна цель — одна заявка",
+    title: "Дробление одной темы на много историй",
+    hint: "Одна ситуация — один материал",
     Icon: LucideIcons.Copy,
     important: true,
   },
@@ -212,7 +207,7 @@ export function ApplicationRulesModal({
                 id="application-rules-title"
                 className="text-lg font-bold text-[#fffffe] sm:text-xl"
               >
-                Правила подачи заявки
+                Правила публикации историй
               </h2>
               <p className="mt-1 text-sm text-[#abd1c6]/80">
                 Переключайте вкладки ниже
@@ -286,7 +281,7 @@ export function ApplicationRulesModal({
             onClick={onClose}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#f9bc60] py-3.5 text-sm font-bold text-[#001e1d] transition-opacity hover:opacity-90"
           >
-            Подать заявку
+            Написать историю
             <LucideIcons.ArrowRight size="sm" />
           </Link>
           <button
@@ -388,9 +383,9 @@ export function ApplicationRulesModal({
             </motion.div>
           )}
 
-          {tab === "reports" && (
+          {tab === "reviews" && (
             <motion.ul
-              key="reports"
+              key="reviews"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
@@ -399,20 +394,20 @@ export function ApplicationRulesModal({
             >
               <RuleRow
                 accent="gold"
-                title="Первый отзыв с фото"
-                hint="После первой одобренной заявки — иначе следующую не подать"
+                title="Отзыв после первой выплаты"
+                hint="Без публикации отзыва о покупке написать новую историю нельзя"
+                icon={<LucideIcons.MessageCircle size="xs" />}
+              />
+              <RuleRow
+                accent="gold"
+                title="Фото к отзыву"
+                hint="Нужно приложить снимки вашей покупки, подтверждающие реальность целевого использования гранта"
                 icon={<LucideIcons.Camera size="xs" />}
               />
               <RuleRow
                 accent="gold"
-                title="Фото‑отчёт к новой заявке"
-                hint="К каждой новой заявке — короткий отчёт по прошлой одобренной помощи"
-                icon={<LucideIcons.Image size="xs" />}
-              />
-              <RuleRow
-                accent="gold"
                 title="Цикл участия"
-                hint="Заявка → решение → отчёт — обычный порядок работы с платформой"
+                hint="История → модерация → отзыв — обычный порядок работы с платформой"
                 icon={<LucideIcons.Clock size="xs" />}
               />
             </motion.ul>

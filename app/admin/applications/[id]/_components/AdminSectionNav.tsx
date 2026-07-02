@@ -2,14 +2,9 @@
 "use client";
 
 const sections = [
-  { id: "section-context", label: "Контекст", labelShort: "Контекст" },
-  { id: "section-payment", label: "Реквизиты", labelShort: "Реквизиты" },
-  { id: "section-previous-review", label: "Прошлый отзыв", labelShort: "Прошлый отзыв" },
-  { id: "section-tech", label: "IP и повторы", labelShort: "IP" },
-  { id: "section-images", label: "Фото", labelShort: "Фото" },
-  { id: "section-story", label: "История", labelShort: "История" },
-  { id: "section-review", label: "Отзыв", labelShort: "Отзыв" },
-  { id: "section-actions", label: "Действия", labelShort: "Действия" },
+  { id: "section-risks", label: "1. Связи", labelShort: "Связи" },
+  { id: "section-application", label: "2. Заявка", labelShort: "Заявка" },
+  { id: "section-actions", label: "3. Решение", labelShort: "Решение" },
 ] as const;
 
 export default function AdminSectionNav() {
@@ -17,7 +12,8 @@ export default function AdminSectionNav() {
     <nav
       className="sticky top-14 sm:top-20 lg:top-24 z-20 py-2 sm:py-4 mb-4 sm:mb-6 min-w-0 w-full"
       style={{
-        background: "linear-gradient(180deg, rgba(0,30,29,0.97) 0%, rgba(0,30,29,0.9) 70%, transparent)",
+        background:
+          "linear-gradient(180deg, rgba(0,30,29,0.97) 0%, rgba(0,30,29,0.9) 70%, transparent)",
       }}
       aria-label="Навигация по разделам"
     >
@@ -34,7 +30,9 @@ export default function AdminSectionNav() {
             }}
             onClick={(e) => {
               e.preventDefault();
-              document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+              document
+                .getElementById(id)
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
           >
             <span className="hidden sm:inline">{label}</span>

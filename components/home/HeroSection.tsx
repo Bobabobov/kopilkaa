@@ -2,7 +2,6 @@
 
 import { HeroSectionHeadline } from "./hero-section/HeroSectionHeadline";
 import { HeroSectionForWho } from "./hero-section/HeroSectionForWho";
-import { HeroSectionCta } from "./hero-section/HeroSectionCta";
 import { HeroSectionAds } from "./hero-section/HeroSectionAds";
 import { HeroSectionStats } from "./hero-section/HeroSectionStats";
 import type { HeroSectionProps } from "./hero-section/types";
@@ -15,7 +14,6 @@ export default function HeroSection({ stats }: HeroSectionProps) {
           <div data-kopi-tour="welcome-intro">
             <HeroSectionHeadline />
             <HeroSectionForWho />
-            <HeroSectionCta />
           </div>
           <div className="mb-10">
             <HeroSectionStats stats={stats} />

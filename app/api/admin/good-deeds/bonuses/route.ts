@@ -1,44 +1,44 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getAllowedAdminUser } from "@/lib/adminAccess";
+import { NextRequest, NextResponse } from 'next/server';
+import { getAllowedAdminUser } from '@/lib/adminAccess';
 import {
   ADMIN_BONUS_DEDUCT_COMMENT,
   ADMIN_BONUS_GRANT_COMMENT,
-} from "@/lib/admin/bonusWithdrawalBlock";
-import { prisma } from "@/lib/db";
-import { computeGoodDeedBonusWallet } from "@/lib/goodDeedBonusWallet";
+} from '@/lib/admin/bonusWithdrawalBlock';
+import { prisma } from '@/lib/db';
+import { computeGoodDeedBonusWallet } from '@/lib/goodDeedBonusWallet';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
     const admin = await getAllowedAdminUser();
     if (!admin) {
-      return NextResponse.json({ error: "Доступ запрещён" }, { status: 403 });
+      return NextResponse.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
 
     const body = await req.json().catch(() => ({}));
-    const userId = String(body?.userId ?? "").trim();
-    const action = body?.action === "deduct" ? "deduct" : "grant";
+    const userId = String(body?.userId ?? '').trim();
+    const action = body?.action === 'deduct' ? 'deduct' : 'grant';
     const amountRaw = body?.amountBonuses;
     const amountBonuses =
-      typeof amountRaw === "number"
+      typeof amountRaw === 'number'
         ? Math.floor(amountRaw)
-        : parseInt(String(amountRaw ?? ""), 10);
+        : parseInt(String(amountRaw ?? ''), 10);
     const comment =
-      typeof body?.comment === "string"
+      typeof body?.comment === 'string'
         ? body.comment.trim().slice(0, 300)
-        : "";
+        : '';
 
     if (!userId || !Number.isFinite(amountBonuses) || amountBonuses <= 0) {
       return NextResponse.json(
-        { error: "Некорректные данные" },
+        { error: 'Некорректные данные' },
         { status: 400 },
       );
     }
 
     if (amountBonuses > 10000) {
       return NextResponse.json(
-        { error: "Слишком большое изменение за раз" },
+        { error: 'Слишком большое изменение за раз' },
         { status: 400 },
       );
     }
@@ -49,12 +49,12 @@ export async function POST(req: NextRequest) {
     });
     if (!userExists) {
       return NextResponse.json(
-        { error: "Пользователь не найден" },
+        { error: 'Пользователь не найден' },
         { status: 404 },
       );
     }
 
-    if (action === "deduct") {
+    if (action === 'deduct') {
       const wallet = await computeGoodDeedBonusWallet(userId);
       if (amountBonuses > wallet.availableBonuses) {
         return NextResponse.json(
@@ -73,24 +73,32 @@ export async function POST(req: NextRequest) {
           grantedById: admin.id,
         },
       });
-
-      return NextResponse.json({ ok: true, action: "deduct" });
+    } else {
+      await prisma.goodDeedBonusGrant.create({
+        data: {
+          userId,
+          amountBonuses,
+          comment: comment || ADMIN_BONUS_GRANT_COMMENT,
+          grantedById: admin.id,
+        },
+      });
     }
 
-    await prisma.goodDeedBonusGrant.create({
+    const wallet = await computeGoodDeedBonusWallet(userId);
+
+    return NextResponse.json({
+      success: true,
       data: {
         userId,
+        action,
         amountBonuses,
-        comment: comment || ADMIN_BONUS_GRANT_COMMENT,
-        grantedById: admin.id,
+        availableBonuses: wallet.availableBonuses,
       },
     });
-
-    return NextResponse.json({ ok: true, action: "grant" });
   } catch (error) {
-    console.error("POST /api/admin/good-deeds/bonuses error:", error);
+    console.error('[API Error] POST /api/admin/good-deeds/bonuses', error);
     return NextResponse.json(
-      { error: "Не удалось изменить баланс бонусов" },
+      { error: 'Не удалось изменить баланс бонусов' },
       { status: 500 },
     );
   }

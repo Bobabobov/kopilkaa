@@ -69,7 +69,7 @@ const TYPE_LABELS: Record<string, string> = {
   like: "Лайк",
   story_comment: "Комментарий",
   friend_request: "Друзья",
-  application_status: "Заявка",
+  application_status: "История",
   withdrawal_status: "Выплата",
   system: "Система",
 };
@@ -263,14 +263,14 @@ export default function NotificationCard({
                     <p className="text-sm sm:text-base text-[#abd1c6]/70 leading-relaxed">
                       {notification.status === "APPROVED" ? (
                         <>
-                          Ваша заявка была{" "}
+                          Ваша история была{" "}
                           <span className="font-medium text-green-400">
                             одобрена
                           </span>
                         </>
                       ) : (
                         <>
-                          Ваша заявка была{" "}
+                          Ваша история была{" "}
                           <span className="font-medium text-red-400">
                             отклонена
                           </span>

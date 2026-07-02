@@ -9,6 +9,7 @@ import ApplicationCardPayment from "./ApplicationCardPayment";
 import ApplicationCardStory from "./ApplicationCardStory";
 import ApplicationCardFooter from "./ApplicationCardFooter";
 import { ApplicationCardIntegrity } from "./ApplicationCardIntegrity";
+import { ApplicationCardEconomy } from "./ApplicationCardEconomy";
 
 interface ApplicationCardProps {
   application: ApplicationItem;
@@ -57,6 +58,8 @@ export default function ApplicationCard({
           applicationId={it.id}
           integrity={it.integrity}
         />
+
+        <ApplicationCardEconomy economy={it.economy} />
 
         <ApplicationCardSummary summary={it.summary} />
 

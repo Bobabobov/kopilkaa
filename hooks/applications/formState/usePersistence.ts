@@ -2,91 +2,70 @@
 
 import { useEffect, useRef } from "react";
 import {
-  loadTrustAck,
+  loadRulesAck,
   loadPolicyAck,
-  loadIntroAck,
-  saveTrustAck,
+  saveRulesAck,
   savePolicyAck,
-  saveIntroAck,
 } from "./storage";
 
-/** Черновики убраны — сохраняем/восстанавливаем только acknowledgments (trust, policy, intro). */
+/** Черновики убраны — сохраняем/восстанавливаем только acknowledgments (правила, policy). */
 
 interface RestoreParams {
-  trustAckKey: string;
+  rulesAckKey: string;
   policyAckKey: string;
-  introAckKey: string;
   loadingAuth: boolean;
-  setTrustAck1: (v: boolean) => void;
-  setTrustAck2: (v: boolean) => void;
-  setTrustAck3: (v: boolean) => void;
+  setRulesAck1: (v: boolean) => void;
+  setRulesAck2: (v: boolean) => void;
+  setRulesAck3: (v: boolean) => void;
   setPoliciesAccepted: (v: boolean) => void;
-  setIntroOpen: (v: boolean) => void;
-  setIntroChecked: (v: boolean) => void;
 }
 
 export function useRestoreForm(params: RestoreParams): void {
   const {
-    trustAckKey,
+    rulesAckKey,
     policyAckKey,
-    introAckKey,
     loadingAuth,
-    setTrustAck1,
-    setTrustAck2,
-    setTrustAck3,
+    setRulesAck1,
+    setRulesAck2,
+    setRulesAck3,
     setPoliciesAccepted,
-    setIntroOpen,
-    setIntroChecked,
   } = params;
 
   useEffect(() => {
     if (loadingAuth) return;
     try {
-      const [t1, t2, t3] = loadTrustAck(trustAckKey);
-      setTrustAck1(t1);
-      setTrustAck2(t2);
-      setTrustAck3(t3);
+      const [t1, t2, t3] = loadRulesAck(rulesAckKey);
+      setRulesAck1(t1);
+      setRulesAck2(t2);
+      setRulesAck3(t3);
       setPoliciesAccepted(loadPolicyAck(policyAckKey));
-      const introAck = loadIntroAck(introAckKey);
-      if (introAck) {
-        setIntroOpen(false);
-        setIntroChecked(true);
-      } else {
-        setIntroOpen(true);
-        setIntroChecked(false);
-      }
     } catch (error) {
       console.error("Ошибка при восстановлении данных:", error);
     }
   }, [
-    trustAckKey,
+    rulesAckKey,
     policyAckKey,
-    introAckKey,
     loadingAuth,
-    setTrustAck1,
-    setTrustAck2,
-    setTrustAck3,
+    setRulesAck1,
+    setRulesAck2,
+    setRulesAck3,
     setPoliciesAccepted,
-    setIntroOpen,
-    setIntroChecked,
   ]);
 }
 
 interface PersistParams {
-  trustAckKey: string;
+  rulesAckKey: string;
   policyAckKey: string;
-  introAckKey: string;
   title: string;
   summary: string;
   story: string;
   amount: string;
   payment: string;
   bankName: string;
-  trustAck1: boolean;
-  trustAck2: boolean;
-  trustAck3: boolean;
+  rulesAck1: boolean;
+  rulesAck2: boolean;
+  rulesAck3: boolean;
   policiesAccepted: boolean;
-  introChecked: boolean;
   formStartedAtRef: React.MutableRefObject<number | null>;
   /** Вызывается после debounce, если в форме есть введённые данные (как сигнал «черновик на месте»). */
   onDebouncedPersist?: () => void;
@@ -94,20 +73,18 @@ interface PersistParams {
 
 export function usePersistForm(params: PersistParams): void {
   const {
-    trustAckKey,
+    rulesAckKey,
     policyAckKey,
-    introAckKey,
     title,
     summary,
     story,
     amount,
     payment,
     bankName,
-    trustAck1,
-    trustAck2,
-    trustAck3,
+    rulesAck1,
+    rulesAck2,
+    rulesAck3,
     policiesAccepted,
-    introChecked,
     formStartedAtRef,
     onDebouncedPersist,
   } = params;
@@ -128,11 +105,8 @@ export function usePersistForm(params: PersistParams): void {
         if (hasInput && formStartedAtRef.current == null) {
           formStartedAtRef.current = Date.now();
         }
-        saveTrustAck(trustAckKey, [trustAck1, trustAck2, trustAck3]);
+        saveRulesAck(rulesAckKey, [rulesAck1, rulesAck2, rulesAck3]);
         savePolicyAck(policyAckKey, policiesAccepted);
-        if (introChecked) {
-          saveIntroAck(introAckKey);
-        }
         if (hasInput) {
           onDebouncedPersistRef.current?.();
         }
@@ -142,20 +116,18 @@ export function usePersistForm(params: PersistParams): void {
     }, 250);
     return () => window.clearTimeout(t);
   }, [
-    trustAckKey,
+    rulesAckKey,
     policyAckKey,
-    introAckKey,
     title,
     summary,
     story,
     amount,
     payment,
     bankName,
-    trustAck1,
-    trustAck2,
-    trustAck3,
+    rulesAck1,
+    rulesAck2,
+    rulesAck3,
     policiesAccepted,
-    introChecked,
     formStartedAtRef,
   ]);
 }

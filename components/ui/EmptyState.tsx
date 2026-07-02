@@ -51,13 +51,13 @@ export default function EmptyState(props: EmptyStateProps) {
         </motion.div>
 
         <h3 className="relative z-10 text-2xl font-bold text-[#fffffe] mb-4">
-          {hasFilters ? "Заявки не найдены" : "Пока нет заявок"}
+          {hasFilters ? "Истории не найдены" : "Пока нет историй"}
         </h3>
 
         <p className="relative z-10 text-[#abd1c6] mb-6 max-w-lg mx-auto leading-relaxed">
           {hasFilters
             ? "Попробуйте изменить фильтры или поисковый запрос"
-            : "Станьте первым, кто поделится своей историей помощи!"}
+            : "Станьте первым, кто поделится своей историей и получит гонорар!"}
         </p>
 
         {!hasFilters && (
@@ -71,7 +71,7 @@ export default function EmptyState(props: EmptyStateProps) {
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-[#f9bc60] to-[#e8a545] hover:from-[#e8a545] hover:to-[#f9bc60] text-[#001e1d] font-semibold rounded-2xl transition-all duration-300 shadow-lg shadow-[#f9bc60]/40 border border-[#f9bc60]/40"
             >
               <LucideIcons.Plus size="md" />
-              Создать заявку
+              Опубликовать историю
             </a>
           </motion.div>
         )}
@@ -130,9 +130,8 @@ export default function EmptyState(props: EmptyStateProps) {
                 </h3>
 
                 <p className="mb-8 leading-relaxed text-[#abd1c6]">
-                  Мы работаем над созданием вдохновляющих историй о помощи.
-                  Скоро здесь появятся первые истории людей, которые получили
-                  поддержку через нашу платформу.
+                  Мы работаем над созданием вдохновляющих историй с гонорарами.
+                  Скоро здесь появятся первые публикации участников платформы.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -141,7 +140,7 @@ export default function EmptyState(props: EmptyStateProps) {
                     className="inline-flex items-center justify-center px-6 py-3 font-semibold rounded-xl transition-all hover:opacity-90"
                     style={ctaStyle}
                   >
-                    Подать заявку
+                    Опубликовать историю
                   </a>
                   <a
                     href="/profile"
@@ -211,12 +210,12 @@ export default function EmptyState(props: EmptyStateProps) {
         <LucideIcons.Document className="w-16 h-16 sm:w-20 sm:h-20 text-gray-500 dark:text-gray-400" />
       </div>
       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-        Заявки не найдены
+        Истории не найдены
       </h3>
       <p className="text-gray-600 dark:text-gray-400">
         {props.hasFilters
           ? "Попробуйте изменить поисковый запрос или фильтры"
-          : "Пока нет заявок для модерации"}
+          : "Пока нет материалов для модерации"}
       </p>
     </motion.div>
   );

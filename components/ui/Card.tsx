@@ -119,6 +119,24 @@ export function CardTitle({
 }
 
 /**
+ * Описание карточки (shadcn CardDescription).
+ */
+export function CardDescription({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+  return (
+    <p
+      className={cn("text-sm leading-relaxed text-[#abd1c6]/90", className)}
+      {...props}
+    >
+      {children}
+    </p>
+  );
+}
+
+/**
  * Контент карточки.
  */
 export function CardContent({

@@ -30,7 +30,7 @@ const filters: {
   { type: "unread", label: "Непрочитанные", icon: "Bell" },
   { type: "like", label: "Лайки", icon: "Heart" },
   { type: "friend_request", label: "Друзья", icon: "UserPlus" },
-  { type: "application_status", label: "Заявки", icon: "FileText" },
+  { type: "application_status", label: "Истории", icon: "FileText" },
   { type: "withdrawal_status", label: "Выплаты", icon: "Coins" },
 ];
 

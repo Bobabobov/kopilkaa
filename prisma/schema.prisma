@@ -79,11 +79,20 @@ model User {
   createdAt            DateTime  @default(now())
   lastSeen             DateTime  @default(now())
   lastCommentAt        DateTime? // Время последнего комментария для кулдауна
-  trustDelta           Int       @default(0)
   /// Админ может запретить вывод бонусов (заявки на вывод отклоняются на стороне UI).
   bonusWithdrawalBlocked Boolean   @default(false)
   /// До 3 slug ачивок для отображения в шапке профиля (JSON-массив строк).
   profileAchievementPins          Json?
+  /// Уровень пользователя (механики начисления опыта — отдельно).
+  level                           Int       @default(1)
+  /// Накопленный опыт (в БД — в половинках: stored / 2 = отображаемый опыт).
+  experience                      Int       @default(0)
+  /// Бонусы, вложенные пользователем в опыт уровня (1 бонус = 0,5 опыта).
+  bonusesInvestedInExperience     Int       @default(0)
+  /// Последний сброс уровня админом: траты бонусов и заявки считаются только после этой даты.
+  adminEconomyResetAt             DateTime?
+  /// Лучший результат в игре «Секретная последовательность» (длина пройденной цепочки).
+  maxSequenceRecord               Int       @default(0)
 
   applications                    Application[]
   userTree                        UserTree?
@@ -109,21 +118,62 @@ model User {
   grantedGoodDeedBonuses          GoodDeedBonusGrant[]        @relation("GoodDeedBonusGrantAdmin")
   dailyBonusState                 DailyBonusState?
   dailyBonusClaims                DailyBonusClaim[]
+  dailyChestState                 DailyChestState?
+  dailyChestClaims                DailyChestClaim[]
   userAchievements                UserAchievement[]
   loginStreakState                LoginStreakState?
   isBanned                        Boolean                     @default(false)
   bannedUntil                     DateTime?
   bannedReason                    String?
-  /**
-   * Публичная метка админа: красный бейдж «Обманывал» на всём сайте.
-   */
-  markedAsDeceiver                Boolean                     @default(false)
 
   tontineParticipations           TontineParticipant[]
   tontineWins                     TontineRound[]              @relation("TontineRoundWinner")
 
   dismissedStatusNotifications    DismissedStatusNotification[]
   userNotifications               UserNotification[]
+  bonusTransactions               BonusTransaction[]
+  dailyQuests                     UserDailyQuests?
+  siteFeedback                    SiteFeedback[]
+}
+
+/// Журнал операций с бонусами (списания за заявки и др.)
+model BonusTransaction {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Положительное число — списание бонусов
+  amount        Int
+  type          String
+  description   String
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([applicationId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+/// Ежедневные игровые квесты (3 контракта в сутки, сброс по UTC-дню).
+model UserDailyQuests {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quest1_done     Boolean  @default(false)
+  quest2_done     Boolean  @default(false)
+  quest3_done     Boolean  @default(false)
+  questDayKey     String?
+  rerollsUsed     Int      @default(0)
+  quest1_type     String?
+  quest1_target   Int?
+  quest2_type     String?
+  quest2_target   Int?
+  quest3_type     String?
+  quest3_target   Int?
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
 }
 
 /// Решения админа (одобрение/отказ) — источник правды для модалки и ленты.
@@ -198,17 +248,14 @@ model Application {
    */
   category                 ApplicationCategory @default(EVERYDAY_SUPPORT)
   amount                   Int                 @default(0)
+  /// Желаемая сумма сверх лимита уровня — только для администратора, не влияет на экономику
+  desiredAmount            Int?
   payment                  String
   /**
    * Нормализованные цифры из payment (>=10) для поиска связанных аккаунтов по всей базе
    */
   paymentFingerprint       String?
   status                   ApplicationStatus   @default(PENDING)
-  countTowardsTrust        Boolean             @default(false)
-  /**
-   * При решении по заявке админ включил «Понизить уровень на 1»
-   */
-  trustDecreasedAtDecision Boolean             @default(false)
   adminComment             String?
   filledMs                 Int?
   /**
@@ -217,14 +264,26 @@ model Application {
   storyEditMs              Int?
   submitterIp              String? // IP при подаче заявки (для админки: поиск дублей)
   clientDevice             String? // Устройство при подаче: desktop/android/ios/other
+  /// IANA timezone браузера при подаче (Europe/Moscow и т.п.)
+  clientTimezone           String?
+  /// SHA-256 отпечаток браузера/устройства (антимультиаккаунт)
+  deviceFingerprint        String?
+  /// Чеклист ручной проверки админа (JSON)
+  adminReviewChecklist     String?
+  /// Первая бесплатная заявка пользователя
+  isFirstFree              Boolean             @default(false)
+  /// Списано бонусов за подачу (0 для первой бесплатной)
+  submitBonusCost          Int                 @default(0)
+  /// Уровень пользователя на момент подачи
+  userLevelAtSubmit        Int?
   createdAt                DateTime            @default(now())
   updatedAt                DateTime            @updatedAt
 
-  images       ApplicationImage[]
+  images            ApplicationImage[]
+  bonusTransactions BonusTransaction[]
   likes        StoryLike[]
   comments     StoryComment[]
   review       Review?
-  reportImages ApplicationReportImage[]
 
   @@index([userId])
   @@index([status])
@@ -232,6 +291,7 @@ model Application {
   @@index([updatedAt])
   @@index([paymentFingerprint])
   @@index([submitterIp])
+  @@index([deviceFingerprint])
 }
 
 model ApplicationImage {
@@ -680,16 +740,27 @@ model DailyBonusClaim {
   @@index([createdAt])
 }
 
-model ApplicationReportImage {
-  id            String      @id @default(cuid())
-  applicationId String
-  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+/// Состояние ежедневного сундука (отдельно от «Ежедневного бонуса» в профиле).
+model DailyChestState {
+  userId        String    @id
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastClaimDate String?
+  lastClaimAt   DateTime?
+  updatedAt     DateTime  @updatedAt
+}
 
-  url  String
-  sort Int    @default(0)
+/// Журнал открытий ежедневного сундука.
+model DailyChestClaim {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  claimDate String
+  amount    Int
+  createdAt DateTime @default(now())
 
-  @@index([applicationId])
-  @@index([sort])
+  @@unique([userId, claimDate])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 enum TontineRoundStatus {
@@ -776,4 +847,28 @@ model AdRequest {
   @@index([status])
   @@index([createdAt])
   @@index([email])
+}
+
+/// Обратная связь с сайта (попап и страница /feedback).
+model SiteFeedback {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  rating      Int?
+  message     String
+  source      String   @default("popup")
+  topic       String   @default("general")
+  topicLabel  String?
+  pagePath    String?
+  status      String   @default("new")
+  adminNote   String?
+  processedBy String?
+  imageUrls   Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId])
+  @@index([topic])
 }

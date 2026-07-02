@@ -9,6 +9,14 @@ export type ProfileAchievementShowcaseItem = {
   icon: string;
 };
 
+export type ProfilePinPickerItem = ProfileAchievementShowcaseItem;
+
+export type ProfilePinPickerPayload = {
+  pinnedSlugs: AchievementSlug[];
+  showcase: ProfileAchievementShowcaseItem[];
+  unlockedItems: ProfilePinPickerItem[];
+};
+
 const VALID_SLUGS = new Set(
   ACHIEVEMENT_DEFINITIONS.map((item) => item.slug),
 );
@@ -74,6 +82,58 @@ export async function getProfileAchievementShowcase(
   }
 
   return showcase;
+}
+
+/** Быстрая выборка для панели закрепления — без syncAllEligibleAchievements и расчёта прогресса. */
+export async function getProfilePinPickerPayload(
+  userId: string,
+): Promise<ProfilePinPickerPayload> {
+  await ensureAchievementCatalog();
+
+  const [user, unlockedRows] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { profileAchievementPins: true },
+    }),
+    prisma.userAchievement.findMany({
+      where: { userId },
+      select: {
+        achievement: {
+          select: {
+            slug: true,
+            name: true,
+            icon: true,
+            sortOrder: true,
+          },
+        },
+      },
+    }),
+  ]);
+
+  const pinnedSlugs = normalizePinnedSlugs(user?.profileAchievementPins);
+
+  const unlockedItems = unlockedRows
+    .map((row) => ({
+      slug: row.achievement.slug as AchievementSlug,
+      name: row.achievement.name,
+      icon: row.achievement.icon,
+      sortOrder: row.achievement.sortOrder,
+    }))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map(({ slug, name, icon }) => ({ slug, name, icon }));
+
+  const unlockedBySlug = new Map(
+    unlockedItems.map((item) => [item.slug, item]),
+  );
+
+  const showcase: ProfileAchievementShowcaseItem[] = [];
+  for (const slug of pinnedSlugs) {
+    const achievement = unlockedBySlug.get(slug);
+    if (!achievement) continue;
+    showcase.push(achievement);
+  }
+
+  return { pinnedSlugs, showcase, unlockedItems };
 }
 
 export async function updateProfileAchievementPins(

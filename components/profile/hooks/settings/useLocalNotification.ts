@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
+import { useCallback } from 'react';
+import { useBeautifulToast } from '@/components/ui/BeautifulToast';
 
-export type NotificationType = "success" | "error" | "info";
+export type NotificationType = 'success' | 'error' | 'info';
 
 export interface LocalNotificationState {
   show: boolean;
@@ -11,24 +12,23 @@ export interface LocalNotificationState {
   message: string;
 }
 
+/** Прокси к глобальным тостам — единый стиль на всём сайте */
 export function useLocalNotification() {
-  const [localNotification, setLocalNotification] =
-    useState<LocalNotificationState>({
-      show: false,
-      type: "info",
-      title: "",
-      message: "",
-    });
+  const { showToast } = useBeautifulToast();
 
   const showLocalNotification = useCallback(
     (type: NotificationType, title: string, message: string) => {
-      setLocalNotification({ show: true, type, title, message });
-      setTimeout(() => {
-        setLocalNotification((prev) => ({ ...prev, show: false }));
-      }, 4000);
+      showToast(type, title, message, 4000);
     },
-    [],
+    [showToast],
   );
+
+  const localNotification: LocalNotificationState = {
+    show: false,
+    type: 'info',
+    title: '',
+    message: '',
+  };
 
   return { localNotification, showLocalNotification };
 }

@@ -3,6 +3,14 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
 import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
+import {
+  isReferralProgramEnabled,
+} from "@/lib/referralProgramConfig";
+
+export {
+  isReferralProgramEnabled,
+  REFERRAL_PROGRAM_PAUSED_MESSAGE,
+} from "@/lib/referralProgramConfig";
 
 export const REFERRAL_VISITOR_COOKIE = "kopilka_ref_visitor";
 export const REFERRAL_CODE_COOKIE = "kopilka_ref_code";
@@ -75,6 +83,10 @@ export async function tryAwardReferralBonusForNewUser(params: {
   referralCode: string;
   visitorId: string;
 }): Promise<{ awarded: boolean }> {
+  if (!isReferralProgramEnabled()) {
+    return { awarded: false };
+  }
+
   const minActiveDays = getReferralMinActiveDays();
 
   if (!params.newUserId || !params.referralCode || !params.visitorId) {

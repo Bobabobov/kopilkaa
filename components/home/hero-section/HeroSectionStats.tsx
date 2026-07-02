@@ -15,21 +15,18 @@ interface HeroSectionStatsProps {
 const subStats = [
   {
     key: "requests" as const,
-    label: "Историй",
+    label: "Опубликовано историй",
     icon: BookOpen,
-    description: "подано заявок",
   },
   {
     key: "approved" as const,
-    label: "Выплачено",
+    label: "Выплачено гонораров",
     icon: Banknote,
-    description: "одобрено заявок",
   },
   {
     key: "people" as const,
-    label: "Участников",
+    label: "Активных авторов",
     icon: Users,
-    description: "в проекте",
   },
 ];
 
@@ -166,7 +163,7 @@ export function HeroSectionStats({ stats }: HeroSectionStatsProps) {
                 </span>
               </div>
               <p className="text-sm text-[#abd1c6] text-center max-w-sm">
-                Всего в копилке · эти средства идут на помощь
+                Выделено на гранты
               </p>
             </div>
             <Separator className="bg-white/10" />
@@ -174,7 +171,7 @@ export function HeroSectionStats({ stats }: HeroSectionStatsProps) {
 
           <motion.div
             variants={gridVariants}
-            className="grid grid-cols-3 gap-3 sm:gap-4"
+            className="grid grid-cols-3 gap-2 xs:gap-3 sm:gap-4"
           >
             {subStats.map((item) => (
               <motion.div
@@ -187,27 +184,24 @@ export function HeroSectionStats({ stats }: HeroSectionStatsProps) {
                 }
                 whileTap={reduceMotion ? undefined : { scale: 0.98 }}
                 className={cn(
-                  "group text-center rounded-2xl p-4 sm:p-5",
+                  "group min-w-0 text-center rounded-2xl px-1.5 py-3 xs:px-2.5 sm:p-5",
                   "bg-white/[0.04] shadow-[0_0_0_1px_rgba(255,255,255,0.06)]",
                   "transition-shadow duration-300",
                   "md:hover:shadow-[0_8px_28px_rgba(0,0,0,0.25),0_0_0_1px_rgba(249,188,96,0.22)]",
                 )}
               >
                 <motion.span
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-full mb-2.5 text-[#abd1c6] bg-white/[0.06] ring-1 ring-white/[0.06] md:group-hover:text-[#f9bc60] md:group-hover:ring-[#f9bc60]/25 transition-colors duration-300"
+                  className="inline-flex items-center justify-center w-8 h-8 xs:w-10 xs:h-10 rounded-full mb-1.5 xs:mb-2 text-[#abd1c6] bg-white/[0.06] ring-1 ring-white/[0.06] md:group-hover:text-[#f9bc60] md:group-hover:ring-[#f9bc60]/25 transition-colors duration-300"
                   whileHover={reduceMotion ? undefined : { scale: 1.06 }}
                   transition={{ type: "spring", stiffness: 400, damping: 18 }}
                 >
-                  <item.icon className="w-5 h-5" />
+                  <item.icon className="w-4 h-4 xs:w-5 xs:h-5" />
                 </motion.span>
-                <div className="text-xl font-bold tabular-nums mb-0.5 text-[#fffffe]">
+                <div className="text-lg xs:text-xl font-bold tabular-nums mb-0.5 text-[#fffffe]">
                   <AnimatedNumber value={stats[item.key]} />
                 </div>
-                <div className="text-sm font-medium text-[#abd1c6]">
+                <div className="text-[10px] leading-tight xs:text-xs sm:text-sm font-medium text-[#abd1c6] text-balance break-words">
                   {item.label}
-                </div>
-                <div className="text-xs mt-0.5 text-[#94a1b2]">
-                  {item.description}
                 </div>
               </motion.div>
             ))}

@@ -2,10 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { AdminHeader } from "../_components/AdminHeader";
+import { AdminPage } from "../_components/AdminPage";
+import {
+  AdminPanel,
+  AdminStatGrid,
+  adminFieldClass,
+} from "../_components/admin-ui";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 
@@ -95,38 +99,32 @@ export default function AdminReferralsClient() {
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ?? "";
 
   return (
-    <div className="min-h-screen relative">
-      <div className="relative z-10">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">
-          <AdminHeader />
-
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-xl font-black text-[#fffffe] sm:text-2xl">
-                Реферальная программа
-              </h2>
-              <p className="mt-1 text-sm text-[#abd1c6] sm:text-base">
-                Кто сколько пригласил: переходы по ссылке, регистрации и
-                начисленные бонусы рефереру.
-              </p>
-            </div>
-            <div className="flex w-full flex-col gap-2 sm:max-w-md sm:flex-row sm:items-center">
-              <Input
+    <AdminPage
+      title="Реферальная программа"
+      description="Кто сколько пригласил: переходы по ссылке, регистрации и начисленные бонусы рефереру."
+    >
+          <AdminPanel
+            title="Поиск рефереров"
+            className="mb-6"
+            accent="neutral"
+          >
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <input
                 value={qInput}
                 onChange={(e) => setQInput(e.target.value)}
                 placeholder="Поиск: email, имя, @username"
-                className="h-11 border-[#abd1c6]/25 bg-[#001e1d]/80 text-[#fffffe]"
+                className={adminFieldClass}
               />
               <Button
                 type="button"
                 variant="secondary"
-                className="h-11 shrink-0"
+                className="h-[44px] shrink-0 rounded-xl border-2 border-[#abd1c6]/30"
                 onClick={() => void load()}
               >
                 Обновить
               </Button>
             </div>
-          </div>
+          </AdminPanel>
 
           {loading && !summary ? (
             <div className="flex justify-center py-16">
@@ -145,68 +143,29 @@ export default function AdminReferralsClient() {
           ) : null}
 
           {summary ? (
-            <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
-              <Card
-                variant="glass"
-                padding="md"
-                className="border-[#abd1c6]/15"
-              >
-                <p className="text-xs font-bold uppercase tracking-wide text-[#667a73]">
-                  Переходов всего
-                </p>
-                <p className="mt-1 text-2xl font-black tabular-nums text-[#fffffe]">
-                  {summary.totalClicks}
-                </p>
-              </Card>
-              <Card
-                variant="glass"
-                padding="md"
-                className="border-[#abd1c6]/15"
-              >
-                <p className="text-xs font-bold uppercase tracking-wide text-[#667a73]">
-                  Регистраций
-                </p>
-                <p className="mt-1 text-2xl font-black tabular-nums text-[#fffffe]">
-                  {summary.totalRegistrations}
-                </p>
-              </Card>
-              <Card
-                variant="glass"
-                padding="md"
-                className="border-[#abd1c6]/15"
-              >
-                <p className="text-xs font-bold uppercase tracking-wide text-[#667a73]">
-                  Рефереров
-                </p>
-                <p className="mt-1 text-2xl font-black tabular-nums text-[#f9bc60]">
-                  {summary.referrersCount}
-                </p>
-              </Card>
-              <Card
-                variant="glass"
-                padding="md"
-                className="border-[#abd1c6]/15"
-              >
-                <p className="text-xs font-bold uppercase tracking-wide text-[#667a73]">
-                  Выплат бонусов
-                </p>
-                <p className="mt-1 text-2xl font-black tabular-nums text-[#fffffe]">
-                  {summary.totalBonusGrants}
-                </p>
-              </Card>
-              <Card
-                variant="glass"
-                padding="md"
-                className="border-[#abd1c6]/15"
-              >
-                <p className="text-xs font-bold uppercase tracking-wide text-[#667a73]">
-                  Сумма бонусов
-                </p>
-                <p className="mt-1 text-2xl font-black tabular-nums text-[#22c55e]">
-                  {summary.totalBonusesSum}
-                </p>
-              </Card>
-            </div>
+            <AdminStatGrid
+              className="mb-6"
+              columns={3}
+              items={[
+                { label: "Переходов всего", value: summary.totalClicks },
+                {
+                  label: "Регистраций",
+                  value: summary.totalRegistrations,
+                  tone: "success",
+                },
+                {
+                  label: "Рефереров",
+                  value: summary.referrersCount,
+                  tone: "pending",
+                },
+                { label: "Выплат бонусов", value: summary.totalBonusGrants },
+                {
+                  label: "Сумма бонусов",
+                  value: summary.totalBonusesSum,
+                  tone: "success",
+                },
+              ]}
+            />
           ) : null}
 
           <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -393,8 +352,6 @@ export default function AdminReferralsClient() {
               </div>
             </div>
           ) : null}
-        </div>
-      </div>
-    </div>
+    </AdminPage>
   );
 }

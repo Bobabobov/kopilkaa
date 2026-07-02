@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import {
   ensureReferralCodeForUser,
   getReferralMinActiveDays,
+  isReferralProgramEnabled,
+  REFERRAL_PROGRAM_PAUSED_MESSAGE,
 } from "@/lib/referralProgram";
 
 export const dynamic = "force-dynamic";
@@ -42,11 +44,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const programEnabled = isReferralProgramEnabled();
     const minActiveDays = getReferralMinActiveDays();
     const availableAtMs =
       user.createdAt.getTime() + minActiveDays * 24 * 60 * 60 * 1000;
     const nowMs = Date.now();
-    const available = nowMs >= availableAtMs;
+    const available = programEnabled && nowMs >= availableAtMs;
 
     const referralCode = user.referralCode
       ? user.referralCode
@@ -193,10 +196,12 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
+      paused: !programEnabled,
+      pausedMessage: programEnabled ? null : REFERRAL_PROGRAM_PAUSED_MESSAGE,
       referralUrl,
       availability: {
         available,
-        availableAtMs,
+        availableAtMs: programEnabled ? availableAtMs : 0,
       },
       stats: {
         transitionsCount,

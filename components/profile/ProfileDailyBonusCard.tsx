@@ -1,17 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ProfileImageIcon } from "@/components/profile/ProfileImageIcon";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/Card";
 import {
   DailyBonusRiskConfirmModal,
   type DailyBonusRiskModalPhase,
@@ -25,7 +17,10 @@ import {
 } from "@/lib/dailyBonus/constants";
 import { invalidateProfileCache } from "@/hooks/profile/useProfileDashboard";
 import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import { dispatchDailyBonusClaimed } from "@/lib/dailyBonus/events";
 import { cn } from "@/lib/utils";
+import { ProfileSectionTitle } from "@/components/profile/ProfileSectionTitle";
+import { PROFILE_EMERALD_PANEL } from "@/components/profile/profileEmerald";
 
 type DailyBonusMilestone = {
   days: number;
@@ -64,56 +59,6 @@ function getStreakLabel(days: number): string {
     return "дня";
   }
   return "дней";
-}
-
-function InfoPill({
-  icon,
-  title,
-  value,
-  subtitle,
-  accent = false,
-}: {
-  icon: ReactNode;
-  title: string;
-  value: string;
-  subtitle: string;
-  accent?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex min-w-0 items-start gap-3 rounded-2xl border p-3.5 sm:p-4",
-        accent
-          ? "border-[#f9bc60]/25 bg-gradient-to-br from-[#f9bc60]/12 via-[#f9bc60]/6 to-transparent"
-          : "border-white/10 bg-white/[0.04]",
-      )}
-    >
-      <div
-        className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border",
-          accent
-            ? "border-[#f9bc60]/30 bg-[#f9bc60]/15 text-[#f9bc60]"
-            : "border-white/10 bg-white/5 text-[#abd1c6]",
-        )}
-      >
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-[11px] font-medium uppercase tracking-wide text-[#abd1c6]/90">
-          {title}
-        </p>
-        <p
-          className={cn(
-            "mt-0.5 text-base font-bold sm:text-lg",
-            accent ? "text-[#f9bc60]" : "text-[#fffffe]",
-          )}
-        >
-          {value}
-        </p>
-        <p className="mt-1 text-xs leading-snug text-[#abd1c6]">{subtitle}</p>
-      </div>
-    </div>
-  );
 }
 
 export function ProfileDailyBonusCard({
@@ -230,6 +175,7 @@ export function ProfileDailyBonusCard({
       }
 
       invalidateProfileCache();
+      dispatchDailyBonusClaimed();
       if (mode === "risk") {
         // Обновление кошелька — после закрытия модалки с результатом.
       } else {
@@ -275,29 +221,25 @@ export function ProfileDailyBonusCard({
 
   if (loading) {
     return (
-      <Card variant="darkGlass" padding="md" className="border-white/[0.08]">
-        <Skeleton className="mb-4 h-28 w-full rounded-2xl bg-white/5" />
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Skeleton className="h-24 rounded-2xl bg-white/5" />
-          <Skeleton className="h-24 rounded-2xl bg-white/5" />
-        </div>
-        <Skeleton className="mt-4 h-16 w-full rounded-2xl bg-white/5" />
-        <Skeleton className="mt-4 h-11 w-full rounded-xl bg-white/5" />
-      </Card>
+      <article className={PROFILE_EMERALD_PANEL}>
+        <Skeleton className="mb-3 h-5 w-40 rounded bg-emerald-950/50" />
+        <Skeleton className="h-16 w-full rounded-xl bg-emerald-950/50" />
+        <Skeleton className="mt-3 h-9 w-full rounded-lg bg-emerald-950/50" />
+      </article>
     );
   }
 
   if (!data || error) {
     return (
-      <Card variant="darkGlass" padding="md" className="border-white/[0.08]">
-        <p className="text-sm text-[#abd1c6]">
+      <article className={PROFILE_EMERALD_PANEL}>
+        <p className="text-sm text-zinc-400">
           {error || "Не удалось загрузить данные"}
         </p>
         <Button
           type="button"
           variant="outline"
           size="sm"
-          className="mt-3"
+          className="mt-3 border-emerald-500/20 text-emerald-400"
           onClick={() => {
             setLoading(true);
             void fetchStatus();
@@ -305,7 +247,7 @@ export function ProfileDailyBonusCard({
         >
           Повторить
         </Button>
-      </Card>
+      </article>
     );
   }
 
@@ -321,205 +263,148 @@ export function ProfileDailyBonusCard({
   return (
     <>
     <motion.div
+      id="profile-daily-bonus"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
     >
-      <Card
-        variant="darkGlass"
-        padding="md"
-        className="relative overflow-hidden border-white/[0.08]"
-      >
-        <div className="pointer-events-none absolute -right-14 -top-14 h-36 w-36 rounded-full bg-[#f9bc60]/14 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -left-10 h-32 w-32 rounded-full bg-[#e16162]/10 blur-3xl" />
+      <article className={cn(PROFILE_EMERALD_PANEL, "relative overflow-hidden !p-3.5 sm:!p-4", data.canClaim && !data.claimedToday && "ring-2 ring-[#f9bc60]/40 shadow-[0_0_24px_rgba(249,188,96,0.12)]")}>
+        {data.canClaim && !data.claimedToday ? (
+          <div className="mb-3 flex items-center gap-2 rounded-lg border border-[#f9bc60]/30 bg-[#f9bc60]/10 px-3 py-2 text-xs font-medium text-[#f9bc60]">
+            <LucideIcons.Sparkles className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            Бонус за сегодня доступен — заберите ниже
+          </div>
+        ) : null}
+        <ProfileSectionTitle
+          imageSrc="/icon/pig8.png"
+          imageAlt="Ежедневный бонус"
+          title="Ежедневный бонус"
+          className="mb-3"
+        />
 
-        <CardContent className="relative space-y-4 !p-0">
+        <div className="relative space-y-3">
           {riskResult ? (
             <div
               className={cn(
-                "rounded-2xl border px-4 py-3.5 sm:px-5",
+                "rounded-lg border px-3 py-2 text-xs",
                 riskResult.won
-                  ? "border-[#f9bc60]/35 bg-gradient-to-br from-[#f9bc60]/16 via-[#f9bc60]/8 to-transparent"
-                  : "border-[#e16162]/35 bg-gradient-to-br from-[#e16162]/16 via-[#e16162]/8 to-transparent",
+                  ? "border-[#f9bc60]/35 bg-[#f9bc60]/10 text-[#abd1c6]"
+                  : "border-[#e16162]/35 bg-[#e16162]/10 text-[#abd1c6]",
               )}
             >
-              <div className="flex items-start gap-3">
-                <div
-                  className={cn(
-                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border",
-                    riskResult.won
-                      ? "border-[#f9bc60]/35 bg-[#f9bc60]/15 text-[#f9bc60]"
-                      : "border-[#e16162]/35 bg-[#e16162]/15 text-[#e16162]",
-                  )}
-                >
-                  {riskResult.won ? (
-                    <LucideIcons.Trophy className="h-5 w-5" />
-                  ) : (
-                    <LucideIcons.XCircle className="h-5 w-5" />
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <p
-                    className={cn(
-                      "text-sm font-bold",
-                      riskResult.won ? "text-[#f9bc60]" : "text-[#e16162]",
-                    )}
-                  >
-                    {riskResult.won ? "Вы выиграли риск!" : "Вы проиграли риск"}
-                  </p>
-                  <p className="mt-1 text-sm leading-relaxed text-[#abd1c6]">
-                    {riskResult.won
-                      ? `+${formatBonuses(riskResult.totalGranted)} бонусов на баланс.`
-                      : riskResult.lostBonuses > 0
-                        ? `Списано ${formatBonuses(riskResult.lostBonuses)} бонусов.`
-                        : "Бонусов для списания не было."}{" "}
-                    Серия сброшена.
-                  </p>
-                </div>
-              </div>
+              <span
+                className={cn(
+                  "font-semibold",
+                  riskResult.won ? "text-[#f9bc60]" : "text-[#e16162]",
+                )}
+              >
+                {riskResult.won ? "Выигрыш риска" : "Проигрыш риска"}:
+              </span>{" "}
+              {riskResult.won
+                ? `+${formatBonuses(riskResult.totalGranted)} бонусов`
+                : riskResult.lostBonuses > 0
+                  ? `−${formatBonuses(riskResult.lostBonuses)} бонусов`
+                  : "без списания"}
+              . Серия сброшена.
             </div>
           ) : null}
 
-          {/* Герой: серия */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.08] via-white/[0.04] to-transparent p-4 sm:p-5">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,188,96,0.12),transparent_55%)]" />
-
-            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                <div className="relative">
-                  <div
-                    className={cn(
-                      "flex h-14 w-14 items-center justify-center rounded-2xl border shadow-[0_8px_24px_rgba(0,0,0,0.2)]",
-                      streakActive
-                        ? "border-[#f9bc60]/35 bg-gradient-to-br from-[#f9bc60]/20 to-[#e16162]/10 text-[#f9bc60]"
-                        : "border-white/15 bg-white/5 text-[#abd1c6]",
-                    )}
-                  >
-                    <LucideIcons.Flame className="h-6 w-6" />
-                  </div>
-                  <ProfileImageIcon
-                    src="/icon/pig8.png"
-                    alt=""
-                    size="xs"
-                    className="absolute -bottom-1 -right-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
-                  />
-                </div>
-
-                <div className="min-w-0">
-                  <p className="text-xs font-medium uppercase tracking-wide text-[#abd1c6]">
-                    Серия посещений
-                  </p>
-                  <p className="mt-0.5 flex items-baseline gap-2">
-                    <span className="text-4xl font-black leading-none tracking-tight text-[#fffffe] sm:text-5xl">
-                      {formatBonuses(data.currentStreak)}
-                    </span>
-                    <span className="text-sm font-medium text-[#abd1c6]">
-                      {data.currentStreak > 0
-                        ? getStreakLabel(data.currentStreak)
-                        : "дней"}
-                      {data.currentStreak > 0 ? " подряд" : " — начните сегодня"}
-                    </span>
-                  </p>
-                </div>
+          {/* Серия и награды в одной строке */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-emerald-500/10 bg-emerald-950/30 px-3 py-2.5">
+            <div className="flex min-w-0 items-center gap-2">
+              <div
+                className={cn(
+                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border",
+                  streakActive
+                    ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-400"
+                    : "border-emerald-500/15 bg-emerald-950/40 text-zinc-500",
+                )}
+              >
+                <LucideIcons.Flame className="h-4 w-4" />
               </div>
-
-              <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end">
-                {data.isAdminTestMode ? (
-                  <Badge
-                    variant="secondary"
-                    className="gap-1.5 border-[#e16162]/30 bg-[#e16162]/15 text-[#fffffe]"
-                  >
-                    <LucideIcons.TestTube className="h-3.5 w-3.5" />
-                    Тест
-                  </Badge>
-                ) : null}
-                <Badge
-                  variant={data.canClaim ? "success" : "secondary"}
-                  className={cn(
-                    "gap-1.5 font-semibold",
-                    data.canClaim
-                      ? "border-[#f9bc60]/30 bg-[#f9bc60]/15 text-[#f9bc60]"
-                      : "border-white/15 bg-white/10 text-[#abd1c6]",
-                  )}
-                >
-                  {data.canClaim ? (
-                    <LucideIcons.Sparkles className="h-3.5 w-3.5" />
-                  ) : (
-                    <LucideIcons.Check className="h-3.5 w-3.5" />
-                  )}
-                  {data.canClaim ? "Бонус доступен" : "Сегодня получено"}
-                </Badge>
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+                  Серия
+                </p>
+                <p className="text-lg font-bold leading-tight text-emerald-400">
+                  {formatBonuses(data.currentStreak)}{" "}
+                  <span className="text-xs font-medium text-zinc-400">
+                    {data.currentStreak > 0
+                      ? getStreakLabel(data.currentStreak)
+                      : "дней"}
+                  </span>
+                </p>
               </div>
             </div>
-          </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <InfoPill
-              icon={<LucideIcons.Coins className="h-5 w-5" />}
-              title="За сегодня"
-              value={
-                data.claimedToday
+            <div className="hidden h-6 w-px bg-emerald-500/15 sm:block" aria-hidden />
+
+            <div className="min-w-0">
+              <p className="text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+                Сегодня
+              </p>
+              <p
+                className={cn(
+                  "text-sm font-bold",
+                  data.claimedToday ? "text-zinc-400" : "text-[#f9bc60]",
+                )}
+              >
+                {data.claimedToday
                   ? "Получено"
-                  : `+${formatBonuses(data.dailyBonus)}`
-              }
-              subtitle={
-                data.claimedToday
-                  ? "Завтра снова можно забрать бонус"
-                  : "Нажмите кнопку ниже, чтобы забрать"
-              }
-              accent={!data.claimedToday}
-            />
-            <InfoPill
-              icon={<LucideIcons.Gift className="h-5 w-5" />}
-              title="Следующая награда"
-              value={
-                data.nextMilestone
-                  ? `+${formatBonuses(data.nextMilestone.bonus)}`
-                  : "Цикл пройден"
-              }
-              subtitle={
-                data.nextMilestone
-                  ? `Через ${formatBonuses(data.daysUntilNextMilestone)} ${getStreakLabel(data.daysUntilNextMilestone)} · за ${data.nextMilestone.days} ${getStreakLabel(data.nextMilestone.days)}`
-                  : "Все награды серии уже получены"
-              }
-              accent={Boolean(data.nextMilestone)}
-            />
+                  : `+${formatBonuses(data.dailyBonus)}`}
+              </p>
+            </div>
+
+            {data.nextMilestone ? (
+              <>
+                <div className="hidden h-6 w-px bg-emerald-500/15 sm:block" aria-hidden />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+                    Следующая
+                  </p>
+                  <p className="text-sm font-bold text-[#f9bc60]">
+                    +{formatBonuses(data.nextMilestone.bonus)}
+                    <span className="ml-1 text-xs font-medium text-zinc-500">
+                      через {formatBonuses(data.daysUntilNextMilestone)}{" "}
+                      {getStreakLabel(data.daysUntilNextMilestone)}
+                    </span>
+                  </p>
+                </div>
+              </>
+            ) : null}
           </div>
 
           {data.nextMilestone ? (
-            <div className="space-y-3 rounded-2xl border border-white/10 bg-black/15 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-2">
-                  <ProfileImageIcon src="/icon/pig14.png" alt="" size="xs" />
-                  <p className="text-sm font-medium text-[#fffffe]">
-                    Путь к награде +{formatBonuses(data.nextMilestone.bonus)}
-                  </p>
-                </div>
-                <span className="shrink-0 text-sm font-bold tabular-nums text-[#f9bc60]">
-                  {formatBonuses(data.currentStreak)} /{" "}
+            <div className="space-y-2 rounded-lg border border-emerald-500/10 bg-emerald-950/30 px-3 py-2.5">
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <span className="font-medium text-zinc-300">
+                  До +{formatBonuses(data.nextMilestone.bonus)}
+                </span>
+                <span className="font-mono font-bold tabular-nums text-emerald-400">
+                  {formatBonuses(data.currentStreak)}/
                   {formatBonuses(data.nextMilestone.days)}
                 </span>
               </div>
 
-              <div className="h-2.5 overflow-hidden rounded-full bg-black/30 shadow-[inset_0_1px_2px_rgba(0,0,0,0.35)]">
+              <div className="h-1 overflow-hidden rounded-full bg-zinc-950/50">
                 <motion.div
-                  className="h-full rounded-full bg-gradient-to-r from-[#f9bc60] via-[#ffd27d] to-[#e8a545] shadow-[0_0_16px_rgba(249,188,96,0.35)]"
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400"
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercent}%` }}
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {STREAK_MILESTONES.map((milestone) => {
                   const reached = data.currentStreak >= milestone.days;
                   const isNext = data.nextMilestone?.days === milestone.days;
 
                   return (
-                    <div
+                    <span
                       key={milestone.days}
                       className={cn(
-                        "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px]",
+                        "rounded-full border px-2 py-0.5 text-[10px] font-medium",
                         reached
                           ? "border-[#abd1c6]/30 bg-[#abd1c6]/10 text-[#abd1c6]"
                           : isNext
@@ -527,42 +412,25 @@ export function ProfileDailyBonusCard({
                             : "border-white/10 bg-white/[0.03] text-[#667a73]",
                       )}
                     >
-                      <span className="font-semibold">{milestone.days} дн.</span>
-                      <span className="opacity-80">
-                        +{formatBonuses(milestone.bonus)}
-                      </span>
-                    </div>
+                      {milestone.days}д +{formatBonuses(milestone.bonus)}
+                    </span>
                   );
                 })}
               </div>
-
-              <p className="text-xs leading-relaxed text-[#667a73]">
-                Каждый день — +{formatBonuses(data.dailyBonus)} бонусов. Пропуск
-                сбрасывает серию.
-              </p>
             </div>
           ) : (
-            <div className="flex items-start gap-3 rounded-2xl border border-[#abd1c6]/20 bg-[#abd1c6]/8 px-4 py-3.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#abd1c6]/25 bg-[#abd1c6]/10 text-[#abd1c6]">
-                <LucideIcons.Trophy className="h-5 w-5" />
-              </div>
-              <p className="text-sm leading-relaxed text-[#abd1c6]">
-                Вы прошли весь цикл наград. Новая серия начнётся с первого дня.
-              </p>
-            </div>
+            <p className="flex items-center gap-2 rounded-lg border border-[#abd1c6]/20 bg-[#abd1c6]/8 px-3 py-2 text-xs text-[#abd1c6]">
+              <LucideIcons.Trophy className="h-3.5 w-3.5 shrink-0" />
+              Цикл наград пройден — серия начнётся заново.
+            </p>
           )}
 
           {statusMessage ? (
-            <>
-              <Separator className="bg-white/10" />
-              <p className="rounded-xl border border-[#abd1c6]/20 bg-[#abd1c6]/8 px-3.5 py-2.5 text-sm text-[#abd1c6]">
-                {statusMessage}
-              </p>
-            </>
+            <p className="text-xs leading-snug text-zinc-400">{statusMessage}</p>
           ) : null}
-        </CardContent>
+        </div>
 
-        <CardFooter className="relative !mt-4 border-[#abd1c6]/10 !p-0">
+        <div className="relative mt-3 border-t border-emerald-500/10 pt-3">
           {data.canClaim ? (
             <div className="grid w-full gap-2 sm:grid-cols-2">
               <Button
@@ -570,16 +438,16 @@ export function ProfileDailyBonusCard({
                 variant="default"
                 disabled={claiming || claimingRisk}
                 onClick={handleClaim}
-                className="h-11 gap-2 rounded-xl border border-[#f9bc60]/45 bg-[#f9bc60]/90 font-semibold text-[#001e1d] shadow-lg shadow-[#f9bc60]/20 transition-all hover:bg-[#f7b24a]"
+                className="h-9 gap-1.5 rounded-lg bg-emerald-600 text-sm font-semibold text-white hover:bg-emerald-500"
               >
                 {claiming ? (
                   <>
-                    <LucideIcons.Loader2 className="h-4 w-4 animate-spin" />
+                    <LucideIcons.Loader2 className="h-3.5 w-3.5 animate-spin" />
                     Получаем...
                   </>
                 ) : (
                   <>
-                    <LucideIcons.Coins className="h-4 w-4" />
+                    <LucideIcons.Coins className="h-3.5 w-3.5" />
                     Забрать +{formatBonuses(data.dailyBonus)}
                   </>
                 )}
@@ -589,17 +457,17 @@ export function ProfileDailyBonusCard({
                 variant="outline"
                 disabled={claiming || claimingRisk}
                 onClick={handleRiskClaim}
-                className="h-11 gap-2 rounded-xl border-[#e16162]/45 bg-[#e16162]/12 font-semibold text-[#fffffe] transition-all hover:border-[#e16162]/60 hover:bg-[#e16162]/20"
+                className="h-9 gap-1.5 rounded-lg border border-red-500/20 bg-red-950/40 text-sm font-semibold text-red-400 hover:bg-red-900/30"
               >
                 {claimingRisk ? (
                   <>
-                    <LucideIcons.Loader2 className="h-4 w-4 animate-spin" />
+                    <LucideIcons.Loader2 className="h-3.5 w-3.5 animate-spin" />
                     Рискуем...
                   </>
                 ) : (
                   <>
-                    <LucideIcons.Zap className="h-4 w-4 text-[#e16162]" />
-                    Риск: +{formatBonuses(DAILY_BONUS_RISK_WIN_AMOUNT)} или всё
+                    <LucideIcons.Zap className="h-3.5 w-3.5" />
+                    Риск +{formatBonuses(DAILY_BONUS_RISK_WIN_AMOUNT)}
                   </>
                 )}
               </Button>
@@ -609,20 +477,20 @@ export function ProfileDailyBonusCard({
               type="button"
               variant="default"
               disabled
-              className="h-11 w-full gap-2 rounded-xl border border-white/15 bg-white/10 font-semibold text-[#abd1c6]"
+              className="h-9 w-full gap-1.5 rounded-lg border border-emerald-500/10 bg-emerald-950/40 text-sm font-semibold text-zinc-500"
             >
-              <LucideIcons.CalendarCheck className="h-4 w-4" />
+              <LucideIcons.CalendarCheck className="h-3.5 w-3.5" />
               Приходите завтра
             </Button>
           )}
           {data.canClaim ? (
-            <p className="mt-2 w-full text-center text-[11px] leading-relaxed text-[#667a73]">
-              Риск: шанс +{formatBonuses(DAILY_BONUS_RISK_WIN_AMOUNT)} — 1 из{" "}
-              {formatBonuses(DAILY_BONUS_RISK_WIN_ODDS)}. Серия сбрасывается.
+            <p className="mt-1.5 text-center text-[10px] text-zinc-500">
+              Риск: 1 из {formatBonuses(DAILY_BONUS_RISK_WIN_ODDS)}, серия
+              сбрасывается
             </p>
           ) : null}
-        </CardFooter>
-      </Card>
+        </div>
+      </article>
     </motion.div>
 
     <DailyBonusRiskConfirmModal

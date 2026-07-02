@@ -23,6 +23,7 @@ export function sanitizeApplicationStoryHtml(html: string) {
       },
     },
     disallowedTagsMode: "discard",
+    allowProtocolRelative: false,
   });
 }
 

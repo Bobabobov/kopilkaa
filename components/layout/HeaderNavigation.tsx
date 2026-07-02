@@ -3,73 +3,70 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import type { Route } from "next";
-
-const links: { href: Route; label: string }[] = [
-  { href: "/", label: "Главная" },
-  { href: "/stories", label: "Истории" },
-  { href: "/reviews", label: "Отзывы" },
-  { href: "/applications", label: "Заявка" },
-  { href: "/good-deeds", label: "Добрые дела" },
-  { href: "/vyzhivanie", label: "Выживание" },
-  { href: "/heroes", label: "Герои" },
-  { href: "/advertising", label: "Реклама" },
-];
+import {
+  HEADER_NAV_LINKS,
+  isHeaderNavLinkActive,
+} from "@/lib/navigation/headerNavLinks";
 
 interface HeaderNavigationProps {
   className?: string;
   onLinkClick?: () => void;
+  variant?: "header" | "drawer";
 }
 
 export default function HeaderNavigation({
   className,
   onLinkClick,
+  variant = "header",
 }: HeaderNavigationProps) {
   const pathname = usePathname();
-
-  // корректная подсветка активного пункта (учитывает вложенные маршруты)
-  const isActive = (href: Route) =>
-    href === "/"
-      ? pathname === "/"
-      : pathname === href || pathname.startsWith(href + "/");
+  const isDrawer = variant === "drawer";
+  const isMobileList = isDrawer || className?.includes("flex-col");
 
   return (
     <nav
-      className={cn("flex items-center gap-2", className)}
+      className={cn(
+        "flex items-center gap-2",
+        isDrawer && "flex-col items-stretch gap-1 w-full",
+        className,
+      )}
       suppressHydrationWarning
     >
-      {links.map((l) => (
-        <Link
-          key={l.href}
-          href={l.href}
-          prefetch={true}
-          onClick={onLinkClick}
-          className={cn(
-            "px-3 sm:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
-            isActive(l.href) ? "shadow-lg" : "hover:shadow-md",
-            // Улучшенная читаемость для мобильного меню (когда используется flex-col)
-            className?.includes("flex-col") &&
-              !isActive(l.href) &&
-              "text-white font-semibold drop-shadow-lg",
-            !className?.includes("flex-col") && "drop-shadow-md",
-          )}
-          style={{
-            backgroundColor: isActive(l.href) ? "#f9bc60" : "transparent",
-            color: isActive(l.href)
-              ? "#001e1d"
-              : className?.includes("flex-col")
-                ? "#ffffff"
-                : "#fffffe",
-            textShadow:
-              !isActive(l.href) && className?.includes("flex-col")
-                ? "0 2px 4px rgba(0,0,0,0.7), 0 0 12px rgba(0,0,0,0.5)"
-                : undefined,
-          }}
-          suppressHydrationWarning
-        >
-          {l.label}
-        </Link>
-      ))}
+      {HEADER_NAV_LINKS.map((l) => {
+        const active = isHeaderNavLinkActive(pathname, l.href);
+
+        return (
+          <Link
+            key={l.href}
+            href={l.href}
+            prefetch={true}
+            onClick={onLinkClick}
+            className={cn(
+              "rounded-xl font-medium transition-all duration-200",
+              isDrawer
+                ? "px-3 py-2.5 text-center text-base font-semibold"
+                : "px-3 sm:px-4 py-2 text-sm",
+              active ? "shadow-lg" : "hover:shadow-md",
+              isMobileList &&
+                !active &&
+                "text-white font-semibold drop-shadow-lg",
+              !isMobileList && "drop-shadow-md",
+              isDrawer && !active && "hover:bg-white/[0.06] active:scale-[0.99]",
+            )}
+            style={{
+              backgroundColor: active ? "#f9bc60" : "transparent",
+              color: active ? "#001e1d" : isMobileList ? "#ffffff" : "#fffffe",
+              textShadow:
+                !active && isMobileList
+                  ? "0 2px 4px rgba(0,0,0,0.7), 0 0 12px rgba(0,0,0,0.5)"
+                  : undefined,
+            }}
+            suppressHydrationWarning
+          >
+            {l.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

@@ -1,7 +1,6 @@
 import { cache } from "react";
 import { prisma } from "@/lib/db";
 import { getSafeExternalUrl } from "@/lib/safeExternalUrl";
-import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 
 export type TopDonorItem = {
   id: string;
@@ -10,7 +9,6 @@ export type TopDonorItem = {
   vkLink: string | null;
   telegramLink: string | null;
   youtubeLink: string | null;
-  markedAsDeceiver: boolean;
   position: number;
   isTop: boolean;
   amount: string;
@@ -51,7 +49,6 @@ export const getTopDonors = cache(
           vkLink: true,
           telegramLink: true,
           youtubeLink: true,
-          ...USER_PUBLIC_BADGE_SELECT,
         },
       });
       const byId = new Map(users.map((u) => [u.id, u]));
@@ -74,7 +71,6 @@ export const getTopDonors = cache(
             vkLink: getSafeExternalUrl(user.vkLink),
             telegramLink: getSafeExternalUrl(user.telegramLink),
             youtubeLink: getSafeExternalUrl(user.youtubeLink),
-            markedAsDeceiver: user.markedAsDeceiver,
             position: index + 1,
             isTop: index === 0,
             amount: totalAmount.toLocaleString("ru-RU"),

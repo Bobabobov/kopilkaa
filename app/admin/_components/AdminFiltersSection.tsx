@@ -1,6 +1,10 @@
 "use client";
 
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import {
+  adminFieldClass,
+  adminLabelClass,
+} from "@/app/admin/_components/admin-ui";
 
 interface AdminFiltersSectionProps {
   q: string;
@@ -40,11 +44,6 @@ const SORT_OPTIONS = [
   },
 ];
 
-const fieldClass =
-  "w-full rounded-xl border border-[#abd1c6]/25 bg-[#003b3a]/70 px-3 py-2.5 text-sm text-[#fffffe] placeholder:text-[#94a1b2] outline-none focus:border-[#f9bc60] min-h-[44px]";
-
-const labelClass = "block text-xs font-bold text-[#abd1c6] mb-1.5";
-
 export function AdminFiltersSection({
   q,
   minAmount,
@@ -69,15 +68,15 @@ export function AdminFiltersSection({
   };
 
   return (
-    <div className="pt-5 border-t border-[#abd1c6]/15">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="border-t-2 border-[#abd1c6]/10 pt-5">
+      <div className="mb-3 flex items-center gap-2">
         <LucideIcons.Search size="sm" className="text-[#f9bc60]" />
         <h3 className="text-sm font-bold text-[#fffffe]">Поиск и сортировка</h3>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-3">
-        <div className="flex-1 min-w-0">
-          <label htmlFor="admin-search" className={labelClass}>
+      <div className="flex flex-col gap-3 lg:flex-row">
+        <div className="min-w-0 flex-1">
+          <label htmlFor="admin-search" className={adminLabelClass}>
             Поиск по истории, нику, почте и тексту заявки
           </label>
           <div className="relative">
@@ -90,20 +89,20 @@ export function AdminFiltersSection({
               value={q}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="История, ник, имя, email, заголовок, реквизиты…"
-              className={`${fieldClass} pl-10`}
+              className={`${adminFieldClass} pl-10`}
             />
           </div>
         </div>
 
-        <div className="w-full lg:w-56 flex-shrink-0">
-          <label htmlFor="admin-sort" className={labelClass}>
+        <div className="w-full shrink-0 lg:w-56">
+          <label htmlFor="admin-sort" className={adminLabelClass}>
             Порядок списка
           </label>
           <select
             id="admin-sort"
             value={sortValue}
             onChange={(e) => handleSortChange(e.target.value)}
-            className={fieldClass}
+            className={adminFieldClass}
           >
             {SORT_OPTIONS.map((option) => (
               <option
@@ -118,9 +117,9 @@ export function AdminFiltersSection({
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="sm:col-span-2">
-          <label htmlFor="admin-min-amount" className={labelClass}>
+          <label htmlFor="admin-min-amount" className={adminLabelClass}>
             Сумма от, ₽
           </label>
           <input
@@ -129,11 +128,11 @@ export function AdminFiltersSection({
             value={minAmount}
             onChange={(e) => onMinAmountChange(e.target.value)}
             placeholder="Без ограничения"
-            className={fieldClass}
+            className={adminFieldClass}
           />
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="admin-max-amount" className={labelClass}>
+          <label htmlFor="admin-max-amount" className={adminLabelClass}>
             Сумма до, ₽
           </label>
           <input
@@ -142,7 +141,7 @@ export function AdminFiltersSection({
             value={maxAmount}
             onChange={(e) => onMaxAmountChange(e.target.value)}
             placeholder="Без ограничения"
-            className={fieldClass}
+            className={adminFieldClass}
           />
         </div>
       </div>

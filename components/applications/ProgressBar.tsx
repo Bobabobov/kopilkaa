@@ -57,7 +57,7 @@ export default function ProgressBar({
       name: "Сумма",
       filled: amount.length > 0 && parseInt(amount) >= LIMITS.amountMin,
     },
-    { name: "Реквизиты", filled: getCharCount(payment) >= LIMITS.paymentMin },
+    { name: "Номер СБП", filled: getCharCount(payment) >= LIMITS.paymentMin },
     { name: "Фото", filled: photos.length > 0 },
   ];
 

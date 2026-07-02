@@ -16,12 +16,14 @@ import {
   type ProfileAchievementShowcaseItem,
 } from "@/components/profile/achievements/profileAchievementPinsEvents";
 import { ProfileImageIcon } from "@/components/profile/ProfileImageIcon";
+import { PROFILE_EMERALD_PANEL } from "@/components/profile/profileEmerald";
 import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import {
   getShowcaseChipEnterClass,
   getShowcaseChipEnterStyle,
 } from "@/components/profile/achievements/showcaseAchievementMotion";
+import { prefetchPinPickerData } from "@/components/profile/achievements/profileAchievementPinPickerCache";
 import { useHorizontalScrollPan } from "@/hooks/useHorizontalScrollPan";
 import { cn } from "@/lib/utils";
 
@@ -36,11 +38,13 @@ type ProfileAchievementShowcaseStripProps = {
 };
 
 const CAROUSEL_NAV_CLASS = cn(
-  "h-8 w-8 rounded-full border border-[#abd1c6]/35 bg-[#001e1d]/95 text-[#f9bc60]",
+  "h-8 w-8 rounded-full border border-emerald-500/25 bg-emerald-950/90 text-emerald-400",
   "shadow-[0_4px_16px_rgba(0,0,0,0.35)]",
-  "hover:bg-[#001e1d] hover:border-[#f9bc60]/50",
+  "hover:border-emerald-400/50 hover:bg-emerald-950 hover:text-emerald-300",
   "disabled:opacity-20",
 );
+
+const STRIP_SEPARATOR = "hidden h-5 w-px shrink-0 bg-emerald-500/15 sm:inline";
 
 function ShowcaseAchievementChip({
   item,
@@ -77,14 +81,15 @@ function ShowcaseAchievementChip({
           name={item.name}
           size="strip"
           variant="floating"
+          className="drop-shadow-[0_0_10px_rgba(16,185,129,0.35)]"
         />
       </div>
       <span
         className={cn(
           "transition-colors duration-200",
           variant === "mobile"
-            ? "line-clamp-2 w-full text-center text-xs leading-snug text-[#abd1c6]"
-            : "truncate text-sm font-medium text-[#fffffe] group-hover:text-[#f9bc60]",
+            ? "line-clamp-2 w-full text-center text-xs leading-snug text-zinc-400"
+            : "truncate text-sm font-medium text-zinc-100 group-hover:text-emerald-400",
         )}
       >
         {item.name}
@@ -109,9 +114,7 @@ function AchievementDesktopScrollRow({
       className={cn(
         "custom-scrollbar hidden min-w-0 flex-1 items-center gap-4 overflow-x-auto overscroll-x-contain pb-0.5 sm:flex [scrollbar-width:thin]",
         "touch-pan-x",
-        isDragging
-          ? "cursor-grabbing select-none"
-          : "cursor-grab",
+        isDragging ? "cursor-grabbing select-none" : "cursor-grab",
       )}
       aria-label="Список закреплённых достижений"
       title="Листайте: Shift + колёсико или перетащите мышью"
@@ -216,7 +219,10 @@ export function ProfileAchievementShowcaseStrip({
 
   useEffect(() => {
     void loadShowcase();
-  }, [loadShowcase]);
+    if (isOwner) {
+      prefetchPinPickerData();
+    }
+  }, [loadShowcase, isOwner]);
 
   useEffect(() => {
     const handleUpdate = (event: Event) => {
@@ -245,17 +251,19 @@ export function ProfileAchievementShowcaseStrip({
     : "Участник ещё не закрепил достижения в профиле";
 
   const editButtonLabel = isEmpty ? "Выбрать" : "Изменить";
-  const editButtonClass = `inline-flex shrink-0 items-center gap-1.5 rounded-xl border text-sm font-semibold transition-colors ${
+  const editButtonClass = cn(
+    "inline-flex shrink-0 items-center gap-1.5 rounded-xl border text-sm font-semibold transition-colors",
     pickerOpen
-      ? "border-[#f9bc60]/50 bg-[#f9bc60]/15 text-[#f9bc60]"
-      : "border-white/10 bg-white/5 text-[#abd1c6] hover:border-[#f9bc60]/35 hover:bg-[#f9bc60]/10 hover:text-[#f9bc60]"
-  }`;
+      ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-400"
+      : "border-emerald-500/15 bg-emerald-950/40 text-zinc-400 hover:border-emerald-400/30 hover:bg-emerald-950/60 hover:text-emerald-400",
+  );
 
   return (
     <div
       ref={rootRef}
       className={cn(
-        "relative flex min-w-0 flex-col gap-3 rounded-2xl border border-white/[0.08] bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)] p-4 shadow-[0_4px_24px_rgba(0,0,0,0.2)] sm:flex-row sm:items-center sm:gap-4 sm:p-5",
+        PROFILE_EMERALD_PANEL,
+        "relative flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 sm:py-5",
         !reducedMotion &&
           "animate-in fade-in-0 slide-in-from-bottom-3 duration-500",
       )}
@@ -267,13 +275,16 @@ export function ProfileAchievementShowcaseStrip({
           src="/icon/pig7.png"
           alt=""
           size="sm"
-          className="drop-shadow-[0_3px_12px_rgba(249,188,96,0.4)]"
+          className="drop-shadow-[0_0_10px_rgba(16,185,129,0.35)]"
         />
-        <span className="text-xs uppercase tracking-wider text-[#abd1c6]/90">
+        <span className="text-xs font-bold uppercase tracking-wide text-emerald-400">
           Достижения
         </span>
         {!isEmpty && (
-          <Badge variant="default" className="font-semibold">
+          <Badge
+            variant="outline"
+            className="border-emerald-500/25 bg-emerald-500/10 font-semibold text-emerald-400"
+          >
             {items.length}
           </Badge>
         )}
@@ -282,7 +293,7 @@ export function ProfileAchievementShowcaseStrip({
           <button
             type="button"
             onClick={() => setPickerOpen((open) => !open)}
-            className={`${editButtonClass} ml-auto px-2.5 py-2 sm:hidden`}
+            className={cn(editButtonClass, "ml-auto px-2.5 py-2 sm:hidden")}
             aria-expanded={pickerOpen}
             aria-label={
               isEmpty ? "Выбрать достижения" : "Изменить достижения"
@@ -295,7 +306,7 @@ export function ProfileAchievementShowcaseStrip({
       </div>
 
       {isEmpty ? (
-        <p className="w-full min-w-0 text-sm text-[#abd1c6]/90 sm:flex-1">
+        <p className="w-full min-w-0 text-sm text-zinc-400 sm:flex-1">
           {emptyMessage}
         </p>
       ) : (
@@ -305,7 +316,7 @@ export function ProfileAchievementShowcaseStrip({
             reducedMotion={reducedMotion}
           />
 
-          <span className="hidden h-5 w-px shrink-0 bg-[#abd1c6]/30 sm:inline" />
+          <span className={STRIP_SEPARATOR} aria-hidden />
 
           <AchievementDesktopScrollRow
             items={items}
@@ -316,11 +327,11 @@ export function ProfileAchievementShowcaseStrip({
 
       {isOwner && (
         <>
-          <span className="hidden h-5 w-px shrink-0 bg-[#abd1c6]/30 sm:inline" />
+          <span className={STRIP_SEPARATOR} aria-hidden />
           <button
             type="button"
             onClick={() => setPickerOpen((open) => !open)}
-            className={`${editButtonClass} hidden px-3 py-2 sm:inline-flex`}
+            className={cn(editButtonClass, "hidden px-3 py-2 sm:inline-flex")}
             aria-expanded={pickerOpen}
             aria-label={
               isEmpty ? "Выбрать достижения" : "Изменить достижения"

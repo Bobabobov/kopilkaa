@@ -19,9 +19,6 @@ export type ApplicationCategoryConfig = {
   /** Что приложить к заявке (до рассмотрения) */
   proofBeforeTitle: string;
   proofBeforeLines: string[];
-  /** Отчёт после одобрения предыдущей заявки */
-  reportSlot1: string;
-  reportSlot2: string;
 };
 
 const CONFIG: Record<ApplicationCategory, ApplicationCategoryConfig> = {
@@ -34,9 +31,6 @@ const CONFIG: Record<ApplicationCategory, ApplicationCategoryConfig> = {
       "Фото корзины в приложении магазина или списка покупок с суммой.",
       "Или фото того, что дома не хватает (холодильник/стол) — чтобы было понятно, что запрос про еду сейчас.",
     ],
-    reportSlot1: "Фото купленных продуктов / перекуса или упаковки после покупки.",
-    reportSlot2:
-      "Чек из магазина или скрин оплаты из банка с суммой и временем.",
   },
   HOUSEHOLD_ESSENTIALS: {
     id: "HOUSEHOLD_ESSENTIALS",
@@ -46,8 +40,6 @@ const CONFIG: Record<ApplicationCategory, ApplicationCategoryConfig> = {
     proofBeforeLines: [
       "Фото того, что нужно купить или заменить (мелочь для дома), или скрин карточки товара с ценой.",
     ],
-    reportSlot1: "Фото купленной вещи / упаковки после покупки.",
-    reportSlot2: "Чек или скрин перевода/оплаты.",
   },
   TRANSPORT_COMMS: {
     id: "TRANSPORT_COMMS",
@@ -57,9 +49,6 @@ const CONFIG: Record<ApplicationCategory, ApplicationCategoryConfig> = {
     proofBeforeLines: [
       "Скрин баланса транспортной карты / приложения оператора / личного кабинета связи: видно, что средств недостаточно или нужно пополнение.",
     ],
-    reportSlot1:
-      "Скрин после пополнения: баланс проездного, мобильного или интернета.",
-    reportSlot2: "Скрин из банка или сервиса, подтверждающий оплату.",
   },
   SMALL_GIFT: {
     id: "SMALL_GIFT",
@@ -69,20 +58,15 @@ const CONFIG: Record<ApplicationCategory, ApplicationCategoryConfig> = {
     proofBeforeLines: [
       "Фото или скрин выбранного недорогого подарка (витрина/карточка товара с ценой), без лишних персональных данных других людей.",
     ],
-    reportSlot1: "Фото подарка (упаковка/товар) после покупки.",
-    reportSlot2: "Чек или скрин оплаты.",
   },
   EVERYDAY_SUPPORT: {
     id: "EVERYDAY_SUPPORT",
     title: "Поддержка в обычной жизненной ситуации",
-    description: "Небольшая помощь без обязательств",
+    description: "Живой рассказ о вашей мелкой бытовой хотелке",
     proofBeforeTitle: "Что должно быть видно на фото или скринах",
     proofBeforeLines: [
       "Одно наглядное фото или скрин ситуации «здесь и сейчас» (без лишних персональных данных третьих лиц).",
     ],
-    reportSlot1:
-      "Фото или скрин, показывающий, на что пошла помощь (результат/чек оплаты по сути ситуации).",
-    reportSlot2: "Подтверждение траты: чек, скрин перевода или из банка.",
   },
   /** Только чтение старых заявок; в форме не предлагается */
   GAME_OR_SERVICE: {
@@ -91,10 +75,12 @@ const CONFIG: Record<ApplicationCategory, ApplicationCategoryConfig> = {
     description: "Устаревшая категория в базе данных.",
     proofBeforeTitle: "Доказательства до рассмотрения",
     proofBeforeLines: ["Категория не используется для новых заявок."],
-    reportSlot1: "Отчёт по заявке.",
-    reportSlot2: "Подтверждение траты.",
   },
 };
+
+/** Категория по умолчанию для новых заявок (выбор категории в форме отключён). */
+export const DEFAULT_APPLICATION_CATEGORY =
+  "EVERYDAY_SUPPORT" as const satisfies ApplicationCategory;
 
 export function getApplicationCategoryConfig(
   id: ApplicationCategory,
@@ -118,6 +104,3 @@ export function isSubmittableApplicationCategory(
     value,
   );
 }
-
-/** Минимум фото в отчёте по прошлой одобренной заявке */
-export const REPORT_PHOTOS_MIN = 2;

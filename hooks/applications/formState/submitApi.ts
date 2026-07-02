@@ -10,15 +10,16 @@ export interface SubmitApplicationPayload {
   summary: string;
   story: string;
   amount: string;
+  desiredAmount?: string;
   payment: string;
   images: string[];
-  /** Фото-отчёт по прошлой одобренной заявке (до 5 шт) */
-  reportImages?: string[];
   hpCompany: string;
   acknowledgedRules: boolean;
   clientMeta: {
     filledMs: number | null;
     storyEditMs?: number | null;
+    deviceFingerprint?: string | null;
+    clientTimezone?: string | null;
   };
 }
 

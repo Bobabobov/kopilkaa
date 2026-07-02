@@ -1,24 +1,21 @@
 // app/profile/page.tsx
-"use client";
-// Профиль сильно зависит от динамических данных и куков,
-// поэтому явно помечаем маршрут как динамический, чтобы Next
-// не пытался предрендерить /profile статически при билде.
-export const dynamic = "force-dynamic";
+'use client';
 
-import { Suspense } from "react";
-import ProfileLoading from "@/components/profile/sections/ProfileLoading";
-import ProfileErrorState from "@/components/profile/ProfileErrorState";
-import ProfileUnauthorizedState from "@/components/profile/ProfileUnauthorizedState";
-import ProfileLayout from "@/components/profile/ProfileLayout";
-import { SettingsModal } from "@/components/profile/ProfileDynamicImports";
-import { useProfileDashboard } from "@/hooks/profile/useProfileDashboard";
-import { useProfileUrlParams } from "@/hooks/profile/useProfileUrlParams";
-import { useTrustLevel } from "@/hooks/profile/useTrustLevel";
-import { useProfileUpdates } from "@/hooks/profile/useProfileUpdates";
-import { useProfileSettingsModal } from "@/hooks/profile/useProfileSettingsModal";
+export const dynamic = 'force-dynamic';
 
-// Обёртка с Suspense — требуется Next.js для страниц,
-// которые используют useSearchParams в режиме CSR bailout.
+import { Suspense } from 'react';
+import ProfileLoading from '@/components/profile/sections/ProfileLoading';
+import ProfileErrorState from '@/components/profile/ProfileErrorState';
+import ProfileUnauthorizedState from '@/components/profile/ProfileUnauthorizedState';
+import ProfileLayout from '@/components/profile/ProfileLayout';
+import { SettingsModal } from '@/components/profile/ProfileDynamicImports';
+import { useProfileDashboard } from '@/hooks/profile/useProfileDashboard';
+import { useProfileUrlParams } from '@/hooks/profile/useProfileUrlParams';
+import { useProfileUpdates } from '@/hooks/profile/useProfileUpdates';
+import { useProfileSettingsModal } from '@/hooks/profile/useProfileSettingsModal';
+import { getUserLevelProgress } from '@/lib/userLevel';
+import { toDisplayExperience } from '@/lib/userLevel/economy';
+
 export default function ProfilePage() {
   return (
     <Suspense fallback={<ProfileLoading />}>
@@ -32,65 +29,12 @@ function ProfilePageContent() {
   const { isSettingsModalOpen, setIsSettingsModalOpen } =
     useProfileSettingsModal();
 
-  // Обработка URL параметров
   useProfileUrlParams();
 
-  const user = profileData?.user || null;
-  const trustSnapshot = profileData?.trust ?? profileData?.stats?.trust;
-  const approvedApplicationsRaw =
-    trustSnapshot?.approvedApplications ??
-    profileData?.stats?.approvedApplications ??
-    0;
-  const approvedApplicationsEffective =
-    trustSnapshot?.effectiveApprovedApplications ??
-    profileData?.stats?.effectiveApprovedApplications ??
-    profileData?.stats?.applications?.effectiveApproved ??
-    approvedApplicationsRaw;
+  const user = profileData?.user ?? null;
 
-  // Расчет уровня доверия
-  const {
-    trustStatus,
-    trustSupportText,
-    progressText,
-    progressValue,
-    progressCurrent,
-    progressTotal,
-  } = useTrustLevel({
-    approvedApplications: approvedApplicationsRaw,
-    effectiveApprovedApplications: approvedApplicationsEffective,
-  });
-  const trustStatusResolved = trustSnapshot?.trustLevel
-    ? (trustSnapshot.trustLevel.toLowerCase() as typeof trustStatus)
-    : trustStatus;
-  const trustSupportResolved =
-    trustSnapshot?.supportRangeText ?? trustSupportText;
-  /* progressCurrent/progressTotal из API учитывают trustDelta (админское понижение уровня) */
-  const progressCurrentResolved =
-    trustSnapshot != null &&
-    typeof trustSnapshot.progressCurrent === "number" &&
-    typeof trustSnapshot.progressTotal === "number"
-      ? trustSnapshot.progressCurrent
-      : progressCurrent;
-  const progressTotalResolved =
-    trustSnapshot != null && typeof trustSnapshot.progressTotal === "number"
-      ? trustSnapshot.progressTotal
-      : progressTotal;
-  const progressTextResolved = trustSnapshot?.progressText ?? progressText;
-  const progressValueResolved =
-    progressTotalResolved != null &&
-    progressTotalResolved > 0 &&
-    progressCurrentResolved != null
-      ? Math.min(
-          1,
-          Math.max(0, progressCurrentResolved / progressTotalResolved),
-        )
-      : progressValue;
-
-  // Обработка обновлений профиля
   const { handleThemeChange, handleCoverChange, handleAvatarChange } =
-    useProfileUpdates({
-      refetch,
-    });
+    useProfileUpdates({ refetch });
 
   if (loading) {
     return <ProfileLoading />;
@@ -104,28 +48,29 @@ function ProfilePageContent() {
     return <ProfileUnauthorizedState />;
   }
 
-  const levelStats = profileData?.levelStats ?? null;
   const bonusWallet = profileData?.bonusWallet ?? {
     totalEarnedBonuses: 0,
+    grossBonuses: 0,
+    bonusesInvestedInExperience: 0,
+    bonusesInLevel: 0,
     availableBonuses: 0,
     pendingWithdrawalBonuses: 0,
     withdrawnBonuses: 0,
     hasPendingWithdrawal: false,
     withdrawalBlocked: false,
+    withdrawalsDisabled: false,
   };
+
+  const userLevel =
+    profileData?.userLevel ??
+    getUserLevelProgress(toDisplayExperience(user.experience ?? 0));
 
   return (
     <>
       <ProfileLayout
         user={user}
-        trustStatus={trustStatusResolved}
-        trustSupportText={trustSupportResolved}
-        trustProgressText={progressTextResolved}
-        trustProgressValue={progressValueResolved}
-        trustProgressCurrent={progressCurrentResolved}
-        trustProgressTotal={progressTotalResolved}
-        levelStats={levelStats}
         bonusWallet={bonusWallet}
+        userLevel={userLevel}
         onThemeChange={handleThemeChange}
         onCoverChange={handleCoverChange}
         onAvatarChange={handleAvatarChange}
@@ -133,7 +78,6 @@ function ProfilePageContent() {
         onBonusClaimed={refetch}
       />
 
-      {/* Модальное окно настроек */}
       {isSettingsModalOpen && (
         <SettingsModal
           isOpen={isSettingsModalOpen}

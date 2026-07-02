@@ -35,11 +35,11 @@ type Status = "PENDING" | "APPROVED" | "REJECTED";
 export function statusSubject(status: Status) {
   switch (status) {
     case "PENDING":
-      return "Ваша заявка принята в обработку";
+      return "Ваша история принята в обработку";
     case "APPROVED":
-      return "Ваша заявка одобрена";
+      return "Ваша история одобрена";
     case "REJECTED":
-      return "Ваша заявка отклонена";
+      return "Ваша история отклонена";
   }
 }
 
@@ -57,9 +57,9 @@ export function statusHtml(opts: {
         : "Отказано";
   return `
   <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5;color:#111">
-    <h2 style="margin:0 0 12px">Статус вашей заявки обновлён</h2>
+    <h2 style="margin:0 0 12px">Статус вашей истории обновлён</h2>
     <div style="padding:12px;border:1px solid #eee;border-radius:12px">
-      <div><strong>Заявка:</strong> ${escapeHtml(title)}</div>
+      <div><strong>История:</strong> ${escapeHtml(title)}</div>
       <div><strong>Статус:</strong> ${statusText}</div>
       ${comment ? `<div style="margin-top:8px"><strong>Комментарий:</strong> ${escapeHtml(comment)}</div>` : ""}
     </div>

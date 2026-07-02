@@ -49,7 +49,7 @@ export function getStatusModalActionLabel(
   ) {
     return "Открыть историю";
   }
-  return "Открыть заявки";
+  return "Открыть истории";
 }
 
 export function getStatusModalStatusLine(notification: Notification): string {
@@ -59,5 +59,5 @@ export function getStatusModalStatusLine(notification: Notification): string {
   if (notification.type === "good_deed_submission_status") {
     return "Обновление по доброму делу";
   }
-  return "Обновление по заявке";
+  return "Обновление по истории";
 }

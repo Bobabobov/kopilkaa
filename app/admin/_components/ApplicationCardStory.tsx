@@ -9,8 +9,11 @@ interface ApplicationCardStoryProps {
 export default function ApplicationCardStory({
   story,
 }: ApplicationCardStoryProps) {
+  const plainLength = story.replace(/<[^>]*>/g, '').trim().length;
+  if (plainLength === 0) return null;
+
   const truncatedStory = (() => {
-    const textLength = story.replace(/<[^>]*>/g, "").length;
+    const textLength = story.replace(/<[^>]*>/g, '').length;
     return textLength > 260 ? truncateHTML(story, 260) : story;
   })();
 

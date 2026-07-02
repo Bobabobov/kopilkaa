@@ -1,8 +1,16 @@
 "use client";
 
-import type { ApplicationCategory } from "@prisma/client";
-import { isApplicationCategory, REPORT_PHOTOS_MIN } from "@/lib/applications/categories";
 import { LIMITS, TOTAL_FIELDS } from "./constants";
+import {
+  applicationPlainTextContainsLink,
+  applicationStoryHtmlContainsLink,
+  getApplicationNoLinksError,
+} from "@/lib/applications/validateContent";
+import { getSbpBankErrorForPhone } from '@/lib/sbp/sbpBanks';
+import {
+  getSbpPhoneError,
+  isValidSbpPhone,
+} from '@/lib/sbp/validatePhone';
 
 export function getStoryTextLen(story: string): number {
   if (!story) return 0;
@@ -17,25 +25,26 @@ export function getCharCount(text: string): number {
 }
 
 export interface FormValidationInput {
-  category: ApplicationCategory | "";
   title: string;
   summary: string;
+  story?: string;
   storyTextLen: number;
   amount: string;
   amountInt: number;
+  desiredAmount?: string;
+  desiredAmountInt?: number;
   bankName: string;
   payment: string;
   photosCount: number;
-  reportPhotosCount: number;
-  /** Нужен фото-отчёт по прошлой одобренной заявке */
-  requiresReport: boolean;
   isAdmin: boolean;
-  withinTrustRange: boolean;
+  /** Динамический лимит суммы по уровню (если не задан — LIMITS.amountMax) */
+  amountMax?: number;
+  /** Показывать и валидировать поле «Желаемая сумма» */
+  showsDesiredAmount?: boolean;
 }
 
 export function isApplicationFormValid(input: FormValidationInput): boolean {
   const {
-    category,
     title,
     summary,
     storyTextLen,
@@ -44,37 +53,39 @@ export function isApplicationFormValid(input: FormValidationInput): boolean {
     bankName,
     payment,
     photosCount,
-    reportPhotosCount,
-    requiresReport,
     isAdmin,
-    withinTrustRange,
   } = input;
-  const reportOk =
-    !requiresReport ||
-    isAdmin ||
-    reportPhotosCount >= REPORT_PHOTOS_MIN;
+  const amountMax = input.amountMax ?? LIMITS.amountMax;
+  const desiredOk =
+    !input.showsDesiredAmount ||
+    !input.desiredAmount ||
+    input.desiredAmount.length === 0 ||
+    (typeof input.desiredAmountInt === "number" &&
+      input.desiredAmountInt > amountInt);
+
   return (
-    isApplicationCategory(category) &&
     title.length <= LIMITS.titleMax &&
+    !applicationPlainTextContainsLink(title) &&
     summary.length > 0 &&
     summary.length <= LIMITS.summaryMax &&
+    !applicationPlainTextContainsLink(summary) &&
+    !(input.story && applicationStoryHtmlContainsLink(input.story)) &&
     storyTextLen >= LIMITS.storyMin &&
     storyTextLen <= LIMITS.storyMax &&
     amount.length > 0 &&
     amountInt >= LIMITS.amountMin &&
-    (isAdmin || amountInt <= LIMITS.amountMax) &&
-    withinTrustRange &&
-    bankName.trim().length > 0 &&
-    payment.length >= LIMITS.paymentMin &&
-    (isAdmin || payment.length <= LIMITS.paymentMax) &&
+    (isAdmin || amountInt <= amountMax) &&
+    desiredOk &&
+    getSbpBankErrorForPhone(bankName, payment) === null &&
+    !applicationPlainTextContainsLink(bankName) &&
+    isValidSbpPhone(payment) &&
+    !applicationPlainTextContainsLink(payment) &&
     photosCount > 0 &&
-    photosCount <= LIMITS.maxPhotos &&
-    reportOk
+    photosCount <= LIMITS.maxPhotos
   );
 }
 
 export function getFilledFieldsCount(input: {
-  category: ApplicationCategory | "";
   title: string;
   summary: string;
   storyTextLen: number;
@@ -86,13 +97,12 @@ export function getFilledFieldsCount(input: {
 }): number {
   const g = getCharCount;
   return [
-    isApplicationCategory(input.category),
     g(input.title) > 0,
     g(input.summary) > 0,
     input.storyTextLen >= LIMITS.storyMin,
     input.amount.length > 0 && input.amountInt >= LIMITS.amountMin,
-    g(input.bankName) > 0,
-    g(input.payment) >= LIMITS.paymentMin,
+    getSbpBankErrorForPhone(input.bankName, input.payment) === null,
+    isValidSbpPhone(input.payment),
     input.photosCount > 0,
   ].filter(Boolean).length;
 }
@@ -103,22 +113,20 @@ export function getProgressPercentage(filledFields: number): number {
 
 /** Ключи полей формы для скролла и подсветки */
 export type ApplicationFieldKey =
-  | "category"
   | "title"
   | "summary"
   | "story"
   | "amount"
+  | "desiredAmount"
   | "bankName"
   | "payment"
-  | "photos"
-  | "reportPhotos";
+  | "photos";
 
 /** Ошибки по полям: ключ — id поля, значение — текст подсказки */
 export function getApplicationFormErrors(
   input: FormValidationInput
 ): Partial<Record<ApplicationFieldKey, string>> {
   const {
-    category,
     title,
     summary,
     storyTextLen,
@@ -127,30 +135,29 @@ export function getApplicationFormErrors(
     bankName,
     payment,
     photosCount,
-    reportPhotosCount,
-    requiresReport,
     isAdmin,
-    withinTrustRange,
   } = input;
   const errors: Partial<Record<ApplicationFieldKey, string>> = {};
 
-  if (!isApplicationCategory(category)) {
-    errors.category = "Выберите категорию помощи";
-  }
-
   if (title.length === 0) {
-    errors.title = "Введите заголовок заявки";
+    errors.title = "Введите заголовок истории";
+  } else if (applicationPlainTextContainsLink(title)) {
+    errors.title = getApplicationNoLinksError("title");
   } else if (title.length > LIMITS.titleMax) {
     errors.title = `Заголовок: максимум ${LIMITS.titleMax} символов`;
   }
 
   if (summary.length === 0) {
     errors.summary = "Введите краткое описание";
+  } else if (applicationPlainTextContainsLink(summary)) {
+    errors.summary = getApplicationNoLinksError("summary");
   } else if (summary.length > LIMITS.summaryMax) {
     errors.summary = `Краткое описание: максимум ${LIMITS.summaryMax} символов`;
   }
 
-  if (storyTextLen < LIMITS.storyMin) {
+  if (input.story && applicationStoryHtmlContainsLink(input.story)) {
+    errors.story = getApplicationNoLinksError("story");
+  } else if (storyTextLen < LIMITS.storyMin) {
     errors.story =
       storyTextLen === 0
         ? "Напишите подробную историю"
@@ -159,41 +166,41 @@ export function getApplicationFormErrors(
     errors.story = `История: максимум ${LIMITS.storyMax} символов`;
   }
 
+  const amountMax = input.amountMax ?? LIMITS.amountMax;
   if (amount.length === 0) {
     errors.amount = "Укажите сумму в рублях";
   } else if (amountInt < LIMITS.amountMin) {
     errors.amount = `Минимальная сумма — ${LIMITS.amountMin} ₽`;
-  } else if (!isAdmin && amountInt > LIMITS.amountMax) {
-    errors.amount = `Максимальная сумма — ${LIMITS.amountMax} ₽`;
-  } else if (!withinTrustRange) {
-    errors.amount = "Сумма превышает лимит для вашего уровня доверия";
+  } else if (!isAdmin && amountInt > amountMax) {
+    errors.amount = `На вашем уровне доступен гонорар до ${amountMax} ₽.`;
   }
 
-  if (bankName.trim().length === 0) {
-    errors.bankName = "Укажите название банка";
+  if (input.showsDesiredAmount && input.desiredAmount && input.desiredAmount.length > 0) {
+    const desiredInt = input.desiredAmountInt ?? 0;
+    if (desiredInt <= amountInt) {
+      errors.desiredAmount =
+        "Желаемая сумма должна быть больше суммы гонорара";
+    }
   }
 
-  if (payment.length < LIMITS.paymentMin) {
-    errors.payment =
-      payment.length === 0
-        ? "Введите реквизиты для получения помощи"
-        : `Реквизиты: минимум ${LIMITS.paymentMin} символов`;
-  } else if (!isAdmin && payment.length > LIMITS.paymentMax) {
-    errors.payment = `Реквизиты: максимум ${LIMITS.paymentMax} символов`;
+  const bankError = getSbpBankErrorForPhone(bankName, payment);
+  if (bankError) {
+    errors.bankName = bankError;
+  } else if (applicationPlainTextContainsLink(bankName)) {
+    errors.bankName = getApplicationNoLinksError("bankName");
+  }
+
+  const phoneError = getSbpPhoneError(payment);
+  if (phoneError) {
+    errors.payment = phoneError;
+  } else if (applicationPlainTextContainsLink(payment)) {
+    errors.payment = getApplicationNoLinksError("payment");
   }
 
   if (photosCount === 0) {
     errors.photos = "Добавьте хотя бы одну фотографию";
   } else if (photosCount > LIMITS.maxPhotos) {
     errors.photos = `Максимум ${LIMITS.maxPhotos} фото`;
-  }
-
-  if (
-    requiresReport &&
-    !isAdmin &&
-    reportPhotosCount < REPORT_PHOTOS_MIN
-  ) {
-    errors.reportPhotos = `Добавьте минимум ${REPORT_PHOTOS_MIN} фото отчёта по прошлой заявке`;
   }
 
   return errors;

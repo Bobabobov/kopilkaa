@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/Card";
+import { AdminStatGrid } from '@/app/admin/_components/admin-ui';
 
 type Props = {
   stats: {
@@ -11,23 +11,19 @@ type Props = {
 
 export function ModerationStats({ stats }: Props) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-      <Card variant="darkGlass" className="py-3">
-        <p className="text-xs text-[#94a1b2]">Всего</p>
-        <p className="text-2xl font-bold text-[#fffffe]">{stats.total}</p>
-      </Card>
-      <Card variant="darkGlass" className="py-3 border border-[#f9bc60]/30">
-        <p className="text-xs text-[#94a1b2]">Требуют решения</p>
-        <p className="text-2xl font-bold text-[#f9bc60]">{stats.pending}</p>
-      </Card>
-      <Card variant="darkGlass" className="py-3">
-        <p className="text-xs text-[#94a1b2]">Подтверждено</p>
-        <p className="text-2xl font-bold text-[#10B981]">{stats.approved}</p>
-      </Card>
-      <Card variant="darkGlass" className="py-3">
-        <p className="text-xs text-[#94a1b2]">Отклонено</p>
-        <p className="text-2xl font-bold text-[#e16162]">{stats.rejected}</p>
-      </Card>
-    </div>
+    <AdminStatGrid
+      className="mb-4"
+      items={[
+        { label: 'Всего', value: stats.total },
+        {
+          label: 'Требуют решения',
+          value: stats.pending,
+          tone: 'pending',
+          highlight: stats.pending > 0,
+        },
+        { label: 'Подтверждено', value: stats.approved, tone: 'success' },
+        { label: 'Отклонено', value: stats.rejected, tone: 'danger' },
+      ]}
+    />
   );
 }

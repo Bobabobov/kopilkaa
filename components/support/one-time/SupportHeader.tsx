@@ -29,8 +29,8 @@ export function SupportHeader() {
         className="text-sm sm:text-base max-w-xl mx-auto px-2 leading-relaxed"
         style={{ color: "#abd1c6" }}
       >
-        Любая сумма — это вклад в развитие платформы и помощь тем, кому она
-        действительно нужна.
+        Любая сумма — это вклад в развитие платформы и фонд вознаграждений
+        для авторов контента.
       </p>
     </motion.div>
   );

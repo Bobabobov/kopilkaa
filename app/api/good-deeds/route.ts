@@ -14,6 +14,7 @@ import {
   getTaskRotationState,
 } from "@/lib/goodDeedTasksAdmin";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { resolveUserProfileLevel } from "@/lib/userLevel/resolveProfileLevel";
 
 export const dynamic = "force-dynamic";
 
@@ -126,14 +127,23 @@ export async function GET(req: NextRequest) {
     let pendingCount = 0;
     let walletInfo = {
       totalEarnedBonuses: 0,
+      bonusesInLevel: 0,
       availableBonuses: 0,
       pendingWithdrawalBonuses: 0,
       withdrawnBonuses: 0,
       hasPendingWithdrawal: false,
       withdrawalBlocked: false,
+      withdrawalsDisabled: false,
     };
 
+    let profileLevel: number | undefined;
+
     if (session?.uid) {
+      const user = await prisma.user.findUnique({
+        where: { id: session.uid },
+        select: { level: true, experience: true },
+      });
+      profileLevel = resolveUserProfileLevel(user ?? {});
       walletInfo = await computeGoodDeedBonusWallet(session.uid);
 
       const userStats = await prisma.goodDeedSubmission.groupBy({
@@ -165,6 +175,7 @@ export async function GET(req: NextRequest) {
         pendingCount,
         ...walletInfo,
       },
+      profileLevel,
       feed: feedSubmissions.map(mapFeedRowToGoodDeedsApiItem),
       viewer: {
         isAuthenticated: Boolean(session?.uid),

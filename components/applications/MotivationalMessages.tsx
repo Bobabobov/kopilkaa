@@ -12,7 +12,7 @@ interface MotivationalMessagesProps {
 const messages = [
   {
     threshold: 0,
-    text: "Начните заполнение заявки",
+    text: "Начните заполнение истории",
     icon: "Rocket",
     color: "#f9bc60",
   },

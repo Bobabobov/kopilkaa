@@ -3,16 +3,24 @@ import {
   GoodDeedWithdrawalStatus,
 } from "@prisma/client";
 import {
+  buildBonusLedgerByUser,
+  type BonusLedgerUserGroup,
+} from "@/lib/admin/bonusLedger";
+import {
   BONUS_SOURCE_LABELS,
   BonusSourceCategory,
   categorizeBonusGrant,
 } from "@/lib/admin/bonusGrantCategory";
 import { prisma } from "@/lib/db";
+import { getUserLevelProgress } from "@/lib/userLevel/calculate";
+import { toDisplayExperience } from "@/lib/userLevel/economy";
+import { resolveUserProfileLevel } from "@/lib/userLevel/resolveProfileLevel";
 
 export type BonusUserBreakdown = {
   goodDeeds: number;
   referrals: number;
   dailyBonus: number;
+  dailyChest: number;
   adminManual: number;
   other: number;
 };
@@ -33,26 +41,15 @@ export type BonusReportUserRow = {
   dailyClaimsCount: number;
   currentStreak: number;
   withdrawalBlocked: boolean;
-};
-
-export type BonusLedgerEntry = {
-  id: string;
-  category: BonusSourceCategory;
-  categoryLabel: string;
-  amountBonuses: number;
-  description: string;
-  createdAt: string;
-  user: {
-    id: string;
-    name: string;
-    username: string | null;
-    avatar: string | null;
-  };
+  level: number;
+  experience: number;
+  progressPercent: number;
 };
 
 export type BonusWithdrawItem = {
   id: string;
   amountBonuses: number;
+  profileLevel: number;
   bankName: string;
   details: string;
   status: GoodDeedWithdrawalStatus;
@@ -82,7 +79,7 @@ export type BonusReportSummary = {
 export type BonusReport = {
   summary: BonusReportSummary;
   users: BonusReportUserRow[];
-  ledger: BonusLedgerEntry[];
+  ledgerUsers: BonusLedgerUserGroup[];
   withdrawals: BonusWithdrawItem[];
 };
 
@@ -91,6 +88,7 @@ function emptyBreakdown(): BonusUserBreakdown {
     goodDeeds: 0,
     referrals: 0,
     dailyBonus: 0,
+    dailyChest: 0,
     adminManual: 0,
     other: 0,
   };
@@ -101,6 +99,10 @@ function addToBreakdown(
   category: BonusSourceCategory,
   amount: number,
 ) {
+  if (category === "goodDeeds") {
+    breakdown.goodDeeds += amount;
+    return;
+  }
   breakdown[category] += amount;
 }
 
@@ -119,8 +121,6 @@ export async function buildAdminBonusReport(): Promise<BonusReport> {
     withdrawalRows,
     dailyClaimsAgg,
     dailyStates,
-    recentSubmissions,
-    recentGrants,
   ] = await Promise.all([
     prisma.goodDeedSubmission.groupBy({
       by: ["userId"],
@@ -163,6 +163,8 @@ export async function buildAdminBonusReport(): Promise<BonusReport> {
             username: true,
             email: true,
             avatar: true,
+            level: true,
+            experience: true,
           },
         },
       },
@@ -174,35 +176,6 @@ export async function buildAdminBonusReport(): Promise<BonusReport> {
     }),
     prisma.dailyBonusState.findMany({
       select: { userId: true, currentStreak: true },
-    }),
-    prisma.goodDeedSubmission.findMany({
-      where: {
-        status: GoodDeedSubmissionStatus.APPROVED,
-        reward: { gt: 0 },
-      },
-      orderBy: { updatedAt: "desc" },
-      take: 80,
-      select: {
-        id: true,
-        userId: true,
-        reward: true,
-        taskTitle: true,
-        updatedAt: true,
-        user: { select: { id: true, name: true, username: true, avatar: true } },
-      },
-    }),
-    prisma.goodDeedBonusGrant.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 120,
-      select: {
-        id: true,
-        userId: true,
-        amountBonuses: true,
-        comment: true,
-        grantedById: true,
-        createdAt: true,
-        user: { select: { id: true, name: true, username: true, avatar: true } },
-      },
     }),
   ]);
 
@@ -224,6 +197,9 @@ export async function buildAdminBonusReport(): Promise<BonusReport> {
             email: true,
             avatar: true,
             bonusWithdrawalBlocked: true,
+            level: true,
+            experience: true,
+            bonusesInvestedInExperience: true,
           },
         })
       : [];
@@ -309,6 +285,13 @@ export async function buildAdminBonusReport(): Promise<BonusReport> {
       totalPendingWithdrawals += wallet.pendingWithdrawalBonuses;
       totalWithdrawn += wallet.withdrawnBonuses;
 
+      const displayExperience = toDisplayExperience(user?.experience ?? 0);
+      const level = resolveUserProfileLevel({
+        level: user?.level,
+        experience: user?.experience,
+      });
+      const userLevel = getUserLevelProgress(displayExperience);
+
       return {
         user: {
           id: userId,
@@ -325,54 +308,31 @@ export async function buildAdminBonusReport(): Promise<BonusReport> {
         dailyClaimsCount: dailyClaimsCountMap.get(userId) ?? 0,
         currentStreak: streakMap.get(userId) ?? 0,
         withdrawalBlocked: user?.bonusWithdrawalBlocked ?? false,
+        level: userLevel.level,
+        experience: userLevel.experience,
+        progressPercent: userLevel.progressPercent,
       };
     })
-    .filter((row) => row.totalEarnedBonuses > 0 || row.availableBonuses > 0)
-    .sort((a, b) => b.availableBonuses - a.availableBonuses);
+    .sort((a, b) => {
+      const balanceDiff = b.availableBonuses - a.availableBonuses;
+      if (balanceDiff !== 0) return balanceDiff;
+      return b.totalEarnedBonuses - a.totalEarnedBonuses;
+    });
 
-  const ledgerFromSubmissions: BonusLedgerEntry[] = recentSubmissions.map(
-    (row) => ({
-      id: `submission-${row.id}`,
-      category: "goodDeeds" as const,
-      categoryLabel: BONUS_SOURCE_LABELS.goodDeeds,
-      amountBonuses: row.reward,
-      description: row.taskTitle
-        ? `Задание: ${row.taskTitle}`
-        : "Награда за доброе дело",
-      createdAt: row.updatedAt.toISOString(),
-      user: {
-        id: row.user.id,
-        name: formatUserLabel(row.user),
-        username: row.user.username,
-        avatar: row.user.avatar,
+  const userMetaById = new Map(
+    users.map((user) => [
+      user.id,
+      {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar,
       },
-    }),
+    ]),
   );
 
-  const ledgerFromGrants: BonusLedgerEntry[] = recentGrants.map((grant) => {
-    const category = categorizeBonusGrant(grant.comment, grant.grantedById);
-    return {
-      id: `grant-${grant.id}`,
-      category,
-      categoryLabel: BONUS_SOURCE_LABELS[category],
-      amountBonuses: grant.amountBonuses,
-      description: grant.comment?.trim() || BONUS_SOURCE_LABELS[category],
-      createdAt: grant.createdAt.toISOString(),
-      user: {
-        id: grant.user.id,
-        name: formatUserLabel(grant.user),
-        username: grant.user.username,
-        avatar: grant.user.avatar,
-      },
-    };
-  });
-
-  const ledger = [...ledgerFromSubmissions, ...ledgerFromGrants]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
-    .slice(0, 150);
+  const ledgerUsers = await buildBonusLedgerByUser(userMetaById);
 
   const totalEarned = Object.values(summaryBreakdown).reduce(
     (sum, value) => sum + value,
@@ -390,15 +350,19 @@ export async function buildAdminBonusReport(): Promise<BonusReport> {
       totalAvailable,
       totalPendingWithdrawals,
       totalWithdrawn,
-      usersWithBonuses: userRows.length,
+      usersWithBonuses: userRows.filter((row) => row.availableBonuses > 0).length,
       dailyClaimsTotal,
       pendingWithdrawalsCount,
     },
     users: userRows,
-    ledger,
+    ledgerUsers,
     withdrawals: withdrawalRows.map((row) => ({
       id: row.id,
       amountBonuses: row.amountBonuses,
+      profileLevel: resolveUserProfileLevel({
+        level: row.user.level,
+        experience: row.user.experience,
+      }),
       bankName: row.bankName,
       details: row.details,
       status: row.status,

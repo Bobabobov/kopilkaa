@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { formatRub } from '@/lib/format';
 import { VYZHIVANIE_PRIZE_RUB } from '@/lib/tontine/constants';
+import { SectionFeedbackCta } from '@/components/feedback/SectionFeedbackCta';
 import type { TontineStatusResponse } from '../types';
 
 type Props = {
@@ -34,7 +35,9 @@ export function VyzhivanieTopBar({ data }: Props) {
         ) : null}
       </div>
 
-      <div className="w-[74px] sm:w-[92px]" aria-hidden />
+      <div className="flex shrink-0 justify-end">
+        <SectionFeedbackCta variant="vyzhivanie" layout="compact" />
+      </div>
     </header>
   );
 }

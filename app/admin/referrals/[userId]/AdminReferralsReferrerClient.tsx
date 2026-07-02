@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { AdminHeader } from "../../_components/AdminHeader";
+import { AdminPage } from "../../_components/AdminPage";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/Card";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -64,11 +64,7 @@ export default function AdminReferralsReferrerClient({ userId }: Props) {
   }, [load]);
 
   return (
-    <div className="min-h-screen relative">
-      <div className="relative z-10">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12">
-          <AdminHeader />
-
+    <AdminPage title="Реферер">
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Button
               type="button"
@@ -238,8 +234,6 @@ export default function AdminReferralsReferrerClient({ userId }: Props) {
               )}
             </>
           ) : null}
-        </div>
-      </div>
-    </div>
+    </AdminPage>
   );
 }

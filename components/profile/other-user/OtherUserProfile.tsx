@@ -12,8 +12,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
     loading,
     isAuthenticated,
     resolvedUserId,
-    ToastComponent,
-    trustDerived,
     friendship,
     friendshipStatus,
     sendFriendRequest,
@@ -39,7 +37,7 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
   }
 
   if (isUserCurrentlyBanned(user)) {
-    return <BannedNotice user={user} ToastComponent={ToastComponent} />;
+    return <BannedNotice user={user} />;
   }
 
   const effectiveUserId = resolvedUserId || user.id;
@@ -54,7 +52,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
         resolvedUserId={effectiveUserId}
         friendshipStatus={friendshipStatus}
         friendship={friendship}
-        trustDerived={trustDerived}
         onSendRequest={sendFriendRequest}
         onAcceptIncoming={acceptFriendRequest}
         onDeclineIncoming={declineFriendRequest}
@@ -63,7 +60,6 @@ export default function OtherUserProfile({ userId }: OtherUserProfileProps) {
         }
       />
 
-      <ToastComponent />
     </main>
   );
 }

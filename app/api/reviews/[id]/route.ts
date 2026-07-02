@@ -2,39 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { type TrustLevel } from "@/lib/trustLevel";
-import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
+import { ApplicationStatus } from "@prisma/client";
 import { isValidCuidLikeId } from "@/lib/reviews/reviewId";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
-
-type TrustSnapshot = {
-  status: Lowercase<TrustLevel>;
-  approved: number;
-  supportRange: string;
-  nextRequirement: string | null;
-};
-
-function buildTrustSnapshot(
-  trust: Awaited<ReturnType<typeof computeUserTrustSnapshot>>,
-): TrustSnapshot {
-  const status = trust.trustLevel.toLowerCase() as Lowercase<TrustLevel>;
-  const nextRequirement =
-    trust.nextRequired === null
-      ? null
-      : `До следующего уровня — ещё ${Math.max(
-          0,
-          trust.nextRequired - trust.effectiveApprovedApplications,
-        )} одобренных заявок`;
-
-  return {
-    status,
-    approved: trust.effectiveApprovedApplications,
-    supportRange: trust.supportRangeText,
-    nextRequirement,
-  };
-}
 
 export async function GET(
   _req: NextRequest,
@@ -76,9 +48,13 @@ export async function GET(
       return NextResponse.json({ error: "Не найдено" }, { status: 404 });
     }
 
-    const trust = buildTrustSnapshot(
-      await computeUserTrustSnapshot(review.userId),
-    );
+    const approvedApplications = await prisma.application.count({
+      where: {
+        userId: review.userId,
+        status: ApplicationStatus.APPROVED,
+      },
+    });
+
     const mapped = {
       id: review.id,
       content: review.content,
@@ -89,7 +65,7 @@ export async function GET(
       user: review.user
         ? {
             ...review.user,
-            trust,
+            approvedApplications,
             isSelf: viewerId ? viewerId === review.userId : false,
           }
         : null,
@@ -98,7 +74,7 @@ export async function GET(
     return NextResponse.json({ review: mapped });
   } catch (error) {
     logRouteCatchError("[API GET /api/reviews/[id]]", error);
-    return NextResponse.json({ error: "Ошибка загрузки" }, { status: 500 });
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }
 
@@ -121,7 +97,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Некорректный id" }, { status: 400 });
     }
 
-    // Проверяем, что отзыв существует и принадлежит текущему пользователю
     const review = await prisma.review.findUnique({
       where: { id: reviewId },
       select: { id: true, userId: true },
@@ -135,7 +110,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Нет доступа" }, { status: 403 });
     }
 
-    // Удаляем отзыв (изображения удалятся каскадно из-за onDelete: Cascade)
     await prisma.review.delete({
       where: { id: reviewId },
     });

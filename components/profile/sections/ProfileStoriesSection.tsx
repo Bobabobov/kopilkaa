@@ -5,7 +5,11 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatRelativeDate } from "@/lib/time";
-import { ProfileImageIcon } from "@/components/profile/ProfileImageIcon";
+import { ProfileSectionTitle } from "@/components/profile/ProfileSectionTitle";
+import {
+  PROFILE_EMERALD_INNER,
+  PROFILE_EMERALD_PANEL,
+} from "@/components/profile/profileEmerald";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 import {
@@ -60,166 +64,111 @@ export default function ProfileStoriesSection({
     fetchStories();
   }, [userId]);
 
+  const title = isOwner ? "Мои истории" : "Истории";
+
   if (loading) {
     return (
-      <motion.div
+      <motion.article
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/3 backdrop-blur-xl shadow-lg p-4 sm:p-5 md:p-6"
+        className={PROFILE_EMERALD_PANEL}
       >
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full" />
+        <Skeleton className="mb-4 h-8 w-40 rounded-lg bg-emerald-950/50" />
+        <div className="space-y-3">
+          <Skeleton className="h-20 w-full rounded-xl bg-emerald-950/50" />
+          <Skeleton className="h-20 w-full rounded-xl bg-emerald-950/50" />
         </div>
-        <div className="relative z-10 space-y-4">
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-xl" />
-            <div className="space-y-2 flex-1">
-              <Skeleton className="h-5 w-32" />
-              <Skeleton className="h-3 w-24" />
-            </div>
-          </div>
-          <div className="space-y-3">
-            <Skeleton className="h-20 w-full rounded-xl" />
-            <Skeleton className="h-20 w-full rounded-xl" />
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  if (stories.length === 0) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/3 backdrop-blur-xl shadow-lg"
-      >
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full" />
-        </div>
-        <div className="relative z-10 p-4 sm:p-5 md:p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <ProfileImageIcon
-              src="/icon/pig4.png"
-              alt={isOwner ? "Мои истории" : "Истории"}
-              size="md"
-            />
-            <div>
-              <h3 className="text-lg font-bold text-white">
-                {isOwner ? "Мои истории" : "Истории"}
-              </h3>
-            </div>
-          </div>
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <LucideIcons.BookOpen className="w-8 h-8 text-white/40" />
-            </div>
-            <p className="text-sm font-medium text-white/80 mb-1">
-              Пока нет историй
-            </p>
-            <p className="text-xs text-white/60 px-4">
-              {isOwner
-                ? "После одобрения заявки здесь появятся ваши истории"
-                : "У пользователя нет историй"}
-            </p>
-          </div>
-        </div>
-      </motion.div>
+      </motion.article>
     );
   }
 
   return (
-    <motion.div
+    <motion.article
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/3 backdrop-blur-xl shadow-lg"
+      className={PROFILE_EMERALD_PANEL}
     >
-      {/* Подсветки */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#f9bc60]/10 blur-3xl rounded-full" />
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#abd1c6]/10 blur-2xl rounded-full" />
-      </div>
+      <ProfileSectionTitle
+        imageSrc="/icon/pig4.png"
+        imageAlt={title}
+        title={title}
+        subtitle={
+          stories.length > 0
+            ? `${stories.length} ${
+                stories.length === 1
+                  ? "история"
+                  : stories.length < 5
+                    ? "истории"
+                    : "историй"
+              }`
+            : undefined
+        }
+        className="mb-5"
+      />
 
-      <div className="relative z-10 p-4 sm:p-5 md:p-6">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <ProfileImageIcon
-            src="/icon/pig4.png"
-            alt={isOwner ? "Мои истории" : "Истории"}
-            size="md"
-          />
-          <div>
-            <h3 className="text-lg font-bold text-white">
-              {isOwner ? "Мои истории" : "Истории"}
-            </h3>
-            <p className="text-xs text-white/60 mt-0.5">
-              {stories.length}{" "}
-              {stories.length === 1
-                ? "история"
-                : stories.length < 5
-                  ? "истории"
-                  : "историй"}
-            </p>
+      {stories.length === 0 ? (
+        <div className="py-6 text-center">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-500/10 bg-emerald-950/30">
+            <LucideIcons.BookOpen className="h-7 w-7 text-emerald-500/40" />
           </div>
+          <p className="mb-1 text-sm font-medium text-zinc-200">
+            Пока нет историй
+          </p>
+          <p className="px-4 text-xs text-zinc-500">
+            {isOwner
+              ? "После одобрения заявки здесь появятся ваши истории"
+              : "У пользователя нет историй"}
+          </p>
         </div>
-
-        {/* Stories List */}
+      ) : (
         <div className="space-y-3">
           {stories.map((story, index) => (
             <motion.div
               key={story.id}
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.06 }}
             >
               <Link
                 href={`/stories/${story.id}`}
-                className="block p-3 sm:p-4 rounded-xl border border-white/10 bg-white/5 transition-all duration-300 group hover:bg-white/10 hover:border-[#f9bc60]/50 hover:-translate-y-1 hover:shadow-[0_12px_28px_-8px_rgba(249,188,96,0.25)]"
+                className={`group block p-3 transition-colors hover:bg-emerald-950/40 sm:p-4 ${PROFILE_EMERALD_INNER}`}
               >
-                <div className="flex gap-2 xs:gap-3">
-                  {/* Image */}
+                <div className="flex gap-3">
                   {story.images && story.images.length > 0 ? (
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 border-white/20 flex-shrink-0 group-hover:border-[#f9bc60]/50 transition-all duration-300 shadow-md">
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-emerald-500/20 sm:h-24 sm:w-24">
                       <img
                         src={story.images[0].url}
                         alt={story.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                         loading="lazy"
                       />
-                      <div className="absolute inset-0 flex items-center justify-center bg-[#001e1d]/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f9bc60] px-3 py-1.5 text-xs font-bold text-[#001e1d] shadow-lg">
-                          Читать
-                          <LucideIcons.ArrowRight size="xs" />
-                        </span>
-                      </div>
                     </div>
                   ) : (
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-white/5 border-2 border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-[#f9bc60]/30 transition-colors">
-                      <LucideIcons.BookOpen className="w-5 h-5 text-white/40" />
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-950/30 sm:h-24 sm:w-24">
+                      <LucideIcons.BookOpen className="h-5 w-5 text-emerald-500/40" />
                     </div>
                   )}
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm sm:text-base font-semibold text-white line-clamp-2 group-hover:text-[#f9bc60] transition-colors mb-1">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="mb-1 line-clamp-2 text-sm font-semibold text-zinc-100 transition-colors group-hover:text-emerald-400 sm:text-base">
                       {story.title}
                     </h4>
                     {story.summary && (
-                      <p className="text-xs sm:text-sm text-white/70 line-clamp-2 mb-2">
+                      <p className="mb-2 line-clamp-2 text-xs text-zinc-400 sm:text-sm">
                         {story.summary}
                       </p>
                     )}
-                    <div className="flex items-center gap-2 text-xs text-white/60">
-                      <LucideIcons.Calendar className="w-3 h-3" />
+                    <div className="flex items-center gap-2 text-xs text-zinc-500">
+                      <LucideIcons.Calendar className="h-3 w-3" />
                       <span>{formatRelativeDate(story.createdAt)}</span>
                       {story._count.likes > 0 && (
                         <>
                           <span>•</span>
                           <div className="flex items-center gap-1">
                             {STORY_REACTION_TYPES.filter(
-                              (type) => (story.reactionCounts?.[type] ?? 0) > 0,
+                              (type) =>
+                                (story.reactionCounts?.[type] ?? 0) > 0,
                             ).map((type) => (
                               <StoryReactionIcon
                                 key={type}
@@ -239,7 +188,7 @@ export default function ProfileStoriesSection({
             </motion.div>
           ))}
         </div>
-      </div>
-    </motion.div>
+      )}
+    </motion.article>
   );
 }

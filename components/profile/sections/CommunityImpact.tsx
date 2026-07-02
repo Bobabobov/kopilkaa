@@ -20,18 +20,18 @@ export default function CommunityImpact() {
     // В реальности это будет из API
     const mockStats: ImpactStat[] = [
       {
-        label: "Помогли людям",
+        label: "Получили гонорар",
         value: 42,
         icon: "Heart",
         color: "#e16162",
-        description: "Человек получили помощь",
+        description: "Человек получили гонорар",
       },
       {
-        label: "Собрано средств",
+        label: "Выплачено гонораров",
         value: 125000,
         icon: "Coin",
         color: "#f9bc60",
-        description: "Рублей через ваши заявки",
+        description: "Рублей через ваши публикации",
       },
       {
         label: "Лайков получено",

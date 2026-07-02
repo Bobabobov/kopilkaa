@@ -4,10 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/Card";
+import { PROFILE_EMERALD_PANEL } from "@/components/profile/profileEmerald";
 import { ProfileFriendsHeader } from "./friends/ProfileFriendsHeader";
 import { ProfileFriendsLoading } from "./friends/ProfileFriendsLoading";
 import { ProfileFriendsError } from "./friends/ProfileFriendsError";
@@ -156,16 +153,16 @@ export default function ProfileFriendsSection() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
     >
-      <Card variant="darkGlass" padding="md" className="border-white/[0.08]">
+      <article className={PROFILE_EMERALD_PANEL}>
         <ProfileFriendsHeader
           totalFriends={totalFriends}
           pendingRequests={pendingRequests}
           onAllClick={() => goToFriends("friends")}
         />
 
-        <Separator className="my-4 bg-white/10" />
+        <Separator className="my-4 bg-emerald-500/10" />
 
-        <CardContent className="space-y-0 !p-0">
+        <div className="space-y-0">
           <AnimatePresence mode="wait">
             {loading ? (
               <ProfileFriendsLoading />
@@ -194,8 +191,8 @@ export default function ProfileFriendsSection() {
               />
             )}
           </AnimatePresence>
-        </CardContent>
-      </Card>
+        </div>
+      </article>
     </motion.div>
   );
 }

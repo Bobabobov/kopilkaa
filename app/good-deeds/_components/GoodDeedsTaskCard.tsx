@@ -21,16 +21,9 @@ import {
   MIN_GOOD_DEED_STORY_CHARS,
 } from "@/lib/goodDeeds";
 import type { GoodDeedTaskView } from "../types";
+import { bonusWord } from "./goodDeedsTaskUi";
 
 type Task = GoodDeedTaskView;
-
-function bonusWord(n: number): string {
-  const m = n % 10;
-  const c = n % 100;
-  if (m === 1 && c !== 11) return "бонус";
-  if (m >= 2 && m <= 4 && (c < 10 || c > 20)) return "бонуса";
-  return "бонусов";
-}
 
 function displayTierLabel(name: string): string {
   if (!name) return name;
@@ -366,7 +359,7 @@ export function GoodDeedsTaskCard({
                   compact ? "px-3 py-2 text-xs" : "px-4 py-3 text-sm",
                 )}
               >
-                Принято, бонусы начислены.
+                Принято модератором.
               </p>
             ) : (
               <>

@@ -10,7 +10,6 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 import { formatAmount } from "@/lib/format";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
-import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { storiesGlassCard } from "../stories-ui/glassStyles";
@@ -123,9 +122,6 @@ function RandomStoryCardInner({ story, isRead }: RandomStoryCardProps) {
                 />
                 <span className="truncate">{authorName}</span>
               </Link>
-              <UserPublicBadges
-                markedAsDeceiver={story.user?.markedAsDeceiver}
-              />
             </>
           ) : (
             <>
@@ -144,9 +140,6 @@ function RandomStoryCardInner({ story, isRead }: RandomStoryCardProps) {
               <span className="truncate text-xs font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                 {authorName}
               </span>
-              <UserPublicBadges
-                markedAsDeceiver={story.user?.markedAsDeceiver}
-              />
             </>
           )}
         </div>

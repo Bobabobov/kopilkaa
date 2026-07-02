@@ -4,18 +4,21 @@ import {
   DAILY_BONUS_RISK_LOSS_GRANT_COMMENT,
   DAILY_BONUS_RISK_WIN_GRANT_COMMENT,
 } from "@/lib/dailyBonus/constants";
+import { DAILY_CHEST_GRANT_COMMENT } from "@/lib/dailyChest/constants";
 
 export type BonusSourceCategory =
   | "goodDeeds"
   | "referrals"
   | "dailyBonus"
+  | "dailyChest"
   | "adminManual"
   | "other";
 
 export const BONUS_SOURCE_LABELS: Record<BonusSourceCategory, string> = {
   goodDeeds: "Добрые дела",
   referrals: "Рефералы",
-  dailyBonus: "Ежедневный вход",
+  dailyBonus: "Ежедневный бонус",
+  dailyChest: "Ежедневный сундук",
   adminManual: "Ручное начисление",
   other: "Прочее",
 };
@@ -25,6 +28,10 @@ export function categorizeBonusGrant(
   grantedById: string | null | undefined,
 ): Exclude<BonusSourceCategory, "goodDeeds"> {
   const normalized = (comment ?? "").trim();
+
+  if (normalized === DAILY_CHEST_GRANT_COMMENT) {
+    return "dailyChest";
+  }
 
   if (
     normalized === DAILY_BONUS_GRANT_COMMENT ||

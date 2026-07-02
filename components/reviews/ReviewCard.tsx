@@ -8,7 +8,6 @@ import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { cn } from "@/lib/utils";
-import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import type { ReviewItem } from "@/hooks/reviews/useReviews";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { buildUploadUrl } from "@/lib/uploads/url";
@@ -53,24 +52,23 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
     review.images?.[0]?.url || "/stories-preview.jpg",
     { variant: "thumb" },
   );
-  const trust = user.trust;
-  const trustLevelNumber = trust.status.split("_")[1] || "";
-  const trustTitle = trustLevelNumber
-    ? `Уровень одобрения ${trustLevelNumber}`
-    : "Уровень одобрения";
-  const trustLabel =
-    trust.nextRequirement ??
-    `Одобрено заявок: ${trust.approved.toLocaleString("ru-RU")}`;
   const profileHref = user.id ? `/profile/${user.id}` : null;
 
   const href = `/reviews/${review.id}`;
 
-  const handleProfileClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (profileHref) {
-      router.push(profileHref);
+  const handleCardClick = () => {
+    router.push(href);
+  };
+
+  const handleCardKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      router.push(href);
     }
+  };
+
+  const stopCardNavigation = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   const hasSocial = user.vkLink || user.telegramLink || user.youtubeLink;
@@ -87,10 +85,13 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
           "linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
       }}
     >
-      <Link
-        href={href}
+      <div
+        role="link"
+        tabIndex={0}
+        onClick={handleCardClick}
+        onKeyDown={handleCardKeyDown}
         className={cn(
-          "block focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/70 rounded-t-2xl focus:rounded-2xl",
+          "block cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/70 rounded-t-2xl focus:rounded-2xl",
           hasSocial ? "rounded-b-none" : "rounded-b-2xl",
         )}
       >
@@ -112,8 +113,9 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
           <div className="absolute bottom-3 left-4 flex items-center gap-2 text-white">
             <div className="relative">
               {profileHref ? (
-                <button
-                  onClick={handleProfileClick}
+                <Link
+                  href={profileHref}
+                  onClick={stopCardNavigation}
                   className="block rounded-full focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/70 cursor-pointer"
                 >
                   <div className="w-10 h-10 rounded-full overflow-hidden border border-white/60 shadow-lg">
@@ -130,7 +132,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
                       }}
                     />
                   </div>
-                </button>
+                </Link>
               ) : (
                 <div className="w-10 h-10 rounded-full overflow-hidden border border-white/60 shadow-lg">
                   <img
@@ -150,27 +152,27 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
             </div>
             <div className="flex flex-col">
               {profileHref ? (
-                <button
-                  onClick={handleProfileClick}
+                <Link
+                  href={profileHref}
+                  onClick={stopCardNavigation}
                   className="flex items-center gap-1.5 text-sm font-semibold leading-tight hover:text-[#f9bc60] transition-colors text-left cursor-pointer"
                 >
                   <span>{user.name}</span>
-                  <UserPublicBadges markedAsDeceiver={user.markedAsDeceiver} />
-                </button>
+                </Link>
               ) : (
                 <span className="flex items-center gap-1.5 text-sm font-semibold leading-tight">
                   <span>{user.name}</span>
-                  <UserPublicBadges markedAsDeceiver={user.markedAsDeceiver} />
                 </span>
               )}
               {user.username &&
                 (profileHref ? (
-                  <button
-                    onClick={handleProfileClick}
+                  <Link
+                    href={profileHref}
+                    onClick={stopCardNavigation}
                     className="text-[11px] text-white/85 hover:text-white transition-colors text-left cursor-pointer"
                   >
                     @{user.username}
-                  </button>
+                  </Link>
                 ) : (
                   <span className="text-[11px] text-white/85">
                     @{user.username}
@@ -182,19 +184,6 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
 
         {/* Body */}
         <div className="p-5 sm:p-6 space-y-4">
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <div
-              className="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 font-semibold"
-              style={{
-                background: "rgba(249, 188, 96, 0.15)",
-                color: "#f9bc60",
-              }}
-            >
-              <LucideIcons.Shield size="xs" />
-              {trustTitle}
-            </div>
-          </div>
-
           <p className="text-base leading-relaxed text-[#abd1c6] whitespace-pre-line line-clamp-3 group-hover:text-[#fffffe] transition-colors duration-200">
             {review.content}
           </p>
@@ -236,7 +225,7 @@ export function ReviewCard({ review }: { review: ReviewItem }) {
             </div>
           )}
         </div>
-      </Link>
+      </div>
 
       {hasSocial && (
         <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-2 border-t border-white/10 rounded-b-2xl bg-gradient-to-b from-transparent to-black/5">

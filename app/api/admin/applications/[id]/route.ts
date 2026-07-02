@@ -7,7 +7,12 @@ import { publish } from "@/lib/sse";
 import { sendStatusEmail } from "@/lib/email";
 import { syncApplicationStatusNotification } from "@/lib/notifications/userNotificationService";
 import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
-import { getReferralBonusAmount } from "@/lib/referralProgram";
+import {
+  getReferralBonusAmount,
+  isReferralProgramEnabled,
+} from "@/lib/referralProgram";
+import { buildApplicationEconomyAdminInfo } from "@/lib/applications/buildApplicationEconomyAdminInfo";
+import { resolveReviewForApplication } from "@/lib/reviews/reviewForApplication";
 
 type SameRef = {
   id: string;
@@ -39,6 +44,7 @@ export async function GET(
         story: true,
         category: true,
         amount: true,
+        desiredAmount: true,
         payment: true,
         status: true,
         adminComment: true,
@@ -46,12 +52,22 @@ export async function GET(
         storyEditMs: true,
         submitterIp: true,
         clientDevice: true,
+        clientTimezone: true,
+        deviceFingerprint: true,
+        isFirstFree: true,
+        submitBonusCost: true,
+        userLevelAtSubmit: true,
         createdAt: true,
         updatedAt: true,
-        countTowardsTrust: true,
-        trustDecreasedAtDecision: true,
         user: {
-          select: { email: true, id: true, name: true, avatar: true, trustDelta: true },
+          select: {
+            email: true,
+            id: true,
+            name: true,
+            avatar: true,
+            level: true,
+            phoneVerified: true,
+          },
         },
         images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
         review: {
@@ -85,30 +101,24 @@ export async function GET(
         id: true,
         title: true,
         createdAt: true,
-        review: {
-          select: {
-            id: true,
-            content: true,
-            createdAt: true,
-            images: {
-              orderBy: { sort: "asc" },
-              select: { url: true, sort: true },
-            },
-          },
-        },
-        reportImages: {
-          orderBy: { sort: "asc" },
-          select: { url: true, sort: true },
-        },
       },
     });
+
+    const previousApprovedReview = previousApproved
+      ? await resolveReviewForApplication(
+          prisma,
+          item.userId,
+          previousApproved.id,
+          { linkOrphan: true },
+        )
+      : null;
+
     const previousApprovedWithReview = previousApproved
       ? {
           id: previousApproved.id,
           title: previousApproved.title,
           createdAt: previousApproved.createdAt,
-          review: previousApproved.review,
-          reportImages: previousApproved.reportImages,
+          review: previousApprovedReview,
         }
       : null;
 
@@ -196,13 +206,56 @@ export async function GET(
       }));
     }
 
+    let sameDeviceApplications: SameRef[] = [];
+    if (item.deviceFingerprint) {
+      const others = await prisma.application.findMany({
+        where: {
+          id: { not: id },
+          deviceFingerprint: item.deviceFingerprint,
+        },
+        orderBy: { createdAt: "desc" },
+        take: 30,
+        select: {
+          id: true,
+          createdAt: true,
+          status: true,
+          title: true,
+          summary: true,
+          amount: true,
+          user: { select: { id: true, email: true, name: true } },
+        },
+      });
+      sameDeviceApplications = others.map((a) => ({
+        id: a.id,
+        createdAt: a.createdAt,
+        status: a.status,
+        title: a.title,
+        summary: a.summary,
+        amount: a.amount,
+        user: a.user,
+      }));
+    }
+
+    const economy = await buildApplicationEconomyAdminInfo({
+      applicationId: item.id,
+      userId: item.userId,
+      createdAt: item.createdAt,
+      userLevelAtSubmit: item.userLevelAtSubmit,
+      submitBonusCost: item.submitBonusCost,
+      isFirstFree: item.isFirstFree,
+      requestedAmount: item.amount,
+      desiredAmount: item.desiredAmount,
+    });
+
     return Response.json({
       item: {
         ...item,
         story: sanitizeApplicationStoryHtml(item.story ?? ""),
         samePaymentApplications,
         sameIpApplications,
+        sameDeviceApplications,
         previousApprovedWithReview,
+        economy,
       },
     });
   } catch (error) {
@@ -225,7 +278,6 @@ export async function PATCH(
     | "APPROVED"
     | "REJECTED"
     | undefined;
-  const decreaseTrustOnDecision = Boolean(body?.decreaseTrustOnDecision);
   const adminComment =
     typeof body?.adminComment === "string" ? body.adminComment : undefined;
   if (
@@ -249,9 +301,6 @@ export async function PATCH(
         data: {
           status,
           adminComment: adminComment ?? null,
-          ...(status === "APPROVED" || status === "REJECTED"
-            ? { trustDecreasedAtDecision: decreaseTrustOnDecision }
-            : {}),
         },
         include: {
           user: { select: { email: true, id: true } },
@@ -262,20 +311,13 @@ export async function PATCH(
         },
       });
 
-      if (
-        decreaseTrustOnDecision &&
-        (status === "APPROVED" || status === "REJECTED") &&
-        updated.user?.id
-      ) {
-        await tx.user.update({
-          where: { id: updated.user.id },
-          data: { trustDelta: { decrement: 3 } },
-        });
-      }
-
       // Реферальный бонус: начисляем ТОЛЬКО когда статус стал APPROVED
       // и ТОЛЬКО один раз на реферала (bonusGrantedAt == null).
-      if (status === "APPROVED" && previous.status !== "APPROVED") {
+      if (
+        isReferralProgramEnabled() &&
+        status === "APPROVED" &&
+        previous.status !== "APPROVED"
+      ) {
         const referredUserId = updated.user?.id;
         if (referredUserId) {
           const reg = await tx.referralRegistration.findUnique({

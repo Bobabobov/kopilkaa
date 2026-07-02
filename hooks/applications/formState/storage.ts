@@ -31,10 +31,12 @@ export function saveFormToStorage(saveKey: string, data: StoredFormData): void {
 }
 
 /** Возвращает [чекбокс1, чекбокс2, чекбокс3]. Старый формат "true"/"false" → все три одинаковы. */
-export function loadTrustAck(trustAckKey: string): [boolean, boolean, boolean] {
+export function loadRulesAck(rulesAckKey: string): [boolean, boolean, boolean] {
   if (typeof window === "undefined") return [false, false, false];
   try {
-    const raw = sessionStorage.getItem(trustAckKey);
+    const raw =
+      sessionStorage.getItem(rulesAckKey) ??
+      sessionStorage.getItem("application_trust_ack");
     if (!raw) return [false, false, false];
     if (raw === "true") return [true, true, true];
     if (raw === "false") return [false, false, false];
@@ -61,18 +63,6 @@ export function loadPolicyAck(policyAckKey: string): boolean {
   }
 }
 
-export function loadIntroAck(introAckKey: string): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    return (
-      sessionStorage.getItem(introAckKey) === "true" ||
-      localStorage.getItem(introAckKey) === "true"
-    );
-  } catch {
-    return false;
-  }
-}
-
 export function loadFormStartTime(formStartKey: string): number | null {
   if (typeof window === "undefined") return null;
   try {
@@ -85,13 +75,13 @@ export function loadFormStartTime(formStartKey: string): number | null {
   }
 }
 
-export function saveTrustAck(
-  trustAckKey: string,
+export function saveRulesAck(
+  rulesAckKey: string,
   value: [boolean, boolean, boolean],
 ): void {
   if (typeof window === "undefined") return;
   try {
-    sessionStorage.setItem(trustAckKey, JSON.stringify(value));
+    sessionStorage.setItem(rulesAckKey, JSON.stringify(value));
   } catch (e) {
     console.error("Ошибка при сохранении данных:", e);
   }
@@ -101,16 +91,6 @@ export function savePolicyAck(policyAckKey: string, value: boolean): void {
   if (typeof window === "undefined") return;
   try {
     sessionStorage.setItem(policyAckKey, value ? "true" : "false");
-  } catch (e) {
-    console.error("Ошибка при сохранении данных:", e);
-  }
-}
-
-export function saveIntroAck(introAckKey: string): void {
-  if (typeof window === "undefined") return;
-  try {
-    sessionStorage.setItem(introAckKey, "true");
-    localStorage.setItem(introAckKey, "true");
   } catch (e) {
     console.error("Ошибка при сохранении данных:", e);
   }
@@ -127,14 +107,15 @@ export function saveFormStartTime(formStartKey: string, time: number): void {
 
 export function clearFormStorage(
   saveKey: string,
-  trustAckKey: string,
+  rulesAckKey: string,
   policyAckKey: string,
   formStartKey: string,
 ): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.removeItem(saveKey);
-    sessionStorage.removeItem(trustAckKey);
+    sessionStorage.removeItem(rulesAckKey);
+    sessionStorage.removeItem("application_trust_ack");
     sessionStorage.removeItem(policyAckKey);
     localStorage.removeItem(formStartKey);
   } catch {

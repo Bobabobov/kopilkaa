@@ -38,7 +38,7 @@ export default function AvatarFrameCustomization({
     user.avatarFrame || "none",
   );
   const [saving, setSaving] = useState(false);
-  const { showToast, ToastComponent } = useBeautifulToast();
+  const { showToast } = useBeautifulToast();
 
   const frames = getAllAvatarFrames();
 
@@ -356,7 +356,6 @@ export default function AvatarFrameCustomization({
           </div>
         </div>
       </GlassModal>
-      <ToastComponent />
     </>
   );
 }

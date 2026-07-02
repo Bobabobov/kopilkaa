@@ -46,7 +46,7 @@ export default function KopiTourInviteModal() {
 
         <p className="mb-6 text-center text-sm leading-relaxed text-[#abd1c6] sm:text-base">
           Я помогу разобраться с «Копилкой»: покажу, где читать истории, как
-          подать заявку, где смотреть отзывы и как устроен личный кабинет.
+          подать историю, где смотреть отзывы и как устроен личный кабинет.
           Экскурсия займёт пару минут.
         </p>
 

@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { useBeautifulToast } from "@/components/ui/BeautifulToast";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 type ReviewData = {
@@ -19,11 +18,7 @@ type ReviewData = {
     name: string;
     username?: string | null;
     avatar?: string | null;
-    trust: {
-      status: string;
-      approved: number;
-      supportRange: string;
-    };
+    approvedApplications?: number;
   };
 };
 
@@ -38,8 +33,6 @@ export default function ProfileReviewSection({
 }: ProfileReviewSectionProps) {
   const [review, setReview] = useState<ReviewData | null>(null);
   const [loading, setLoading] = useState(true);
-  const { ToastComponent } = useBeautifulToast();
-
   useEffect(() => {
     const fetchReview = async () => {
       try {
@@ -104,7 +97,7 @@ export default function ProfileReviewSection({
           </p>
           <p className="text-xs text-[#94a1b2] mb-4 max-w-xs mx-auto">
             {isOwner
-              ? "После одобрения заявки вы сможете оставить отзыв о помощи"
+              ? "После одобрения истории вы сможете оставить отзыв о гонораре"
               : "Участник ещё не оставил отзыв"}
           </p>
           {isOwner && (
@@ -193,23 +186,22 @@ export default function ProfileReviewSection({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-3 pt-3 border-t border-white/10">
-          <div className="flex items-center gap-2 text-xs text-white/60">
-            <LucideIcons.Calendar className="w-3.5 h-3.5" />
-            <span>{formattedDate}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f9bc60]/15 border border-[#f9bc60]/30 text-xs font-medium text-[#f9bc60]">
-              <LucideIcons.Shield className="w-3 h-3" />
-              <span>
-                Уровень {review.user.trust.status.split("_")[1] || ""}
+        <div className="flex items-center gap-2 pt-3 border-t border-white/10 text-xs text-white/60">
+          <LucideIcons.Calendar className="w-3.5 h-3.5" />
+          <span>{formattedDate}</span>
+          {(review.user?.approvedApplications ?? 0) > 0 && (
+            <>
+              <span className="text-white/30" aria-hidden>
+                ·
               </span>
-            </div>
-          </div>
+              <span>
+                {review.user?.approvedApplications} одобр. заявок
+              </span>
+            </>
+          )}
         </div>
       </div>
 
-      <ToastComponent />
     </motion.div>
   );
 }

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { ProfileImageIcon } from "@/components/profile/ProfileImageIcon";
-import { LucideIcons } from "@/components/ui/LucideIcons";
-import type { ComponentType } from "react";
+import { ProfileImageIcon } from '@/components/profile/ProfileImageIcon';
+import { LucideIcons } from '@/components/ui/LucideIcons';
+import { cn } from '@/lib/utils';
+import type { ComponentType } from 'react';
 
 interface ProfileSectionTitleProps {
   icon?: keyof typeof LucideIcons;
   imageSrc?: string;
   imageAlt?: string;
   title: string;
-  /** Опциональный подзаголовок под заголовком */
   subtitle?: string;
   className?: string;
 }
@@ -17,40 +17,31 @@ interface ProfileSectionTitleProps {
 export function ProfileSectionTitle({
   icon: iconKey,
   imageSrc,
-  imageAlt = "",
+  imageAlt = '',
   title,
   subtitle,
-  className = "",
+  className,
 }: ProfileSectionTitleProps) {
   const Icon = iconKey
     ? (LucideIcons[iconKey] as ComponentType<{ className?: string }> | undefined)
     : undefined;
 
   return (
-    <div
-      className={`flex items-center gap-2.5 sm:gap-3 ${className}`}
-      aria-hidden
-    >
+    <div className={cn('mb-4 flex items-center gap-2.5 sm:gap-3', className)}>
       {imageSrc ? (
         <ProfileImageIcon src={imageSrc} alt={imageAlt} size="md" />
       ) : Icon ? (
-        <div
-          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-[#f9bc60]"
-          style={{ background: "rgba(249, 188, 96, 0.15)" }}
-        >
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
           <Icon className="h-4 w-4" />
         </div>
       ) : null}
       <div>
-        <h3
-          className="text-sm font-semibold uppercase tracking-wider"
-          style={{ color: "#f9bc60", letterSpacing: "0.1em" }}
-        >
+        <h3 className="text-sm font-bold uppercase tracking-wide text-emerald-400">
           {title}
         </h3>
-        {subtitle && (
-          <p className="mt-0.5 text-xs text-[#94a1b2]">{subtitle}</p>
-        )}
+        {subtitle ? (
+          <p className="mt-0.5 text-xs leading-relaxed text-zinc-400">{subtitle}</p>
+        ) : null}
       </div>
     </div>
   );

@@ -9,7 +9,6 @@ import {
   storiesGlassCard,
   storiesGlassShine,
 } from "@/app/stories/_components/stories-ui/glassStyles";
-import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import { UserSocialLinks } from "@/components/users/UserSocialLinks";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import {
@@ -316,7 +315,6 @@ function CommentContent({
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#fffffe] transition-colors hover:text-[#f9bc60]"
           >
             <span>{comment.user.name}</span>
-            <UserPublicBadges markedAsDeceiver={comment.user.markedAsDeceiver} />
           </Link>
           {comment.user.isSelf && (
             <Badge variant="default" className="text-[10px] uppercase">
@@ -848,14 +846,14 @@ export function StoryCommentsSection({
       return {
         tone: "info" as const,
         title: "Войдите, чтобы комментировать",
-        body: "Комментарии могут оставлять только зарегистрированные участники с одобренной заявкой.",
+        body: "Комментарии могут оставлять только зарегистрированные участники с одобренной историей.",
       };
     }
     if (viewer.isAuthenticated && !viewer.canComment) {
       return {
         tone: "warn" as const,
         title: "Комментарии пока недоступны",
-        body: "Оставить комментарий можно после одобрения хотя бы одной заявки на помощь.",
+        body: "Оставить комментарий можно после одобрения хотя бы одной опубликованной истории.",
       };
     }
     return null;
@@ -1001,7 +999,7 @@ export function StoryCommentsSection({
                     className="h-auto px-0 text-[#f9bc60]"
                   >
                     <Link href="/applications">
-                      Подать заявку
+                      Опубликовать историю
                       <LucideIcons.ArrowRight size="xs" />
                     </Link>
                   </Button>

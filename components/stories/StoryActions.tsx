@@ -34,8 +34,8 @@ export default function StoryActions({
         </h2>
         <p className="mx-auto mb-6 max-w-md text-sm text-[#abd1c6]/85 leading-relaxed">
           {isAd
-            ? "Разместите рекламную историю там, где люди читают реальные истории поддержки."
-            : "Подайте заявку на финансовую помощь — мы рассмотрим её и поможем, если сможем."}
+            ? "Разместите рекламную историю там, где люди читают реальные жизненные рассказы."
+            : "Опубликуйте историю — редакция рассмотрит материал и определит гонорар."}
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
@@ -64,7 +64,7 @@ export default function StoryActions({
               className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] px-8 py-3.5 text-[#001e1d] font-bold shadow-[0_8px_24px_rgba(249,188,96,0.3)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(249,188,96,0.35)] hover:-translate-y-0.5"
             >
               <LucideIcons.Plus size="md" />
-              Подать заявку
+              Опубликовать историю
             </Link>
           )}
         </div>

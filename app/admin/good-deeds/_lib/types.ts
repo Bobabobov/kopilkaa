@@ -28,4 +28,4 @@ export type Notice = {
 };
 
 export type StatusFilter = "ALL" | "PENDING" | "APPROVED" | "REJECTED";
-export type SortBy = "created_desc" | "created_asc" | "reward_desc" | "story_desc";
+export type SortBy = "created_desc" | "created_asc" | "reward_desc";

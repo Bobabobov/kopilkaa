@@ -276,7 +276,7 @@ export default function KopiAssistant() {
     appendMessages([{ id: createId(), role: 'user', text: action.label }]);
 
     if (actionId === 'go-applications') {
-      replyAsKopi('Отлично! Сейчас перенесу вас на страницу заявки.', () => {
+      replyAsKopi('Отлично! Сейчас перенесу вас на страницу публикации истории.', () => {
         closeAssistant();
         router.push('/applications');
       });
@@ -285,7 +285,7 @@ export default function KopiAssistant() {
 
     if (actionId === 'application') {
       setMenu('application');
-      replyAsKopi('Вот пошаговая инструкция — следуйте ей, и заявка будет готова:');
+      replyAsKopi('Вот пошаговая инструкция — следуйте ей, и история будет готова:');
       return;
     }
 
@@ -483,7 +483,7 @@ export default function KopiAssistant() {
                         onClick={() => handleMainAction('go-applications')}
                         className="mt-2 w-full rounded-xl bg-[#f9bc60] px-4 py-2.5 text-sm font-bold text-[#001e1d] transition-opacity hover:opacity-90"
                       >
-                        Перейти к заявке →
+                        Перейти к публикации →
                       </button>
                     </div>
                   )}

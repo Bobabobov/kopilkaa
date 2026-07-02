@@ -5,18 +5,15 @@ import { motion, useReducedMotion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Card, CardContent } from "@/components/ui/Card";
 import { usePageTimeTracking } from "@/hooks/ui/usePageTimeTracking";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import TrustHowItWorksModal from "@/components/applications/TrustHowItWorksModal";
 import ApplicationsForm from "@/components/applications/ApplicationsForm";
 import {
   useApplicationFormState,
   LIMITS,
 } from "@/hooks/applications/useApplicationFormState";
-import TrustIntroModal from "@/components/applications/TrustIntroModal";
 import SuccessScreen from "@/components/applications/SuccessScreen";
 import PageHeader from "@/components/applications/PageHeader";
+import { useFeedbackMeaningfulOnResult } from "@/hooks/feedback/useFeedbackMeaningfulOnResult";
 
 function applicantLabelFromUser(user: {
   name?: string | null;
@@ -46,8 +43,7 @@ export default function ApplicationsPageClient() {
   const {
     user,
     loadingAuth,
-    category,
-    setCategory,
+    isAdmin,
     title,
     setTitle,
     summary,
@@ -56,41 +52,37 @@ export default function ApplicationsPageClient() {
     setStory,
     amountFormatted,
     handleAmountInputChange,
+    desiredAmountFormatted,
+    handleDesiredAmountInputChange,
+    showsDesiredAmount,
     payment,
     setPayment,
     bankName,
     setBankName,
     photos,
     setPhotos,
-    reportPhotos,
-    setReportPhotos,
     uploading,
     submitting,
     err,
     left,
+    eligibility,
+    loadingEligibility,
+    amountMax,
     submitted,
-    trustAcknowledged,
-    trustAck1,
-    setTrustAck1,
-    trustAck2,
-    setTrustAck2,
-    trustAck3,
-    setTrustAck3,
+    rulesAcknowledged,
+    rulesAck1,
+    setRulesAck1,
+    rulesAck2,
+    setRulesAck2,
+    rulesAck3,
+    setRulesAck3,
     policiesAccepted,
     setPoliciesAccepted,
     ackError,
-    introOpen,
-    setIntroOpen,
-    introChecked,
-    setIntroChecked,
-    trustLimits,
-    trustLevel,
-    trustHint,
     amountInputRef,
+    desiredAmountInputRef,
     hpCompany,
     setHpCompany,
-    valid,
-    exceedsTrustLimit,
     fieldErrors,
     firstErrorKey,
     validationScrollTrigger,
@@ -101,9 +93,9 @@ export default function ApplicationsPageClient() {
     approvedCount,
   } = state;
 
-  const [trustInfoOpen, setTrustInfoOpen] = useState(false);
+  useFeedbackMeaningfulOnResult(submitted);
+
   const reducedMotion = useReducedMotion();
-  const router = useRouter();
 
   if (loadingAuth) {
     return (
@@ -163,7 +155,7 @@ export default function ApplicationsPageClient() {
             </div>
             <div role="status" aria-live="polite">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#fffffe] mb-3">
-                Войдите, чтобы подать заявку
+                Войдите, чтобы опубликовать историю
               </h1>
               <p className="text-[#abd1c6] mb-6 leading-relaxed">
                 Окно входа или регистрации должно открыться автоматически. Если
@@ -171,7 +163,7 @@ export default function ApplicationsPageClient() {
               </p>
               <p className="text-sm text-[#94a1b2]">
                 После входа вы вернётесь на эту страницу и сможете заполнить
-                заявку.
+                историю.
               </p>
             </div>
           </Card>
@@ -212,65 +204,10 @@ export default function ApplicationsPageClient() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#f9bc60]/5 rounded-full blur-3xl" />
         <div className="hidden sm:block absolute bottom-0 left-0 w-[350px] h-[350px] bg-[#abd1c6]/5 rounded-full blur-3xl" />
       </div>
-      <TrustIntroModal
-        open={introOpen}
-        checked={introChecked}
-        onCheckedChange={setIntroChecked}
-        onConfirm={() => {
-          setIntroOpen(false);
-        }}
-        onExit={() => router.push("/")}
-      />
-
-      <TrustHowItWorksModal
-        open={trustInfoOpen}
-        onClose={() => setTrustInfoOpen(false)}
-      />
 
       <PageHeader />
 
-      <div
-        className={cn(
-          "container-p mx-auto max-w-xl lg:max-w-5xl xl:max-w-6xl relative z-10 px-3 sm:px-4",
-          introOpen ? "pointer-events-none select-none opacity-60" : "",
-        )}
-      >
-        <div className="flex justify-center mb-5">
-          <motion.button
-            type="button"
-            onClick={() => setTrustInfoOpen(true)}
-            whileHover={
-              reducedMotion
-                ? undefined
-                : { scale: 1.05, boxShadow: "0 0 24px rgba(249,188,96,0.2)" }
-            }
-            whileTap={reducedMotion ? undefined : { scale: 0.97 }}
-            className={cn(
-              "inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors",
-              "border border-[#f9bc60]/40 bg-[#f9bc60]/10 text-[#f9bc60]",
-              "hover:bg-[#f9bc60]/18",
-            )}
-          >
-            <motion.span
-              className="inline-flex"
-              animate={
-                reducedMotion
-                  ? undefined
-                  : { rotate: [0, 12, -8, 0] }
-              }
-              transition={{
-                duration: 4.5,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-                repeatDelay: 5,
-              }}
-            >
-              <LucideIcons.Sparkles size="xs" className="text-[#f9bc60]" />
-            </motion.span>
-            Как это работает?
-          </motion.button>
-        </div>
-
+      <div className="container-p mx-auto max-w-xl lg:max-w-5xl xl:max-w-6xl relative z-10 px-3 sm:px-4">
         <div className="space-y-6">
           {approvedCount !== null && approvedCount >= 1 && requiresReview && (
             <Card
@@ -294,10 +231,10 @@ export default function ApplicationsPageClient() {
                 </div>
                 <div className="flex-1 space-y-2">
                   <h2 className="text-xl sm:text-2xl font-semibold text-[#fffffe]">
-                    Отзыв после первой заявки
+                    Отзыв после первой публикации
                   </h2>
                   <p className="text-sm sm:text-base text-[#abd1c6] leading-relaxed">
-                    После первой одобренной заявки нужно один раз оставить отзыв
+                    После первой одобренной истории нужно один раз оставить отзыв
                     о проекте. Сделать это можно на отдельной странице.
                   </p>
                   <Link
@@ -322,8 +259,6 @@ export default function ApplicationsPageClient() {
           {!requiresReview && user && (
             <ApplicationsForm
               {...applicantLabelFromUser(user)}
-              category={category}
-              setCategory={setCategory}
               title={title}
               setTitle={setTitle}
               summary={summary}
@@ -332,8 +267,9 @@ export default function ApplicationsPageClient() {
               setStory={setStory}
               amountFormatted={amountFormatted}
               handleAmountInputChange={handleAmountInputChange}
-              trustHint={trustHint}
-              trustLimitsMax={trustLimits.max}
+              desiredAmountFormatted={desiredAmountFormatted}
+              handleDesiredAmountInputChange={handleDesiredAmountInputChange}
+              showsDesiredAmount={showsDesiredAmount}
               payment={payment}
               setPayment={setPayment}
               bankName={bankName}
@@ -343,6 +279,9 @@ export default function ApplicationsPageClient() {
               uploading={uploading}
               submitting={submitting}
               left={left}
+              eligibility={eligibility}
+              loadingEligibility={loadingEligibility}
+              isAdmin={isAdmin}
               err={err}
               fieldErrors={fieldErrors}
               firstErrorKey={firstErrorKey}
@@ -357,32 +296,23 @@ export default function ApplicationsPageClient() {
                 storyMin: LIMITS.storyMin,
                 storyMax: LIMITS.storyMax,
                 amountMin: LIMITS.amountMin,
+                amountMax,
                 paymentMin: LIMITS.paymentMin,
                 paymentMax: LIMITS.paymentMax,
                 maxPhotos: LIMITS.maxPhotos,
               }}
               amountInputRef={amountInputRef}
-              trustAcknowledged={trustAcknowledged}
-              trustAck1={trustAck1}
-              setTrustAck1={setTrustAck1}
-              trustAck2={trustAck2}
-              setTrustAck2={setTrustAck2}
-              trustAck3={trustAck3}
-              setTrustAck3={setTrustAck3}
+              desiredAmountInputRef={desiredAmountInputRef}
+              rulesAcknowledged={rulesAcknowledged}
+              rulesAck1={rulesAck1}
+              setRulesAck1={setRulesAck1}
+              rulesAck2={rulesAck2}
+              setRulesAck2={setRulesAck2}
+              rulesAck3={rulesAck3}
+              setRulesAck3={setRulesAck3}
               policiesAccepted={policiesAccepted}
               setPoliciesAccepted={setPoliciesAccepted}
               ackError={ackError}
-              trustSupportNotice={
-                exceedsTrustLimit ? (
-                  <p className="mt-1 text-xs text-[#94a1b2]">
-                    Максимальная сумма для вашего уровня —{" "}
-                    {trustLimits.max.toLocaleString("ru-RU")} ₽
-                  </p>
-                ) : null
-              }
-              approvedCount={approvedCount}
-              reportPhotos={reportPhotos}
-              setReportPhotos={setReportPhotos}
             />
           )}
         </div>

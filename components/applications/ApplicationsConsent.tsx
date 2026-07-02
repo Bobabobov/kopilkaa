@@ -5,12 +5,12 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  trustAck1: boolean;
-  setTrustAck1: (v: boolean) => void;
-  trustAck2: boolean;
-  setTrustAck2: (v: boolean) => void;
-  trustAck3: boolean;
-  setTrustAck3: (v: boolean) => void;
+  rulesAck1: boolean;
+  setRulesAck1: (v: boolean) => void;
+  rulesAck2: boolean;
+  setRulesAck2: (v: boolean) => void;
+  rulesAck3: boolean;
+  setRulesAck3: (v: boolean) => void;
   policiesAccepted: boolean;
   setPoliciesAccepted: (v: boolean) => void;
   ackError: boolean;
@@ -29,17 +29,17 @@ function Highlight({ children }: { children: React.ReactNode }) {
 }
 
 export function ApplicationsConsent({
-  trustAck1,
-  setTrustAck1,
-  trustAck2,
-  setTrustAck2,
-  trustAck3,
-  setTrustAck3,
+  rulesAck1,
+  setRulesAck1,
+  rulesAck2,
+  setRulesAck2,
+  rulesAck3,
+  setRulesAck3,
   policiesAccepted,
   setPoliciesAccepted,
   ackError,
 }: Props) {
-  const allTrustAcked = trustAck1 && trustAck2 && trustAck3;
+  const allRulesAcked = rulesAck1 && rulesAck2 && rulesAck3;
 
   return (
     <Card
@@ -48,7 +48,6 @@ export function ApplicationsConsent({
       padding="none"
       className={cn("overflow-hidden", ackError && "border-[#e16162]/40 ring-2 ring-[#e16162]/20")}
     >
-      {/* Заголовок блока */}
       <div className="flex items-center gap-3 px-5 sm:px-6 pt-5 sm:pt-6 pb-2">
         <span
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[#f9bc60]"
@@ -70,18 +69,17 @@ export function ApplicationsConsent({
           </svg>
         </span>
         <span className="text-sm font-bold uppercase tracking-widest text-[#94a1b2]">
-          Перед отправкой заявки
+          Перед отправкой материала
         </span>
       </div>
 
       <CardContent className="space-y-5 px-5 sm:px-6 pb-5 sm:pb-6 pt-0">
-        {/* Блок 1: три чекбокса про уровень доверия */}
         <div
           className={cn(
             "rounded-2xl border p-5 transition-all duration-300 space-y-4",
             "border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.15)]",
             "bg-[linear-gradient(165deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)]",
-            allTrustAcked && "border-[#f9bc60]/30",
+            allRulesAcked && "border-[#f9bc60]/30",
           )}
         >
           <p className="text-base sm:text-lg font-bold text-[#fffffe] pb-0.5">
@@ -94,12 +92,12 @@ export function ApplicationsConsent({
                 checkboxBase,
                 "border-[#2c4f45] bg-[#0b2a24] text-[#f9bc60] checked:border-[#f9bc60] checked:bg-[#f9bc60] mt-0.5",
               )}
-              checked={trustAck1}
-              onChange={(e) => setTrustAck1(e.target.checked)}
+              checked={rulesAck1}
+              onChange={(e) => setRulesAck1(e.target.checked)}
             />
             <span className="text-sm sm:text-base text-[#e8f0ed] leading-relaxed">
-              уровень доверия{" "}
-              <Highlight>не гарантирует одобрение заявки</Highlight>;
+              публикация истории{" "}
+              <Highlight>не гарантирует одобрение</Highlight>;
             </span>
           </label>
           <label className="flex cursor-pointer select-none items-start gap-3 py-1">
@@ -109,11 +107,11 @@ export function ApplicationsConsent({
                 checkboxBase,
                 "border-[#2c4f45] bg-[#0b2a24] text-[#f9bc60] checked:border-[#f9bc60] checked:bg-[#f9bc60] mt-0.5",
               )}
-              checked={trustAck2}
-              onChange={(e) => setTrustAck2(e.target.checked)}
+              checked={rulesAck2}
+              onChange={(e) => setRulesAck2(e.target.checked)}
             />
             <span className="text-sm sm:text-base text-[#e8f0ed] leading-relaxed">
-              решение о поддержке принимается{" "}
+              решение о гонораре принимается{" "}
               <Highlight>индивидуально</Highlight>;
             </span>
           </label>
@@ -124,18 +122,17 @@ export function ApplicationsConsent({
                 checkboxBase,
                 "border-[#2c4f45] bg-[#0b2a24] text-[#f9bc60] checked:border-[#f9bc60] checked:bg-[#f9bc60] mt-0.5",
               )}
-              checked={trustAck3}
-              onChange={(e) => setTrustAck3(e.target.checked)}
+              checked={rulesAck3}
+              onChange={(e) => setRulesAck3(e.target.checked)}
             />
             <span className="text-sm sm:text-base text-[#e8f0ed] leading-relaxed">
-              сумма поддержки может быть{" "}
-              <Highlight>меньше запрошенной</Highlight> или заявка может быть{" "}
-              <Highlight>отклонена</Highlight>.
+              сумма гонорара может быть{" "}
+              <Highlight>меньше запрошенной</Highlight> или материал может быть{" "}
+              <Highlight>отклонён</Highlight>.
             </span>
           </label>
         </div>
 
-        {/* Блок 2: согласие с документами */}
         <div
           className={cn(
             "rounded-2xl border p-5 transition-all duration-300",

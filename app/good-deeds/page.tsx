@@ -18,6 +18,7 @@ import {
 } from "@/lib/goodDeedsSubmissions";
 import type { GoodDeedsResponse } from "./types";
 import { throwIfApiFailed, logRouteCatchError } from "@/lib/api/parseApiError";
+import { recordFeedbackMeaningfulAction } from "@/lib/feedback/promptStorage";
 import { validateGoodDeedMediaFile } from "@/lib/uploads/limits";
 
 export default function GoodDeedsPage() {
@@ -28,7 +29,7 @@ export default function GoodDeedsPage() {
   const [storyByTask, setStoryByTask] = useState<Record<string, string>>({});
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [initialTaskId, setInitialTaskId] = useState<string | null>(null);
-  const { showToast, ToastComponent } = useBeautifulToast();
+  const { showToast } = useBeautifulToast();
   const showToastRef = useRef(showToast);
 
   useEffect(() => {
@@ -186,8 +187,9 @@ export default function GoodDeedsPage() {
       showToast(
         "success",
         "Отчёт отправлен",
-        "Мы проверим и начислим бонусы, если всё в порядке",
+        "Мы проверим отчёт и сообщим результат",
       );
+      recordFeedbackMeaningfulAction();
       setFilesByTask((prev) => ({ ...prev, [taskId]: [] }));
       setStoryByTask((prev) => ({ ...prev, [taskId]: "" }));
       closeSubmitModal();
@@ -210,8 +212,8 @@ export default function GoodDeedsPage() {
   const handleBeFirst = useCallback(() => {
     showToast(
       "info",
-      "+300 бонусов навсегда одному",
-      "Их получит первый участник, чей отчёт одобрят для общей ленты — сумма добавится к бонусам отчёта автоматически.",
+      "Первый в ленте",
+      "Станьте первым участником, чей отчёт появится в общей ленте после модерации.",
     );
     if (isAuthenticated) {
       openSubmitModal();
@@ -233,14 +235,7 @@ export default function GoodDeedsPage() {
           <div className="space-y-5 sm:space-y-6">
             <GoodDeedsHero
               isAuthenticated={isAuthenticated}
-              withdrawStats={isAuthenticated ? data.stats : undefined}
               cycleLabel={data.cycle.label}
-              showToast={showToast}
-              onWithdrawSuccess={() =>
-                load().catch((error) =>
-                  logRouteCatchError("[GoodDeedsPage] load (withdraw)", error),
-                )
-              }
             />
 
             <GoodDeedsParticipationBar
@@ -288,7 +283,6 @@ export default function GoodDeedsPage() {
         </>
       ) : null}
 
-      <ToastComponent />
     </div>
   );
 }

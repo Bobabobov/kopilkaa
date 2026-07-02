@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { SectionFeedbackCta } from "@/components/feedback/SectionFeedbackCta";
 
 type Stats = {
   collected: number;
@@ -119,6 +120,10 @@ export default function SupportHero() {
           >
             Поддержка добровольная. Это не инвестиция и не финансовая услуга.
           </p>
+
+          <div className="max-w-2xl mx-auto mb-8 text-left">
+            <SectionFeedbackCta variant="support" />
+          </div>
 
           <Card
             variant="darkGlass"

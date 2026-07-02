@@ -20,7 +20,6 @@ type User = {
   isBanned?: boolean;
   bannedUntil?: string | null;
   bannedReason?: string | null;
-  markedAsDeceiver?: boolean;
 };
 
 interface UseOtherUserDataParams {

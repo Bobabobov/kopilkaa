@@ -1,7 +1,7 @@
+/** Фиксированная награда «Ежедневного бонуса» в профиле (без сундука). */
 export const DAILY_BONUS_AMOUNT = 10;
 
-/** Выигрыш при успешном риске в ежедневном бонусе. */
-export const DAILY_BONUS_RISK_WIN_AMOUNT = 700;
+/** Выигрыш при успешном риске в ежедневном бонусе. */export const DAILY_BONUS_RISK_WIN_AMOUNT = 700;
 
 /** Шанс выигрыша: 1 из N (0.1%). */
 export const DAILY_BONUS_RISK_WIN_ODDS = 1000;

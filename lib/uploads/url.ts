@@ -3,6 +3,13 @@ const CDN_BASE = process.env.NEXT_PUBLIC_UPLOADS_CDN_URL?.replace(/\/+$/, "");
 export const isUploadUrl = (url: string) => url.startsWith("/api/uploads/");
 export const isExternalUrl = (url: string) => /^https?:\/\//i.test(url);
 
+/** Только файлы, выданные upload-роутом; защита от path traversal. */
+export function isSafeUploadUrl(url: string): boolean {
+  if (typeof url !== "string" || !url.trim()) return false;
+  const trimmed = url.trim();
+  return trimmed.startsWith("/api/uploads/") && !trimmed.includes("..");
+}
+
 type Variant = "thumb" | "medium" | "full";
 
 interface UploadUrlOptions {

@@ -27,7 +27,7 @@ export default function AvatarUpload({
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { showToast, ToastComponent } = useBeautifulToast();
+  const { showToast } = useBeautifulToast();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -208,7 +208,6 @@ export default function AvatarUpload({
       </motion.div>
 
       {/* Toast уведомления */}
-      <ToastComponent />
     </>
   );
 }

@@ -1,0 +1,83 @@
+import { z } from 'zod';
+import { getAuthUser } from '@/lib/auth';
+import { checkUserBan } from '@/lib/ban-check';
+import { logRouteCatchError } from '@/lib/api/parseApiError';
+import {
+  generateMathQuestion,
+  MathSprintDailyLimitError,
+  MathSprintInsufficientBalanceError,
+  TIME_LIMIT_MS,
+} from '@/lib/games/mathSprint';
+
+const startBodySchema = z.object({
+  difficulty: z.enum(['easy', 'medium', 'hard']),
+});
+
+export async function POST(request: Request) {
+  try {
+    const session = await getAuthUser(request);
+    if (!session) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const banStatus = await checkUserBan(session.uid);
+    if (banStatus.isBanned) {
+      return Response.json(
+        {
+          error: 'Banned',
+          banned: true,
+          banInfo: {
+            reason: banStatus.bannedReason,
+            until: banStatus.bannedUntil?.toISOString() ?? null,
+            isPermanent: banStatus.isPermanent,
+          },
+        },
+        { status: 403 },
+      );
+    }
+
+    const rawBody = await request.json().catch(() => null);
+    const parsed = startBodySchema.safeParse(rawBody);
+
+    if (!parsed.success) {
+      return Response.json(
+        { error: 'Некорректный уровень сложности.' },
+        { status: 400 },
+      );
+    }
+
+    const data = await generateMathQuestion(session.uid, parsed.data.difficulty);
+
+    return Response.json({
+      success: true,
+      data: {
+        difficulty: data.difficulty,
+        questionText: data.questionText,
+        options: data.options,
+        timeLimitMs: TIME_LIMIT_MS,
+        balanceAfter: data.balanceAfter,
+        serverStartTime: data.serverStartTime,
+        dailyAttemptsUsed: data.dailyAttemptsUsed,
+        dailyAttemptsLeft: data.dailyAttemptsLeft,
+        purchasedAttemptsAvailable: data.purchasedAttemptsAvailable,
+      },
+    });
+  } catch (error) {
+    if (error instanceof MathSprintInsufficientBalanceError) {
+      return Response.json(
+        { error: 'Недостаточно бонусов для запуска игры' },
+        { status: 400 },
+      );
+    }
+
+    if (error instanceof MathSprintDailyLimitError) {
+      return Response.json(
+        { error: 'Достигнут суточный лимит попыток (10 в день)' },
+        { status: 429 },
+      );
+    }
+
+    logRouteCatchError('[API POST /api/games/math/start]', error);
+    return Response.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

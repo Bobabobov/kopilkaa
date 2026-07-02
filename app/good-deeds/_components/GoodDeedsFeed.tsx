@@ -39,7 +39,7 @@ function GoodDeedsFeedEmpty({ onBeFirst }: { onBeFirst?: () => void }) {
           className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-[#f9bc60] px-6 py-3.5 text-sm font-bold text-[#001e1d] shadow-[0_8px_28px_rgba(249,188,96,0.35)] transition hover:bg-[#fcdca3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f9bc60] focus-visible:ring-offset-2 focus-visible:ring-offset-[#001e1d]"
         >
           <Sparkles className="h-4 w-4" />
-          Подать первый отчёт · до +300 бонусов
+          Подать первый отчёт
         </button>
       </div>
     </div>

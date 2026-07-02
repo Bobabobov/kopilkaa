@@ -5,7 +5,7 @@ import { Gift } from "lucide-react";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { buildUploadUrl } from "@/lib/uploads/url";
-import { UserPublicBadges } from "@/components/users/UserPublicBadges";
+import { bonusWord } from "@/app/good-deeds/_components/goodDeedsTaskUi";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -16,7 +16,6 @@ type Props = {
   authorId: string;
   authorAvatar?: string | null;
   authorUsername?: string | null;
-  markedAsDeceiver?: boolean;
   createdAt: string;
   readTime: number;
   mediaCount: number;
@@ -38,7 +37,6 @@ export function GoodDeedDeedHero({
   authorId,
   authorAvatar,
   authorUsername,
-  markedAsDeceiver,
   createdAt,
   readTime,
   mediaCount,
@@ -62,7 +60,7 @@ export function GoodDeedDeedHero({
         <MetaDot />
         <span className="inline-flex items-center gap-1.5 rounded-full border border-[#f9bc60]/30 bg-[#f9bc60]/10 px-2.5 py-0.5 text-[11px] font-bold text-[#f9bc60]">
           <Gift className="h-3 w-3" aria-hidden />
-          +{reward} бонусов
+          +{reward} {bonusWord(reward)}
         </span>
       </div>
 
@@ -89,9 +87,8 @@ export function GoodDeedDeedHero({
               e.currentTarget.src = DEFAULT_AVATAR;
             }}
           />
-          <span className="inline-flex min-w-0 items-center gap-1.5 font-medium text-[#abd1c6]">
-            <span className="truncate">{authorName}</span>
-            <UserPublicBadges markedAsDeceiver={markedAsDeceiver} />
+          <span className="truncate font-medium text-[#abd1c6]">
+            {authorName}
           </span>
         </Link>
 

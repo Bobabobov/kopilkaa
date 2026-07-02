@@ -1,4 +1,13 @@
-/** Маршруты, где игра занимает весь экран без шапки и футера сайта. */
+/** Маршруты с полноэкранным UI без шапки, футера и фона сайта. */
 export function isFullscreenGameRoute(pathname: string): boolean {
-  return pathname === '/vyzhivanie' || pathname.startsWith('/vyzhivanie/');
+  if (pathname === '/profile/levels') {
+    return true;
+  }
+  if (pathname === '/vyzhivanie' || pathname.startsWith('/vyzhivanie/')) {
+    return true;
+  }
+  if (pathname === '/games' || pathname.startsWith('/games/')) {
+    return true;
+  }
+  return false;
 }

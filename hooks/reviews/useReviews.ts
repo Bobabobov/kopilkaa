@@ -22,13 +22,7 @@ type ReviewUser = {
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;
-  markedAsDeceiver?: boolean;
-  trust: {
-    status: string;
-    approved: number;
-    supportRange: string;
-    nextRequirement: string | null;
-  };
+  approvedApplications: number;
   isSelf?: boolean;
 };
 
@@ -68,7 +62,7 @@ export function useReviews(options?: UseReviewsOptions) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [data, setData] = useState<ReviewsResponse | null>(null);
-  const { showToast, ToastComponent } = useBeautifulToast();
+  const { showToast } = useBeautifulToast();
   const showToastRef = useRef(showToast);
 
   // держим последнюю версию showToast без пересоздания эффектов
@@ -158,7 +152,7 @@ export function useReviews(options?: UseReviewsOptions) {
         showToastRef.current?.(
           "error",
           "Ошибка",
-          "Не указана заявка для отзыва",
+          "Не указана история для отзыва",
         );
         return;
       }
@@ -330,6 +324,5 @@ export function useReviews(options?: UseReviewsOptions) {
     loadMore,
     submitReview,
     deleteReview,
-    ToastComponent,
   };
 }

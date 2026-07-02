@@ -87,9 +87,9 @@ export default function UserTimeStatsNew({
       >
         <div className="text-center text-blue-600 dark:text-blue-400">
           <div className="text-2xl mb-2">⏱️</div>
-          <div className="font-medium">Время написания заявки</div>
+          <div className="font-medium">Время написания истории</div>
           <div className="text-sm mt-1">
-            Нет данных о времени, проведенном на странице заявок
+            Нет данных о времени, проведённом на странице публикации
           </div>
           {data && (
             <div className="text-xs mt-2 text-blue-500 dark:text-blue-300">
@@ -110,7 +110,7 @@ export default function UserTimeStatsNew({
       <div className="text-center">
         <div className="text-2xl mb-3">⏱️</div>
         <div className="font-bold text-emerald-700 dark:text-emerald-300 text-lg mb-2">
-          Время написания заявки
+          Время написания истории
         </div>
 
         <div className="text-sm text-emerald-600 dark:text-emerald-400 mb-4">

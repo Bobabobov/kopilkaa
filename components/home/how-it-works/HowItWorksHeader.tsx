@@ -27,13 +27,13 @@ export function HowItWorksHeader() {
         className="text-4xl md:text-5xl font-bold mb-3 tracking-tight"
         style={{ color: "#fffffe" }}
       >
-        Как получить финансовую помощь
+        Как стать автором и получить гонорар
       </h2>
       <p
         className="text-lg md:text-xl max-w-2xl mx-auto"
         style={{ color: "#abd1c6" }}
       >
-        4 шага: от регистрации до решения по вашей заявке
+        4 шага: от регистрации до выплаты за лучшие публикации
       </p>
     </motion.div>
   );

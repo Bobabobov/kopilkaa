@@ -2,9 +2,18 @@
  * Общие типы админки. Используются в app/admin и в hooks/admin.
  * Размещение в types/ чтобы hooks не зависели от app/.
  */
-import type { TrustLevel } from "@/lib/trustLevel";
 
 export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export type ApplicationEconomySummary = {
+  userLevel: number;
+  userLevelAtSubmit: number | null;
+  helpLimit: number;
+  submitBonusCost: number;
+  isFirstFree: boolean;
+  requestedAmount?: number;
+  desiredAmount?: number | null;
+};
 
 export type ApplicationItem = {
   id: string;
@@ -12,14 +21,14 @@ export type ApplicationItem = {
   summary: string;
   story: string;
   amount: number;
+  desiredAmount?: number | null;
   payment: string;
   bankName?: string | null;
   status: ApplicationStatus;
   adminComment: string | null;
   createdAt: string;
-  countTowardsTrust: boolean;
-  trustDecreasedAtDecision?: boolean;
   clientDevice?: string | null;
+  deviceFingerprint?: string | null;
   user: {
     email: string;
     id: string;
@@ -28,9 +37,10 @@ export type ApplicationItem = {
     avatar: string | null;
     avatarFrame: string | null;
     hideEmail: boolean;
-    trustDelta?: number;
+    level?: number;
   };
   images: { url: string; sort: number }[];
+  economy?: ApplicationEconomySummary;
   integrity?: ApplicationIntegrity;
 };
 
@@ -63,9 +73,11 @@ export type ApplicationIntegrity = {
   submitterIp: string | null;
   sameIpCount: number;
   samePaymentCount: number;
+  sameDeviceCount: number;
   links: {
     sameIp: ApplicationIntegrityLink[];
     samePayment: ApplicationIntegrityLink[];
+    sameDevice: ApplicationIntegrityLink[];
   };
 };
 
@@ -81,7 +93,6 @@ export type StatusModal = {
   id: string;
   status: ApplicationStatus;
   comment: string;
-  decreaseTrustOnDecision: boolean;
   linkedAccounts?: ApplicationIntegrityAccount[];
 };
 
@@ -107,18 +118,10 @@ export interface AdminUser {
   createdAt: string;
   lastSeen: string | null;
   role: string;
-  markedAsDeceiver?: boolean;
-  trustDelta?: number;
-  trustLevel?: TrustLevel;
   effectiveApprovedApplications?: number;
-  /** Микростатистика по заявкам для карточки уровня доверия и рейтинга. */
-  levelStats?: {
+  applicationStats?: {
     approvedTotal: number;
-    approvedCounting: number;
-    approvedWithoutLevel: number;
     rejectedTotal: number;
-    rejectedWithLevelDecrease: number;
-    trustScore: number;
   };
   /** Связи по реквизитам и IP (возможные мультиаккаунты). Запрос с withLinks=1; поиск по всей базе заявок и выводов. */
   links?: {

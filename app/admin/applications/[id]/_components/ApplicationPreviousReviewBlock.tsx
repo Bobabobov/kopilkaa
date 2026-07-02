@@ -164,7 +164,7 @@ export default function ApplicationPreviousReviewBlock({
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
               />
             </svg>
-            Проверка: отчёт по прошлой заявке
+            Проверка: отзыв по прошлой заявке
           </h3>
         )}
 
@@ -200,13 +200,6 @@ export default function ApplicationPreviousReviewBlock({
               Открыть прошлую заявку: {data.title.slice(0, 50)}
               {data.title.length > 50 ? "…" : ""}
             </Link>
-
-            <PreviousReviewImageGrid
-              images={data.reportImages ?? []}
-              label="Фото-отчёт по прошлой заявке"
-              borderColor="rgba(171, 209, 198, 0.5)"
-              onOpen={openLightbox}
-            />
           </div>
         ) : (
           <div>
@@ -249,13 +242,6 @@ export default function ApplicationPreviousReviewBlock({
               images={data.review.images}
               label="Фото отзыва"
               borderColor="rgba(249, 188, 96, 0.4)"
-              onOpen={openLightbox}
-            />
-
-            <PreviousReviewImageGrid
-              images={data.reportImages ?? []}
-              label="Фото-отчёт по прошлой заявке"
-              borderColor="rgba(171, 209, 198, 0.5)"
               onOpen={openLightbox}
             />
           </div>

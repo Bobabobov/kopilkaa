@@ -31,7 +31,7 @@ import {
   displayTierLabel,
   getTaskStatusMeta,
   TASK_TIER,
-} from "./goodDeedsTaskUi";
+} from './goodDeedsTaskUi';
 import {
   getUploadSizeLimitLabel,
   UPLOAD_PHOTO_ACCEPT,
@@ -200,8 +200,8 @@ export function GoodDeedsSubmitModal({
                       рассказом.
                     </p>
                     <p className="mt-2 text-xs leading-relaxed text-[#94a1b2]">
-                      Проверим отчёт и начислим бонусы — их можно вывести
-                      рублями (1 бонус = 1 ₽).
+                      После одобрения отчёта начислим бонусы — сумма указана у
+                      каждого задания.
                     </p>
                   </div>
 

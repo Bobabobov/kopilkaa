@@ -6,7 +6,6 @@ import { renderHighlightedText } from "./highlight";
 import type { Story } from "./types";
 import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
-import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import type {
   StoryReactionCounts,
   StoryReactionType,
@@ -147,9 +146,6 @@ export function StoryCardContent({
                     {authorName}
                   </span>
                 </Link>
-                <UserPublicBadges
-                  markedAsDeceiver={story.user?.markedAsDeceiver}
-                />
               </>
             ) : (
               <>
@@ -167,9 +163,6 @@ export function StoryCardContent({
                     {authorName}
                   </span>
                 </div>
-                <UserPublicBadges
-                  markedAsDeceiver={story.user?.markedAsDeceiver}
-                />
               </>
             )}
 

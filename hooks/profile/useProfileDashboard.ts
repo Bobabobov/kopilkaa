@@ -1,10 +1,14 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import type { TrustLevel } from "@/lib/trustLevel";
 import {
   getMessageFromApiJson,
   logRouteCatchError,
 } from "@/lib/api/parseApiError";
+import type { UserLevelProgress } from "@/lib/userLevel";
+import { getUserLevelProgress } from "@/lib/userLevel";
+import { toDisplayExperience } from "@/lib/userLevel/economy";
+import type { FirstWithdrawalBonusStatus } from "@/lib/bonusWithdrawals/firstWithdrawalBonus";
+import { emptyFirstWithdrawalBonusStatus } from "@/lib/bonusWithdrawals/firstWithdrawalBonus";
 
 interface User {
   id: string;
@@ -22,6 +26,8 @@ interface User {
   youtubeLink?: string | null;
   createdAt: string;
   lastSeen?: string | null;
+  level?: number;
+  experience?: number;
 }
 
 interface Friend {
@@ -47,20 +53,7 @@ interface Stats {
   applications?: {
     effectiveApproved?: number;
   };
-  trust?: TrustSnapshot;
 }
-
-type TrustSnapshot = {
-  approvedApplications: number;
-  effectiveApprovedApplications: number;
-  trustLevel: TrustLevel;
-  limits: { min: number; max: number };
-  supportRangeText: string;
-  nextRequired: number | null;
-  progressCurrent: number;
-  progressTotal: number;
-  progressText: string | null;
-};
 
 interface Notification {
   id: string;
@@ -82,21 +75,27 @@ interface Notification {
 
 export interface LevelStats {
   approvedTotal: number;
-  approvedCounting: number;
-  approvedWithoutLevel: number;
-  approvedWithLevelDecrease: number;
   rejectedTotal: number;
-  rejectedWithLevelDecrease: number;
   pending: number;
+  approvedCounting?: number;
+  approvedWithoutLevel?: number;
+  approvedWithLevelDecrease?: number;
+  rejectedWithLevelDecrease?: number;
 }
 
 export interface ProfileBonusWallet {
   totalEarnedBonuses: number;
+  grossBonuses?: number;
+  bonusesInvestedInExperience: number;
+  bonusesInLevel: number;
   availableBonuses: number;
   pendingWithdrawalBonuses: number;
   withdrawnBonuses: number;
   hasPendingWithdrawal: boolean;
   withdrawalBlocked: boolean;
+  withdrawalsDisabled?: boolean;
+  firstWithdrawalBonus?: FirstWithdrawalBonusStatus;
+  firstWithdrawalBonusEligible?: boolean;
 }
 
 interface ProfileDashboardData {
@@ -105,9 +104,8 @@ interface ProfileDashboardData {
   receivedRequests: Friend[];
   stats: Stats;
   bonusWallet: ProfileBonusWallet;
+  userLevel: UserLevelProgress;
   notifications: Notification[];
-  trust?: TrustSnapshot;
-  levelStats?: LevelStats;
 }
 
 interface UseProfileDashboardReturn {
@@ -122,7 +120,7 @@ const profileCache = new Map<
   string,
   { data: ProfileDashboardData; timestamp: number; etag?: string | null }
 >();
-const CACHE_DURATION = 30 * 1000; // 30 секунд
+const CACHE_DURATION = 5 * 1000; // 5 секунд — уровень и бонусы должны обновляться быстро
 
 export function useProfileDashboard(): UseProfileDashboardReturn {
   const [data, setData] = useState<ProfileDashboardData | null>(null);
@@ -296,7 +294,6 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
         pendingApplications,
         rejectedApplications,
         approvedAmount,
-        trust: statsData?.trust ?? statsData?.stats?.trust,
       };
     })();
 
@@ -307,14 +304,22 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
       stats: normalizedStats || {},
       bonusWallet: statsData?.bonusWallet ?? {
         totalEarnedBonuses: 0,
+        grossBonuses: 0,
+        bonusesInvestedInExperience: 0,
+        bonusesInLevel: 0,
         availableBonuses: 0,
         pendingWithdrawalBonuses: 0,
         withdrawnBonuses: 0,
         hasPendingWithdrawal: false,
         withdrawalBlocked: false,
+        withdrawalsDisabled: false,
+        firstWithdrawalBonus: emptyFirstWithdrawalBonusStatus(),
+        firstWithdrawalBonusEligible: false,
       },
+      userLevel: getUserLevelProgress(
+        toDisplayExperience(userData.user.experience ?? 0),
+      ),
       notifications: [],
-      trust: normalizedStats?.trust ?? statsData?.trust,
     };
 
     setData(fallbackData);
@@ -329,12 +334,20 @@ export function useProfileDashboard(): UseProfileDashboardReturn {
 
   useEffect(() => {
     if (!isInitialized) {
-      // Очищаем кэш при первом запуске для предотвращения проблем
       profileCache.clear();
       setIsInitialized(true);
     }
     fetchData();
   }, [fetchData, isInitialized]);
+
+  useEffect(() => {
+    const onFocus = () => {
+      profileCache.clear();
+      void fetchData({ silent: true });
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [fetchData]);
 
   return { data, loading, error, refetch };
 }

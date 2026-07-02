@@ -17,12 +17,12 @@ export function HeroSectionCta() {
           href="#how-it-works"
           className="underline underline-offset-4 hover:text-[#fffffe] transition-colors"
         >
-          Как получить помощь
+          Как получить гонорар
         </a>
       </div>
       <p className="mt-4 text-sm text-[#94a1b2] max-w-2xl mx-auto leading-relaxed">
-        Решение по каждой заявке принимаем мы; помощь не гарантирована, но мы
-        помогаем по возможности.
+        Решение по каждой истории принимаем мы; гонорар не гарантирован, но мы
+        выплачиваем вознаграждение за лучшие материалы.
       </p>
     </div>
   );

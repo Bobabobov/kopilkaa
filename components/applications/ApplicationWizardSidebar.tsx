@@ -14,7 +14,7 @@ export function ApplicationWizardSidebar({ step, labels, onGoToStep }: Props) {
   const reducedMotion = useReducedMotion();
 
   return (
-    <nav aria-label="Этапы заявки" className="select-none">
+    <nav aria-label="Этапы публикации" className="select-none">
       <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94a1b2]">
         Этапы
       </p>

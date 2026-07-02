@@ -12,7 +12,7 @@ function clampInt(n: unknown, min: number, max: number): number | null {
 
 export async function POST(
   request: Request,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   const admin = await getAllowedAdminUser();
   if (!admin) {
@@ -20,7 +20,7 @@ export async function POST(
   }
 
   try {
-    const { userId } = params;
+    const { userId } = await params;
     const { reason, days } = await request.json();
     const daysClamped = clampInt(days, 1, 365); // максимум 365 дней
     const user = await prisma.user.findUnique({
@@ -83,7 +83,7 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { userId: string } },
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   const admin = await getAllowedAdminUser();
   if (!admin) {
@@ -91,7 +91,7 @@ export async function DELETE(
   }
 
   try {
-    const { userId } = params;
+    const { userId } = await params;
     if (!userId || typeof userId !== "string") {
       return NextResponse.json(
         { message: "Некорректный ID пользователя" },

@@ -7,7 +7,6 @@ import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { resolveAvatarUrl } from "@/lib/avatar";
-import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 
 const DEFAULT_AVATAR = "/default-avatar.png";
 
@@ -22,7 +21,6 @@ export interface OtherUserBasic {
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;
-  markedAsDeceiver?: boolean;
 }
 
 export function OtherUserAvatar({ user }: { user: OtherUserBasic }) {
@@ -56,7 +54,6 @@ export function OtherUserAvatar({ user }: { user: OtherUserBasic }) {
         className="text-2xl font-bold text-[#fffffe] mb-2 flex flex-wrap items-center justify-center gap-2"
       >
         <span>{user.name || "Пользователь"}</span>
-        <UserPublicBadges markedAsDeceiver={user.markedAsDeceiver} />
       </motion.h2>
       <motion.p
         initial={{ opacity: 0, y: 10 }}

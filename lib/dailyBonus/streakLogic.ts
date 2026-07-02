@@ -17,7 +17,10 @@ export type DailyBonusStatus = {
   currentStreak: number;
   canClaim: boolean;
   claimedToday: boolean;
+  /** @deprecated Используйте dailyBonusMin / dailyBonusMax */
   dailyBonus: number;
+  dailyBonusMin: number;
+  dailyBonusMax: number;
   nextMilestone: StreakMilestone | null;
   daysUntilNextMilestone: number;
   progressToNextMilestone: number;
@@ -119,6 +122,8 @@ export function buildDailyBonusStatus(
     canClaim,
     claimedToday,
     dailyBonus: DAILY_BONUS_AMOUNT,
+    dailyBonusMin: DAILY_BONUS_AMOUNT,
+    dailyBonusMax: DAILY_BONUS_AMOUNT,
     nextMilestone,
     daysUntilNextMilestone,
     progressToNextMilestone,

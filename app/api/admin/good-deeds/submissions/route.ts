@@ -1,78 +1,65 @@
-import { NextResponse } from "next/server";
-import { getAllowedAdminUser } from "@/lib/adminAccess";
-import { prisma } from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
+import type { GoodDeedSubmissionStatus } from '@prisma/client';
+import { getAllowedAdminUser } from '@/lib/adminAccess';
+import {
+  listGoodDeedSubmissions,
+  type GoodDeedSubmissionSort,
+} from '@/lib/admin/goodDeedSubmissions';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
-export async function GET() {
+function parseStatus(value: string | null): 'ALL' | GoodDeedSubmissionStatus {
+  if (value === 'PENDING' || value === 'APPROVED' || value === 'REJECTED') {
+    return value;
+  }
+  return 'ALL';
+}
+
+function parseSort(value: string | null): GoodDeedSubmissionSort {
+  if (value === 'created_asc' || value === 'reward_desc') return value;
+  return 'created_desc';
+}
+
+export async function GET(req: NextRequest) {
   try {
     const admin = await getAllowedAdminUser();
     if (!admin) {
-      return NextResponse.json({ error: "Доступ запрещён" }, { status: 403 });
+      return NextResponse.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
 
-    const submissions = await prisma.goodDeedSubmission.findMany({
-      orderBy: [{ createdAt: "desc" }],
-      take: 100,
-      select: {
-        id: true,
-        taskTitle: true,
-        taskDescription: true,
-        storyText: true,
-        reward: true,
-        weekKey: true,
-        status: true,
-        adminComment: true,
-        reviewedAt: true,
-        createdAt: true,
-        media: {
-          orderBy: { sort: "asc" },
-          select: { url: true, type: true },
-        },
-        user: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            avatar: true,
-            email: true,
-            vkLink: true,
-            telegramLink: true,
-            youtubeLink: true,
-          },
-        },
-      },
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(1, Number(searchParams.get('page') || 1));
+    const limit = Math.min(
+      50,
+      Math.max(1, Number(searchParams.get('limit') || 20)),
+    );
+    const q = (searchParams.get('q') || '').trim();
+    const status = parseStatus(searchParams.get('status'));
+    const sortBy = parseSort(searchParams.get('sortBy'));
+
+    const { items, total } = await listGoodDeedSubmissions({
+      page,
+      limit,
+      q,
+      status,
+      sortBy,
     });
 
     return NextResponse.json({
-      items: submissions.map((item) => ({
-        id: item.id,
-        taskTitle: item.taskTitle,
-        taskDescription: item.taskDescription,
-        storyText: item.storyText || "",
-        reward: item.reward,
-        weekKey: item.weekKey,
-        status: item.status,
-        adminComment: item.adminComment,
-        reviewedAt: item.reviewedAt,
-        createdAt: item.createdAt,
-        media: item.media,
-        user: {
-          id: item.user.id,
-          name: item.user.name || item.user.username || "Пользователь",
-          username: item.user.username,
-          avatar: item.user.avatar,
-          email: item.user.email,
-          vkLink: item.user.vkLink,
-          telegramLink: item.user.telegramLink,
-          youtubeLink: item.user.youtubeLink,
-        },
-      })),
+      success: true,
+      data: {
+        items,
+        total,
+        page,
+        limit,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+        sortBy,
+      },
     });
   } catch (error) {
-    console.error("GET /api/admin/good-deeds/submissions error:", error);
+    console.error('[API Error] GET /api/admin/good-deeds/submissions', error);
     return NextResponse.json(
-      { error: "Не удалось загрузить задания для модерации" },
+      { error: 'Не удалось загрузить задания для модерации' },
       { status: 500 },
     );
   }

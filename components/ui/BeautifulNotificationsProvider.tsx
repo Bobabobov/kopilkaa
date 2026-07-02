@@ -5,7 +5,10 @@ import { createContext, useContext, ReactNode } from "react";
 import { useBeautifulAlert } from "./BeautifulAlert";
 import { useBeautifulModal } from "./BeautifulModal";
 import { useBeautifulDialog } from "./BeautifulDialog";
-import { useBeautifulToast } from "./BeautifulToast";
+import {
+  BeautifulToastProvider,
+  useBeautifulToast,
+} from "./BeautifulToast";
 
 interface BeautifulNotificationsContextType {
   // Alert функции
@@ -67,7 +70,7 @@ interface BeautifulNotificationsContextType {
 const BeautifulNotificationsContext =
   createContext<BeautifulNotificationsContextType | null>(null);
 
-export function BeautifulNotificationsProvider({
+function BeautifulNotificationsProviderInner({
   children,
 }: {
   children: ReactNode;
@@ -75,7 +78,7 @@ export function BeautifulNotificationsProvider({
   const { showAlert, hideAlert, AlertComponent } = useBeautifulAlert();
   const { showModal, hideModal, ModalComponent } = useBeautifulModal();
   const { showDialog, hideDialog, DialogComponent } = useBeautifulDialog();
-  const { showToast, hideToast, ToastComponent } = useBeautifulToast();
+  const { showToast, hideToast } = useBeautifulToast();
 
   // Замена стандартного alert
   const alert = (message: string, title: string = "Уведомление") => {
@@ -145,8 +148,21 @@ export function BeautifulNotificationsProvider({
       <AlertComponent key="alert-component" />
       <ModalComponent key="modal-component" />
       <DialogComponent key="dialog-component" />
-      <ToastComponent key="toast-component" />
     </BeautifulNotificationsContext.Provider>
+  );
+}
+
+export function BeautifulNotificationsProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <BeautifulToastProvider>
+      <BeautifulNotificationsProviderInner>
+        {children}
+      </BeautifulNotificationsProviderInner>
+    </BeautifulToastProvider>
   );
 }
 

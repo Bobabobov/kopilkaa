@@ -78,7 +78,7 @@ export function GoodDeedsTasksPanel({
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-[#abd1c6]/85">
               Три уровня сложности. Выполните в жизни, приложите рассказ и
-              медиа — после проверки начислим бонусы.
+              медиа — после проверки отчёт будет подтверждён.
             </p>
           </div>
           <div className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm text-[#abd1c6]">

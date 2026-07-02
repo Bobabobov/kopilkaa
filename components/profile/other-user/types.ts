@@ -19,6 +19,8 @@ export type OtherUserProfileUser = {
   isBanned?: boolean;
   bannedUntil?: string | null;
   bannedReason?: string | null;
+  level?: number;
+  experience?: number;
 };
 
 export interface OtherUserProfileProps {

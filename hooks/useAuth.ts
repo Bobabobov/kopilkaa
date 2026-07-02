@@ -25,6 +25,8 @@ interface UseAuthResult {
   isAuthenticated: boolean;
   /** Данные пользователя (null если не авторизован) */
   user: AuthUser | null;
+  /** Доступ в админку (отдельный флаг с сервера) */
+  isAdminAllowed: boolean;
   /** Загрузка данных */
   loading: boolean;
   /** Перезагрузить данные авторизации */
@@ -34,9 +36,27 @@ interface UseAuthResult {
 // Глобальный кеш для избежания множественных запросов
 let cachedUser: AuthUser | null = null;
 let cachedIsAuthenticated: boolean | null = null;
-let fetchPromise: Promise<{ user: AuthUser | null; isAuthenticated: boolean }> | null = null;
+let cachedIsAdminAllowed = false;
+let fetchPromise: Promise<{
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+  isAdminAllowed: boolean;
+}> | null = null;
 
-async function fetchAuthData(): Promise<{ user: AuthUser | null; isAuthenticated: boolean }> {
+function notifyAuthStatusChange(isAuthenticated: boolean) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent("auth-status-change", {
+      detail: { isAuthenticated },
+    }),
+  );
+}
+
+async function fetchAuthData(): Promise<{
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+  isAdminAllowed: boolean;
+}> {
   // Если уже есть активный запрос — используем его
   if (fetchPromise) {
     return fetchPromise;
@@ -49,11 +69,13 @@ async function fetchAuthData(): Promise<{ user: AuthUser | null; isAuthenticated
       if (!response.ok) {
         cachedUser = null;
         cachedIsAuthenticated = false;
-        return { user: null, isAuthenticated: false };
+        cachedIsAdminAllowed = false;
+        notifyAuthStatusChange(false);
+        return { user: null, isAuthenticated: false, isAdminAllowed: false };
       }
 
       const data = await response.json();
-      
+
       if (data.user) {
         cachedUser = {
           id: data.user.id,
@@ -64,16 +86,26 @@ async function fetchAuthData(): Promise<{ user: AuthUser | null; isAuthenticated
           role: data.user.role,
         };
         cachedIsAuthenticated = true;
-        return { user: cachedUser, isAuthenticated: true };
+        cachedIsAdminAllowed = Boolean(data.isAdminAllowed);
+        notifyAuthStatusChange(true);
+        return {
+          user: cachedUser,
+          isAuthenticated: true,
+          isAdminAllowed: cachedIsAdminAllowed,
+        };
       }
 
       cachedUser = null;
       cachedIsAuthenticated = false;
-      return { user: null, isAuthenticated: false };
+      cachedIsAdminAllowed = false;
+      notifyAuthStatusChange(false);
+      return { user: null, isAuthenticated: false, isAdminAllowed: false };
     } catch {
       cachedUser = null;
       cachedIsAuthenticated = false;
-      return { user: null, isAuthenticated: false };
+      cachedIsAdminAllowed = false;
+      notifyAuthStatusChange(false);
+      return { user: null, isAuthenticated: false, isAdminAllowed: false };
     } finally {
       // Сбрасываем промис через небольшую задержку
       // чтобы избежать гонки между компонентами
@@ -93,39 +125,45 @@ async function fetchAuthData(): Promise<{ user: AuthUser | null; isAuthenticated
 export function useAuth(): UseAuthResult {
   const [user, setUser] = useState<AuthUser | null>(cachedUser);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    cachedIsAuthenticated ?? false
+    cachedIsAuthenticated ?? false,
   );
-  const [loading, setLoading] = useState<boolean>(cachedIsAuthenticated === null);
+  const [isAdminAllowed, setIsAdminAllowed] = useState<boolean>(
+    cachedIsAdminAllowed,
+  );
+  const [loading, setLoading] = useState<boolean>(
+    cachedIsAuthenticated === null,
+  );
 
   const refetch = useCallback(async () => {
     setLoading(true);
-    // Сбрасываем кеш
     cachedUser = null;
     cachedIsAuthenticated = null;
+    cachedIsAdminAllowed = false;
     fetchPromise = null;
-    
+
     const result = await fetchAuthData();
     setUser(result.user);
     setIsAuthenticated(result.isAuthenticated);
+    setIsAdminAllowed(result.isAdminAllowed);
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    // Если есть кеш — используем его
     if (cachedIsAuthenticated !== null) {
       setUser(cachedUser);
       setIsAuthenticated(cachedIsAuthenticated);
+      setIsAdminAllowed(cachedIsAdminAllowed);
       setLoading(false);
       return;
     }
 
-    // Иначе загружаем данные
     let mounted = true;
 
     fetchAuthData().then((result) => {
       if (mounted) {
         setUser(result.user);
         setIsAuthenticated(result.isAuthenticated);
+        setIsAdminAllowed(result.isAdminAllowed);
         setLoading(false);
       }
     });
@@ -135,7 +173,7 @@ export function useAuth(): UseAuthResult {
     };
   }, []);
 
-  return { isAuthenticated, user, loading, refetch };
+  return { isAuthenticated, user, isAdminAllowed, loading, refetch };
 }
 
 /**
@@ -145,7 +183,9 @@ export function useAuth(): UseAuthResult {
 export function clearAuthCache(): void {
   cachedUser = null;
   cachedIsAuthenticated = null;
+  cachedIsAdminAllowed = false;
   fetchPromise = null;
+  notifyAuthStatusChange(false);
 }
 
 /**

@@ -79,15 +79,15 @@ export const MIN_GOOD_DEED_STORY_CHARS = 100;
 /** Максимальная длина рассказа (защита от злоупотреблений). */
 export const MAX_GOOD_DEED_STORY_CHARS = 10000;
 
-/** 1 бонус на сайте эквивалентен 1 ₽ при оплате/списании. */
+/** @deprecated Бонусы больше не конвертируются в рубли — только в опыт уровня. */
 export const BONUS_RUB_RATE = 1;
 
-/** Минимум бонусов для заявки на вывод на карту / по реквизитам. */
-export const MIN_WITHDRAWAL_BONUSES = 10;
-
-/** Лимиты полей заявки на вывод. */
-export const MAX_WITHDRAWAL_BANK_LEN = 160;
-export const MAX_WITHDRAWAL_DETAILS_LEN = 2500;
+/** @deprecated Используйте @/lib/bonusWithdrawals/constants */
+export {
+  MIN_WITHDRAWAL_BONUSES,
+  WITHDRAWAL_BANK_MAX_LEN as MAX_WITHDRAWAL_BANK_LEN,
+  WITHDRAWAL_PHONE_MAX_LEN as MAX_WITHDRAWAL_DETAILS_LEN,
+} from '@/lib/bonusWithdrawals/constants';
 
 /**
  * Экономика наград (середина между «слишком мало» и фармом):

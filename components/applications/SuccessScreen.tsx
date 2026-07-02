@@ -67,7 +67,7 @@ export default function SuccessScreen({
         transition={{ duration: 0.5, delay: 0.3 }}
         className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-[#fffffe] via-[#f9bc60] to-[#fffffe] bg-clip-text text-transparent"
       >
-        Заявка отправлена!
+        История отправлена!
       </motion.h2>
 
       <motion.div
@@ -77,7 +77,7 @@ export default function SuccessScreen({
         className="mb-8 sm:mb-10 max-w-2xl mx-auto px-4"
       >
         <p className="text-base sm:text-lg md:text-xl text-[#abd1c6] leading-relaxed mb-3">
-          Спасибо за вашу заявку!
+          Спасибо за вашу историю!
         </p>
         <motion.p
           initial={{ opacity: 0 }}
@@ -111,7 +111,7 @@ export default function SuccessScreen({
                 Модерация
               </h3>
               <p className="text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
-                Ваша заявка проверяется.
+                Ваш материал проверяется.
               </p>
             </CardContent>
           </Card>
@@ -149,10 +149,10 @@ export default function SuccessScreen({
                 <LucideIcons.Clock size="lg" className="text-[#abd1c6]" />
               </motion.div>
               <h3 className="font-bold text-[#fffffe] mb-2 text-base sm:text-lg group-hover:text-[#abd1c6] transition-colors">
-                Следующая заявка
+                Следующая публикация
               </h3>
               <p className="text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
-                Новую заявку можно подать через 24 часа — это помогает сохранять
+                Новую историю можно опубликовать через 24 часа — это помогает сохранять
                 честность и порядок
               </p>
             </CardContent>
@@ -174,7 +174,7 @@ export default function SuccessScreen({
                   Поддержка
                 </h3>
                 <p className="text-xs sm:text-sm text-[#abd1c6] leading-relaxed">
-                  Если нужна помощь, обращайтесь в поддержку
+                  Если возникли вопросы, обращайтесь в службу поддержки
                 </p>
               </CardContent>
             </Card>

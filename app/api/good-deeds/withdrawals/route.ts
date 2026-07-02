@@ -1,110 +1,58 @@
-import { NextRequest, NextResponse } from "next/server";
-import { GoodDeedWithdrawalStatus } from "@prisma/client";
-import { getAuthUser } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-import { computeGoodDeedBonusWallet } from "@/lib/goodDeedBonusWallet";
-import {
-  MAX_WITHDRAWAL_BANK_LEN,
-  MAX_WITHDRAWAL_DETAILS_LEN,
-  MIN_WITHDRAWAL_BONUSES,
-} from "@/lib/goodDeeds";
-import { digitsFingerprint } from "@/lib/admin/requisitesFingerprint";
-import { BONUS_WITHDRAWAL_BLOCKED_MESSAGE } from "@/lib/admin/bonusWithdrawalBlock";
-import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { NextRequest, NextResponse } from 'next/server';
 
-export const dynamic = "force-dynamic";
+import { getAuthUser } from '@/lib/auth';
+import { logRouteCatchError } from '@/lib/api/parseApiError';
+import {
+  BonusWithdrawalPendingError,
+  BonusWithdrawalValidationError,
+  createBonusWithdrawalRequest,
+} from '@/lib/bonusWithdrawals/createBonusWithdrawalRequest';
+import { parseBonusWithdrawalBody } from '@/lib/bonusWithdrawals/validateWithdrawalInput';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-  const session = await getAuthUser(req);
-  if (!session?.uid) {
-    return NextResponse.json(
-      { error: "Требуется авторизация" },
-      { status: 401 },
-    );
-  }
-
   try {
+    const session = await getAuthUser(req);
+    if (!session?.uid) {
+      return NextResponse.json(
+        { error: 'Требуется авторизация' },
+        { status: 401 },
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
-    const rawAmount = body?.amountBonuses ?? body?.amount;
-    const amountBonuses =
-      typeof rawAmount === "number"
-        ? Math.floor(rawAmount)
-        : parseInt(String(rawAmount ?? ""), 10);
+    const parsed = parseBonusWithdrawalBody(body);
 
-    const bankName = String(body?.bankName ?? "").trim();
-    const details = String(body?.details ?? "").trim();
-
-    if (
-      !Number.isFinite(amountBonuses) ||
-      amountBonuses < MIN_WITHDRAWAL_BONUSES
-    ) {
-      return NextResponse.json(
-        {
-          error: `Минимальная сумма вывода — ${MIN_WITHDRAWAL_BONUSES} бонусов`,
-        },
-        { status: 400 },
-      );
+    if (!parsed.ok) {
+      return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
 
-    if (!bankName.length || bankName.length > MAX_WITHDRAWAL_BANK_LEN) {
-      return NextResponse.json(
-        { error: "Укажите название банка" },
-        { status: 400 },
-      );
-    }
+    const created = await createBonusWithdrawalRequest(
+      session.uid,
+      parsed.data,
+    );
 
-    if (!details.length || details.length > MAX_WITHDRAWAL_DETAILS_LEN) {
-      return NextResponse.json(
-        { error: "Укажите реквизиты для перевода (карта, счёт, телефон)" },
-        { status: 400 },
-      );
-    }
-
-    const wallet = await computeGoodDeedBonusWallet(session.uid);
-
-    if (wallet.withdrawalBlocked) {
-      return NextResponse.json(
-        { error: BONUS_WITHDRAWAL_BLOCKED_MESSAGE },
-        { status: 403 },
-      );
-    }
-
-    if (wallet.hasPendingWithdrawal) {
-      return NextResponse.json(
-        {
-          error:
-            "У вас уже есть заявка на вывод на проверке. Дождитесь решения.",
-        },
-        { status: 409 },
-      );
-    }
-
-    if (amountBonuses > wallet.availableBonuses) {
-      return NextResponse.json(
-        {
-          error: "Недостаточно доступных бонусов для этой суммы",
-          availableBonuses: wallet.availableBonuses,
-        },
-        { status: 400 },
-      );
-    }
-
-    await prisma.goodDeedWithdrawalRequest.create({
+    return NextResponse.json({
+      success: true,
       data: {
-        userId: session.uid,
-        amountBonuses,
-        bankName,
-        details,
-        detailsFingerprint: digitsFingerprint(details),
-        status: GoodDeedWithdrawalStatus.PENDING,
+        id: created.id,
+        amountBonuses: created.amountBonuses,
+        status: created.status,
+        createdAt: created.createdAt.toISOString(),
       },
     });
-
-    return NextResponse.json({ ok: true });
   } catch (error) {
-    logRouteCatchError("POST /api/good-deeds/withdrawals error:", error);
+    if (error instanceof BonusWithdrawalValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    if (error instanceof BonusWithdrawalPendingError) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
+
+    logRouteCatchError('[API Error] POST /api/good-deeds/withdrawals', error);
     return NextResponse.json(
-      { error: "Не удалось отправить заявку" },
+      { error: 'Не удалось отправить запрос на вывод гонорара' },
       { status: 500 },
     );
   }

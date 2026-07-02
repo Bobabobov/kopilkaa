@@ -4,8 +4,9 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
 import { isUsernameIdentifier } from "@/lib/userResolve";
-import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
+import { resolveUserProfileLevel } from "@/lib/userLevel/resolveProfileLevel";
+import { toDisplayExperience } from "@/lib/userLevel/economy";
 
 export async function GET(
   request: Request,
@@ -46,7 +47,8 @@ export async function GET(
       isBanned: true,
       bannedUntil: true,
       bannedReason: true,
-      ...USER_PUBLIC_BADGE_SELECT,
+      level: true,
+      experience: true,
     } as const;
 
     const user = isUsernameIdentifier(normalized)
@@ -67,8 +69,16 @@ export async function GET(
     }
 
     const safeUser = sanitizeEmailForViewer(user, session.uid);
+    const profileLevel = resolveUserProfileLevel(user);
+    const displayExperience = toDisplayExperience(user.experience ?? 0);
 
-    return NextResponse.json({ user: safeUser });
+    return NextResponse.json({
+      user: {
+        ...safeUser,
+        level: profileLevel,
+        experience: displayExperience,
+      },
+    });
   } catch (error) {
     logRouteCatchError("[API GET /api/users/[userId]]", error);
     return NextResponse.json(

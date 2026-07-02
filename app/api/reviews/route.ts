@@ -2,24 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import {
-  getNextLevelRequirement,
-  getTrustLevelFromApprovedCount,
-  getTrustLimits,
-  type TrustLevel,
-} from "@/lib/trustLevel";
 import { ApplicationStatus, type Prisma } from "@prisma/client";
+import { loadUserEconomyContext } from "@/lib/applications/userEconomyContext";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
-import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
 import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
+import {
+  REVIEW_MAX_IMAGES,
+  REVIEW_MAX_TEXT_LENGTH,
+  REVIEW_MIN_IMAGES,
+  REVIEW_MIN_TEXT_LENGTH,
+} from "@/lib/reviews/constants";
+import { upsertApplicationReview } from "@/lib/reviews/reviewForApplication";
 
 export const dynamic = "force-dynamic";
 
-const MAX_IMAGES = 5;
-const MIN_IMAGES = 1;
-const MAX_TEXT_LENGTH = 1200;
-const MIN_TEXT_LENGTH = 50;
+const MAX_IMAGES = REVIEW_MAX_IMAGES;
+const MIN_IMAGES = REVIEW_MIN_IMAGES;
+const MAX_TEXT_LENGTH = REVIEW_MAX_TEXT_LENGTH;
+const MIN_TEXT_LENGTH = REVIEW_MIN_TEXT_LENGTH;
 
 const REVIEW_SELECT = {
   id: true,
@@ -42,7 +43,6 @@ const REVIEW_SELECT = {
       vkLink: true,
       telegramLink: true,
       youtubeLink: true,
-      ...USER_PUBLIC_BADGE_SELECT,
     },
   },
 };
@@ -56,32 +56,6 @@ function isSafeUploadUrl(url: string): boolean {
   return trimmed.startsWith("/api/uploads/") && !trimmed.includes("..");
 }
 
-type TrustSnapshot = {
-  status: Lowercase<TrustLevel>;
-  approved: number;
-  supportRange: string;
-  nextRequirement: string | null;
-};
-
-function buildTrustSnapshot(approved: number): TrustSnapshot {
-  const level = getTrustLevelFromApprovedCount(approved);
-  const status = level.toLowerCase() as Lowercase<TrustLevel>;
-  const limits = getTrustLimits(level);
-  const supportRange = `Ориентир: от ${limits.min.toLocaleString("ru-RU")} до ${limits.max.toLocaleString("ru-RU")} ₽`;
-  const nextReq = getNextLevelRequirement(level);
-  const nextRequirement =
-    nextReq === null
-      ? null
-      : `До пересмотра уровня — ещё ${Math.max(0, nextReq - approved)} одобренных заявок`;
-
-  return {
-    status,
-    approved,
-    supportRange,
-    nextRequirement,
-  };
-}
-
 type ReviewListRow = Prisma.ReviewGetPayload<{ select: typeof REVIEW_SELECT }>;
 
 async function mapReviews(raw: ReviewListRow[], viewerId: string | null) {
@@ -89,28 +63,24 @@ async function mapReviews(raw: ReviewListRow[], viewerId: string | null) {
 
   const userIds = Array.from(new Set(raw.map((r) => r.userId)));
 
-  const [effectiveGroups] = await Promise.all([
-    prisma.application
-      .groupBy({
-        by: ["userId"],
-        where: {
-          userId: { in: userIds },
-          status: ApplicationStatus.APPROVED,
-          countTowardsTrust: true,
-        },
-        _count: { _all: true },
-      })
-      .catch(() => []),
-  ]);
+  const approvedGroups = await prisma.application
+    .groupBy({
+      by: ["userId"],
+      where: {
+        userId: { in: userIds },
+        status: ApplicationStatus.APPROVED,
+      },
+      _count: { _all: true },
+    })
+    .catch(() => []);
 
   const approvedMap = new Map<string, number>();
-  effectiveGroups.forEach((g) => {
+  approvedGroups.forEach((g) => {
     approvedMap.set(g.userId, g._count._all);
   });
 
   return raw.map((item) => {
-    const approvedCount = approvedMap.get(item.userId) ?? 0;
-    const trust = buildTrustSnapshot(approvedCount);
+    const approvedApplications = approvedMap.get(item.userId) ?? 0;
     const displayName = item.user.name || item.user.username || "Без имени";
 
     return {
@@ -129,8 +99,7 @@ async function mapReviews(raw: ReviewListRow[], viewerId: string | null) {
         vkLink: item.user.vkLink,
         telegramLink: item.user.telegramLink,
         youtubeLink: item.user.youtubeLink,
-        markedAsDeceiver: item.user.markedAsDeceiver,
-        trust,
+        approvedApplications,
         isSelf: viewerId ? viewerId === item.userId : false,
       },
     };
@@ -157,31 +126,14 @@ export async function GET(req: NextRequest) {
     const where = {};
     const orderBy = { createdAt: "desc" as const } as const;
 
-    const [
-      totalCount,
-      viewerApproved,
-      lastApprovedApp,
-      anyReview,
-      viewerSingleReview,
-    ] = await Promise.all([
+    const economy = viewerId
+      ? await loadUserEconomyContext(prisma, viewerId)
+      : null;
+    const viewerApproved = economy?.approvedApplicationCount ?? 0;
+    const lastApprovedApp = economy?.lastApprovedApplication ?? null;
+
+    const [totalCount, anyReview, viewerSingleReview] = await Promise.all([
       prisma.review.count({ where }),
-      viewerId
-        ? prisma.application
-            .count({
-              where: { userId: viewerId, status: ApplicationStatus.APPROVED },
-            })
-            .catch(() => 0)
-        : 0,
-      viewerId
-        ? prisma.application.findFirst({
-            where: {
-              userId: viewerId,
-              status: ApplicationStatus.APPROVED,
-            },
-            orderBy: { createdAt: "desc" },
-            select: { id: true, title: true },
-          })
-        : null,
       viewerId
         ? prisma.review.findFirst({
             where: { userId: viewerId },
@@ -271,7 +223,7 @@ export async function POST(req: NextRequest) {
 
     if (!applicationId) {
       return NextResponse.json(
-        { error: "Укажите заявку, по которой оставляете отзыв" },
+        { error: "Укажите историю, по которой оставляете отзыв" },
         { status: 400 },
       );
     }
@@ -304,7 +256,7 @@ export async function POST(req: NextRequest) {
     if (images.length < MIN_IMAGES) {
       return NextResponse.json(
         {
-          error: "Добавьте хотя бы одно фото (чек, товар или результат помощи)",
+          error: "Добавьте хотя бы одно фото (чек, товар или результат гонорара)",
         },
         { status: 400 },
       );
@@ -341,49 +293,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Заявка не найдена, не одобрена или вы не можете оставить по ней отзыв",
+            "История не найдена, не одобрена или вы не можете оставить по ней отзыв",
         },
         { status: 403 },
       );
     }
 
-    const result = await prisma.$transaction(async (tx) => {
-      // Старый формат: 1 отзыв на пользователя, без привязки к заявке (applicationId == null)
-      const existingByUser = await tx.review.findFirst({
-        where: { userId: viewerId, applicationId: null },
-        select: { id: true },
-      });
-
-      if (existingByUser) {
-        await tx.reviewImage.deleteMany({
-          where: { reviewId: existingByUser.id },
-        });
-        const updated = await tx.review.update({
-          where: { id: existingByUser.id },
-          data: {
-            content,
-            images: {
-              create: sanitizedImages.map((url, idx) => ({ url, sort: idx })),
-            },
-          },
-          select,
-        });
-        return updated;
-      }
-
-      const created = await tx.review.create({
-        data: {
-          userId: viewerId,
-          applicationId: null,
-          content,
-          images: {
-            create: sanitizedImages.map((url, idx) => ({ url, sort: idx })),
-          },
-        },
+    const result = await prisma.$transaction(async (tx) =>
+      upsertApplicationReview(tx, {
+        userId: viewerId,
+        applicationId,
+        content,
+        sanitizedImages,
         select,
-      });
-      return created;
-    });
+      }),
+    );
 
     const mapped = (await mapReviews([result], viewerId))[0] ?? null;
 
@@ -398,6 +322,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ review: mapped }, { status: 200 });
   } catch (error) {
+    const status = (error as { status?: number }).status;
+    if (status === 403) {
+      return NextResponse.json(
+        { error: "Нельзя изменить чужой отзыв" },
+        { status: 403 },
+      );
+    }
     logRouteCatchError("[API POST /api/reviews]", error);
     return NextResponse.json(
       { error: "Не удалось сохранить отзыв" },

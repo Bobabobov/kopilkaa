@@ -10,6 +10,10 @@ import {
   type KopiQuickAction,
 } from '@/lib/kopi/kopiScenarios';
 import { sanitizeKopiUserQuery } from '@/lib/kopi/kopiSecurity';
+import {
+  isReferralProgramEnabled,
+  REFERRAL_PROGRAM_PAUSED_MESSAGE,
+} from '@/lib/referralProgramConfig';
 
 interface PageHint {
   welcomeSuffix: string;
@@ -74,7 +78,7 @@ const SMALLTALK_RULES: SmalltalkRule[] = [
         'как поживаешь',
       ]),
     reply:
-      'У меня всё отлично, спасибо что спросили! Готов помочь с «Копилкой» — заявки, разделы сайта, частые вопросы.',
+      'У меня всё отлично, спасибо что спросили! Готов помочь с «Копилкой» — публикации историй, разделы сайта, частые вопросы.',
   },
   {
     match: (text) =>
@@ -89,7 +93,7 @@ const SMALLTALK_RULES: SmalltalkRule[] = [
         'чем можешь помочь',
       ]),
     reply:
-      'Я Копи — помощник платформы «Копилка». Подскажу по сайту, заявкам и частым вопросам. По живому общению — наш Telegram-канал, напишите «телеграм».',
+      'Я Копи — помощник платформы «Копилка». Подскажу по сайту, публикации историй и частым вопросам. По живому общению — наш Telegram-канал, напишите «телеграм».',
   },
   {
     match: (text) => {
@@ -111,17 +115,17 @@ const SMALLTALK_RULES: SmalltalkRule[] = [
   {
     match: (text) => includesAny(text, ['смешно', 'шутк', 'анекдот', 'пошути']),
     reply:
-      'Шутить — это пока не мой конёк, я больше по делу. Но с заявкой или навигацией по сайту точно помогу!',
+      'Шутить — это пока не мой конёк, я больше по делу. Но с публикацией истории или навигацией по сайту точно помогу!',
   },
   {
     match: (text) => includesAny(text, ['скучно', 'грустно', 'плохо', 'тяжело']),
     reply:
-      'Мне жаль, что вам нелегко. Я не смогу решить всё за вас, но если нужна помощь с «Копилкой» — расскажу, как подать историю или куда обратиться на сайте.',
+      'Мне жаль, что вам нелегко. Я не смогу решить всё за вас, но если нужна подсказка по «Копилке» — расскажу, как опубликовать историю или куда обратиться на сайте.',
   },
   {
     match: (text) =>
       includesAny(text, ['ты тут', 'есть кто', 'на связи', 'живой']) && text.length < 30,
-    reply: 'Я здесь! Спросите про заявку, разделы сайта или нажмите «Частые вопросы».',
+    reply: 'Я здесь! Спросите про публикацию истории, разделы сайта или нажмите «Частые вопросы».',
   },
 ];
 
@@ -159,7 +163,7 @@ const PAGE_HINTS: Array<{ match: (path: string) => boolean; hint: PageHint }> = 
     match: (path) => path === '/applications' || path.startsWith('/applications/'),
     hint: {
       welcomeSuffix:
-        'Вы в разделе заявки — подскажу, как заполнить форму и что указать в истории.',
+        'Вы в разделе публикации — подскажу, как заполнить форму и что указать в истории.',
       priorityActionIds: ['go-applications', 'application'],
     },
   },
@@ -167,7 +171,7 @@ const PAGE_HINTS: Array<{ match: (path: string) => boolean; hint: PageHint }> = 
     match: (path) => path === '/stories' || path.startsWith('/stories/'),
     hint: {
       welcomeSuffix:
-        'Здесь публикуются одобренные истории. Если готовы рассказать свою — помогу с заявкой.',
+        'Здесь публикуются одобренные истории. Если готовы рассказать свою — помогу с публикацией.',
       priorityActionIds: ['go-applications', 'application'],
     },
   },
@@ -183,7 +187,7 @@ const PAGE_HINTS: Array<{ match: (path: string) => boolean; hint: PageHint }> = 
     match: (path) => path === '/support',
     hint: {
       welcomeSuffix:
-        'Это раздел поддержки проекта. Расскажу, чем донаты отличаются от заявок на помощь.',
+        'Это раздел поддержки проекта. Расскажу, чем донаты отличаются от публикации историй за гонорар.',
       priorityActionIds: ['faq', 'navigation'],
     },
   },
@@ -191,7 +195,7 @@ const PAGE_HINTS: Array<{ match: (path: string) => boolean; hint: PageHint }> = 
     match: (path) => path === '/profile' || path.startsWith('/profile/'),
     hint: {
       welcomeSuffix:
-        'В профиле — заявки, друзья и настройки. Подскажу, где что найти.',
+        'В профиле — истории, друзья и настройки. Подскажу, где что найти.',
       priorityActionIds: ['navigation', 'application'],
     },
   },
@@ -199,7 +203,7 @@ const PAGE_HINTS: Array<{ match: (path: string) => boolean; hint: PageHint }> = 
     match: (path) => path === '/reviews',
     hint: {
       welcomeSuffix:
-        'Здесь отзывы участников. Если думаете подать заявку — расскажу, как это сделать.',
+        'Здесь отзывы участников. Если думаете опубликовать историю — расскажу, как это сделать.',
       priorityActionIds: ['application', 'go-applications'],
     },
   },
@@ -207,7 +211,7 @@ const PAGE_HINTS: Array<{ match: (path: string) => boolean; hint: PageHint }> = 
     match: (path) => path === '/standards' || path.startsWith('/standards/'),
     hint: {
       welcomeSuffix:
-        'Здесь правила и стандарты платформы. Спросите про заявки, рекламу или условия участия.',
+        'Здесь правила и стандарты платформы. Спросите про публикации, рекламу или условия участия.',
       priorityActionIds: ['faq', 'application'],
     },
   },
@@ -215,7 +219,7 @@ const PAGE_HINTS: Array<{ match: (path: string) => boolean; hint: PageHint }> = 
     match: (path) => path === '/advertising' || path.startsWith('/advertising/'),
     hint: {
       welcomeSuffix:
-        'Раздел для рекламодателей. По заявкам на помощь — это другой путь, подскажу отдельно.',
+        'Раздел для рекламодателей. Публикация историй за гонорар — другой путь, подскажу отдельно.',
       priorityActionIds: ['faq', 'navigation'],
     },
   },
@@ -223,7 +227,7 @@ const PAGE_HINTS: Array<{ match: (path: string) => boolean; hint: PageHint }> = 
     match: (path) => path === '/terms' || path.startsWith('/terms/'),
     hint: {
       welcomeSuffix:
-        'Здесь правила и условия платформы. По заявкам и разделам сайта тоже подскажу.',
+        'Здесь правила и условия платформы. По публикациям и разделам сайта тоже подскажу.',
       priorityActionIds: ['faq', 'application'],
     },
   },
@@ -231,7 +235,7 @@ const PAGE_HINTS: Array<{ match: (path: string) => boolean; hint: PageHint }> = 
     match: (path) => path === '/heroes' || path.startsWith('/heroes/'),
     hint: {
       welcomeSuffix:
-        'Здесь участники, которые поддерживают проект. Хотите подать заявку — расскажу, как.',
+        'Здесь участники, которые поддерживают проект. Хотите опубликовать историю — расскажу, как.',
       priorityActionIds: ['application', 'faq'],
     },
   },
@@ -253,7 +257,7 @@ const PAGE_HINTS: Array<{ match: (path: string) => boolean; hint: PageHint }> = 
 ];
 
 const UNKNOWN_REPLY =
-  'Хм, я пока не умею ответить на это — всё ещё учусь. Сейчас лучше всего помогаю с заявками, разделами сайта и частыми вопросами о «Копилке». Попробуйте переформулировать или нажмите «Частые вопросы».';
+  'Хм, я пока не умею ответить на это — всё ещё учусь. Сейчас лучше всего помогаю с публикацией историй, разделами сайта и частыми вопросами о «Копилке». Попробуйте переформулировать или нажмите «Частые вопросы».';
 
 const TYPO_REPLACEMENTS: Array<[RegExp, string]> = [
   [/капилк/g, 'копилк'],
@@ -276,7 +280,7 @@ const COMPARISON_REPLIES: Array<{ match: (text: string) => boolean; reply: strin
       includesAny(text, ['заявк', 'истори', 'помощь мне']) &&
       includesAny(text, ['отличи', 'разниц', 'чем', 'что лучше']),
     reply:
-      'Коротко:\n\n• **Заявка** — вы просите финансовую поддержку для своей жизненной ситуации. Решение принимает платформа, гарантий нет.\n\n• **Донат** — вы поддерживаете саму «Копилку» и развитие проекта. Это не заявка на помощь и не повышает шансы одобрения истории.\n\nЕсли нужна помощь лично вам — подавайте заявку. Если хотите поддержать проект — раздел «Поддержать».',
+      'Коротко:\n\n• **Публикация истории** — вы рассказываете свою историю и можете получить гонорар или грант. Решение принимает редакция, гарантий нет.\n\n• **Донат** — вы поддерживаете саму «Копилку» и развитие проекта. Это не публикация и не повышает шансы одобрения истории.\n\nЕсли хотите гонорар за материал — опубликуйте историю. Если хотите поддержать проект — раздел «Поддержать».',
   },
   {
     match: (text) =>
@@ -284,7 +288,7 @@ const COMPARISON_REPLIES: Array<{ match: (text: string) => boolean; reply: strin
       includesAny(text, ['заявк', 'истори', 'финанс']) &&
       includesAny(text, ['отличи', 'разниц', 'чем']),
     reply:
-      '**Заявка** — запрос финансовой поддержки по вашей ситуации.\n\n**Добрые дела** — отдельные задания за бонусы: выполняете в жизни, отправляете отчёт, модератор проверяет. Это не замена заявке и не гарантирует выплату.',
+      '**Публикация истории** — материал на рассмотрение редакции с возможным гонораром или грантом.\n\n**Добрые дела** — отдельные задания за бонусы: выполняете в жизни, отправляете отчёт, модератор проверяет. Это не замена публикации и не гарантирует выплату.',
   },
 ];
 
@@ -292,7 +296,7 @@ const FAQ_KEYWORDS: Record<number, string[]> = {
   0: ['гарант', 'проект', 'что это', 'копилка', 'платформа', 'надежн', 'обман', 'довер', 'легальн', 'мошен'],
   1: ['истори', 'рассказ', 'категор', 'ситуац', 'писать', 'заполн', 'форм', 'тема', 'фото', 'реквизит'],
   2: ['ждать', 'срок', 'решени', 'очеред', 'рассмотр', 'долго', 'когда ответ', 'статус', 'одобр', 'отклон'],
-  3: ['стрим', 'трансляц', 'зрител', 'эфир', 'вещан', 'kick', 'твич'],
+  3: ['лент', 'истори', 'архив', 'опублик', 'лайк', 'комментар', 'гонорар', 'грант', 'модерац'],
   4: ['донат', 'поддержк проект', 'пожертв', 'поддержать копилк', 'вложить в проект'],
   5: ['деньг', 'комисси', 'баланс', 'бюджет', 'куда уходят', 'счет', 'счёт', 'касс'],
   6: ['повторн', 'снова', 'второй раз', 'еще раз', 'ещё раз', 'несколько', 'вторая заяв'],
@@ -307,7 +311,7 @@ const FAQ_ALIASES: Array<{ patterns: string[]; index: number }> = [
   { patterns: ['что за проект', 'что это за', 'что такое копил'], index: 0 },
   { patterns: ['какие истории', 'что писать', 'что можно рассказ'], index: 1 },
   { patterns: ['сколько ждать', 'как долго', 'когда ответ', 'срок рассмотр'], index: 2 },
-  { patterns: ['стрим', 'трансляц', 'эфир'], index: 3 },
+  { patterns: ['лент', 'попадают в лент', 'общая лента', 'раздел истор'], index: 3 },
   { patterns: ['что такое донат', 'зачем донат', 'донат в копил'], index: 4 },
   { patterns: ['комисси', 'куда деньги', 'где деньги', 'баланс'], index: 5 },
   { patterns: ['повторно', 'снова подать', 'второй раз'], index: 6 },
@@ -343,7 +347,7 @@ interface RouteIntent {
 const ROUTE_INTENTS: RouteIntent[] = [
   {
     route: '/applications',
-    label: 'Заявка',
+    label: 'История',
     keywords: ['заявк', 'подать истор', 'рассказать истор', 'оформить заяв', 'подать заяв'],
     exclude: ['статус', 'где смотреть', 'где моя', 'где заяв', 'одобри', 'отклон'],
   },
@@ -412,7 +416,7 @@ const FAQ_MIN_SCORE = 5;
 const FAQ_SOFT_MIN_SCORE = 3;
 
 const APPLICATION_STATUS_REPLY =
-  'Если заявку одобрят или отклонят — придёт уведомление. Если уведомлений нет, значит заявка ещё в очереди на проверку.';
+  'Если историю одобрят или отклонят — придёт уведомление. Если уведомлений нет, значит материал ещё в очереди на проверку.';
 
 function isApplicationStatusQuery(text: string): boolean {
   return (
@@ -609,8 +613,8 @@ function detectDirectSectionQuery(normalized: string): RouteIntent | null {
   if (isApplicationStatusQuery(normalized)) return null;
 
   const directPhrases: Array<{ patterns: string[]; route: Route; label: string }> = [
-    { patterns: ['хочу подать', 'нужна помощь', 'нужны деньги', 'помогите'], route: '/applications', label: 'Заявка' },
-    { patterns: ['заявк'], route: '/applications', label: 'Заявка' },
+    { patterns: ['хочу подать', 'нужна помощь', 'нужны деньги', 'помогите'], route: '/applications', label: 'История' },
+    { patterns: ['заявк'], route: '/applications', label: 'История' },
     { patterns: ['профил', 'кабинет'], route: '/profile', label: 'Профиль' },
     { patterns: ['донат', 'поддержать проект'], route: '/support', label: 'Поддержать' },
     { patterns: ['добр дел', 'бонус'], route: '/good-deeds', label: 'Добрые дела' },
@@ -689,7 +693,7 @@ function detectAuthIntent(query: string, isGuest: boolean): KopiQueryResult | nu
     return {
       intent: 'application_guide',
       reply:
-        'Для заявки нужен аккаунт. Нажмите «Войти» в шапке сайта — там же можно зарегистрироваться. После входа откроется форма заявки.',
+        'Для публикации истории нужен аккаунт. Нажмите «Войти» в шапке сайта — там же можно зарегистрироваться. После входа откроется форма.',
       openMenu: 'application',
     };
   }
@@ -697,7 +701,7 @@ function detectAuthIntent(query: string, isGuest: boolean): KopiQueryResult | nu
   return {
     intent: 'navigate',
     reply:
-      'Вы уже вошли в аккаунт. Статус заявок, друзья и настройки — в разделе «Профиль». Сейчас перенесу вас туда.',
+      'Вы уже вошли в аккаунт. Статус историй, друзья и настройки — в разделе «Профиль». Сейчас перенесу вас туда.',
     navigateTo: '/profile',
     navigateLabel: 'Профиль',
   };
@@ -723,10 +727,10 @@ function buildFaqAnswerReply(
 
 function getFaqActionHint(faqIndex: number, context?: KopiQueryContext): string | null {
   const hints: Record<number, string> = {
-    0: 'Если готовы рассказать ситуацию — напишите «как подать заявку», проведу по шагам.',
-    1: 'Могу открыть инструкцию по заявке — просто спросите «как подать заявку».',
-    2: 'Если одобрят или отклонят — придёт уведомление. Нет уведомлений — заявка ещё на проверке.',
-    4: 'Поддержать проект можно в разделе «Поддержать» — это не то же самое, что подача заявки.',
+    0: 'Если готовы рассказать историю — напишите «как опубликовать историю», проведу по шагам.',
+    1: 'Могу открыть инструкцию по публикации — просто спросите «как опубликовать историю».',
+    2: 'Если одобрят или отклонят — придёт уведомление. Нет уведомлений — материал ещё на проверке.',
+    4: 'Поддержать проект можно в разделе «Поддержать» — это не то же самое, что публикация истории.',
     7: 'Раздел «Добрые дела» на сайте — там выбираете задания и отправляете отчёты.',
   };
   return hints[faqIndex] ?? null;
@@ -791,13 +795,13 @@ function getFaqAffirmativeFollowUp(faqIndex: number): KopiQueryResult | null {
   const actions: Partial<Record<number, KopiQueryResult>> = {
     0: {
       intent: 'application_guide',
-      reply: 'Хорошо! Покажу, как подать заявку — шаг за шагом.',
+      reply: 'Хорошо! Покажу, как опубликовать историю — шаг за шагом.',
       openMenu: 'application',
       conversationPatch: { lastIntent: 'application_guide' },
     },
     1: {
       intent: 'application_guide',
-      reply: 'Отлично! Открою инструкцию по заполнению заявки.',
+      reply: 'Отлично! Открою инструкцию по заполнению формы публикации.',
       openMenu: 'application',
       conversationPatch: { lastIntent: 'application_guide' },
     },
@@ -863,7 +867,7 @@ function detectFollowUp(
   ) {
     return {
       intent: 'smalltalk',
-      reply: 'Хорошо, без проблем. Если понадобится помощь — я рядом.',
+      reply: 'Хорошо, без проблем. Если понадобится подсказка — я рядом.',
       conversationPatch: { lastIntent: 'smalltalk' },
     };
   }
@@ -950,9 +954,9 @@ function detectFollowUp(
   ) {
     return {
       intent: 'navigate',
-      reply: 'Отлично! Переношу вас в раздел заявки.',
+      reply: 'Отлично! Переношу вас в раздел публикации истории.',
       navigateTo: '/applications',
-      navigateLabel: 'Заявка',
+      navigateLabel: 'История',
       conversationPatch: { lastIntent: 'navigate' },
     };
   }
@@ -992,7 +996,7 @@ function detectVagueHelp(query: string, context: KopiQueryContext): KopiQueryRes
   if (hint?.welcomeSuffix) {
     return {
       intent: 'smalltalk',
-      reply: `${hint.welcomeSuffix}\n\nМогу показать инструкцию по заявке, открыть разделы сайта или ответить на частый вопрос — напишите, что вам ближе.`,
+      reply: `${hint.welcomeSuffix}\n\nМогу показать инструкцию по публикации, открыть разделы сайта или ответить на частый вопрос — напишите, что вам ближе.`,
       conversationPatch: { lastIntent: 'smalltalk' },
     };
   }
@@ -1000,7 +1004,7 @@ function detectVagueHelp(query: string, context: KopiQueryContext): KopiQueryRes
   return {
     intent: 'smalltalk',
     reply:
-      'Давайте разберёмся. Чаще всего спрашивают про заявку, донаты, добрые дела и разделы сайта. Напишите, что вам нужно — или нажмите «Частые вопросы».',
+      'Давайте разберёмся. Чаще всего спрашивают про публикацию историй, донаты, добрые дела и разделы сайта. Напишите, что вам нужно — или нажмите «Частые вопросы».',
     conversationPatch: { lastIntent: 'smalltalk' },
   };
 }
@@ -1061,7 +1065,7 @@ const CONTEXTUAL_KNOWLEDGE: ContextualKnowledgeRule[] = [
     build: () => ({
       intent: 'faq_answer',
       reply:
-        'Реквизиты для перевода указываются в форме заявки, если они нужны. Проверьте данные перед отправкой — ошибка в карте или СБП затруднит помощь.',
+        'Номер СБП для получения гонорара указывается в форме публикации. Проверьте данные перед отправкой — ошибка в номере или банке затруднит выплату.',
       faqIndex: 1,
       openMenu: 'application',
       conversationPatch: { lastFaqIndex: 1, lastIntent: 'faq_answer' },
@@ -1073,7 +1077,7 @@ const CONTEXTUAL_KNOWLEDGE: ContextualKnowledgeRule[] = [
     build: (context) => ({
       intent: 'faq_answer',
       reply:
-        'Фото в заявке необязательно, но помогает лучше понять ситуацию — документы, скриншоты и т.п. Прикрепляются в форме при заполнении.',
+        'Фото в материале необязательно, но помогает лучше понять историю — документы, скриншоты и т.п. Прикрепляются в форме при заполнении.',
       faqIndex: 1,
       openMenu: context.pathname.startsWith('/applications') ? 'faq-answer' : 'application',
       conversationPatch: { lastFaqIndex: 1, lastIntent: 'faq_answer' },
@@ -1101,7 +1105,7 @@ const CONTEXTUAL_KNOWLEDGE: ContextualKnowledgeRule[] = [
     build: (context) => ({
       intent: 'application_guide',
       reply:
-        'В форме нужны категория, заголовок, краткое описание и полная история. Пишите честно и по сути — так модераторам проще принять решение. Могу провести по шагам — напишите «как подать заявку».',
+        'В форме нужны категория, заголовок, краткое описание и полная история. Пишите честно и по сути — так модераторам проще принять решение. Могу провести по шагам — напишите «как опубликовать историю».',
       openMenu: 'application',
       conversationPatch: { lastIntent: 'application_guide' },
     }),
@@ -1120,7 +1124,7 @@ const CONTEXTUAL_KNOWLEDGE: ContextualKnowledgeRule[] = [
     build: () => ({
       intent: 'navigate',
       reply:
-        'После одобрения заявки нужно оставить отзыв с фото — это условие для следующей заявки. Открою раздел «Отзывы».',
+        'После одобрения истории нужно оставить отзыв с фото — это условие для следующей публикации. Открою раздел «Отзывы».',
       navigateTo: '/reviews',
       navigateLabel: 'Отзывы',
       conversationPatch: { lastIntent: 'navigate' },
@@ -1129,15 +1133,25 @@ const CONTEXTUAL_KNOWLEDGE: ContextualKnowledgeRule[] = [
   {
     match: (text) =>
       includesAny(text, ['реферальн', 'рефералк', 'пригласить друга', 'реф ссылк', 'бонус за друга']),
-    build: (context) => ({
-      intent: 'navigate',
-      reply: context.isGuest
-        ? 'Реферальная программа доступна после регистрации — ссылка и статистика в профиле.'
-        : 'Реферальная программа — в профиле: ваша ссылка и статистика приглашений.',
-      navigateTo: '/profile/referrals',
-      navigateLabel: 'Рефералы',
-      conversationPatch: { lastIntent: 'navigate' },
-    }),
+    build: (context) => {
+      if (!isReferralProgramEnabled()) {
+        return {
+          intent: 'faq_answer' as const,
+          reply: REFERRAL_PROGRAM_PAUSED_MESSAGE,
+          conversationPatch: { lastIntent: 'faq_answer' },
+        };
+      }
+
+      return {
+        intent: 'navigate' as const,
+        reply: context.isGuest
+          ? 'Реферальная программа доступна после регистрации — ссылка и статистика в профиле.'
+          : 'Реферальная программа — в профиле: ваша ссылка и статистика приглашений.',
+        navigateTo: '/profile/referrals',
+        navigateLabel: 'Рефералы',
+        conversationPatch: { lastIntent: 'navigate' },
+      };
+    },
   },
   {
     match: (text) =>
@@ -1146,7 +1160,7 @@ const CONTEXTUAL_KNOWLEDGE: ContextualKnowledgeRule[] = [
     build: () => ({
       intent: 'faq_answer',
       reply:
-        'Фиксированной суммы нет — платформа смотрит на ситуацию и возможности бюджета. Уровень доверия в профиле влияет на лимит, но не гарантирует выплату.',
+        'Фиксированной суммы нет — редакция смотрит на материал и возможности бюджета. Решение по каждой истории принимается индивидуально.',
       faqIndex: 0,
       conversationPatch: { lastFaqIndex: 0, lastIntent: 'faq_answer' },
     }),
@@ -1158,7 +1172,7 @@ const CONTEXTUAL_KNOWLEDGE: ContextualKnowledgeRule[] = [
     build: (context) => ({
       intent: 'navigate',
       reply:
-        'Уровень доверия и лимит поддержки смотрите в профиле. Это не гарантия выплаты, но показывает текущие возможности платформы.',
+        'Сумма гонорара определяется индивидуально по каждой истории — гарантии выплаты нет.',
       navigateTo: context.isGuest ? '/profile/demo' : '/profile',
       navigateLabel: 'Профиль',
       conversationPatch: { lastIntent: 'navigate' },
@@ -1174,8 +1188,8 @@ const CONTEXTUAL_KNOWLEDGE: ContextualKnowledgeRule[] = [
     build: (context) => ({
       intent: 'application_guide',
       reply: context.isGuest
-        ? 'Чтобы получить финансовую поддержку — подайте заявку с историей. Сначала нужен аккаунт. Показать шаги?'
-        : 'Чтобы получить финансовую поддержку — подайте заявку с вашей историей. Показать, как заполнить форму?',
+        ? 'Чтобы получить гонорар — опубликуйте историю на платформе. Сначала нужен аккаунт. Показать шаги?'
+        : 'Чтобы получить гонорар — опубликуйте историю. Показать, как заполнить форму?',
       openMenu: 'application',
       conversationPatch: { lastIntent: 'application_guide' },
     }),
@@ -1224,7 +1238,7 @@ function detectPageContextAnswer(
     return {
       intent: 'smalltalk',
       reply:
-        'В профиле — ваши заявки и их статус, друзья, настройки аккаунта. Спросите «статус заявки», если ищете конкретное.',
+        'В профиле — ваши истории и их статус, друзья, настройки аккаунта. Спросите «статус истории», если ищете конкретное.',
       conversationPatch: { lastIntent: 'smalltalk' },
     };
   }
@@ -1343,7 +1357,7 @@ export function resolveKopiQuery(
     const hint = getPageHint(context.pathname);
     const suffix = hint?.welcomeSuffix
       ? `\n\n${hint.welcomeSuffix}`
-      : '\n\nСпросите про заявку, разделы сайта или выберите быстрое действие ниже.';
+      : '\n\nСпросите про публикацию истории, разделы сайта или выберите быстрое действие ниже.';
     return patchConversation({
       intent: 'greeting',
       reply: `${greeting} Я Копи — ваш помощник по «Копилке».${suffix}`,
@@ -1382,8 +1396,8 @@ export function resolveKopiQuery(
     return patchConversation({
       intent: 'application_guide',
       reply: context.isGuest
-        ? 'Вот пошаговая инструкция — сначала нужен аккаунт, затем заполните форму. Когда будете готовы — напишите «да», перенесу к заявке.'
-        : 'Вы уже вошли — вот шаги до отправки заявки. Когда будете готовы — напишите «да», открою раздел заявки.',
+        ? 'Вот пошаговая инструкция — сначала нужен аккаунт, затем заполните форму. Когда будете готовы — напишите «да», перенесу к публикации.'
+        : 'Вы уже вошли — вот шаги до отправки истории. Когда будете готовы — напишите «да», открою раздел публикации.',
       openMenu: 'application',
     });
   }

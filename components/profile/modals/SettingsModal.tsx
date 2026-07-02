@@ -17,14 +17,13 @@ import {
 } from "../settings/ProfileStates";
 import { SettingsAccountSection } from "./SettingsAccountSection";
 import { SettingsNotificationsSection } from "./SettingsNotificationsSection";
-import { useBeautifulToast } from "@/components/ui/BeautifulToast";
-import { SettingsSection } from "./SettingsFields";
+import { SettingsReviewSection } from "./SettingsReviewSection";
 import { useSettingsModalLifecycle } from "./hooks/useSettingsModalLifecycle";
 import { SettingsModalHeader } from "./SettingsModalHeader";
-import { SettingsLocalNotification } from "./SettingsLocalNotification";
 import { SettingsAvatarSection } from "./SettingsAvatarSection";
 import { SettingsSocialLinksSection } from "./SettingsSocialLinksSection";
 import { SettingsMetaInfo } from "./SettingsMetaInfo";
+import { SettingsSection } from "./SettingsFields";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -37,7 +36,6 @@ export default function SettingsModal({
   onClose,
   onProfileUpdated,
 }: SettingsModalProps) {
-  const { ToastComponent } = useBeautifulToast();
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -46,7 +44,6 @@ export default function SettingsModal({
     loading,
     loadError,
     saving,
-    localNotification,
     isChangingPassword,
     setIsChangingPassword,
     passwordData,
@@ -103,9 +100,6 @@ export default function SettingsModal({
         dialogRef={dialogRef}
         showCloseButton={false}
         header={<SettingsModalHeader onClose={handleClose} />}
-        headerAfter={
-          <SettingsLocalNotification notification={localNotification} />
-        }
         bodyClassName="p-4 sm:p-6"
         ariaLabelledBy="profile-settings-title"
         ariaDescribedBy="profile-settings-desc"
@@ -181,6 +175,12 @@ export default function SettingsModal({
 
             <SettingsNotificationsSection />
 
+            <SettingsReviewSection
+              userId={user.id}
+              saving={saving}
+              onNotify={showLocalNotification}
+            />
+
             <SettingsAccountSection
               saving={saving}
               isChangingPassword={isChangingPassword}
@@ -197,7 +197,6 @@ export default function SettingsModal({
           </div>
         )}
       </GlassModal>
-      <ToastComponent />
     </>
   );
 }

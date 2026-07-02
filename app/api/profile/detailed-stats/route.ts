@@ -2,7 +2,6 @@
 import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +29,6 @@ export async function GET(request: Request) {
             status: true,
             amount: true,
             createdAt: true,
-            countTowardsTrust: true,
           },
         }),
 
@@ -95,7 +93,7 @@ export async function GET(request: Request) {
       pending: applications.filter((app) => app.status === "PENDING").length,
       approved: applications.filter((app) => app.status === "APPROVED").length,
       effectiveApproved: applications.filter(
-        (app) => app.status === "APPROVED" && app.countTowardsTrust === true,
+        (app) => app.status === "APPROVED",
       ).length,
       rejected: applications.filter((app) => app.status === "REJECTED").length,
       totalAmount: applications.reduce(
@@ -127,7 +125,6 @@ export async function GET(request: Request) {
       daysActive,
     };
 
-    const trust = await computeUserTrustSnapshot(session.uid);
     const detailedStats = {
       applications: applicationStats,
       activity: activityStats,
@@ -135,7 +132,6 @@ export async function GET(request: Request) {
         createdAt: userData?.createdAt || new Date(),
       },
       effectiveApprovedApplications: applicationStats.effectiveApproved,
-      trust,
     };
 
     return NextResponse.json(
@@ -170,17 +166,6 @@ export async function GET(request: Request) {
         createdAt: new Date(),
       },
       effectiveApprovedApplications: 0,
-      trust: {
-        approvedApplications: 0,
-        effectiveApprovedApplications: 0,
-        trustLevel: "LEVEL_1",
-        limits: { min: 50, max: 150 },
-        supportRangeText: "от 50 до 150 ₽",
-        nextRequired: 3,
-        progressCurrent: 0,
-        progressTotal: 3,
-        progressText: "До пересмотра уровня — ещё 3 одобренных заявок",
-      },
     };
 
     return NextResponse.json(

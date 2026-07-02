@@ -1,6 +1,5 @@
 import { cache } from "react";
 import { prisma } from "@/lib/db";
-import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
 
 export type RecentApplicationItem = {
   id: string;
@@ -13,7 +12,6 @@ export type RecentApplicationItem = {
     id: string;
     name: string | null;
     avatar: string | null;
-    markedAsDeceiver?: boolean;
   };
 };
 
@@ -41,7 +39,6 @@ export const getRecentApplications = cache(
               id: true,
               name: true,
               avatar: true,
-              ...USER_PUBLIC_BADGE_SELECT,
             },
           },
         },

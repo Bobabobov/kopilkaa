@@ -39,7 +39,7 @@ export function FiltersAndSearch({
           />
           <input
             type="text"
-            placeholder="Поиск по заявкам..."
+            placeholder="Поиск по историям..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 sm:pl-9 pr-3 py-2 sm:py-2 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300 text-sm"
@@ -63,7 +63,7 @@ export function FiltersAndSearch({
               color: "#fffffe",
             }}
           >
-            <option value="ALL">Все заявки</option>
+            <option value="ALL">Все истории</option>
             <option value="PENDING">На рассмотрении</option>
             <option value="APPROVED">Одобрено</option>
             <option value="REJECTED">Отклонено</option>

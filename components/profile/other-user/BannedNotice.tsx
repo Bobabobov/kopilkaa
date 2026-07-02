@@ -14,10 +14,9 @@ export function isUserCurrentlyBanned(user: BannedUser) {
 
 interface BannedNoticeProps {
   user: BannedUser;
-  ToastComponent: React.ComponentType;
 }
 
-export function BannedNotice({ user, ToastComponent }: BannedNoticeProps) {
+export function BannedNotice({ user }: BannedNoticeProps) {
   const isCurrentlyBanned = isUserCurrentlyBanned(user);
   const bannedUntil = user.bannedUntil ? new Date(user.bannedUntil) : null;
   const isBannedPermanent = user.isBanned === true && !user.bannedUntil;
@@ -89,7 +88,6 @@ export function BannedNotice({ user, ToastComponent }: BannedNoticeProps) {
           </motion.div>
         </div>
       </div>
-      <ToastComponent />
     </main>
   );
 }

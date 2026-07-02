@@ -6,7 +6,9 @@ import { motion } from "framer-motion";
 import AvatarUpload from "../AvatarUpload";
 import type { UserStatus } from "../hooks/useUserStatus";
 import { needsNoReferrerAvatar, resolveAvatarUrl } from "@/lib/avatar";
+import { cn } from "@/lib/utils";
 import { buildUploadUrl, isExternalUrl, isUploadUrl } from "@/lib/uploads/url";
+
 const DEFAULT_AVATAR = "/default-avatar.png";
 
 type AvatarUser = {
@@ -23,6 +25,7 @@ interface AvatarBlockProps {
   currentAvatar: string | null;
   status: UserStatus;
   onAvatarChange?: (val: string | null) => void;
+  tone?: "light" | "dark";
 }
 
 export function AvatarBlock({
@@ -31,6 +34,7 @@ export function AvatarBlock({
   currentAvatar,
   status,
   onAvatarChange,
+  tone = "dark",
 }: AvatarBlockProps) {
   const [avatarSrc, setAvatarSrc] = useState(
     resolveAvatarUrl(user.avatar || DEFAULT_AVATAR),
@@ -55,6 +59,9 @@ export function AvatarBlock({
         ? status.text
         : `Был(а) ${status.text}`;
 
+  const statusTextClass =
+    tone === "light" ? "text-slate-600" : "text-white/90";
+
   if (isOwner) {
     return (
       <div className="flex-shrink-0">
@@ -68,13 +75,13 @@ export function AvatarBlock({
             onAvatarChange={onAvatarChange || (() => {})}
           />
         </div>
-        <div className="mt-1.5 xs:mt-2 flex items-center gap-2 text-xs xs:text-sm text-white min-w-0">
+        <div className={cn("mt-1.5 xs:mt-2 flex items-center gap-2 text-xs xs:text-sm min-w-0", tone === "light" ? "text-slate-600" : "text-white")}>
           <span
             className={`w-2 h-2 xs:w-2.5 xs:h-2.5 rounded-full flex-shrink-0 ${
-              status.status === "online" ? "bg-emerald-400" : "bg-slate-400"
+              status.status === "online" ? "bg-[#00B956]" : "bg-slate-300"
             }`}
           />
-          <span className="text-white/90 truncate">{statusLabel}</span>
+          <span className={cn("truncate", statusTextClass)}>{statusLabel}</span>
         </div>
       </div>
     );
@@ -97,19 +104,19 @@ export function AvatarBlock({
         />
         <span
           className={`absolute bottom-1.5 sm:bottom-2 right-1.5 sm:right-2 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${
-            status.status === "online" ? "bg-emerald-400" : "bg-slate-500"
+            status.status === "online" ? "bg-[#00B956]" : "bg-slate-300"
           }`}
           aria-label={status.status === "online" ? "Онлайн" : "Оффлайн"}
           title={status.status === "online" ? "Онлайн" : "Оффлайн"}
         />
       </div>
-      <div className="mt-1.5 xs:mt-2 flex items-center gap-2 text-xs xs:text-sm text-white min-w-0">
+      <div className={cn("mt-1.5 xs:mt-2 flex items-center gap-2 text-xs xs:text-sm min-w-0", tone === "light" ? "text-[#4A5D53]" : "text-white")}>
         <span
           className={`w-2 h-2 xs:w-2.5 xs:h-2.5 rounded-full flex-shrink-0 ${
-            status.status === "online" ? "bg-emerald-400" : "bg-slate-400"
+            status.status === "online" ? "bg-[#00B956]" : "bg-slate-300"
           }`}
         />
-        <span className="text-white/90 truncate">{statusLabel}</span>
+        <span className={cn("truncate", statusTextClass)}>{statusLabel}</span>
       </div>
     </div>
   );

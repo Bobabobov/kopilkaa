@@ -1,6 +1,5 @@
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 
 export const dynamic = "force-dynamic";
 
@@ -12,27 +11,19 @@ export async function GET(request: Request) {
 
     const userId = session.uid;
 
-    // Получаем статистику заявок с обработкой ошибок
-    const [applications, trust] = await Promise.all([
-      prisma.application
-        .findMany({
-          where: { userId },
-          select: {
-            status: true,
-            amount: true,
-            countTowardsTrust: true,
-          },
-        })
-        .catch(() => []),
-      computeUserTrustSnapshot(userId),
-    ]);
+    const applications = await prisma.application
+      .findMany({
+        where: { userId },
+        select: {
+          status: true,
+          amount: true,
+        },
+      })
+      .catch(() => []);
 
     const totalApplications = applications.length;
     const approvedApplications = applications.filter(
       (app) => app.status === "APPROVED",
-    ).length;
-    const effectiveApprovedApplications = applications.filter(
-      (app) => app.status === "APPROVED" && app.countTowardsTrust === true,
     ).length;
     const pendingApplications = applications.filter(
       (app) => app.status === "PENDING",
@@ -44,7 +35,6 @@ export async function GET(request: Request) {
       .filter((app) => app.status === "APPROVED")
       .reduce((sum, app) => sum + app.amount, 0);
 
-    // Получаем количество друзей с обработкой ошибок
     const friendsCount = await prisma.friendship
       .count({
         where: {
@@ -56,7 +46,6 @@ export async function GET(request: Request) {
       })
       .catch(() => 0);
 
-    // Получаем детальную статистику заявок
     const applicationsStats = {
       total: totalApplications,
       pending: pendingApplications,
@@ -64,7 +53,6 @@ export async function GET(request: Request) {
       rejected: rejectedApplications,
     };
 
-    // Вычисляем дни с регистрации с обработкой ошибок
     const user = await prisma.user
       .findUnique({
         where: { id: userId },
@@ -88,17 +76,16 @@ export async function GET(request: Request) {
       user: userStats,
       totalApplications,
       approvedApplications,
-      effectiveApprovedApplications,
+      effectiveApprovedApplications: approvedApplications,
       pendingApplications,
       rejectedApplications,
       approvedAmount: totalAmount,
-      trust,
+      friendsCount,
     };
 
-    return Response.json({ ...stats, trust });
+    return Response.json(stats);
   } catch (error) {
     console.error("Error loading stats:", error);
-    // Возвращаем пустую статистику вместо ошибки
     return Response.json({
       applications: {
         total: 0,
@@ -109,18 +96,13 @@ export async function GET(request: Request) {
       user: {
         daysSinceRegistration: 0,
       },
+      totalApplications: 0,
+      approvedApplications: 0,
       effectiveApprovedApplications: 0,
-      trust: {
-        approvedApplications: 0,
-        effectiveApprovedApplications: 0,
-        trustLevel: "LEVEL_1",
-        limits: { min: 50, max: 150 },
-        supportRangeText: "от 50 до 150 ₽",
-        nextRequired: 3,
-        progressCurrent: 0,
-        progressTotal: 3,
-        progressText: "До пересмотра уровня — ещё 3 одобренных заявок",
-      },
+      pendingApplications: 0,
+      rejectedApplications: 0,
+      approvedAmount: 0,
+      friendsCount: 0,
     });
   }
 }

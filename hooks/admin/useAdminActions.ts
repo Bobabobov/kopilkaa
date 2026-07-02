@@ -17,13 +17,11 @@ export function useAdminActions({
     id: string;
     status: ApplicationStatus;
     comment: string;
-    decreaseTrustOnDecision: boolean;
     linkedAccounts?: ApplicationIntegrityAccount[];
   }>({
     id: "",
     status: "PENDING",
     comment: "",
-    decreaseTrustOnDecision: false,
     linkedAccounts: [],
   });
 
@@ -32,35 +30,10 @@ export function useAdminActions({
     title: string;
   }>({ id: "", title: "" });
 
-  const toggleTrust = async (id: string, next: boolean) => {
-    try {
-      const response = await fetch(`/api/admin/applications/${id}/trust`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ countTowardsTrust: next }),
-      });
-      const raw = await response.json().catch(() => null);
-      if (!response.ok) {
-        throw new Error(
-          getMessageFromApiJson(raw, "Не удалось обновить флаг доверия"),
-        );
-      }
-      showToast("success", "Флаг доверия обновлён");
-      await refreshApplications();
-    } catch (err) {
-      console.error("Failed to update trust flag:", err);
-      showToast(
-        "error",
-        err instanceof Error ? err.message : "Ошибка обновления флага доверия",
-      );
-    }
-  };
-
   const quickUpdate = async (
     id: string,
     newStatus: ApplicationStatus,
     comment: string,
-    decreaseTrustOnDecision?: boolean,
   ) => {
     try {
       const response = await fetch(`/api/admin/applications/${id}`, {
@@ -69,7 +42,6 @@ export function useAdminActions({
         body: JSON.stringify({
           status: newStatus,
           adminComment: comment,
-          decreaseTrustOnDecision: Boolean(decreaseTrustOnDecision),
         }),
       });
 
@@ -103,7 +75,6 @@ export function useAdminActions({
         body: JSON.stringify({
           status: modal.status,
           adminComment: modal.comment,
-          decreaseTrustOnDecision: Boolean(modal.decreaseTrustOnDecision),
         }),
       });
 
@@ -120,7 +91,6 @@ export function useAdminActions({
         id: "",
         status: "PENDING",
         comment: "",
-        decreaseTrustOnDecision: false,
         linkedAccounts: [],
       });
 
@@ -166,14 +136,12 @@ export function useAdminActions({
     id: string,
     status: ApplicationStatus,
     comment: string,
-    decreaseTrustOnDecision?: boolean,
     linkedAccounts?: ApplicationIntegrityAccount[],
   ) => {
     setModal({
       id,
       status,
       comment,
-      decreaseTrustOnDecision: decreaseTrustOnDecision ?? false,
       linkedAccounts: linkedAccounts ?? [],
     });
   };
@@ -182,18 +150,16 @@ export function useAdminActions({
     id: string,
     status: ApplicationStatus,
     comment: string,
-    decreaseTrustOnDecision?: boolean,
   ) => {
-    quickUpdate(id, status, comment, decreaseTrustOnDecision);
+    quickUpdate(id, status, comment);
   };
 
   const handleQuickReject = (
     id: string,
     status: ApplicationStatus,
     comment: string,
-    decreaseTrustOnDecision?: boolean,
   ) => {
-    quickUpdate(id, status, comment, decreaseTrustOnDecision);
+    quickUpdate(id, status, comment);
   };
 
   const handleDelete = (id: string, title: string) => {
@@ -211,6 +177,5 @@ export function useAdminActions({
     handleQuickApprove,
     handleQuickReject,
     handleDelete,
-    toggleTrust,
   };
 }

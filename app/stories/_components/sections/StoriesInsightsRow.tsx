@@ -69,7 +69,7 @@ export function StoriesInsightsRow({
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-[#abd1c6]/75">
-                      Проект помог на сумму
+                      Выплачено гонораров на сумму
                     </p>
                     <p className="mt-0.5 text-2xl sm:text-3xl font-black tabular-nums text-[#f9bc60]">
                       {formatAmount(totalPaid)}
@@ -101,10 +101,10 @@ export function StoriesInsightsRow({
               </span>
               <div className="relative min-w-0 flex-1">
                 <p className="font-semibold text-[#fffffe] group-hover:text-[#f9bc60] transition-colors">
-                  Рассказать свою историю
+                  Написать свою историю
                 </p>
                 <p className="text-xs text-[#abd1c6]/75 mt-0.5">
-                  Подать заявку на поддержку
+                  Отправить материал на модерацию
                 </p>
               </div>
               <LucideIcons.ArrowRight
@@ -134,7 +134,7 @@ export function StoriesInsightsRow({
                   Правила подачи
                 </p>
                 <p className="text-xs text-[#abd1c6]/75 mt-0.5">
-                  Что можно, что нельзя и как отправить заявку
+                  Что можно, что нельзя и как получить грант за текст
                 </p>
               </div>
               <LucideIcons.Info

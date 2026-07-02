@@ -26,6 +26,7 @@ import {
   Sparkles,
   Copy,
   BarChart3,
+  PauseCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,8 @@ import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 
 type ReferralAnalyticsResponse = {
   ok: boolean;
+  paused?: boolean;
+  pausedMessage?: string | null;
   referralUrl: string;
   availability: {
     available: boolean;
@@ -212,7 +215,9 @@ export default function ReferralAnalyticsPageClient() {
     }));
   }, [data]);
 
-  const linkUnlocked = data?.availability.available ?? true;
+  const linkUnlocked =
+    !data?.paused && (data?.availability.available ?? true);
+  const programPaused = data?.paused ?? false;
   const remainingMs = data
     ? Math.max(0, data.availability.availableAtMs - nowMs)
     : 0;
@@ -315,11 +320,16 @@ export default function ReferralAnalyticsPageClient() {
                 <Sparkles className="h-3.5 w-3.5" />
                 Приглашения
               </Badge>
-              {!linkUnlocked && (
+              {programPaused ? (
+                <Badge variant="secondary" className="gap-1">
+                  <PauseCircle className="h-3.5 w-3.5" />
+                  Временно недоступна
+                </Badge>
+              ) : !linkUnlocked ? (
                 <Badge variant="secondary">
                   Ссылка через {formatRemaining(remainingMs)}
                 </Badge>
-              )}
+              ) : null}
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-[#fffffe] sm:text-4xl">
               Как идут ваши приглашения
@@ -350,6 +360,29 @@ export default function ReferralAnalyticsPageClient() {
           </motion.div>
         </motion.div>
 
+        {programPaused ? (
+          <motion.div variants={itemVariants}>
+            <Card
+              variant="darkGlass"
+              padding="lg"
+              className="border-amber-500/30 bg-amber-500/10"
+            >
+              <div className="flex items-start gap-3">
+                <PauseCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+                <div className="space-y-1">
+                  <p className="font-semibold text-[#fffffe]">
+                    Реферальная программа временно не работает
+                  </p>
+                  <p className="text-sm leading-relaxed text-[#abd1c6]">
+                    {data.pausedMessage ||
+                      "Мы приостановили приглашения и начисление бонусов. Статистика ниже сохранена."}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        ) : null}
+
         {/* Ссылка */}
         <motion.div variants={itemVariants}>
           <Card
@@ -367,14 +400,20 @@ export default function ReferralAnalyticsPageClient() {
                   Ваша реферальная ссылка
                 </CardTitle>
                 <p className="mt-2 text-sm text-[#abd1c6]">
-                  Поделитесь ссылкой — мы зафиксируем переход и привяжем
-                  регистрацию к вам.
+                  {programPaused
+                    ? "Копирование ссылки отключено, пока программа на паузе."
+                    : "Поделитесь ссылкой — мы зафиксируем переход и привяжем регистрацию к вам."}
                 </p>
               </CardHeader>
               <CardContent className="relative mt-4 flex flex-col gap-3 sm:flex-row sm:items-stretch">
                 <Input
-                  value={data.referralUrl}
+                  value={
+                    programPaused
+                      ? "Реферальная программа временно не работает"
+                      : data.referralUrl
+                  }
                   readOnly
+                  disabled={programPaused}
                   className="h-11 flex-1 border-[#abd1c6]/20 bg-[#001e1d]/80 font-mono text-sm"
                 />
                 <motion.div whileTap={{ scale: 0.98 }}>

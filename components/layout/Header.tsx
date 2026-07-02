@@ -1,73 +1,20 @@
 // components/layout/Header.tsx
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
-import NavAuth from "@/components/layout/NavAuth";
-import HeaderLogo from "./HeaderLogo";
+import { useAuth } from "@/hooks/useAuth";
+import NavAuth from "@/components/layout/NavAuth";import HeaderLogo from "./HeaderLogo";
 import HeaderNavigation from "./HeaderNavigation";
 import HeaderMobileButton from "./HeaderMobileButton";
+import HeaderMobileDrawer from "./HeaderMobileDrawer";
 import NotificationBell from "./NotificationBell";
 import DonateButton from "./DonateButton";
 
 export default function Header() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [menuTop, setMenuTop] = useState(0);
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
-
-  // Авторизация:
-  // - основной источник: событие "auth-status-change" (его диспатчит NavAuth)
-  // - fallback: если событие долго не приходит (например, NavAuth не смонтирован на мобилке),
-  //   делаем лёгкий запрос /api/profile/me
-  useEffect(() => {
-    let cancelled = false;
-    let resolvedByEvent = false;
-
-    const handleAuthChange = (event: Event) => {
-      const detail = (event as CustomEvent<{ isAuthenticated?: boolean }>)
-        .detail;
-      if (typeof detail?.isAuthenticated === "boolean") {
-        resolvedByEvent = true;
-        setIsAuthenticated(detail.isAuthenticated);
-        setAuthLoading(false);
-      }
-    };
-
-    window.addEventListener("auth-status-change", handleAuthChange);
-
-    const fallbackTimer = setTimeout(() => {
-      if (cancelled || resolvedByEvent) return;
-
-      (async () => {
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 1200);
-
-          const response = await fetch("/api/profile/me", {
-            signal: controller.signal,
-            cache: "no-store",
-          });
-
-          clearTimeout(timeoutId);
-          if (cancelled) return;
-          setIsAuthenticated(response.ok);
-        } catch {
-          if (!cancelled) setIsAuthenticated(false);
-        } finally {
-          if (!cancelled) setAuthLoading(false);
-        }
-      })();
-    }, 600);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(fallbackTimer);
-      window.removeEventListener("auth-status-change", handleAuthChange);
-    };
-  }, []);
 
   // Синхронизация Header с TopBanner при скролле (только на десктопе)
   // Важно: не привязываемся к querySelector('[data-top-banner]') на маунте,
@@ -109,20 +56,6 @@ export default function Header() {
       if (rafId) window.cancelAnimationFrame(rafId);
     };
   }, []);
-
-  // Вычисляем позицию мобильного меню один раз при открытии
-  useEffect(() => {
-    if (!mobileMenuOpen || !headerRef.current) return;
-
-    const updateMenuTop = () => {
-      const rect = headerRef.current?.getBoundingClientRect();
-      if (rect) {
-        setMenuTop(rect.bottom);
-      }
-    };
-
-    updateMenuTop();
-  }, [mobileMenuOpen]);
 
   // Закрываем мобильное меню при изменении размера экрана (>=1200px)
   useEffect(() => {
@@ -204,58 +137,11 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Мобильное меню */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            {/* Подложка для затемнения */}
-            <motion.div
-              className="fixed inset-0 z-30 min-[1200px]:hidden bg-black/40"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              onClick={() => setMobileMenuOpen(false)}
-            />
-
-            <motion.div
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.2 }}
-              className="min-[1200px]:hidden fixed left-0 right-0 z-40 border-t border-[#abd1c6]/25 backdrop-blur-xl shadow-2xl rounded-b-3xl bg-[#001e1d]/98 overflow-hidden"
-              style={{
-                top: `${menuTop}px`,
-                maxHeight: `calc(100vh - ${menuTop + 12}px)`,
-              }}
-            >
-              {/* Подсветки для мобильного меню (ослабленные) */}
-              <div className="pointer-events-none absolute top-0 right-0 w-36 h-36 bg-gradient-to-br from-[#f9bc60]/6 to-transparent rounded-full blur-[52px]"></div>
-              <div className="pointer-events-none absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#e16162]/6 to-transparent rounded-full blur-[52px]"></div>
-
-              <div className="container-p py-4 space-y-3 overflow-y-auto relative z-10">
-                {/* Навигационные ссылки */}
-                <div className="space-y-2">
-                  <HeaderNavigation
-                    className="flex-col space-y-1 text-base"
-                    onLinkClick={() => setMobileMenuOpen(false)}
-                  />
-                </div>
-
-                {/* Авторизация для мобильных */}
-                <div className="pt-3 border-t border-white/15">
-                  <div className="px-2 sm:px-4 space-y-3">
-                    <NavAuth
-                      isMobile
-                      onLinkClick={() => setMobileMenuOpen(false)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <HeaderMobileDrawer
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        showNotifications={Boolean(isAuthenticated && !authLoading)}
+      />
     </>
   );
 }

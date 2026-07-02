@@ -7,6 +7,7 @@ import {
   storiesGlassPanel,
   storiesGlassShine,
 } from "./stories-ui/glassStyles";
+import { SectionFeedbackCta } from "@/components/feedback/SectionFeedbackCta";
 
 interface StoriesPageHeaderProps {
   query: string;
@@ -47,11 +48,11 @@ export function StoriesPageHeader({
                   Истории поддержки
                 </h1>
                 <p className="mt-2 text-sm sm:text-base text-[#abd1c6]/85 leading-relaxed max-w-xl">
-                  Реальные истории людей, получивших{" "}
+                  Реальные истории наших авторов, получивших{" "}
                   <span className="font-semibold text-[#f9bc60]">
-                    финансовую помощь
+                    творческие гранты
                   </span>{" "}
-                  через Копилку
+                  от платформы «Копилка»
                 </p>
               </div>
             </div>
@@ -109,6 +110,8 @@ export function StoriesPageHeader({
               )}
             </div>
           </div>
+
+          <SectionFeedbackCta variant="stories" className="relative mt-6" />
         </div>
       </div>
     </header>

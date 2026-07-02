@@ -1,9 +1,11 @@
 // app/admin/applications/[id]/components/ApplicationFooter.tsx
 "use client";
 import { motion } from "framer-motion";
+import { buildSubmittedAtDisplay } from "@/lib/admin/formatSubmittedAt";
 
 interface ApplicationFooterProps {
   createdAt: string;
+  clientTimezone?: string | null;
   status: "PENDING" | "APPROVED" | "REJECTED";
   applicationId: string;
   onDelete: () => void;
@@ -11,27 +13,28 @@ interface ApplicationFooterProps {
 
 export default function ApplicationFooter({
   createdAt,
+  clientTimezone,
   status,
   applicationId,
   onDelete,
 }: ApplicationFooterProps) {
+  const submitted = buildSubmittedAtDisplay(createdAt, clientTimezone);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.9 }}
-      className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 border-t min-w-0"
+      className="flex flex-col gap-3 pt-4 border-t min-w-0 w-full overflow-hidden"
       style={{ borderColor: "rgba(171,209,198,0.2)" }}
     >
-      <div
-        className="flex items-center gap-2 text-xs sm:text-sm"
-        style={{ color: "#abd1c6" }}
-      >
+      <div className="flex gap-2 min-w-0 w-full">
         <svg
-          className="w-4 h-4 flex-shrink-0"
+          className="w-4 h-4 flex-shrink-0 mt-0.5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          style={{ color: "#abd1c6" }}
         >
           <path
             strokeLinecap="round"
@@ -40,21 +43,37 @@ export default function ApplicationFooter({
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span>Отправлено: {new Date(createdAt).toLocaleString()}</span>
+        <div
+          className="min-w-0 flex-1 text-xs leading-relaxed space-y-0.5"
+          style={{ color: "#abd1c6" }}
+        >
+          <p className="font-semibold text-[#fffffe]">Отправлено</p>
+          {submitted.authorTime && submitted.authorCity ? (
+            <p>
+              У автора ({submitted.authorCity}): {submitted.authorTime}
+            </p>
+          ) : (
+            <>
+              <p>{new Date(createdAt).toLocaleString("ru-RU")}</p>
+              <p className="text-[10px] opacity-75">
+                Часовой пояс автора не записан (старая заявка)
+              </p>
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto min-w-0">
-        {/* Кнопка "Посмотреть историю" - только для одобренных заявок */}
+      <div className="flex flex-col gap-2 w-full min-w-0">
         {status === "APPROVED" && (
           <a
             href={`/stories/${applicationId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center gap-2 px-3 sm:px-4 py-2 bg-[#f9bc60] hover:bg-[#e8a545] rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-medium shadow-lg hover:shadow-xl text-sm sm:text-base"
+            className="group flex items-center justify-center gap-2 w-full px-3 py-2 bg-[#f9bc60] hover:bg-[#e8a545] rounded-lg transition-colors font-medium shadow-md text-sm"
             style={{ color: "#001e1d" }}
           >
             <svg
-              className="w-4 h-4 group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+              className="w-4 h-4 flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -72,26 +91,12 @@ export default function ApplicationFooter({
                 d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
               />
             </svg>
-            <span className="hidden sm:inline">Посмотреть историю</span>
-            <span className="sm:hidden">История</span>
-            <svg
-              className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300 flex-shrink-0 hidden sm:block"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-              />
-            </svg>
+            <span>Посмотреть историю</span>
           </a>
         )}
 
-        {/* Кнопка удаления */}
         <button
+          type="button"
           onClick={() => {
             if (
               confirm(
@@ -101,10 +106,10 @@ export default function ApplicationFooter({
               onDelete();
             }
           }}
-          className="group flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg sm:rounded-xl transition-all duration-300 hover:scale-105 font-medium shadow-lg hover:shadow-xl text-sm sm:text-base"
+          className="flex items-center justify-center gap-2 w-full px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-colors font-medium shadow-md text-sm"
         >
           <svg
-            className="w-4 h-4 group-hover:scale-110 transition-transform duration-300 flex-shrink-0"
+            className="w-4 h-4 flex-shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

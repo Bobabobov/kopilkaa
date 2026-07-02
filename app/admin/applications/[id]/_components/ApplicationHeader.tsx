@@ -1,25 +1,12 @@
 // app/admin/applications/[id]/components/ApplicationHeader.tsx
 "use client";
 import { motion } from "framer-motion";
-import { statusRu, statusColor } from "@/lib/status";
-
-type Status = "PENDING" | "APPROVED" | "REJECTED";
 
 interface ApplicationHeaderProps {
-  status: Status;
   onBack: () => void;
 }
 
-function Badge({ s }: { s: Status }) {
-  return (
-    <span className={`px-2 py-1 rounded-xl text-xs ${statusColor(s)}`}>
-      {statusRu[s]}
-    </span>
-  );
-}
-
 export default function ApplicationHeader({
-  status,
   onBack,
 }: ApplicationHeaderProps) {
   return (
@@ -50,7 +37,6 @@ export default function ApplicationHeader({
         <span className="sm:hidden">Назад</span>
         <span className="hidden sm:inline">Назад к списку</span>
       </button>
-      <Badge s={status} />
     </motion.div>
   );
 }

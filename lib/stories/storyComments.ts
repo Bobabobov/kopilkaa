@@ -3,7 +3,10 @@ import sanitizeHtml from "sanitize-html";
 
 import { prisma } from "@/lib/db";
 import { isValidCuidLikeId } from "@/lib/reviews/reviewId";
-import { USER_PUBLIC_BADGE_SELECT } from "@/lib/userPublicBadges";
+import {
+  textContainsLink,
+  USER_TEXT_NO_LINKS_ERROR,
+} from "@/lib/text/noLinks";
 
 /** Опасные управляющие символы (кроме перевода строки и табуляции). */
 const CONTROL_CHARS_RE = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g;
@@ -11,18 +14,12 @@ const CONTROL_CHARS_RE = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g;
 const BIDI_OVERRIDE_RE = /[\u202A-\u202E\u2066-\u2069\u200E\u200F]/g;
 const DANGEROUS_URL_SCHEME_RE = /(?:javascript|data|vbscript):/gi;
 
-/** Явные URL, www, markdown-ссылки и популярные домены/сокращатели. */
-const COMMENT_LINK_PATTERNS: RegExp[] = [
-  /(?:https?|ftp):\/\/\S+/i,
-  /\bwww\.\S+/i,
-  /\[[^\]]+\]\([^)]+\)/,
-  /(?:^|\s)(?:t\.me|vk\.com|vk\.cc|bit\.ly|goo\.gl|clck\.ru|youtu\.be)\/\S+/i,
-  /\b[a-z0-9][a-z0-9-]*\.(?:com|ru|org|net|io|dev|app|me|su|online|site|link|shop|store|info|biz|pro|xyz)(?:\/\S*|\b)/i,
-];
-
 export const STORY_COMMENT_MIN_LENGTH = 2;
 export const STORY_COMMENT_MAX_LENGTH = 1000;
-export const STORY_COMMENT_NO_LINKS_ERROR = "Ссылки в комментариях запрещены";
+export const STORY_COMMENT_NO_LINKS_ERROR = USER_TEXT_NO_LINKS_ERROR.replace(
+  "в тексте",
+  "в комментариях",
+);
 /** Пауза между комментариями одного пользователя (см. User.lastCommentAt). */
 export const STORY_COMMENT_COOLDOWN_MS = 30_000;
 /** Максимальная глубина ветки (корень = 0, первый ответ = 1). */
@@ -37,7 +34,6 @@ const STORY_COMMENT_USER_SELECT = {
   vkLink: true,
   telegramLink: true,
   youtubeLink: true,
-  ...USER_PUBLIC_BADGE_SELECT,
 } as const;
 
 const STORY_COMMENT_SELECT = {
@@ -116,7 +112,7 @@ export function sanitizeNotificationTextSnippet(
 }
 
 export function commentContainsLink(text: string): boolean {
-  return COMMENT_LINK_PATTERNS.some((pattern) => pattern.test(text));
+  return textContainsLink(text);
 }
 
 export type StoryCommentValidationResult =
@@ -217,7 +213,6 @@ function mapStoryCommentUser(
     vkLink: user.vkLink,
     telegramLink: user.telegramLink,
     youtubeLink: user.youtubeLink,
-    markedAsDeceiver: user.markedAsDeceiver,
     isSelf: viewerId ? viewerId === userId : false,
   };
 }

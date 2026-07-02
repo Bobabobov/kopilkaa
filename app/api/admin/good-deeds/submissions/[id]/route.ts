@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoodDeedSubmissionStatus } from "@prisma/client";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
+import { getGoodDeedSubmissionDetail } from "@/lib/admin/goodDeedSubmissions";
 import {
   GOOD_DEED_FIRST_IN_FEED_BONUS_BONUSES,
   GOOD_DEED_FIRST_IN_FEED_BONUS_ROW_ID,
@@ -17,6 +18,32 @@ import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
 import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
 
 export const dynamic = "force-dynamic";
+
+export async function GET(
+  _req: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) {
+  try {
+    const admin = await getAllowedAdminUser();
+    if (!admin) {
+      return NextResponse.json({ error: "Доступ запрещён" }, { status: 403 });
+    }
+
+    const { id } = await context.params;
+    const item = await getGoodDeedSubmissionDetail(id);
+    if (!item) {
+      return NextResponse.json({ error: "Отчёт не найден" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: item });
+  } catch (error) {
+    console.error("GET /api/admin/good-deeds/submissions/[id] error:", error);
+    return NextResponse.json(
+      { error: "Не удалось загрузить отчёт" },
+      { status: 500 },
+    );
+  }
+}
 
 export async function PATCH(
   req: NextRequest,

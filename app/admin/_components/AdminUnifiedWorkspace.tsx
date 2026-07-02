@@ -1,10 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { motion } from "framer-motion";
 import type { ApplicationItem, ApplicationStatus, Stats } from "@/types/admin";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { Card } from "@/components/ui/Card";
+import { AdminPanel } from "@/app/admin/_components/admin-ui";
 import { AdminOverviewSection } from "./AdminOverviewSection";
 import { AdminFiltersSection } from "./AdminFiltersSection";
 
@@ -88,66 +87,47 @@ export default function AdminUnifiedWorkspace({
   );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: 0.1 }}
+    <AdminPanel
+      title="Рабочее место"
+      subtitle="Статистика, фильтры и быстрый доступ к очереди"
       className="mb-6"
     >
-      <Card variant="darkGlass" padding="md" className="space-y-0">
-        <div className="flex items-center justify-between gap-3 pb-4 border-b border-[#abd1c6]/10">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#f9bc60] to-[#e8a545] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#f9bc60]/15">
-              <LucideIcons.LayoutGrid size="sm" className="text-[#001e1d]" />
-            </div>
-            <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-black text-[#fffffe]">
-                Рабочее место
-              </h2>
-              <p className="text-xs sm:text-sm text-[#abd1c6]/80">
-                Статистика, фильтры и быстрый доступ к очереди
-              </p>
-            </div>
-          </div>
-
-          {filtersActive ? (
-            <button
-              type="button"
-              onClick={onReset}
-              className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-[#abd1c6] hover:text-[#fffffe] border border-[#abd1c6]/25 hover:border-[#f9bc60]/40 hover:bg-[#f9bc60]/10 transition-colors flex-shrink-0 min-h-[40px]"
-            >
-              <LucideIcons.RefreshCw size="sm" />
-              <span className="hidden sm:inline">Сбросить фильтры</span>
-              <span className="sm:hidden">Сброс</span>
-            </button>
-          ) : null}
+      {filtersActive ? (
+        <div className="mb-4 flex justify-end">
+          <button
+            type="button"
+            onClick={onReset}
+            className="flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl border-2 border-[#abd1c6]/25 px-3 py-2 text-xs font-bold text-[#abd1c6] transition-colors hover:border-[#f9bc60]/40 hover:bg-[#f9bc60]/10 hover:text-[#fffffe] sm:text-sm"
+          >
+            <LucideIcons.RefreshCw size="sm" />
+            <span className="hidden sm:inline">Сбросить фильтры</span>
+            <span className="sm:hidden">Сброс</span>
+          </button>
         </div>
+      ) : null}
 
-        <div className="pt-4">
-          <AdminOverviewSection
-            stats={stats}
-            status={status}
-            shownCount={items.length}
-            newestId={newestPending?.id ?? null}
-            newestTitle={newestPending?.title ?? null}
-            newestAgeHours={newestPendingAge}
-            onStatusChange={onStatusChange}
-          />
-        </div>
+      <AdminOverviewSection
+        stats={stats}
+        status={status}
+        shownCount={items.length}
+        newestId={newestPending?.id ?? null}
+        newestTitle={newestPending?.title ?? null}
+        newestAgeHours={newestPendingAge}
+        onStatusChange={onStatusChange}
+      />
 
-        <AdminFiltersSection
-          q={q}
-          minAmount={minAmount}
-          maxAmount={maxAmount}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          onSearchChange={onSearchChange}
-          onMinAmountChange={onMinAmountChange}
-          onMaxAmountChange={onMaxAmountChange}
-          onSortByChange={onSortByChange}
-          onSortOrderChange={onSortOrderChange}
-        />
-      </Card>
-    </motion.div>
+      <AdminFiltersSection
+        q={q}
+        minAmount={minAmount}
+        maxAmount={maxAmount}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onSearchChange={onSearchChange}
+        onMinAmountChange={onMinAmountChange}
+        onMaxAmountChange={onMaxAmountChange}
+        onSortByChange={onSortByChange}
+        onSortOrderChange={onSortOrderChange}
+      />
+    </AdminPanel>
   );
 }

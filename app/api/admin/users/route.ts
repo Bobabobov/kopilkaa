@@ -4,7 +4,6 @@ import type { Prisma } from "@prisma/client";
 import { ApplicationStatus } from "@prisma/client";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { prisma } from "@/lib/db";
-import { getTrustLevelFromEffectiveApproved } from "@/lib/trustLevel";
 import { digitsFingerprint } from "@/lib/admin/requisitesFingerprint";
 import {
   clientIpStorageVariants,
@@ -52,9 +51,7 @@ export async function GET(request: Request) {
           createdAt: true,
           lastSeen: true,
           role: true,
-          trustDelta: true,
           emailVerified: true,
-          markedAsDeceiver: true,
         },
         orderBy: {
           createdAt: "desc",
@@ -68,11 +65,8 @@ export async function GET(request: Request) {
     const userIds = users.map((user) => user.id);
 
     const [
-      effectiveGroups,
       approvedTotalGroups,
       rejectedTotalGroups,
-      rejectedWithDecreaseGroups,
-      approvedNotCountingGroups,
     ] = userIds.length
       ? await Promise.all([
           prisma.application.groupBy({
@@ -80,15 +74,6 @@ export async function GET(request: Request) {
             where: {
               userId: { in: userIds },
               status: ApplicationStatus.APPROVED,
-              countTowardsTrust: true,
-            },
-            _count: { _all: true },
-          }),
-          prisma.application.groupBy({
-            by: ["userId"],
-            where: {
-              userId: { in: userIds },
-              status: ApplicationStatus.APPROVED,
             },
             _count: { _all: true },
           }),
@@ -97,34 +82,12 @@ export async function GET(request: Request) {
             where: {
               userId: { in: userIds },
               status: ApplicationStatus.REJECTED,
-            },
-            _count: { _all: true },
-          }),
-          prisma.application.groupBy({
-            by: ["userId"],
-            where: {
-              userId: { in: userIds },
-              status: ApplicationStatus.REJECTED,
-              trustDecreasedAtDecision: true,
-            },
-            _count: { _all: true },
-          }),
-          prisma.application.groupBy({
-            by: ["userId"],
-            where: {
-              userId: { in: userIds },
-              status: ApplicationStatus.APPROVED,
-              countTowardsTrust: false,
             },
             _count: { _all: true },
           }),
         ])
-      : [[], [], [], [], []];
+      : [[], []];
 
-    const effectiveMap = new Map<string, number>();
-    (effectiveGroups as any[]).forEach((group: any) => {
-      effectiveMap.set(group.userId, group._count?._all ?? 0);
-    });
     const approvedTotalMap = new Map<string, number>();
     (approvedTotalGroups as any[]).forEach((group: any) => {
       approvedTotalMap.set(group.userId, group._count?._all ?? 0);
@@ -133,39 +96,16 @@ export async function GET(request: Request) {
     (rejectedTotalGroups as any[]).forEach((group: any) => {
       rejectedTotalMap.set(group.userId, group._count?._all ?? 0);
     });
-    const rejectedWithDecreaseMap = new Map<string, number>();
-    (rejectedWithDecreaseGroups as any[]).forEach((group: any) => {
-      rejectedWithDecreaseMap.set(group.userId, group._count?._all ?? 0);
-    });
-    const approvedNotCountingMap = new Map<string, number>();
-    (approvedNotCountingGroups as any[]).forEach((group: any) => {
-      approvedNotCountingMap.set(group.userId, group._count?._all ?? 0);
-    });
 
-    let usersWithTrust = users.map((user) => {
-      const effectiveApprovedApplications = effectiveMap.get(user.id) ?? 0;
-      const trustDelta = user.trustDelta ?? 0;
+    let usersWithStats = users.map((user) => {
       const approvedTotal = approvedTotalMap.get(user.id) ?? 0;
-      const approvedCounting = effectiveApprovedApplications;
-      const approvedWithoutLevel = approvedNotCountingMap.get(user.id) ?? 0;
       const rejectedTotal = rejectedTotalMap.get(user.id) ?? 0;
-      const rejectedWithLevelDecrease =
-        rejectedWithDecreaseMap.get(user.id) ?? 0;
-      const trustScore = approvedCounting - rejectedWithLevelDecrease;
       return {
         ...user,
-        effectiveApprovedApplications,
-        trustLevel: getTrustLevelFromEffectiveApproved(
-          effectiveApprovedApplications,
-          trustDelta,
-        ),
-        levelStats: {
+        effectiveApprovedApplications: approvedTotal,
+        applicationStats: {
           approvedTotal,
-          approvedCounting,
-          approvedWithoutLevel,
           rejectedTotal,
-          rejectedWithLevelDecrease,
-          trustScore,
         },
       };
     });
@@ -303,7 +243,7 @@ export async function GET(request: Request) {
         { samePayment: string[]; sameIp: string[] }
       >();
 
-      for (const user of usersWithTrust) {
+      for (const user of usersWithStats) {
         const myFingerprints = new Set<string>();
         const myIps = new Set<string>();
         for (const app of userApps.get(user.id) ?? []) {
@@ -355,7 +295,7 @@ export async function GET(request: Request) {
           : [];
       const linkedMap = new Map(linkedUsers.map((u) => [u.id, u]));
 
-      usersWithTrust = usersWithTrust.map((user) => {
+      usersWithStats = usersWithStats.map((user) => {
         const links = linksByUserId.get(user.id);
         if (!links) return { ...user, links: { samePayment: [], sameIp: [] } };
         return {
@@ -374,7 +314,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: true,
-      data: usersWithTrust,
+      data: usersWithStats,
       page,
       limit,
       total,

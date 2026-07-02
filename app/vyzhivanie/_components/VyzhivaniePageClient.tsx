@@ -16,7 +16,7 @@ export function VyzhivaniePageClient() {
   const [startOpen, setStartOpen] = useState(true);
   const [rulesOpenOnStart, setRulesOpenOnStart] = useState(false);
   const [focusMyGraveToken, setFocusMyGraveToken] = useState(0);
-  const { showToast, ToastComponent } = useBeautifulToast();
+  const { showToast } = useBeautifulToast();
   const showToastRef = useRef(showToast);
 
   useEffect(() => {
@@ -174,7 +174,6 @@ export function VyzhivaniePageClient() {
         )}
       </div>
 
-      <ToastComponent />
     </div>
   );
 }

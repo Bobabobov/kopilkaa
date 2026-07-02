@@ -110,7 +110,8 @@ export function ApplicationCardIntegrity({
   const isClean = integrity.isClean;
   const hasLinks =
     integrity.links.sameIp.length > 0 ||
-    integrity.links.samePayment.length > 0;
+    integrity.links.samePayment.length > 0 ||
+    integrity.links.sameDevice.length > 0;
 
   return (
     <div
@@ -191,6 +192,18 @@ export function ApplicationCardIntegrity({
                           key={`pay-${link.kind}-${link.id}`}
                           link={link}
                         />
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {integrity.links.sameDevice.length > 0 ? (
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-[#abd1c6]/70 mb-1">
+                      По устройству ({integrity.sameDeviceCount})
+                    </p>
+                    <ul className="space-y-2">
+                      {integrity.links.sameDevice.map((link) => (
+                        <LinkRow key={`dev-${link.id}`} link={link} />
                       ))}
                     </ul>
                   </div>

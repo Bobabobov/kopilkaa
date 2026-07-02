@@ -7,6 +7,7 @@ import { isAchievementImageIcon } from "@/lib/achievements/icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { ProfileAchievementBadge } from "@/components/profile/achievements/ProfileAchievementBadge";
 
 export type AchievementListItem = {
   slug: string;
@@ -229,6 +230,8 @@ type AchievementListCardProps = {
   savingPinSlug?: string | null;
   onTogglePin?: (slug: string) => void;
   compact?: boolean;
+  /** Тонкая строка для боковой панели профиля */
+  strip?: boolean;
   animated?: boolean;
 };
 
@@ -241,6 +244,7 @@ export function AchievementListCard({
   savingPinSlug = null,
   onTogglePin,
   compact = false,
+  strip = false,
   animated = false,
 }: AchievementListCardProps) {
   const rarity = getRarityStyle(item.rarity);
@@ -248,6 +252,58 @@ export function AchievementListCard({
     item.targetValue > 0
       ? Math.min(100, (item.progress / item.targetValue) * 100)
       : 0;
+
+  if (strip) {
+    return (
+      <article
+        className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${
+          item.unlocked
+            ? "border-emerald-500/20 bg-emerald-950/30"
+            : "border-emerald-500/10 bg-emerald-950/20 opacity-40"
+        }`}
+        aria-label={`${item.name}${item.unlocked ? ", получена" : ", не получена"}`}
+      >
+        <ProfileAchievementBadge
+          icon={item.icon}
+          name={item.name}
+          size="sm"
+          variant="floating"
+          className={
+            item.unlocked
+              ? "drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]"
+              : "grayscale opacity-45"
+          }
+        />
+        <div className="min-w-0 flex-1">
+          <h4 className="truncate text-sm font-medium text-zinc-100">
+            {item.name}
+          </h4>
+          {!item.unlocked && item.hint && (
+            <p className="truncate text-xs text-zinc-500">{item.hint}</p>
+          )}
+        </div>
+        {isOwner && item.unlocked && onTogglePin && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={pinDisabled}
+            onClick={() => onTogglePin(item.slug)}
+            className="h-7 shrink-0 px-2 text-xs text-zinc-500 hover:text-emerald-400"
+            aria-label={isPinned ? "Убрать из шапки" : "Показать в шапке"}
+          >
+            {savingPinSlug === item.slug ? (
+              <LucideIcons.Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : isPinned ? (
+              <LucideIcons.Star className="h-3.5 w-3.5 fill-emerald-500 text-emerald-500" />
+            ) : (
+              <LucideIcons.Plus className="h-3.5 w-3.5" />
+            )}
+          </Button>
+        )}
+      </article>
+    );
+  }
 
   return (
     <motion.article

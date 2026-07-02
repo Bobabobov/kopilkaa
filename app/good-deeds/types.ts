@@ -26,7 +26,9 @@ export type GoodDeedsResponse = {
     pendingCount: number;
     /** Сумма бонусов по всем одобренным отчётам. */
     totalEarnedBonuses: number;
-    /** Доступно с учётом уже выведенного и заявок в работе. */
+    /** Опыт, вложенный в уровень (всё начисленное минус выведенное и старые заявки). */
+    bonusesInLevel: number;
+    /** @deprecated Используйте bonusesInLevel. */
     availableBonuses: number;
     /** Сумма в заявках на вывод со статусом «на проверке». */
     pendingWithdrawalBonuses: number;
@@ -34,7 +36,10 @@ export type GoodDeedsResponse = {
     withdrawnBonuses: number;
     hasPendingWithdrawal: boolean;
     withdrawalBlocked: boolean;
+    withdrawalsDisabled?: boolean;
   };
+  /** Уровень профиля зрителя (если авторизован). */
+  profileLevel?: number;
   feed: {
     id: string;
     taskTitle: string;
@@ -53,7 +58,6 @@ export type GoodDeedsResponse = {
       vkLink?: string | null;
       telegramLink?: string | null;
       youtubeLink?: string | null;
-      markedAsDeceiver?: boolean;
     };
   }[];
   viewer: {

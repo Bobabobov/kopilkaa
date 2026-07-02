@@ -7,9 +7,9 @@ describe("buildApplicationIntegrity", () => {
       applicationId: "a1",
       userId: "u1",
       submitterIp: "10.0.0.1",
-      markedAsDeceiver: false,
       sameIpMatches: [],
       samePaymentMatches: [],
+      sameDeviceMatches: [],
     });
 
     expect(result.isClean).toBe(true);
@@ -22,7 +22,6 @@ describe("buildApplicationIntegrity", () => {
       applicationId: "a1",
       userId: "u1",
       submitterIp: "10.0.0.5",
-      markedAsDeceiver: false,
       sameIpMatches: [
         {
           kind: "application",
@@ -51,7 +50,6 @@ describe("buildApplicationIntegrity", () => {
       applicationId: "a1",
       userId: "u1",
       submitterIp: "10.0.0.5",
-      markedAsDeceiver: false,
       sameIpMatches: [
         {
           kind: "application",
@@ -70,12 +68,11 @@ describe("buildApplicationIntegrity", () => {
     expect(result.isClean).toBe(true);
   });
 
-  it("должно указать совпадение реквизитов и метку обманщика", () => {
+  it("должно указать совпадение реквизитов с выводами бонусов", () => {
     const result = buildApplicationIntegrity({
       applicationId: "a1",
       userId: "u1",
       submitterIp: null,
-      markedAsDeceiver: true,
       sameIpMatches: [],
       samePaymentMatches: [
         {
@@ -91,14 +88,38 @@ describe("buildApplicationIntegrity", () => {
 
     expect(result.isClean).toBe(false);
     expect(
-      result.reasons.some((r) => r.message.includes("Обманывал")),
-    ).toBe(true);
-    expect(
       result.reasons.some((r) => r.message.includes("выводами бонусов")),
     ).toBe(true);
     expect(
       result.reasons.find((r) => r.key === "same-payment-withdrawals")
         ?.accounts?.[0]?.userLabel,
     ).toBe("other@test.ru");
+  });
+
+  it("должно указать совпадение отпечатка устройства с другими аккаунтами", () => {
+    const result = buildApplicationIntegrity({
+      applicationId: "a1",
+      userId: "u1",
+      submitterIp: null,
+      sameIpMatches: [],
+      samePaymentMatches: [],
+      sameDeviceMatches: [
+        {
+          kind: "application",
+          id: "a9",
+          userId: "u9",
+          userName: "Другой",
+          userEmail: null,
+          userAvatar: null,
+          title: "Чужая заявка",
+          status: "PENDING",
+        },
+      ],
+    });
+
+    expect(result.isClean).toBe(false);
+    expect(result.sameDeviceCount).toBe(1);
+    expect(result.reasons.some((r) => r.key === "same-device")).toBe(true);
+    expect(result.links.sameDevice).toHaveLength(1);
   });
 });

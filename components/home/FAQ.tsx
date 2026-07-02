@@ -115,7 +115,7 @@ export default function FAQ() {
               boxShadow: "0 8px 32px rgba(249, 188, 96, 0.25)",
             }}
           >
-            Рассказать историю
+            Написать историю
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

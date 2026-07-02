@@ -6,6 +6,10 @@ import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 import { trackLoginVisit } from "@/lib/achievements/unlock";
 import { scheduleTelegramAvatarSync } from "@/lib/telegramAvatarSync";
+import { toDisplayExperience } from "@/lib/userLevel/economy";
+import {
+  syncUserProfileLevelIfStale,
+} from "@/lib/userLevel/resolveProfileLevel";
 
 type SocialLinkType = "vk" | "telegram" | "youtube";
 
@@ -194,6 +198,8 @@ export async function GET(request: Request) {
         avatarFrame: true,
         hideEmail: true,
         lastSeen: true,
+        level: true,
+        experience: true,
       },
     });
 
@@ -240,6 +246,13 @@ export async function GET(request: Request) {
       });
     }
 
+    if (!user) {
+      return Response.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const level = await syncUserProfileLevelIfStale(session.uid, user);
+    const displayExperience = toDisplayExperience(user.experience ?? 0);
+
     // Нормализуем пользователя: если есть telegramUsername, но нет telegramLink,
     // подставляем ссылку автоматически, чтобы профиль видел привязку Телеграма
     const publicUser = user
@@ -254,8 +267,12 @@ export async function GET(request: Request) {
         ? {
             ...publicUser,
             telegramLink: `https://t.me/${publicUser.telegramUsername}`,
+            level,
+            experience: displayExperience,
           }
-        : publicUser;
+        : publicUser
+          ? { ...publicUser, level, experience: displayExperience }
+          : null;
 
     // Флаг допуска в админку рассчитываем по той же логике, что и на серверных маршрутах
     const allowedAdmin = await getAllowedAdminUser();

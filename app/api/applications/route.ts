@@ -6,22 +6,35 @@ import {
   getPlainTextLenFromHtml,
   sanitizeApplicationStoryHtml,
 } from "@/lib/applications/sanitize";
-import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 import { ApplicationCategory, ApplicationStatus, Prisma } from "@prisma/client";
 import {
   isApplicationCategory,
   isSubmittableApplicationCategory,
-  REPORT_PHOTOS_MIN,
+  DEFAULT_APPLICATION_CATEGORY,
 } from "@/lib/applications/categories";
 import {
   extractClientIpFromRequest,
   normalizeClientIp,
 } from "@/lib/http/clientIp";
 import { digitsFingerprint } from "@/lib/admin/requisitesFingerprint";
+import { parseDeviceFingerprint } from "@/lib/deviceFingerprint/validate";
+import { parseClientTimezone } from "@/lib/applications/clientTimezone";
 import { ACHIEVEMENT_SLUGS } from "@/lib/achievements/definitions";
 import { checkAndUnlockAchievement } from "@/lib/achievements/unlock";
-
-const DAY_MS = 24 * 60 * 60 * 1000;
+import { validateApplicationEconomy } from "@/lib/applications/applicationEconomy";
+import { loadUserEconomyContext, requiresReviewBeforeNextApplication } from "@/lib/applications/userEconomyContext";
+import { logApplicationSubmitBonusTransaction } from "@/lib/bonusTransactions/log";
+import { getMaxApplicationAmount, showsDesiredAmountField } from "@/lib/level-config";
+import { resolveUserProfileLevel } from "@/lib/userLevel/resolveProfileLevel";
+import {
+  findApplicationFieldWithLink,
+  getApplicationNoLinksError,
+} from "@/lib/applications/validateContent";
+import { isSafeUploadUrl } from "@/lib/uploads/url";
+import {
+  normalizeApplicationSbpPayment,
+  validateApplicationSbpPayment,
+} from "@/lib/sbp/validateApplicationPayment";
 
 function getWhitelistEmails(): string[] {
   const raw = process.env.WHITELIST_EMAILS || "";
@@ -62,36 +75,26 @@ export async function POST(req: Request) {
     summary: string;
     story: string;
     amount: string;
+    desiredAmount?: string;
     payment: string;
+    bankName?: string;
     images: string[];
-    reportImages?: string[];
     hpCompany?: string;
     clientMeta?: {
       filledMs?: number | null;
       storyEditMs?: number | null;
+      deviceFingerprint?: string | null;
+      clientTimezone?: string | null;
     };
     acknowledgedRules?: boolean;
   };
 
   try {
     const whitelistEmails = getWhitelistEmails();
-    const [requester, lastByUser, lastApprovedByUser] = await Promise.all([
+    const [requester] = await Promise.all([
       prisma.user.findUnique({
         where: { id: session.uid },
-        select: { email: true },
-      }),
-      prisma.application.findFirst({
-        where: { userId: session.uid },
-        orderBy: { createdAt: "desc" },
-        select: { createdAt: true },
-      }),
-      prisma.application.findFirst({
-        where: {
-          userId: session.uid,
-          status: ApplicationStatus.APPROVED,
-        },
-        orderBy: { createdAt: "desc" },
-        select: { id: true },
+        select: { email: true, level: true, experience: true },
       }),
     ]);
     const isWhitelisted =
@@ -104,9 +107,10 @@ export async function POST(req: Request) {
       summary,
       story,
       amount,
+      desiredAmount: desiredAmountRaw,
       payment,
+      bankName: bankNameRaw,
       images,
-      reportImages,
       hpCompany,
       clientMeta,
       acknowledgedRules,
@@ -156,22 +160,35 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!categoryRaw || !isApplicationCategory(categoryRaw)) {
+    const categoryResolved: ApplicationCategory =
+      categoryRaw && isApplicationCategory(categoryRaw)
+        ? categoryRaw
+        : DEFAULT_APPLICATION_CATEGORY;
+    if (!isSubmittableApplicationCategory(categoryResolved)) {
       return Response.json(
-        { error: "Укажите категорию помощи" },
+        { error: "Выберите актуальную категорию истории" },
         { status: 400 },
       );
     }
-    if (!isSubmittableApplicationCategory(categoryRaw)) {
-      return Response.json(
-        { error: "Выберите актуальную категорию помощи" },
-        { status: 400 },
-      );
-    }
-    const category: ApplicationCategory = categoryRaw;
+    const category: ApplicationCategory = categoryResolved;
 
     const sanitizedStory = sanitizeApplicationStoryHtml(story);
     const storyTextLen = getPlainTextLenFromHtml(sanitizedStory);
+
+    const linkField = findApplicationFieldWithLink({
+      title: typeof title === "string" ? title : "",
+      summary: typeof summary === "string" ? summary : "",
+      storyHtml: sanitizedStory,
+      payment: typeof payment === "string" ? payment : "",
+      bankName:
+        typeof bankNameRaw === "string" ? bankNameRaw : undefined,
+    });
+    if (linkField) {
+      return Response.json(
+        { error: getApplicationNoLinksError(linkField) },
+        { status: 400 },
+      );
+    }
 
     // Валидация длин (расширенные лимиты для администратора)
     const titleMax = isAdmin ? 100 : 40;
@@ -179,6 +196,22 @@ export async function POST(req: Request) {
     const storyMax = isAdmin ? 10000 : 3000;
     const storyMin = 100;
     const paymentMax = isAdmin ? 500 : 200;
+    const bankName =
+      typeof bankNameRaw === "string" ? bankNameRaw.trim() : "";
+    const paymentError = validateApplicationSbpPayment(payment, bankName);
+    if (!payment || paymentError) {
+      return Response.json(
+        { error: paymentError ?? "Укажите номер телефона и банк для СБП" },
+        { status: 400 },
+      );
+    }
+    const normalizedPayment = normalizeApplicationSbpPayment(payment, bankName);
+    if (normalizedPayment.length > paymentMax) {
+      return Response.json(
+        { error: `Данные СБП: не более ${paymentMax} символов` },
+        { status: 400 },
+      );
+    }
 
     if (!title || title.length > titleMax)
       return Response.json(
@@ -195,22 +228,58 @@ export async function POST(req: Request) {
         { error: `История ${storyMin}–${storyMax} символов` },
         { status: 400 },
       );
+    const profileLevel = resolveUserProfileLevel(requester ?? {});
     const amountNumber = parseInt(amount);
+    const userMaxAmount =
+      isAdmin || isWhitelisted
+        ? 1_000_000
+        : getMaxApplicationAmount(profileLevel);
     if (
       !amount ||
       isNaN(amountNumber) ||
       amountNumber < 1 ||
-      amountNumber > 1000000
+      amountNumber > userMaxAmount
     )
       return Response.json(
-        { error: `Сумма должна быть от 1 до 1 000 000 рублей` },
+        {
+          error:
+            isAdmin || isWhitelisted
+              ? `Сумма должна быть от 1 до 1 000 000 рублей`
+              : `На вашем уровне доступен гонорар до ${userMaxAmount} ₽.`,
+        },
         { status: 400 },
       );
-    if (!payment || payment.length < 10 || payment.length > paymentMax)
-      return Response.json(
-        { error: `Реквизиты 10–${paymentMax} символов` },
-        { status: 400 },
-      );
+
+    let desiredAmountNumber: number | null = null;
+    const userLevel = profileLevel;
+    const canSetDesiredAmount =
+      isAdmin || isWhitelisted || showsDesiredAmountField(userLevel);
+
+    if (
+      desiredAmountRaw != null &&
+      String(desiredAmountRaw).trim().length > 0
+    ) {
+      if (!canSetDesiredAmount) {
+        return Response.json(
+          { error: "Желаемая сумма доступна с 2-го уровня профиля" },
+          { status: 400 },
+        );
+      }
+      desiredAmountNumber = parseInt(String(desiredAmountRaw), 10);
+      if (
+        isNaN(desiredAmountNumber) ||
+        desiredAmountNumber < 1 ||
+        desiredAmountNumber <= amountNumber
+      ) {
+        return Response.json(
+          {
+            error:
+              "Желаемая сумма должна быть больше суммы гонорара",
+          },
+          { status: 400 },
+        );
+      }
+    }
     // Ограничение на количество изображений (администратор может загружать больше)
     const maxImages = session.role === "ADMIN" ? 20 : 5;
     if (!Array.isArray(images) || images.length > maxImages) {
@@ -225,26 +294,19 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
-
-    // Лимит раз в 24 часа (только для обычных пользователей)
-    if (session.role !== "ADMIN" && !isWhitelisted) {
-      if (lastByUser) {
-        const diff = Date.now() - lastByUser.createdAt.getTime();
-        const left = DAY_MS - diff;
-        if (left > 0) {
-          return Response.json(
-            { error: "Лимит: 1 заявка в 24 часа", leftMs: left },
-            { status: 429 },
-          );
-        }
-      }
+    const unsafeImage = images.find((url) => !isSafeUploadUrl(url));
+    if (unsafeImage) {
+      return Response.json(
+        { error: "Недопустимый URL изображения" },
+        { status: 400 },
+      );
     }
 
-    const trust = await computeUserTrustSnapshot(session.uid);
+    const economyContext = await loadUserEconomyContext(prisma, session.uid);
 
-    // Отзыв перед 2-й заявкой (вайтлист по email без изменений)
-    if (!isWhitelisted) {
-      if (trust.approvedApplications >= 1) {
+    // Отзыв перед 2-й заявкой в текущем экономическом цикле (вайтлист без изменений)
+    if (!isWhitelisted && economyContext) {
+      if (requiresReviewBeforeNextApplication(economyContext)) {
         const anyApplicationReview = await prisma.review.findFirst({
           where: { userId: session.uid },
           select: { id: true },
@@ -253,7 +315,7 @@ export async function POST(req: Request) {
           return Response.json(
             {
               error:
-                "Для создания следующей заявки необходимо сначала оставить отзыв по первой одобренной заявке. Перейдите на страницу отзывов и оставьте отзыв.",
+                "Для публикации следующей истории необходимо сначала оставить отзыв по первой одобренной публикации. Перейдите на страницу отзывов и оставьте отзыв.",
               requiresReview: true,
             },
             { status: 403 },
@@ -262,40 +324,30 @@ export async function POST(req: Request) {
       }
     }
 
-    // Ориентир суммы по уровню доверия (кроме администраторов и вайтлиста)
-    if (session.role !== "ADMIN" && !isWhitelisted) {
-      if (amountNumber < trust.limits.min || amountNumber > trust.limits.max) {
-        const minText = trust.limits.min.toLocaleString("ru-RU");
-        const maxText = trust.limits.max.toLocaleString("ru-RU");
-        return Response.json(
-          {
-            error: `Сумма не соответствует ориентиру вашего уровня (от ${minText} до ${maxText} ₽).`,
-          },
-          { status: 400 },
-        );
-      }
-    }
-
     const submitterIpRaw = extractClientIpFromRequest(req);
     const submitterIp = normalizeClientIp(submitterIpRaw);
     const clientDevice = getClientDevice(req);
-
-    if (
-      session.role !== "ADMIN" &&
-      lastApprovedByUser?.id &&
-      (!Array.isArray(reportImages) || reportImages.length < REPORT_PHOTOS_MIN)
-    ) {
-      return Response.json(
-        {
-          error: `Приложите минимум ${REPORT_PHOTOS_MIN} фото отчёта по прошлой одобренной заявке`,
-        },
-        { status: 400 },
-      );
-    }
+    const deviceFingerprint = parseDeviceFingerprint(
+      clientMeta?.deviceFingerprint,
+    );
+    const clientTimezone = parseClientTimezone(clientMeta?.clientTimezone);
 
     // Используем транзакцию для атомарности
     const result = await prisma.$transaction(async (tx) => {
-      // Создаём заявку
+      const economyCheck = await validateApplicationEconomy(tx, {
+        userId: session.uid,
+        amount: amountNumber,
+        isAdmin,
+        isWhitelisted: Boolean(isWhitelisted),
+      });
+
+      if (!economyCheck.ok) {
+        throw Object.assign(new Error(economyCheck.error), {
+          status: economyCheck.status,
+          leftMs: economyCheck.leftMs,
+        });
+      }
+
       const app = await tx.application.create({
         data: {
           userId: session.uid,
@@ -304,15 +356,29 @@ export async function POST(req: Request) {
           summary,
           story: sanitizedStory,
           amount: amountNumber,
-          payment,
-          paymentFingerprint: digitsFingerprint(payment),
-          countTowardsTrust: false,
+          desiredAmount: desiredAmountNumber,
+          payment: normalizedPayment,
+          paymentFingerprint: digitsFingerprint(normalizedPayment),
           filledMs: clampedFilledMs,
           storyEditMs: clampedStoryEditMs,
           submitterIp: submitterIp || undefined,
           clientDevice,
+          clientTimezone: clientTimezone ?? undefined,
+          deviceFingerprint: deviceFingerprint ?? undefined,
+          isFirstFree: economyCheck.isFirstFree,
+          submitBonusCost:
+            isAdmin || isWhitelisted ? 0 : economyCheck.submitBonusCost,
+          userLevelAtSubmit: economyCheck.userLevel,
         },
         select: { id: true },
+      });
+
+      await logApplicationSubmitBonusTransaction(tx, {
+        userId: session.uid,
+        applicationId: app.id,
+        amount: isAdmin || isWhitelisted ? 0 : economyCheck.submitBonusCost,
+        isFirstFree:
+          economyCheck.isFirstFree || Boolean(isAdmin || isWhitelisted),
       });
 
       // Привязываем изображения по порядку
@@ -324,32 +390,6 @@ export async function POST(req: Request) {
             sort: i,
           })),
         });
-      }
-
-      // Фото-отчёт по прошлой одобренной заявке:
-      // если есть последняя одобренная заявка и переданы reportImages —
-      // сохраняем их как отдельные записи, перезаписывая предыдущий отчёт.
-      if (
-        Array.isArray(reportImages) &&
-        reportImages.length > 0 &&
-        lastApprovedByUser?.id
-      ) {
-        const urls = reportImages.slice(
-          0,
-          session.role === "ADMIN" ? reportImages.length : 5,
-        );
-        await tx.applicationReportImage.deleteMany({
-          where: { applicationId: lastApprovedByUser.id },
-        });
-        if (urls.length > 0) {
-          await tx.applicationReportImage.createMany({
-            data: urls.map((url, index) => ({
-              applicationId: lastApprovedByUser.id,
-              url,
-              sort: index,
-            })),
-          });
-        }
       }
 
       return app;
@@ -375,6 +415,31 @@ export async function POST(req: Request) {
 
     return Response.json({ ok: true, id: result.id });
   } catch (error) {
+    const economyStatus =
+      error &&
+      typeof error === 'object' &&
+      'status' in error &&
+      typeof (error as { status: unknown }).status === 'number'
+        ? (error as { status: number; leftMs?: number }).status
+        : null;
+    const economyLeftMs =
+      error &&
+      typeof error === 'object' &&
+      'leftMs' in error &&
+      typeof (error as { leftMs: unknown }).leftMs === 'number'
+        ? (error as { leftMs: number }).leftMs
+        : undefined;
+
+    if (economyStatus != null && error instanceof Error) {
+      return Response.json(
+        {
+          error: error.message,
+          ...(economyLeftMs != null ? { leftMs: economyLeftMs } : {}),
+        },
+        { status: economyStatus },
+      );
+    }
+
     const msg = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack : "";
     if (process.env.NODE_ENV !== "production") {
@@ -415,7 +480,7 @@ export async function POST(req: Request) {
 
     return Response.json(
       {
-        error: "Ошибка сохранения заявки",
+        error: "Ошибка сохранения истории",
         ...(process.env.NODE_ENV === "development"
           ? { detail: msg.slice(0, 300) }
           : {}),

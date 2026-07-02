@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
+import { cn } from "@/lib/utils";
 import {
   ACCEPTED_PHOTO_TYPES,
   UPLOAD_LIMITS,
@@ -43,7 +44,10 @@ export default function PhotoUpload({
     title ??
     (isDark ? "Фотографии" : `Фотографии * (до ${maxPhotos})`);
   const prevUrlsRef = useRef<string[]>([]);
+  const dragCounterRef = useRef(0);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const reducedMotion = useReducedMotion();
   const displayError = error || localError;
 
   useEffect(() => {
@@ -152,26 +156,87 @@ export default function PhotoUpload({
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    dragCounterRef.current = 0;
+    setIsDraggingOver(false);
     addFiles(Array.from(e.dataTransfer.files));
   };
+
+  const onDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    dragCounterRef.current += 1;
+    setIsDraggingOver(true);
+  };
+
+  const onDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    dragCounterRef.current = Math.max(0, dragCounterRef.current - 1);
+    if (dragCounterRef.current === 0) {
+      setIsDraggingOver(false);
+    }
+  };
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+    if (!isDraggingOver) setIsDraggingOver(true);
+  };
+
+  const dropZoneActive = isDraggingOver && !reducedMotion;
+  const dragLiftY = isDraggingOver ? (reducedMotion ? 0 : -10) : 0;
+  const dragScale = isDraggingOver ? (reducedMotion ? 1.008 : 1.03) : 1;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      onDragOver={(e) => e.preventDefault()}
+      animate={{
+        opacity: 1,
+        y: dragLiftY,
+        scale: dragScale,
+      }}
+      transition={
+        isDraggingOver
+          ? { type: "spring", stiffness: 380, damping: 24, mass: 0.85 }
+          : { type: "spring", stiffness: 320, damping: 28, delay }
+      }
+      style={{ transformOrigin: "center center" }}
+      onDragEnter={onDragEnter}
+      onDragLeave={onDragLeave}
+      onDragOver={onDragOver}
       onDrop={onDrop}
-      className={`rounded-2xl border-2 border-dashed p-4 sm:p-5 transition-colors duration-300 relative ${
+      className={cn(
+        "rounded-2xl border-2 border-dashed p-4 sm:p-5 transition-colors duration-300 relative overflow-hidden",
+        isDraggingOver && "z-20",
         isDark
           ? displayError
             ? "border-[#e16162]/60 bg-[#e16162]/8"
-            : "border-[#abd1c6]/35 bg-[#004643]/30 hover:border-[#f9bc60]/45"
+            : isDraggingOver
+              ? "border-[#f9bc60] bg-[#f9bc60]/14 shadow-[0_0_0_1px_rgba(249,188,96,0.4),0_18px_48px_rgba(249,188,96,0.28),0_8px_24px_rgba(0,0,0,0.35)]"
+              : "border-[#abd1c6]/35 bg-[#004643]/30 hover:border-[#f9bc60]/45"
           : displayError
             ? "border-[#e16162]/60 bg-[#e16162]/8"
-            : "border-slate-300 dark:border-slate-600 hover:border-emerald-400 dark:hover:border-emerald-500 bg-transparent"
-      }`}
+            : isDraggingOver
+              ? "border-amber-400 bg-amber-50/80 shadow-[0_18px_40px_rgba(245,158,11,0.22)] dark:border-amber-500 dark:bg-amber-950/30"
+              : "border-slate-300 dark:border-slate-600 hover:border-emerald-400 dark:hover:border-emerald-500 bg-transparent",
+      )}
     >
+      {dropZoneActive && (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-2xl bg-[#f9bc60]/12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.35, 0.65, 0.35] }}
+          transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
+      {dropZoneActive && (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-3 rounded-xl border border-[#f9bc60]/50"
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: [0.98, 1.01, 0.98] }}
+          transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
         <div className="flex items-center gap-2 min-w-0">
           <LucideIcons.Image
@@ -265,28 +330,65 @@ export default function PhotoUpload({
           ))}
         </div>
       ) : (
-        <div className="text-center py-6 sm:py-8 px-2">
-          <LucideIcons.Image
-            size="lg"
-            className={`mx-auto mb-2 ${isDark ? "text-[#abd1c6]/50" : "text-gray-400"}`}
-          />
-          <p
-            className={`text-sm ${isDark ? "text-[#abd1c6]" : "text-gray-500 dark:text-gray-400"}`}
+        <div className="relative text-center py-6 sm:py-8 px-2">
+          <motion.div
+            className="mx-auto mb-2 w-fit"
+            animate={
+              dropZoneActive
+                ? { scale: 1.16, y: -10 }
+                : { scale: 1, y: 0 }
+            }
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
-            Перетащите сюда или нажмите «Добавить фото»
-          </p>
+            <LucideIcons.Image
+              size="lg"
+              className={cn(
+                "mx-auto",
+                isDraggingOver
+                  ? isDark
+                    ? "text-[#f9bc60]"
+                    : "text-amber-500"
+                  : isDark
+                    ? "text-[#abd1c6]/50"
+                    : "text-gray-400",
+              )}
+            />
+          </motion.div>
+          <motion.p
+            className={cn(
+              "text-sm",
+              isDraggingOver
+                ? isDark
+                  ? "text-[#f9bc60] font-semibold"
+                  : "text-amber-600 dark:text-amber-400 font-semibold"
+                : isDark
+                  ? "text-[#abd1c6]"
+                  : "text-gray-500 dark:text-gray-400",
+            )}
+            animate={dropZoneActive ? { scale: [1, 1.02, 1] } : { scale: 1 }}
+            transition={
+              dropZoneActive
+                ? { duration: 0.9, repeat: Infinity, ease: "easeInOut" }
+                : { duration: 0.2 }
+            }
+          >
+            {isDraggingOver
+              ? "Отпустите, чтобы добавить фото"
+              : "Перетащите сюда или нажмите «Добавить фото»"}
+          </motion.p>
           {subtitle ? (
             <p
               className={`text-xs mt-2 ${isDark ? "text-[#94a1b2]" : "text-gray-500 dark:text-gray-400"}`}
             >
               {subtitle}
             </p>
-          ) : null}
-          <p
-            className={`text-xs mt-2 ${isDark ? "text-[#94a1b2]" : "text-gray-500 dark:text-gray-400"}`}
-          >
-            {getApplicationPhotoUploadHint(maxPhotos)}
-          </p>
+          ) : (
+            <p
+              className={`text-xs mt-2 ${isDark ? "text-[#94a1b2]" : "text-gray-500 dark:text-gray-400"}`}
+            >
+              {getApplicationPhotoUploadHint(maxPhotos)}
+            </p>
+          )}
         </div>
       )}
       {displayError && (

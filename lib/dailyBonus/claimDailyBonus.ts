@@ -102,13 +102,14 @@ export async function claimDailyBonusForUser(
       const newStreak = computeNextStreakOnClaim(state, todayKey, isAdmin);
       const milestoneBonus = getMilestoneBonusForStreak(newStreak);
       const streakAfter = getStreakAfterClaim(newStreak);
-      const totalGranted = DAILY_BONUS_AMOUNT + milestoneBonus;
+      const grantedDaily = DAILY_BONUS_AMOUNT;
+      const totalGranted = grantedDaily + milestoneBonus;
 
       await tx.dailyBonusClaim.create({
         data: {
           userId,
           claimDate: claimDateKey,
-          dailyBonus: DAILY_BONUS_AMOUNT,
+          dailyBonus: grantedDaily,
           milestoneBonus,
           streakAfter,
         },
@@ -126,7 +127,7 @@ export async function claimDailyBonusForUser(
       await tx.goodDeedBonusGrant.create({
         data: {
           userId,
-          amountBonuses: DAILY_BONUS_AMOUNT,
+          amountBonuses: grantedDaily,
           comment: DAILY_BONUS_GRANT_COMMENT,
         },
       });
@@ -155,7 +156,7 @@ export async function claimDailyBonusForUser(
       return {
         ...status,
         claimMode: "safe",
-        grantedDaily: DAILY_BONUS_AMOUNT,
+        grantedDaily,
         grantedMilestone: milestoneBonus,
         totalGranted,
       };

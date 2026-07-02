@@ -8,6 +8,7 @@ import { LucideIcons } from "@/components/ui/LucideIcons";
 
 interface ApplicationMetaInfoProps {
   amount: number;
+  desiredAmount?: number | null;
   userId: string;
   userName?: string | null;
   userAvatar?: string | null;
@@ -17,6 +18,8 @@ interface ApplicationMetaInfoProps {
   filledMs?: number | null;
   /** Локализованное название категории помощи */
   categoryLabel?: string | null;
+  /** Только автор и категория — без дубля суммы и описания */
+  compact?: boolean;
 }
 
 function getAuthorLabel(
@@ -30,6 +33,7 @@ function getAuthorLabel(
 
 export default function ApplicationMetaInfo({
   amount,
+  desiredAmount,
   userId,
   userName,
   userAvatar,
@@ -38,6 +42,7 @@ export default function ApplicationMetaInfo({
   onCopyEmail,
   filledMs,
   categoryLabel,
+  compact = false,
 }: ApplicationMetaInfoProps) {
   const authorLabel = getAuthorLabel(userName, userEmail);
   const avatarUrl = resolveAvatarUrl(userAvatar);
@@ -50,6 +55,56 @@ export default function ApplicationMetaInfo({
     return `${min} мин ${sec.toString().padStart(2, "0")} c`;
   })();
 
+  if (compact) {
+    return (
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 min-w-0">
+        <Link
+          href={`/profile/${userId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center gap-2.5 min-w-0 rounded-xl border border-white/10 bg-black/15 px-3 py-2 hover:border-[#f9bc60]/30 transition-colors"
+        >
+          <img
+            src={avatarUrl}
+            alt=""
+            className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-[#abd1c6]/25"
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_AVATAR;
+            }}
+          />
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-bold text-[#f9bc60]">
+              {authorLabel}
+            </span>
+            <span className="block text-[11px] text-[#94a1b2]">Профиль автора</span>
+          </span>
+        </Link>
+        <button
+          type="button"
+          onClick={() => onCopyEmail(userEmail)}
+          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/15 px-3 py-2 text-xs text-[#abd1c6] hover:border-[#f9bc60]/30"
+        >
+          <LucideIcons.Mail size="xs" />
+          Email
+          <LucideIcons.Copy size="xs" className="text-[#f9bc60]" />
+        </button>
+        {categoryLabel ? (
+          <span className="text-xs text-[#94a1b2]">
+            Категория:{" "}
+            <span className="font-semibold text-[#f9bc60]">{categoryLabel}</span>
+          </span>
+        ) : null}
+        {formattedTime ? (
+          <span className="text-xs text-[#94a1b2]">
+            Заполнено за{" "}
+            <span className="font-semibold text-[#abd1c6]">{formattedTime}</span>
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Сумма, автор и краткое описание */}
@@ -59,15 +114,26 @@ export default function ApplicationMetaInfo({
         transition={{ duration: 0.5, delay: 0.3 }}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6"
       >
-        {/* Сумма запроса */}
+        {/* Запрошенная сумма */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl border border-[#f9bc60]/40 bg-[#f9bc60]/10 backdrop-blur-sm min-w-0 shadow-[0_12px_30px_rgba(0,0,0,0.28)]">
           <span className="font-bold text-xl sm:text-2xl text-[#f9bc60]">
-            ₽{amount.toLocaleString()}
+            ₽{amount.toLocaleString("ru-RU")}
           </span>
           <span className="text-xs sm:text-sm font-medium text-[#abd1c6]">
-            Сумма запроса
+            Запрошенная сумма
           </span>
         </div>
+
+        {desiredAmount != null && desiredAmount > amount && (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl border border-[#abd1c6]/35 bg-[#004643]/50 backdrop-blur-sm min-w-0 shadow-[0_12px_30px_rgba(0,0,0,0.28)]">
+            <span className="font-bold text-xl sm:text-2xl text-[#fffffe]">
+              ₽{desiredAmount.toLocaleString("ru-RU")}
+            </span>
+            <span className="text-xs sm:text-sm font-medium text-[#abd1c6]">
+              Желаемая сумма
+            </span>
+          </div>
+        )}
 
         {/* Автор */}
         <div className="rounded-2xl border border-[#abd1c6]/35 bg-[#001e1d]/40 backdrop-blur-sm min-w-0 overflow-hidden shadow-[0_12px_30px_rgba(0,0,0,0.28)] p-2.5 sm:p-3">

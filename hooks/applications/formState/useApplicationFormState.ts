@@ -2,14 +2,14 @@
 
 import { useMemo, useRef, useState, useCallback, useEffect } from "react";
 import type { ApplicationCategory } from "@prisma/client";
-import { isApplicationCategory } from "@/lib/applications/categories";
+import { DEFAULT_APPLICATION_CATEGORY } from "@/lib/applications/categories";
 
 import { buildAuthModalUrl } from "@/lib/authModalUrl";
+import { recordFeedbackMeaningfulAction } from "@/lib/feedback/promptStorage";
 import {
   SAVE_KEY_BASE,
-  TRUST_ACK_KEY_BASE,
+  RULES_ACK_KEY_BASE,
   POLICY_ACK_KEY_BASE,
-  INTRO_ACK_KEY_BASE,
   FORM_START_KEY_BASE,
   LIMITS,
   TOTAL_FIELDS,
@@ -17,8 +17,7 @@ import {
 import type { LocalImage } from "./types";
 import { useApplicationFormAuth } from "./useAuth";
 import { useRestoreForm, usePersistForm } from "./usePersistence";
-import { useIntroOverflow } from "./useIntroOverflow";
-import { useTrustAndReview } from "./useTrustAndReview";
+import { useApplicationReviewStats } from "./useApplicationReviewStats";
 import {
   getStoryTextLen,
   isApplicationFormValid,
@@ -31,38 +30,44 @@ import { formatAmountRu, createHandleAmountInputChange } from "./amountUtils";
 import { getMessageFromApiJson } from "@/lib/api/parseApiError";
 import { uploadApplicationPhotos } from "./upload";
 import { postApplication } from "./submitApi";
+import { collectDeviceFingerprint, getClientTimezone } from "@/lib/deviceFingerprint/collect";
 import { clearFormStorage } from "./storage";
 import { consumePendingSubmissionSuccess } from "@/lib/applications/pendingSubmission";
+import type { ApplicationEligibility } from "@/lib/applications/applicationEconomy";
+import { getMaxApplicationAmount, showsDesiredAmountField } from "@/lib/level-config";
+import { buildSbpPaymentPayload } from "@/lib/sbp/formatPayment";
 
 export function useApplicationFormState() {
   const { user, loadingAuth } = useApplicationFormAuth();
 
-  const [category, setCategory] = useState<ApplicationCategory | "">("");
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [story, setStory] = useState("");
   const [amount, setAmount] = useState("");
+  const [desiredAmount, setDesiredAmount] = useState("");
   const [payment, setPayment] = useState("");
   const [bankName, setBankName] = useState("");
   const [photos, setPhotos] = useState<LocalImage[]>([]);
-  const [reportPhotos, setReportPhotos] = useState<LocalImage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [left, setLeft] = useState<number | null>(null);
+  const [eligibility, setEligibility] = useState<ApplicationEligibility | null>(
+    null,
+  );
+  const [loadingEligibility, setLoadingEligibility] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [trustAck1, setTrustAck1] = useState(false);
-  const [trustAck2, setTrustAck2] = useState(false);
-  const [trustAck3, setTrustAck3] = useState(false);
+  const [rulesAck1, setRulesAck1] = useState(false);
+  const [rulesAck2, setRulesAck2] = useState(false);
+  const [rulesAck3, setRulesAck3] = useState(false);
   const [policiesAccepted, setPoliciesAccepted] = useState(false);
-  const trustAcknowledged = trustAck1 && trustAck2 && trustAck3;
+  const rulesAcknowledged = rulesAck1 && rulesAck2 && rulesAck3;
   const [ackError, setAckError] = useState(false);
-  const [introOpen, setIntroOpen] = useState(false);
-  const [introChecked, setIntroChecked] = useState(false);
   const [hpCompany, setHpCompany] = useState("");
   const [validationScrollTrigger, setValidationScrollTrigger] = useState(0);
 
   const amountInputRef = useRef<HTMLInputElement | null>(null);
+  const desiredAmountInputRef = useRef<HTMLInputElement | null>(null);
   const formStartedAtRef = useRef<number | null>(null);
   const storyFirstEditAtRef = useRef<number | null>(null);
   const storyLastEditAtRef = useRef<number | null>(null);
@@ -72,16 +77,12 @@ export function useApplicationFormState() {
     () => `${SAVE_KEY_BASE}:${storageSuffix}`,
     [storageSuffix],
   );
-  const trustAckKey = useMemo(
-    () => `${TRUST_ACK_KEY_BASE}:${storageSuffix}`,
+  const rulesAckKey = useMemo(
+    () => `${RULES_ACK_KEY_BASE}:${storageSuffix}`,
     [storageSuffix],
   );
   const policyAckKey = useMemo(
     () => `${POLICY_ACK_KEY_BASE}:${storageSuffix}`,
-    [storageSuffix],
-  );
-  const introAckKey = useMemo(
-    () => `${INTRO_ACK_KEY_BASE}:${storageSuffix}`,
     [storageSuffix],
   );
   const formStartKey = useMemo(
@@ -100,45 +101,30 @@ export function useApplicationFormState() {
   }, [loadingAuth, saveKey, formStartKey]);
 
   useRestoreForm({
-    trustAckKey,
+    rulesAckKey,
     policyAckKey,
-    introAckKey,
     loadingAuth,
-    setTrustAck1,
-    setTrustAck2,
-    setTrustAck3,
+    setRulesAck1,
+    setRulesAck2,
+    setRulesAck3,
     setPoliciesAccepted,
-    setIntroOpen,
-    setIntroChecked,
   });
 
   usePersistForm({
-    trustAckKey,
+    rulesAckKey,
     policyAckKey,
-    introAckKey,
     title,
     summary,
     story,
     amount,
     payment,
     bankName,
-    trustAck1,
-    trustAck2,
-    trustAck3,
+    rulesAck1,
+    rulesAck2,
+    rulesAck3,
     policiesAccepted,
-    introChecked,
     formStartedAtRef,
   });
-
-  useIntroOverflow(introOpen);
-
-  // Окно условий теперь показываем при каждом заходе на /applications
-  // для авторизованного пользователя.
-  useEffect(() => {
-    if (!loadingAuth && user) {
-      setIntroOpen(true);
-    }
-  }, [loadingAuth, user]);
 
   useEffect(() => {
     if (loadingAuth) return;
@@ -146,47 +132,82 @@ export function useApplicationFormState() {
     if (!wasSubmitted) return;
     setSubmitted(true);
     setPhotos([]);
-    setReportPhotos([]);
-    setCategory("");
     setTitle("");
     setSummary("");
     setStory("");
     setAmount("");
+    setDesiredAmount("");
     setPayment("");
     setBankName("");
-    setTrustAck1(false);
-    setTrustAck2(false);
-    setTrustAck3(false);
+    setRulesAck1(false);
+    setRulesAck2(false);
+    setRulesAck3(false);
     setPoliciesAccepted(false);
     setAckError(false);
     setErr(null);
     setLeft(null);
-    clearFormStorage(saveKey, trustAckKey, policyAckKey, formStartKey);
+    clearFormStorage(saveKey, rulesAckKey, policyAckKey, formStartKey);
   }, [
     loadingAuth,
     saveKey,
-    trustAckKey,
+    rulesAckKey,
     policyAckKey,
     formStartKey,
   ]);
 
-  const trust = useTrustAndReview(user, amount);
-  const {
-    approvedCount,
-    pendingReviewApplication,
-    trustSnapshot,
-    trustLevel,
-    trustLimits,
-    trustHint,
-    withinTrustRange,
-    exceedsTrustLimit,
-    isAdmin,
-    amountInt,
-  } = trust;
+  const { approvedCount, pendingReviewApplication, isAdmin, amountInt } =
+    useApplicationReviewStats(user, amount);
+
+  const amountMax = useMemo(() => {
+    if (isAdmin) return LIMITS.amountMax;
+    return eligibility?.maxApplicationAmount ?? getMaxApplicationAmount(1);
+  }, [isAdmin, eligibility?.maxApplicationAmount]);
+
+  const showsDesiredAmount = useMemo(() => {
+    if (isAdmin) return true;
+    const level = eligibility?.userLevel ?? 1;
+    return showsDesiredAmountField(level);
+  }, [isAdmin, eligibility?.userLevel]);
+
+  const desiredAmountInt = desiredAmount ? parseInt(desiredAmount, 10) : NaN;
+
+  useEffect(() => {
+    if (loadingAuth || !user?.id) {
+      setEligibility(null);
+      return;
+    }
+
+    let cancelled = false;
+    setLoadingEligibility(true);
+
+    fetch("/api/applications/eligibility", { cache: "no-store" })
+      .then(async (res) => {
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json?.data) return null;
+        return json.data as ApplicationEligibility;
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setEligibility(data);
+        if (data?.cooldownRemainingMs != null && data.cooldownRemainingMs > 0) {
+          setLeft(data.cooldownRemainingMs);
+        } else {
+          setLeft(null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setEligibility(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingEligibility(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [loadingAuth, user?.id]);
 
   const storyTextLen = useMemo(() => getStoryTextLen(story), [story]);
-  const requiresReport =
-    approvedCount !== null && approvedCount >= 1;
 
   useEffect(() => {
     if (storyTextLen > 0) {
@@ -200,40 +221,41 @@ export function useApplicationFormState() {
   const valid = useMemo(
     () =>
       isApplicationFormValid({
-        category,
         title,
         summary,
+        story,
         storyTextLen,
         amount,
         amountInt,
+        desiredAmount,
+        desiredAmountInt,
         bankName,
         payment,
         photosCount: photos.length,
-        reportPhotosCount: reportPhotos.length,
-        requiresReport,
         isAdmin,
-        withinTrustRange,
+        amountMax,
+        showsDesiredAmount,
       }),
     [
-      category,
       title,
       summary,
+      story,
       storyTextLen,
       amount,
       amountInt,
+      desiredAmount,
+      desiredAmountInt,
       bankName,
       payment,
       photos.length,
-      reportPhotos.length,
-      requiresReport,
       isAdmin,
-      withinTrustRange,
+      amountMax,
+      showsDesiredAmount,
     ],
   );
   const filledFields = useMemo(
     () =>
       getFilledFieldsCount({
-        category,
         title,
         summary,
         storyTextLen,
@@ -244,9 +266,9 @@ export function useApplicationFormState() {
         photosCount: photos.length,
       }),
     [
-      category,
       title,
       summary,
+      story,
       storyTextLen,
       amount,
       amountInt,
@@ -261,34 +283,36 @@ export function useApplicationFormState() {
   const fieldErrors = useMemo(
     () =>
       getApplicationFormErrors({
-        category,
         title,
         summary,
+        story,
         storyTextLen,
         amount,
         amountInt,
+        desiredAmount,
+        desiredAmountInt,
         bankName,
         payment,
         photosCount: photos.length,
-        reportPhotosCount: reportPhotos.length,
-        requiresReport,
         isAdmin,
-        withinTrustRange,
+        amountMax,
+        showsDesiredAmount,
       }),
     [
-      category,
       title,
       summary,
+      story,
       storyTextLen,
       amount,
       amountInt,
+      desiredAmount,
+      desiredAmountInt,
       bankName,
       payment,
       photos.length,
-      reportPhotos.length,
-      requiresReport,
       isAdmin,
-      withinTrustRange,
+      amountMax,
+      showsDesiredAmount,
     ]
   );
   const firstErrorKey = useMemo(
@@ -300,13 +324,24 @@ export function useApplicationFormState() {
     createHandleAmountInputChange(
       setAmount,
       isAdmin,
-      trustLimits.max,
+      amountMax,
       amountInputRef,
     ),
-    [isAdmin, trustLimits.max],
+    [isAdmin, amountMax],
+  );
+
+  const handleDesiredAmountInputChange = useCallback(
+    createHandleAmountInputChange(
+      setDesiredAmount,
+      true,
+      LIMITS.amountMax,
+      desiredAmountInputRef,
+    ),
+    [],
   );
 
   const amountFormatted = formatAmountRu(amount);
+  const desiredAmountFormatted = formatAmountRu(desiredAmount);
 
   /** Проверки перед отправкой (без загрузки файлов и без API). */
   const validateSubmit = useCallback((): boolean => {
@@ -324,7 +359,7 @@ export function useApplicationFormState() {
       if (typeof window !== "undefined") window.location.href = href;
       return false;
     }
-    if (!trustAcknowledged || !policiesAccepted) {
+    if (!rulesAcknowledged || !policiesAccepted) {
       setAckError(true);
       return false;
     }
@@ -339,34 +374,22 @@ export function useApplicationFormState() {
       return false;
     }
 
-    if (!isApplicationCategory(category)) {
-      setErr("Выберите категорию помощи");
-      setValidationScrollTrigger((n) => n + 1);
-      return false;
-    }
-
     return true;
   }, [
     user,
-    trustAcknowledged,
+    rulesAcknowledged,
     policiesAccepted,
     photos.length,
     valid,
-    category,
   ]);
 
   const executeSubmit = useCallback(async () => {
-    const categorySubmit = category;
-    if (!isApplicationCategory(categorySubmit)) {
-      setErr("Выберите категорию помощи");
-      return;
-    }
+    const categorySubmit: ApplicationCategory = DEFAULT_APPLICATION_CATEGORY;
 
       try {
         setSubmitting(true);
         setUploading(true);
         const urls = await uploadApplicationPhotos(photos);
-        const reportUrls = await uploadApplicationPhotos(reportPhotos);
 
         if (formStartedAtRef.current == null) {
           formStartedAtRef.current = Date.now();
@@ -384,9 +407,9 @@ export function useApplicationFormState() {
                 storyLastEditAtRef.current - storyFirstEditAtRef.current,
               )
             : null;
-        const paymentPayload = bankName
-          ? `Банк: ${bankName}\n${payment}`
-          : payment;
+        const paymentPayload = buildSbpPaymentPayload(bankName, payment);
+        const deviceFingerprint = await collectDeviceFingerprint();
+        const clientTimezone = getClientTimezone();
 
         const pendingPayload = {
           category: categorySubmit,
@@ -394,12 +417,16 @@ export function useApplicationFormState() {
           summary,
           story,
           amount,
+          ...(showsDesiredAmount &&
+          desiredAmount &&
+          desiredAmountInt > amountInt
+            ? { desiredAmount }
+            : {}),
           payment: paymentPayload,
           images: urls,
-          reportImages: reportUrls,
           hpCompany,
-          acknowledgedRules: trustAcknowledged && policiesAccepted,
-          clientMeta: { filledMs, storyEditMs },
+          acknowledgedRules: rulesAcknowledged && policiesAccepted,
+          clientMeta: { filledMs, storyEditMs, deviceFingerprint, clientTimezone },
         };
 
         const { response: r, data: d } = await postApplication(pendingPayload);
@@ -420,17 +447,19 @@ export function useApplicationFormState() {
           throw new Error(
             getMessageFromApiJson(
               d,
-              "Необходимо оставить отзыв перед созданием следующей заявки",
+              "Необходимо оставить отзыв перед публикацией следующей истории",
             ),
           );
         }
         if (r.status === 429) {
           if (typeof d?.leftMs === "number") {
             setLeft(d.leftMs as number);
-            throw new Error("Лимит: 1 заявка в 24 часа");
           }
           throw new Error(
-            getMessageFromApiJson(d, "Превышен лимит. Попробуйте позже."),
+            getMessageFromApiJson(
+              d,
+              "Следующую историю можно опубликовать позже",
+            ),
           );
         }
         if (!r.ok) {
@@ -443,21 +472,29 @@ export function useApplicationFormState() {
         }
 
         setSubmitted(true);
+        recordFeedbackMeaningfulAction();
+        void fetch("/api/applications/eligibility", { cache: "no-store" })
+          .then(async (res) => {
+            const json = await res.json().catch(() => ({}));
+            if (res.ok && json?.data) {
+              setEligibility(json.data as ApplicationEligibility);
+            }
+          })
+          .catch(() => undefined);
         setPhotos([]);
-        setReportPhotos([]);
-        setCategory("");
         setTitle("");
         setSummary("");
         setStory("");
         setAmount("");
+    setDesiredAmount("");
         setPayment("");
         setBankName("");
-        setTrustAck1(false);
-        setTrustAck2(false);
-        setTrustAck3(false);
+        setRulesAck1(false);
+        setRulesAck2(false);
+        setRulesAck3(false);
         setPoliciesAccepted(false);
         setAckError(false);
-        clearFormStorage(saveKey, trustAckKey, policyAckKey, formStartKey);
+        clearFormStorage(saveKey, rulesAckKey, policyAckKey, formStartKey);
       } catch (e: unknown) {
         setErr(e instanceof Error ? e.message : "Ошибка");
       } finally {
@@ -465,21 +502,22 @@ export function useApplicationFormState() {
         setUploading(false);
       }
   }, [
-    category,
     photos,
-    reportPhotos,
     storyTextLen,
     title,
     summary,
     story,
     amount,
+    desiredAmount,
+    desiredAmountInt,
+    showsDesiredAmount,
     bankName,
     payment,
     hpCompany,
-    trustAcknowledged,
+    rulesAcknowledged,
     policiesAccepted,
     saveKey,
-    trustAckKey,
+    rulesAckKey,
     policyAckKey,
     formStartKey,
   ]);
@@ -494,11 +532,9 @@ export function useApplicationFormState() {
   );
 
   return {
-    introAckKey,
     user,
     loadingAuth,
-    category,
-    setCategory,
+    isAdmin,
     title,
     setTitle,
     summary,
@@ -508,48 +544,46 @@ export function useApplicationFormState() {
     amount,
     setAmount,
     amountFormatted,
+    desiredAmount,
+    setDesiredAmount,
+    desiredAmountFormatted,
+    showsDesiredAmount,
     payment,
     setPayment,
     bankName,
     setBankName,
     photos,
     setPhotos,
-    reportPhotos,
-    setReportPhotos,
     uploading,
     submitting,
     err,
     left,
+    eligibility,
+    loadingEligibility,
+    amountMax,
     submitted,
     setSubmitted,
-    trustAcknowledged,
-    trustAck1,
-    setTrustAck1,
-    trustAck2,
-    setTrustAck2,
-    trustAck3,
-    setTrustAck3,
+    rulesAcknowledged,
+    rulesAck1,
+    setRulesAck1,
+    rulesAck2,
+    setRulesAck2,
+    rulesAck3,
+    setRulesAck3,
     policiesAccepted,
     setPoliciesAccepted,
     ackError,
-    introOpen,
-    setIntroOpen,
-    introChecked,
-    setIntroChecked,
     approvedCount,
     pendingReviewApplication,
     requiresReview: Boolean(pendingReviewApplication),
-    trustLevel,
-    trustLimits,
-    trustHint,
     amountInputRef,
+    desiredAmountInputRef,
     hpCompany,
     setHpCompany,
     progressPercentage,
     filledFields,
     totalFields,
     valid,
-    exceedsTrustLimit,
     fieldErrors,
     firstErrorKey,
     validationScrollTrigger,
@@ -559,5 +593,6 @@ export function useApplicationFormState() {
     formStartedAtRef,
     formStartKey,
     handleAmountInputChange,
+    handleDesiredAmountInputChange,
   };
 }

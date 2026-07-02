@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { Card, CardContent } from "@/components/ui/Card";
 import { cardEntranceSpring } from "@/components/applications/applicationWizardMotion";
+import { SectionFeedbackCta } from "@/components/feedback/SectionFeedbackCta";
 
 export default function PageHeader() {
   const reducedMotion = useReducedMotion();
@@ -73,7 +74,7 @@ export default function PageHeader() {
               >
                 <LucideIcons.FileText size="sm" />
               </motion.span>
-              Подача заявки
+              Публикация истории
             </motion.div>
 
             <motion.h1
@@ -97,6 +98,10 @@ export default function PageHeader() {
             >
               Заполните шаги ниже — чем яснее история, тем проще рассмотрение.
             </motion.p>
+
+            <div className="mt-4 flex justify-center">
+              <SectionFeedbackCta variant="applications" layout="compact" />
+            </div>
           </CardContent>
         </Card>
       </div>

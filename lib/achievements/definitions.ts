@@ -59,8 +59,8 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     slug: ACHIEVEMENT_SLUGS.FIRST_APPLICATION,
     name: "Первый шаг",
     description:
-      "Вы подали свою первую заявку. Смелость попросить о помощи — уже половина пути.",
-    hint: "Подайте первую заявку на помощь",
+      "Вы опубликовали свою первую историю. Смелость рассказать — уже половина пути.",
+    hint: "Опубликуйте первую историю на платформе",
     icon: "/Achievements/1chag.png",
     rarity: "COMMON",
     targetValue: 1,
@@ -114,8 +114,8 @@ export const ACHIEVEMENT_DEFINITIONS: AchievementDefinition[] = [
     slug: ACHIEVEMENT_SLUGS.LEFT_REVIEW,
     name: "Оставил отзыв",
     description:
-      "Вы поделились опытом после полученной помощи. Ваш отзыв вдохновляет других не бояться просить.",
-    hint: "Оставьте отзыв о полученной помощи",
+      "Вы поделились опытом после полученного гонорара. Ваш отзыв вдохновляет других публиковать истории.",
+    hint: "Оставьте отзыв о полученном гонораре",
     icon: "/Achievements/review.png",
     rarity: "COMMON",
     targetValue: 1,

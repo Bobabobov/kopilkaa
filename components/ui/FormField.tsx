@@ -1,9 +1,15 @@
 // components/ui/FormField.tsx
 "use client";
 
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { cn } from "@/lib/utils";
+import {
+  createManualTextInputHandlers,
+  MANUAL_INPUT_PASTE_BLOCKED_MESSAGE,
+  mergeManualTextInputProps,
+} from "@/lib/forms/manualTextInput";
 
 interface FormFieldProps {
   // Основные свойства
@@ -32,6 +38,10 @@ interface FormFieldProps {
   charCountVisibility?: "always" | "when_nonempty";
   /** Блок «Поле заполнено корректно» и похожие подсказки */
   showFieldStatus?: boolean;
+  /** Запрет вставки и перетаскивания текста — только ручной ввод */
+  manualInputOnly?: boolean;
+  /** Кастомный подсчёт символов (например, только цифры в маске телефона) */
+  countChars?: (value: string) => number;
 
   // Дополнительные свойства
   rows?: number;
@@ -59,13 +69,30 @@ export default function FormField({
   compact = false,
   charCountVisibility = "always",
   showFieldStatus = true,
+  manualInputOnly = false,
+  countChars,
   rows = 6,
   inputProps,
   textareaProps,
 }: FormFieldProps) {
+  const [pasteBlocked, setPasteBlocked] = useState(false);
+  const manualInputHandlers = useMemo(
+    () => createManualTextInputHandlers(() => setPasteBlocked(true)),
+    [],
+  );
+  const mergedInputProps = manualInputOnly
+    ? mergeManualTextInputProps(inputProps, manualInputHandlers)
+    : inputProps;
+  const mergedTextareaProps = manualInputOnly
+    ? mergeManualTextInputProps(textareaProps, manualInputHandlers)
+    : textareaProps;
+
   // Подсчет символов (без пробелов для textarea, с пробелами для input)
-  const charCount =
-    type === "textarea" ? value.replace(/\s/g, "").length : value.trim().length;
+  const charCount = countChars
+    ? countChars(value)
+    : type === "textarea"
+      ? value.replace(/\s/g, "").length
+      : value.trim().length;
 
   const isValid = maxLength
     ? charCount >= minLength && charCount <= maxLength
@@ -137,7 +164,7 @@ export default function FormField({
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             rows={compact ? 2 : rows}
-            {...textareaProps}
+            {...mergedTextareaProps}
             className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#f9bc60]/50 resize-none ${
               error || isRequiredEmpty
                 ? "border-[#e16162]/60 bg-[#e16162]/8"
@@ -177,7 +204,7 @@ export default function FormField({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
-            {...inputProps}
+            {...mergedInputProps}
           />
         )}
 
@@ -193,6 +220,12 @@ export default function FormField({
           </div>
         )}
       </div>
+
+      {manualInputOnly && pasteBlocked && (
+        <p className="text-[12px] text-[#e16162]">
+          {MANUAL_INPUT_PASTE_BLOCKED_MESSAGE}
+        </p>
+      )}
 
       {/* Подсказка и счетчик */}
       {(hint ||

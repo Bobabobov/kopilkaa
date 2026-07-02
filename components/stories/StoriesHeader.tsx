@@ -35,7 +35,7 @@ export function StoriesHeader({ query, onQueryChange }: StoriesHeaderProps) {
             </div>
             <p className="mx-auto max-w-2xl text-base sm:text-lg leading-relaxed text-[#abd1c6]">
               Истории пользователей, получивших{" "}
-              <span className="text-[#f9bc60] font-semibold">финансовую поддержку</span> через платформу.
+              <span className="text-[#f9bc60] font-semibold">гонорар или грант</span> через платформу.
             </p>
           </div>
         </Card>

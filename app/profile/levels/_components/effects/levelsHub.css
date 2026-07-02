@@ -1,0 +1,48 @@
+@keyframes levels-ascension-shimmer {
+  0% {
+    transform: translate3d(-130%, 0, 0) skewX(-14deg);
+  }
+  100% {
+    transform: translate3d(230%, 0, 0) skewX(-14deg);
+  }
+}
+
+@keyframes levels-orbit-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.04);
+  }
+}
+
+.levels-hub-shimmer-beam {
+  position: absolute;
+  inset: 0;
+  width: 45%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(249, 188, 96, 0.06) 40%,
+    rgba(249, 188, 96, 0.22) 50%,
+    rgba(249, 188, 96, 0.06) 60%,
+    transparent 100%
+  );
+  animation: levels-ascension-shimmer 3.2s ease-in-out infinite;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.levels-hub-orbit {
+  animation: levels-orbit-pulse 4.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .levels-hub-shimmer-beam,
+  .levels-hub-orbit {
+    animation: none;
+  }
+}

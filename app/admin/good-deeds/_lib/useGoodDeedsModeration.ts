@@ -192,8 +192,6 @@ export function useGoodDeedsModeration() {
       if (sortBy === "created_asc")
         return +new Date(a.createdAt) - +new Date(b.createdAt);
       if (sortBy === "reward_desc") return b.reward - a.reward;
-      if (sortBy === "story_desc")
-        return b.storyText.length - a.storyText.length;
       return +new Date(b.createdAt) - +new Date(a.createdAt);
     });
 

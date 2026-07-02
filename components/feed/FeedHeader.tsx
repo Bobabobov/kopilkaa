@@ -41,7 +41,7 @@ export default function FeedHeader({
                     Уведомления
                   </h1>
                   <p className="text-sm text-[#abd1c6]/80">
-                    Лайки, заявки, заявки в друзья
+                    Лайки, истории, заявки в друзья
                   </p>
                 </div>
               </div>

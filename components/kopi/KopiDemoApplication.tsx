@@ -15,10 +15,10 @@ import type { Route } from 'next';
 
 const DEMO_FIELDS = [
   { label: 'Категория', value: 'Бытовые расходы', icon: ClipboardList },
-  { label: 'Заголовок', value: 'Нужна помощь с оплатой жилья', icon: FileText },
+  { label: 'Заголовок', value: 'История о мелкой бытовой хотелке', icon: FileText },
   {
     label: 'История',
-    value: 'Кратко опишите ситуацию и почему сейчас нужна поддержка…',
+    value: 'Кратко опишите ситуацию и желаемый гонорар…',
     icon: FileText,
   },
   { label: 'Сумма', value: '12 000 ₽', icon: Wallet },
@@ -49,10 +49,10 @@ export default function KopiDemoApplication() {
           <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#f9bc60]" />
           <div>
             <p className="text-sm font-bold text-[#fffffe] sm:text-base">
-              Демо-заявка
+              Демо-публикация
             </p>
             <p className="mt-1 text-sm leading-relaxed text-[#abd1c6]">
-              Так выглядит страница подачи заявки после входа в аккаунт. Здесь
+              Так выглядит страница публикации истории после входа в аккаунт. Здесь
               показан пример — отправить её нельзя.
             </p>
           </div>
@@ -68,7 +68,7 @@ export default function KopiDemoApplication() {
         >
           <div className="border-b border-white/10 px-5 py-6 sm:px-8">
             <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[#f9bc60]">
-              Подача заявки
+              Публикация истории
             </p>
             <h1 className="text-2xl font-bold text-[#fffffe] sm:text-3xl">
               Расскажите свою историю
@@ -110,7 +110,7 @@ export default function KopiDemoApplication() {
               <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#f9bc60]" />
               <p className="text-sm leading-relaxed text-[#abd1c6]">
                 Перед формой вы ознакомитесь с условиями платформы и подтвердите
-                согласие — только после этого откроется отправка заявки.
+                согласие — только после этого откроется отправка истории.
               </p>
             </motion.div>
 
@@ -118,7 +118,7 @@ export default function KopiDemoApplication() {
               className="rounded-xl px-4 py-3 text-center text-sm font-bold opacity-60"
               style={{ background: '#f9bc60', color: '#001e1d' }}
             >
-              Отправить заявку (демо)
+              Отправить историю (демо)
             </div>
           </div>
         </motion.section>
@@ -139,7 +139,7 @@ export default function KopiDemoApplication() {
               boxShadow: '0 10px 30px rgba(249, 188, 96, 0.25)',
             }}
           >
-            Войти и подать заявку
+            Войти и опубликовать историю
           </Link>
         </motion.div>
       </div>

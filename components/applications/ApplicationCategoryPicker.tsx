@@ -148,7 +148,7 @@ export function ApplicationCategoryPicker({
             <div className="space-y-1">
               <h2 className="text-xl font-bold tracking-tight text-[#fffffe] sm:text-2xl lg:text-[1.65rem]">
                 <span className="bg-gradient-to-r from-[#fff7e8] via-[#f9bc60] to-[#d4a05a] bg-clip-text text-transparent">
-                  Выберите категорию помощи
+                  Выберите категорию истории
                 </span>
               </h2>
               <p className="max-w-2xl text-sm leading-relaxed text-[#abd1c6]/95 sm:text-[0.9375rem]">
@@ -161,7 +161,7 @@ export function ApplicationCategoryPicker({
           <LayoutGroup id="application-category-picker">
             <motion.div
               role="radiogroup"
-              aria-label="Категория помощи"
+              aria-label="Категория истории"
               className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3.5 sm:items-stretch"
               variants={listContainer}
               initial="hidden"

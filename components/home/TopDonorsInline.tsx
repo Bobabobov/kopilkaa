@@ -8,7 +8,6 @@ import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
-import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import { HomeSectionLayout } from "@/components/home/HomeSectionLayout";
 import type { TopDonorItem } from "@/lib/donations/getTopDonors";
 
@@ -43,16 +42,18 @@ export default function TopDonorsInline({ donors }: TopDonorsInlineProps) {
             style={{ color: "#f9bc60", letterSpacing: "0.12em" }}
           >
             <Trophy className="w-4 h-4" />
-            Наши герои
+            Наши меценаты
           </span>
           <h2
             className="text-4xl md:text-5xl font-bold mb-3 tracking-tight"
             style={{ color: "#fffffe" }}
           >
-            Топ-донатеры
+            Попечители платформы
           </h2>
-          <p className="text-lg md:text-xl mb-4" style={{ color: "#abd1c6" }}>
-            Люди, которые уже поддержали проект
+          <p className="text-lg md:text-xl mb-4 max-w-3xl mx-auto" style={{ color: "#abd1c6" }}>
+            Список неравнодушных людей, которые добровольно поддерживают проект.
+            Все собранные средства идут напрямую в фонд вознаграждения авторов за
+            их творчество и развитие платформы.
           </p>
           {formattedTotal && (
             <div
@@ -149,9 +150,6 @@ export default function TopDonorsInline({ donors }: TopDonorsInlineProps) {
                           style={{ color: "#fffffe" }}
                         >
                           <span className="truncate">{donor.name}</span>
-                          <UserPublicBadges
-                            markedAsDeceiver={donor.markedAsDeceiver}
-                          />
                         </p>
                         <p
                           className="text-sm font-medium"

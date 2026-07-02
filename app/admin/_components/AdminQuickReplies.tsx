@@ -96,10 +96,6 @@ export function AdminQuickReplies({
       className={`rounded-xl border border-white/10 bg-[#001e1d]/40 p-3 space-y-3 ${className}`}
     >
       <p className="text-xs font-bold text-[#f9bc60]">Быстрые ответы</p>
-      <p className="text-[11px] text-[#abd1c6]/75 -mt-1">
-        Только вставляют текст в комментарий. Статус меняют кнопки «Одобрить» /
-        «Отказать» или «Сохранить».
-      </p>
 
       <ReplyGroup
         title="Шаблоны одобрения"

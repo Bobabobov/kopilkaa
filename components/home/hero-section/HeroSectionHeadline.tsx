@@ -3,18 +3,17 @@
 export function HeroSectionHeadline() {
   return (
     <>
-      <p
-        className="text-sm sm:text-base font-semibold uppercase tracking-wider mb-4 text-[#f9bc60]"
-        style={{ letterSpacing: "0.15em" }}
-      >
-        Платформа финансовой помощи
-      </p>
-
-      <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-9 text-[#fffffe]">
-        Нужны деньги на жизнь?{" "}
-        <span className="text-[#f9bc60]">Расскажите историю</span> — мы
-        рассмотрим и, по возможности, поможем
+      <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6 text-[#fffffe]">
+        Копилка Online —{" "}
+        <span className="text-[#f9bc60]">платформа живых историй</span> и
+        творческой поддержки
       </h1>
+
+      <p className="text-base sm:text-lg text-[#abd1c6] mb-10 max-w-3xl mx-auto leading-relaxed">
+        Читайте честные откровения реальных людей или делитесь своими ситуациями
+        из жизни. Наш проект поощряет авторов за уникальный контент и регулярно
+        выплачивает поощрительные гранты за лучшие публикации.
+      </p>
     </>
   );
 }

@@ -1,32 +1,32 @@
-// components/profile/ProfileLayout.tsx
-// Профиль: shadcn Card/Badge/Separator + Next.js семантика (Context7)
-"use client";
+// components/profile/ProfileLayout.tsx — изумрудный glass-профиль
+'use client';
 
-import { motion } from "framer-motion";
-import { ProfileTrustAndStatsCard } from "@/components/profile/ProfileTrustAndStatsCard";
-import type { TrustLevel } from "@/lib/trustLevel";
-import type {
-  LevelStats,
-  ProfileBonusWallet,
-} from "@/hooks/profile/useProfileDashboard";
-import ProfileStoriesSection from "./sections/ProfileStoriesSection";
+import { motion } from 'framer-motion';
+import type { ProfileBonusWallet } from '@/hooks/profile/useProfileDashboard';
+import type { UserLevelProgress } from '@/lib/userLevel';
+import {
+  ProfileLevelSection,
+  ProfileWalletSection,
+} from '@/components/profile/ProfileLevelBar';
+import { emptyFirstWithdrawalBonusStatus } from '@/lib/bonusWithdrawals/firstWithdrawalBonus';
 import {
   ProfileHeaderCard,
   ProfileFriendsSection,
-} from "./ProfileDynamicImports";
-import ProfileReferralProgramCard from "./ProfileReferralProgramCard";
-import { ProfileBonusesCard } from "./ProfileBonusesCard";
-import { ProfileDailyBonusCard } from "./ProfileDailyBonusCard";
-import { ProfileAchievementShowcaseStrip } from "@/components/profile/achievements/ProfileAchievementShowcaseStrip";
-import { ProfileSectionTitle } from "./ProfileSectionTitle";
-import ProfileAchievementsSection from "./sections/ProfileAchievementsSection";
+} from './ProfileDynamicImports';
+import ProfileReferralProgramCard from './ProfileReferralProgramCard';
+import { ProfileDailyBonusCard } from './ProfileDailyBonusCard';
+import { ProfileDailyBonusReminder } from './ProfileDailyBonusReminder';
+import ProfileStoriesSection from './sections/ProfileStoriesSection';
+import ProfileAchievementsSection from './sections/ProfileAchievementsSection';
+import { ProfileAchievementShowcaseStrip } from '@/components/profile/achievements/ProfileAchievementShowcaseStrip';
+import { SectionFeedbackCta } from '@/components/feedback/SectionFeedbackCta';
 
 interface ProfileLayoutProps {
   user: {
     id: string;
     email: string | null;
     username?: string | null;
-    role: "USER" | "ADMIN";
+    role: 'USER' | 'ADMIN';
     name?: string | null;
     createdAt: string;
     avatar?: string | null;
@@ -38,13 +38,7 @@ interface ProfileLayoutProps {
     youtubeLink?: string | null;
     lastSeen?: string | null;
   };
-  trustStatus: Lowercase<TrustLevel>;
-  trustSupportText: string;
-  trustProgressText: string | null;
-  trustProgressValue: number | null;
-  trustProgressCurrent: number | null;
-  trustProgressTotal: number | null;
-  levelStats?: LevelStats | null;
+  userLevel: UserLevelProgress;
   bonusWallet: ProfileBonusWallet;
   onThemeChange: (newTheme: string | null) => Promise<void>;
   onCoverChange: (coverUrl: string | null) => Promise<void>;
@@ -55,13 +49,7 @@ interface ProfileLayoutProps {
 
 export default function ProfileLayout({
   user,
-  trustStatus,
-  trustSupportText,
-  trustProgressText,
-  trustProgressValue,
-  trustProgressCurrent,
-  trustProgressTotal,
-  levelStats,
+  userLevel,
   bonusWallet,
   onThemeChange,
   onCoverChange,
@@ -73,29 +61,49 @@ export default function ProfileLayout({
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: { staggerChildren: 0.08, delayChildren: 0.05 },
+      transition: { staggerChildren: 0.07, delayChildren: 0.04 },
     },
   };
   const item = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 16 },
     show: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
     },
   };
 
+  const handleWalletRefresh = () => {
+    onBonusClaimed?.();
+  };
+
+  const walletSection = (
+    <ProfileWalletSection
+      userLevel={userLevel}
+      availableBonuses={bonusWallet.availableBonuses}
+      bonusesInvestedInExperience={bonusWallet.bonusesInvestedInExperience}
+      hasPendingWithdrawal={bonusWallet.hasPendingWithdrawal}
+      withdrawalBlocked={bonusWallet.withdrawalBlocked}
+      firstWithdrawalBonus={
+        bonusWallet.firstWithdrawalBonus ?? emptyFirstWithdrawalBonusStatus()
+      }
+      onInvested={handleWalletRefresh}
+      onWithdrawn={handleWalletRefresh}
+    />
+  );
+
   return (
     <main
-      className="min-h-screen relative overflow-x-hidden overflow-y-auto"
+      className="relative min-h-screen overflow-x-hidden overflow-y-auto"
       aria-label="Профиль пользователя"
     >
-      <div className="relative z-10 w-full px-2 xs:px-3 sm:px-4 md:px-5 lg:px-6 pt-3 xs:pt-4 sm:pt-6 md:pt-8 lg:pt-10 pb-6 xs:pb-8 sm:pb-10 md:pb-12">
-        <div className="max-w-6xl mx-auto space-y-5 sm:space-y-6">
+      <div className="relative z-10 w-full px-2 pb-6 pt-3 xs:px-3 xs:pb-8 xs:pt-4 sm:px-4 sm:pb-10 sm:pt-6 md:px-5 md:pb-12 md:pt-8 lg:px-6 lg:pt-10">
+        <div className="mx-auto max-w-6xl space-y-6 sm:space-y-8">
           <header>
             <ProfileHeaderCard
               user={user}
               isOwner
+              profileLevel={userLevel.level}
               onThemeChange={onThemeChange}
               onCoverChange={onCoverChange}
               onOpenSettings={onOpenSettings}
@@ -103,44 +111,45 @@ export default function ProfileLayout({
             />
           </header>
 
+          <ProfileDailyBonusReminder />
+
           <ProfileAchievementShowcaseStrip userId={user.id} isOwner />
 
-          <div className="my-4 sm:my-5 h-px bg-white/10" aria-hidden />
+          <SectionFeedbackCta variant="profile" />
 
           <div
-            className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-5 sm:gap-6 lg:gap-7"
+            className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] lg:gap-8"
             role="region"
             aria-label="Контент профиля"
           >
             <section
-              className="space-y-5 sm:space-y-6 min-w-0"
-              aria-labelledby="profile-content-heading"
+              className="flex min-w-0 flex-col gap-6 sm:gap-8"
+              aria-labelledby="profile-main-heading"
             >
-              <h2 id="profile-content-heading" className="sr-only">
-                Разделы профиля
+              <h2 id="profile-main-heading" className="sr-only">
+                Уровень и активность
               </h2>
               <motion.div
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="space-y-5 sm:space-y-6"
+                className="flex flex-col gap-6 sm:gap-8"
               >
-                <motion.div variants={item} className="space-y-2">
-                  <ProfileSectionTitle
-                    imageSrc="/icon/pig3.png"
-                    imageAlt="Бонусы"
-                    title="Бонусы"
-                    subtitle="Добрые дела, рефералы и другое"
-                  />
-                  <ProfileBonusesCard wallet={bonusWallet} />
+                <motion.div variants={item} className="lg:hidden">
+                  {walletSection}
                 </motion.div>
-                <motion.div variants={item} className="space-y-2">
-                  <ProfileSectionTitle
-                    imageSrc="/icon/pig8.png"
-                    imageAlt="Копилка"
-                    title="Ежедневный бонус"
-                    subtitle="Заходите каждый день — серия открывает дополнительные награды"
+                <motion.div variants={item}>
+                  <ProfileLevelSection
+                    userLevel={userLevel}
+                    availableBonuses={bonusWallet.availableBonuses}
+                    firstWithdrawalBonus={
+                      bonusWallet.firstWithdrawalBonus ??
+                      emptyFirstWithdrawalBonusStatus()
+                    }
+                    onBonusClaimed={handleWalletRefresh}
                   />
+                </motion.div>
+                <motion.div variants={item}>
                   <ProfileDailyBonusCard onBonusClaimed={onBonusClaimed} />
                 </motion.div>
                 <motion.div variants={item}>
@@ -150,35 +159,21 @@ export default function ProfileLayout({
             </section>
 
             <aside
-              className="space-y-5 sm:space-y-6 min-w-0"
-              aria-label="Боковая панель профиля"
+              className="flex min-w-0 flex-col gap-6 sm:gap-8"
+              aria-label="Кошелёк и сообщество"
             >
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.1 }}
-                className="space-y-2"
+                transition={{ duration: 0.35, delay: 0.08 }}
+                className="hidden lg:block"
               >
-                <ProfileSectionTitle
-                  imageSrc="/icon/pig6.png"
-                  imageAlt="Доверие"
-                  title="Доверие"
-                  subtitle="Уровень и поддержка"
-                />
-                <ProfileTrustAndStatsCard
-                  status={trustStatus}
-                  supportText={trustSupportText}
-                  progressText={trustProgressText}
-                  progressValue={trustProgressValue}
-                  progressCurrent={trustProgressCurrent}
-                  progressTotal={trustProgressTotal}
-                  levelStats={levelStats ?? undefined}
-                />
+                {walletSection}
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.11 }}
+                transition={{ duration: 0.35, delay: 0.1 }}
               >
                 <ProfileAchievementsSection userId={user.id} />
               </motion.div>
@@ -192,7 +187,7 @@ export default function ProfileLayout({
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.15 }}
+                transition={{ duration: 0.35, delay: 0.14 }}
               >
                 <ProfileFriendsSection />
               </motion.div>

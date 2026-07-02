@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import ProfileHeaderCard from "@/components/profile/ProfileHeaderCard";
 import { FriendActions } from "@/components/profile/header/FriendActions";
-import TrustLevelCard from "@/components/profile/TrustLevelCard";
 import ProfileReviewSection from "@/components/profile/sections/ProfileReviewSection";
 import ProfileStoriesSection from "@/components/profile/sections/ProfileStoriesSection";
 import MutualFriends from "./widgets/MutualFriends";
@@ -14,151 +13,124 @@ import { ProfileSectionTitle } from "@/components/profile/ProfileSectionTitle";
 import ProfileAchievementsSection from "@/components/profile/sections/ProfileAchievementsSection";
 import { Separator } from "@/components/ui/separator";
 import type { OtherUserProfileUser } from "./types";
-import type { TrustLevel } from "@/lib/trustLevel";
 
 interface OtherUserProfileContentProps {
   user: OtherUserProfileUser;
   resolvedUserId: string;
   friendshipStatus: "none" | "requested" | "incoming" | "friends";
   friendship: { status: string } | null;
-  trustDerived: {
-    trustStatus: Lowercase<TrustLevel>;
-    supportText: string;
-    progressText: string | null;
-    progressValue: number | null;
-    progressCurrent: number | null;
-    progressTotal: number | null;
-  };
   onSendRequest: () => Promise<void>;
   onAcceptIncoming: () => Promise<void>;
   onDeclineIncoming: () => Promise<void>;
   onRemoveFriend: (() => Promise<void>) | undefined;
 }
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 14 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
 export function OtherUserProfileContent({
   user,
   resolvedUserId,
   friendshipStatus,
-  friendship,
-  trustDerived,
   onSendRequest,
   onAcceptIncoming,
   onDeclineIncoming,
   onRemoveFriend,
 }: OtherUserProfileContentProps) {
   return (
-    <div className="min-h-screen relative overflow-x-hidden overflow-y-auto w-full">
-      <div className="relative z-10 w-full px-2 xs:px-3 sm:px-4 md:px-5 lg:px-6 pt-3 xs:pt-4 sm:pt-6 md:pt-8 lg:pt-10 pb-6 xs:pb-8 sm:pb-10 md:pb-12">
-        <div className="max-w-6xl mx-auto space-y-5 sm:space-y-6">
-          <OtherUserProfileBackLink />
+    <div className="relative z-10 w-full px-2 pb-6 pt-3 xs:px-3 xs:pb-8 xs:pt-4 sm:px-4 sm:pb-10 sm:pt-6 md:px-5 md:pb-12 md:pt-8 lg:px-6 lg:pt-10">
+      <div className="mx-auto max-w-6xl space-y-5 sm:space-y-6 lg:space-y-8">
+        <OtherUserProfileBackLink />
 
-          <header>
-          <ProfileHeaderCard user={user} isOwner={false} />
-          </header>
-
-          <div className="flex justify-center px-2">
-            <FriendActions
-              isOwner={false}
-              status={friendshipStatus}
-              centered
-              onSendRequest={onSendRequest}
-              onAcceptIncoming={onAcceptIncoming}
-              onDeclineIncoming={onDeclineIncoming}
-              onRemoveFriend={onRemoveFriend}
-            />
-          </div>
-
-          <ProfileAchievementShowcaseStrip
-            userId={resolvedUserId}
+        <header>
+          <ProfileHeaderCard
+            user={user}
             isOwner={false}
+            profileLevel={user.level}
           />
+        </header>
 
-          <MutualFriends userId={resolvedUserId} />
+        <div className="flex justify-center">
+          <FriendActions
+            isOwner={false}
+            status={friendshipStatus}
+            centered
+            onSendRequest={onSendRequest}
+            onAcceptIncoming={onAcceptIncoming}
+            onDeclineIncoming={onDeclineIncoming}
+            onRemoveFriend={onRemoveFriend}
+          />
+        </div>
 
-          <Separator className="my-2 sm:my-4" />
+        <ProfileAchievementShowcaseStrip
+          userId={resolvedUserId}
+          isOwner={false}
+        />
 
-          <main
-            className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] gap-5 sm:gap-6 lg:gap-7"
-            aria-label="Контент профиля"
+        <MutualFriends userId={resolvedUserId} />
+
+        <Separator className="my-1 sm:my-2" />
+
+        <div className="grid grid-cols-1 items-start gap-4 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <section
+            className="min-w-0 space-y-5 sm:space-y-6"
+            aria-labelledby="profile-content-heading"
           >
-            <section
-              className="space-y-5 sm:space-y-6 min-w-0"
-              aria-labelledby="profile-content-heading"
-            >
             <h2 id="profile-content-heading" className="sr-only">
               Разделы профиля
             </h2>
+
             <motion.div
               initial="hidden"
               animate="show"
-              variants={{
-                hidden: {},
-                show: { transition: { staggerChildren: 0.06 } },
-              }}
-              className="space-y-5 sm:space-y-6"
+              variants={fadeUp}
+              className="space-y-2"
             >
-              <motion.div
-                variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
-                className="space-y-2"
-              >
-                <ProfileSectionTitle
-                  imageSrc="/icon/pig6.png"
-                  imageAlt="Доверие"
-                  title="Доверие"
-                  subtitle="Уровень участника"
-                />
-                <TrustLevelCard
-                  status={trustDerived.trustStatus}
-                  supportText={trustDerived.supportText}
-                  progressText={trustDerived.progressText}
-                  progressValue={trustDerived.progressValue}
-                  progressCurrent={trustDerived.progressCurrent}
-                  progressTotal={trustDerived.progressTotal}
-                  titleOverride="Уровень доверия участника"
-                  descriptionOverride="Расчёт по одобренным заявкам этого профиля"
-                  extraOverride="Показывает доступный диапазон поддержки для этого участника"
-                />
-              </motion.div>
-              <motion.div
-                variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
-                className="space-y-2"
-              >
-                <ProfileSectionTitle icon="BarChart3" title="Статистика" />
-                <OtherUserPersonalStats userId={resolvedUserId} />
-              </motion.div>
-              <motion.div
-                variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
-                className="space-y-2"
-              >
-                <ProfileSectionTitle icon="MessageCircle" title="Отзыв" />
-                <ProfileReviewSection userId={resolvedUserId} isOwner={false} />
-              </motion.div>
+              <ProfileSectionTitle icon="BarChart3" title="Статистика" />
+              <OtherUserPersonalStats userId={resolvedUserId} />
             </motion.div>
-            </section>
 
-            <aside
-              className="space-y-5 sm:space-y-6 min-w-0"
-              aria-label="Боковая панель"
+            <motion.div
+              initial="hidden"
+              animate="show"
+              variants={fadeUp}
+              transition={{ delay: 0.06 }}
+              className="space-y-2"
             >
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.1 }}
-              >
-                <ProfileStoriesSection userId={resolvedUserId} isOwner={false} />
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.12 }}
-              >
-                <ProfileAchievementsSection
-                  userId={resolvedUserId}
-                  isOwner={false}
-                />
-              </motion.div>
-            </aside>
-          </main>
+              <ProfileSectionTitle icon="MessageCircle" title="Отзыв" />
+              <ProfileReviewSection userId={resolvedUserId} isOwner={false} />
+            </motion.div>
+          </section>
+
+          <aside
+            className="min-w-0 space-y-5 sm:space-y-6 lg:sticky lg:top-[calc(var(--header-offset)+1.25rem)] lg:max-h-[calc(100dvh-var(--header-offset)-2rem)] lg:overflow-y-auto lg:overscroll-contain"
+            aria-label="Боковая панель"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.1 }}
+            >
+              <ProfileStoriesSection userId={resolvedUserId} isOwner={false} />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.14 }}
+            >
+              <ProfileAchievementsSection
+                userId={resolvedUserId}
+                isOwner={false}
+              />
+            </motion.div>
+          </aside>
         </div>
       </div>
     </div>

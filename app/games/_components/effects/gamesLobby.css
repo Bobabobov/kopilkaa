@@ -1,0 +1,70 @@
+@keyframes games-lobby-shimmer {
+  0% {
+    transform: translate3d(-120%, 0, 0) skewX(-12deg);
+  }
+  100% {
+    transform: translate3d(220%, 0, 0) skewX(-12deg);
+  }
+}
+
+.games-lobby-shimmer-beam {
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 42%,
+    rgba(255, 255, 255, 0.28) 50%,
+    rgba(255, 255, 255, 0.08) 58%,
+    transparent 100%
+  );
+  animation: games-lobby-shimmer 2.8s ease-in-out infinite;
+  will-change: transform;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .games-lobby-shimmer-beam {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Тёмный скроллбар в духе игрового лобби (вместо системного белого) */
+.games-lobby-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(52, 211, 153, 0.6) rgba(24, 24, 27, 0.98);
+}
+
+.games-lobby-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.games-lobby-scrollbar::-webkit-scrollbar-track {
+  background: rgba(9, 9, 11, 0.98);
+  border-left: 1px solid rgba(63, 63, 70, 0.45);
+}
+
+.games-lobby-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(52, 211, 153, 0.8),
+    rgba(16, 185, 129, 0.55)
+  );
+  border: 2px solid rgba(9, 9, 11, 0.98);
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.games-lobby-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(110, 231, 183, 0.95),
+    rgba(52, 211, 153, 0.75)
+  );
+}
+
+.games-lobby-scrollbar::-webkit-scrollbar-corner {
+  background: rgba(9, 9, 11, 0.98);
+}

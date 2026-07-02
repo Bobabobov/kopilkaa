@@ -7,7 +7,6 @@ import { VKIcon } from "@/components/ui/icons/VKIcon";
 import { YouTubeIcon } from "@/components/ui/icons/YouTubeIcon";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
 import { buildUploadUrl } from "@/lib/uploads/url";
-import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import { cn } from "@/lib/utils";
 import {
   storiesGlassCard,
@@ -19,7 +18,6 @@ type Props = {
   authorId: string;
   authorAvatar?: string | null;
   authorUsername?: string | null;
-  markedAsDeceiver?: boolean;
   vkLink?: string | null;
   telegramLink?: string | null;
   youtubeLink?: string | null;
@@ -30,7 +28,6 @@ export function GoodDeedDeedSidebar({
   authorId,
   authorAvatar,
   authorUsername,
-  markedAsDeceiver,
   vkLink,
   telegramLink,
   youtubeLink,
@@ -65,9 +62,8 @@ export function GoodDeedDeedSidebar({
               }}
             />
             <div className="min-w-0">
-              <p className="flex items-center gap-1.5 truncate font-semibold text-[#fffffe] transition-colors group-hover:text-[#f9bc60]">
-                <span className="truncate">{authorName}</span>
-                <UserPublicBadges markedAsDeceiver={markedAsDeceiver} />
+              <p className="truncate font-semibold text-[#fffffe] transition-colors group-hover:text-[#f9bc60]">
+                {authorName}
               </p>
               <p className="truncate text-xs text-[#abd1c6]/70">
                 {authorUsername ? `@${authorUsername}` : "Профиль участника"}

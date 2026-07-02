@@ -4,6 +4,7 @@ import {
   postApplication,
   type SubmitApplicationPayload,
 } from "@/hooks/applications/formState/submitApi";
+import { collectDeviceFingerprint, getClientTimezone } from "@/lib/deviceFingerprint/collect";
 import {
   isApplicationCategory,
   isSubmittableApplicationCategory,
@@ -17,7 +18,6 @@ export type PendingApplicationPayload = {
   amount: string;
   payment: string;
   images: string[];
-  reportImages?: string[];
   hpCompany: string;
   acknowledgedRules: boolean;
   clientMeta: { filledMs: number | null };
@@ -105,9 +105,17 @@ export async function submitPendingApplicationIfNeeded(): Promise<boolean> {
       return false;
     }
 
-    const { response, data } = await postApplication(
-      payload as SubmitApplicationPayload,
-    );
+    const deviceFingerprint = await collectDeviceFingerprint();
+    const clientTimezone = getClientTimezone();
+
+    const { response, data } = await postApplication({
+      ...(payload as SubmitApplicationPayload),
+      clientMeta: {
+        ...payload.clientMeta,
+        deviceFingerprint,
+        clientTimezone,
+      },
+    });
     if (response.ok) {
       markPendingSubmissionSuccess();
       clearPendingApplication();

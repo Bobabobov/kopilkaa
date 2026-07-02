@@ -17,7 +17,7 @@ export default function HowItWorks() {
         <HowItWorksHeader />
 
         <HomeSectionLayout
-          ariaLabel="Как это работает"
+          ariaLabel="Как стать автором и получить гонорар"
           gridClassName="md:grid-cols-2 lg:grid-cols-4"
           slideBasis="basis-[85%]"
         >

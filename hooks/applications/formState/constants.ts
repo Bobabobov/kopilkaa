@@ -9,9 +9,8 @@ import {
 } from "@/lib/uploads/limits";
 
 export const SAVE_KEY_BASE = "application_form_data";
-export const TRUST_ACK_KEY_BASE = "application_trust_ack";
+export const RULES_ACK_KEY_BASE = "application_rules_ack";
 export const POLICY_ACK_KEY_BASE = "application_policy_ack";
-export const INTRO_ACK_KEY_BASE = "application_intro_ack";
 export const FORM_START_KEY_BASE = "application_form_started_at";
 
 export const LIMITS = {
@@ -19,7 +18,7 @@ export const LIMITS = {
   summaryMax: 60,
   storyMin: 100,
   storyMax: 3000,
-  amountMin: 50,
+  amountMin: 1,
   amountMax: 5000,
   paymentMin: 10,
   paymentMax: 200,
@@ -61,4 +60,4 @@ export function hasAllowedPhotoType(file: File): boolean {
   return UPLOAD_LIMITS.allowedExtensions.some((ext) => name.endsWith(ext));
 }
 
-export const TOTAL_FIELDS = 8;
+export const TOTAL_FIELDS = 7;

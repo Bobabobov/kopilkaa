@@ -18,10 +18,6 @@ export function ReviewHero({
   const { user } = review;
   const avatar = resolveAvatarUrl(user?.avatar);
   const heroImage = review.images?.[0]?.url;
-  const trustLevelNumber = user?.trust?.status?.split("_")[1];
-  const trustTitle = trustLevelNumber
-    ? `Уровень одобрения ${trustLevelNumber}`
-    : "Уровень одобрения";
   const profileHref = user?.id ? `/profile/${user.id}` : null;
 
   return (
@@ -126,20 +122,6 @@ export function ReviewHero({
                   @{user.username}
                 </p>
               ))}
-            {user?.trust && (
-              <div className="inline-flex max-w-full flex-wrap items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] text-white/85 shadow-lg backdrop-blur xs:text-xs sm:gap-2 sm:px-3 sm:py-1">
-                <LucideIcons.Shield
-                  size="xs"
-                  className="flex-shrink-0 text-[#f9bc60]"
-                />
-                <span className="min-w-0 break-words font-semibold">
-                  {trustTitle}
-                </span>
-                <span className="flex-shrink-0 whitespace-nowrap opacity-80">
-                  · {user.trust.supportRange}
-                </span>
-              </div>
-            )}
           </div>
         </div>
         <div className="inline-flex flex-shrink-0 items-center gap-1.5 self-start rounded-full border border-white/15 bg-white/10 px-2 py-1 text-[10px] text-white/75 backdrop-blur-md whitespace-nowrap sm:gap-2 sm:px-3 sm:py-1.5 xs:text-xs md:self-auto">

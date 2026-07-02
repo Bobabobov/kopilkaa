@@ -1,10 +1,19 @@
 // components/ui/BeautifulToast.tsx
-"use client";
+'use client';
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LucideIcons } from '@/components/ui/LucideIcons';
+import { cn } from '@/lib/utils';
 
-export type ToastType = "success" | "error" | "info" | "warning";
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 export interface ToastProps {
   show: boolean;
@@ -15,98 +24,102 @@ export interface ToastProps {
   duration?: number;
 }
 
+/** Единая палитра: непрозрачный фон + высокий контраст текста */
 const toastConfig = {
   success: {
-    icon: (
-      <svg
-        className="w-full h-full text-white"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2.5}
-          d="M5 13l4 4L19 7"
-        />
-      </svg>
-    ),
-    gradient: "from-emerald-500 to-green-500",
-    bgColor: "bg-emerald-50/95 dark:bg-[#0d2b29]/97",
-    borderColor: "border-emerald-300 dark:border-emerald-500",
-    textColor: "!text-emerald-900 dark:!text-emerald-200",
-    /** Тело: всегда контрастно к bgColor этого типа */
-    messageColor: "!text-slate-900 dark:!text-emerald-50/95",
+    backgroundColor: '#004643',
+    borderColor: 'rgba(52, 211, 153, 0.55)',
+    titleColor: '#ffffff',
+    messageColor: '#d8ebe6',
+    iconGradient: 'from-emerald-400 to-green-500',
+    closeColor: '#abd1c6',
+    closeHover: 'hover:bg-white/10',
+    Icon: LucideIcons.CheckCircle,
   },
   error: {
-    icon: (
-      <svg
-        className="w-full h-full text-white"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M6 18L18 6M6 6l12 12"
-        />
-      </svg>
-    ),
-    gradient: "from-red-500 to-rose-500",
-    bgColor: "bg-red-50 dark:bg-[#2a1a1a]/97",
-    borderColor: "border-red-300 dark:border-red-500",
-    textColor: "text-red-600 dark:text-red-400",
-    messageColor: "text-red-950/90 dark:text-red-50/95",
+    backgroundColor: '#2a1215',
+    borderColor: 'rgba(225, 97, 98, 0.55)',
+    titleColor: '#ffb4b4',
+    messageColor: '#f5d6d6',
+    iconGradient: 'from-[#e16162] to-rose-500',
+    closeColor: '#f5d6d6',
+    closeHover: 'hover:bg-white/10',
+    Icon: LucideIcons.XCircle,
   },
   warning: {
-    icon: (
-      <svg
-        className="w-full h-full text-white"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-        />
-      </svg>
-    ),
-    gradient: "from-amber-500 to-yellow-500",
-    bgColor: "bg-amber-50 dark:bg-[#001e1d]/98",
-    borderColor: "border-amber-300 dark:border-amber-500",
-    textColor: "text-amber-600 dark:text-amber-400",
-    messageColor: "text-amber-950/90 dark:text-amber-50/95",
+    backgroundColor: '#2a2210',
+    borderColor: 'rgba(249, 188, 96, 0.6)',
+    titleColor: '#ffe8b8',
+    messageColor: '#f5e6c8',
+    iconGradient: 'from-[#f9bc60] to-amber-400',
+    closeColor: '#f5e6c8',
+    closeHover: 'hover:bg-white/10',
+    Icon: LucideIcons.AlertTriangle,
   },
   info: {
-    icon: (
-      <svg
-        className="w-full h-full text-white"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
-    gradient: "from-blue-500 to-indigo-500",
-    bgColor: "bg-blue-50 dark:bg-[#0d1f2b]/97",
-    borderColor: "border-blue-300 dark:border-blue-500",
-    textColor: "text-blue-600 dark:text-blue-400",
-    /** Только тёмный текст — при `html.dark` классы `dark:text-*` давали белое на голубой плашке */
-    messageColor: "!text-black",
+    backgroundColor: '#0a2a28',
+    borderColor: 'rgba(171, 209, 198, 0.45)',
+    titleColor: '#ffffff',
+    messageColor: '#d8ebe6',
+    iconGradient: 'from-[#abd1c6] to-teal-400',
+    closeColor: '#abd1c6',
+    closeHover: 'hover:bg-white/10',
+    Icon: LucideIcons.Info,
   },
-};
+} as const;
+
+interface ToastContextValue {
+  showToast: (
+    type: ToastType,
+    title: string,
+    message?: string,
+    duration?: number,
+  ) => void;
+  hideToast: () => void;
+}
+
+const ToastContext = createContext<ToastContextValue | null>(null);
+
+interface ToastState {
+  show: boolean;
+  type: ToastType;
+  title: string;
+  message?: string;
+  duration?: number;
+}
+
+export function BeautifulToastProvider({ children }: { children: ReactNode }) {
+  const [toast, setToast] = useState<ToastState>({
+    show: false,
+    type: 'info',
+    title: '',
+  });
+
+  const showToast = useCallback(
+    (type: ToastType, title: string, message?: string, duration?: number) => {
+      setToast({ show: true, type, title, message, duration });
+    },
+    [],
+  );
+
+  const hideToast = useCallback(() => {
+    setToast((prev) => ({ ...prev, show: false }));
+  }, []);
+
+  return (
+    <ToastContext.Provider value={{ showToast, hideToast }}>
+      {children}
+      <BeautifulToast
+        show={toast.show}
+        onClose={hideToast}
+        type={toast.type}
+        title={toast.title}
+        message={toast.message}
+        duration={toast.duration}
+      />
+    </ToastContext.Provider>
+  );
+}
 
 export default function BeautifulToast({
   show,
@@ -114,9 +127,10 @@ export default function BeautifulToast({
   type,
   title,
   message,
-  duration = 3000,
+  duration = 4000,
 }: ToastProps) {
-  const config = toastConfig[type] || toastConfig.info;
+  const config = toastConfig[type] ?? toastConfig.info;
+  const Icon = config.Icon;
 
   useEffect(() => {
     if (show && duration > 0) {
@@ -127,10 +141,6 @@ export default function BeautifulToast({
     }
   }, [show, duration, onClose]);
 
-  if (!config) {
-    return null;
-  }
-
   return (
     <AnimatePresence>
       {show && (
@@ -139,66 +149,67 @@ export default function BeautifulToast({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.95 }}
           transition={{
-            type: "spring",
+            type: 'spring',
             stiffness: 400,
             damping: 25,
             duration: 0.4,
           }}
-          className="fixed top-3 right-3 left-3 xs:top-4 xs:right-4 xs:left-auto sm:top-6 sm:right-6 z-[9999] max-w-full xs:max-w-sm sm:max-w-md mx-auto xs:mx-0"
+          className="fixed top-3 right-3 left-3 z-[9999] mx-auto max-w-full xs:top-4 xs:right-4 xs:left-auto xs:mx-0 xs:max-w-sm sm:top-6 sm:right-6 sm:max-w-md"
+          role="status"
+          aria-live="polite"
         >
-          <div className="relative w-full">
-            {/* Основная плашка */}
+          <div
+            className="relative w-full rounded-xl border-2 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.45)] xs:p-3.5 sm:p-4"
+            style={{
+              backgroundColor: config.backgroundColor,
+              borderColor: config.borderColor,
+            }}
+          >
             <div
-              className={`relative ${config.bgColor} rounded-lg shadow-lg sm:shadow-xl border ${config.borderColor} p-3 xs:p-3.5 sm:p-4 w-full backdrop-blur-sm`}
-            >
-              {/* Аккуратное внутреннее свечение */}
-              <div
-                className={`absolute inset-0 rounded-lg bg-gradient-to-r ${config.gradient} opacity-5`}
-              ></div>
-              <div className="relative z-10 flex items-start gap-2.5 xs:gap-3 sm:gap-3">
-                <div className="flex-shrink-0">
-                  <div
-                    className={`w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 bg-gradient-to-r ${config.gradient} rounded-full flex items-center justify-center shadow-sm`}
-                  >
-                    <div className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4">
-                      {config.icon}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0 pr-1">
-                  <p
-                    className={`text-xs xs:text-sm sm:text-base font-semibold ${config.textColor} leading-tight break-words`}
-                  >
-                    {title}
-                  </p>
-                  {message && (
-                    <p
-                      className={`text-xs xs:text-sm sm:text-sm mt-1 xs:mt-1.5 leading-relaxed break-words font-medium ${config.messageColor}`}
-                    >
-                      {message}
-                    </p>
+              className={cn(
+                'pointer-events-none absolute inset-0 rounded-[10px] bg-gradient-to-r opacity-10',
+                config.iconGradient,
+              )}
+            />
+            <div className="relative z-10 flex items-start gap-2.5 xs:gap-3 sm:gap-3">
+              <div className="flex-shrink-0">
+                <div
+                  className={cn(
+                    'flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-r shadow-sm xs:h-8 xs:w-8',
+                    config.iconGradient,
                   )}
-                </div>
-                <button
-                  onClick={onClose}
-                  className="flex-shrink-0 p-1 xs:p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 active:scale-95"
-                  aria-label="Закрыть уведомление"
                 >
-                  <svg
-                    className="w-4 h-4 xs:w-4 xs:h-4 sm:w-5 sm:h-5 text-gray-500 dark:text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
+                  <Icon className="h-3.5 w-3.5 text-[#001e1d] xs:h-4 xs:w-4" />
+                </div>
               </div>
+              <div className="min-w-0 flex-1 pr-1">
+                <p
+                  className="break-words text-xs font-bold leading-tight xs:text-sm sm:text-base"
+                  style={{ color: config.titleColor }}
+                >
+                  {title}
+                </p>
+                {message && (
+                  <p
+                    className="mt-1 break-words text-xs font-medium leading-relaxed xs:mt-1.5 xs:text-sm"
+                    style={{ color: config.messageColor }}
+                  >
+                    {message}
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className={cn(
+                  'flex-shrink-0 rounded-md p-1 transition-colors duration-200 active:scale-95 xs:p-1.5',
+                  config.closeHover,
+                )}
+                style={{ color: config.closeColor }}
+                aria-label="Закрыть уведомление"
+              >
+                <LucideIcons.X className="h-4 w-4 xs:h-5 xs:w-5" />
+              </button>
             </div>
           </div>
         </motion.div>
@@ -207,43 +218,16 @@ export default function BeautifulToast({
   );
 }
 
-// Хук для удобного использования
 export function useBeautifulToast() {
-  const [toast, setToast] = useState<{
-    show: boolean;
-    type: ToastType;
-    title: string;
-    message?: string;
-    duration?: number;
-  }>({
-    show: false,
-    type: "info",
-    title: "",
-  });
+  const context = useContext(ToastContext);
+  if (!context) {
+    throw new Error(
+      'useBeautifulToast must be used within BeautifulToastProvider',
+    );
+  }
 
-  const showToast = (
-    type: ToastType,
-    title: string,
-    message?: string,
-    duration?: number,
-  ) => {
-    setToast({ show: true, type, title, message, duration });
-  };
+  /** @deprecated Тост рендерится глобально в BeautifulToastProvider */
+  const ToastComponent = () => null;
 
-  const hideToast = () => {
-    setToast((prev) => ({ ...prev, show: false }));
-  };
-
-  const ToastComponent = () => (
-    <BeautifulToast
-      show={toast.show}
-      onClose={hideToast}
-      type={toast.type}
-      title={toast.title}
-      message={toast.message}
-      duration={toast.duration}
-    />
-  );
-
-  return { showToast, hideToast, ToastComponent };
+  return { ...context, ToastComponent };
 }

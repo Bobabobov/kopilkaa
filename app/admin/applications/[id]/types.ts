@@ -30,7 +30,6 @@ export type PreviousApprovedWithReview = {
     createdAt: string;
     images: { url: string; sort: number }[];
   } | null;
-  reportImages?: { url: string; sort: number }[];
 };
 
 export type ApplicationItem = {
@@ -46,6 +45,7 @@ export type ApplicationItem = {
     | "SMALL_GIFT"
     | "EVERYDAY_SUPPORT";
   amount: number;
+  desiredAmount?: number | null;
   payment: string;
   bankName?: string | null;
   status: ApplicationStatus;
@@ -54,14 +54,22 @@ export type ApplicationItem = {
   storyEditMs?: number | null;
   submitterIp?: string | null;
   clientDevice?: string | null;
+  clientTimezone?: string | null;
+  deviceFingerprint?: string | null;
   createdAt: string;
-  user: { email: string; id: string; name?: string | null; avatar?: string | null };
+  user: {
+    email: string;
+    id: string;
+    name?: string | null;
+    avatar?: string | null;
+    phoneVerified?: boolean;
+  };
   images: { url: string; sort: number }[];
   samePaymentApplications?: SameApplicationRef[];
   sameIpApplications?: SameApplicationRef[];
+  sameDeviceApplications?: SameApplicationRef[];
   review?: ApplicationReview | null;
-  countTowardsTrust?: boolean;
-  trustDecreasedAtDecision?: boolean;
   /** Последняя одобренная заявка пользователя и её отзыв (для проверки перед одобрением) */
   previousApprovedWithReview?: PreviousApprovedWithReview | null;
+  economy?: import('./_components/ApplicationEconomyBlock').ApplicationEconomyAdminInfo;
 };

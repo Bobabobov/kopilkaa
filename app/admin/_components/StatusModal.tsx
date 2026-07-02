@@ -10,7 +10,6 @@ interface StatusModalProps {
   onClose: () => void;
   onStatusChange: (status: ApplicationStatus) => void;
   onCommentChange: (comment: string) => void;
-  onDecreaseTrustChange: (next: boolean) => void;
   onSave: () => Promise<void>;
 }
 
@@ -19,12 +18,8 @@ export default function StatusModal({
   onClose,
   onStatusChange,
   onCommentChange,
-  onDecreaseTrustChange,
   onSave,
 }: StatusModalProps) {
-  const canDecrease =
-    modal.status === "APPROVED" || modal.status === "REJECTED";
-
   return (
     <GlassModal
       open={Boolean(modal.id)}
@@ -119,51 +114,6 @@ export default function StatusModal({
           <p className="mt-2 text-xs text-[#abd1c6]">
             Этот комментарий увидит пользователь в уведомлении и в модальном
             окне.
-          </p>
-        </div>
-
-        <div>
-          <button
-            type="button"
-            onClick={() => onDecreaseTrustChange(!modal.decreaseTrustOnDecision)}
-            disabled={!canDecrease}
-            className={[
-              "flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 transition-colors",
-              canDecrease
-                ? "border-white/10 bg-white/5 hover:bg-white/10"
-                : "cursor-not-allowed border-white/5 bg-white/[0.03] opacity-60",
-            ].join(" ")}
-          >
-            <div className="flex min-w-0 items-center gap-3">
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#e16162]/25 bg-[#e16162]/12">
-                <LucideIcons.AlertTriangle
-                  size="sm"
-                  className="text-[#e16162]"
-                />
-              </span>
-              <div className="min-w-0 text-left">
-                <p className="text-sm font-semibold text-[#fffffe]">
-                  Понизить уровень на 1
-                </p>
-                <p className="text-xs text-[#abd1c6]">
-                  Применится при одобрении/отказе
-                </p>
-              </div>
-            </div>
-            <span className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border border-white/10 bg-white/10">
-              <span
-                className={[
-                  "absolute h-4 w-4 rounded-full transition-transform",
-                  modal.decreaseTrustOnDecision
-                    ? "translate-x-[18px] bg-[#e16162]"
-                    : "translate-x-[2px] bg-[#abd1c6]/60",
-                ].join(" ")}
-              />
-            </span>
-          </button>
-          <p className="mt-1 text-[11px] text-[#abd1c6]/80">
-            При отказе с галкой у пользователя в профиле будет учтено как
-            «Отклонено с понижением».
           </p>
         </div>
       </div>

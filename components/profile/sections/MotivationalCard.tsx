@@ -91,7 +91,7 @@ const motivationalQuotes = [
     gradient: "from-[#f9bc60] to-[#e8a545]",
   },
   {
-    text: "Не размер помощи важнее, а то, что вы не прошли мимо",
+    text: "Не размер гонорара важнее, а то, что вы не прошли мимо",
     author: "Неизвестный",
     icon: "Heart",
     color: "#e16162",

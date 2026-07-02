@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { getAllowedAdminUser } from "@/lib/adminAccess";
 import { buildApplicationSearchWhere } from "@/lib/admin/applicationSearch";
 import { buildApplicationIntegrityBatch } from "@/lib/admin/buildApplicationIntegrityBatch";
-import { sanitizeApplicationStoryHtml } from "@/lib/applications/sanitize";
+import { getMaxApplicationAmount } from "@/lib/level-config";
 
 export const dynamic = "force-dynamic";
 
@@ -81,19 +81,21 @@ export async function GET(req: Request) {
           userId: true,
           title: true,
           summary: true,
-          story: true,
           amount: true,
+          desiredAmount: true,
           payment: true,
           paymentFingerprint: true,
           submitterIp: true,
           status: true,
           adminComment: true,
           clientDevice: true,
+          deviceFingerprint: true,
           createdAt: true,
           updatedAt: true,
           filledMs: true,
-          countTowardsTrust: true,
-          trustDecreasedAtDecision: true,
+          isFirstFree: true,
+          submitBonusCost: true,
+          userLevelAtSubmit: true,
           user: {
             select: {
               email: true,
@@ -103,8 +105,7 @@ export async function GET(req: Request) {
               avatar: true,
               avatarFrame: true,
               hideEmail: true,
-              trustDelta: true,
-              markedAsDeceiver: true,
+              level: true,
             },
           },
           images: { orderBy: { sort: "asc" }, select: { url: true, sort: true } },
@@ -117,7 +118,18 @@ export async function GET(req: Request) {
 
     const safeItems = items.map((it) => ({
       ...it,
-      story: sanitizeApplicationStoryHtml(it.story),
+      story: '',
+      economy: {
+        userLevel: it.user.level,
+        userLevelAtSubmit: it.userLevelAtSubmit,
+        helpLimit: getMaxApplicationAmount(
+          it.userLevelAtSubmit ?? it.user.level,
+        ),
+        submitBonusCost: it.submitBonusCost,
+        isFirstFree: it.isFirstFree,
+        requestedAmount: it.amount,
+        desiredAmount: it.desiredAmount,
+      },
       integrity: integrityMap.get(it.id) ?? {
         isClean: true,
         verdict: "Заявка чистая",
@@ -125,7 +137,8 @@ export async function GET(req: Request) {
         submitterIp: it.submitterIp ?? null,
         sameIpCount: 0,
         samePaymentCount: 0,
-        links: { sameIp: [], samePayment: [] },
+        sameDeviceCount: 0,
+        links: { sameIp: [], samePayment: [], sameDevice: [] },
       },
     }));
 

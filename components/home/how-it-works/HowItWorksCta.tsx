@@ -39,7 +39,7 @@ export function HowItWorksCta({ loading, onStartClick }: HowItWorksCtaProps) {
           </>
         ) : (
           <>
-            <span>Рассказать историю</span>
+            <span>Поделиться историей</span>
             <ArrowRight className="w-5 h-5" />
           </>
         )}

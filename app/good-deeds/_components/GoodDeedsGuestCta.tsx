@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LogIn, Sparkles, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LEVEL_BENEFIT_HINT } from "@/lib/userLevel/economy";
 import {
   goodDeedsGlassPanel,
   goodDeedsGlassShine,
@@ -27,11 +28,14 @@ export function GoodDeedsGuestCta() {
             </span>
             <div>
               <h2 className="text-lg font-bold text-[#fffffe] sm:text-xl">
-                Участвуйте и получайте бонусы
+                Участвуйте в добрых делах
               </h2>
               <p className="mt-1.5 max-w-lg text-sm leading-relaxed text-[#abd1c6]/90">
                 Войдите в аккаунт, чтобы выполнять задания, отправлять
-                отчёты и выводить заработанные бонусы.
+                отчёты и прокачивать уровень профиля.
+              </p>
+              <p className="mt-1 max-w-lg text-xs leading-relaxed text-[#94a1b2]">
+                {LEVEL_BENEFIT_HINT}
               </p>
             </div>
           </div>

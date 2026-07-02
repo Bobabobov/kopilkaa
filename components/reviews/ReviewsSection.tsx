@@ -9,6 +9,7 @@ import { ReviewsList } from "./ReviewsList";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { TelegramIcon } from "@/components/ui/icons/TelegramIcon";
 import { Card, CardContent } from "@/components/ui/Card";
+import { SectionFeedbackCta } from "@/components/feedback/SectionFeedbackCta";
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -33,15 +34,23 @@ export function ReviewsSection() {
     hasMore,
     loadMore,
     submitReview,
-    deleteReview,
-    ToastComponent,
   } = useReviews();
 
   const heroSubtitle = useMemo(
-    () =>
-      total > 0
-        ? `Уже ${total.toLocaleString("ru-RU")} отзывов — чеки, фото и истории участников`
-        : "Чеки, фото и истории тех, кто получил помощь",
+    () => {
+      if (total <= 0) {
+        return "Фото и отчеты участников платформы";
+      }
+      const word =
+        total % 10 === 1 && total % 100 !== 11
+          ? "отзыв"
+          : total % 10 >= 2 &&
+              total % 10 <= 4 &&
+              (total % 100 < 10 || total % 100 >= 20)
+            ? "отзыва"
+            : "отзывов";
+      return `Уже ${total.toLocaleString("ru-RU")} ${word} — фото и отчеты участников`;
+    },
     [total],
   );
 
@@ -80,60 +89,13 @@ export function ReviewsSection() {
         <p className="mt-4 text-lg sm:text-xl text-[#abd1c6] max-w-2xl mx-auto leading-relaxed">
           {heroSubtitle}
         </p>
+        <div className="mt-8 max-w-2xl mx-auto text-left">
+          <SectionFeedbackCta variant="reviews" />
+        </div>
       </motion.header>
 
       {/* Форма обязательного отзыва */}
-      {viewerReview ? (
-        <motion.div
-          variants={sectionVariants}
-          initial="hidden"
-          animate="visible"
-          custom={0}
-          className="max-w-6xl mx-auto"
-        >
-          <Card variant="darkGlass" padding="lg" className="border-[#f9bc60]/30">
-            <CardContent className="flex items-start gap-4 p-0">
-              <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center text-[#001e1d] flex-shrink-0"
-                style={{ background: "linear-gradient(135deg, #f9bc60 0%, #e8a545 100%)" }}
-              >
-                <LucideIcons.CheckCircle size="sm" />
-              </div>
-              <div className="space-y-3 flex-1 min-w-0">
-                <p className="text-xs uppercase tracking-[0.08em] text-[#94a1b2]">
-                  Отзыв оставлен
-                </p>
-                <h2 className="text-lg sm:text-xl font-semibold text-[#fffffe]">
-                  Спасибо за отзыв
-                </h2>
-                <p className="text-sm text-[#abd1c6]">
-                  Теперь вы можете подать новую заявку.
-                </p>
-                <button
-                  onClick={() => {
-                    if (
-                      confirm(
-                        "Удалить отзыв? Тогда нужно будет оставить новый, чтобы подать следующую заявку.",
-                      )
-                    ) {
-                      deleteReview(viewerReview.id);
-                    }
-                  }}
-                  disabled={submitting}
-                  className="inline-flex items-center gap-2 rounded-xl border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-300 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold disabled:opacity-50 transition-colors"
-                >
-                  {submitting ? (
-                    <LucideIcons.Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <LucideIcons.Trash2 size="xs" />
-                  )}
-                  Удалить отзыв
-                </button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      ) : !canReview && approvedApplications > 0 ? null : !canReview ? (
+      {viewerReview ? null : !canReview && approvedApplications > 0 ? null : !canReview ? (
         <motion.div
           variants={sectionVariants}
           initial="hidden"
@@ -251,7 +213,7 @@ export function ReviewsSection() {
               </div>
             </div>
             <p className="text-sm text-[#94a1b2] mb-8 max-w-2xl">
-              Участники прикрепляют чеки, фото товаров или результата — так видно, на что пошла помощь.
+              Участники прикрепляют фото товаров или результата — так видно, на что был потрачен гонорар.
             </p>
             <ReviewsList
               reviews={reviews}
@@ -334,7 +296,6 @@ export function ReviewsSection() {
         </Link>
       </motion.section>
 
-      <ToastComponent />
     </div>
   );
 }

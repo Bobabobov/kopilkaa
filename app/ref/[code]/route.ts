@@ -6,6 +6,7 @@ import {
   REFERRAL_CODE_COOKIE,
   REFERRAL_VISITOR_COOKIE,
   getReferralMinActiveDays,
+  isReferralProgramEnabled,
   isReferrerActive,
 } from "@/lib/referralProgram";
 
@@ -36,6 +37,10 @@ export async function GET(
   const referralCode = normalizeReferralCode(params.code);
 
   const redirectUrl = getSignupRedirectUrl(request);
+
+  if (!isReferralProgramEnabled()) {
+    return NextResponse.redirect(redirectUrl, 302);
+  }
 
   if (!referralCode) {
     return NextResponse.redirect(redirectUrl, 302);

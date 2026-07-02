@@ -1,9 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PROFILE_EMERALD_PANEL } from "@/components/profile/profileEmerald";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { ProfileSectionTitle } from "@/components/profile/ProfileSectionTitle";
 import { PROFILE_ACHIEVEMENT_PINS_UPDATED_EVENT } from "@/components/profile/achievements/profileAchievementPinsEvents";
@@ -179,53 +178,43 @@ export default function ProfileAchievementsSection({
   const hasMoreAchievements = items.length > PROFILE_ACHIEVEMENTS_PREVIEW_LIMIT;
 
   return (
-    <section aria-labelledby="profile-achievements-heading" className="space-y-2">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <ProfileSectionTitle
-          imageSrc="/icon/pig7.png"
-          imageAlt="Достижения"
-          title="Достижения"
-          subtitle={
-            isOwner
-              ? "Закрепите достижения — они появятся в профиле"
-              : "Полученные достижения участника"
-          }
-        />
-        {!loading && !error && summary.totalCount > 0 && (
-          <Badge
-            variant="outline"
-            className="border-[#f9bc60]/25 bg-[#f9bc60]/10 text-[#f9bc60]"
-          >
-            {summary.unlockedCount} из {summary.totalCount} получено
-          </Badge>
-        )}
-      </div>
+    <section
+      aria-labelledby="profile-achievements-heading"
+      className={PROFILE_EMERALD_PANEL}
+    >
+      <ProfileSectionTitle
+        imageSrc="/icon/pig7.png"
+        imageAlt="Достижения"
+        title="Достижения"
+        subtitle={
+          isOwner
+            ? "Закрепите достижения — они появятся в профиле"
+            : "Полученные достижения участника"
+        }
+        className="mb-5"
+      />
 
       {loading ? (
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-2">
           {Array.from({ length: 3 }).map((_, index) => (
-            <Skeleton key={index} className="h-28 rounded-2xl bg-white/5" />
+            <Skeleton key={index} className="h-12 rounded-xl bg-emerald-950/50" />
           ))}
         </div>
       ) : error ? (
-        <Card className="border-white/10 bg-white/5">
-          <CardContent className="p-4 text-sm text-[#e16162]">{error}</CardContent>
-        </Card>
+        <p className="text-sm text-red-400">{error}</p>
       ) : items.length === 0 ? (
-        <Card className="border-white/10 bg-white/5">
-          <CardContent className="p-4 text-sm text-[#94a1b2]">
-            {isOwner
-              ? "Пока нет полученных достижений. Выполняйте задания на сайте — они появятся здесь."
-              : "У участника пока нет полученных достижений."}
-          </CardContent>
-        </Card>
+        <p className="text-sm text-zinc-400">
+          {isOwner
+            ? "Пока нет полученных достижений. Выполняйте задания на сайте — они появятся здесь."
+            : "У участника пока нет полученных достижений."}
+        </p>
       ) : (
         <>
           {isOwner && pinError && !modalOpen && (
-            <p className="text-xs text-[#e16162]">{pinError}</p>
+            <p className="mb-2 text-xs text-red-400">{pinError}</p>
           )}
 
-          <div className="grid grid-cols-1 gap-3">
+          <div className="space-y-2">
             {previewItems.map((item, index) => {
               const isPinned = pinnedSlugs.includes(item.slug);
               const pinDisabled = !item.unlocked || savingPinSlug !== null;
@@ -235,7 +224,7 @@ export default function ProfileAchievementsSection({
                   key={item.slug}
                   item={item}
                   index={index}
-                  compact
+                  strip
                   isOwner={isOwner}
                   isPinned={isPinned}
                   pinDisabled={pinDisabled}
@@ -246,12 +235,16 @@ export default function ProfileAchievementsSection({
             })}
           </div>
 
+          <p className="mt-4 text-center text-xs text-zinc-500">
+            Достижения: {summary.unlockedCount} из {summary.totalCount} получено
+          </p>
+
           {hasMoreAchievements && (
             <Button
               type="button"
               variant="outline"
               onClick={() => setModalOpen(true)}
-              className="w-full border-[#f9bc60]/30 bg-[#f9bc60]/10 text-[#f9bc60] hover:bg-[#f9bc60]/15"
+              className="mt-3 w-full border-emerald-500/20 bg-emerald-950/30 text-emerald-400 hover:bg-emerald-950/50"
             >
               <LucideIcons.LayoutGrid className="mr-2 h-4 w-4" />
               Смотреть все ({items.length})

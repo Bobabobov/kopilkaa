@@ -18,7 +18,7 @@ export function HeaderCoverSection({
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
-  const { showToast, ToastComponent } = useBeautifulToast();
+  const { showToast } = useBeautifulToast();
 
   const previewUrl = headerCover ? buildUploadUrl(headerCover) : null;
 
@@ -180,7 +180,6 @@ export function HeaderCoverSection({
           </p>
         )}
       </div>
-      <ToastComponent />
     </>
   );
 }

@@ -2,6 +2,11 @@ import type { ReactNode } from "react";
 import type { ApplicationStatus, Stats } from "@/types/admin";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import Link from "next/link";
+import {
+  AdminFilterChips,
+  AdminSectionLabel,
+  AdminStatGrid,
+} from "@/app/admin/_components/admin-ui";
 
 interface AdminOverviewSectionProps {
   stats: Stats | null;
@@ -45,7 +50,7 @@ function SectionLabel({
 }) {
   const Icon = LucideIcons[icon];
   return (
-    <div className="flex items-center gap-2 mb-3">
+    <div className="mb-3 flex items-center gap-2">
       <Icon size="sm" className="text-[#f9bc60]" />
       <h3 className="text-sm font-bold text-[#fffffe]">{children}</h3>
     </div>
@@ -75,64 +80,31 @@ export function AdminOverviewSection({
 
   return (
     <div className="space-y-5">
-      {/* Сводка */}
       <div>
         <SectionLabel icon="BarChart3">Сводка</SectionLabel>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
-          {(
-            [
-              {
-                label: "В обработке",
-                value: stats.pending,
-                accent: "text-[#f9bc60]",
-                border: "border-[#f9bc60]/30",
-                bg: "bg-[#f9bc60]/8",
-                highlight: stats.pending > 0,
-              },
-              {
-                label: "Одобрено",
-                value: stats.approved,
-                accent: "text-[#10B981]",
-                border: "border-[#10B981]/30",
-                bg: "bg-[#10B981]/8",
-                highlight: false,
-              },
-              {
-                label: "Отказано",
-                value: stats.rejected,
-                accent: "text-[#e16162]",
-                border: "border-[#e16162]/30",
-                bg: "bg-[#e16162]/8",
-                highlight: false,
-              },
-              {
-                label: "Всего",
-                value: stats.total,
-                accent: "text-[#fffffe]",
-                border: "border-[#abd1c6]/25",
-                bg: "bg-[#abd1c6]/8",
-                highlight: false,
-              },
-            ] as const
-          ).map((item) => (
-            <div
-              key={item.label}
-              className={`rounded-xl border p-3 sm:p-4 ${item.border} ${item.bg} ${
-                item.highlight ? "ring-1 ring-[#f9bc60]/25" : ""
-              }`}
-            >
-              <div
-                className={`text-2xl sm:text-3xl font-black tabular-nums ${item.accent}`}
-              >
-                {item.value}
-              </div>
-              <div className="mt-1 text-xs sm:text-sm text-[#abd1c6]">
-                {item.label}
-              </div>
-            </div>
-          ))}
-        </div>
-        <p className="mt-3 text-xs sm:text-sm text-[#abd1c6]/80">
+        <AdminStatGrid
+          columns={4}
+          items={[
+            {
+              label: "В обработке",
+              value: stats.pending,
+              tone: "pending",
+              highlight: stats.pending > 0,
+            },
+            {
+              label: "Одобрено",
+              value: stats.approved,
+              tone: "success",
+            },
+            {
+              label: "Отказано",
+              value: stats.rejected,
+              tone: "danger",
+            },
+            { label: "Всего", value: stats.total },
+          ]}
+        />
+        <p className="mt-3 text-xs text-[#abd1c6]/80 sm:text-sm">
           Сумма запросов:{" "}
           <span className="font-bold text-[#abd1c6]">
             {formatAmount(stats.totalAmount)}
@@ -140,40 +112,25 @@ export function AdminOverviewSection({
         </p>
       </div>
 
-      {/* Фильтр */}
       <div>
-        <SectionLabel icon="Filter">Показать в списке</SectionLabel>
-        <div className="flex flex-wrap gap-2">
-          {STATUS_FILTERS.map((filter) => {
-            const active = status === filter.value;
-            const count =
-              filter.countKey != null ? stats[filter.countKey] : null;
-            return (
-              <button
-                key={filter.value}
-                type="button"
-                onClick={() => onStatusChange(filter.value)}
-                className={`rounded-xl px-3 py-2 text-sm font-bold transition-all min-h-[40px] ${
-                  active
-                    ? "bg-[#f9bc60] text-[#001e1d] shadow-md shadow-[#f9bc60]/20"
-                    : "border border-[#abd1c6]/25 bg-[#001e1d]/50 text-[#abd1c6] hover:border-[#f9bc60]/40 hover:text-[#fffffe]"
-                }`}
-              >
-                {filter.label}
-                {count != null ? (
-                  <span
-                    className={`ml-1.5 tabular-nums ${active ? "opacity-80" : "opacity-60"}`}
-                  >
-                    ({count})
-                  </span>
-                ) : null}
-              </button>
-            );
-          })}
-        </div>
+        <AdminSectionLabel accent="gold" className="mb-3">
+          Показать в списке
+        </AdminSectionLabel>
+        <AdminFilterChips
+          activeId={status}
+          onChange={(id) =>
+            onStatusChange(id as "ALL" | ApplicationStatus)
+          }
+          items={STATUS_FILTERS.map((filter) => ({
+            id: filter.value,
+            label: filter.label,
+            count:
+              filter.countKey != null ? stats[filter.countKey] : undefined,
+          }))}
+        />
         <p className="mt-2 text-xs text-[#abd1c6]/60">
           Сейчас отображается:{" "}
-          <span className="text-[#fffffe] font-semibold">
+          <span className="font-semibold text-[#fffffe]">
             {activeFilterLabel}
           </span>
           {" · "}
@@ -181,39 +138,41 @@ export function AdminOverviewSection({
         </p>
       </div>
 
-      {/* Следующая заявка */}
       {stats.pending > 0 && newestId ? (
         <Link
           href={`/admin/applications/${newestId}`}
-          className="flex items-center gap-3 rounded-xl border border-[#f9bc60]/35 bg-gradient-to-r from-[#f9bc60]/15 to-[#f9bc60]/5 p-3 sm:p-4 transition-all hover:border-[#f9bc60]/55 hover:from-[#f9bc60]/20 group"
+          className="group flex items-center gap-3 rounded-xl border-2 border-[#f9bc60]/35 bg-gradient-to-r from-[#f9bc60]/15 to-[#f9bc60]/5 p-3 transition-all hover:border-[#f9bc60]/55 hover:from-[#f9bc60]/20 sm:p-4"
         >
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#f9bc60] flex items-center justify-center">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#f9bc60]">
             <LucideIcons.Zap size="sm" className="text-[#001e1d]" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-xs font-bold uppercase tracking-wide text-[#f9bc60] mb-0.5">
+            <div className="mb-0.5 text-xs font-bold uppercase tracking-wide text-[#f9bc60]">
               Следующая на проверку
             </div>
-            <div className="text-sm sm:text-base font-bold text-[#fffffe] truncate group-hover:text-[#f9bc60] transition-colors">
+            <div className="truncate text-sm font-bold text-[#fffffe] transition-colors group-hover:text-[#f9bc60] sm:text-base">
               {newestTitle || "Без названия"}
             </div>
             {newestAgeHours != null ? (
-              <div className="text-xs text-[#abd1c6]/80 mt-0.5">
+              <div className="mt-0.5 text-xs text-[#abd1c6]/80">
                 {formatAge(newestAgeHours)}
               </div>
             ) : null}
           </div>
-          <div className="flex-shrink-0 flex items-center gap-1 text-sm font-bold text-[#f9bc60]">
+          <div className="flex shrink-0 items-center gap-1 text-sm font-bold text-[#f9bc60]">
             Открыть
             <LucideIcons.ArrowRight
               size="sm"
-              className="group-hover:translate-x-0.5 transition-transform"
+              className="transition-transform group-hover:translate-x-0.5"
             />
           </div>
         </Link>
       ) : stats.pending === 0 ? (
-        <div className="flex items-center gap-3 rounded-xl border border-[#10B981]/25 bg-[#10B981]/8 p-3 sm:p-4">
-          <LucideIcons.CheckCircle size="sm" className="text-[#10B981] flex-shrink-0" />
+        <div className="flex items-center gap-3 rounded-xl border-2 border-emerald-400/30 bg-emerald-500/10 p-3 sm:p-4">
+          <LucideIcons.CheckCircle
+            size="sm"
+            className="shrink-0 text-[#10B981]"
+          />
           <p className="text-sm text-[#abd1c6]">
             Очередь пуста — новых заявок на проверку нет
           </p>

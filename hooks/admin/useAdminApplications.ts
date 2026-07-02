@@ -1,65 +1,62 @@
 // app/admin/hooks/useAdminApplications.ts
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import type { ApplicationItem, Stats } from "@/types/admin";
-import { applicationMatchesClientSearch } from "@/lib/admin/applicationSearch";
-import { getMessageFromApiJson } from "@/lib/api/parseApiError";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import type { ApplicationItem, Stats } from '@/types/admin';
+import { getMessageFromApiJson } from '@/lib/api/parseApiError';
+
+const PAGE_SIZE = 20;
+const SEARCH_DEBOUNCE_MS = 300;
 
 interface UseAdminApplicationsProps {
   initialPage?: number;
+  initialStatus?: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED';
 }
 
 interface UseAdminApplicationsReturn {
   items: ApplicationItem[];
-  /** Список с мгновенной клиентской фильтрацией при вводе */
-  displayItems: ApplicationItem[];
   isSearchPending: boolean;
   loading: boolean;
-  loadingMore: boolean;
   error: string | null;
-  currentPage: number;
-  hasMore: boolean;
+  page: number;
+  total: number;
+  totalPages: number;
   stats: Stats | null;
 
   q: string;
   setQ: (query: string) => void;
-  status: "ALL" | "PENDING" | "APPROVED" | "REJECTED";
-  setStatus: (
-    status: "ALL" | "PENDING" | "APPROVED" | "REJECTED",
-  ) => void;
+  status: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED';
+  setStatus: (status: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED') => void;
   minAmount: string;
   setMinAmount: (amount: string) => void;
   maxAmount: string;
   setMaxAmount: (amount: string) => void;
-  sortBy: "date" | "amount" | "status";
-  setSortBy: (sort: "date" | "amount" | "status") => void;
-  sortOrder: "asc" | "desc";
-  setSortOrder: (order: "asc" | "desc") => void;
+  sortBy: 'date' | 'amount' | 'status';
+  setSortBy: (sort: 'date' | 'amount' | 'status') => void;
+  sortOrder: 'asc' | 'desc';
+  setSortOrder: (order: 'asc' | 'desc') => void;
 
-  loadMore: () => Promise<void>;
+  setPage: (page: number) => void;
   refreshStats: () => Promise<void>;
   refreshApplications: () => Promise<void>;
   toggleEmail: (id: string) => void;
   visibleEmails: Set<string>;
 }
 
-const SEARCH_DEBOUNCE_MS = 300;
-
 function buildListParams(
   page: number,
   debouncedQ: string,
-  status: UseAdminApplicationsReturn["status"],
+  status: UseAdminApplicationsReturn['status'],
   minAmount: string,
   maxAmount: string,
-  sortBy: UseAdminApplicationsReturn["sortBy"],
-  sortOrder: UseAdminApplicationsReturn["sortOrder"],
+  sortBy: UseAdminApplicationsReturn['sortBy'],
+  sortOrder: UseAdminApplicationsReturn['sortOrder'],
 ): URLSearchParams {
   return new URLSearchParams({
     page: page.toString(),
-    limit: "20",
+    limit: String(PAGE_SIZE),
     ...(debouncedQ && { q: debouncedQ }),
-    ...(status !== "ALL" && { status }),
+    ...(status !== 'ALL' && { status }),
     ...(minAmount && { minAmount }),
     ...(maxAmount && { maxAmount }),
     ...(sortBy && { sortBy }),
@@ -69,22 +66,23 @@ function buildListParams(
 
 export function useAdminApplications({
   initialPage = 1,
+  initialStatus = 'ALL',
 }: UseAdminApplicationsProps = {}): UseAdminApplicationsReturn {
-  const [q, setQ] = useState("");
-  const [debouncedQ, setDebouncedQ] = useState("");
+  const [q, setQ] = useState('');
+  const [debouncedQ, setDebouncedQ] = useState('');
   const [status, setStatus] = useState<
-    "ALL" | "PENDING" | "APPROVED" | "REJECTED"
-  >("ALL");
-  const [minAmount, setMinAmount] = useState("");
-  const [maxAmount, setMaxAmount] = useState("");
-  const [sortBy, setSortBy] = useState<"date" | "amount" | "status">("date");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+    'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'
+  >(initialStatus);
+  const [minAmount, setMinAmount] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
+  const [sortBy, setSortBy] = useState<'date' | 'amount' | 'status'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [page, setPageState] = useState(initialPage);
   const [items, setItems] = useState<ApplicationItem[]>([]);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [visibleEmails, setVisibleEmails] = useState<Set<string>>(new Set());
@@ -94,14 +92,13 @@ export function useAdminApplications({
   const fetchGenerationRef = useRef(0);
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const pageRef = useRef(page);
 
   const isSearchPending = q.trim() !== debouncedQ.trim();
 
-  const displayItems = useMemo(() => {
-    const query = q.trim();
-    if (!query) return items;
-    return items.filter((item) => applicationMatchesClientSearch(item, query));
-  }, [items, q]);
+  useEffect(() => {
+    pageRef.current = page;
+  }, [page]);
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -111,7 +108,7 @@ export function useAdminApplications({
   }, [q]);
 
   const fetchApplications = useCallback(
-    async (page: number, replace: boolean) => {
+    async (targetPage: number) => {
       const generation = ++fetchGenerationRef.current;
 
       if (abortControllerRef.current) {
@@ -121,15 +118,11 @@ export function useAdminApplications({
       abortControllerRef.current = abortController;
 
       try {
-        if (page === 1) {
-          setLoading(true);
-        } else {
-          setLoadingMore(true);
-        }
+        setLoading(true);
         setError(null);
 
         const params = buildListParams(
-          page,
+          targetPage,
           debouncedQ,
           status,
           minAmount,
@@ -139,7 +132,7 @@ export function useAdminApplications({
         );
 
         const response = await fetch(`/api/admin/applications?${params}`, {
-          cache: "no-store",
+          cache: 'no-store',
           signal: abortController.signal,
         });
 
@@ -149,51 +142,59 @@ export function useAdminApplications({
         const data = await response.json().catch(() => null);
         if (!response.ok) {
           throw new Error(
-            getMessageFromApiJson(data, "Не удалось загрузить список заявок"),
+            getMessageFromApiJson(data, 'Не удалось загрузить список заявок'),
           );
         }
 
+        if (generation !== fetchGenerationRef.current) return;
+
         const newItems: ApplicationItem[] = data?.items || [];
+        const pages = Math.max(1, data?.pages || 1);
+        const resolvedPage = Math.min(targetPage, pages);
 
-        if (generation !== fetchGenerationRef.current) return;
+        setItems(newItems);
+        setTotal(data?.total ?? newItems.length);
+        setTotalPages(pages);
+        setPageState(resolvedPage);
 
-        if (page === 1) {
-          setItems(newItems);
-        } else {
-          setItems((prev) => [...prev, ...newItems]);
+        if (resolvedPage !== targetPage && generation === fetchGenerationRef.current) {
+          void fetchApplications(resolvedPage);
         }
-
-        setHasMore(page < (data?.pages || 1));
-        setCurrentPage(page + 1);
       } catch (err) {
-        if (err instanceof Error && err.name === "AbortError") return;
+        if (err instanceof Error && err.name === 'AbortError') return;
         if (generation !== fetchGenerationRef.current) return;
-        console.error("Failed to load applications:", err);
+        console.error('Failed to load applications:', err);
         setError(
-          err instanceof Error ? err.message : "Ошибка загрузки заявок",
+          err instanceof Error ? err.message : 'Ошибка загрузки заявок',
         );
-        if (page === 1) {
-          setItems([]);
-        }
+        setItems([]);
+        setTotal(0);
+        setTotalPages(1);
       } finally {
         if (generation === fetchGenerationRef.current) {
           setLoading(false);
-          setLoadingMore(false);
         }
       }
     },
     [debouncedQ, status, minAmount, maxAmount, sortBy, sortOrder],
   );
 
-  const loadMore = useCallback(async () => {
-    if (loading || loadingMore || !hasMore) return;
-    const page = currentPage;
-    await fetchApplications(page, false);
-  }, [loading, loadingMore, hasMore, currentPage, fetchApplications]);
+  const setPage = useCallback(
+    (nextPage: number) => {
+      const safePage = Math.max(1, Math.min(nextPage, totalPages || 1));
+      if (safePage === pageRef.current) return;
+      setPageState(safePage);
+      void fetchApplications(safePage);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    },
+    [fetchApplications, totalPages],
+  );
 
   const refreshStats = useCallback(async () => {
     try {
-      const response = await fetch("/api/admin/stats");
+      const response = await fetch('/api/admin/stats');
       if (response.status === 401 || response.status === 403) {
         setCanStream(false);
         return;
@@ -212,7 +213,7 @@ export function useAdminApplications({
         }
       }
     } catch (err) {
-      console.error("Failed to load stats:", err);
+      console.error('Failed to load stats:', err);
       setCanStream(false);
     }
   }, []);
@@ -235,16 +236,14 @@ export function useAdminApplications({
     }
 
     refreshTimeoutRef.current = setTimeout(() => {
-      setCurrentPage(1);
-      setHasMore(true);
-      void fetchApplications(1, true);
+      void fetchApplications(pageRef.current);
     }, 50);
   }, [fetchApplications]);
 
+  // Фильтры и поиск — сброс на первую страницу
   useEffect(() => {
-    setCurrentPage(1);
-    setHasMore(true);
-    void fetchApplications(1, true);
+    setPageState(1);
+    void fetchApplications(1);
   }, [debouncedQ, status, minAmount, maxAmount, sortBy, sortOrder, fetchApplications]);
 
   useEffect(() => {
@@ -259,19 +258,19 @@ export function useAdminApplications({
         eventSourceRef.current.close();
       }
 
-      const eventSource = new EventSource("/api/admin/stream");
+      const eventSource = new EventSource('/api/admin/stream');
       eventSourceRef.current = eventSource;
 
-      eventSource.addEventListener("application:update", () => {
+      eventSource.addEventListener('application:update', () => {
         refreshApplications();
       });
-      eventSource.addEventListener("application:created", () => {
+      eventSource.addEventListener('application:created', () => {
         refreshApplications();
       });
-      eventSource.addEventListener("application:delete", () => {
+      eventSource.addEventListener('application:delete', () => {
         refreshApplications();
       });
-      eventSource.addEventListener("stats:dirty", () => {
+      eventSource.addEventListener('stats:dirty', () => {
         refreshStats();
       });
 
@@ -301,13 +300,12 @@ export function useAdminApplications({
 
   return {
     items,
-    displayItems,
     isSearchPending,
     loading,
-    loadingMore,
     error,
-    currentPage,
-    hasMore,
+    page,
+    total,
+    totalPages,
     stats,
     q,
     setQ,
@@ -321,7 +319,7 @@ export function useAdminApplications({
     setSortBy,
     sortOrder,
     setSortOrder,
-    loadMore,
+    setPage,
     refreshStats,
     refreshApplications,
     toggleEmail,

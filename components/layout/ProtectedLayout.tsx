@@ -11,6 +11,7 @@ import UniversalBackground from "@/components/ui/UniversalBackground";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { shouldShowMobileBottomNav } from "@/lib/navigation/mobileBottomNav";
 import { isFullscreenGameRoute } from "@/lib/navigation/fullscreenRoutes";
+import { isAdminRoute } from "@/lib/navigation/adminRoutes";
 import { cn } from "@/lib/utils";
 
 const ScrollToTop = dynamic(() => import("@/components/ui/ScrollToTop"), {
@@ -22,6 +23,11 @@ const KopiExperience = dynamic(
   { ssr: false },
 );
 
+const SiteFeedbackGate = dynamic(
+  () => import('@/components/feedback/SiteFeedbackGate'),
+  { ssr: false },
+);
+
 const ApplicationStatusModalGate = dynamic(
   () => import("@/components/notifications/ApplicationStatusModalGate"),
   { ssr: false },
@@ -29,6 +35,11 @@ const ApplicationStatusModalGate = dynamic(
 
 const PushNotificationPromptGate = dynamic(
   () => import("@/components/notifications/PushNotificationPromptGate"),
+  { ssr: false },
+);
+
+const DailyChestGate = dynamic(
+  () => import("@/components/dailyBonus/DailyChestGate"),
   { ssr: false },
 );
 
@@ -57,10 +68,15 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     );
   }
 
+  if (isAdminRoute(pathname)) {
+    return <>{children}</>;
+  }
+
   if (isFullscreenGameRoute(pathname)) {
     return (
       <>
         <ApplicationStatusModalGate />
+        <DailyChestGate />
         <PushNotificationPromptGate />
         <BrowserNotificationBridge />
         <main className="fixed inset-0 z-40 h-[100dvh] w-full overflow-hidden">
@@ -84,8 +100,10 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     >
       <UniversalBackground />
       <ApplicationStatusModalGate />
+      <DailyChestGate />
       <PushNotificationPromptGate />
       <BrowserNotificationBridge />
+      <SiteFeedbackGate />
       <TopBanner />
       <Header />
       <main className="flex-1 container-p mx-auto w-full min-w-0 overflow-x-hidden">

@@ -10,6 +10,7 @@ import {
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import ApplicationsConsent from "@/components/applications/ApplicationsConsent";
 import FormField from "@/components/ui/FormField";
 import { Card } from "@/components/ui/Card";
@@ -17,61 +18,63 @@ import RichTextEditor from "@/components/applications/RichTextEditor";
 import PhotoUpload from "@/components/applications/PhotoUpload";
 import SubmitSection from "@/components/applications/SubmitSection";
 import { LucideIcons } from "@/components/ui/LucideIcons";
-import { ApplicationApplicantStrip } from "@/components/applications/ApplicationApplicantStrip";
+import { ApplicationFormAsideIntro } from "@/components/applications/ApplicationFormAsideIntro";
 import { ApplicationWizardSidebar } from "@/components/applications/ApplicationWizardSidebar";
 import { cardEntranceSpring } from "@/components/applications/applicationWizardMotion";
 import type { ApplicationFieldKey } from "@/hooks/applications/formState/validation";
-import type { ApplicationCategory } from "@prisma/client";
-import {
-  getApplicationCategoryConfig,
-  REPORT_PHOTOS_MIN,
-} from "@/lib/applications/categories";
-import { ApplicationCategoryPicker } from "@/components/applications/ApplicationCategoryPicker";
-import {
-  ApplicationPhotoCurrentRequestHints,
-  ApplicationPhotoReportHints,
-  ApplicationPhotoStepIntro,
-} from "@/components/applications/ApplicationPhotoStepHints";
-import ApplicationSubmitConfirmModal from "@/components/applications/ApplicationSubmitConfirmModal";
+import { ApplicationPhotoStepIntro } from "@/components/applications/ApplicationPhotoStepHints";
+import { ApplicationEconomyRules } from "@/components/applications/ApplicationEconomyRules";
+import { SbpPaymentNotice } from "@/components/sbp/SbpPaymentNotice";
+import { RussianBankSelect } from "@/components/sbp/RussianBankSelect";
+import { SbpPhoneField } from "@/components/sbp/SbpPhoneField";
+import { detectSbpPhoneCountry } from "@/lib/sbp/validatePhone";
+import type { SbpPhoneCountryId } from "@/lib/sbp/sbpPhoneCountries";
+import { isApplicationBlockedByBonuses } from "@/lib/applications/applicationEconomy";
+import type { ApplicationEligibility } from "@/lib/applications/applicationEconomy";
+import { formatDesiredAmountFieldHint } from "@/lib/applications/publicationPricing";
 
 type LocalImage = { file: File; url: string };
 
-type WizardStepId =
-  | "category"
-  | "base"
-  | "story"
-  | "payment"
-  | "report"
-  | "photos";
+type WizardStepId = "base" | "story" | "payment" | "photos";
 
 interface WizardStepDefinition {
   id: WizardStepId;
   label: string;
+  /** Что нужно сделать на этом этапе */
+  description: string;
   fields: ApplicationFieldKey[];
 }
 
-const WIZARD_STEPS_WITHOUT_REPORT: WizardStepDefinition[] = [
-  { id: "category", label: "Категория", fields: ["category"] },
-  { id: "base", label: "Основа", fields: ["title", "summary", "amount"] },
-  { id: "story", label: "История", fields: ["story"] },
-  { id: "payment", label: "Реквизиты", fields: ["bankName", "payment"] },
-  { id: "photos", label: "Фото", fields: ["photos"] },
+const WIZARD_STEPS: WizardStepDefinition[] = [
+  {
+    id: "base",
+    label: "Основа",
+    description:
+      "Придумайте заголовок и короткое описание — так материал увидят в списке. Укажите желаемый гонорар в пределах лимита вашего уровня.",
+    fields: ["title", "summary", "amount", "desiredAmount"],
+  },
+  {
+    id: "story",
+    label: "История",
+    description:
+      "Расскажите подробно, что случилось и на что планируете потратить гонорар. Пишите честно — это поможет редакторам рассмотреть материал.",
+    fields: ["story"],
+  },
+  {
+    id: "payment",
+    label: "Данные СБП",
+    description:
+      "Укажите номер телефона и банк для получения гонорара по СБП. Если материал одобрят, вознаграждение поступит на этот номер.",
+    fields: ["bankName", "payment"],
+  },
+  {
+    id: "photos",
+    label: "Фото",
+    description:
+      "Загрузите фото того, что вам нужно. Без контента 18+ и личных данных.",
+    fields: ["photos"],
+  },
 ];
-
-const REPORT_STEP: WizardStepDefinition = {
-  id: "report",
-  label: "Отчёт",
-  fields: ["reportPhotos"],
-};
-
-function getWizardSteps(hasReportStep: boolean): WizardStepDefinition[] {
-  if (!hasReportStep) return WIZARD_STEPS_WITHOUT_REPORT;
-  return [
-    ...WIZARD_STEPS_WITHOUT_REPORT.slice(0, 4),
-    REPORT_STEP,
-    WIZARD_STEPS_WITHOUT_REPORT[4],
-  ];
-}
 
 function WizardProgressFill({
   pct,
@@ -127,8 +130,6 @@ function stepHasError(
 }
 
 type Props = {
-  category: ApplicationCategory | "";
-  setCategory: (v: ApplicationCategory | "") => void;
   title: string;
   setTitle: (v: string) => void;
   summary: string;
@@ -137,8 +138,10 @@ type Props = {
   setStory: (v: string) => void;
   amountFormatted: string;
   handleAmountInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  trustHint: string;
-  trustLimitsMax: number;
+  desiredAmountFormatted?: string;
+  handleDesiredAmountInputChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  showsDesiredAmount?: boolean;
+  desiredAmountInputRef?: React.RefObject<HTMLInputElement | null>;
   payment: string;
   setPayment: (v: string) => void;
   bankName: string;
@@ -148,6 +151,9 @@ type Props = {
   uploading: boolean;
   submitting: boolean;
   left: number | null;
+  eligibility?: ApplicationEligibility | null;
+  loadingEligibility?: boolean;
+  isAdmin?: boolean;
   err: string | null;
   fieldErrors?: Partial<Record<string, string>>;
   firstErrorKey?: string;
@@ -162,25 +168,22 @@ type Props = {
     storyMin: number;
     storyMax: number;
     amountMin: number;
+    amountMax: number;
     paymentMin: number;
     paymentMax: number;
     maxPhotos: number;
   };
   amountInputRef: React.RefObject<HTMLInputElement | null>;
-  trustAcknowledged: boolean;
-  trustAck1: boolean;
-  setTrustAck1: (v: boolean) => void;
-  trustAck2: boolean;
-  setTrustAck2: (v: boolean) => void;
-  trustAck3: boolean;
-  setTrustAck3: (v: boolean) => void;
+  rulesAcknowledged: boolean;
+  rulesAck1: boolean;
+  setRulesAck1: (v: boolean) => void;
+  rulesAck2: boolean;
+  setRulesAck2: (v: boolean) => void;
+  rulesAck3: boolean;
+  setRulesAck3: (v: boolean) => void;
   policiesAccepted: boolean;
   setPoliciesAccepted: (v: boolean) => void;
   ackError: boolean;
-  trustSupportNotice?: ReactNode;
-  approvedCount: number | null;
-  reportPhotos: LocalImage[];
-  setReportPhotos: (v: LocalImage[]) => void;
   /** Имя и аватар для подписи «кто заполняет» */
   applicantDisplayName: string;
   applicantAvatarUrl?: string | null;
@@ -188,8 +191,6 @@ type Props = {
 
 export function ApplicationsForm(props: Props) {
   const {
-    category,
-    setCategory,
     title,
     setTitle,
     summary,
@@ -198,8 +199,10 @@ export function ApplicationsForm(props: Props) {
     setStory,
     amountFormatted,
     handleAmountInputChange,
-    trustHint,
-    trustLimitsMax,
+    desiredAmountFormatted = "",
+    handleDesiredAmountInputChange,
+    showsDesiredAmount = false,
+    desiredAmountInputRef,
     payment,
     setPayment,
     bankName,
@@ -209,6 +212,9 @@ export function ApplicationsForm(props: Props) {
     uploading,
     submitting,
     left,
+    eligibility = null,
+    loadingEligibility = false,
+    isAdmin = false,
     err,
     fieldErrors,
     firstErrorKey,
@@ -219,20 +225,16 @@ export function ApplicationsForm(props: Props) {
     setHpCompany,
     limits,
     amountInputRef,
-    trustAcknowledged,
-    trustAck1,
-    setTrustAck1,
-    trustAck2,
-    setTrustAck2,
-    trustAck3,
-    setTrustAck3,
+    rulesAcknowledged,
+    rulesAck1,
+    setRulesAck1,
+    rulesAck2,
+    setRulesAck2,
+    rulesAck3,
+    setRulesAck3,
     policiesAccepted,
     setPoliciesAccepted,
     ackError,
-    trustSupportNotice,
-    approvedCount,
-    reportPhotos,
-    setReportPhotos,
     applicantDisplayName,
     applicantAvatarUrl,
   } = props;
@@ -240,36 +242,50 @@ export function ApplicationsForm(props: Props) {
   const reducedMotion = useReducedMotion();
   const [step, setStep] = useState(0);
   const [stepFeedback, setStepFeedback] = useState<string | null>(null);
-  const [confirmSendOpen, setConfirmSendOpen] = useState(false);
-  const hasReportStep = approvedCount !== null && approvedCount >= 1;
-  const wizardSteps = useMemo(
-    () => getWizardSteps(hasReportStep),
-    [hasReportStep],
-  );
+  const [phoneCountryId, setPhoneCountryId] = useState<SbpPhoneCountryId>('RU');
+  const wizardSteps = WIZARD_STEPS;
   const stepLabels = useMemo(
     () => wizardSteps.map((item) => item.label),
     [wizardSteps],
   );
+
+  useEffect(() => {
+    if (!payment.trim()) return;
+    setPhoneCountryId((prev) => detectSbpPhoneCountry(payment, prev));
+  }, [payment]);
   const totalSteps = wizardSteps.length;
-  const currentStep = wizardSteps[step]?.id ?? "category";
+  const currentStep = wizardSteps[step]?.id ?? "base";
+
+  const blockedByBonuses = isApplicationBlockedByBonuses(
+    eligibility,
+    isAdmin,
+  );
+
+  useEffect(() => {
+    if (blockedByBonuses && step > 0) {
+      setStep(0);
+    }
+  }, [blockedByBonuses, step]);
+
+  const activeStepLabel =
+    blockedByBonuses && step === 0
+      ? "Недостаточно бонусов"
+      : stepLabels[step];
+
+  const activeStepDescription =
+    blockedByBonuses && step === 0
+      ? "Пополните баланс бонусов в профиле, чтобы продолжить публикацию истории."
+      : wizardSteps[step]?.description ?? "";
 
   const handleSubmitIntent = (e?: FormEvent) => {
     if (e) e.preventDefault();
     if (!validateSubmit()) return;
-    setConfirmSendOpen(true);
-  };
-
-  const handleConfirmSend = async () => {
-    setConfirmSendOpen(false);
-    await executeSubmit();
+    void executeSubmit();
   };
 
   const fe = fieldErrors as
     | Partial<Record<ApplicationFieldKey, string>>
     | undefined;
-
-  const categoryConfig =
-    category !== "" ? getApplicationCategoryConfig(category) : null;
 
   useEffect(() => {
     if (!err || !firstErrorKey || typeof document === "undefined") return;
@@ -313,6 +329,7 @@ export function ApplicationsForm(props: Props) {
 
   const goNext = () => {
     if (step >= totalSteps - 1) return;
+    if (blockedByBonuses && step === 0) return;
     if (stepHasError(step, fe ?? {}, wizardSteps)) return;
     if (step === 0) {
       setStepFeedback("Отлично, продолжаем");
@@ -342,7 +359,7 @@ export function ApplicationsForm(props: Props) {
             handleSubmitIntent(e);
           }}
           onFocusCapture={() => {
-            if (!trustAcknowledged && !policiesAccepted) return;
+            if (!rulesAcknowledged && !policiesAccepted) return;
           }}
         >
           <div
@@ -373,13 +390,14 @@ export function ApplicationsForm(props: Props) {
                     : { type: "spring", stiffness: 260, damping: 28 }
                 }
               >
-                <div className="border-b border-white/10 px-8 pb-5 pt-8 xl:px-10 xl:pt-10">
-                  <ApplicationApplicantStrip
-                    displayName={applicantDisplayName}
-                    avatarUrl={applicantAvatarUrl}
-                    size="md"
-                  />
-                </div>
+                <ApplicationFormAsideIntro
+                  displayName={applicantDisplayName}
+                  avatarUrl={applicantAvatarUrl}
+                  eligibility={eligibility}
+                  loadingEligibility={loadingEligibility}
+                  showEconomyRules={!blockedByBonuses}
+                  size="md"
+                />
                 <div className="lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] px-8 pb-8 pt-6 xl:px-10 xl:pb-10">
                   <ApplicationWizardSidebar
                     step={step}
@@ -392,13 +410,15 @@ export function ApplicationsForm(props: Props) {
               </motion.aside>
 
               <div className="flex min-w-0 flex-col gap-5 sm:gap-6 lg:gap-7 lg:p-8 xl:p-10 lg:pt-9">
-                <div className="lg:hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 sm:px-4">
-                  <ApplicationApplicantStrip
-                    displayName={applicantDisplayName}
-                    avatarUrl={applicantAvatarUrl}
-                    size="sm"
-                  />
-                </div>
+                <ApplicationFormAsideIntro
+                  className="lg:hidden"
+                  displayName={applicantDisplayName}
+                  avatarUrl={applicantAvatarUrl}
+                  eligibility={eligibility}
+                  loadingEligibility={loadingEligibility}
+                  showEconomyRules={!blockedByBonuses}
+                  size="sm"
+                />
                 <div className="space-y-3 lg:hidden">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-sm font-medium text-[#fffffe]">
@@ -421,7 +441,7 @@ export function ApplicationsForm(props: Props) {
                           className="text-[#94a1b2] font-normal"
                         >
                           {" "}
-                          · {stepLabels[step]}
+                          · {activeStepLabel}
                         </motion.span>
                       </AnimatePresence>
                     </p>
@@ -449,6 +469,24 @@ export function ApplicationsForm(props: Props) {
                       reducedMotion={Boolean(reducedMotion)}
                     />
                   </div>
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.p
+                      key={activeStepDescription}
+                      initial={
+                        reducedMotion ? false : { opacity: 0, y: 6 }
+                      }
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={
+                        reducedMotion
+                          ? { opacity: 1 }
+                          : { opacity: 0, y: -4 }
+                      }
+                      transition={{ duration: 0.18 }}
+                      className="text-sm leading-relaxed text-[#94a1b2]"
+                    >
+                      {activeStepDescription}
+                    </motion.p>
+                  </AnimatePresence>
                 </div>
 
                 <div className="hidden lg:block space-y-3">
@@ -474,12 +512,30 @@ export function ApplicationsForm(props: Props) {
                           transition={{ duration: 0.2, ease: "easeOut" }}
                           className="mt-1 text-xl font-semibold tracking-tight text-[#fffffe] xl:text-2xl"
                         >
-                          {stepLabels[step]}
+                          {activeStepLabel}
                         </motion.h2>
                       </AnimatePresence>
                       <p className="mt-1 text-sm text-[#abd1c6]">
                         Шаг {step + 1} из {totalSteps}
                       </p>
+                      <AnimatePresence mode="wait" initial={false}>
+                        <motion.p
+                          key={activeStepDescription}
+                          initial={
+                            reducedMotion ? false : { opacity: 0, y: 8 }
+                          }
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={
+                            reducedMotion
+                              ? { opacity: 1 }
+                              : { opacity: 0, y: -6 }
+                          }
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                          className="mt-2 max-w-xl text-sm leading-relaxed text-[#94a1b2]"
+                        >
+                          {activeStepDescription}
+                        </motion.p>
+                      </AnimatePresence>
                     </div>
                     <div
                       className="flex shrink-0 flex-col items-end gap-2"
@@ -537,19 +593,15 @@ export function ApplicationsForm(props: Props) {
                       !reducedMotion && "animate-fadeIn",
                     )}
                   >
-                    {currentStep === "category" && (
-                      <div className="grid gap-5 lg:gap-6">
-                        <div>
-                          <ApplicationCategoryPicker
-                            category={category}
-                            setCategory={setCategory}
-                            error={fe?.category}
-                          />
-                        </div>
-                      </div>
+                    {currentStep === "base" && blockedByBonuses && (
+                      <ApplicationEconomyRules
+                        eligibility={eligibility}
+                        loading={loadingEligibility}
+                        variant="step-gate"
+                      />
                     )}
 
-                    {currentStep === "base" && (
+                    {currentStep === "base" && !blockedByBonuses && (
                       <div className="grid gap-5 lg:grid-cols-2 lg:gap-6 lg:items-start">
                         <div className="min-w-0">
                           <div
@@ -566,11 +618,12 @@ export function ApplicationsForm(props: Props) {
                               icon="Home"
                               value={title}
                               onChange={setTitle}
-                              placeholder="Например: Помощь с арендой после сокращения"
-                              hint={`До ${limits.titleMax} символов`}
+                              placeholder="Например: История о мелкой бытовой хотелке"
+                              hint={`До ${limits.titleMax} символов. Ввод вручную, без вставки.`}
                               maxLength={limits.titleMax}
                               charCountVisibility="when_nonempty"
                               showFieldStatus={false}
+                              manualInputOnly
                               delay={0}
                               required
                               error={fe?.title}
@@ -593,10 +646,11 @@ export function ApplicationsForm(props: Props) {
                               value={summary}
                               onChange={setSummary}
                               placeholder="3–10 слов для списка заявок"
-                              hint={`До ${limits.summaryMax} символов`}
+                              hint={`До ${limits.summaryMax} символов. Ввод вручную, без вставки.`}
                               maxLength={limits.summaryMax}
                               charCountVisibility="when_nonempty"
                               showFieldStatus={false}
+                              manualInputOnly
                               delay={0}
                               required
                               error={fe?.summary}
@@ -612,14 +666,19 @@ export function ApplicationsForm(props: Props) {
                                 "border-[#e16162]/50 bg-[#e16162]/8",
                             )}
                           >
+                            {showsDesiredAmount && (
+                              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#94a1b2]">
+                                Лимит уровня: до {limits.amountMax.toLocaleString("ru-RU")} ₽
+                              </p>
+                            )}
                             <FormField
                               type="input"
                               label="Сумма"
                               icon="DollarSign"
                               value={amountFormatted}
                               onChange={() => {}}
-                              placeholder="Например: 5 000"
-                              hint={`От ${limits.amountMin} ₽. ${trustHint}`.trim()}
+                              placeholder={`Например: ${Math.min(limits.amountMax, 5000).toLocaleString("ru-RU")}`}
+                              hint={`На вашем уровне доступен гонорар до ${limits.amountMax.toLocaleString("ru-RU")} ₽.`}
                               maxLength={7}
                               charCountVisibility="when_nonempty"
                               showFieldStatus={false}
@@ -629,24 +688,86 @@ export function ApplicationsForm(props: Props) {
                                 autoComplete: "off",
                                 ref: amountInputRef,
                                 onChange: handleAmountInputChange,
-                                max: trustLimitsMax,
+                                max: limits.amountMax,
                               }}
                               delay={0}
                               required
                               error={fe?.amount}
                             />
-                            {trustSupportNotice}
                           </div>
                         </div>
+
+                        {showsDesiredAmount && handleDesiredAmountInputChange && (
+                          <div className="min-w-0 lg:col-span-2">
+                            <div
+                              id="application-field-desiredAmount"
+                              className={cn(
+                                "rounded-2xl p-3 sm:p-4 -mx-1 border border-transparent transition-colors lg:p-5 space-y-3",
+                                fe?.desiredAmount &&
+                                  "border-[#e16162]/50 bg-[#e16162]/8",
+                              )}
+                            >
+                              <FormField
+                                type="input"
+                                label="Желаемая сумма"
+                                icon="TrendingUp"
+                                value={desiredAmountFormatted}
+                                onChange={() => {}}
+                                placeholder="Необязательно — если нужна сумма больше лимита"
+                                hint={formatDesiredAmountFieldHint(limits.amountMax)}
+                                maxLength={7}
+                                charCountVisibility="when_nonempty"
+                                showFieldStatus={false}
+                                inputProps={{
+                                  type: "tel",
+                                  inputMode: "numeric",
+                                  autoComplete: "off",
+                                  ref: desiredAmountInputRef,
+                                  onChange: handleDesiredAmountInputChange,
+                                }}
+                                delay={0}
+                                error={fe?.desiredAmount}
+                              />
+                              <p className="text-xs leading-relaxed text-[#94a1b2]">
+                                Если вам требуется большая сумма, можете указать её
+                                дополнительно. Это не гарантирует одобрение материала,
+                                но поможет администрации понять вашу реальную
+                                потребность.
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
                     {currentStep === "story" && (
-                      <div>
-                        <div
-                          id="application-field-story"
-                          className={cn(
-                              "rounded-2xl p-3 sm:p-4 -mx-1 border border-transparent transition-colors lg:max-w-4xl lg:p-5",
+                      <div className="space-y-5 lg:max-w-4xl">
+                        <div className="rounded-2xl border border-[#abd1c6]/20 bg-[#004643]/35 px-4 py-4 sm:px-5 sm:py-5">
+                          <p className="text-sm leading-relaxed text-[#abd1c6]/95">
+                            Вы публикуете историю на Копилке — гонорар выплачивает
+                            сама платформа, материал проверяет редакция.{" "}
+                            <span className="font-semibold text-[#e8f4f0]">
+                              Это не кредит, не займ и не переводы от других
+                              людей
+                            </span>
+                            .{" "}
+                            <span className="font-semibold text-[#e8f4f0]">
+                              Напишите честно, что случилось и зачем нужны
+                              средства
+                            </span>
+                            : при одобрении гонорар поступит на ваш номер СБП.{" "}
+                            <span className="font-semibold text-[#f9bc60]">
+                              Возвращать ничего не нужно
+                            </span>{" "}
+                            — это безвозмездное поощрение авторов в рамках правил
+                            Копилки.
+                          </p>
+                        </div>
+                        <div>
+                          <div
+                            id="application-field-story"
+                            className={cn(
+                              "rounded-2xl p-3 sm:p-4 -mx-1 border border-transparent transition-colors lg:p-5",
                               fe?.story &&
                                 "border-[#e16162]/50 bg-[#e16162]/8",
                             )}
@@ -664,7 +785,7 @@ export function ApplicationsForm(props: Props) {
                             <RichTextEditor
                               value={story}
                               onChange={setStory}
-                              placeholder="Что случилось, зачем нужна поддержка, как планируете использовать средства…"
+                              placeholder="Что случилось, зачем нужен гонорар, как планируете использовать вознаграждение…"
                               minLength={limits.storyMin}
                               maxLength={limits.storyMax}
                               rows={8}
@@ -675,37 +796,14 @@ export function ApplicationsForm(props: Props) {
                               charCountVisibility="when_nonempty"
                             />
                           </div>
+                        </div>
                       </div>
                     )}
 
                     {currentStep === "payment" && (
                       <div className="grid gap-5 lg:max-w-3xl lg:gap-6">
-                        <div>
-                          <div
-                            id="application-field-bankName"
-                            className={cn(
-                              "rounded-2xl p-3 sm:p-4 -mx-1 border border-transparent transition-colors lg:p-5",
-                              fe?.bankName &&
-                                "border-[#e16162]/50 bg-[#e16162]/8",
-                            )}
-                          >
-                            <FormField
-                              type="input"
-                              label="Банк"
-                              icon="CreditCard"
-                              value={bankName}
-                              onChange={setBankName}
-                              placeholder="Например: Тинькофф, Сбер"
-                              hint="Название банка получателя"
-                              maxLength={15}
-                              charCountVisibility="when_nonempty"
-                              showFieldStatus={false}
-                              delay={0}
-                              required
-                              error={fe?.bankName}
-                            />
-                          </div>
-                        </div>
+                        <SbpPaymentNotice variant="application" />
+
                         <div>
                           <div
                             id="application-field-payment"
@@ -715,55 +813,33 @@ export function ApplicationsForm(props: Props) {
                                 "border-[#e16162]/50 bg-[#e16162]/8",
                             )}
                           >
-                            <FormField
-                              type="textarea"
-                              label="Реквизиты для получения помощи"
-                              icon="CreditCard"
+                            <SbpPhoneField
                               value={payment}
                               onChange={setPayment}
-                              placeholder="Счёт, СБП или карта МИР — по шаблону банка"
-                              hint={`МИР / СБП / счёт (не Visa/Mastercard). От ${limits.paymentMin} до ${limits.paymentMax} символов.`}
-                              minLength={limits.paymentMin}
-                              maxLength={limits.paymentMax}
-                              compact
-                              charCountVisibility="when_nonempty"
-                              showFieldStatus={false}
-                              delay={0}
+                              onCountryChange={setPhoneCountryId}
                               required
                               error={fe?.payment}
+                              disabled={submitting}
                             />
                           </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {currentStep === "report" && (
-                      <div className="grid gap-5 lg:max-w-4xl lg:gap-6">
-                        <div>
-                          <ApplicationPhotoReportHints
-                            config={categoryConfig}
-                          />
                         </div>
 
                         <div>
                           <div
-                            id="application-field-reportPhotos"
+                            id="application-field-bankName"
                             className={cn(
-                              "rounded-2xl p-2 -mx-1 border border-transparent transition-colors",
-                              fe?.reportPhotos &&
+                              "rounded-2xl p-3 sm:p-4 -mx-1 border border-transparent transition-colors lg:p-5",
+                              fe?.bankName &&
                                 "border-[#e16162]/50 bg-[#e16162]/8",
                             )}
                           >
-                            <PhotoUpload
-                              photos={reportPhotos}
-                              onPhotosChange={setReportPhotos}
-                              maxPhotos={5}
-                              delay={0}
-                              error={fe?.reportPhotos}
-                              inputId="report-photos-upload"
-                              variant="dark"
-                              title="Загрузите файлы отчёта"
-                              subtitle={`Минимум ${REPORT_PHOTOS_MIN} разных фото по двум блокам выше. Можно больше файлов, если нужно.`}
+                            <RussianBankSelect
+                              value={bankName}
+                              onChange={setBankName}
+                              countryId={phoneCountryId}
+                              required
+                              error={fe?.bankName}
+                              disabled={submitting}
                             />
                           </div>
                         </div>
@@ -773,15 +849,7 @@ export function ApplicationsForm(props: Props) {
                     {currentStep === "photos" && (
                       <div className="grid gap-5 lg:max-w-4xl lg:gap-6">
                         <div>
-                          <ApplicationPhotoStepIntro
-                            config={categoryConfig}
-                          />
-                        </div>
-
-                        <div>
-                          <ApplicationPhotoCurrentRequestHints
-                            config={categoryConfig}
-                          />
+                          <ApplicationPhotoStepIntro />
                         </div>
 
                         <div>
@@ -801,24 +869,20 @@ export function ApplicationsForm(props: Props) {
                               error={fe?.photos}
                               inputId="application-photos-upload"
                               variant="dark"
-                              title="Загрузите файлы к этой заявке"
-                              subtitle={
-                                categoryConfig
-                                  ? "Добавьте хотя бы один файл. Снимки должны соответствовать нумерованному списку выше (можно несколько фото)."
-                                  : "Сначала выберите категорию на шаге 1."
-                              }
+                              title="Загрузите файлы к этой истории"
+                              subtitle="Добавьте хотя бы одно фото. Без контента 18+ и личных данных."
                             />
                           </div>
                         </div>
 
                         <div>
                           <ApplicationsConsent
-                            trustAck1={trustAck1}
-                            setTrustAck1={setTrustAck1}
-                            trustAck2={trustAck2}
-                            setTrustAck2={setTrustAck2}
-                            trustAck3={trustAck3}
-                            setTrustAck3={setTrustAck3}
+                            rulesAck1={rulesAck1}
+                            setRulesAck1={setRulesAck1}
+                            rulesAck2={rulesAck2}
+                            setRulesAck2={setRulesAck2}
+                            rulesAck3={rulesAck3}
+                            setRulesAck3={setRulesAck3}
                             policiesAccepted={policiesAccepted}
                             setPoliciesAccepted={setPoliciesAccepted}
                             ackError={ackError}
@@ -836,6 +900,8 @@ export function ApplicationsForm(props: Props) {
                         submitting={submitting}
                         uploading={uploading}
                         left={left}
+                        eligibility={eligibility}
+                        isAdmin={isAdmin}
                         err={
                           err &&
                           fieldErrors &&
@@ -847,6 +913,24 @@ export function ApplicationsForm(props: Props) {
                           handleSubmitIntent(e);
                         }}
                       />
+                    </div>
+                  ) : blockedByBonuses && step === 0 ? (
+                    <div className="flex flex-col items-center gap-4 border-t border-white/10 pt-8">
+                      <p className="text-center text-sm text-[#abd1c6]">
+                        Накопите бонусы, чтобы продолжить публикацию истории.
+                      </p>
+                      <Link
+                        href="/profile"
+                        className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-xl px-10 text-sm font-semibold text-[#001e1d] transition-opacity hover:opacity-92"
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+                          boxShadow: "0 10px 28px rgba(249, 188, 96, 0.22)",
+                        }}
+                      >
+                        Перейти в профиль
+                        <LucideIcons.ArrowRight size="xs" />
+                      </Link>
                     </div>
                   ) : (
                     <div className="flex flex-row items-center justify-between gap-6 border-t border-white/10 pt-8">
@@ -906,6 +990,8 @@ export function ApplicationsForm(props: Props) {
                         submitting={submitting}
                         uploading={uploading}
                         left={left}
+                        eligibility={eligibility}
+                        isAdmin={isAdmin}
                         err={
                           err &&
                           fieldErrors &&
@@ -930,6 +1016,24 @@ export function ApplicationsForm(props: Props) {
                       >
                         Назад
                       </motion.button>
+                    </div>
+                  ) : blockedByBonuses && step === 0 ? (
+                    <div className="flex flex-col items-center gap-4 border-t border-white/10 pt-8">
+                      <p className="text-center text-sm text-[#abd1c6]">
+                        Накопите бонусы, чтобы продолжить публикацию истории.
+                      </p>
+                      <Link
+                        href="/profile"
+                        className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-xl px-10 text-sm font-semibold text-[#001e1d] transition-opacity hover:opacity-92"
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #e8a545 0%, #f9bc60 50%, #e8a545 100%)",
+                          boxShadow: "0 10px 28px rgba(249, 188, 96, 0.22)",
+                        }}
+                      >
+                        Перейти в профиль
+                        <LucideIcons.ArrowRight size="xs" />
+                      </Link>
                     </div>
                   ) : (
                     <div className="flex gap-3 w-full">
@@ -980,14 +1084,6 @@ export function ApplicationsForm(props: Props) {
           </div>
         </form>
       </Card>
-
-      <ApplicationSubmitConfirmModal
-        isOpen={confirmSendOpen}
-        onClose={() => setConfirmSendOpen(false)}
-        onConfirm={handleConfirmSend}
-        submitting={submitting}
-        uploading={uploading}
-      />
     </motion.div>
   );
 }

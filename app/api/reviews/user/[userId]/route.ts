@@ -2,43 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import {
-  getNextLevelRequirement,
-  getTrustLevelFromApprovedCount,
-  getTrustLimits,
-  type TrustLevel,
-} from "@/lib/trustLevel";
 import { ApplicationStatus } from "@prisma/client";
 import { isValidCuidLikeId } from "@/lib/reviews/reviewId";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 
 export const dynamic = "force-dynamic";
-
-type TrustSnapshot = {
-  status: Lowercase<TrustLevel>;
-  approved: number;
-  supportRange: string;
-  nextRequirement: string | null;
-};
-
-function buildTrustSnapshot(approved: number): TrustSnapshot {
-  const level = getTrustLevelFromApprovedCount(approved);
-  const status = level.toLowerCase() as Lowercase<TrustLevel>;
-  const limits = getTrustLimits(level);
-  const supportRange = `Ориентир: от ${limits.min.toLocaleString("ru-RU")} до ${limits.max.toLocaleString("ru-RU")} ₽`;
-  const nextReq = getNextLevelRequirement(level);
-  const nextRequirement =
-    nextReq === null
-      ? null
-      : `До пересмотра уровня — ещё ${Math.max(0, nextReq - approved)} одобренных заявок`;
-
-  return {
-    status,
-    approved,
-    supportRange,
-    nextRequirement,
-  };
-}
 
 export async function GET(
   _req: NextRequest,
@@ -80,7 +48,6 @@ export async function GET(
       },
     };
 
-    // Показываем последний отзыв пользователя независимо от типа исторической записи.
     const review = await prisma.review.findFirst({
       where: { userId },
       orderBy: { createdAt: "desc" },
@@ -91,14 +58,13 @@ export async function GET(
       return NextResponse.json({ review: null });
     }
 
-    const approvedCount = await prisma.application.count({
+    const approvedApplications = await prisma.application.count({
       where: {
         userId: review.userId,
         status: ApplicationStatus.APPROVED,
-        countTowardsTrust: true,
       },
     });
-    const trust = buildTrustSnapshot(approvedCount);
+
     const mapped = {
       id: review.id,
       content: review.content,
@@ -109,7 +75,7 @@ export async function GET(
       user: review.user
         ? {
             ...review.user,
-            trust,
+            approvedApplications,
             isSelf: viewerId ? viewerId === review.userId : false,
           }
         : null,

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Heart, ArrowRight } from "lucide-react";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
-import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import { HomeSectionLayout } from "@/components/home/HomeSectionLayout";
 import { buildUploadUrl } from "@/lib/uploads/url";
 import type { RecentApplicationItem } from "@/lib/applications/getRecentApplications";
@@ -43,7 +42,7 @@ export default function RecentApplications({
             className="text-lg md:text-xl max-w-xl mx-auto"
             style={{ color: "#abd1c6" }}
           >
-            Люди, которым уже помогли
+            Авторы, получившие гонорары от платформы
           </p>
         </div>
 
@@ -150,11 +149,6 @@ export default function RecentApplications({
                           <span className="truncate">
                             {app.user ? app.user.name || "Аноним" : "Аноним"}
                           </span>
-                          {app.user ? (
-                            <UserPublicBadges
-                              markedAsDeceiver={app.user.markedAsDeceiver}
-                            />
-                          ) : null}
                         </p>
                         <p className="text-xs" style={{ color: "#94a1b2" }}>
                           {createdAt.toLocaleDateString("ru-RU", {

@@ -180,7 +180,7 @@ export function ProfileBonusesCard({ wallet }: ProfileBonusesCardProps) {
         <Button
           type="button"
           variant="default"
-          className="h-11 w-full rounded-2xl bg-[#f9bc60] font-bold text-[#001e1d] shadow-lg shadow-[#f9bc60]/15 hover:bg-[#f7b24a]"
+          className="h-11 w-full rounded-2xl border border-[#f9bc60]/40 bg-[#f9bc60] font-bold text-[#001e1d] shadow-[0_4px_16px_rgba(249,188,96,0.35)] hover:bg-[#f7b24a]"
           asChild
         >
           <Link href="/good-deeds">

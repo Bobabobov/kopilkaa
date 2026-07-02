@@ -9,7 +9,6 @@ import { ArrowUpRight, Gift } from "lucide-react";
 import { StoryAdGallery } from "@/app/good-deeds/_components/StoryAdGallery";
 import { buildUploadUrl, isUploadUrl, isExternalUrl } from "@/lib/uploads/url";
 import { DEFAULT_AVATAR, resolveAvatarUrl } from "@/lib/avatar";
-import { UserPublicBadges } from "@/components/users/UserPublicBadges";
 import { cn } from "@/lib/utils";
 import type { GoodDeedsResponse } from "../types";
 import { goodDeedsGlassCard } from "./good-deeds-ui/glassStyles";
@@ -154,7 +153,6 @@ function GoodDeedFeedCardInner({
                 {authorName}
               </span>
             </Link>
-            <UserPublicBadges markedAsDeceiver={item.user.markedAsDeceiver} />
           </div>
 
           <p className="mt-2 text-[11px] font-medium uppercase tracking-wide text-[#94a1b2]">

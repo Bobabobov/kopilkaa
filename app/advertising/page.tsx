@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/Card";
 import { LucideIcons } from "@/components/ui/LucideIcons";
 import { AdvertisingContact } from "@/components/advertising";
+import { SectionFeedbackCta } from "@/components/feedback/SectionFeedbackCta";
 
 const ctaPrimary =
   "inline-flex items-center justify-center px-10 py-5 text-lg font-semibold rounded-xl transition-all hover:opacity-90";
@@ -112,6 +113,10 @@ export default function AdvertisingPage() {
             <a href="/standards" className={ctaSecondary}>
               Стандарты рекламы
             </a>
+          </div>
+
+          <div className="mt-8 max-w-3xl">
+            <SectionFeedbackCta variant="advertising" />
           </div>
         </div>
       </div>

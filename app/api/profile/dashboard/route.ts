@@ -4,9 +4,16 @@ import { prisma } from "@/lib/db";
 import { formatTimeAgo } from "@/lib/time";
 import { createHash } from "crypto";
 import { sanitizeEmailForViewer } from "@/lib/privacy";
-import { computeUserTrustSnapshot } from "@/lib/trust/computeTrustSnapshot";
 import { logRouteCatchError } from "@/lib/api/parseApiError";
 import { computeGoodDeedBonusWallet } from "@/lib/goodDeedBonusWallet";
+import { emptyFirstWithdrawalBonusStatus } from "@/lib/bonusWithdrawals/firstWithdrawalBonus";
+import { syncMissedLevel3MilestoneBonus } from "@/lib/userLevel/levelMilestoneBonuses";
+import { getUserLevelProgress } from "@/lib/userLevel";
+import { toDisplayExperience } from "@/lib/userLevel/economy";
+import {
+  syncUserProfileLevelIfStale,
+  resolveUserProfileLevel,
+} from "@/lib/userLevel/resolveProfileLevel";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +56,8 @@ export async function GET(request: NextRequest) {
             hideEmail: true,
             createdAt: true,
             lastSeen: true,
+            level: true,
+            experience: true,
           },
         })
         .catch(() => null),
@@ -132,7 +141,7 @@ export async function GET(request: NextRequest) {
         })
         .catch(() => []),
 
-      // Статистика заявок (включая trustDecreasedAtDecision для микростатистики уровня)
+      // Статистика заявок
       prisma.application
         .findMany({
           where: { userId },
@@ -140,8 +149,6 @@ export async function GET(request: NextRequest) {
             id: true,
             status: true,
             amount: true,
-            countTowardsTrust: true,
-            trustDecreasedAtDecision: true,
           },
         })
         .catch(() => []),
@@ -177,17 +184,24 @@ export async function GET(request: NextRequest) {
         })
         .catch(() => []),
 
-      computeGoodDeedBonusWallet(userId).catch((error) => {
-        logRouteCatchError("GET /api/profile/dashboard bonusWallet:", error);
-        return {
-          totalEarnedBonuses: 0,
-          availableBonuses: 0,
-          pendingWithdrawalBonuses: 0,
-          withdrawnBonuses: 0,
-          hasPendingWithdrawal: false,
-          withdrawalBlocked: false,
-        };
-      }),
+      (async () => {
+        try {
+          await syncMissedLevel3MilestoneBonus(userId);
+          return await computeGoodDeedBonusWallet(userId);
+        } catch (error) {
+          logRouteCatchError("GET /api/profile/dashboard bonusWallet:", error);
+          return {
+            totalEarnedBonuses: 0,
+            availableBonuses: 0,
+            pendingWithdrawalBonuses: 0,
+            withdrawnBonuses: 0,
+            hasPendingWithdrawal: false,
+            withdrawalBlocked: false,
+            firstWithdrawalBonus: emptyFirstWithdrawalBonusStatus(),
+            firstWithdrawalBonusEligible: false,
+          };
+        }
+      })(),
     ]);
 
     if (!user) {
@@ -209,12 +223,19 @@ export async function GET(request: NextRequest) {
         },
         bonusWallet: {
           totalEarnedBonuses: 0,
+          grossBonuses: 0,
+          bonusesInvestedInExperience: 0,
           availableBonuses: 0,
+          bonusesInLevel: 0,
           pendingWithdrawalBonuses: 0,
           withdrawnBonuses: 0,
           hasPendingWithdrawal: false,
-          withdrawalBlocked: false,
+          withdrawalBlocked: true,
+          withdrawalsDisabled: false,
+          firstWithdrawalBonus: emptyFirstWithdrawalBonusStatus(),
+          firstWithdrawalBonusEligible: false,
         },
+        userLevel: getUserLevelProgress(0),
         notifications: [],
       });
     }
@@ -222,24 +243,11 @@ export async function GET(request: NextRequest) {
     const approvedApps = applications.filter((a) => a.status === "APPROVED");
     const rejectedApps = applications.filter((a) => a.status === "REJECTED");
     const pendingApps = applications.filter((a) => a.status === "PENDING");
-    const approvedCounting = approvedApps.filter(
-      (a) => a.countTowardsTrust === true,
-    ).length;
-    const approvedWithoutLevel = approvedApps.filter(
-      (a) => a.countTowardsTrust === false,
-    ).length;
-    const rejectedWithLevelDecrease = rejectedApps.filter(
-      (a) => a.trustDecreasedAtDecision === true,
-    ).length;
-    const approvedWithLevelDecrease = approvedApps.filter(
-      (a) => a.trustDecreasedAtDecision === true,
-    ).length;
 
-    // Подсчитываем статистику
     const stats = {
       totalApplications: applications.length,
       approvedApplications: approvedApps.length,
-      effectiveApprovedApplications: approvedCounting,
+      effectiveApprovedApplications: approvedApps.length,
       pendingApplications: pendingApps.length,
       rejectedApplications: rejectedApps.length,
       totalAmountRequested: applications.reduce(
@@ -253,17 +261,6 @@ export async function GET(request: NextRequest) {
       friendsCount: friendsData.length,
       pendingFriendRequests: receivedRequestsData.length,
     };
-
-    const levelStats = {
-      approvedTotal: approvedApps.length,
-      approvedCounting,
-      approvedWithoutLevel,
-      approvedWithLevelDecrease,
-      rejectedTotal: rejectedApps.length,
-      rejectedWithLevelDecrease,
-      pending: pendingApps.length,
-    };
-    const trust = await computeUserTrustSnapshot(userId);
 
     // Форматируем друзей
     const friends = friendsData.map((friendship) => ({
@@ -288,6 +285,9 @@ export async function GET(request: NextRequest) {
 
     // Стабильный ETag: зависит от реально важных кусочков данных (а не от Date.now()).
     // Это нужно, чтобы браузер/клиент могли получать 304 Not Modified и не грузить всё заново.
+    const displayExperienceForEtag = toDisplayExperience(user.experience ?? 0);
+    const resolvedLevelForEtag = resolveUserProfileLevel(user);
+
     const etagPayload = {
       userId,
       user: {
@@ -299,11 +299,11 @@ export async function GET(request: NextRequest) {
         avatarFrame: user.avatarFrame ?? "",
         hideEmail: Boolean(user.hideEmail),
         lastSeen: user.lastSeen ? new Date(user.lastSeen).getTime() : 0,
+        level: resolvedLevelForEtag,
+        experience: displayExperienceForEtag,
       },
       stats,
       bonusWallet,
-      trust,
-      levelStats,
       latest: {
         friend: friendsData[0]?.createdAt
           ? new Date(friendsData[0].createdAt).getTime()
@@ -328,8 +328,17 @@ export async function GET(request: NextRequest) {
       return notModified;
     }
 
+    const displayExperience = toDisplayExperience(user.experience ?? 0);
+    const level = await syncUserProfileLevelIfStale(userId, user);
+
+    const userLevel = getUserLevelProgress(displayExperience);
+
     const response = NextResponse.json({
-      user,
+      user: {
+        ...user,
+        level,
+        experience: displayExperience,
+      },
       friends,
       receivedRequests: receivedRequestsData.map((req: any) => ({
         ...req,
@@ -337,11 +346,10 @@ export async function GET(request: NextRequest) {
           ? sanitizeEmailForViewer(req.requester as any, userId)
           : req.requester,
       })),
-      stats: { ...stats, trust },
+      stats,
       bonusWallet,
+      userLevel,
       notifications: formattedNotifications,
-      trust,
-      levelStats,
     });
 
     // Добавляем заголовки кэширования

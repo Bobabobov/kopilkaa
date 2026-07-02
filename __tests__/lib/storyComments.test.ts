@@ -159,7 +159,6 @@ function makeCommentRow(params: {
       vkLink: null,
       telegramLink: null,
       youtubeLink: null,
-      markedAsDeceiver: false,
     },
     parent: params.parent
       ? {
@@ -174,7 +173,6 @@ function makeCommentRow(params: {
             vkLink: null,
             telegramLink: null,
             youtubeLink: null,
-            markedAsDeceiver: false,
           },
         }
       : null,
@@ -295,7 +293,6 @@ describe("sortStoryCommentThreads", () => {
           vkLink: null,
           telegramLink: null,
           youtubeLink: null,
-          markedAsDeceiver: false,
           isSelf: false,
         },
         replies: [],
@@ -321,7 +318,6 @@ describe("sortStoryCommentThreads", () => {
           vkLink: null,
           telegramLink: null,
           youtubeLink: null,
-          markedAsDeceiver: false,
           isSelf: false,
         },
         replies: [],

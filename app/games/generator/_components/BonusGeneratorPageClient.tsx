@@ -21,9 +21,11 @@ import { celebrateGeneratorLaunch } from '@/lib/games/bonusGeneratorConfetti';
 import { getMessageFromApiJson } from '@/lib/api/parseApiError';
 import { invalidateProfileCache } from '@/hooks/profile/useProfileDashboard';
 import { NumberTicker } from '@/app/games/_components/effects/NumberTicker';
+import { GameLeaderboard } from '@/app/games/_components/GameLeaderboard';
 import { LucideIcons } from '@/components/ui/LucideIcons';
 import { cn } from '@/lib/utils';
 import { GamesFullscreenScrollShell } from '@/app/games/_components/GamesFullscreenScrollShell';
+import { useGameLeaderboard } from '@/hooks/games/useGameLeaderboard';
 import { BonusGeneratorCelebrate } from './BonusGeneratorCelebrate';
 import { BonusGeneratorAnimatedReward } from './BonusGeneratorAnimatedReward';
 import { useFeedbackMeaningfulOnResult } from '@/hooks/feedback/useFeedbackMeaningfulOnResult';
@@ -461,6 +463,11 @@ export default function BonusGeneratorPageClient({
   initialBalance,
 }: BonusGeneratorPageClientProps) {
   const [balance, setBalance] = useState(initialBalance);
+  const {
+    entries: leaderboardEntries,
+    isLoading: leaderboardLoading,
+    meta: leaderboardMeta,
+  } = useGameLeaderboard('generator');
   const [phase, setPhase] = useState<GeneratorPhase>('idle');
   useFeedbackMeaningfulOnResult(phase === 'result');
   const [result, setResult] = useState<BonusGeneratorRunResult | null>(null);
@@ -685,6 +692,12 @@ export default function BonusGeneratorPageClient({
                   </div>
                 </div>
               </div>
+
+              <GameLeaderboard
+                entries={leaderboardEntries}
+                isLoading={leaderboardLoading}
+                meta={leaderboardMeta}
+              />
             </aside>
           </div>
         </div>

@@ -512,24 +512,6 @@ export async function verifySequenceClicks(
   };
 }
 
-export async function getSequenceLeaderboard(): Promise<SequenceLeaderboardEntry[]> {
-  const users = await prisma.user.findMany({
-    where: {
-      maxSequenceRecord: { gt: 0 },
-    },
-    orderBy: { maxSequenceRecord: 'desc' },
-    take: 10,
-    select: {
-      id: true,
-      username: true,
-      avatar: true,
-      maxSequenceRecord: true,
-    },
-  });
-
-  return users;
-}
-
 export async function getSequencePlayerStats(userId: string): Promise<{
   maxSequenceRecord: number;
   dailyAttemptsUsed: number;

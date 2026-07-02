@@ -8,17 +8,17 @@ import {
   DAILY_ATTEMPT_LIMIT,
   FLASH_INTERVAL_MS,
   GAME_COST,
-  type SequenceLeaderboardEntry,
   type SequenceVerifyResult,
 } from '@/lib/games/sequenceGame';
 import { getMessageFromApiJson } from '@/lib/api/parseApiError';
 import { invalidateProfileCache } from '@/hooks/profile/useProfileDashboard';
+import { GameLeaderboard } from '@/app/games/_components/GameLeaderboard';
 import { GamePurchaseAttemptButton } from '@/app/games/_components/GamePurchaseAttemptButton';
 import { GamesFullscreenScrollShell } from '@/app/games/_components/GamesFullscreenScrollShell';
 import { useGameAttemptPurchase } from '@/hooks/games/useGameAttemptPurchase';
+import { useGameLeaderboard } from '@/hooks/games/useGameLeaderboard';
 import { SequenceGrid } from './SequenceGrid';
 import { SequenceHud } from './SequenceHud';
-import { SequenceLeaderboard } from './SequenceLeaderboard';
 import { SequenceStartButton } from './SequenceStartButton';
 import { useFeedbackMeaningfulOnResult } from '@/hooks/feedback/useFeedbackMeaningfulOnResult';
 
@@ -48,11 +48,6 @@ interface StartApiResponse {
 interface VerifyApiResponse {
   success: boolean;
   data: SequenceVerifyResult;
-}
-
-interface LeaderboardApiResponse {
-  success: boolean;
-  data: SequenceLeaderboardEntry[];
 }
 
 interface SequencePageClientProps {
@@ -106,8 +101,11 @@ export default function SequencePageClient({
   const [playerClicks, setPlayerClicks] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SequenceVerifyResult | null>(null);
-  const [leaderboard, setLeaderboard] = useState<SequenceLeaderboardEntry[]>([]);
-  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
+  const {
+    entries: leaderboard,
+    isLoading: leaderboardLoading,
+    meta: leaderboardMeta,
+  } = useGameLeaderboard('sequence');
 
   const serverStartTimeRef = useRef<number | null>(null);
   const timeLimitMsRef = useRef<number>(0);
@@ -267,34 +265,6 @@ export default function SequencePageClient({
       clearInputTimeout();
     };
   }, [clearInputTimeout]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadLeaderboard() {
-      try {
-        const response = await fetch('/api/games/sequence/leaderboard', {
-          cache: 'no-store',
-        });
-        const raw = await response.json().catch(() => null);
-        const payload = raw as LeaderboardApiResponse | null;
-
-        if (!cancelled && payload?.data) {
-          setLeaderboard(payload.data);
-        }
-      } finally {
-        if (!cancelled) {
-          setLeaderboardLoading(false);
-        }
-      }
-    }
-
-    void loadLeaderboard();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const handleStart = useCallback(async () => {
     if (!canStart) {
@@ -556,9 +526,10 @@ export default function SequencePageClient({
           </section>
 
           <div className='lg:col-span-1'>
-            <SequenceLeaderboard
+            <GameLeaderboard
               entries={leaderboard}
               isLoading={leaderboardLoading}
+              meta={leaderboardMeta}
             />
           </div>
         </motion.div>

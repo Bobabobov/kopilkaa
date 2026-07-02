@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { ALL_GAME_WIN_COMMENT_MARKERS } from '@/lib/games/leaderboard';
 
 export interface GameLiveWinEntry {
   id: string;
@@ -11,11 +12,19 @@ export interface GameLiveWinEntry {
 const GAME_WIN_COMMENT_MARKERS: Array<{ marker: string; gameName: string }> = [
   { marker: 'математическом спринте', gameName: 'Математический спринт' },
   { marker: 'генератора бонусов', gameName: 'Генератор бонусов' },
+  { marker: 'Начисление за запуск генератора', gameName: 'Генератор бонусов' },
   { marker: 'Секретную последовательность', gameName: 'Секретная последовательность' },
   { marker: 'Цветовом конфликте', gameName: 'Цветовой конфликт' },
   { marker: 'Лишнем числе', gameName: 'Лишнее число' },
   { marker: 'Быстром балансе', gameName: 'Быстрый баланс' },
 ];
+
+const LIVE_HISTORY_MARKERS = Array.from(
+  new Set([
+    ...ALL_GAME_WIN_COMMENT_MARKERS,
+    ...GAME_WIN_COMMENT_MARKERS.map((item) => item.marker),
+  ]),
+);
 
 function mapGrantCommentToGameName(comment: string | null): string | null {
   if (!comment) {
@@ -39,8 +48,8 @@ export async function getGameLiveWinHistory(
   const grants = await prisma.goodDeedBonusGrant.findMany({
     where: {
       amountBonuses: { gt: 0 },
-      OR: GAME_WIN_COMMENT_MARKERS.map((item) => ({
-        comment: { contains: item.marker },
+      OR: LIVE_HISTORY_MARKERS.map((marker) => ({
+        comment: { contains: marker },
       })),
     },
     orderBy: { createdAt: 'desc' },

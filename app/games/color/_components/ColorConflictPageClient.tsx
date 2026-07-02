@@ -14,8 +14,10 @@ import {
 import { getMessageFromApiJson } from '@/lib/api/parseApiError';
 import { invalidateProfileCache } from '@/hooks/profile/useProfileDashboard';
 import { NumberTicker } from '@/app/games/_components/effects/NumberTicker';
+import { GameLeaderboard } from '@/app/games/_components/GameLeaderboard';
 import { GamePurchaseAttemptButton } from '@/app/games/_components/GamePurchaseAttemptButton';
 import { useGameAttemptPurchase } from '@/hooks/games/useGameAttemptPurchase';
+import { useGameLeaderboard } from '@/hooks/games/useGameLeaderboard';
 import { LucideIcons } from '@/components/ui/LucideIcons';
 import { Brain, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -134,6 +136,11 @@ export default function ColorConflictPageClient({
   const activeConfig = COLOR_CONFLICT_DIFFICULTIES[difficulty];
   const timeLimitMs = round?.timeLimitMs ?? activeConfig.timeLimitMs;
   const dailyAttemptsLeft = Math.max(0, DAILY_ATTEMPT_LIMIT - dailyAttemptsUsed);
+  const {
+    entries: leaderboardEntries,
+    isLoading: leaderboardLoading,
+    meta: leaderboardMeta,
+  } = useGameLeaderboard('color');
 
   const {
     purchasedAttemptsAvailable,
@@ -901,6 +908,12 @@ export default function ColorConflictPageClient({
                   </p>
                 </motion.div>
               )}
+
+              <GameLeaderboard
+                entries={leaderboardEntries}
+                isLoading={leaderboardLoading}
+                meta={leaderboardMeta}
+              />
             </motion.div>
           </aside>
         </div>

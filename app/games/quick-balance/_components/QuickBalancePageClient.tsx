@@ -20,9 +20,11 @@ import {
 import { getMessageFromApiJson } from '@/lib/api/parseApiError';
 import { invalidateProfileCache } from '@/hooks/profile/useProfileDashboard';
 import { NumberTicker } from '@/app/games/_components/effects/NumberTicker';
+import { GameLeaderboard } from '@/app/games/_components/GameLeaderboard';
 import { GamePurchaseAttemptButton } from '@/app/games/_components/GamePurchaseAttemptButton';
 import { LucideIcons } from '@/components/ui/LucideIcons';
 import { useGameAttemptPurchase } from '@/hooks/games/useGameAttemptPurchase';
+import { useGameLeaderboard } from '@/hooks/games/useGameLeaderboard';
 import { cn } from '@/lib/utils';
 import '@/app/games/_components/effects/gamesLobby.css';
 import { QuickBalancePlayingStage } from './QuickBalancePlayingStage';
@@ -98,6 +100,11 @@ export default function QuickBalancePageClient({
   const choicesRef = useRef<QuickBalanceComparison[]>([]);
 
   const dailyAttemptsLeft = Math.max(0, DAILY_ATTEMPT_LIMIT - dailyAttemptsUsed);
+  const {
+    entries: leaderboardEntries,
+    isLoading: leaderboardLoading,
+    meta: leaderboardMeta,
+  } = useGameLeaderboard('quick-balance');
   const isBusy = phase === 'verifying' || isStarting;
 
   const {
@@ -528,6 +535,12 @@ export default function QuickBalancePageClient({
                   {dailyAttemptsLeft} / {DAILY_ATTEMPT_LIMIT}
                 </p>
               </div>
+
+              <GameLeaderboard
+                entries={leaderboardEntries}
+                isLoading={leaderboardLoading}
+                meta={leaderboardMeta}
+              />
             </div>
           </aside>
         </div>

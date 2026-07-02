@@ -1,9 +1,9 @@
 import { logRouteCatchError } from '@/lib/api/parseApiError';
-import { getSequenceLeaderboard } from '@/lib/games/sequenceGame';
+import { getGameLeaderboard } from '@/lib/games/leaderboard';
 
 export async function GET() {
   try {
-    const leaderboard = await getSequenceLeaderboard();
+    const leaderboard = await getGameLeaderboard('sequence');
 
     return Response.json({
       success: true,

@@ -7,6 +7,7 @@ import { GamesDevelopmentDisclaimer } from './GamesDevelopmentDisclaimer';
 import { GamesGuestGate } from './GamesGuestGate';
 import { GamesHero } from './GamesHero';
 import { GamesHowItWorks } from './GamesHowItWorks';
+import { GamesGlobalLeaderboards } from './GamesGlobalLeaderboards';
 import { GamesLiveWinTicker } from './GamesLiveWinTicker';
 import { GamesLobbyShell } from './GamesLobbyShell';
 
@@ -36,6 +37,7 @@ export default function GamesPageClient({
         </div>
 
         <GamesLiveWinTicker />
+        <GamesGlobalLeaderboards />
         <GamesCatalog availableBonuses={availableBonuses} />
         <GamesHowItWorks />
       </div>

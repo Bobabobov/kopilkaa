@@ -5,15 +5,16 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Crown, Medal, Trophy } from 'lucide-react';
 import { resolveAvatarUrl } from '@/lib/avatar';
-import type { SequenceLeaderboardEntry } from '@/lib/games/sequenceGame';
+import type { GameLeaderboardEntry, GameLeaderboardMeta } from '@/lib/games/leaderboard';
 import { cn } from '@/lib/utils';
 
 const DEFAULT_AVATAR = '/default-avatar.png';
 const LeaderboardRow = motion(Link);
 
-interface SequenceLeaderboardProps {
-  entries: SequenceLeaderboardEntry[];
+interface GameLeaderboardProps {
+  entries: GameLeaderboardEntry[];
   isLoading: boolean;
+  meta: GameLeaderboardMeta;
 }
 
 function RankMarker({ rank }: { rank: number }) {
@@ -57,18 +58,27 @@ function RankMarker({ rank }: { rank: number }) {
   );
 }
 
-export function SequenceLeaderboard({
+function formatScore(score: number, suffix: string): string {
+  if (!suffix) {
+    return String(score);
+  }
+
+  return `${score} ${suffix}`;
+}
+
+export function GameLeaderboard({
   entries,
   isLoading,
-}: SequenceLeaderboardProps) {
+  meta,
+}: GameLeaderboardProps) {
   return (
-    <aside className='flex min-h-[400px] flex-col space-y-4 rounded-2xl border border-emerald-500/10 bg-zinc-900/40 p-6 backdrop-blur-md'>
+    <aside className='flex min-h-[320px] flex-col space-y-4 rounded-2xl border border-emerald-500/10 bg-zinc-900/40 p-6 backdrop-blur-md'>
       <header className='space-y-2'>
         <span className='inline-block rounded-md border border-orange-500/25 bg-orange-500/10 px-3 py-1 font-mono text-sm uppercase tracking-wider text-orange-400'>
           Мегамозги сайта
         </span>
         <p className='font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-600'>
-          Топ-10 рекордов
+          {meta.subtitle}
         </p>
       </header>
 
@@ -84,15 +94,16 @@ export function SequenceLeaderboard({
       ) : entries.length === 0 ? (
         <div className='flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800 px-4 py-8 text-center'>
           <p className='font-mono text-sm text-zinc-500'>
-            Пока никто не установил рекорд
+            Пока никто не попал в рейтинг
           </p>
-          <p className='mt-1 text-xs text-zinc-600'>Станьте первым мегамозгом</p>
+          <p className='mt-1 text-xs text-zinc-600'>{meta.emptyHint}</p>
         </div>
       ) : (
         <ul className='flex flex-1 flex-col space-y-2.5 overflow-y-auto pr-1'>
           {entries.map((entry, index) => {
             const rank = index + 1;
             const displayName = entry.username ?? 'Игрок';
+            const scoreLabel = formatScore(entry.score, meta.scoreSuffix);
 
             return (
               <li key={entry.id}>
@@ -108,7 +119,7 @@ export function SequenceLeaderboard({
                     'transition-colors hover:border-emerald-500/25 hover:bg-zinc-900/60',
                     rank <= 3 && 'border-emerald-500/15 bg-emerald-950/20',
                   )}
-                  aria-label={`Профиль ${displayName}, рекорд ${entry.maxSequenceRecord}`}
+                  aria-label={`Профиль ${displayName}, результат ${scoreLabel}`}
                 >
                   <RankMarker rank={rank} />
                   <div className='relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-zinc-700'>
@@ -128,7 +139,7 @@ export function SequenceLeaderboard({
                     {displayName}
                   </span>
                   <span className='font-mono text-sm font-bold text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.35)]'>
-                    {entry.maxSequenceRecord}
+                    {scoreLabel}
                   </span>
                 </LeaderboardRow>
               </li>

@@ -19,6 +19,10 @@ import {
   type QuickBalanceRoundInternal,
   type QuickBalanceRoundView,
 } from '@/lib/games/quickBalanceExpressions';
+import {
+  saveRuntimeSession,
+  takeRuntimeSession,
+} from '@/lib/games/runtimeSessionStore';
 
 export const ROUNDS_IN_SERIES = 3;
 export const TIME_LIMIT_MS = 1800;
@@ -38,6 +42,7 @@ interface QuickBalanceSession {
   startTime: number;
   expiresAt: number;
 }
+const QUICK_BALANCE_SESSION_KEY = 'quick-balance';
 
 export interface QuickBalanceStartPayload {
   rounds: QuickBalanceRoundView[];
@@ -83,42 +88,6 @@ export class QuickBalanceDailyLimitError extends Error {
 
 const SESSION_TTL_MS =
   ROUNDS_IN_SERIES * TIME_LIMIT_MS + 30_000;
-
-const globalForQuickBalance = globalThis as unknown as {
-  quickBalanceSessions?: Map<string, QuickBalanceSession>;
-};
-
-function getSessionStore(): Map<string, QuickBalanceSession> {
-  if (!globalForQuickBalance.quickBalanceSessions) {
-    globalForQuickBalance.quickBalanceSessions = new Map();
-  }
-  return globalForQuickBalance.quickBalanceSessions;
-}
-
-function purgeExpiredSessions(store: Map<string, QuickBalanceSession>): void {
-  const now = Date.now();
-  for (const [userId, session] of store.entries()) {
-    if (session.expiresAt <= now) {
-      store.delete(userId);
-    }
-  }
-}
-
-function saveSession(session: QuickBalanceSession): void {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  store.set(session.userId, session);
-}
-
-function takeSession(userId: string): QuickBalanceSession | null {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  const session = store.get(userId) ?? null;
-  if (session) {
-    store.delete(userId);
-  }
-  return session;
-}
 
 async function lockUserRowIfSupported(
   tx: Prisma.TransactionClient,
@@ -261,11 +230,16 @@ export async function startQuickBalanceGame(
     };
   });
 
-  saveSession({
+  await saveRuntimeSession<QuickBalanceSession>({
     userId,
-    rounds,
-    startTime,
-    expiresAt: startTime + SESSION_TTL_MS,
+    gameKey: QUICK_BALANCE_SESSION_KEY,
+    payload: {
+      userId,
+      rounds,
+      startTime,
+      expiresAt: startTime + SESSION_TTL_MS,
+    },
+    expiresAtMs: startTime + SESSION_TTL_MS,
   });
 
   return {
@@ -319,7 +293,10 @@ export async function verifyQuickBalanceChoices(
   choices: QuickBalanceComparison[],
   timedOut = false,
 ): Promise<QuickBalanceVerifyResult> {
-  const session = takeSession(userId);
+  const session = await takeRuntimeSession<QuickBalanceSession>(
+    userId,
+    QUICK_BALANCE_SESSION_KEY,
+  );
 
   if (!session) {
     return buildLossResult('no_active_session', 0, null);

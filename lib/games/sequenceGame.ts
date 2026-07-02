@@ -14,6 +14,11 @@ import {
 import { GAME_PING_BUFFER_MS, isGameReactionTimedOut } from '@/lib/games/pingBuffer';
 import { evaluateDailyQuests } from '@/lib/games/quests';
 import { toUtcDayKey } from '@/lib/dailyBonus/dayKey';
+import {
+  deleteRuntimeSession,
+  peekRuntimeSession,
+  saveRuntimeSession,
+} from '@/lib/games/runtimeSessionStore';
 
 export const GAME_COST = 15;
 export const DAILY_ATTEMPT_LIMIT = 10;
@@ -37,6 +42,7 @@ interface SequenceGameSession {
   startTime: number;
   expiresAt: number;
 }
+const SEQUENCE_SESSION_KEY = 'sequence-game';
 
 export interface SequenceStartPayload {
   sequence: number[];
@@ -94,47 +100,6 @@ export class SequenceDailyLimitError extends Error {
 }
 
 export class SequencePurchaseInsufficientBalanceError extends GameAttemptPurchaseInsufficientBalanceError {}
-
-const globalForSequenceGame = globalThis as unknown as {
-  sequenceGameSessions?: Map<string, SequenceGameSession>;
-};
-
-function getSessionStore(): Map<string, SequenceGameSession> {
-  if (!globalForSequenceGame.sequenceGameSessions) {
-    globalForSequenceGame.sequenceGameSessions = new Map();
-  }
-  return globalForSequenceGame.sequenceGameSessions;
-}
-
-function purgeExpiredSessions(store: Map<string, SequenceGameSession>): void {
-  const now = Date.now();
-  for (const [userId, session] of store.entries()) {
-    if (session.expiresAt <= now) {
-      store.delete(userId);
-    }
-  }
-}
-
-function saveSession(session: SequenceGameSession): void {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  store.set(session.userId, session);
-}
-
-function deleteSession(userId: string): void {
-  getSessionStore().delete(userId);
-}
-
-function peekSession(userId: string): SequenceGameSession | null {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  const session = store.get(userId) ?? null;
-  if (!session || session.expiresAt <= Date.now()) {
-    store.delete(userId);
-    return null;
-  }
-  return session;
-}
 
 async function lockUserRowIfSupported(
   tx: Prisma.TransactionClient,
@@ -362,11 +327,16 @@ export async function startSequenceGame(
     };
   });
 
-  saveSession({
+  await saveRuntimeSession<SequenceGameSession>({
     userId,
-    sequence,
-    startTime,
-    expiresAt: startTime + SESSION_TTL_MS,
+    gameKey: SEQUENCE_SESSION_KEY,
+    payload: {
+      userId,
+      sequence,
+      startTime,
+      expiresAt: startTime + SESSION_TTL_MS,
+    },
+    expiresAtMs: startTime + SESSION_TTL_MS,
   });
 
   return {
@@ -395,7 +365,10 @@ export async function verifySequenceClicks(
   userId: string,
   clicks: number[],
 ): Promise<SequenceVerifyResult> {
-  const session = peekSession(userId);
+  const session = await peekRuntimeSession<SequenceGameSession>(
+    userId,
+    SEQUENCE_SESSION_KEY,
+  );
 
   if (!session) {
     return {
@@ -421,7 +394,7 @@ export async function verifySequenceClicks(
     session.sequence.length - INITIAL_SEQUENCE_LENGTH + 1;
 
   if (isGameReactionTimedOut(reactionMs, timeLimitMs - GAME_PING_BUFFER_MS)) {
-    deleteSession(userId);
+    await deleteRuntimeSession(userId, SEQUENCE_SESSION_KEY);
 
     const lastCompletedLength = Math.max(0, session.sequence.length - 1);
     const finalized = await finalizeGameOver(
@@ -446,7 +419,7 @@ export async function verifySequenceClicks(
   }
 
   if (clicks.length !== session.sequence.length) {
-    deleteSession(userId);
+    await deleteRuntimeSession(userId, SEQUENCE_SESSION_KEY);
 
     const lastCompletedLength = Math.max(0, session.sequence.length - 1);
     const finalized = await finalizeGameOver(
@@ -471,7 +444,7 @@ export async function verifySequenceClicks(
   }
 
   if (!sequencesMatch(session.sequence, clicks)) {
-    deleteSession(userId);
+    await deleteRuntimeSession(userId, SEQUENCE_SESSION_KEY);
 
     const lastCompletedLength = Math.max(0, session.sequence.length - 1);
     const finalized = await finalizeGameOver(
@@ -512,11 +485,16 @@ export async function verifySequenceClicks(
   const nextTimeLimitMs = getRoundTimeLimitMs(nextSequence.length);
   const nextRound = nextSequence.length - INITIAL_SEQUENCE_LENGTH + 1;
 
-  saveSession({
+  await saveRuntimeSession<SequenceGameSession>({
     userId,
-    sequence: nextSequence,
-    startTime: nextStartTime,
-    expiresAt: nextStartTime + SESSION_TTL_MS,
+    gameKey: SEQUENCE_SESSION_KEY,
+    payload: {
+      userId,
+      sequence: nextSequence,
+      startTime: nextStartTime,
+      expiresAt: nextStartTime + SESSION_TTL_MS,
+    },
+    expiresAtMs: nextStartTime + SESSION_TTL_MS,
   });
 
   return {
@@ -587,6 +565,10 @@ export async function getSequencePlayerStats(userId: string): Promise<{
   };
 }
 
-export function hasActiveSequenceSession(userId: string): boolean {
-  return peekSession(userId) !== null;
+export async function hasActiveSequenceSession(userId: string): Promise<boolean> {
+  const session = await peekRuntimeSession<SequenceGameSession>(
+    userId,
+    SEQUENCE_SESSION_KEY,
+  );
+  return session !== null;
 }

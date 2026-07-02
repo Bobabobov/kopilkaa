@@ -12,6 +12,11 @@ import {
   resolveGameAttemptSlot,
 } from '@/lib/games/gameAttemptPurchases';
 import { isGameReactionTimedOut } from '@/lib/games/pingBuffer';
+import {
+  peekRuntimeSession,
+  saveRuntimeSession,
+  takeRuntimeSession,
+} from '@/lib/games/runtimeSessionStore';
 
 export const GRID_SIZE = 4;
 export const GRID_CELL_COUNT = GRID_SIZE * GRID_SIZE;
@@ -39,6 +44,7 @@ interface SchulteSession {
   startTime: number;
   expiresAt: number;
 }
+const ODD_NUMBER_SESSION_KEY = 'odd-number-schulte';
 
 export interface OddNumberStartPayload {
   cells: OddNumberCell[];
@@ -83,53 +89,6 @@ export class OddNumberDailyLimitError extends Error {
 }
 
 const SESSION_TTL_MS = TIME_LIMIT_MS + 60_000;
-
-const globalForOddNumber = globalThis as unknown as {
-  oddNumberSchulteSessions?: Map<string, SchulteSession>;
-};
-
-function getSessionStore(): Map<string, SchulteSession> {
-  if (!globalForOddNumber.oddNumberSchulteSessions) {
-    globalForOddNumber.oddNumberSchulteSessions = new Map();
-  }
-  return globalForOddNumber.oddNumberSchulteSessions;
-}
-
-function purgeExpiredSessions(store: Map<string, SchulteSession>): void {
-  const now = Date.now();
-  for (const [userId, session] of store.entries()) {
-    if (session.expiresAt <= now) {
-      store.delete(userId);
-    }
-  }
-}
-
-function saveSession(session: SchulteSession): void {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  store.set(session.userId, session);
-}
-
-function takeSession(userId: string): SchulteSession | null {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  const session = store.get(userId) ?? null;
-  if (session) {
-    store.delete(userId);
-  }
-  return session;
-}
-
-function peekSession(userId: string): SchulteSession | null {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  const session = store.get(userId) ?? null;
-  if (!session || session.expiresAt <= Date.now()) {
-    store.delete(userId);
-    return null;
-  }
-  return session;
-}
 
 async function lockUserRowIfSupported(
   tx: Prisma.TransactionClient,
@@ -332,11 +291,16 @@ export async function startOddNumberGame(
     };
   });
 
-  saveSession({
+  await saveRuntimeSession<SchulteSession>({
     userId,
-    cells,
-    startTime,
-    expiresAt: startTime + SESSION_TTL_MS,
+    gameKey: ODD_NUMBER_SESSION_KEY,
+    payload: {
+      userId,
+      cells,
+      startTime,
+      expiresAt: startTime + SESSION_TTL_MS,
+    },
+    expiresAtMs: startTime + SESSION_TTL_MS,
   });
 
   return {
@@ -377,7 +341,10 @@ export async function verifySchulteClicks(
   clicks: number[],
   timedOut = false,
 ): Promise<OddNumberAnswerResult> {
-  const session = takeSession(userId);
+  const session = await takeRuntimeSession<SchulteSession>(
+    userId,
+    ODD_NUMBER_SESSION_KEY,
+  );
 
   if (!session) {
     return buildGameOverResult('no_active_session', false, null, 0, null, 0);
@@ -443,6 +410,10 @@ export async function verifySchulteClicks(
   );
 }
 
-export function hasActiveOddNumberSession(userId: string): boolean {
-  return peekSession(userId) !== null;
+export async function hasActiveOddNumberSession(userId: string): Promise<boolean> {
+  const session = await peekRuntimeSession<SchulteSession>(
+    userId,
+    ODD_NUMBER_SESSION_KEY,
+  );
+  return session !== null;
 }

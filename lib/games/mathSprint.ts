@@ -14,6 +14,11 @@ import {
 } from '@/lib/games/gameAttemptPurchases';
 import { evaluateDailyQuests } from '@/lib/games/quests';
 import { isGameReactionTimedOut } from '@/lib/games/pingBuffer';
+import {
+  peekRuntimeSession,
+  saveRuntimeSession,
+  takeRuntimeSession,
+} from '@/lib/games/runtimeSessionStore';
 
 export const TIME_LIMIT_MS = 2000;
 export const DAILY_ATTEMPT_LIMIT = 10;
@@ -71,6 +76,7 @@ interface MathSprintSession {
   startTime: number;
   expiresAt: number;
 }
+const MATH_SPRINT_SESSION_KEY = 'math-sprint';
 
 export interface MathSprintQuestionPayload {
   difficulty: MathSprintDifficulty;
@@ -193,53 +199,6 @@ export async function purchaseMathSprintAttempt(
     `Покупка доп. попытки в мат. спринте (${label})`,
     attemptCost,
   );
-}
-
-const globalForMathSprint = globalThis as unknown as {
-  mathSprintSessions?: Map<string, MathSprintSession>;
-};
-
-function getSessionStore(): Map<string, MathSprintSession> {
-  if (!globalForMathSprint.mathSprintSessions) {
-    globalForMathSprint.mathSprintSessions = new Map();
-  }
-  return globalForMathSprint.mathSprintSessions;
-}
-
-function purgeExpiredSessions(store: Map<string, MathSprintSession>): void {
-  const now = Date.now();
-  for (const [userId, session] of store.entries()) {
-    if (session.expiresAt <= now) {
-      store.delete(userId);
-    }
-  }
-}
-
-function saveSession(session: MathSprintSession): void {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  store.set(session.userId, session);
-}
-
-function takeSession(userId: string): MathSprintSession | null {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  const session = store.get(userId) ?? null;
-  if (session) {
-    store.delete(userId);
-  }
-  return session;
-}
-
-function peekSession(userId: string): MathSprintSession | null {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  const session = store.get(userId) ?? null;
-  if (!session || session.expiresAt <= Date.now()) {
-    store.delete(userId);
-    return null;
-  }
-  return session;
 }
 
 async function lockUserRowIfSupported(
@@ -507,13 +466,18 @@ export async function generateMathQuestion(
 
   const startTime = Date.now();
 
-  saveSession({
+  await saveRuntimeSession<MathSprintSession>({
     userId,
-    difficulty,
-    correctAnswer,
-    reward: config.reward,
-    startTime,
-    expiresAt: startTime + SESSION_TTL_MS,
+    gameKey: MATH_SPRINT_SESSION_KEY,
+    payload: {
+      userId,
+      difficulty,
+      correctAnswer,
+      reward: config.reward,
+      startTime,
+      expiresAt: startTime + SESSION_TTL_MS,
+    },
+    expiresAtMs: startTime + SESSION_TTL_MS,
   });
 
   return {
@@ -533,7 +497,10 @@ export async function submitMathSprintAnswer(
   userId: string,
   selectedAnswer: number,
 ): Promise<MathSprintAnswerResult> {
-  const session = takeSession(userId);
+  const session = await takeRuntimeSession<MathSprintSession>(
+    userId,
+    MATH_SPRINT_SESSION_KEY,
+  );
 
   if (!session) {
     return {
@@ -599,6 +566,10 @@ export async function submitMathSprintAnswer(
   };
 }
 
-export function hasActiveMathSprintSession(userId: string): boolean {
-  return peekSession(userId) !== null;
+export async function hasActiveMathSprintSession(userId: string): Promise<boolean> {
+  const session = await peekRuntimeSession<MathSprintSession>(
+    userId,
+    MATH_SPRINT_SESSION_KEY,
+  );
+  return session !== null;
 }

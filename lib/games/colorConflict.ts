@@ -20,6 +20,11 @@ import {
   resolveGameAttemptSlot,
 } from '@/lib/games/gameAttemptPurchases';
 import { isGameReactionTimedOut } from '@/lib/games/pingBuffer';
+import {
+  deleteRuntimeSession,
+  peekRuntimeSession,
+  saveRuntimeSession,
+} from '@/lib/games/runtimeSessionStore';
 
 export type ColorConflictDifficulty = 'easy' | 'medium' | 'hard';
 
@@ -95,6 +100,7 @@ interface ColorConflictSession {
   startTime: number;
   expiresAt: number;
 }
+const COLOR_CONFLICT_SESSION_KEY = 'color-conflict';
 
 export interface ColorConflictRoundPayload {
   wordText: string;
@@ -222,47 +228,6 @@ export async function getColorConflictPlayerStats(userId: string): Promise<{
       dailyAttemptPurchasesUsed,
     ),
   };
-}
-
-const globalForColorConflict = globalThis as unknown as {
-  colorConflictSessions?: Map<string, ColorConflictSession>;
-};
-
-function getSessionStore(): Map<string, ColorConflictSession> {
-  if (!globalForColorConflict.colorConflictSessions) {
-    globalForColorConflict.colorConflictSessions = new Map();
-  }
-  return globalForColorConflict.colorConflictSessions;
-}
-
-function purgeExpiredSessions(store: Map<string, ColorConflictSession>): void {
-  const now = Date.now();
-  for (const [userId, session] of store.entries()) {
-    if (session.expiresAt <= now) {
-      store.delete(userId);
-    }
-  }
-}
-
-function saveSession(session: ColorConflictSession): void {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  store.set(session.userId, session);
-}
-
-function deleteSession(userId: string): void {
-  getSessionStore().delete(userId);
-}
-
-function peekSession(userId: string): ColorConflictSession | null {
-  const store = getSessionStore();
-  purgeExpiredSessions(store);
-  const session = store.get(userId) ?? null;
-  if (!session || session.expiresAt <= Date.now()) {
-    store.delete(userId);
-    return null;
-  }
-  return session;
 }
 
 async function lockUserRowIfSupported(
@@ -447,7 +412,12 @@ export async function startColorConflictGame(
     expiresAt: startTime + SESSION_TTL_MS,
   };
 
-  saveSession(session);
+  await saveRuntimeSession<ColorConflictSession>({
+    userId,
+    gameKey: COLOR_CONFLICT_SESSION_KEY,
+    payload: session,
+    expiresAtMs: session.expiresAt,
+  });
 
   return {
     difficulty,
@@ -464,7 +434,10 @@ export async function submitColorConflictAnswer(
   userId: string,
   selectedAnswer: string | null,
 ): Promise<ColorConflictAnswerResult> {
-  const session = peekSession(userId);
+  const session = await peekRuntimeSession<ColorConflictSession>(
+    userId,
+    COLOR_CONFLICT_SESSION_KEY,
+  );
 
   if (!session) {
     return buildGameOverResult(
@@ -483,7 +456,7 @@ export async function submitColorConflictAnswer(
   const currentStreakBefore = session.streakIndex;
 
   if (isGameReactionTimedOut(reactionMs, session.timeLimitMs)) {
-    deleteSession(userId);
+    await deleteRuntimeSession(userId, COLOR_CONFLICT_SESSION_KEY);
     return buildGameOverResult(
       session,
       'timeout',
@@ -496,7 +469,7 @@ export async function submitColorConflictAnswer(
   }
 
   if (!selectedAnswer || selectedAnswer !== session.correctAnswer) {
-    deleteSession(userId);
+    await deleteRuntimeSession(userId, COLOR_CONFLICT_SESSION_KEY);
     return buildGameOverResult(
       session,
       'wrong_answer',
@@ -511,7 +484,7 @@ export async function submitColorConflictAnswer(
   const nextStreakIndex = session.streakIndex + 1;
 
   if (nextStreakIndex >= session.seriesTarget) {
-    deleteSession(userId);
+    await deleteRuntimeSession(userId, COLOR_CONFLICT_SESSION_KEY);
 
     const config = COLOR_CONFLICT_DIFFICULTIES[session.difficulty];
     const reward = session.reward;
@@ -545,12 +518,17 @@ export async function submitColorConflictAnswer(
   const nextRound = generateRound();
   const nextStartTime = Date.now();
 
-  saveSession({
-    ...session,
-    streakIndex: nextStreakIndex,
-    correctAnswer: nextRound.correctAnswer,
-    startTime: nextStartTime,
-    expiresAt: nextStartTime + SESSION_TTL_MS,
+  await saveRuntimeSession<ColorConflictSession>({
+    userId,
+    gameKey: COLOR_CONFLICT_SESSION_KEY,
+    payload: {
+      ...session,
+      streakIndex: nextStreakIndex,
+      correctAnswer: nextRound.correctAnswer,
+      startTime: nextStartTime,
+      expiresAt: nextStartTime + SESSION_TTL_MS,
+    },
+    expiresAtMs: nextStartTime + SESSION_TTL_MS,
   });
 
   return {
@@ -571,8 +549,14 @@ export async function submitColorConflictAnswer(
   };
 }
 
-export function hasActiveColorConflictSession(userId: string): boolean {
-  return peekSession(userId) !== null;
+export async function hasActiveColorConflictSession(
+  userId: string,
+): Promise<boolean> {
+  const session = await peekRuntimeSession<ColorConflictSession>(
+    userId,
+    COLOR_CONFLICT_SESSION_KEY,
+  );
+  return session !== null;
 }
 
 export interface ColorConflictReadyPayload {
@@ -584,17 +568,25 @@ export interface ColorConflictReadyPayload {
 export function acknowledgeColorConflictRoundReady(
   userId: string,
 ): ColorConflictReadyPayload | null {
-  const session = peekSession(userId);
+  const session = await peekRuntimeSession<ColorConflictSession>(
+    userId,
+    COLOR_CONFLICT_SESSION_KEY,
+  );
   if (!session) {
     return null;
   }
 
   const startTime = Date.now();
 
-  saveSession({
-    ...session,
-    startTime,
-    expiresAt: startTime + SESSION_TTL_MS,
+  await saveRuntimeSession<ColorConflictSession>({
+    userId,
+    gameKey: COLOR_CONFLICT_SESSION_KEY,
+    payload: {
+      ...session,
+      startTime,
+      expiresAt: startTime + SESSION_TTL_MS,
+    },
+    expiresAtMs: startTime + SESSION_TTL_MS,
   });
 
   return {
